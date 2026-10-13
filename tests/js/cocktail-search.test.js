@@ -1,22 +1,10 @@
-// =============================================================================
-// Tests for assets/js/cocktail-search.js — the cocktail index's pool building,
-// candidate ranking, declared-family umbrellas and the two matching rules.
-// No DOM required. GitHub issues #579 (the extraction) and #549 (what it fixes).
+// Tests for assets/js/cocktail-search.js: the cocktail index's pool building,
+// candidate ranking, declared-family umbrellas and the two matching rules
+// (#579, #549). A pure module, so no DOM is needed.
 //
 // Run from the repo root, with the local Node runtime:
 //
 //   .node-runtime/node/bin/node --test
-//
-// See tests/js/ingredient-search.test.js for why not the system node.
-//
-// -----------------------------------------------------------------------------
-// WHY THIS FILE EXISTS AT ALL, since cocktail-index.js ran untested for weeks:
-// every behaviour below was hand-rolled inside 428 lines of DOM wiring, where
-// the only way to ask it a question was to open a browser and type. back-link.js
-// is the argument (MANUAL §3) and it applies exactly: "does a chip named `gin`
-// exclude a drink whose only gin-shaped ingredient is ginger syrup?" is a
-// question a pure function can be asked and a page cannot.
-// =============================================================================
 'use strict';
 
 const test = require('node:test');
@@ -30,8 +18,7 @@ const VOCAB = {
   search: {
     min_query_chars: 2,
     family_button_min_chars: 3,
-    // The real list, from _data/cocktails/ingredients.yml. `and` is absent on
-    // purpose: `Wray and Nephew` is one bottle.
+    // `and` is absent on purpose: `Wray and Nephew` is one bottle.
     prose_words: ['a', 'an', 'or', 'if', 'you', 'your', 'need', 'needs', 'best',
       'better', 'prefer', 'other', 'instead', 'sub', 'fine', 'use', 'using',
       'when', 'with', 'for', 'unless', 'though', 'is'],
@@ -57,11 +44,9 @@ const VOCAB = {
   // name Helen chose from text someone transcribed, the same shape
   // test_cocktails.py's _declared_generics reads.
   syrups: ['ginger and lemongrass cordial', 'cane sugar syrup 1:1', 'cane sugar syrup 2:1'],
-  // `Jamaican, moderately aged` is #561's RETIRED shape, kept here as the one
-  // declared term that reads as prose by the comma rule. Nothing in the live
-  // vocabulary does -- measured 2026-08-31, 0 of 188 -- so without a fixture
-  // saying so, viaKind's declared-before-prose ordering is a branch no test
-  // can reach, and flipping it would stay green.
+  // `Jamaican, moderately aged` is the one declared term here that reads as
+  // prose by the comma rule. No live term does, so without it viaKind's
+  // declared-before-prose ordering is a branch no test reaches.
   cane_and_palm_spirits: ['coconut rum', 'moderately aged rum', 'Jamaican, moderately aged',
     'lightly aged and filtered rum'],
   liqueurs: ['falernum', 'apricot liqueur', 'cherry liqueur', 'gin liqueur'],
@@ -71,9 +56,9 @@ const VOCAB = {
     'aged Demerara rum': 'Demerara rum',
     'overproof Demerara rum': 'overproof Demerara rum',
     'moderately aged Jamaican rum': 'Jamaican rum',
-    // Two generics under one card name is #501's declared collapse, and it is
-    // what puts the comma'd spelling above out of sight behind a card name --
-    // which is the only way it reaches viaKind as a HIDDEN declared term.
+    // Two generics under one card name (#501) puts the comma'd spelling above
+    // behind a card name, which is how it reaches viaKind as a hidden
+    // declared term.
     'Jamaican, moderately aged': 'Jamaican rum',
     'moderately aged rum': 'aged rum',
     'cane sugar syrup 1:1': 'sugar syrup',
@@ -92,17 +77,16 @@ const BOTTLES = {
       aliases: ['Wray and Nephew', 'Wray & Nephew Overproof']
     },
     'El Dorado 3': { generic: 'lightly aged and filtered rum', aliases: ['ED3', 'El Dorado 3yo'] },
-    // Kamaniwanalaya's two, which is the collection's one worked example of a
-    // disjunctive pour whose bottles each name exactly one of the options.
+    // Kamaniwanalaya's two: an ingredient offering two generics, whose
+    // bottles each name exactly one of them.
     'Appleton Estate 8 Year Reserve': {
       generic: 'moderately aged Jamaican rum',
       aliases: ['Appleton 8']
     },
     "Chairman's Reserve": { generic: 'moderately aged rum' },
     'Rum Fire': { generic: 'overproof Jamaican rum, unaged' },
-    // The measured collision: `coconut rum` is a DECLARED GENERIC and also a
-    // declared alias of this bottle. Resolving it would put a brand back into
-    // the picker, reversing #501.
+    // `coconut rum` is a declared generic and also a declared alias of this
+    // bottle. Resolving it would put a brand back into the picker (#501).
     'Malibu': { generic: 'coconut rum', aliases: ['Coconut rum'] }
   },
   unresolved_suggestions: {
@@ -117,13 +101,13 @@ const S = CS.create(VOCAB, BOTTLES);
 // `|`, the whole thing downcased at build time.
 const attr = (...entries) => entries.map((e) => e + '|').join('');
 
-// Several unrelated pours, each its own group. buildPool takes one group per
-// INGREDIENT — putting two pours in one group says a bottle in it belongs to
-// the other one's generic, which is the pairing the whole thing turns on.
+// Several unrelated ingredients, each its own group. buildPool takes one group
+// per ingredient: two in one group says a bottle in it belongs to the other
+// one's generic.
 const pours = (...terms) => terms.map((t) => attr(t));
 
-// The pool holds CHIPS now, not strings — see the note on chipForTerm in
-// cocktail-search.js. Most cases below only care what the buttons SAY.
+// The pool holds chips, { value, terms }. Most cases below only care what the
+// buttons say.
 const labels = (pool) => pool.map((c) => c.value);
 
 // --- splitting the attribute -------------------------------------------------
@@ -149,20 +133,16 @@ test('the pool is every distinct entry across every card, deduplicated', () => {
 });
 
 test('the sort is case-insensitive, so a stray capital does not jump the list', () => {
-  // The template downcases before writing the attribute, so this should not
-  // arise -- but a plain .sort() puts every capital ahead of every lowercase
-  // letter, which is the trap ingredient-search.js's buildMasterList records,
-  // and "the values happen to arrive lowercase" is a fact about the template
-  // rather than about this function.
+  // The template downcases before writing the attribute, but a plain .sort()
+  // puts every capital ahead of every lowercase letter, and the values
+  // arriving lowercase is a fact about the template, not about this function.
   const pool = S.buildPool(pours('absinthe', 'Campari', 'lime juice'));
   assert.deepStrictEqual(labels(pool), ['absinthe', 'Campari', 'lime juice']);
 });
 
-// --- folding: GitHub issue #45's problem, on this site -----------------------
-// Measured 2026-08-29 over all 114 drafts: 19 of the 240 pool terms carry an
-// accent (crème de cassis, cachaça, bénédictine, blue curaçao) and three drink
-// names do (Jägerita, Vieux Carré, Champs Elysées). Before this module none of
-// them was reachable by typing ASCII, because cocktail-index.js folded nothing.
+// --- folding (#45) -------------------------------------------------------------
+// Pool terms and drink names carry accents (crème de cassis, cachaça, Vieux
+// Carré) and have to be reachable by typing ASCII.
 
 test('an unaccented query finds an accented entry', () => {
   const pool = S.buildPool(pours('crème de cassis', 'cachaça', 'bénédictine'));
@@ -187,10 +167,9 @@ test('a hyphen reads as a space, so a naturally typed two-word query matches', (
 });
 
 // --- the three bands ---------------------------------------------------------
-// The ordering rule is HTF.ingredientSearch's, shared rather than re-derived --
-// see assets/js/ingredient-search.js's orderByBand. What each site computes for
-// itself is the two PREDICATES, because they are answered in different
-// vocabularies; the ordering is what kept drifting and is what is now shared.
+// The ordering rule is orderByBand in assets/js/ingredient-search.js, shared
+// with food. Each site computes its own two predicates, because they are
+// answered in different vocabularies.
 
 test('an entry starting with the query outranks a word match, which outranks a substring', () => {
   const pool = S.buildPool(pours('lime juice', 'apricot liqueur', 'galliano'));
@@ -221,15 +200,12 @@ test('a word match is flagged, so the picker can mark what you actually meant', 
 });
 
 // --- no cap -------------------------------------------------------------------
-// There was one, of eight, with the remainder counted as "+N more". Helen,
-// 2026-10-11: "I don't want to have the 'N more' behaviour for cocktails...
-// It's helpful to see the list when e.g. rum has so many results."
+// Every candidate is listed; there is no "+N more".
 
 test('every candidate is offered, however many there are', () => {
   const many = [];
-  // Two letters, not one: a bare "a" is a prose word, so `liqueur a` is
-  // correctly not a bottle name and the first version of this fixture built
-  // twelve strings the pool was right to refuse.
+  // Two letters, not one: a bare "a" is a prose word, so `liqueur a` is not a
+  // bottle name and the pool refuses it.
   for (let i = 0; i < 12; i++) many.push('liqueur x' + String.fromCharCode(97 + i));
   const pool = S.buildPool(pours(...many));
   const result = S.search('liq', pool);
@@ -239,14 +215,12 @@ test('every candidate is offered, however many there are', () => {
 });
 
 // --- the minimum query length ------------------------------------------------
-// #549 point 4. The number lives in _data/cocktails/ingredients.yml, not here
-// and not in the DOM wiring -- the same rule food's family_button_min_chars
-// follows, and test_the_cocktail_search_config_is_not_hardcoded enforces it.
+// #549. The number lives in _data/cocktails/ingredients.yml, not here and not
+// in the DOM wiring.
 
 test('a query shorter than the declared minimum offers nothing at all', () => {
-  // Two ingredients, so two groups. buildPool takes one group per INGREDIENT —
-  // putting both in one would say they are the same pour, and a bottle in a
-  // group is read as a bottle FOR that group's generic.
+  // Two ingredients, so two groups: a bottle in a group is read as a bottle
+  // for that group's generic.
   const pool = S.buildPool([attr('gin'), attr('gin liqueur')]);
   assert.deepStrictEqual(S.search('g', pool).results, []);
   assert.strictEqual(S.search('gi', pool).results.length, 2);
@@ -268,20 +242,11 @@ test('an entry already chosen is not offered again', () => {
   );
 });
 
-// =============================================================================
-// DECLARED FAMILIES — _data/cocktails/ingredients.yml's `family_of`
-// =============================================================================
-// The file has said since #322 what these are for: "the ingredient search's
-// `(all)` buttons ... and exclusion. 'I don't like Scotch' is a family-level
-// operation." 68 generics are mapped across 10 families and the index read none
-// of them until now, which is what #549 point 1 is actually asking for.
-//
-// FOOD'S FAMILY DERIVATION IS NOT REUSED AND MUST NOT BE. An (all) button on
-// the food site forms where entries share a head word after normalisation.
-// These styles share no word at all -- "aged Demerara rum" and "moderately aged
-// Jamaican rum" have nothing textually in common -- which is exactly why the
-// family is DECLARED here. What is shared with food is the CONSUMPTION of a
-// declared family, which is what `synonyms` in ingredient_words.yml already is.
+// === Declared families: `family_of` in _data/cocktails/ingredients.yml =========
+// The (all) buttons and exclusion are family-level operations (#322, #549).
+// Food's family derivation is not reused: an (all) button there forms where
+// entries share a head word, and `Old Tom` and `London dry gin` share none,
+// which is why the family is declared here.
 
 test('a family whose name starts the query earns an (all) button', () => {
   const pool = S.buildPool(pours('london dry gin', 'old tom'));
@@ -304,9 +269,8 @@ test('the (all) button carries the suffix filter-state.js already spells', () =>
   assert.strictEqual(CS.FAMILY_SUFFIX, ' (all)');
 });
 
-// --- a family answers to more than one name — Helen, 2026-08-29 --------------
-// "'whiskey (all)' should return all whisky and bourbon and rye, and the same
-// for 'whisky'." The family already HELD all three; the spelling found nothing.
+// --- a family answers to more than one name -----------------------------------
+// `whiskey` and `scotch` reach the whisky family, which holds bourbon and rye.
 
 test('an alias spelling reaches the family, whatever the button ends up called', () => {
   const pool = S.buildPool(pours('bourbon', 'rye'));
@@ -316,10 +280,8 @@ test('an alias spelling reaches the family, whatever the button ends up called',
 });
 
 test('an alias never mints a SECOND umbrella, which would lie about its width', () => {
-  // The whisky family holds bourbon and rye. A button labelled "scotch (all)"
-  // returning bourbon is an umbrella misdescribing itself, so one button
-  // appears and it carries the family's own name -- Helen was shown that trade
-  // and asked for the alias anyway.
+  // A button labelled "scotch (all)" returning bourbon would misdescribe
+  // itself, so one button appears and it carries the family's own label.
   const pool = S.buildPool(pours('bourbon', 'rye'));
   const buttons = S.search('scotch', pool).familyButtons;
   assert.strictEqual(buttons.length, 1);
@@ -341,15 +303,8 @@ test('an alias that names no family is still just a word', () => {
 });
 
 test('an (all) button already chosen is not offered a SECOND time', () => {
-  // Helen, 2026-08-29, with a screenshot of `whisky (all)` rendered twice --
-  // once filled because it was selected, once plain beside it: "If I click
-  // 'whiskey (all)', I see the same button again."
-  //
-  // The chosen chips are drawn first, then the search's results. Pool
-  // candidates were filtered against what was already chosen and FAMILY
-  // BUTTONS were not, so an umbrella you had picked came back round as an
-  // offer. Same class of omission as issue #390's dropped flag: the answer was
-  // computed correctly and one of the two consumers ignored it.
+  // The chosen chips are drawn first, then the search's results, so family
+  // buttons are filtered against what is already chosen, as candidates are.
   const pool = S.buildPool(pours('bourbon', 'rye'));
   assert.deepStrictEqual(S.search('whi', pool).familyButtons, ['whisk(e)y']);
   assert.deepStrictEqual(S.search('whi', pool, ['whisk(e)y (all)']).familyButtons, []);
@@ -361,14 +316,10 @@ test('choosing one family does not hide another', () => {
 });
 
 // --- the family's own display name -------------------------------------------
-// Helen, 2026-08-29: "I think that chip should be 'whisk(e)y (all)', even though
-// it's clunky, to avoid ever having to split or claim they combine."
-//
-// A DISPLAY LABEL, not a rename of the family. `whisky_characters` is keyed off
-// the family name by test_a_declared_character_vocabulary_is_enforced (it
-// strips the `_characters` suffix), so renaming the family would drag
-// `whisk(e)y_characters` along with it. Same separation `card_names` already
-// draws for generics: matching runs on the key, the button shows the name.
+// A display label, not a rename of the family:
+// test_a_declared_character_vocabulary_is_enforced keys `whisky_characters`
+// off the family name. As with `card_names`, matching runs on the key and the
+// button shows the name.
 
 test('a family with a declared label wears it on the button', () => {
   const pool = S.buildPool(pours('bourbon', 'rye'));
@@ -395,17 +346,13 @@ test('the label is reachable by typing it, parentheses and all', () => {
   assert.deepStrictEqual(S.search('whisk(e)', pool).familyButtons, ['whisk(e)y']);
 });
 
-// =============================================================================
-// ONE CHIP PER CATEGORY, WEARING THE CARD'S NAME — Helen, 2026-08-29
-// =============================================================================
-// "we have no 'aged rum' in our dictionary", said looking at `aged rum` and
-// `moderately aged rum` offered as two separate buttons. Fifteen generics in
-// the real collection had their card name in the pool as a chip of its own, and
-// eleven of those fifteen pairs selected exactly the same drinks.
+// === One chip per category, wearing the card's name ============================
+// A generic and the card name that abbreviates it (`moderately aged rum`,
+// `aged rum`) are one chip, never two buttons.
 
 test('a generic with a card name is not offered twice', () => {
-  // The rum's own group carries both spellings, exactly as data-ing does; the
-  // lime is a separate pour.
+  // The rum's own group carries both spellings, as data-ing does; the lime is
+  // a separate ingredient.
   const pool = S.buildPool([attr('moderately aged rum', 'aged rum'), attr('lime juice')]);
   assert.deepStrictEqual(labels(pool), ['aged rum', 'lime juice']);
 });
@@ -416,9 +363,8 @@ test('the surviving chip wears the CARD name, so the picker and the card agree',
 });
 
 test('the generic stays searchable -- collapsing a pair must not lose a way in', () => {
-  // Typing the generic still finds the chip; it just never appears as a second
-  // button. Food's display_names is the same idea: "matching still has to run
-  // against the real match key, not the pretty name."
+  // Typing the generic still finds the chip; it never appears as a second
+  // button.
   const pool = S.buildPool([attr('moderately aged rum')]);
   assert.deepStrictEqual(S.search('moderately', pool).results.map((r) => r.entry), ['aged rum']);
   assert.deepStrictEqual(S.search('aged', pool).results.map((r) => r.entry), ['aged rum']);
@@ -434,8 +380,8 @@ test('a chip is ranked by its BEST term, not only by the name on its face', () =
 });
 
 test('a chip that stands for two generics selects both -- the ratios collapse', () => {
-  // §9.10.1: "a ratio is a MAKING fact, not a CHOOSING fact." One `sugar syrup`
-  // chip rather than a 1:1 button and a 2:1 button.
+  // A ratio is a making fact, not a choosing fact (MANUAL §9.10.1): one
+  // `sugar syrup` chip, not a 1:1 button and a 2:1 button.
   const pool = S.buildPool([attr('cane sugar syrup 1:1'), attr('cane sugar syrup 2:1')]);
   assert.deepStrictEqual(labels(pool), ['sugar syrup']);
 
@@ -457,8 +403,8 @@ test('a card-name chip excludes exactly what it includes, and nothing wider', ()
 });
 
 test('a card name resolves to the family of the generic it abbreviates', () => {
-  // `Demerara rum` is a card name for two different rum generics (#501's
-  // deliberate, declared collapse), and both are family `rum`.
+  // `Demerara rum` is a card name for two different rum generics (#501), and
+  // both are family `rum`.
   assert.deepStrictEqual(S.familiesOf('demerara rum'), ['rum']);
   assert.deepStrictEqual(S.familiesOf('london dry gin'), ['gin']);
 });
@@ -468,23 +414,12 @@ test('an entry with no declared family has none -- lime juice is not a family', 
   assert.deepStrictEqual(S.familiesOf('havana 3'), []);
 });
 
-// =============================================================================
-// THE TWO MATCHING RULES, AND THEY ARE DELIBERATELY DIFFERENT
-// =============================================================================
-// Food's rule, and the reason for the asymmetry is the cost of being wrong in
-// each direction. Over-including shows you a drink you may not want: visible,
-// and you can see why it is there. Over-EXCLUDING hides a drink you would have
-// had: invisible, and you never learn it existed. So: fuzzy to find, fuzzy to
-// include, exact-or-declared-family to exclude.
-//
-// WHAT THIS REPLACES. cocktail-index.js matched both directions with a raw
-// substring test against the whole concatenated attribute -- exactly what
-// filter-state.js's excludesRow() forbids on the food side ("excluding peas
-// would silently lose the peanut butter cookies and the pearl barley
-// casserole"). Measured over 114 drinks, 26 of 240 pool terms over-matched:
-// `gin` hid 12 drinks whose only gin-shaped ingredient was ginger, `water` hid
-// 13 whose only water was honey water, and `apple juice` matched 15 drinks that
-// have pineapple juice.
+// === The two matching rules, deliberately different ============================
+// Over-including shows a drink you may not want: visible, and you can see why
+// it is there. Over-excluding hides a drink you would have had, and you never
+// learn it existed. So: fuzzy to find, fuzzy to include, exact or declared
+// family to exclude. A substring test against the joined attribute makes `gin`
+// hide the ginger and `apple juice` match pineapple juice.
 
 test('EXCLUDE is exact: a gin chip does not take the ginger with it', () => {
   const ginger = CS.splitEntries(attr('ginger syrup', 'lime juice'));
@@ -501,8 +436,8 @@ test('EXCLUDE is exact: honey water is not water, and pineapple juice is not app
 });
 
 test('EXCLUDE never matches across an entry boundary', () => {
-  // The old substring test ran against "lime|gin|", where "e|g" spans two
-  // entries. Nothing typed should ever be able to see that seam.
+  // A substring test against "lime|gin|" sees "e|g", which spans two entries.
+  // Nothing typed may see that seam.
   const entries = CS.splitEntries(attr('lime', 'gin'));
   assert.strictEqual(S.matchesExclude(entries, 'e|g'), false);
   assert.strictEqual(S.matchesExclude(entries, 'megi'), false);
@@ -549,22 +484,14 @@ test('both rules fold, so an accented ingredient is filterable at all', () => {
   assert.strictEqual(S.matchesExclude(entries, 'creme de cassis'), true);
 });
 
-// =============================================================================
-// A CHIP IS NEVER AN "X or Y" — Helen, 2026-08-29
-// =============================================================================
-// "I don't want any returned search chips to be an X or Y shape. Also, 'wray and
-// nephew' and 'wray & nephew' should both collapse onto the latter."
+// === A chip is never an "X or Y" ===============================================
+// _data/cocktails/bottles.yml declares both answers: an alias collapses onto
+// the bottle's one name, and an unresolved suggestion is not offered.
 //
-// Both are answered by the same change, and _data/cocktails/bottles.yml had
-// already declared both answers -- the search simply never read it. MANUAL
-// §9.10.1 names the gap outright: "suggestions go in raw rather than resolved
-// through bottles.yml's aliases, so `Havana 3` and `Havana Club 3` can both
-// appear."
-//
-// THE RULES APPLY TO SUGGESTIONS ONLY, never to declared vocabulary. A generic
+// The rules apply to suggestions only, never to declared vocabulary. A generic
 // is a name Helen chose; a suggestion is free text typed while transcribing.
-// `ginger and lemongrass cordial` is a real generic and a blanket connector ban
-// would have eaten it.
+// `ginger and lemongrass cordial` is a real generic, and a blanket connector
+// ban would eat it.
 
 test('a bottle keeps ONE identity: an alias collapses onto the canonical name', () => {
   const pool = S.buildPool([attr('wray and nephew'), attr('wray & nephew')]);
@@ -590,8 +517,7 @@ test('a suggestion the bottle file calls unresolved is not offered at all', () =
 });
 
 test('an "X or Y" suggestion is dropped even when nothing has declared it', () => {
-  // bottles.yml is a RUM file, so the bitters and the syrups are not in it and
-  // never will be. The shape is the rule, not the declaration.
+  // The shape is the rule, not the declaration: nothing has to list the string.
   const pool = S.buildPool(pours('or other aromatic bitters', 'Or 20g palm sugar'));
   assert.deepStrictEqual(labels(pool), []);
 });
@@ -609,29 +535,17 @@ test('a declared generic is never dropped, whatever it happens to contain', () =
 });
 
 test('a declared generic is never resolved into a BOTTLE, and one really collides', () => {
-  // `coconut rum` is a declared generic AND a declared alias of Malibu. The one
-  // collision of the 173 declared names against the 97 bottle names and
-  // aliases, measured -- and without the boundary it would silently put a brand
-  // back into the picker, reversing #501's "no brand appears on a card any
-  // more". A guard for exactly one case, and the case is real.
+  // `coconut rum` is a declared generic and a declared alias of Malibu.
+  // Without the boundary it would put a brand back into the picker (#501).
   const pool = S.buildPool([attr('coconut rum')]);
   assert.deepStrictEqual(labels(pool), ['coconut rum']);
   const drink = CS.splitEntries(attr('coconut rum'));
   assert.strictEqual(S.matchesInclude(drink, 'coconut rum'), true);
 });
 
-// =============================================================================
-// A BOTTLE IS NOT OFFERED WHEN ITS CATEGORY IS — Helen, 2026-08-29
-// =============================================================================
-// On `falernum` and `john d taylor's velvet falernum` sitting side by side:
-// "the first chip being 'falernum (all)' would at least stop me worrying that
-// the two sets were disjoint."
-//
-// They are not disjoint, measured rather than argued: the bottle matches 1
-// drink and the category 14, and the 1 is inside the 14. Across all 15
-// bottle/category pairs in the collection 14 are strictly nested, and the
-// exception is a data bug. So the two chips were never alternatives, and a
-// picker that lays them out as though they were asks a question with no answer.
+// === A bottle is not offered when its category is ==============================
+// A bottle's drinks are a subset of its category's, so the two chips are not
+// alternatives: the bottle is a way in to the category's chip.
 
 test('a bottle beside a category does not get its own chip', () => {
   const pool = S.buildPool([attr('falernum', "john d taylor's velvet falernum")]);
@@ -651,25 +565,18 @@ test('a bottle with no category beside it is still offered', () => {
 });
 
 test('the category a bottle folds into is the one on ITS ingredient', () => {
-  // Two pours. The bottle belongs to the first and must not attach to the
-  // second, which is the pairing a card-level attribute has already lost.
+  // Two ingredients. The bottle belongs to the first and must not attach to
+  // the second.
   const pool = S.buildPool([attr('falernum', 'velvet falernum'), attr('lime juice')]);
   assert.deepStrictEqual(labels(pool), ['falernum', 'lime juice']);
   assert.deepStrictEqual(S.search('velvet', pool).results.map((r) => r.entry), ['falernum']);
 });
 
 // --- a hidden term cannot earn a chip on a substring alone -------------------
-// Helen, 2026-08-29: "'el' returns both 'aged rum' and 'jamaican rum', which is
-// counterintuitive." It is worse than counterintuitive -- it is unexplainable.
-// Neither LABEL contains "el". The match was band 3, a mid-word substring,
-// inside the hidden generics those chips stand for: "moderat(el)y aged rum" and
-// "caram(el)-forward Jamaican rum".
-//
-// Band 3 means "in the list for some other reason", and a card can always show
-// its reason. A chip cannot show a term it does not display, so a hidden alias
-// may only earn its chip a place on a REAL match -- the query starting the
-// entry, or starting a word in it. Substring reach belongs to the visible label
-// alone.
+// A chip cannot show a term it does not display, so a hidden generic or alias
+// earns its chip a place only on a real match: the query starting the entry,
+// or starting a word in it. "el" is mid-word in "moderately aged rum" and must
+// not surface `aged rum`. Substring reach belongs to the visible label alone.
 
 test('a hidden generic does not surface its chip on a mid-word substring', () => {
   const pool = S.buildPool(pours('moderately aged rum', 'moderately aged jamaican rum'));
@@ -690,16 +597,10 @@ test('a hidden bottle alias behaves the same way', () => {
   assert.deepStrictEqual(S.search('nd', pool).results.map((r) => r.entry), []);
 });
 
-// --- four bands, and the order Helen gave -------------------------------------
-// "It's surprising to me that 've' returns 'falernum' before any vermouth. I
-// think here it should be prefix matching of first word, prefix matching of any
-// word, then prefix matching of any word in the bottle name as is this one,
-// then substring."
-//
-// Visible beats hidden at equal strength, and any real word beats a mere
-// substring. Band 3 exists only because a bottle stopped being its own chip and
-// became a way IN to its category -- a way in that was outranking the thing you
-// had actually typed.
+// --- four bands ----------------------------------------------------------------
+// The chip's own name starts with the query; a word in its own name does; a
+// word in a hidden name does; a substring of its own name. Visible beats
+// hidden at equal strength, and any real word beats a mere substring.
 
 test('a visible name outranks a hidden one, however strong the hidden match', () => {
   const pool = S.buildPool([
@@ -732,23 +633,15 @@ test('a hidden word still beats a visible substring -- a real word is a real sig
 });
 
 test('the VISIBLE label keeps its substring reach, which is the last band doing its job', () => {
-  // `galliano` for "li" is the case the three bands exist to rank, and it is
-  // fine precisely because you can see the "li" in the button.
+  // `galliano` for "li" is fine because you can see the "li" in the button.
   const pool = S.buildPool([attr('galliano')]);
   assert.deepStrictEqual(S.search('li', pool).results.map((r) => r.entry), ['galliano']);
 });
 
 // --- prose is not a bottle name ----------------------------------------------
-// Helen hit three of these one at a time -- the Havana disjunction, `Tesco
-// Finest`, `Avallen -- a round, fresh taste if you need to sub` -- and then
-// `Jack Daniels > Bulleit`. Patching them one by one is how the fourth arrives,
-// so the shape is a rule, declared in _data/cocktails/ingredients.yml.
-//
-// MEASURED AGAINST ALL 87 REAL SUGGESTIONS BEFORE IT WAS TRUSTED: it flags 17
-// and every one of them is genuinely prose, with no bottle name caught. The
-// words that fired are the whole list; `the` and `that` were dropped from a
-// first draft because a bottle can carry them ("The Botanist") and neither was
-// doing any work.
+// The shape is a rule, declared in _data/cocktails/ingredients.yml as
+// `prose_words` and `prose_marks`. `the` and `that` are not prose words: a
+// bottle can carry them ("The Botanist").
 
 test('an aside, a question mark, a comparison or a comma is not a bottle name', () => {
   const pool = S.buildPool(pours(
@@ -783,10 +676,9 @@ test('with no bottle file the pool still works, and still refuses an X or Y', ()
 });
 
 // --- the name search ---------------------------------------------------------
-// I KNOW WHAT I WANT is substring rather than word-start, and deliberately: a
-// drink name is a thing you already hold and are part-way through typing, so
-// "negr" should find the Negroni. What it was missing is folding -- three drink
-// names carry an accent and none was typeable.
+// I KNOW WHAT I WANT is substring, not word-start: a drink name is a thing you
+// already hold and are part-way through typing, so "negr" finds the Negroni.
+// It folds, so an accented name is typeable.
 
 test('a drink name matches part-way through typing', () => {
   assert.strictEqual(S.matchesName('Negroni', 'negr'), true);
@@ -831,18 +723,10 @@ test('a matched ingredient on a card is found by the same rule the filter used',
   assert.strictEqual(S.entryIsHit(CS.splitEntries(attr('ginger syrup')), []), false);
 });
 
-// --- why a chip is on screen: `via` and `viaKind` -----------------------------
-// #603. Helen typed three letters three times and got three chips that could
-// not say why they were there: "mu" -> `clear blended rum`, "sa" -> `cachaça`,
-// "wr" -> `overproof Jamaican rum`. Every one was band 3 doing exactly what it
-// was built to do -- matching a name the chip does not display.
-//
-// The module cannot decide what a picker should DO about that; what it can do
-// is stop the picker having to guess. `via` is the term that won and `viaKind`
-// says what kind of name it was, because the three hidden kinds are three
-// different arguments: a BOTTLE is the case band 3 exists for, a hidden
-// GENERIC is the case Helen finds confusing, and PROSE is one #585 has already
-// ruled should not be there at all.
+// --- why a chip is on screen: `via` and `viaKind` (#603) -----------------------
+// A band-3 match is on a name the chip does not display. `via` is the term
+// that won and `viaKind` the kind of name it was (`own`, `bottle`, `generic`),
+// so the picker does not have to guess.
 
 test('a chip matched on its own name says so, on every visible band', () => {
   const pool = S.buildPool(pours('lime juice', 'apricot liqueur'));
@@ -876,11 +760,8 @@ test('a chip found through a BOTTLE names the bottle -- the case band 3 exists f
   assert.strictEqual(hit.viaKind, 'bottle');
 });
 
-// --- an umbrella suppresses its own bare word — #51's rule, ported ------------
-// Food has applied this in both its pickers since issue #51 and this index
-// never got it. Helen, from the page: "I think gin (all) should suppress gin",
-// and in #51 itself: "if I read 'chicken (all)' next to 'chicken' I'd look at
-// both."
+// --- an umbrella suppresses its own bare word (#51) ----------------------------
+// `gin (all)` beside `gin` makes a reader check both.
 
 test('an (all) button takes the bare chip of the same name off the list', () => {
   const pool = S.buildPool(pours('gin', 'sloe gin', 'Old Tom'));
@@ -921,10 +802,9 @@ test('a bare word its umbrella suppresses is not offered beside it', () => {
 });
 
 test('a multi-word query matches a hidden name from its start', () => {
-  // Helen, 2026-08-31: "I do want to be able to type 'el d' and see el dorado."
-  // `hasWordMatch` asks whether one WORD begins with the whole query, so it is
-  // never true of a query containing a space -- typing a bottle's real name
-  // found nothing at all.
+  // `hasWordMatch` asks whether one word begins with the whole query, so it
+  // is never true of a query containing a space. A multi-word query matches a
+  // hidden name from its start instead.
   const pool = S.buildPool(pours(attr('lightly aged and filtered rum', 'el dorado 3')));
 
   ['el d', 'el dorado', 'el dorado 3'].forEach((q) => {
@@ -936,27 +816,17 @@ test('a multi-word query matches a hidden name from its start', () => {
 });
 
 test('a multi-word query still may not begin mid-word, or on a connector', () => {
-  // The two faults band 3 was narrowed for, restated against the wider rule:
-  // "orado" is inside El Dorado and starts no word of it, and `and` reaches
-  // Wray & Nephew only through its alias's connector.
+  // "orado" is inside El Dorado and starts no word of it.
   const dorado = S.buildPool(pours(attr('lightly aged and filtered rum', 'el dorado 3')));
   assert.deepStrictEqual(S.search('orado', dorado, []).results, []);
   // A whole-string prefix is a prefix, not a substring: "dorado 3" appears in
   // "el dorado 3" and does not start it.
   assert.deepStrictEqual(S.search('dorado 3', dorado, []).results, []);
 
-  /* THE CONNECTOR RULE IS NARROWER THAN §9.3.3 CLAIMS, and this is where that
-     shows. It refuses a hidden match only when the matched WORD is itself in
-     the prose list -- and `and` is deliberately absent from that list, because
-     `Wray and Nephew` is one bottle. So the case the rule is named for, `an`
-     reaching a rum through "Smith AND Cross", is refused only by `an` being a
-     prose word and not by anything about "and".
-
-     Asserted as it IS rather than as it was described: a query matching a real
-     word of a hidden name is a band-3 hit, and what stops it being confusing
-     is that the bracket now shows the spelling carrying the query (see the
-     alias test above). Two characters are also below the live minimum now, so
-     `an` cannot be typed on the real page at all. */
+  /* The connector rule refuses a hidden match only when the matched word is
+     itself in the prose list, and `and` is deliberately absent from that list
+     (`Wray and Nephew` is one bottle). So "and" is a band-3 hit, and the
+     bracket shows the spelling carrying the query. */
   const wray = S.buildPool(pours(
     attr('moderately aged jamaican rum', 'jamaican rum', 'Wray and Nephew')));
   const [connector] = S.search('and', wray, []).results;
@@ -970,11 +840,10 @@ test('a multi-word query still may not begin mid-word, or on a connector', () =>
 });
 
 test('the bracket shows the spelling that carries the query, not always the canonical', () => {
-  // #603 arriving through its own fix. `Wray and Nephew` is an alias of the
-  // bottle `Wray & Nephew`; someone typing "and" matches the alias, and
-  // canonicalising the answer prints a bracket with not one letter of what
-  // they typed in it. The canonical name is right whenever it can explain
-  // itself, and the alias as written is right when it cannot.
+  // `Wray and Nephew` is an alias of the bottle `Wray & Nephew`. Typing "and"
+  // matches the alias, and the canonical name has not one letter of the query
+  // in it, so the bracket shows the alias as written. The canonical name is
+  // shown wherever it carries the query (#603).
   const pool = S.buildPool(pours(
     attr('moderately aged jamaican rum', 'jamaican rum', 'Wray and Nephew')));
 
@@ -995,12 +864,10 @@ test('a chip found through the GENERIC its card name abbreviates says which', ()
 });
 
 test('PROSE beside a generic is not searchable at all, so it can explain nothing', () => {
-  // "Wray & Nephew, or Rum Fire" is two bottles in one string, and bottles.yml's
-  // own `unresolved_suggestions` says so. #585 already stopped it becoming a
-  // chip; nothing stopped it being searchABLE, because buildPool only filtered
-  // loose terms on an ingredient carrying NO generic. So "wray" reached a
-  // category through a string Helen has said should not exist -- and under
-  // #603's annotation that string would have been printed as the reason.
+  // "Wray & Nephew, or Rum Fire" is two bottles in one string, listed in
+  // bottles.yml's `unresolved_suggestions`. It is not a chip (#585) and must
+  // not be searchable either, or "wray" reaches a category through it and
+  // #603's bracket prints it as the reason.
   const pool = S.buildPool(pours(
     attr('moderately aged jamaican rum', 'jamaican rum', 'wray & nephew, or rum fire')));
 
@@ -1010,12 +877,9 @@ test('PROSE beside a generic is not searchable at all, so it can explain nothing
 });
 
 test('a DECLARED name that reads as prose is still searchable', () => {
-  // resolveHiddenTerm asks "is this declared?" before "is this prose?", and the
-  // order is load-bearing in the direction that loses data: a generic dropped
-  // as prose takes a real chip's own search term with it. No live term needs
-  // it today (0 of 188 declared terms read as prose, measured 2026-08-31), so
-  // the fixture pins it with the comma'd spelling #561 retired -- a retired
-  // shape being the one likeliest to come back through an alias.
+  // resolveHiddenTerm asks "is this declared?" before "is this prose?": a
+  // generic dropped as prose takes a real chip's own search term with it. No
+  // live term needs it, so the fixture pins it with a comma'd spelling.
   const pool = S.buildPool(pours(attr('jamaican, moderately aged', 'jamaican rum')));
   const [hit] = S.search('moderat', pool, []).results;
 
@@ -1024,11 +888,9 @@ test('a DECLARED name that reads as prose is still searchable', () => {
 });
 
 test('a bottle belongs to the option it names, not to every option on the pour', () => {
-  // Kamaniwanalaya's shape, and the drink that proves this is code and not
-  // data: its suggestions were rewritten into a proper list on 2026-08-30, and
-  // typing "chairman" still offered BOTH categories, though Chairman's Reserve
-  // is declared `moderately aged rum` and nothing else. A disjunctive generic
-  // means "either would do" (#441); it does not mean either bottle.
+  // Kamaniwanalaya's shape. Chairman's Reserve is declared `moderately aged
+  // rum` and nothing else, so "chairman" offers that category only. A
+  // disjunctive generic means "either would do" (#441), not either bottle.
   const pool = S.buildPool(pours(attr(
     'moderately aged jamaican rum', 'jamaican rum',
     'moderately aged rum', 'aged rum',
@@ -1054,9 +916,8 @@ test('a bottle from ANOTHER category still reaches a pour offering only one', ()
 });
 
 test('an alias keeps finding its bottle, and the bracket prints the real name', () => {
-  // ED3 contains not one letter of "El Dorado 3", so collapsing the spelling
-  // instead of adding to it would delete a way in that works today. Both are
-  // searchable; what a reader is shown is the name bottles.yml calls canonical.
+  // ED3 contains not one letter of "El Dorado 3", so both spellings stay
+  // searchable.
   const pool = S.buildPool(pours(attr('lightly aged and filtered rum', 'ed3')));
 
   const short = S.search('ed3', pool, []).results[0];
@@ -1076,8 +937,7 @@ test('the winning band decides which term is reported, not the first one seen', 
   // the one that won -- annotating it with the bottle would be explaining a
   // chip that needs no explanation.
   //
-  // NOT `gin`, which this used to use: `gin` is a family name, so the umbrella
-  // now suppresses the bare chip (#51) and there is no result to inspect.
+  // Not `gin`: a family name's bare chip is suppressed by its umbrella (#51).
   const pool = S.buildPool(pours(attr('falernum', "john d taylor's velvet falernum")));
   const [hit] = S.search('falernum', pool, []).results;
 

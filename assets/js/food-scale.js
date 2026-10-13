@@ -135,9 +135,7 @@
   }
 
   /**
-   * The opening of an ingredient's own text, at a factor -- for a row with no
-   * amount: "a handful of fresh parsley" x3 is "3 handfuls of fresh parsley".
-   *
+   * A row with no amount: "a handful of parsley" x3 is "3 handfuls of parsley".
    * @param {string} text - the item's text as the page prints it
    * @param {number} factor
    * @param {{halfStep?: string[], quarterStep?: string[]}} [options]
@@ -159,17 +157,12 @@
   }
 
   /**
-   * One written amount at a factor.
-   *
-   * @param {string} amount - as the recipe wrote it: "200 g", "1½ tbsp",
-   *        "30–50 g", "2 large", "1 tbsp (6 g)", "1 handful", "a few handfuls"
+   * @param {string} amount - as the recipe wrote it: "200 g", "30–50 g", "2 large"
    * @param {number} factor - portions wanted over portions the recipe makes
-   * @param {{halfStep?: string[], quarterStep?: string[]}} [options] -
-   *        _data/food/scaling.yml's `half_step_measures` and
-   *        `quarter_step_measures`
-   * @returns {{text: string, scaled: boolean}} the amount to show, and
-   *        whether it was scaled. An amount with no count in it comes back as
-   *        written with `scaled: false`.
+   * @param {{halfStep?: string[], quarterStep?: string[]}} [options] - the
+   *        `half_step_measures` and `quarter_step_measures` of scaling.yml
+   * @returns {{text: string, scaled: boolean}} an amount with no count in it
+   *        comes back as written with `scaled: false`
    */
   function scaleAmount(amount, factor, options) {
     var written = String(amount === undefined || amount === null ? '' : amount);
@@ -307,18 +300,14 @@
     return name;
   }
 
-  /* A MODE is what the wiring asks for; recipe-scale.js holds no arithmetic.
-
-       base        the figure the recipe is written for; factor = value / base
-       clamp(n)    a typed or stepped value, made into one the box can hold
-       step(n, d)  one press of minus (-1) or plus (+1)
-       box(n)      what the input shows
-       word(n)     what follows the input, or null to leave the markup alone
-
-     A `makes:` recipe steps in whole recipes (#1286), and the box shows what
-     that many make; a typed figure goes to the nearest whole multiple. One
-     step exists below one recipe, ×½, only where the build allows it (`half`,
-     from _plugins/food_half_recipe.rb): the steps are ½, 1, 2, 3, never 1½. */
+  /* A MODE is what the wiring asks for; recipe-scale.js holds no arithmetic:
+     `base` (the figure the recipe is written for; factor = value / base),
+     `clamp(n)` (a typed or stepped value made into one the box can hold),
+     `step(n, d)` (one press of minus or plus), `box(n)` (what the input
+     shows), `word(n)` (what follows it, or null to leave the markup alone).
+     A `makes:` recipe steps in whole recipes (#1286); a typed figure goes to
+     the nearest whole multiple. Below one recipe only ×½ exists, and only
+     where the build allows it (`half`, from _plugins/food_half_recipe.rb). */
   function wholeRecipes(base, box, word, half) {
     function multiple(n) {
       var m = n / base;
@@ -341,7 +330,6 @@
 
   /**
    * The mode for a control that says "portions".
-   *
    * @param {number} base - how many the recipe feeds
    * @param {boolean} [whole] - true on a `makes:` recipe whose yield has no
    *        count to show ("Some"): the box still says portions, and steps in

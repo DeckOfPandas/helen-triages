@@ -11,13 +11,11 @@ is no PIL in the devcontainer), treats anything far from the image's most common
 colour as ink, splits the image into column bands separated by blank columns,
 and prints each band's vertical extent and centre in device pixels.
 
-MEASURE IN ONE IMAGE. Crop the element that CONTAINS every mark being compared
+Measure in one image: crop the element that contains every mark being compared
 and read their bands from that single crop. An element screenshot pads its box
 by about a pixel, so cropping two elements separately and subtracting their
-page positions is wrong by that padding -- which at small sizes is most of the
-answer. The nav lettering's first correction (2026-09-14) was made that way and
-was a pixel short; the one-image reading is what found it. See `.site-nav-word`
-in _sass/shared/_layout.scss.
+page positions is wrong by that padding, which at small sizes is most of the
+answer.
 
 `min-gap` is how many blank columns may sit inside one band before it is split
 into two: small (4-6) to separate a bracket from the word inside it, large (30)

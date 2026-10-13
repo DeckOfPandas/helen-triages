@@ -1,42 +1,21 @@
 #!/usr/bin/env python3
 """Refuse any Bash command that runs `awk` (or gawk, mawk, nawk), anywhere in it.
 
-WHY THIS EXISTS (2026-09-15). Helen, drafting the README's list of guards,
-had written "Never `awk` (same)" beside "Never `sed`" and found no hook behind
-it: "Should I have a guard against awk? I feel like I should."
+awk is a programming language whose program arrives inline, in a quoted
+argument the permission checker cannot see into: `print > "path"` writes any
+file, `system("...")` and `"cmd" | getline` run any command, and
+`gawk -i inplace` edits in place. Python covers it, in a file the checker can
+name. DECISIONS §11.
 
-The case is stronger than sed's. awk is not a stream filter with one dangerous
-flag; it is a whole programming language whose program arrives INLINE, in a
-quoted argument the permission checker cannot see into -- the same opacity
-guard-inline-script.py refuses for `python -c`, `ruby -e`, `node -e` and
-`perl -e`, which never listed awk only because nobody thought of it as an
-interpreter. Inside that quoted program:
-  * `print > "path"` and `printf ... >> "path"` write any file,
-  * `system("...")` and `"cmd" | getline` run any command,
-  * `gawk -i inplace` edits files in place, sed -i's exact failure mode.
-None of that is visible to the checker, which sees `awk` and a string.
+It does not tell a harmless awk from one that writes or runs something: that
+means parsing awk, and detection logic is where the next gap grows.
 
-Python covers everything awk does, more readably, in a file the checker can
-name (CLAUDE.md: every program goes in a file, however short).
+Allowed on purpose: the word inside a quoted string or a heredoc body, and
+tokens that merely contain it (`guard-awk.py`, `hawkish.txt`), because it
+matches whole command words. `sh -c 'awk ...'` therefore passes this hook, as
+it passes guard-sed.py. Tested in `tests/test_text_tool_guards.py`.
 
-A pipe into awk (`grep ... | awk '{print $2}'`) is ALREADY refused, by
-guard-unanalyzable-bash.py, for being a pipe. What got through before this
-hook was awk standing alone: `awk -F, '{...}' some.csv`, one command, no pipe,
-no substitution -- analysable in shape, opaque in content.
-
-DELIBERATELY NOT CLEVER, for guard-sed.py's reason: telling a harmless
-`awk '{print $1}'` from one that writes or runs something means parsing awk,
-and detection logic is exactly what grows the next gap. No awk, full stop.
-
-WHAT IT DELIBERATELY ALLOWS: the word inside a quoted string or a heredoc body,
-so a commit message or grep pattern can discuss it; and tokens that merely
-contain it (`guard-awk.py`, `hawkish.txt`), because it matches whole command
-words, not substrings. `sh -c 'awk ...'` hides it in quotes and passes this
-hook -- as it passes guard-sed.py -- but `sh -c` with a program is itself the
-unanalysable shape, and a script FILE containing awk still asks Helen, as every
-tmp/ script does.
-
-Invoked as `python3 .claude/hooks/guard-awk.py`, so it needs no execute bit.
+Invoked as `python3 <path>` so it needs no execute bit.
 """
 from __future__ import annotations
 

@@ -73,12 +73,9 @@
 // --- the pick: a flat row of cloned parts ------------------------------------
 // The section's `data-universe-parts` names `.drink-card-name`,
 // `.drink-card-glass` and `.drink-card-ingredients` individually, so all three
-// arrive as direct children and a flex `order` can place them. universe.js
-// copies them in the order the attribute lists them.
-//
-// The pick does not carry `drink-card`: the rules it needs from _cards.scss are
-// written against the child classes, and its `::before` and `::after` are used
-// below.
+// arrive as direct children and a flex `order` can place them. The pick does
+// not carry `drink-card`: the rules it needs from _cards.scss are written
+// against the child classes, and its `::before` and `::after` are used below.
 //
 // `nowrap` is load-bearing: the ellipsis rule below assumes one line.
 .universe-pick {
@@ -90,20 +87,13 @@
 }
 
 // --- the tiny glass ----------------------------------------------------------
-// One height for every glass, the opposite of the card's rule: here it is a
-// mark at the head of a line, and one that changed size between deals would
-// read as a wobble. So the svg's height is set outright and the card's
-// `--glass-ratio` and `--glass-cheat` are bypassed.
-//
-// A fixed slot, wider than the widest drawing at that height, so the tape does
-// not jump on redeal. A narrower slot would cap the widest glass and draw it
-// shorter than the rest. scripts/universe_glass_slot.py reads both variables
-// from this file and fails if they stop agreeing with the drawings: run it
-// after adding a glass or changing the height.
-//
-// Centred on the tape, not on the row's baseline. `align-self: center` is exact
-// only because the tape is the tallest thing in the row and so sets the flex
-// line's height; if anything taller joins the row that stops being true.
+// One height for every glass, so the mark does not wobble between deals: the
+// svg's height is set outright and the card's `--glass-ratio` and
+// `--glass-cheat` are bypassed. The slot is fixed and wider than the widest
+// drawing at that height, or the tape jumps on redeal; run
+// scripts/universe_glass_slot.py after adding a glass or changing the height.
+// `align-self: center` is exact only while the tape is the tallest thing in
+// the row and so sets the flex line's height.
 $universe-glass-height: 1.4rem;
 $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
 
@@ -158,12 +148,10 @@ $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
 }
 
 // --- ( the ingredients, cut off inside the closing bracket ) ------------------
-// The closing bracket cannot live in the truncating box: `text-overflow:
-// ellipsis` clips at the box's edge, so an `::after` here would be clipped away
-// with the text it closes. So the opening bracket rides inside the box, as its
-// first character, and the closing one is a separate flex item on the pick,
-// ordered to land immediately after. `flex: 0 1 auto` (shrink, never grow)
-// keeps this box against it.
+// `text-overflow: ellipsis` clips at the box's edge, so a closing bracket in
+// an `::after` here would be clipped with the text. The opening bracket rides
+// inside the box and the closing one is a separate flex item on the pick,
+// ordered immediately after; `flex: 0 1 auto` keeps this box against it.
 //
 // `display: block` overrides the card's `-webkit-box`, which would win over
 // text-overflow if left in.

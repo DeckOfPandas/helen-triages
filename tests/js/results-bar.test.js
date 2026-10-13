@@ -1,26 +1,15 @@
-// =============================================================================
-// Tests for assets/js/results-bar.js -- the sticky "N survivors" bar on both
-// indexes. Helen, 2026-09-26, from the "N survivors" candidates page: "both
-// treatments", the mono number and this bar.
+// Tests for assets/js/results-bar.js: the sticky "N survivors" bar on both
+// indexes.
 //
 //   node --test tests/js/*.test.js
-// =============================================================================
-// THE BAR IS A MIRROR, and every test here is about the mirroring: it shows
-// the count the index script painted and the clear-all's own visibility, and
-// its button presses the index's button. Nothing here checks a count, because
-// the bar does not compute one.
 //
-// THE STUB DOM HAS NO IntersectionObserver AND NO MutationObserver, and it
-// should not grow real ones -- neither is a DOM tree operation, and a stub
-// that pretended to know when an element crossed the viewport would be
-// inventing geometry (tests/js/dom-stub.js says why it must not). Both are
-// stubbed HERE, minimally: each records what it was asked to observe and lets
-// a test fire its callback with an entry of the test's choosing. That is the
-// whole of the browser's contribution the script depends on.
+// The bar is a mirror: it shows the count the index script painted and the
+// clear-all's own visibility, and its button presses the index's button.
+// Nothing here checks a count, because the bar does not compute one.
 //
-// `el.click()` is the one thing dom-stub.js grew for this script: the bar's
-// button forwards to the index's by the DOM method, and the stub answers it by
-// dispatching a click, which is what a browser does.
+// IntersectionObserver and MutationObserver are stubbed here, not in
+// tests/js/dom-stub.js, which must not invent geometry: each records what it
+// was asked to observe and lets a test fire its callback with a chosen entry.
 'use strict';
 
 const test = require('node:test');

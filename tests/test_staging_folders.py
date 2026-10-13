@@ -1,17 +1,12 @@
 """Every staging folder PIPELINE.md §3 names exists in each drafts clone.
 
-Helen, #1080: "These folders should always be present even if they don't
-contain any drafts." Git keeps no empty folder, so each holds a `.gitkeep`
-(added 2026-09-15 on both private repos); a folder that exists only because a
-draft happens to sit in it disappears the day that draft is promoted or binned.
+The folders are always present, drafts or no drafts (#1080). Git keeps no empty
+folder, so each holds a `.gitkeep`, and this checks the placeholder, not just
+the folder: a folder on disk with no tracked file in it is what a fresh clone
+would not have.
 
-So this checks the placeholder, not just the folder: a folder on disk with no
-tracked file in it is exactly what a fresh clone would not have.
-
-The drafts repos are private and absent in CI, so each case SKIPS with a reason
-when its clone is missing -- a skip reads as "did not run", never as "checked
-and clean" (tests/test_suite_hygiene.py, #378). On Helen's machine, and in any
-worktree that has cloned the drafts, it runs.
+The drafts repos are private and absent in CI, so each case skips with a
+reason when its clone is missing (tests/test_suite_hygiene.py, #378).
 """
 from __future__ import annotations
 

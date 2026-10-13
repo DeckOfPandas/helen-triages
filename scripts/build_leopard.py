@@ -1,24 +1,23 @@
 """Write the two leopard tiles the cocktails site ships, from Helen's chosen settings.
 
-REPRODUCES NO NUMBER -- it GENERATES `assets/img/cocktails/leopard-fur.svg` and
-`leopard-nap.svg`, which `assets/js/ground-print.js` draws once into a picture
-for the page ground, and `_sass/cocktails/_leopard-version.scss`, a hash of the
-two that tells a browser when its kept picture is out of date.
-Run `--check` by hand after touching `scripts/leopard_splodge.py`. The suite
-does NOT run it: a byte comparison of ten thousand rounded sines is one libm
-away from a red `main`, and a red `main` stops the deploy. What the suite does
-check (`tests/test_site_config.py`) is that the stylesheet's size is the fur
-file's own, and that the version is the hash of the COMMITTED files, which is
-plain arithmetic on bytes and cannot drift with a platform.
-
-The settings are Helen's, 2026-10-06, each chosen by looking (LEOPARD.md
-section 4): the FUR crinkle, the repeat OFFSET over three columns, and the NAP
-ground texture. Neither tile has a ground or a tone of its own -- they are
-white at very low alpha -- so the darkness of the page is `$color-paper` in
-`_sass/cocktails/_palette.scss` and nothing here.
-
     python3 scripts/build_leopard.py --write    regenerate both files and the version
     python3 scripts/build_leopard.py --check    exit 1 if either differs
+
+Writes `assets/img/cocktails/leopard-fur.svg` and `leopard-nap.svg`, which
+`assets/js/ground-print.js` draws once into a picture for the page ground, and
+`_sass/cocktails/_leopard-version.scss`, a hash of the two that tells a
+browser when its kept picture is out of date. Commit all three together.
+
+Run `--check` by hand after touching `scripts/leopard_splodge.py`. The suite
+does not run it: a byte comparison of thousands of rounded sines is one libm
+away from a red `main`, which stops the deploy. `tests/test_site_config.py`
+checks instead that the stylesheet's size is the fur file's own and that the
+version is the hash of the committed files.
+
+The settings are Helen's (LEOPARD.md §4): the fur crinkle, the repeat offset
+over three columns, and the nap ground texture. Neither tile has a ground or a
+tone of its own, so the darkness of the page is `$color-paper` in
+`_sass/cocktails/_palette.scss` and nothing here.
 """
 import hashlib, os, sys
 

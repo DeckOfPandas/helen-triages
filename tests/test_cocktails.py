@@ -1,32 +1,16 @@
-"""The cocktails collection's own rules. Spec: GitHub issue #322.
+"""The cocktails collection's own rules (#322); `tests/conftest.py` is the food suite.
 
-`tests/conftest.py` is explicitly the FOOD suite, and says so: the food schema
-does not apply to a cocktail. This is the sibling it anticipated.
+The corpus is both collections, `_cocktail_recipes/` and `_cocktail_drafts/`
+(#540). The drafts are a private repo, gitignored here and absent in CI, so CI
+checks the published drinks alone.
 
-THE CORPUS IS BOTH COLLECTIONS -- `_cocktail_recipes/` and `_cocktail_drafts/`
--- since 2026-08-29, issue #540. This docstring described the drafts alone until
-then, which matched a loader that read the drafts alone, and that was the bug:
-the published collection lives in THIS repo and is present in CI, so a promoted
-drink was checked by nothing anywhere. See the long note above `_load()`.
-
-WHY THIS FILE SKIPS RATHER THAN FAILS ON AN ABSENT COLLECTION, and why that is
-not the vacuity trap tests/test_suite_hygiene.py exists to catch.
-`_cocktail_drafts/` is its own private git repo, gitignored from this one, and
-nothing is promoted into `_cocktail_recipes/` yet, so on a clean checkout of the
-public repo BOTH directories are genuinely ABSENT -- not empty, absent. That is
-a legitimate state and the right response is to skip loudly saying so.
-
-What is NOT legitimate is a directory being present and yielding nothing, which
-would mean the loader has gone stale. So: skip when NEITHER collection is here,
-assert non-empty when one is. "This machine has no drinks" and "I looked and
-found nothing" must never produce the same green.
-
-AND A THIRD ANSWER EXISTS, because a PARTIAL corpus is now possible: any claim
-of the form "this registry has no dead entries" or "no value covers more than
-half the book" is unanswerable when only some drinks are present, since a drink
-that is merely absent looks exactly like one that has been fixed. Those live in
-their own tests, call `_require_whole_collection`, and are listed in
+Neither collection on disk is a skip with a reason; a collection that is
+present and yields nothing fails, because that is a stale loader. A claim about
+the whole book ("this registry has no dead entries") cannot be judged on a
+partial corpus: those tests call `_require_whole_collection` and are listed in
 WHOLE_COLLECTION_ONLY.
+
+Run this half alone with `pytest -m cocktails`.
 """
 from __future__ import annotations
 
@@ -38,12 +22,8 @@ from pathlib import Path
 import pytest
 import yaml
 
-# THE HOUSE-STYLE RULES ARE SHARED WITH THE FOOD SITE, NOT RE-TYPED HERE --
-# issue #670. An en dash, an accent, a quoted scalar and a degree sign are
-# properties of Helen's writing rather than of a recipe, and
-# `model_instructions/INGEST_ONE_COCKTAIL.md` §7 demands every one of them of a
-# drink. conftest.py holds the corpus-agnostic predicates and nothing else; the
-# asserts, the messages and the field lists below are this collection's own.
+# The house-style predicates are shared with the food suite through conftest.py
+# (#670); the asserts, messages and field lists below are this collection's own.
 import drafts_schema
 from conftest import (
     SHARED_TYPOGRAPHY, accent_problems, accented_words, checkable_text,
@@ -51,50 +31,17 @@ from conftest import (
     number_range_hits, spelling_problems, unquoted_scalars,
 )
 
-# Suite marker, so `pytest -m cocktails` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.cocktails
 
 ROOT = Path(__file__).resolve().parent.parent
 RECIPES = ROOT / "_cocktail_recipes"
 DRAFTS = ROOT / "_cocktail_drafts"
-# THE STAGING FOLDER IS THE PUBLISHED TENSE -- Helen, 2026-09-04, going through
-# Fish House Punch: "'ED3' isn't a bottle" and "this has 'item' everywhere too".
-# `4-promote/` is where a drink sits once she has cooked it, amended it and
-# decided it ships; the only thing between it and `_cocktail_recipes/` is her
-# own proofread. So the rules that bite at promotion bite HERE, where there is
-# still time to fix them, rather than at the moment of the move. See
-# `_load_staged`.
-# `4-promote/` SINCE 2026-09-14 (#1008), was `to-promote/`. Helen numbered the
-# staging folders so they sort in pipeline order at the top of her file list:
-# "I'd like each subfolder to appear in order at the top of my files list --
-# small usability tweak for future-Helen. So shall we try 1-rewrite, 2-make,
-# and so on?" PIPELINE.md §3 is the set: 1-rewrite (food only), 2-make, 3-keep,
-# 4-promote, 5-final-proofread (drinks only).
-#
-# TWO FOLDERS SINCE 2026-09-18, AND THE PLURAL IS THE WHOLE POINT.
-# `5-final-proofread/` holds a drink that was staged for promotion and bounced
-# back because something in it needs Helen. It is just as much the published
-# tense as `4-promote/` is -- it got there BY being staged, it is going to be
-# promoted the moment she rules, and the only difference is which of them is
-# holding it up. So the rules that bite at promotion must bite there too.
-#
-# LEAVING THIS SINGULAR WOULD HAVE FAILED SILENTLY, which is why it is spelled
-# out. `test_a_staged_drink_writes_a_bottles_canonical_name` and
-# `test_a_staged_drink_carries_no_transcription_field` are the two rules that
-# read it, and both would simply have stopped applying to exactly the drinks
-# that sit longest in a folder being edited -- a drink could pick up a
-# shorthand alias or an `item` while it waited for a ruling, and nothing would
-# say so. A test that stops checking reports green.
+# The staging folders. A drink in either is finished writing and waits only on
+# Helen, so the rules that bite at promotion bite here too (`_load_staged`). A
+# folder left off this tuple silently drops out of those rules. PIPELINE.md §3.
 STAGED_DIRS = (DRAFTS / "4-promote", DRAFTS / "5-final-proofread")
-# The folder names as prose, for failure messages that want to say WHERE the
-# rule bites. Derived here rather than spelled out in each message so there is
-# one list -- and it exists as its own constant because the AST guard below
-# (`test_every_drink_reading_test_goes_through_the_loader`) refuses any test
-# that names `STAGED_DIRS` directly, which it should: naming the paths inside a
-# test is how a test comes to read the collection without the loader. It caught
-# this on the day the folder was added, which is the guard doing its job.
+# The folder names as prose, for failure messages: a test may not name
+# `STAGED_DIRS` itself (`test_every_drink_reading_test_goes_through_the_loader`).
 STAGED_NAMES = ", ".join(f"`{d.name}/`" for d in STAGED_DIRS)
 # The collections as they are on disk, fixed at import: `_scan` reads each of
 # these once per run. A test that monkeypatches RECIPES or DRAFTS points them
@@ -107,21 +54,10 @@ BOTTLES = ROOT / "_data" / "cocktails" / "bottles.yml"
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
 
-# =============================================================================
-# ONE PARSE PER DATA FILE PER RUN -- #1271
-# =============================================================================
-# Every loader below (`_vocab`, `_bottles`, `_costs`, `_abv`, ...) used to
-# parse its YAML afresh on every call, and the per-drink tests call them once
-# per drink. Measured 2026-10-02 with both drafts clones: seven per-drink tests
-# cost 0.06-0.19s a drink over 140 drinks, about 112 of this module's 147
-# seconds, nearly all of it PyYAML reading the same few files 140 times each.
-#
-# THE PRICE IS THAT EVERY TEST NOW SHARES ONE OBJECT PER FILE, so a test that
-# edits what a loader returned changes the data for every test after it, and
-# the symptom would be a failure that depends on test order. Nothing did when
-# this went in. `_the_shared_data_is_as_parsed` below is the guard: it
-# re-parses every file once at the end of the module and fails if a shared
-# copy no longer matches. Copy before you change one.
+# --- One parse per data file per run (#1271) ---
+# Every test shares one object per file, so a test that edits what a loader
+# returned changes the data for every test after it. Copy before changing one;
+# `_the_shared_data_is_as_parsed` fails the module if a shared copy has drifted.
 _PARSED = {}
 _SCANNED = {}       # the drink collections themselves -- see `_scan`
 
@@ -160,48 +96,23 @@ def _the_shared_data_is_as_parsed():
         "mutates what a loader returned and make it copy first."
     )
 
-# =============================================================================
-# THE DRINK SCHEMA -- issue #669. What a drink file may and must contain.
-# =============================================================================
-# THE CORPUS WAS ALREADY UNIFORM AND NOTHING SAID SO. Censused 2026-09-02 over
-# all 124 drinks: twelve top-level keys, every one single-shaped, `meta` exactly
-# `{ship, date_last_edited}` on every file -- `date_last_edited` has since gone
-# (#712, 2026-09-05) and `made_before` and the three gate flags have arrived. The "ad hoc" feeling around this
-# collection came from the ABSENCE OF A GUARD, not from the data -- and the
-# proof is what the same census found underneath: nine drinks with no `method`
-# at all and eleven ingredient entries with no `amount`, both invisible to every
-# test in this module for as long as they had existed.
-#
-# A CLOSED SET IS THE POINT, AND SO IS THE COST OF ADDING TO IT. A new key is
-# one line here, and writing that line is the moment somebody decides the key is
-# real -- the same bargain `canonical_glasses`, `measures:` and the
-# `<family>_characters` lists all strike. A typo'd key name is otherwise a
-# silent no-op: nothing reads it, nothing renders it, nothing fails.
+# --- The drink schema (#669): what a drink file may and must contain ---
+# A closed set: an undeclared key is a silent no-op that nothing reads or
+# renders, so a new key is one line here.
 
-# THE LIST IS IN PAGE ORDER, AND THE ORDER IS A RULE FOR DRAFTS -- #1213.
-# Helen: "yaml fields should be rewritten in the order they appear on the page,
-# top to bottom", scoped in her words to drafts and new ingests and "not
-# retrospectively to published recipes". So this one list is both the closed set
-# (`TOP_LEVEL_KEYS` below is derived from it, never typed again) and the order
-# `scripts/tidy_drafts.py --only order` writes.
-#
-# THE ORDER IS NOT CHOSEN HERE, IT IS READ OFF `_layouts/cocktail.html`:
-# `test_the_declared_key_order_is_the_order_the_page_prints` derives it from the
-# layout and fails when the two disagree, so moving a section on the page moves
-# this list or goes red.
-#
-# `meta` IS FIFTH BECAUSE SHIP IT? IS: the head's meta row prints glass,
-# garnish, then `meta.ship`, and the mood chips come under it. The four other
-# `meta` keys print nothing and travel with the block.
+# In page order, and the order is a rule for drafts, not for published drinks
+# (#1213): `scripts/tidy_drafts.py --only order` writes it. The order is read
+# off `_layouts/cocktail.html`, and
+# `test_the_declared_key_order_is_the_order_the_page_prints` fails when the two
+# disagree. `meta` follows `garnish` because the head prints `meta.ship` there.
 TOP_LEVEL_KEYS_IN_ORDER = [
     "title", "tagline", "snippet", "glass", "garnish", "meta", "mood",
     "ingredients", "serve", "serves", "method", "to_serve", "notes", "source",
     "source_url",
 ]
 
-# A KEY THE LAYOUT NEVER NAMES has no place the page can give it, so its place
-# is declared here, with the reason. The derivation test refuses an entry the
-# layout HAS started to name, so this cannot outlive its excuse.
+# A key the layout never names has its place declared here, with the reason.
+# The derivation test refuses an entry the layout has started to name.
 KEYS_THE_LAYOUT_NEVER_NAMES = {
     "snippet":
         "read by `_layouts/default.html` for the meta description and the "
@@ -217,138 +128,27 @@ KEYS_THE_LAYOUT_NEVER_NAMES = {
 
 TOP_LEVEL_KEYS = set(TOP_LEVEL_KEYS_IN_ORDER)
 
-# `serves` ARRIVED 2026-09-06 with the unit count (#297) and is DELIBERATELY
-# NARROW: it is on nine drinks and absent on the other 115.
+# `serves` is optional and absent means one (#297): the unit count divides by
+# it, and the scaler does not read it.
 #
-# WHY IT EXISTS AT ALL, GIVEN cocktail-scale.js REFUSED TO INVENT IT. That
-# refusal is about the SCALER and it still stands -- "x2 is twice what the page
-# says", and the scaler does not read this field. But #297 reports units PER
-# SERVING, and for a punch bowl holding 690 ml the figure without a divisor is
-# a number that reads as a warning rather than a fact.
-#
-# ABSENT MEANS ONE, and that is why it is not in REQUIRED_TOP_LEVEL. A drink
-# that fills one glass says nothing, exactly as a drink with no serveware note
-# says nothing about `to_serve`. The nine that carry it are the seven punch-bowl
-# drinks, the mulled wine, and the Modern Zombie whose own title says "makes 2".
-#
-# THE VALUES ARE DERIVED, NOT PICKED, per MANUAL §13.11. A punch cup is 4-6 US
-# fl oz, so 150 ml is the midpoint and the divisor; the mulled wine goes into a
-# 200 ml mug. tmp/plan_serves.py is not kept -- the derivation is one line and it
-# is here: round(total poured ml / cup size). Re-deriving it needs no script.
-
-# `serve` ARRIVED 2026-09-05 and is the answer to "where does the ice live?".
-#
-# A drink has a BUILD and a SERVE, and only the build had fields. The serve is
-# five things: the vessel (`glass`), the garnish (`garnish`), the serveware
-# (`to_serve`) -- and then the ICE IN THE GLASS and the GLASS PREP, which had
-# no home at all. Having nowhere to live, those two rode in the last method
-# step, in free prose, which is why "strain" appeared in SEVENTEEN different
-# sentences across 124 drinks: "Strain into a chilled glass", "Strain over
-# crushed ice", "Strain over two giant ice cubes", "Fine-strain into
-# pre-chilled" (a truncated sentence nobody had noticed).
-#
-# Giving them a field collapsed 94 uses of 31 spellings into five techniques --
-# Strain, Fine strain, Double strain, Pour, Dump -- with the variance moved
-# somewhere the page can render it identically every time. That is methods.yml's
-# own argument: a shape that changes every time has to be RE-READ, an identical
-# repeated one becomes something you RECOGNISE.
-#
-# IT IS NOT `to_serve`, WHICH ALREADY EXISTED AND STAYS. That field is the
-# SERVEWARE -- Cobra's Fang's "Plastic giraffes, paper umbrella, teeny
-# flamingos", the swizzles' "Straw.", the punches' "Ladle and punch glasses."
-# Blue Hawaiian had put its cocktail umbrella in `garnish` instead, which is
-# exactly the inconsistency Helen reported ("things to serve with, like a paper
-# umbrella, aren't written or laid out the same way"), and it moved to
-# `to_serve` rather than justifying a second serveware field.
-#
-# ABSENT MEANS NOBODY HAS DECIDED, `ice: "none"` MEANS SERVED UP. The same
-# distinction `garnish` already draws between `[]` and `["no garnish"]`, and it
-# is load-bearing: pic-a-de-crop-punch strains into a punch bowl and its method
-# never says whether ice goes in, where its two sibling punches both say a large
-# block. That is a real question for Helen, not a blank to fill with a default.
-#
-# THERE IS NO `chill`, AND THERE WAS FOR ABOUT AN HOUR. It held `chilled` on 21
-# drinks until Helen ruled it out -- "I think it's implied that glasses should
-# be chilled (except hot drinks obviously). I am the user after all." Its other
-# three values (`frozen` once, `rinsed` three times) were each already a method
-# step in their own right, so the whole field went rather than the one value and
-# nothing it held was lost. Recorded because a field redundant with a default is
-# exactly the kind of thing that gets re-proposed.
-# `fill` JOINED 2026-09-28, and it is the quantity `ice` was never allowed to
-# carry. Helen's Milliners Punch sentence is "Strain into a hurricane glass
-# half-filled with crushed ice."; serve.yml's own Fish House Punch note says
-# "the thing the field cannot carry is QUANTITY", so the quantity got a field
-# of its own rather than a sixth spelling of crushed. Keeping `ice: crushed`
-# untouched matters beyond tidiness: the mood deriver tests that exact string
-# in two places and `mood_serve_ice` in a third.
+# `serve` holds what happens in the glass; `to_serve` is the serveware and is a
+# separate field. An absent `serve` means nobody has decided, and `ice: "none"`
+# means served up. There is no `chill` key: a chilled glass is implied. A
+# quantity of ice goes in `fill`, never in `ice`. MANUAL §9.10a.
 SERVE_KEYS = {"ice", "rim", "fill"}
 
-# `to_serve` and `serve` are the optional ones -- most drinks have no serveware
-# note, and `serve` is absent where nobody has ruled on the ice. Everything else
-# is on every file today, including `source`/`source_url` where the value is the
-# empty string: "nobody has recorded a source" and "the key is missing" must not
-# look alike.
+# `to_serve`, `serve`, `serves` and `snippet` are optional. Every other key is
+# written even when empty (`source: ""`): "nobody has recorded a source" and
+# "the key is missing" must not look alike.
 REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves", "snippet"}
 
-# `item` IS GONE, AND #544'S MIGRATION IS OVER -- Helen, 2026-09-21: "'item'
-# needs to go. Kill it with fire. Data can be read straight into
-# generic/suggestion with or without QQs, and anything genuinely unclear added
-# to a page note for me (titled QQ so I definitely find it)."
-#
-# It was the SOURCE's own wording for a pour, held beside `generic: "QQ"` until
-# the category was known, and it had been retiring since 2026-09-02. What ended
-# it was `QQ <the source's words>`: once the words go in `generic` -- the field
-# the page and the cards actually read -- a second field holding the same string
-# renders nowhere and is read by nothing. Three whole tests went with it
-# (`test_item_is_gone_once_the_generic_is_filled_in`,
-# `test_a_staged_drink_carries_no_transcription_field`,
-# `test_a_promoted_drink_carries_no_draft_only_key`), along with
-# `INGREDIENT_KEYS_RECIPES`, which existed only to subtract this one key.
-#
-# `suggestion` IS NOW WRITTEN EVEN WHEN IT IS EMPTY -- same ruling: "At ingest,
-# please add a blank suggestion field if there isn't a named suggestion, because
-# that saves me typing YAML when I come to it if I want to note my own
-# suggestion." `suggestion: []` is the shape; `["QQ"]` is not, and never was
-# anything but a bottle nobody had chosen.
-#
-# `as` AND `card_order` ARE THE TWO PRESENTATION KEYS, added 2026-09-07 (#754).
-# `as` says how a pour is USED -- float, rinse, muddle -- and the card ordering
-# reads it for #567's tier 7 and its muddle clause. `card_order` names a tier
-# outright for a drink whose small pour IS the drink.
-#
-# `card_order` HAD BEEN DOCUMENTED BUT NOT PERMITTED, which is why the plugin
-# said it had "no users yet": `_plugins/cocktail_card_ingredients.rb` has read
-# it since #567 and this whitelist would have rejected any drink that wrote one.
-# A field the code supports and the schema refuses is a trap for whoever tries
-# it first, so both are declared here now.
-# THE THREE `_claude` KEYS ARE A PROPOSAL, NOT AN ANSWER -- added 2026-09-21.
-# Helen, asked where a Claude's proposed category should live so she can check
-# it against the source's own words: "I'd want to make sure Claude doesn't
-# always confidently write 'Gosling's' instead of both."
-#
-# SO THE SOURCE'S WORDS STAY IN `generic`, BEHIND THE QQ, AND THE PROPOSAL SITS
-# BESIDE THEM. It is the `QQ original` / `QQ Claude` pair applied to a field
-# rather than to a method step: both halves are on the file, the page renders
-# the QQ so the drink cannot publish, and she collapses the pair by ruling.
-#
-# THEY ARE FOR A NARROWER CASE THAN IT FIRST LOOKS, and her own rule is what
-# narrows it: "If the source says 'Gosling's' then the correct thing for Claude
-# to do is give 'moderately aged rum, character: blackstrap'. But if a recipe
-# gives 'blackstrap' Claude shouldn't suggest anything." A DECLARED BOTTLE is a
-# dictionary read -- write `generic` and `suggestion` outright, no proposal. A
-# bare category word nobody can resolve is hers alone -- `QQ <the words>` and
-# nothing else. A proposal belongs only in between.
-#
-# `character_claude` IS THE CLEAREST CASE THERE IS, and it exists because
-# `bottles.yml` deliberately has no character column: its own note against
-# Gosling's Black Seal says the bottle is "reached for FOR its blackstrap, which
-# is a `character` on the recipe and never a generic -- #314, and the reason
-# this file has no character column". So resolving the BOTTLE gives the generic
-# and the suggestion mechanically and gives no character at all, and Helen's
-# 2026-09-14 ruling says why: "We don't name characters on bottles. We name
-# characters on recipe lines ... having a character is only in a context."
-# A character is therefore always an inference about THIS recipe, and an
-# inference is exactly what belongs in a proposal rather than in the field.
+# `suggestion` is written even when empty, as `suggestion: []`. `as` says how
+# an ingredient is used and `card_order` names a card tier outright (#754);
+# `_plugins/cocktail_card_ingredients.rb` reads both. The three `_claude` keys
+# hold a proposal beside a `QQ <the source's words>` in the field itself, for
+# Helen to collapse by ruling. A declared bottle needs none, and a bare
+# category word nobody can resolve gets the QQ alone. A character is always an
+# inference about this recipe: `bottles.yml` has no character column (#314).
 INGREDIENT_KEYS = {
     "generic", "amount", "suggestion", "note", "character", "optional",
     "as", "card_order",
@@ -366,61 +166,27 @@ CLAUDE_PROPOSALS = {
 # explanation -- see test_every_ingredient_has_an_amount below.
 REQUIRED_INGREDIENT = {"generic"}
 
-# THE ORDER IS THE ASSERTION, not tidiness -- the same claim
-# test_front_matter.py::test_meta_block_is_exactly_the_three_flags_in_order
-# makes about a food recipe. Reordering a block changes no value, so obeying it
-# is free, which is exactly what makes it enforceable.
-#
-# WORKSTREAM 2 APPENDED `rewritten`, `awaiting_fix`, `proofread` on 2026-09-02
-# (D1/D2, issue #668), and this list was the single place that changed: the two
-# tests below read it and name nothing themselves.
-#
-# THE THREE GATE FLAGS ARE FOOD'S, IN FOOD'S ORDER -- test_front_matter.py's
-# `META_ORDER` -- after the two drink-specific keys. Same names deliberately:
-# they are the same three questions (has Helen rewritten it, is one thing
-# ticketed, has she read what is in the file now), and a second vocabulary for
-# them would be two things to keep in step for no gain. `awaiting_fix` and
-# `proofread` are read by _plugins/publish_gate.rb the moment a drink is
-# promoted; `rewritten` is read by nothing and is Helen's own record.
-#
-# `made_before` ARRIVED 2026-09-05 (issue #722) AND SITS FIRST DELIBERATELY. You
-# make a drink, and then you have an opinion about it -- so the block reads in
-# the order the facts happen, and `ship` is only a meaningful claim on a file
-# whose line above it says true. Helen, raising #722: "I know whether I've made
-# the drinks before, and I bet unrated ones I just haven't made. I want to
-# confirm these line by line." She confirmed all 22 on 2026-09-05 and the bet
-# was right 20 times.
-#
-# THE OTHER 104 ARE `true` BY INFERENCE, NOT BY HER SAYING SO ONE AT A TIME, and
-# the inference is the premise of #722 itself: a rung on `ship_scale` is a
-# verdict, and a verdict means she drank it. The 22 she ruled on are the ones
-# where that inference did NOT hold -- which is exactly why they were the ones
-# worth asking about. If a `true` here is ever wrong, it is one drink and one
-# word, not a schema problem.
+# The order is the assertion. `made_before` and `ship` are the drink's own
+# (#722); the three gate flags follow in food's `META_ORDER` order
+# (test_front_matter.py). `_plugins/publish_gate.rb` reads all three on a
+# promoted drink (DECISIONS §4.0).
 META_KEYS_IN_ORDER = ["made_before", "ship", "rewritten", "awaiting_fix",
                       "proofread"]
 
-# The two flags the publish gate reads, and `rewritten` alongside them because
-# all three are booleans with the same trap.
+# The flags the publish gate reads: booleans, all with the same quoting trap.
 GATE_FLAGS = ["rewritten", "awaiting_fix", "proofread"]
 
-# A tagline nobody has written yet. 120 of the 124 drinks say this, which is a
-# backlog and not a design smell (Helen, 2026-09-02) -- but it is a backlog that
-# must not reach the live site. See test_a_promoted_drink_has_a_real_tagline.
+# A tagline nobody has written yet. It must not reach the live site: see
+# test_no_published_drink_carries_a_qq.
 PLACEHOLDER = "QQ"
 
 
 def _is_qq(value):
     """`QQ`, or `QQ` followed by whatever the source said.
 
-    Helen, 2026-09-20, of a draft whose page showed a bare `QQ` beside 90 ml and
-    nothing else: "if it's not obvious write QQ then whatever the source said
-    then I have a chance of being able to fix it myself." The page reads
-    `generic`, not `item`, so the source's words have to be IN `generic` to be
-    seen: `generic: "QQ aged Jamaican rum"`. It is still an unanswered question
-    and every check that sets a bare `QQ` aside sets this aside for the same
-    reason. What it must not do is match a real generic that merely starts with
-    those letters, hence the space.
+    `generic: "QQ aged Jamaican rum"` is still an unanswered question: the page
+    reads `generic`, so the source's words go there to be seen. The space stops
+    a real generic that merely starts with those letters from matching.
     """
     if value is None:
         return False
@@ -431,102 +197,18 @@ def _is_qq(value):
 def _unanswered(values):
     """True where every name given is the `QQ` placeholder.
 
-    A QQ IS A DECLARED ABSENCE, NOT A NAME, and this predicate exists because
-    four tests forgot that on 2026-09-20. `test_every_generic_is_declared_or_qq`
-    states the contract -- `if generic and generic != "QQ" and generic not in
-    declared` -- and an ingredient nobody has typed yet writes `generic: "QQ"`
-    on purpose, so that the gap is visible rather than silent (#335, #1108).
-
-    WHAT WENT WRONG WITHOUT IT. The card-tier, price, ABV-strength and bottle-
-    resolution checks looked a QQ up as though it were a real name, found
-    nothing, and reported it as a stale vocabulary. So the suite asserted that
-    no draft has an unanswered question, against a collection whose entire
-    purpose is holding unanswered questions -- and rosita alone failed four
-    tests for one honest `QQ - the source does not say blanco, reposado or
-    añejo.`
-
-    IT WAS INVISIBLE IN CI, WHICH IS WHY IT SURVIVED. CI checks out the public
-    repo alone, so `_cocktail_drafts/` is absent and none of the four is even
-    parametrised into existence. The suite was green there and red on any
-    machine with a drafts clone -- the worst arrangement, because the local
-    signal that matters is buried under noise the pipeline never sees. Helen,
-    2026-09-20: "it's not useful to have a situation where we expect tests to
-    fail, and we should rearchitect."
-
-    NOTHING IS WEAKENED. A generic that is a real name and is missing from the
-    vocabulary still fails every one of the four. Only the value that MEANS
-    "not answered yet" is set aside, and answering it is tracked as a backlog
-    rather than as a defect.
+    A QQ is a declared absence, not a name (#335, #1108). A check that looks
+    one up in a vocabulary finds nothing and reports a stale vocabulary, which
+    fails on any machine with the drafts and never in CI. A real name missing
+    from the vocabulary still fails.
     """
     names = [str(v).strip() for v in values if v is not None and str(v).strip()]
     return bool(names) and all(_is_qq(n) for n in names)
 
-# Groups in ingredients.yml that are lists of generic VALUES. Everything else at
-# the top level is a mapping (family_of, family_less, retired_*) or the family
-# list itself, and must not be mistaken for declared generics.
-#
-# `rum_characters` JOINED THIS SET ON 2026-08-26, AND ITS ABSENCE WAS A REAL
-# HOLE. A character is not a generic -- separating them is the entire content of
-# #441 -- but this exclusion list named only `families`, so every value in
-# `rum_characters` was ALSO a permitted generic. `sherry` and `Spanish-style`
-# would have passed silently on any ingredient, and Helen's #314 ruling that
-# `blackstrap` is only ever a character could not be enforced while this list
-# still declared it a generic. The guard meant to keep the two fields apart was
-# quietly putting them back together.
-# DERIVED FROM THE SUFFIX SINCE 2026-08-29, not listed by hand. `rum_characters`
-# had to be added to this set by hand in the first place, four days after the
-# list existed, and `whisky_characters` would have needed the same remembering.
-# A `<family>_characters` list is never a generic vocabulary, so the rule can be
-# stated once instead of enumerated -- the same reasoning `_retired` already
-# uses for its `retired_` prefix.
-# `not_on_cards` JOINED THIS SET ON 2026-08-30, AND IT WAS THE SAME HOLE AGAIN.
-# It names generics that must never reach a card (#580) -- it REFERS to the
-# vocabulary rather than declaring any of it, exactly as `families` does. Left
-# out, every word in it became a permitted generic on its own say-so, so a typo
-# there would have declared itself valid and `test_every_generic_is_declared`
-# would have agreed. Found by breaking the guard that reads this list on purpose
-# and watching it stay green, which is the only reason it was found at all.
-# `rum_groups` JOINED ON 2026-09-06 AND IS THE THIRD TIME (#529). It is a list
-# of {name, styles} mappings -- a second READING of `rum_styles` for the
-# reference page's sections, declaring no vocabulary of its own -- so it belongs
-# here for the same reason `families` and `not_on_cards` do. It is also the
-# first entry whose members are not strings, which is what makes it loud rather
-# than silent: left out, `set(value)` raises on an unhashable dict instead of
-# quietly minting generics. That is luck, not design, and the next such block
-# will not be so obliging.
-# `ingredient_as` JOINS THEM FOR #754, and it is the same trap `rum_groups`
-# hit: a list at the top of ingredients.yml is READ AS GENERIC VALUES unless it
-# says otherwise, so leaving it out would quietly mint `float`, `rinse` and
-# `muddle` as three new generics that no drink could ever pour.
-# `bottle_origins` JOINS THEM FOR #591, AND IT IS THE FOURTH TIME. The comment
-# above ends "the next such block will not be so obliging", and it was right:
-# `rum_groups` was loud only because its members are dicts and `set(value)`
-# raises on those. `bottle_origins` is a list of four plain strings, so leaving
-# it out would have minted `Martinique`, `Guadeloupe`, `Haiti` and `Brazil` as
-# permitted generics in total silence -- four words no drink could ever pour,
-# quietly valid on any ingredient.
-# `shopping_shelves` JOINS THEM TOO, AND IT WAS ALREADY WRONG -- found while
-# adding `bottle_origins`, by listing every top-level list and asking how each
-# was classified. It is ten AISLE NAMES (`spirits`, `fortified`, `liqueurs`,
-# `fresh produce`, `freshly squeezed fruit juice`, `bottled fruit juice`,
-# `larder`, `sugar syrup`, `bitters`, `tops`), and every one of them has
-# been a silently permitted generic since the shelves were declared. Nothing
-# pours a shelf, so nothing ever noticed.
-#
-# THAT IS THE TRAP FIRING FOR REAL RATHER THAN IN A COMMENT. The four entries
-# above were each caught while the list was being added; this one was not, and
-# sat in the data. The prediction was on the record -- `rum_groups`' note says
-# it was loud only because its members are dicts, "that is luck, not design,
-# and the next such block will not be so obliging" -- and `shopping_shelves` is
-# a list of plain strings, so it was exactly as silent as predicted.
-# `always_fresh` JOINS THEM FOR #707. It is a list of plain strings again, and
-# every member is already declared under `juices:` -- being silently treated
-# as a second vocabulary source would have cost nothing today (its values are
-# already valid generics), but that is exactly the "harmless until it isn't"
-# shape #930 is about, so it is registered rather than left to luck.
-# `standing_notes` (also #707) needs no entry here: it is a MAPPING, not a
-# list, so `_declared_generics`'s own `isinstance(value, list)` check already
-# skips it, the same way `card_names` does.
+# Top-level lists in ingredients.yml that are NOT generic vocabularies. A list
+# left off this set silently mints every member as a permitted generic, so
+# every new top-level list is either a vocabulary or goes here.
+# `<family>_characters` lists are excluded by suffix; a mapping needs no entry.
 NOT_GENERIC_LISTS = {"families", "not_on_cards", "rum_groups", "ingredient_as",
                      "bottle_origins", "shopping_shelves", "always_fresh"}
 
@@ -535,30 +217,10 @@ def _is_character_list(key):
     return key.endswith("_characters")
 
 
-# =============================================================================
-# THE CORPUS IS BOTH COLLECTIONS, AND THAT IS THE PROMOTION GATE -- issue #540
-# =============================================================================
-# This loader read `_cocktail_drafts/` and nothing else until 2026-08-29, and
-# #540 records the consequence: the drafts are a separate private repo, CI
-# checks out this one alone, so the directory is ALWAYS absent there and 24 of
-# this module's tests skipped in every deploy run, reported as passes.
-#
-# #540 says the mask "comes off the day a cocktail is promoted". IT DID NOT, and
-# that is what this change fixes. `_cocktail_recipes/` lives in THIS repo and is
-# present in CI -- but the loader globbed the drafts directory, so a promoted
-# drink would have been read by nothing, anywhere, ever. Promotion did not lift
-# the gate; it moved a drink permanently out from under it.
-#
-# So the corpus is both roots. The published half is checked wherever it exists,
-# including CI. The private half is checked wherever it has been cloned. Helen's
-# ruling, 2026-08-29, choosing this over putting the private drinks into a
-# runner: gate at promotion, and leave the drafts a local concern.
-#
-# WHAT THIS DOES NOT DO, said plainly so the green is not over-read: with no
-# drink promoted yet, CI still checks nothing, because there is nothing there to
-# check. The difference is that this is now a fact about the collection rather
-# than about the loader, and it stops being true on the day the first drink
-# moves rather than needing anyone to remember.
+# --- The corpus is both collections, and that is the promotion gate (#540) ---
+# The published half is in this repo and is checked wherever it exists, CI
+# included; the private drafts are checked wherever they are cloned. A loader
+# that reads the drafts alone leaves a promoted drink checked by nothing.
 
 NO_DRINKS_REASON = (
     "No drinks on this machine to check. `_cocktail_recipes/` holds no promoted "
@@ -574,12 +236,8 @@ NO_DRINKS_REASON = (
 class DrinkFile:
     """One drink file: its slug, its path, its raw text and its front matter.
 
-    ADDED 2026-09-03 FOR THE HOUSE-STYLE RULES (#670), which need two things
-    `(slug, fm)` cannot give them: the RAW TEXT, because quoting and a `QQ` line
-    are properties of how the file is written rather than of what it parses to,
-    and the PATH, because a failure message that cannot be opened is worth
-    little. Everything else in this module still reads the pair, which is why
-    `_read` below is now a projection of this rather than a second scan.
+    The raw text is here because quoting and a `QQ` line are properties of how
+    the file is written, not of what it parses to (#670).
     """
 
     __slots__ = ("path", "slug", "raw", "fm")
@@ -597,18 +255,12 @@ class DrinkFile:
 def _scan(root):
     """Every parseable drink under one collection root. Absent root -> nothing.
 
-    `rglob`, not `glob`. The drafts folder is flat today, but food's loader used
-    `glob` and silently stopped seeing seven files the moment a staging pipeline
-    appeared under it (MANUAL §4) -- and those seven were the ones closest to
-    promotion. Costs nothing to not repeat.
+    `rglob`, not `glob`: the drafts have staging subfolders, and a flat glob
+    stops seeing exactly the drinks closest to promotion.
 
-    THE REAL COLLECTIONS ARE READ ONCE PER RUN -- #1271. Some eighty
-    whole-corpus tests each re-read and re-parsed all 140 drinks, about 0.3s a
-    time. The roots this module names at import are scanned once and the
-    drinks shared; any other root (a test's own `tmp_path`, which it writes to
-    and scans again) is read afresh every time. Same bargain and same guard as
-    `_parsed`: the caller gets its own LIST, but the drinks in it are shared,
-    so copy a front matter before changing it.
+    The roots in `_REAL_ROOTS` are scanned once per run (#1271); any other root
+    is read afresh. The caller gets its own list but the drinks in it are
+    shared, so copy a front matter before changing it.
     """
     if root in _REAL_ROOTS:
         if root not in _SCANNED:
@@ -637,11 +289,9 @@ def _read(root):
 def _load_files():
     """Published drinks plus draft drinks, whole, from whichever roots are here.
 
-    Skips ONLY when neither collection is on disk. A root that IS here and
-    yields nothing is the loader-has-gone-stale case and must never be quiet:
-    "this machine has no drinks" and "I looked and found nothing" are opposite
-    answers, and the whole of tests/test_suite_hygiene.py exists because they
-    are easy to conflate into the same green.
+    Skips only when neither collection is on disk. A root that is here and
+    yields nothing is a stale loader and fails: "this machine has no drinks"
+    and "I looked and found nothing" must never be the same green.
     """
     out = _scan(RECIPES) + _scan(DRAFTS)
     if out:
@@ -661,10 +311,8 @@ def _load_files():
 def _load():
     """The same corpus as `_load_files`, as `(slug, front matter)` pairs.
 
-    STILL THE ONE DOOR -- see test_every_drink_reading_test_goes_through_the_
-    loader. `_load_files` is the same door with the raw text left on, not a
-    second one: both go through `_scan`, both skip and fail in the same places,
-    and this is a projection of that rather than its own glob.
+    Not a second door: both go through `_scan` and skip and fail in the same
+    places. See test_every_drink_reading_test_goes_through_the_loader.
     """
     return [(drink.slug, drink.fm) for drink in _load_files()]
 
@@ -672,18 +320,10 @@ def _load():
 def _load_published():
     """Only the drinks in `_cocktail_recipes/` -- the ones the world sees.
 
-    A SECOND DOOR, NOT A SECOND GLOB, and the distinction is what keeps #540
-    shut. `_load()` above is right for anything true of every drink; a PROMOTION
-    GATE is a claim about published drinks alone, and answering it from the
-    combined corpus would hold 114 drafts to a rule that is deliberately not
-    theirs.
-
-    It skips rather than passing when nothing is promoted. That is the honest
-    answer here and not the one `_load()` gives: `_cocktail_recipes/` lives in
-    THIS repo, so it is never missing, and an empty one is a true fact about the
-    collection rather than a stale scan. Reporting "checked, all fine" over zero
-    drinks would be the vacuous green tests/test_suite_hygiene.py exists to
-    prevent.
+    For a promotion gate, which is a claim about published drinks alone; the
+    combined corpus would hold drafts to a rule that is not theirs. Skips
+    rather than passes when nothing is promoted: green over zero drinks is
+    vacuous.
     """
     return [(drink.slug, drink.fm) for drink in _load_published_files()]
 
@@ -691,12 +331,9 @@ def _load_published():
 def _load_published_files():
     """`_load_published`, with the raw text left on.
 
-    THE SAME DOOR, NOT A SECOND ONE -- the relationship `_load_files` has to
-    `_load`, for the same reason. A rule about the WHOLE FILE rather than about
-    a parsed field (`test_no_published_drink_carries_a_qq` is the one) needs the
-    text, and the alternative is a test globbing `RECIPES` itself, which
-    `test_every_drink_reading_test_goes_through_the_loader` refuses on #540's
-    grounds and was right to.
+    For a rule about the whole file rather than a parsed field
+    (`test_no_published_drink_carries_a_qq`). The alternative is a test
+    globbing `RECIPES` itself, which the loader guard refuses.
     """
     out = _scan(RECIPES)
     if not out:
@@ -710,14 +347,12 @@ def _load_published_files():
 
 
 def _load_draft_files():
-    """Only the drinks in `_cocktail_drafts/`, whole -- the unpublished tense.
+    """Only the drinks in `_cocktail_drafts/`, whole.
 
-    THE MIRROR OF `_load_published_files`, for a rule that is true of a draft
-    and deliberately NOT of a published drink (#1258: a draft always carries a
-    notes slot, a published drink with nothing to say writes `notes: []`). It
-    filters `_load_files()` rather than scanning the root, so the skip and the
-    loud failure are that door's and not a copy of them. Absent drafts skip:
-    the private repo not being cloned is the ordinary state of CI.
+    For a rule that is true of a draft and deliberately not of a published
+    drink (#1258). It filters `_load_files()` rather than scanning the root, so
+    the skip and the loud failure are that door's. Absent drafts skip: that is
+    the ordinary state of CI.
     """
     out = [d for d in _load_files() if DRAFTS in d.path.parents]
     if not out:
@@ -728,32 +363,12 @@ def _load_draft_files():
 def _load_staged():
     """The published tense: `_cocktail_recipes/` plus every staging folder in STAGED_DIRS.
 
-    A THIRD DOOR, AND IT EXISTS BECAUSE PROMOTION IS TOO LATE TO FIND OUT.
-    `_load_published` asks about drinks the world can already see, which is the
-    right scope for a claim about the live site and the wrong one for a claim
-    about work in progress: a rule that first fires on the day a file is moved
-    turns promotion into a debugging session, and the drink is ready except for
-    a thing nobody mentioned while it was being written.
+    A drink in a staging folder is finished prose waiting on Helen, so the
+    fields the site publishes are already in their published form there; a
+    rule that first fires on the day a file is moved is too late.
 
-    Helen drew the line herself, 2026-09-04, reading Fish House Punch: *"'ED3'
-    isn't a bottle"* and *"this has 'item' everywhere too"*. `4-promote/` is
-    hers -- she moves files into it once she has made the drink and decided it
-    ships -- so a file in there is finished prose waiting on her proofread, and
-    the fields the site publishes should already be in their published form.
-
-    `5-final-proofread/` JOINED 2026-09-18 and is the same tense for the same
-    reason. A drink is there because it WAS staged and got bounced back for a
-    ruling only Helen can give, so it is finished prose waiting on her exactly
-    as `4-promote/` is -- the difference is only which of them is holding it
-    up, and a drink sits there longest, being edited, which is when a shorthand
-    alias or a stray `item` is most likely to creep in. See STAGED_DIRS.
-
-    IT SKIPS WHEN NO DIRECTORY IS ON DISK, and only then. The staging folders
-    live in the private drafts repo, so CI never has them; `_cocktail_recipes/`
-    is in this repo. Any one present and yielding drinks is enough to run,
-    which is the same bargain `_load_files` strikes -- "this machine has no
-    staged drinks" and "I looked and found nothing" must not produce the same
-    green.
+    Skips when no directory is on disk, and when none holds a drink. The
+    staging folders are in the private drafts repo, so CI never has them.
     """
     out = _read(RECIPES)
     for staged in STAGED_DIRS:
@@ -777,22 +392,11 @@ def _load_staged():
     )
 
 
-# =============================================================================
-# PER-DRINK PARAMETRISATION, added 2026-09-03 with the house-style rules (#670)
-# =============================================================================
-# Every other test in this module scans the whole corpus and reports one list of
-# offenders, which is right for a claim about the collection ("no two generics
-# differ only by case"). A house-style rule is a claim about a FILE, and food
-# has always parametrised those per recipe so that the failure names the file
-# you have to open -- conftest.pytest_generate_tests, and the module docstring
-# there says why. A drink gets the same.
-#
-# THE EMPTY CASE ROUTES BACK THROUGH `_load_files`, deliberately. Parametrising
-# over nothing makes pytest report a bare "skipped", which says neither that the
-# collections are absent nor that a loader has gone stale -- and those are
-# opposite answers (see `_load_files`). So an empty corpus yields ONE parameter,
-# `None`, and `_require_drink` hands it straight back to the loader for the
-# right skip or the right loud failure.
+# --- Per-drink parametrisation (#670) ---
+# A house-style rule is a claim about a file, so its failure names the file.
+# An empty corpus yields one parameter, `None`, which `_require_drink` hands
+# back to `_load_files` for the right skip or the right loud failure: a bare
+# parametrise over nothing reports "skipped" for both.
 
 def pytest_generate_tests(metafunc):
     if "drink_file" not in metafunc.fixturenames:
@@ -821,72 +425,30 @@ def _drink_where(drink, detail=""):
     return path + (f" -- {detail}" if detail else "")
 
 
-# =============================================================================
-# WHAT A PARTIAL CORPUS CANNOT ANSWER -- the other half of #540
-# =============================================================================
-# Making the loader read both collections is not the whole fix, and the missing
-# half was found by promoting real drinks into a scratch `_cocktail_recipes/`
-# with the drafts moved aside -- i.e. by building the CI shape and looking,
-# rather than by reasoning about it.
-#
-# FIVE GUARDS FAILED ON DATA THAT WAS ENTIRELY CORRECT. All five hang on a
-# SHRINK-ONLY REGISTRY -- GLASSLESS_ON_2026_08_27, KNOWN_PROSE_SUGGESTIONS,
-# `card_name_joins`, methods.yml's proposals -- or on a proportion of the book.
-# Each asserts the registry has no dead entries, on the principle that a
-# registry with dead entries stops being read.
-#
-# THAT ASSERTION IS UNANSWERABLE ON A PARTIAL CORPUS, and unanswerable in the
-# one direction that matters: a drink that is merely ABSENT looks exactly like
-# a drink that has been fixed. In CI the drafts are always absent, so every
-# such registry reads as entirely stale. Promotion day would have produced five
-# false reds, on `main`, for ever -- not once.
-#
-# So the two halves are separated. The RATCHET half ("no NEW offender") is a
-# per-drink rule, true of any drink on its own, and runs everywhere including
-# CI: that is the coverage promotion is supposed to buy. The STALENESS half
-# skips with a reason when the whole book is not here.
-#
-# The alternative considered and rejected: let promotion day produce the five
-# failures and re-baseline the registries by hand. It reads as a one-off and is
-# not one -- every later promotion re-runs them over a partial corpus too.
+# --- What a partial corpus cannot answer (#540) ---
+# "This registry has no dead entries" and "no value covers more than half the
+# book" are unanswerable when only some drinks are present: an absent drink
+# looks exactly like a fixed one, and in CI the drafts are always absent. So
+# the ratchet half of such a rule ("no new offender") runs everywhere, and the
+# staleness half is its own test, calls `_require_whole_collection` and is
+# listed here. `test_whole_collection_only_says_what_it_does` pins the list.
 
 WHOLE_COLLECTION_ONLY = {
     "test_the_glassless_list_has_no_stale_entries",
     "test_the_known_prose_suggestion_list_has_no_stale_entries",
-    # Added 2026-09-02, #585. Same shape as its neighbours and the same reason:
-    # a drink merely ABSENT looks exactly like a drink FIXED, so "no drink says
-    # this any more" is unanswerable on a partial corpus.
     "test_unresolved_suggestions_has_no_stale_entries",
     "test_every_card_name_join_is_reachable",
     "test_every_proposal_still_matches_a_real_step",
     "test_every_garnish_proposal_still_matches_a_real_string",
     "test_no_mood_covers_more_than_half_the_collection",
-    # The five COVERAGE claims below -- see _exercised.
+    # The coverage claims -- see _exercised.
     "test_the_character_vocabulary_is_exercised",
     "test_the_bottle_index_is_exercised",
     "test_the_cross_category_check_is_exercised",
     "test_the_syrup_ratio_check_is_exercised",
     "test_the_amount_table_is_exercised",
-    # ADDED 2026-09-26 with the counted-unit rule. `_exercised` wraps
-    # `_require_whole_collection`, so this is a sixth coverage claim and this
-    # registry caught it the moment it was written -- which is the registry
-    # doing its job rather than a nuisance.
     "test_the_plural_unit_rule_is_exercised",
-    # A correction whose drink is merely ABSENT looks exactly like one whose
-    # drink is gone -- see _require_whole_collection.
     "test_every_mood_correction_is_reachable_and_needed",
-    # ADDED 2026-09-10, AND IT IS THE ONE THAT PROVED THIS LIST IS NOT A
-    # FORMALITY. The comment above this set already warned that promotion is
-    # "not one" event -- "every later promotion re-runs them over a partial
-    # corpus too" -- and this test was the member nobody had spotted. It went
-    # red in CI the night the first drinks went live, on an exception for a
-    # note belonging to a DRAFT: with no drafts the note does not exist, so the
-    # exception read as stale. The entry was fine; the corpus was partial.
-    #
-    # WHY IT HID UNTIL THAT DAY: with NOTHING promoted, CI's corpus was EMPTY,
-    # so the "live notes" set was empty and the comparison never ran against
-    # anything real. Absent is safe here and PARTIAL is not, which is the state
-    # promotion created.
     "test_no_drink_note_exception_is_stale",
 }
 
@@ -911,31 +473,12 @@ def _require_whole_collection(what):
 
 
 def _exercised(count, what, implausible):
-    """This guard's scan found something to check -- a COVERAGE claim.
+    """This guard's scan found something to check -- a coverage claim.
 
-    FOUR GUARDS HERE END `assert checked, "...so this check is vacuous"`, and
-    they are right to: a scan that came back empty and passed is the one failure
-    mode with a green symptom, and tests/test_suite_hygiene.py exists because it
-    has bitten six times.
-
-    BUT EVERY ONE OF THEM ARGUES FROM THE SIZE OF THE WHOLE BOOK -- "blackstrap
-    alone is on three drinks", "around forty rum pours name a bottle", "that is
-    implausible for this collection". On a partial corpus the argument simply
-    does not hold: one promoted drink may legitimately contain no rum at all,
-    and finding no rum suggestions in it says nothing about `family_of`.
-
-    SO EACH IS SPLIT OUT INTO ITS OWN TEST RATHER THAN SKIPPED IN PLACE, and the
-    distinction is the whole point. Skipping the original test to silence the
-    coverage claim would take the OFFENDER check down with it -- and that
-    offender check is exactly the coverage promotion is meant to buy (#540).
-    Split, both halves keep working: the substantive rule runs on every promoted
-    drink in CI, and the "is this corpus big enough to exercise me" claim is
-    asked only where it can be answered.
-
-    Helen, 2026-08-29, on the four reds this would otherwise have left for
-    promotion day: "my preference is not to leave things in a state where tests
-    fail and we have to remember why every time we run the suite, but the
-    solution to that is not to turn off or otherwise avoid the tests."
+    The claim argues from the size of the whole book, so it holds only on the
+    whole collection: one promoted drink may contain no rum at all. It is its
+    own test rather than a skip inside the offender check, which must keep
+    running on every promoted drink in CI (#540).
     """
     _require_whole_collection(what)
     assert count, f"{what} found nothing to check. {implausible}"
@@ -962,11 +505,9 @@ def _drink_file(directory, slug, body="glass:\n  - \"coupe\"\n"):
 def test_a_promoted_drink_is_checked_with_no_drafts_present(tmp_path, monkeypatch):
     """A drink in `_cocktail_recipes/` is read even when the drafts are absent.
 
-    THIS IS THE GATE, and it is the assertion #540 needed. CI has this repo and
-    not the private drafts one, so "absent drafts" is the shape every deploy run
-    takes. Before this change the loader skipped outright in that state, which
-    meant a promoted drink -- the only kind the public ever sees -- was the one
-    thing no guard in this module could reach.
+    CI has this repo and not the private drafts, so absent drafts is the shape
+    of every deploy run; a loader that skips there checks no published drink
+    (#540).
     """
     monkeypatch.setattr("test_cocktails.RECIPES", tmp_path / "_cocktail_recipes")
     monkeypatch.setattr("test_cocktails.DRAFTS", tmp_path / "_cocktail_drafts")
@@ -981,9 +522,7 @@ def test_a_promoted_drink_is_checked_with_no_drafts_present(tmp_path, monkeypatc
 def test_no_drinks_anywhere_skips_rather_than_reporting_green(tmp_path, monkeypatch):
     """Neither collection on disk is a skip with a reason, never a silent pass.
 
-    The honest answer to "there is nothing here" is to say so in the run. An
-    empty corpus that returns quietly is the vacuity failure this repository
-    has now been bitten by six times (tests/test_suite_hygiene.py).
+    The reason must say how to make the check real.
     """
     monkeypatch.setattr("test_cocktails.RECIPES", tmp_path / "nope")
     monkeypatch.setattr("test_cocktails.DRAFTS", tmp_path / "also-nope")
@@ -997,12 +536,11 @@ def test_no_drinks_anywhere_skips_rather_than_reporting_green(tmp_path, monkeypa
 
 
 def test_a_present_but_empty_collection_is_never_quiet(tmp_path, monkeypatch):
-    """A root that exists and yields nothing FAILS -- it does not skip.
+    """A root that exists and yields nothing fails -- it does not skip.
 
-    This is the half that stops the fix above from becoming a new hiding place.
     "The drafts are not cloned here" and "the drafts are cloned and I parsed
-    none of them" must not produce the same outcome, or a loader that has gone
-    stale looks exactly like a machine without the private repo.
+    none of them" must not produce the same outcome, or a stale loader looks
+    like a machine without the private repo.
     """
     monkeypatch.setattr("test_cocktails.RECIPES", tmp_path / "nope")
     monkeypatch.setattr("test_cocktails.DRAFTS", tmp_path / "_cocktail_drafts")
@@ -1016,15 +554,11 @@ def test_a_present_but_empty_collection_is_never_quiet(tmp_path, monkeypatch):
 
 
 def test_every_drink_reading_test_goes_through_the_loader():
-    """No test may glob the collections itself; `_load()` is the only door.
+    """No test may glob the collections itself; the loaders are the only door.
 
-    ONE DOOR IS WHAT MAKES THE GATE ABOVE WORTH ANYTHING. Every guard in this
-    module calls `_load()`, so fixing the loader fixed all 24 at once -- and the
-    same property means a single future test globbing `DRAFTS` directly would
-    reintroduce exactly the #540 hole for itself, silently, in CI only.
-
-    Generated from the source rather than from a list somebody maintains, which
-    is MANUAL §12's lesson about generating the next check from the other end.
+    A test naming `RECIPES` or `DRAFTS` directly gets none of the loader's
+    skip-or-fail and, in CI, scans nothing and reports green (#540). Read from
+    the syntax tree, not from a list somebody maintains.
     """
     import ast
 
@@ -1038,14 +572,8 @@ def test_every_drink_reading_test_goes_through_the_loader():
         if node.name in LOADER_GUARDS:
             continue
         names = {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
-        # `STAGED_DIRS` since 2026-09-18, and `STAGED` stays in the set on
-        # purpose even though no such name exists any more: a test written
-        # against the old singular would be a NameError rather than a silent
-        # hole, but leaving it costs nothing and the guard is here precisely
-        # for the things nobody thought of. Rename this constant again and the
-        # new name must join this set in the same commit, or the guard quietly
-        # stops seeing direct access to it -- green, in CI only, which is the
-        # #540 hole reopening.
+        # Rename a root constant and the new name must join this set in the
+        # same commit, or the guard stops seeing direct access to it.
         named = sorted(names & {"RECIPES", "DRAFTS", "STAGED", "STAGED_DIRS"})
         if named:
             offenders.append(f"{node.name} names {', '.join(named)} directly")
@@ -1080,16 +608,10 @@ def test_every_drink_reading_test_goes_through_the_loader():
 def test_whole_collection_only_says_what_it_does():
     """Every test in WHOLE_COLLECTION_ONLY actually skips, and nothing else does.
 
-    THE REGISTRY IS ONLY WORTH HAVING IF IT IS TRUE -- the same claim
-    test_suite_hygiene.py makes about SKIPS_WITHOUT_DRAFTS, and the same reason.
-    A test listed here but not calling `_require_whole_collection` runs in CI
-    over a partial corpus and reports a stale registry that is merely absent; a
-    test calling it without being listed silently stops covering the collection
-    and nobody chose that.
-
-    Asked of the syntax tree, not the text, because a docstring explaining that
-    a check needs the whole collection contains every word a grep would look
-    for -- MANUAL §12, five instances of exactly that collision.
+    A test listed but not calling `_require_whole_collection` reports absent
+    entries as stale in CI; one calling it unlisted silently stops covering
+    the collection. Read from the syntax tree: a docstring explaining the rule
+    contains every word a grep would look for (MANUAL §12).
     """
     import ast
 
@@ -1099,14 +621,7 @@ def test_whole_collection_only_says_what_it_does():
         if not (isinstance(node, ast.FunctionDef) and node.name.startswith("test_")):
             continue
         seen.add(node.name)
-        # BOTH ENTRY POINTS, and the second was found by this guard failing on
-        # four tests that plainly did skip. `_exercised` wraps
-        # `_require_whole_collection` for the coverage claims, so a scan looking
-        # only for the direct call classified all four as "listed but never
-        # calls it". A guard that follows exactly one spelling of the thing it
-        # checks is MANUAL §11.0's lesson about the destructive-git hook, in
-        # miniature: enumerate how the thing can be SPELLED, not how you happen
-        # to have written it today.
+        # Both entry points: `_exercised` wraps `_require_whole_collection`.
         for child in ast.walk(node):
             if (isinstance(child, ast.Call) and isinstance(child.func, ast.Name)
                     and child.func.id in ("_require_whole_collection", "_exercised")):
@@ -1131,22 +646,16 @@ def test_whole_collection_only_says_what_it_does():
     )
 
 
-# =============================================================================
-# THE SCHEMA GUARD -- issue #669. A drink cannot gain or lose a key in silence.
-# =============================================================================
+# --- The schema guard (#669): a drink cannot gain or lose a key in silence ---
 # Every check below reads the constants at the top of this file and names no
-# field of its own, so the schema is stated once and enforced from there. The
-# food suite's equivalents are test_front_matter.py::test_no_retired_fields,
-# ::test_meta_block_is_exactly_the_three_flags_in_order and ::test_notes_is_a_list;
-# these are the cocktails half, which did not exist until now.
+# field of its own.
 
 
 def test_no_unknown_top_level_keys():
-    """A drink's front matter holds only the twelve keys the schema declares.
+    """A drink's front matter holds only the keys the schema declares.
 
     An undeclared key is a silent no-op: no template reads it, no test sees it,
-    and a misspelling of a real one reads exactly like a new idea. Adding a key
-    is one line in TOP_LEVEL_KEYS, and having to write that line is the point.
+    and a misspelling of a real one reads exactly like a new idea.
     """
     bad = []
     for slug, fm in _load():
@@ -1161,11 +670,10 @@ def test_no_unknown_top_level_keys():
 
 
 def test_required_top_level_keys_present():
-    """Every drink carries all eleven required keys, `to_serve` aside.
+    """Every drink carries every key in REQUIRED_TOP_LEVEL.
 
-    A MISSING KEY AND AN EMPTY ONE ARE DIFFERENT FACTS and only one of them is
-    recorded. `source: ""` says nobody has found the source yet; no `source` at
-    all says nothing, and reads identically to a key that was never written.
+    A missing key and an empty one are different facts: `source: ""` says
+    nobody has found the source yet; no `source` at all says nothing.
     """
     bad = []
     for slug, fm in _load():
@@ -1180,28 +688,18 @@ def test_required_top_level_keys_present():
     )
 
 
-# =============================================================================
-# KEY ORDER -- #1213. A draft is written in the order the page prints it.
-# =============================================================================
-# Helen: "yaml fields should be rewritten in the order they appear on the page,
-# top to bottom ... 1. Do not apply this retrospectively to published recipes.
-# 2. Please apply to drafts. 3. Please apply to new ingests."
-#
-# TWO TESTS, AND THEY ANSWER DIFFERENT QUESTIONS. The first is about this repo
-# alone and runs everywhere, CI included: is the declared order still the
-# page's? The second is about the private drafts and is DRAFTS ONLY -- a
-# published drink is never asked, which is her scope 1.
+# --- Key order (#1213): a draft is written in the order the page prints it ---
+# Two tests. The first asks whether the declared order is still the page's and
+# runs everywhere; the second reads the private drafts only, because the rule
+# is not applied to published drinks.
 
 COCKTAIL_LAYOUT = ROOT / "_layouts" / "cocktail.html"
 _LIQUID_COMMENT = re.compile(
     r"\{%-?\s*comment\s*-?%\}.*?\{%-?\s*endcomment\s*-?%\}", re.S)
 _PAGE_FIELD = re.compile(r"\bpage\.([a-z_]+)")
-# WHERE THE PAGE'S WORDS BEGIN. Everything above this in the layout is the glass
-# ICON -- a picture drawn beside the title block, looked up from `page.glass`
-# before the name is printed. Counting it would put `glass` first, above the
-# title, and Helen's own example of the order opens "title, tagline, glass".
-# The order is the order of the WORDS, so the derivation starts at the element
-# that holds them.
+# Where the page's words begin. Above this the layout looks the glass icon up
+# from `page.glass`, which would put `glass` above `title`; the order is the
+# order of the words.
 _WORDS_BEGIN = 'class="cocktail-head-words"'
 
 
@@ -1246,10 +744,9 @@ def keys_out_of_page_order(keys):
 def test_the_declared_key_order_is_the_order_the_page_prints():
     """`TOP_LEVEL_KEYS_IN_ORDER` equals the order read off the layout. #1213.
 
-    THE LIST IS DATA AND THE LAYOUT IS THE AUTHORITY, so neither can move alone.
-    Reorder two sections of the page and this names the two keys; add a key to
-    the schema and it must either be printed by the layout or be given a place
-    and a reason in `KEYS_THE_LAYOUT_NEVER_NAMES`.
+    The layout is the authority, so neither can move alone: a key added to the
+    schema is either printed by the layout or given a place and a reason in
+    `KEYS_THE_LAYOUT_NEVER_NAMES`.
     """
     derived = page_order_from_the_layout()
     assert len(derived) >= 10, (
@@ -1289,18 +786,12 @@ def test_the_declared_key_order_is_the_order_the_page_prints():
 
 
 def test_a_draft_drinks_keys_are_in_page_order():
-    """A cocktail DRAFT's top-level keys are in page order. #1213.
+    """A cocktail draft's top-level keys are in page order. #1213.
 
-    DRAFTS ONLY. Helen's first scope line is "Do not apply this retrospectively
-    to published recipes", so `_cocktail_recipes/` is never read here and a
-    drink keeps whatever order it was promoted in.
-
-    THE PASS RAN ON 2026-10-04, all 62 drafts, after she had read one:
-    "Billingsley: looks great! Deep breath, please do the same for all our
-    drafts a) now, and b) at ingest". It is drafts schema 2
+    Drafts only: the rule is not applied to published drinks, which keep the
+    order they were promoted in. The order is part of the drafts schema
     (`tests/drafts_schema.py`), so a clone that predates it fails
-    `test_the_cocktail_drafts_clone_is_in_step` first, and that message says
-    this one is its fault.
+    `test_the_cocktail_drafts_clone_is_in_step` first.
     """
     bad = []
     for drink in _load_draft_files():
@@ -1321,15 +812,9 @@ def test_a_draft_drinks_keys_are_in_page_order():
 def test_no_unknown_ingredient_keys():
     """An ingredient entry holds only the keys the schema declares.
 
-    The same argument as the top-level check, and it bites harder: an entry is a
-    bare mapping with no layout of its own, so a stray key renders nowhere and
-    fails nothing. `note` versus `notes` is the whole failure mode.
-
-    ONE SET FOR BOTH COLLECTIONS SINCE 2026-09-21, when `item` was retired.
-    There used to be two -- `INGREDIENT_KEYS_DRAFTS` and a `_RECIPES` that
-    subtracted exactly one key -- plus a second test to apply the smaller one to
-    published drinks, plus a third to apply it early at the staging folders.
-    Retiring the key collapsed all of that into this.
+    An entry is a bare mapping with no layout of its own, so a stray key
+    renders nowhere and fails nothing: `note` versus `notes` is the whole
+    failure mode. One set for both collections.
     """
     bad = []
     for slug, fm in _load():
@@ -1350,41 +835,17 @@ def test_no_unknown_ingredient_keys():
     )
 
 
-# =============================================================================
-# THE PUBLISHED TENSE -- Helen's rulings on Fish House Punch, 2026-09-04
-# =============================================================================
-# Two rules, one scope: `_cocktail_drafts/4-promote/` and `_cocktail_recipes/`.
-# Both are about the difference between a drink being WRITTEN and a drink being
-# FINISHED, and both were things Helen had to say out loud while reading a file
-# she was about to ship.
-#
-# THE DRAFTS KEEP HER SPELLING AND THE ALIASES DO THE READING. That standing
-# rule (§9.3.2: "leave the drinks as she wrote them; aliases do the reading") is
-# untouched and is why `bottles.yml` carries seventeen bottles under more than
-# one name. What these add is an END to it: the alias map exists so a drink can
-# be written fast and still resolve, and a drink that is finished has had time
-# to say the bottle's real name.
+# --- The published tense: the staging folders and `_cocktail_recipes/` ---
+# A draft keeps Helen's spelling and the aliases do the reading (MANUAL
+# §9.3.2). A finished drink says the bottle's real name.
 
 def test_a_staged_drink_writes_a_bottles_canonical_name():
     """A drink ready to publish names each bottle as `bottles.yml` names it.
 
-    Helen, 2026-09-04, on Fish House Punch's `suggestion: "ED3"`: *"'ED3' isn't
-    a bottle."* It resolves -- it is a declared alias of `El Dorado 3 year old
-    rum` -- so `test_every_suggested_bottle_resolves` was and is happy, which is
-    exactly why this is a second rule rather than a change to that one. An alias
-    is a READING convenience; the published page is a piece of WRITING, and
-    "ED3" on it is a note to self that escaped.
-
-    AND IT IS NOT A CHANGE OF MIND ABOUT DRAFTS. §9.3.2's rule stands
-    everywhere else: write the bottle as she spells it, add the spelling as an
-    alias, never retype a drink to canonical form. The alias map is what lets an
-    ingest be fast. This says only that the fast form is not the finished form,
-    and it fires in `4-promote/` -- where there is still time -- rather than at
-    the moment of the move.
-
-    A SUGGESTION THAT RESOLVES TO NOTHING IS NOT THIS TEST'S PROBLEM: it is
-    `test_every_suggested_bottle_resolves`'s, and reporting one fault as two
-    teaches you to skim the output.
+    An alias resolves, so `test_every_suggested_bottle_resolves` passes it; it
+    is shorthand for transcribing and not what the published page says. Drafts
+    elsewhere keep her spelling (MANUAL §9.3.2). A suggestion that resolves to
+    nothing is that other test's to report.
     """
     data = _bottles()
     index = _bottle_index(data)
@@ -1423,9 +884,9 @@ def test_a_staged_drink_writes_a_bottles_canonical_name():
 def test_every_ingredient_has_a_declared_shape():
     """Every ingredient entry carries a `generic`; nothing else is required.
 
-    `generic` IS WHAT THE INDEX BROWSES BY (§9.3.1), so an entry without one is
-    invisible to every filter and to the card. Coverage cannot quietly regrow
-    either: an untyped ingredient is a visible `QQ` generic, never an absent key.
+    `generic` is what the index browses by (MANUAL §9.3.1), so an entry without
+    one is invisible to every filter and to the card. An untyped ingredient is
+    a visible `QQ` generic, never an absent key.
     """
     bad = []
     for slug, fm in _load():
@@ -1446,18 +907,10 @@ def test_every_ingredient_has_a_declared_shape():
 def _step_text(step):
     """The words of one method step, whichever of the two shapes it is written in.
 
-    A STEP IS A STRING OR A `{step, note}` PAIR -- Helen, 2026-09-04: "separate
-    note field please, although it will be used sparingly." Every reader of
-    `method` in this file goes through here, and that is the point: the pair
-    arrived on one drink and turned
-    `test_every_proposal_still_matches_a_real_step` red with "cannot use 'dict'
-    as a set element", because that test built a set straight out of the raw
-    list. One reader, fixed once, is what stops the next reader hitting the same
-    wall -- `conftest.Recipe.method_steps` is the food side's own version of this
-    and has read both shapes for as long as food has had them.
-
-    Anything that is neither shape reads as no words at all, and the shape test
-    below is what fails on it -- a reader is not the place to complain.
+    A step is a string or a `{step, note}` pair, and every reader of `method`
+    in this file goes through here: a reader of the raw list breaks on the
+    pair. Anything in neither shape reads as no words; the shape test below
+    fails on it.
     """
     if isinstance(step, dict):
         step = step.get("step")
@@ -1476,22 +929,11 @@ def _steps(fm):
 
 
 def test_a_method_step_is_a_string_or_a_step_note_pair():
-    """`method` holds strings, or `{step, note}` pairs -- Helen, 2026-09-04.
+    """`method` holds strings, or `{step, note}` pairs.
 
-    "Separate note field please, although it will be used sparingly." The
-    Caipirinha is the drink that earned it: its muddle step used to carry the
-    remark in brackets -- "(my giant spiky muddler, not the polite smooth one)"
-    -- inside the instruction, where it reads as part of what to do rather than
-    as an aside about how she does it.
-
-    THE NOTE MUST BE A NON-EMPTY STRING WHEN PRESENT. `note: ""` and `note: []`
-    both render as a step with an empty grey line under it, which looks like a
-    page bug rather than like a drink with nothing to add; a step with nothing
-    to say simply stays a string.
-
-    AND THE PAIR MAY HOLD NOTHING ELSE. A third key is either a typo or a field
-    nobody implemented, and both render as silence -- the same argument
-    `test_no_unknown_front_matter_keys` makes one level up.
+    The note is a non-empty string when present: `note: ""` renders as a step
+    with an empty grey line under it. The pair holds nothing else: a third key
+    is a typo or an unimplemented field, and both render as silence.
     """
     bad = []
     for slug, fm in _load():
@@ -1525,10 +967,8 @@ def test_a_method_step_is_a_string_or_a_step_note_pair():
 def test_method_is_a_non_empty_list():
     """Every drink's `method` is an ordered list with at least one step in it.
 
-    NINE DRINKS HAD NO `method` KEY AT ALL until 2026-09-02 and no test noticed,
-    so a drink you cannot make rendered as a drink with nothing left to do.
-    Where the source genuinely records no build the step is a visible `QQ`, which
-    is a question on the page rather than a silence.
+    A drink with no `method` renders as a drink with nothing left to do. Where
+    the source records no build the step is a visible `QQ`.
     """
     bad = []
     for slug, fm in _load():
@@ -1546,13 +986,11 @@ def test_method_is_a_non_empty_list():
 
 
 def test_every_ingredient_has_an_amount():
-    """Every ingredient entry says how much, in every case, with no exceptions.
+    """Every ingredient entry says how much, with no exceptions.
 
-    Helen's ruling, 2026-09-02: an ingredient the method ADDS rather than
-    measures still has an amount, and it is a verb phrase -- "champagne, to top",
-    "absinthe, to rinse". Eleven entries carried no `amount` before that, and a
-    consumer reading the key got the same `None` for "numberless by nature" and
-    "nobody wrote it down".
+    An ingredient the method adds rather than measures has a verb-phrase
+    amount ("to top", "to rinse"); without one, "numberless by nature" and
+    "nobody wrote it down" are the same `None`.
     """
     bad = []
     for slug, fm in _load():
@@ -1576,10 +1014,8 @@ def test_every_ingredient_has_an_amount():
 def test_meta_keys_are_exactly_the_schema_in_order():
     """A drink's `meta:` block holds exactly META_KEYS_IN_ORDER, in that order.
 
-    THE ORDER IS FREE TO OBEY, which is what makes it worth enforcing: reordering
-    a block changes no value, so nothing is at stake but consistency across 124
-    files read at a glance. Workstream 2 added the three gate flags on
-    2026-09-02 and that list was, as promised, the only line that changed.
+    Reordering a block changes no value, so the order is free to obey and the
+    blocks read alike at a glance.
     """
     bad = []
     for slug, fm in _load():
@@ -1601,9 +1037,8 @@ def test_meta_keys_are_exactly_the_schema_in_order():
 def test_tagline_is_a_non_empty_string():
     """Every drink has a `tagline`, and it is a string with something in it.
 
-    `tagline` IS A REAL FIELD and is not to be dropped -- Helen, 2026-09-02, on
-    the 120 drinks that still say `QQ`. That is a backlog, and this check is what
-    keeps it a visible one rather than letting the key quietly disappear.
+    An unwritten tagline says `QQ`; that keeps the backlog visible rather than
+    letting the key quietly disappear.
     """
     bad = []
     for slug, fm in _load():
@@ -1624,36 +1059,10 @@ _QQ_ANYWHERE = re.compile(r"\bQQ\b")
 def test_no_published_drink_carries_a_qq():
     """`QQ` never reaches the live site, in any field, in any shape.
 
-    HELEN'S RULING, 2026-09-21, and it is the whole specification: *"QQ just
-    means 'Helen pay attention to this for some reason' ... Honestly we don't
-    need to disambiguate, only to block anything on the site from publishing
-    with a QQ in any context, hence why I use 'QQ' rather than any mark that
-    might appear in real, wanted text."*
-
-    THIS IS FOOD'S `test_no_qq_placeholder`, WHICH DRINKS HAD NEVER HAD. That
-    guard is parametrised over the food `recipe` fixture and `tests/conftest.py`
-    names `_food_recipes/` and `_food_drafts/` and nothing else, so the one rule
-    that keeps an unfinished marker off the live site covered one of the two
-    sites. A drink published on `awaiting_fix: false` + `proofread: true` alone,
-    and those two flags are about whether Helen has READ the file, not about
-    whether anything in it is still owed.
-
-    IT REPLACES `test_a_promoted_drink_has_a_real_tagline`, which asked whether
-    the tagline was EXACTLY `"QQ"` -- and stopped being sufficient the moment a
-    QQ could carry the source's words after it. `tagline: "QQ."` and
-    `tagline: "QQ - rewrite: ..."` both exist in `_food_drafts/` today and both
-    walked past that equality test. A word-boundary search over the whole file
-    is the shape that cannot be outgrown by a new convention, which is why
-    Helen's rule is about the two letters and not about a grammar.
-
-    IT ALSO ENFORCES THE TAGLINE RULE SHE ASKED FOR IN THE SAME BREATH -- *"a
-    drink without a tagline written by me gets a QQ, so I protect my voice in
-    the public content."* An unwritten tagline says QQ; a QQ cannot publish; so
-    the line on the live site is hers. One check, both rules, no second list of
-    which fields matter.
-
-    READS THE RAW TEXT, not the parsed front matter, so a QQ in a method step, a
-    note, a comment or the body is caught alongside one in a field.
+    `QQ` means "Helen, look at this", and the gate flags say only that she has
+    read the file, not that nothing in it is owed. A word-boundary search over
+    the raw text, so a QQ in a method step, a note, a comment or the body is
+    caught, and an unwritten tagline (`QQ`) cannot publish.
     """
     bad = []
     for drink in _load_published_files():
@@ -1671,32 +1080,17 @@ def test_no_published_drink_carries_a_qq():
     )
 
 
-# =============================================================================
-# THE PUBLICATION GATE, DRINK SIDE — issues #667, #668, D1–D3
-# =============================================================================
-# `_plugins/publish_gate.rb` has listed `cocktail_recipes` in GATED_COLLECTIONS
-# since the plugin existed, and since 2026-09-02 it publishes a document only on
-# `meta.awaiting_fix == false` AND `meta.proofread == true`. Until the migration
-# in this commit's private-repo counterpart, no drink carried either key, so the
-# gate would have held back every promoted drink silently -- safe, and invisible.
-#
-# These are the drink half of test_front_matter.py's four food guards. The
-# boolean and hyphen checks run over BOTH collections, because they are true of
-# any drink; the git-history check runs over `_cocktail_recipes/` alone, because
-# it is a claim about published files.
+# --- The publication gate, drink side (#667, #668) ---
+# `_plugins/publish_gate.rb` publishes a drink only on an explicit pass of each
+# gate flag (DECISIONS §4.0). The boolean and hyphen checks run over both
+# collections; the git-history check runs over `_cocktail_recipes/` alone,
+# because it is a claim about published files.
 
 def test_the_gate_flags_are_real_booleans():
-    """`awaiting_fix: "false"` is a STRING and the gate does not match it.
+    """`awaiting_fix: "false"` is a string and the gate does not match it.
 
-    THE SILENT ONE, exactly as on the food side. The plugin compares against
-    Ruby's `false` and `true`, not truthiness, so a quoted value is never equal
-    to either -- and because the gate fails closed, a quoted flag holds the
-    drink back rather than publishing it. Safe, and completely unexplained: you
-    would be left looking for a drink that simply is not there.
-
-    The mirror of this trap bit `_data/cocktails/taxonomy.yml`'s `ship_scale`,
-    where a bare `yes` parsed as the BOOLEAN True and failed every comparison
-    against the string "yes". Same family, pointing the other way.
+    The plugin compares against Ruby's `false` and `true`, not truthiness, and
+    fails closed, so a quoted flag holds the drink back with no explanation.
     """
     bad = []
     for slug, fm in _load():
@@ -1725,17 +1119,9 @@ def test_the_gate_flags_are_real_booleans():
 def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
     """`awaiting-fix` must never appear, on a drink or anywhere else.
 
-    THE HYPHEN IS A HAZARD, NOT A STYLE PREFERENCE, which is why this is a test
-    and not a note. Ruby reads `meta["awaiting-fix"]` happily, so the plugin
-    never minds -- but LIQUID PARSES `page.meta.awaiting-fix` AS SUBTRACTION.
-    Any template asking whether a drink is flagged would get arithmetic instead
-    of a boolean, evaluate it as false, i.e. "not flagged", and show the drink
-    it was asked to hide. The drinks index reads `meta` on every card, so this
-    is a live surface rather than a hypothetical one.
-
-    Food renamed the key on 2026-08-18 and carries the identical guard. The
-    drinks arrived after the rename and have never used the old spelling; this
-    is what keeps it that way rather than a fix for anything.
+    Ruby reads `meta["awaiting-fix"]` happily, but Liquid parses
+    `page.meta.awaiting-fix` as subtraction, so a template asking whether a
+    drink is flagged gets arithmetic instead of the flag.
     """
     bad = []
     for slug, fm in _load():
@@ -1753,539 +1139,23 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
     )
 
 
-# THE BASELINE, AND WHY IT GRANDFATHERS NOTHING.
-#
-# The food test's `BASELINE_COMMIT` exists to exempt history from before its
-# rule existed. Here there is no such history to exempt: `_cocktail_recipes/`
-# is EMPTY -- not one drink has been promoted -- so every commit reachable from
-# this baseline touched zero published drinks, and the exemption covers zero
-# files by construction.
-#
-# The migration that gave drinks their flags is not this SHA and cannot be: it
-# landed in `_cocktail_drafts/`, a different git repository, and this test reads
-# THIS repo's history only. There is no public-side counterpart commit to point
-# at, and pointing at one that merely happened at the same time would assert a
-# relationship that does not exist.
-#
-# So it is simply the tip of `origin/main` on the day the test was written. Move
-# it only under the rules the food constant's own comment sets out -- measure
-# first ("how many drinks is this rule currently holding at proofread: false?"),
-# and never to make a red test green. Once drinks are actually promoted this
-# stops being a formality.
-# MOVED ONCE, 2026-09-09, TO THE PROMOTION ITSELF -- and this is the case the
-# paragraph above meant by "once drinks are actually promoted this stops being a
-# formality". Read this before moving it again, because the rule is otherwise
-# "never to make a red test green" and that is exactly what this looks like.
-#
-# WHAT HAPPENED. Helen proofread 19 drinks and asked for them to be moved into
-# the public repo: "please move all proofread: true files into the public repo.
-# If you do this then I don't have to fish through one by one to find out which
-# I still need to proofread." The promotion is a COPY -- byte-identical,
-# asserted rather than assumed -- so the content of every one of those files is
-# exactly what she read and approved.
-#
-# BUT THE COMMIT THAT ADDS THEM IS AN AGENT'S, and this test reads the public
-# repo's history only (#624: a public test must never require private drink
-# data). So it cannot tell a promotion from an edit: from here, 19 drinks
-# marked `proofread: true` appeared in an agent commit, which is precisely the
-# shape the test exists to catch. The blind spot is deliberate and the baseline
-# is the documented lever for it -- MANUAL §4.0's exception, "if she has
-# reviewed the change herself then she was the last judgement even though an
-# agent's commit wrote the bytes".
-#
-# IT GRANDFATHERS NOTHING GOING FORWARD, which is why this is safe. The check
-# skips a commit only if it is an ANCESTOR of this SHA, so every commit after
-# the promotion is examined exactly as before. Edit one of these 19 drinks
-# tomorrow without setting `proofread: false` and this test fires.
-#
-# THE NEXT TIME IT SHOULD MOVE is another promotion of drinks Helen has read.
-# It should NOT move because an ordinary edit went red -- that is the failure
-# it is for, and the fix there is the flag.
-#
-# AND THE NEXT TIME CAME WITHIN THE DAY, 2026-09-10. `5c7ecad` promoted the
-# first NINETEEN drinks; `fa37ebb` promoted the remaining twenty-nine, in a
-# second agent commit, and the live deploy went red on exactly those 29. That
-# is the rule above working rather than failing -- a second promotion is a
-# second batch of drinks Helen has read appearing in an agent's commit, and it
-# needs the same grant as the first.
-#
-# THE LESSON IS THAT PROMOTION IS NOT AN EVENT, IT IS A HABIT. The first move
-# read as a one-off; two in one day says this constant will keep moving, and
-# will keep needing Helen's word each time. If promotion becomes routine, the
-# honest fix is a test that can tell a promotion from an edit -- which needs
-# something the public repo can check, since it cannot see the private history
-# (#624). Nobody has designed that yet, and until they do, this line moving is
-# the visible cost of each deployment.
-# MOVED A THIRD TIME, 2026-09-10, AND NOT FOR A PROMOTION -- read the paragraph
-# above about "an ordinary edit went red" before assuming this one is wrong.
-# `e5ebf1b` applied the accepted method proposals (#705, PR #906) to 12 live
-# drinks: one method line each, plus the Bellini's "exept". Helen chose to
-# review that diff line by line rather than re-read 12 pages -- asked how she
-# wanted to re-proofread after a methods pass: "Line by line. I can just grind
-# it out." -- which is MANUAL §4.0's exception in her words, granted before the
-# edit was made. So the flags stay `true`, nothing leaves the live site during
-# her review, and the diff IS the proofread. Covers e5ebf1b and nothing after.
-# MOVED A FOURTH TIME, 2026-09-10, AND IT IS THE SMALLEST GRANT YET -- which is
-# the interesting thing about it. `832c726` deletes ONE CHARACTER from each of
-# two live drinks: the leading apostrophe in `Bittermens 'Elemakule Tiki
-# Bitters`, on #879. Helen: "delete those two apostrophes, don't flip the
-# proofread flag, explicit permission."
-#
-# WHY IT NEEDED A GRANT AT ALL, when the obvious fix is the bottle dictionary:
-# _layouts/cocktail.html renders `item.suggestion` VERBATIM from the recipe file
-# and does not resolve it through bottles.yml, so the apostrophe could only be
-# removed from the PAGE by editing the two recipes. Renaming the key alone would
-# have closed nothing. Without her word that is two of 48 live drinks off the
-# site until she re-read them, for one character each.
-#
-# SO THE PRECEDENT NOW COVERS A THIRD SHAPE. The first two moves were
-# promotions (drinks she had already read appearing in an agent's commit); the
-# third was a methods pass she chose to review as a diff. This one is neither:
-# it is a change so small she could see all of it in the sentence that asked for
-# it. The grant is still hers and still explicit, which is the only thing that
-# has to stay true. Covers 832c726 and nothing after.
-# MOVED A FIFTH TIME, 2026-09-10, AND THIS ONE IS THE RULE WORKING END TO END.
-# `1e8b7d0` gave four live drinks (Accoutrement, Aperol Spritz, the Bellini,
-# L'Isle Martinique) the taglines Helen wrote that day and flipped all four to
-# `proofread: false` in the same commit, as #367 requires; they would have left
-# the live site on merge. She read the four built pages BEFORE the merge, on the
-# branch, and granted the exception in so many words: "I've checked those four
-# live drinks, and they're perfect. Please flip their proofread flags back to
-# true and push for me." `39240e8` flips them back. So the sequence the rule
-# describes happened in full -- agent edit, flag off, her read, her word, flag
-# on -- and the only thing this line records is that the last step was hers.
-# Covers 39240e8 and nothing after.
-# MOVED A SIXTH TIME, 2026-09-10, LATE, AND THE GRANT CAME BEFORE THE READ.
-# `ae13155` sets `proofread: true` on four live drinks (Accoutrement, Sazerac,
-# South Sider, Vieux Carré) whose only agent edit since her last read was one
-# word -- `Creole bitters` to `Créole bitters` (#882, PR #946). That PR had
-# flipped them off the site as #367 requires; Helen said she had flipped them
-# back herself, but that commit never reached `main`, and with the site's
-# deploys blocked by a red suite she granted it outright: "Break the rule,
-# explicit permission, and get everything up on the site with proofread=true.
-# Then hand on heart I'll look at them myself to confirm everything is fine."
-# So this is the fourth move's shape (a change she could see whole in the
-# sentence that asked for it) with the read promised rather than done. The
-# grant is still hers, still explicit, still quoted. Covers ae13155 and
-# nothing after. #933 is the open question of whether a constant is the right
-# shape for this at all; six moves in a day say it is not.
-# MOVED A SEVENTH TIME, 2026-09-12, AND THE GRANT AGAIN CAME BEFORE THE READ.
-# `ea6525d` sets `proofread: true` on Sazerac and Caribbean Sazerac. Their only
-# agent edit since Helen's last read was 46bdc4c, changing the method from
-# shake to stir on her ruling (#883), which correctly flipped both to
-# `proofread: false` in the same commit. Helen, this session: "Please flip the
-# proofread flag on sazerac and caribbean sazerac -- this is explicit
-# permission. They are both in published recipes, but were touched by an
-# agent so needed to be proofread again." The grant is hers, explicit, and
-# quoted -- the sixth move's shape exactly, read promised rather than shown.
-# Covers ea6525d and nothing after.
-# MOVED 2026-09-16, WITH ITS FOOD TWIN, FOR ONE BARE STRING. Her PR #1126
-# proofread the Arrack Christmas Punch and added `suggestion: "Ceylon Arrack"`,
-# which `test_suggestion_is_always_a_list` refuses -- so `main` was red and
-# nothing was deploying. `3039210` wraps it in a list and changes nothing a
-# reader sees: the drink page prints the bottle name either way. Her grant,
-# asked as a choice between flipping the flag and moving the baseline: "Fix and
-# keep proofread true". Proved with the old value first: the test named
-# arrack-christmas-punch-wife-3.md and nothing else. Covers 3039210 and nothing
-# after it.
-# MOVED 2026-09-18 FOR A PROMOTION, WHICH IS THE ONE CASE THIS CONSTANT CANNOT
-# TELL APART FROM AN EDIT. `b196949` copies seven drinks from the private
-# repo's `4-promote/` into `_cocktail_recipes/` unchanged -- byte-for-byte,
-# asserted at copy time -- and the test reads the PUBLIC repo's history only
-# (#624), so all it can see is seven files marked `proofread: true` appearing
-# in an agent's commit. That is indistinguishable from an agent editing seven
-# proofread drinks, and it is exactly what `PUBLISHING_A_COCKTAIL.md` step 6
-# warned this constant would have to absorb.
-#
-# HER GRANT, and the read is already done rather than promised, which makes
-# this the cheapest shape rather than the sixth move's. Helen, 2026-09-18, of
-# the seven: "Are the 7 remainders ready to promote otherwise? If yes then
-# please do it." Four of them this batch never touched at all; the other three
-# were edited only from `notes:` YAML null to `notes: []`, which renders
-# identically -- so her existing proofread covers the published bytes exactly,
-# and no page went up that she has not read. The ten drinks that DID change
-# visibly are not here: they went to `proofread: false` and are back with her.
-#
-# Proved with the old value first, as every move before it was: the test named
-# all seven promoted files and nothing else. Covers b196949 and nothing after.
-# MOVED AGAIN 2026-09-19, FOR A GARNISH REWORDING SHE DICTATED. `3644a61`
-# retypes `half lime shell` to `half an empty lime shell` in both Mai Tais and
-# in garnish.yml, because the generated step had been reading "Garnish with a
-# half lime shell" -- correct data and not English. Helen chose the words
-# herself and then granted the flag: "Those rewords are fine for Mai Tais, no
-# need to flip the flag."
-#
-# THE CHEAPEST OF THE SHAPES THIS CONSTANT HAS TAKEN, and the fourth move's
-# exactly -- a change she could see whole in the sentence that asked for it,
-# where the words she is being asked to re-read are the words she supplied.
-# Flipping would have taken the classic Mai Tai off the live site until she
-# re-read a page whose only change was her own. `PIPELINE.md` §5's first row
-# is this case in as many words: a word or a number, asked first, granted
-# without the flip.
-#
-# Proved with the old value first: the test named
-# `_cocktail_recipes/mai-tai.md` and `mai-tai-diffords-recipe.md`, and nothing
-# else. Covers 3644a61 and nothing after.
-# MOVED 2026-09-19 FOR THE BATCH'S SECOND PROMOTION, which finishes it. `4eacc21`
-# copies the remaining ten out of `5-final-proofread/` unchanged -- byte-for-byte,
-# asserted at copy time -- and this test reads the PUBLIC repo's history only
-# (#624), so all it can see is ten files marked `proofread: true` appearing in an
-# agent's commit. Indistinguishable from an agent editing ten proofread drinks,
-# which is the case `PUBLISHING_A_COCKTAIL.md` step 6 says this constant exists to
-# absorb.
-#
-# HER GRANT: "Those are all fine. Set proofread to true, and fully promote!"
-# The flags were set by Claude on her word in the private repo's 52590ba, which
-# is step 5's documented alternative ("tells Claude the slugs and Claude flips
-# them on her word") rather than an exception to it. She had been reading the
-# rendered pages throughout -- she quoted Zombie Intoxica's generated garnish
-# line back verbatim, article bug and all, which is not visible in the source.
-#
-# Proved with the old value first, as every move before it: the test named all
-# ten promoted files and nothing else. Covers 4eacc21 and nothing after.
-# MOVED 2026-09-19 FOR ONE FLAG ON ONE DRINK, AND THIS IS THE SHAPE THE
-# MECHANISM IS WEAKEST AT. `1031e77` sets `proofread: true` on Smokestack
-# Lightning and changes nothing else in the file. Helen: "Smokestack is
-# proofread, please flip the flag and commit with this work now." The drink had
-# been off the live site since 9d5621a on 2026-09-16 and nothing surfaced that
-# -- the cards deliberately do not show the flags (#562) -- so it was found by
-# counting 65 files against 64 pages while checking something unrelated.
-#
-# NOT A `HELEN_CLEARED` ENTRY, and the drinks side has no such list anyway.
-# `test_front_matter.py`'s baseline comment worked through the same choice on
-# 2026-09-10 and reached the same answer: an exemption entry covers a file FOR
-# EVER, which is more than a single read grants, while the baseline covers this
-# commit and nothing after -- so the next agent edit to this drink trips the
-# test again, which is correct.
-#
-# FOUR MOVES IN TWO DAYS, all for promotions or for a flag Helen dictated, and
-# none for an edit the rule was written to catch. #933 asks whether a constant
-# is the right shape for this at all; this batch is more evidence that it is
-# not, and none that the RULE is wrong.
-#
-# Proved with the old value first: the test named
-# `_cocktail_recipes/smokestack-lightning.md` and nothing else. Covers 1031e77
-# and nothing after.
-# MOVED 2026-09-20 FOR A DERIVED CHIP ON FIFTEEN DRINKS -- the widest move this
-# constant has made, and the one whose argument is the least about the files.
-# `cf4967a` puts `proofread: true` back on the fifteen published drinks that
-# gained `no measuring` (#1127), so none of them ever leaves the live site.
-#
-# HER GRANT, given before merging and conditional: "if the only change to those
-# 15 files is the chip appearing, I don't need to proofread, please just let
-# them be live."
-#
-# THE CONDITION WAS CHECKED, NOT ASSUMED, which is what a conditional grant
-# asks for. `tmp/prove_only_the_chip.py` diffed all fifteen against `main` and
-# required every changed line to be one of exactly two: the added
-# `- "no measuring"`, and the flag itself. A reordered mood, a changed amount
-# or a stray whitespace edit would have failed it.
-#
-# WHY A DERIVED VALUE IS DIFFERENT FROM AN EDIT, and this is the part worth
-# keeping. #367's reason is that an agent editing a recipe means Helen's read
-# no longer covers what is in the file. Here it does: the one added line is
-# COMPUTED from amounts she has already read, by a rule she ruled on the same
-# day, and it renders as a chip rather than as prose. Nothing she proofread
-# changed. That is not a new kind of exception -- it is the fourth and fifth
-# moves' shape (a change she can see whole in the sentence that asked for it)
-# arriving for a field no human types at all.
-#
-# FIFTEEN FILES ON ONE GRANT is the number to be uneasy about rather than the
-# reasoning. #933's question gets sharper every time this happens: a constant
-# that moves for a mechanical re-derivation is absorbing something the rule was
-# never pointed at, and `_only_invisible_keys_changed` is the mechanism that
-# would answer it properly -- `mood` is not invisible (it renders a chip), but
-# it is DERIVED, and the suite has no word for that yet.
-#
-# Proved with the old value first, as every move before it: the test named all
-# fifteen files, every one of them "last touched by cf4967a9", and nothing
-# else. Covers cf4967a and nothing after.
-#
-# MOVED 2026-09-21 FOR TWO SOURCE LINES, AND THIS IS THE NARROWEST MOVE THE
-# CONSTANT HAS MADE. `742aa73` normalises `Difford's Guide` to `Difford's` on
-# `biggles-sidecar` and `classic-champagne-cocktail` -- 24 other drinks say
-# `Difford's`, and the new `_data/cocktails/sources.yml` declares that the house
-# form. Two files, one field, four characters removed from each.
-#
-# HER GRANT, UNPROMPTED AND EXPLICITLY BOUNDED: "If you're tweaking a bracket in
-# a source line there's no need to flip the proofread flag, in this session
-# only, normal rules again after this." The bound is hers and is recorded here
-# because a grant with an expiry is worthless if only the taker remembers it:
-# THIS IS THAT SESSION AND THERE IS NOT ANOTHER. A later commit citing this
-# paragraph for a different edit is misreading it.
-#
-# WHY IT IS A DEFENSIBLE ONE ANYWAY, on the terms #367 actually sets. The rule
-# is that an agent's edit means her read no longer covers what is in the file.
-# What changed here is the SPELLING of a publication's name, on a line whose
-# content she has read, to the form she has read on 24 other drinks. There is no
-# reading of "Difford's Guide" that her proofread of "Difford's" fails to cover.
-# That is the fourth and fifth moves' shape -- a change she can see whole in the
-# sentence that asked for it -- rather than the fifteen-file shape #933 is uneasy
-# about.
-#
-# AND IT IS STILL A VISIBLE FIELD, which is why this needed a grant at all
-# rather than `_only_invisible_keys_changed`. `source` prints on the drink page;
-# only `source_type` is on the invisible list. A spelling that renders is a
-# spelling a reader sees.
-#
-# Proved with the old value first, as every move before it: the test named
-# `_cocktail_recipes/biggles-sidecar.md` and
-# `_cocktail_recipes/classic-champagne-cocktail.md`, both "last touched by
-# 742aa738", and nothing else. Covers 742aa73 and nothing after.
-#
-# MOVED 2026-09-26 FOR FOUR DRINKS, THREE OF THEM A PLURAL. `6fe3ca1` flips
-# `proofread` back to true on accoutrement, caribbean-sazerac,
-# mai-tai-diffords-recipe -- each `2 dash` -> `2 dashes`, on Helen's new rule
-# that day, "'dashes' throughout please, but 'dash' when it's one" -- and on
-# german-vacation, which gained the derived `sharp` chip when `sharp` stopped
-# being disqualified by crushed ice.
-#
-# HER GRANT: "Proofread flag: fine to flip back on those four drinks with
-# dashes. I'll double check, but I'm happy to do that live." Three of the four
-# have dashes and the fourth is german-vacation; read as the four that were
-# demoted together and reported to her as one group, and its change is the
-# #1127 derived-chip case she has already ruled on ("if the only change to
-# those 15 files is the chip appearing, I don't need to proofread").
-#
-# THE CONDITION WAS CHECKED BEFORE THE GRANT WAS ACTED ON, which PIPELINE.md 5
-# requires of a grant of this shape and which is the half easiest to skip.
-# `tmp/prove_only_expected.py` on that branch diffs all four against
-# `origin/main` and requires every changed line to be one of three shapes: the
-# dash pluralisation, the `sharp` chip, the flag. It passed with nothing left
-# over; a reordered mood or a changed amount would have failed it.
-#
-# Proved with the old value first, as every move before it: the test named
-# exactly those four files, every one "last touched by 6fe3ca19", and nothing
-# else. Covers 6fe3ca1 and nothing after.
-#
-# MOVED AGAIN 2026-09-27 FOR SEVEN DRINKS, ON TWO GRANTS IN ONE SENTENCE EACH.
-# `9b7aea8` flips `proofread` back on five topped drinks -- airmail,
-# arrack-christmas-punch-wife-3, julien-sorel,
-# pear-apricot-and-rosemary-bellini, tom-collins -- whose amounts became
-# `(top)` under #1217, and on jagerita and vieux-carre, which the #1216
-# bar-spoon rule demoted the day before for one derived `no measuring` chip
-# each.
-#
-# HER GRANTS: "to top: yes please, if those are the only changes then flip the
-# flag back to make them live again", and "Yes please, I grant Jag and VC."
-#
-# THE FIRST IS CONDITIONAL IN HER OWN WORDS, so the condition was checked
-# rather than assumed -- PIPELINE.md 5, and the half easiest to skip.
-# `tmp/prove_only_expected_2.py` on that branch diffs all seven against
-# `origin/main` and requires every changed line to be one of the shapes she was
-# shown: the amount rename and the flag for the five, and THE FLAG ALONE for
-# Jag and VC, whose chip was already on main. It passed with nothing over.
-#
-# WHY THE RENAME IS COVERED BY A PROOFREAD SHE GAVE BEFORE IT. `(top)` is the
-# string Helen typed in the ruling that asked for it, on a line whose content
-# she has read -- the same shape as the 742aa73 move above, "a change she can
-# see whole in the sentence that asked for it", rather than the fifteen-file
-# shape #933 is uneasy about.
-#
-# Proved with the old value first: the test named exactly those seven files,
-# every one "last touched by 9b7aea88", and nothing else. Covers 9b7aea8 and
-# nothing after.
-#
-# MOVED 2026-09-28 FOR A PROMOTION, WHICH IS THE ORDINARY REASON. `17d1638`
-# brings Bitter Mai Tai, Cadillac Margarita, Haley Traub's Frozen Margarita and
-# Minty Pentones out of `_cocktail_drafts/4-promote/` and into this collection,
-# already `proofread: true` because Helen read them there.
-#
-# THIS TEST CANNOT TELL A PROMOTION FROM AN EDIT, which is why the constant
-# exists (#624): it reads the PUBLIC repo's history only, so all it sees is
-# four drinks marked `proofread: true` appearing in an agent's commit. The
-# proofread happened in the other repo, where this test cannot look.
-#
-# Helen's word, on her own PR #75 against the drafts: "if there are any easy
-# fixes here, or any actually ready, then let's buff and promote." Four of the
-# twelve passed the gate; the other eight are held by `proofread` alone and
-# stayed behind.
-#
-# Proved with the old value first, as every move before it: the test named
-# exactly those four files, every one "last touched by 17d16384", and nothing
-# else. Covers 17d1638 and nothing after.
-# MOVED 2026-09-29 FOR THE SECOND PROMOTION OF THE BATCH. `12765a9` brings
-# chartreuse-swizzle, cobra-effect, gin-rickey, kamaniwanalaya, moscow-mule and
-# reef-juice out of `4-promote/`, already `proofread: true` because Helen read
-# them there and pushed.
-#
-# Proved with the old value first, as every move before it: the test named
-# exactly those six files, every one "last touched by 12765a92", and nothing
-# else. Covers 12765a9 and nothing after.
-#
-# ONE OF THE SIX WAS EDITED AFTER HER PROOFREAD, and it is worth saying which
-# and why it is still covered. Kamaniwanalaya's strain step read "Strain into a
-# collins glass filled with ice." -- the sentence the LAYOUT composes from
-# `Strain.` plus glasses.yml plus serve.yml -- so the stored form became the
-# bare technique. The rendered page is byte-identical to what she read, which is
-# the only reason that edit did not need a fresh proofread.
-#
-# MOVED 2026-10-02 FOR ONE DRINK AND ONE LINE, ON HELEN'S EXPLICIT GRANT.
-# `4f3621b` adds `I want to faff` to Porn Star Martini's `mood:` (#1268) -- the
-# tag she asked for in the issue's own words, "Scooping out three passion fruit
-# half-shells definitely counts", written by the deriver from a `mood_include`
-# entry. Nothing else in the file changed.
-#
-# HER GRANT, asked for the tag: "No need to flip the proofread flag, this is an
-# explicit grant." It is the 742aa73 shape again: a change she can see whole in
-# the sentence that asked for it.
-#
-# Proved with the old value first, as every move before it: the test named
-# exactly one file, `_cocktail_recipes/porn-star-martini.md`, "last touched by
-# 4f3621bc", and nothing else. Covers 4f3621b and nothing after.
-#
-# MOVED 2026-10-04 FOR THREE DRINKS, ON HELEN'S EXPLICIT GRANT (#1244).
-# `b3d2a03` moves Reef Juice and Fog Cutter (Bramble style) from a collins to a
-# tiki mug and scales the Arrack Christmas Punch from 135 ml to 87.5 ml
-# (22.5 / 22.5 / 12.5 / 22.5 / 7.5); `5f89c5e` puts their flags back.
-#
-# HER GRANT, told the three had been set `proofread: false` and would leave the
-# live site: "Reef, Fog and Arrack punch can stay proofread: true, so make that
-# happen please." Every change is one she dictated on the issue -- "Reef Juice
-# and Fog Cutter to tiki mug please", "Arrack Christmas Punch option B please",
-# the amounts chosen from a table put in front of her. The 742aa73 shape.
-#
-# Proved with the old value first, as every move before it: the test named
-# exactly those three files, every one "last touched by 5f89c5e3", and nothing
-# else. Covers 5f89c5e and nothing after.
-#
-# MOVED AGAIN THE SAME DAY FOR LITA GREY, WHICH THE GRANT ABOVE DID NOT NAME
-# and so was committed `proofread: false`. `6271217` scales it to two thirds
-# (5 x 15 ml shaken, 40 ml champagne -- her "option C") and drops the coupe;
-# `6481f2a` puts the flag back.
-#
-# HER GRANT, told it would leave the live site: "Lita Grey proofread: true too
-# please, and flute only, dropping the amounts to what we agreed."
-#
-# Proved with the old value first: the test named exactly one file,
-# `_cocktail_recipes/lita-grey.md`, "last touched by 6481f2af", and nothing
-# else. Covers 6481f2a and nothing after.
-#
-# MOVED ONCE MORE THAT DAY FOR #1290's FOUR DRINKS, WHICH HELEN PROOFREAD.
-# gin-sour, sazerac and white-negroni-pina-colada she ticked on the issue;
-# tiki-max she held for #1294, fixed in `2f1c123`. Sazerac's note was reworded
-# to the text she gave there (`5d68720`), and `db62ad1` sets the four flags.
-#
-# HER WORD: "#1290 are all good to go! Tiki Max was addressed."
-#
-# Proved with the old value first: the test named exactly gin-sour.md,
-# sazerac.md, tiki-max.md and white-negroni-pina-colada.md, each "last touched
-# by db62ad14", and nothing else. Covers db62ad1 and nothing after.
-#
-# NOT A GRANT FOR 18th-century-cocktail, which `13406a2` retyped to `white
-# crème de cacao` earlier on the same branch. It is an ancestor of this
-# baseline and says `proofread: false`; it stays that way until she reads it.
-#
-# MOVED 2026-10-07 FOR THE CHRISTMAS DAIQUIRI, ON HELEN'S EXPLICIT GRANT.
-# `f5dd435` changes one line: `garnish` from `no garnish` to `star anise
-# (floated)`, which is what its Difford's source says and what she noticed
-# while ruling on the Scandinavian Daiquiri's garnish from the same page.
-#
-# HER GRANT, told the edit would otherwise take the page off the live site:
-# "Add the floating star anise, keep it live, explicit grant." The 742aa73
-# shape: a change she can see whole in the sentence that asked for it.
-#
-# Proved with the old value first, as every move before it: the test named
-# exactly one file, `_cocktail_recipes/christmas-daiquiri.md`, "last touched by
-# f5dd4350", and nothing else. Covers f5dd435 and nothing after. (That move was
-# made on the branch `worktree-opus-misc-ingest`, in parallel with the three
-# below, which reached `main` first; they are reconciled at the foot of this
-# block.)
-#
-# MOVED 2026-10-07 FOR THIRTY DRINKS, WHICH HELEN PROOFREAD ON THE BRANCH
-# (#1321). The branch wrote her own new taglines into thirty published drinks
-# (and four shorter titles), from the worksheet she and Claude worked through
-# for #1292; every one flipped to `proofread: false` in the commit that wrote
-# it, as #367 requires. `6de7c97` puts the thirty flags back and changes
-# nothing else.
-#
-# HER WORD, having read the pages on her local build of that branch: "I've
-# proofread 1321, please commit the proofread true and I'll merge."
-#
-# Proved with the old value first, as every move before it: the test named
-# exactly those thirty files, every one "last touched by 6de7c97e", and
-# nothing else. Covers 6de7c97 and nothing after.
-#
-# 18th-century-cocktail WAS NOT AMONG THE THIRTY. The branch changed its
-# tagline too, but it was already `proofread: false` on main for `13406a2`, so
-# its flag was left alone and she was asked whether her read covered the page.
-#
-# MOVED AGAIN THE SAME DAY FOR THAT ONE DRINK, ON HER ANSWER. `c654809` sets
-# its flag and changes nothing else.
-#
-# HER WORD, asked whether her proofread of #1321 covered the whole page,
-# the `white crème de cacao` retype included: "18th century is good to go too".
-#
-# Proved with the old value first: the test named exactly one file,
-# `_cocktail_recipes/18th-century-cocktail.md`, "last touched by c6548095", and
-# nothing else. Covers c654809 and nothing after. The "NOT A GRANT" note
-# further up is history now: that drink has since been read and granted.
-#
-# MOVED AGAIN, 2026-10-08 -- #1089's COPY SITTING. It was `c654809`, above.
-# `3df50ce4` sets `proofread: true` on seven drinks and changes nothing else:
-# the caipirinha, El Presidente and Cobra's Fang (a typo each), the Negroni
-# (its new `snippet:` line), and the mulled wine, the Bellini and the frozen
-# fruit daiquiri (their titles in Title Case). Each was edited on the branch
-# and set to `false` in the same commit.
-#
-# HER GRANT, having read the rendered pages on the branch before it merged:
-# "#1341 is proofread! Let's go."
-#
-# Proved with the old value first: against `c654809` the test named exactly
-# those seven files, each "last touched by 3df50ce4", and nothing else.
-# Covers 3df50ce4 and nothing after.
-#
-# MOVED TO A MERGE, 2026-10-08, TO HOLD GRANTS MADE IN PARALLEL. The Christmas
-# Daiquiri move above (`f5dd435`) was made on `worktree-opus-misc-ingest` while
-# #1321's and #1341's were made on their own branches and merged first.
-# Neither `f5dd435` nor `3df50ce4` is an ancestor of the other, so neither
-# value covers both. `91431cf6` is the merge of `main` into that branch and
-# has all of them behind it.
-#
-# NO NEW GRANT IS IN THIS MOVE, only those already quoted above. Proved in the
-# merge itself, with `3df50ce4` still in place: the test named exactly one
-# file, `_cocktail_recipes/christmas-daiquiri.md`, "last touched by f5dd4350",
-# and nothing else.
-#
-# MOVED 2026-10-10 FOR ONE LINE IN EACH OF SIX DRINKS -- #1359. `92a132f6`
-# sets `made_before: false` -> `true` on the six published drinks that said
-# false (Bitter Mai Tai, Cadillac Margarita, Caribbean Sazerac, Classic
-# Champagne Cocktail, Haley Traub's Frozen Margarita, White Negroni Piña
-# Colada) and changes nothing else in any of them. Helen on #1359: "I have
-# made all the drinks we ingested from Difford's recently ... Same for all
-# drinks on the live site."
-#
-# HER GRANT, asked for before the edit and given 2026-10-10: "Explicit grant
-# now to update all those files, including the live ones -- I'll need to
-# reproofread anyway (argh), and these changes are minor so I trust you!"
-#
-# `efe55b56` is the merge of `main` into that branch, the same value the food
-# baseline takes for the same commit; it has `91431cf6` behind it. Proved with
-# the old value first: the test named exactly those six files, each "last
-# touched by 92a132f6", and nothing else.
-#
-# MOVED 2026-10-11 FOR FOUR DRINKS HELEN PROMOTED HERSELF -- #1368. She copied
-# Blue Hawaiian, Island of Martinique, Lucien Gaudin and Voodoo That You Do
-# into `_cocktail_recipes/` in her own commit (`2afd1f25`), asked for a double
-# check, and asked an agent to make the fixes it found: Voodoo's tagline,
-# source and source_url, Blue Hawaiian's "Paper umbrella.", a bare `notes:`,
-# the key order of three, and `rewritten: true` on two (`8253f32a`, which set
-# all four `proofread: false`). None of them had reached `main`.
-#
-# HER GRANT, told the four were on the PR's branch for her to pull and read,
-# 2026-10-11: "Great, thanks, flip those flags please." `ea203447` flips them
-# and changes nothing else. `efe55b56` is behind it. Proved with the old value
-# first: the test named exactly those four files, each "last touched by
-# ea203447", and nothing else.
+# The newest commit whose agent edits Helen has read herself. A published drink
+# last touched at or before it is exempt from the proofread flip (#367). The
+# test sees this repo's history only, so a promotion of drinks she has already
+# read looks like an agent edit and needs a move too (#624).
+# Moving it is Helen's grant, never a way to turn a red test green: run the
+# test with the old value, which must name only the granted files, then move
+# it in a commit of its own quoting her grant (DECISIONS §4.0). A grant covers
+# that commit and nothing after; parallel grants need the merge behind both.
 COCKTAIL_BASELINE_COMMIT = "49822c36"   # has `e5d693ab` behind it: #1375's fourteen, #1378's thirteen, Cynar Toronto
 
 
 def _newest_commit_per_published_drink():
     """{relative path: newest commit sha} across `_cocktail_recipes/`.
 
-    A module-level helper rather than inline, so the test function itself never
-    names the corpus roots -- see test_every_drink_reading_test_goes_through_
-    the_loader, which is what keeps `_load()` the only door.
+    A module-level helper so the test function never names the corpus roots:
+    test_every_drink_reading_test_goes_through_the_loader keeps `_load()` the
+    only door.
     """
     from test_front_matter import _git
 
@@ -2305,26 +1175,11 @@ def _newest_commit_per_published_drink():
 
 def test_agent_edited_drinks_are_not_marked_proofread():
     """A promoted drink whose newest commit is an agent's must say
-    `proofread: false`. Issue #367's rule, applied to drinks.
+    `proofread: false` (#367).
 
-    THE SAME MECHANISM, NOT A COPY OF IT. `_git`, `AGENT_TRAILER` and
-    `_only_invisible_keys_changed` are imported from tests/test_front_matter.py
-    rather than reimplemented: `_only_invisible_keys_changed` in particular is
-    150 lines of hard-won reasoning about what "nothing a reader could see
-    changed" means (#417, #429), and two copies of it would drift the first time
-    one was fixed. `INVISIBLE_KEYS` covers `meta.rewritten`, which is a
-    drink key too and genuinely renders nothing. (It also covers
-    `meta.date_last_edited`, which stopped being a drink key on 2026-09-05,
-    #712 -- the entry outlives the key on purpose, as its own note explains.)
-
-    IT READS THIS REPO'S HISTORY ONLY. `_cocktail_recipes/` lives here;
-    `_cocktail_drafts/` is a separate private repo and its history is not
-    readable from a public test, nor should it be -- issue #624: a public test
-    must never require private drink data.
-
-    It skips while nothing is promoted, the way `_load_published` does, because
-    "checked, all fine" over zero drinks is the vacuous green
-    tests/test_suite_hygiene.py exists to prevent.
+    `_git`, `AGENT_TRAILER` and `_only_invisible_keys_changed` are imported
+    from tests/test_front_matter.py so the two sites cannot drift. It reads
+    this repo's history only (#624), and skips while nothing is promoted.
     """
     from test_front_matter import AGENT_TRAILER, _git, _only_invisible_keys_changed
 
@@ -2387,13 +1242,9 @@ def _vocab():
 def _retired(vocab):
     """Every retired generic -> its reason, from every `retired_*` mapping.
 
-    DERIVED FROM THE PREFIX, not from a list of block names, and the reason is
-    the same one _declared_generics gives for deriving from the file's shape: a
-    block added tomorrow is covered tomorrow. This was a hardcoded
-    `retired_rum_styles` until 2026-08-26, which meant `retired_gin_styles`
-    landed invisible to both retirement checks -- a drink still saying
-    `flavoured` would have failed as "undeclared generic", with no reason
-    attached, which is the precise failure these blocks exist to prevent.
+    Derived from the prefix, not a list of block names, so a new `retired_*`
+    block is covered at once; one left out fails as a bare "undeclared
+    generic" with no reason attached.
     """
     out = {}
     for key, value in vocab.items():
@@ -2405,9 +1256,8 @@ def _retired(vocab):
 def _declared_generics(vocab):
     """Every declared generic value, from every list group in the file.
 
-    Derived from the file's own shape rather than a hardcoded list of group
-    names, so a group added tomorrow is covered tomorrow -- the same reasoning
-    test_every_drafts_collection_is_gitignored uses for reading _config.yml.
+    Derived from the file's shape, not a list of group names, so a group added
+    tomorrow is covered tomorrow.
     """
     out = set()
     for key, value in vocab.items():
@@ -2421,20 +1271,9 @@ def _declared_generics(vocab):
 def _ingredients():
     """(drink, generic) for every ingredient entry, one row per generic.
 
-    `generic` MAY BE A LIST, and that is deliberate rather than sloppy: two
-    ingredients in the collection genuinely offer alternatives in one cell --
-    "Demerara or dark Muscovado sugar" and "Grand Marnier / Cointreau / Triple
-    Sec". Helen, 2026-08-17: "What I have there is fine. I can do what I want on
-    the spot." So the generic carries both, which is what `glass` and `garnish`
-    already do for the same reason.
-
-    Flattened here so every check below sees one generic at a time and none of
-    them has to know about the list form. A list arriving somewhere that expects
-    a string is exactly how the `glass` scalar bug would have gone unnoticed.
-
-    IT USED TO CARRY `item` AS ITS MIDDLE VALUE, dropped with the field on
-    2026-09-21. That is worth a line because one caller was reading it as a
-    GUARD rather than as a label -- see test_every_ingredient_has_a_generic_or_a_qq.
+    `generic` may be a list, meaning either would do (#441). It is flattened
+    here so each check sees one generic at a time and none has to know about
+    the list form.
     """
     out = []
     for slug, fm in _load():
@@ -2449,18 +1288,14 @@ def _ingredients():
     return out
 
 
-# =============================================================================
-# 1 and 2 -- the vocabulary is closed, and retirements bite
-# =============================================================================
+# --- 1 and 2: the vocabulary is closed, and retirements bite ---
 
 def test_qq_followed_by_the_sources_words_is_still_a_qq():
     """`generic: "QQ aged Jamaican rum"` is an unanswered question with a hint.
 
-    Helen, 2026-09-20: "if it's not obvious write QQ then whatever the source
-    said." CI has no drafts clone, so nothing else there would notice `_is_qq`
-    breaking; this pins it directly, in both directions -- the words must be
-    accepted, and a real generic that merely starts with those two letters
-    must not be.
+    CI has no drafts clone, so nothing else there notices `_is_qq` breaking.
+    Pinned both ways: the source's words are accepted, and a real generic that
+    merely starts with those two letters is not.
     """
     assert _is_qq("QQ")
     assert _is_qq("QQ aged Jamaican rum")
@@ -2475,17 +1310,11 @@ def test_qq_followed_by_the_sources_words_is_still_a_qq():
 
 
 def test_every_generic_is_declared():
-    """A `generic` is a declared value or the literal `QQ`. A third thing is how
-    a typo mints a category silently.
+    """A `generic` is a declared value or `QQ`. A third thing is how a typo
+    mints a category silently.
 
-    QQ is allowed here and nowhere near a published recipe: these are drafts,
-    and 70 of 594 entries genuinely need Helen's call.
-
-    THIS CAUGHT FIVE REAL ONES when it was written -- all in the three
-    hand-written schema examples, which predate the vocabulary: `Creole bitters`
-    (capitalised), `chartreuse` (which of the two?), `peach liqueur` (the
-    collection uses crème de pêche), `rye whiskey` (the style is `rye`) and
-    `sugar syrup` (which sugar, and 1:1 or 2:1, are the whole distinction).
+    Retired values are left to test_no_drink_uses_a_retired_generic, which
+    reports them with their reason.
     """
     vocab = _vocab()
     declared = _declared_generics(vocab)
@@ -2523,25 +1352,12 @@ def _shelf_problems(vocab) -> list[str]:
 
 
 def test_every_declared_generic_is_on_a_shopping_shelf():
-    """`shelf_of` has exactly one row per declared generic, on a real shelf.
+    """`shelf_of` has exactly one row per declared generic, on a real shelf (#1175).
 
-    A generic with no row is not an error anywhere else: the shopping list
-    sorts an unknown shelf last and carries on, so the only person who finds
-    out is whoever builds a list with that drink in it. On 2026-09-21 that was
-    20 of 181 generics, six of them poured and two of those by published
-    drinks (`molasses sugar`, `peach brandy`), and `milk` had been given a
-    cost and a strength the day before and no shelf (#1175). The rows were
-    added and the comment above `shelf_of` went on saying "there is no test
-    for this yet".
-
-    DECLARED, NOT POURED, so it runs in CI. The drafts are absent there, and a
-    check over what is poured would cover the published drinks alone. Every
-    declared generic having a row is the stronger statement and needs no
-    drink to read.
-
-    The other two directions are what keep the map honest as it is edited: a
-    row for a generic that was renamed or retired, and a row filed under a
-    shelf nobody declared, which sorts last exactly as a missing row does.
+    Nothing else errors on a missing row: the shopping list sorts an unknown
+    shelf last and carries on. Declared, not poured, so it runs in CI without
+    the drafts. A row for an undeclared generic, or under an undeclared shelf,
+    fails too.
     """
     vocab = _vocab()
     assert _declared_generics(vocab) and vocab.get("shelf_of"), (
@@ -2576,30 +1392,12 @@ def test_the_shelf_check_sees_each_way_the_map_can_be_wrong():
 
 
 def test_a_claude_proposal_only_sits_beside_an_open_question():
-    """A `_claude` key is legal only while the POUR still carries a `QQ`.
+    """A `_claude` key is legal only while its entry still carries a `QQ`.
 
-    CONDITIONAL, AND THAT IS THE WHOLE DESIGN, the same shape the retired `item`
-    rule had: the proposal is allowed exactly as long as the question it answers
-    is open, and is forbidden the moment it is settled. A proposal beside a
-    fully-answered pour is one that outlived its answer -- which is how `item`
-    became a dumping ground, 215 pours deep, before it was retired.
-
-    THE QQ MAY BE IN THE `note`, NOT ONLY IN `generic`, and that is not a
-    loophole -- it is the case the proposal keys were ADDED for. A source
-    naming `Gosling's` resolves its generic and its suggestion outright, from
-    `bottles.yml`, so no QQ survives in `generic`; what is still open is the
-    CHARACTER, which `bottles.yml` deliberately does not record. That pour is
-    typed and has an open question, and the question lives in a `QQ -` note
-    beside the proposal. Helen's own definition is what makes this right: `QQ`
-    means "Helen pay attention to this for some reason", and it is the marker
-    rather than the field that carries the meaning.
-
-    IT IS ALSO WHY NO SECOND LIST IS NEEDED FOR PUBLISHED DRINKS. A published
-    drink carries no `QQ` anywhere (`test_no_published_drink_carries_a_qq`), so
-    by this rule it can carry no proposal either. One rule, both collections, no
-    `INGREDIENT_KEYS_RECIPES` to keep in step -- and that matters, because the
-    last key that needed a published-tense list of its own needed three tests
-    and got them wrong twice.
+    The `QQ` may be in `generic` or in the `note`: a source naming a bottle
+    resolves the generic outright and leaves only the character open. A
+    published drink carries no `QQ` (test_no_published_drink_carries_a_qq), so
+    this one rule keeps proposals out of both collections.
     """
     bad = []
     for slug, fm in _load():
@@ -2636,15 +1434,9 @@ def _listed(value):
 def test_a_claude_proposal_names_a_real_value():
     """A proposed generic, character or bottle is one the repo declares.
 
-    A PROPOSAL IS STILL HELD TO THE VOCABULARY, and it has to be: its whole
-    purpose is to be promotable into the field with one edit, so a value the
-    field would refuse is a proposal that can never be accepted. This is the
-    guard that stops `generic_claude: "blackstrap"` -- a word that is a
-    CHARACTER in this model and has been retired as a generic since #314, which
-    is precisely the confusion Helen raised when she asked for these keys.
-
-    `suggestion_claude` RESOLVES THROUGH THE ALIAS MAP, like any suggestion, so
-    a proposal may name a bottle the way the source spelled it.
+    A proposal exists to be promoted into its field with one edit, so a value
+    the field would refuse can never be accepted. `suggestion_claude` resolves
+    through the alias map, like any suggestion.
     """
     vocab = _vocab()
     declared = _declared_generics(vocab)
@@ -2683,12 +1475,10 @@ def test_a_claude_proposal_names_a_real_value():
 
 
 def test_no_drink_uses_a_retired_generic():
-    """Retired values fail with their retirement REASON attached.
+    """Retired values fail with their retirement reason attached.
 
-    Checked separately from "not declared", the same way food's
-    test_star_ingredient_is_declared handles retired stars: a value that used to
-    mean something must not blend into the generic not-declared pile, where
-    nobody learns why it went.
+    Checked apart from "not declared", so a value that used to mean something
+    does not blend into the undeclared pile, where nobody learns why it went.
     """
     retired = _retired(_vocab())
     assert retired, (
@@ -2729,25 +1519,10 @@ def _sources_data():
 def test_every_source_spelling_is_canonical():
     """A drink that cites a declared publication spells it the declared way.
 
-    A SPELLING RULE, NEVER A COVERAGE ONE, and `sources.yml`'s own header
-    argues the distinction at length. Helen ruled on 2026-08-30 that most
-    drinks will say `source: ""` and that this is right: "I sort of don't care
-    about this ... I'm not going to sweat it." A `source` matching nothing in
-    the table is free text and passes, which is the entire point -- her own
-    answers ("life", "Original", "spitting out weird soapy drinks every time I
-    accidentally use Blanc") are answers, and compound attributions name two
-    sources on purpose.
-
-    WHAT IT CATCHES is the one fault a table can catch: `Difford's` on 24
-    drinks and `Difford's Guide` on two. One publication, two spellings, and
-    nothing to tell the next ingest which is the house form -- so a third was
-    only a matter of time. The same shape `bottles.yml` uses for bottles, and
-    for the same reason.
-
-    THE MATCH IS ON THE WHOLE FIELD, not a substring, so "Satan's Whiskers,
-    London, via punchdrink.com" is untouched: it is a compound attribution that
-    happens to contain a publication's domain, and correcting inside one would
-    be rewriting a citation rather than spelling it.
+    A spelling rule, never a coverage one (DECISIONS §9.2): a `source` matching
+    nothing in the table is free text and passes. The match is on the whole
+    field, so a compound attribution that contains a publication's name is
+    untouched.
     """
     declared = _sources_data().get("publications") or {}
     canonical = {name.strip().lower(): name for name in declared}
@@ -2781,13 +1556,10 @@ def test_every_source_spelling_is_canonical():
 
 
 def test_no_source_alias_is_stale():
-    """The other direction: a declared alias is one somebody might write.
+    """Every declared publication lists at least one alias.
 
-    The same rule `unresolved_suggestions` and the garnish `proposals` have.
-    An alias nobody has ever written is a guess about the future, and a table
-    of guesses is one nobody trusts to be current -- so an alias earns its
-    place by having been seen, or by being the form the publication itself
-    uses.
+    The spelling test acts on aliases only, so an entry with none filters
+    nothing.
     """
     declared = _sources_data().get("publications") or {}
     assert declared, "sources.yml declares no publications, so this checks nothing."
@@ -2803,15 +1575,9 @@ def test_no_source_alias_is_stale():
 def test_serve_block_uses_only_declared_keys_and_values():
     """`serve` is a closed vocabulary, declared in _data/cocktails/serve.yml.
 
-    The field exists because the ice in the glass had no home and rode in the
-    last method step instead -- which is how "strain" came to be written
-    seventeen different ways. A free-text `ice` would put it straight back.
-
-    ABSENT IS ALWAYS LEGAL and means nobody has decided yet, exactly as
-    `garnish: []` does. Pic-a-de-Crop Punch is the live case: it strains into a
-    small punch bowl and never says whether ice goes in, where both its sibling
-    punches say a large block. Defaulting that to `none` would be inventing an
-    answer to a question only Helen can settle.
+    A free-text `ice` puts the ice back into prose, where "strain" gets written
+    many ways. Absent is always legal and means nobody has decided yet; an
+    empty mapping is not.
     """
     vocab = _serve_vocab()
     ices = set(vocab["ice"])
@@ -2841,11 +1607,8 @@ def test_serve_block_uses_only_declared_keys_and_values():
 def test_every_fill_is_a_declared_one():
     """`serve.fill` says how full, and serve.yml declares the words.
 
-    Added 2026-09-28 with the field. Same bargain every other closed
-    vocabulary here strikes: declaring a value is what switches enforcement on,
-    and an undeclared one would render the ice clause UNCHANGED -- "filled with
-    crushed ice" where the drink said half -- which is a silent wrong answer
-    rather than a loud one.
+    An undeclared value renders the ice clause unchanged ("filled with crushed
+    ice" where the drink said half): a silent wrong answer, not a loud one.
     """
     vocab = _serve_vocab()
     declared = set(vocab.get("fill") or {})
@@ -2870,15 +1633,9 @@ def test_every_fill_is_a_declared_one():
 def test_a_fill_has_something_to_fill():
     """A drink saying how full must have ice whose clause says `filled`.
 
-    THE SUBSTITUTION IS THE REASON. `fill` swaps the word `filled` in the
-    composed clause, and only `cubed` and `crushed` produce one -- `large cube`
-    and `block` are ice you pour the drink ONTO (", over a large ice cube"),
-    where half of one cube is not a quantity anybody is describing.
-
-    Paired with `none`, or with no `serve.ice` at all, the substitution finds
-    nothing and does NOTHING, which is the failure worth catching: the drink
-    reads as though somebody recorded how full it is and the page never says
-    so. A silent no-op is worse than a refusal, because it looks recorded.
+    `fill` swaps the word `filled` in the composed ice clause. Where the clause
+    has none (ice the drink is strained onto, `none`, or no `serve.ice`) the
+    substitution silently does nothing, and the page never says how full.
     """
     vocab = _serve_vocab()
     clauses = vocab.get("in_the_glass") or {}
@@ -2900,20 +1657,12 @@ def test_a_fill_has_something_to_fill():
     )
 
 def test_serve_ice_is_not_restated_in_the_method():
-    """The ice is recorded once, in `serve`, and not again in prose.
+    """The ice is recorded once, in `serve`, and not again in a strain step.
 
-    THIS IS THE WHOLE POINT OF THE FIELD, and without this guard the collection
-    drifts straight back: a step reading "Strain over crushed ice" beside
-    `ice: "crushed"` is the same fact twice, and two copies of a fact are two
-    chances to disagree. Nine drinks lost a mood on 2026-09-05 precisely because
-    `ice ice baby` was grepping that prose, and taxonomy.yml's own comment had
-    predicted it -- "a step reworded out of this list silently loses the mood".
-
-    THE SWIZZLES ARE THE DELIBERATE EXCEPTION. "Fill with crushed ice" then
-    "Swizzle until the glass frosts" is a TECHNIQUE: the drink is stirred
-    against the ice, so the step is doing work no field can do. Those steps
-    start with Fill or Top, never with a strain verb, which is the line this
-    test draws.
+    "Strain over crushed ice" beside `ice: "crushed"` is one fact twice, and
+    the copies can disagree. Swizzles are the exception: "Fill with crushed
+    ice" is technique, and those steps start with Fill or Top, never a strain
+    verb, which is the line this test draws.
     """
     bad = []
     for slug, fm in _load():
@@ -2941,27 +1690,11 @@ _DANGLING = re.compile(
 
 
 def test_no_method_step_ends_on_a_dangling_word():
-    """A step whose last word cannot end a sentence has been truncated.
+    """A step whose last word cannot end a sentence has been truncated, as in
+    "Fine strain into a chilled." or "Add to the.".
 
-    THREE OF THESE WERE FOUND BY ACCIDENT IN ONE DAY, which is why the shape
-    gets a test rather than another read-through:
-
-        "Fine strain into a chilled."      "Fine-strain into pre-chilled."
-        "Add to the."                      (vestigial: "Add to the [glass]")
-
-    None was found by anybody reading the drinks. The first two surfaced only
-    because the serve pass collapsed 31 spellings of "strain" into five and the
-    odd ones out stopped matching; the third because Helen read the list that
-    produced. Nobody reads 124 last-lines in a row, and prose that varies is
-    prose nobody can check -- which is the whole argument for `serve` and for
-    methods.yml before it.
-
-    A SWEEP OF ALL 313 STEPS AFTERWARDS FOUND NO FOURTH, so this starts life
-    green and bites on the next one, the ratchet bargain garnish.yml strikes.
-    Two candidates it deliberately allows: "Add ice and shake until chilled."
-    and "Squeeze a lime wedge into a shaker and drop it in." Both are whole
-    sentences, which is why `chilled` and a trailing `in` after a pronoun are
-    not treated as dangling.
+    Whole sentences that look similar pass: "... shake until chilled." and
+    "... drop it in.". A step starting `QQ` is skipped.
     """
     bad = []
     for slug, fm in _load():
@@ -2982,18 +1715,10 @@ def test_no_method_step_ends_on_a_dangling_word():
 
 
 def test_to_serve_is_serveware_and_not_the_ice():
-    """`to_serve` is what the drink is served WITH, never how it is iced.
+    """`to_serve` is what the drink is served with, never how it is iced.
 
-    The two fields drifted into each other in both directions and each way was
-    invisible from the other side. Blue Hawaiian put a cocktail umbrella --
-    serveware -- into `garnish`; Gin Sour put `to_serve: "Without ice."` into
-    the serveware field. Helen's original report was exactly this: "things to
-    serve with (like a paper umbrella) aren't written or laid out the same way."
-
-    Ice belongs in `serve.ice`, which is a closed vocabulary and which the page
-    renders as its own line. A sentence about ice here is a second, free-text
-    copy of a fact already recorded -- and two copies of a fact are two chances
-    to disagree.
+    Ice belongs in `serve.ice`, a closed vocabulary the page renders itself; a
+    sentence about ice here is a second, free-text copy that can disagree.
     """
     bad = []
     for slug, fm in _load():
@@ -3032,37 +1757,12 @@ def test_a_rim_says_rim():
 
 
 def test_a_garnish_is_not_an_ingredient_or_a_rim():
-    """`garnish` holds garnishes, not pours, not rims, not serveware.
+    """`garnish` holds garnishes, not ingredients, rims or serveware.
 
-    THE FIELD HAD ABSORBED FOUR OTHER KINDS OF THING, because three of them had
-    no home of their own until 2026-09-05:
-
-        cocktail umbrella                  -> `to_serve`, which already existed
-        half-rim of sugar                  -> `serve.rim`
-        passion fruit shell filled with
-          overproof rum                    -> its own method step already said it
-
-    This checks the two shapes a machine can be sure about: a quantity at the
-    front (`3 dashes ...`, `5 drops of ...`), which means a POUR that belongs in
-    `ingredients` where #297 can count it, and the word `rim` in a phrase that
-    describes rimming rather than placement.
-
-    `lime wedge on rim` PASSES AND MUST. garnish.yml rules that a placement
-    carries information -- "lime wedge on rim says where to put it" -- so the
-    test looks for a rim being MADE ("half-rim of sugar"), not for one being
-    used as an address. `over the rim` is the same address in other words:
-    Golden Bird's `orange peel over the rim (cut to look like a beak)` is
-    Helen's own wording, 2026-10-07, written to finish the sentence "Garnish
-    with ...".
-
-    TWO LIVE VALUES STILL FAIL THIS SHAPE AND ARE HELEN'S CALL, not a machine's:
-    german-vacation's "3 dashes red creole-style bitters" and mastiha-mojito's
-    "5 drops of olive oil". Both are pours by this rule; both would need a
-    ruling (does a float of olive oil earn a generic?) and one would need a new
-    vocabulary entry. They are listed in the failure message rather than
-    silently exempted, so the test is red until she rules -- see
-    tests/README-style note: a guard that quietly excuses the cases it was
-    written for enforces nothing.
+    Two shapes a machine can be sure of: a quantity or the word dash/drop,
+    which is an ingredient and belongs where #297 can count it, and a rim
+    being made ("half-rim of sugar"), which is `serve.rim`. A rim used as an
+    address passes: "lime wedge on rim", "orange peel over the rim".
     """
     quantity = re.compile(r"^\s*\d|\b(dash|dashes|drop|drops)\b", re.I)
     rimming = re.compile(r"\brim\b(?!\s*$)|rim of\b|-rim\b", re.I)
@@ -3086,25 +1786,12 @@ def test_a_garnish_is_not_an_ingredient_or_a_rim():
 
 
 def test_every_glass_in_use_has_a_serving_phrase():
-    """Every glass a drink names can be written into a strain step.
+    """Every glass a drink names has a `serving` phrase in glasses.yml.
 
-    The page BUILDS its strain step -- "Strain into an old fashioned glass, over
-    a large ice cube." -- out of three fields: the technique from `method`, the
-    glass's phrase from `serving` in glasses.yml, and the ice clause from
-    serve.yml. Helen asked for the glass and the ice back in the method on
-    2026-09-05 ("I'd like to name the glass too where it appears"), and the
-    sentence is composed rather than stored so that each fact lives in one place
-    and the prose cannot drift from it.
-
-    A GLASS WITH NO PHRASE FAILS HERE RATHER THAN ON THE PAGE. Without this the
-    step silently falls back to a bare "Strain." and the glass is simply absent
-    from the method -- the quiet kind of gap that took six drinks' glass icons
-    with it in 2026-08 and was found by inspection rather than by a test.
-
-    THE ARTICLE AND THE WORD "GLASS" ARE PART OF THE PHRASE. "an old fashioned
-    glass" but "a highball" and "a coupe" -- Helen's own examples set that
-    pattern, and it is not derivable: an old fashioned is also a drink, so the
-    noun does real work there and none after "coupe".
+    The page composes its strain step from the technique, this phrase and the
+    ice clause from serve.yml. A glass with no phrase falls back to a bare
+    "Strain." and the glass silently leaves the method. The article and the
+    word "glass" are part of the phrase: "an old fashioned glass", "a coupe".
     """
     glasses = _glasses()
     serving = glasses.get("serving") or {}
@@ -3127,20 +1814,11 @@ def test_every_glass_in_use_has_a_serving_phrase():
 
 
 def test_suggestion_is_always_a_list():
-    """One shape for the bottle field, so no consumer has to handle two.
+    """`suggestion` is always a list, so no consumer has to handle two shapes.
 
-    It was a bare string on 194 pours and a list on 18 until 2026-09-05. Liquid
-    treats a bare string as a one-item sequence, so the template tolerated both
-    by accident and nothing ever complained -- but every consumer #297 (ABV) and
-    #547 (cost) will add would have had to keep handling both, forever.
-
-    `generic` IS DELIBERATELY NOT HELD TO THIS, and the difference is the whole
-    reason this test names only one field. There a string means "this category"
-    and a list means "either of these would do" (#441, Helen 2026-08-17: "What I
-    have there is fine. I can do what I want on the spot"), so the two shapes
-    carry DIFFERENT MEANINGS and the 677-to-6 split is not drift. On
-    `suggestion` both shapes mean the same thing and differ only in how many
-    bottles are named, which is.
+    Liquid treats a bare string as a one-item sequence, so the template
+    tolerates both and nothing complains. `generic` is not held to this: there
+    a string and a list mean different things (#441).
     """
     bad = []
     for slug, fm in _load():
@@ -3157,22 +1835,14 @@ def test_suggestion_is_always_a_list():
     )
 
 
-# =============================================================================
-# 3 -- the family roll-up, which serves search and exclusion (NOT browsing)
-# =============================================================================
+# --- 3: the family roll-up, which serves search and exclusion, not browsing ---
 
 def test_every_family_is_declared_and_bases_have_one():
     """`family_of` maps base generics to a declared family, and every base
-    either has a family or an explicit reason for not having one.
+    either has a family or a reason in `family_less`.
 
-    NOT "every generic has a family" -- that would fail on `lime juice`, and
-    correctly so: nobody excludes "all juices". Only BASES roll up. The
-    distinction was a real bug in this test's own spec, caught before it was
-    written.
-
-    `family_less` is the exemption list, carrying a reason per entry, exactly as
-    tests/test_reference_data.py's NO_TEMPERATURE_BECAUSE does -- so "why is
-    this not groupable?" is answered in the repo rather than in someone's head.
+    Only bases roll up: "every generic has a family" would fail on
+    `lime juice`, and nobody excludes "all juices".
     """
     vocab = _vocab()
     families = set(vocab.get("families") or [])
@@ -3212,9 +1882,7 @@ def test_every_family_is_declared_and_bases_have_one():
     )
 
 
-# =============================================================================
-# 4 -- spelling collisions, the food test that actually fires in practice
-# =============================================================================
+# --- 4: spelling collisions ---
 
 def _fold(text):
     stripped = "".join(c for c in unicodedata.normalize("NFD", text)
@@ -3223,15 +1891,12 @@ def _fold(text):
 
 
 def test_no_two_generics_differ_only_by_case_or_accent():
-    """The cocktails version of test_no_main_ingredient_spelling_collisions.
+    """No two declared generics differ only by case or accent.
 
-    That is the food test that fires most often in real use, because two
-    spellings of one thing means two filter buttons each holding half the
-    drinks -- and the search layer folds accents when matching, so the collision
-    is invisible until someone browses the buttons.
-
-    Checked against the DECLARED vocabulary rather than the drinks, because the
-    vocabulary is what the buttons are built from.
+    Two spellings of one thing are two filter buttons each holding half the
+    drinks, and search folds accents, so the collision is invisible until
+    someone browses the buttons. Checked on the declared vocabulary, not the
+    drinks.
     """
     vocab = _vocab()
     seen = {}
@@ -3249,25 +1914,14 @@ def test_no_two_generics_differ_only_by_case_or_accent():
     )
 
 
-# =============================================================================
-# 5 -- coverage: an untyped ingredient must be VISIBLE, not absent
-# =============================================================================
+# --- 5: coverage -- an untyped ingredient must be visible, not absent ---
 
 def test_every_ingredient_has_a_generic_or_a_qq():
-    """No ingredient may be silently untyped.
+    """No ingredient may be silently untyped: a declared generic, or `QQ`.
 
-    THIS IS THE GAP `Smith & Cross` FELL INTO. Written without the word "rum",
-    it matched no pattern, so it got no generic AND no QQ -- invisible to both
-    the declared-value check and the retirement check. An absent key reads as
-    "nothing to see"; a QQ reads as "not done yet". Only one of those is true.
-
-    IT WAS GATED ON `item` UNTIL 2026-09-21 -- `if item and not generic` -- so
-    that it only spoke about entries that had the source's words to show you.
-    When `item` was retired the gate would have been false on every entry in the
-    collection and this check would have passed over an empty set forever, which
-    is the "green because it examined nothing" shape #540 is about. The gate is
-    gone rather than rewritten: an entry with no generic is wrong whether or not
-    anything else on it can be quoted back.
+    An absent key reads as "nothing to see" and is invisible to both the
+    declared-value check and the retirement check. Not gated on any other key
+    of the entry, so it cannot pass over an empty set (#540).
     """
     missing = sorted({f"{slug}: entry with no `generic` key"
                       for slug, generic in _ingredients() if not generic})
@@ -3279,37 +1933,19 @@ def test_every_ingredient_has_a_generic_or_a_qq():
     )
 
 
-# =============================================================================
-# 5a -- the one generic that cannot stand on its own
-# =============================================================================
+# --- 5a: the one generic that cannot stand on its own ---
 
-# Helen, 2026-08-26: "speciality should always carry a character field."
-# A pair rather than a bare string so a second such generic is one line, not a
-# rewrite -- gin is simply the only family with one today.
+# `speciality` always carries a `character`. A tuple, so a second such generic
+# is one line.
 GENERICS_REQUIRING_A_CHARACTER = ("speciality",)
 
 
 def test_speciality_gin_declares_a_character():
-    """`speciality` names a gin by what it is NOT (juniper-led) and stops there.
+    """A `speciality` gin carries a non-empty `character`.
 
-    It replaced `flavoured`, which was retired for covering sloe, rhubarb and
-    cucumber alike -- three gins nobody would swap for each other. Renaming it
-    fixes the label and none of the underlying problem: the word still doesn't
-    say what went in the still. `character` is what carries that, so on this
-    generic it is required rather than optional.
-
-    CHARACTER IS FREE TEXT HERE, deliberately, and this test does not check its
-    value -- Helen's call, 2026-08-26. Rum's characters close into a list
-    because they come from a handful of production traits; a gin's is whatever
-    the distiller reached for, and a closed list would mean a vocabulary edit
-    per bottle. So: present and non-empty, never a declared member.
-
-    ONE REAL CASE TODAY: Spiced Negroni's Ophir, cardamom / cubeb pepper /
-    black pepper. (An earlier version of this docstring claimed the test was
-    vacuous -- it was written alongside the retyping that gave it its first
-    case, and was wrong the moment it was committed. Corrected 2026-08-26,
-    which is exactly the §11.2 failure this repo keeps re-learning: a
-    docstring is a claim about the code and rots like any other.)
+    The generic says only what the gin is not (juniper-led); `character` says
+    what went in the still. Free text on purpose: gin declares no character
+    list, so the value is not checked, only its presence.
     """
     bad = []
     for slug, fm in _load():
@@ -3321,8 +1957,7 @@ def test_speciality_gin_declares_a_character():
             if not any(g in GENERICS_REQUIRING_A_CHARACTER for g in generics):
                 continue
             character = item.get("character")
-            # A bare string is as good as a list -- Liquid iterates either, and
-            # `generic`/`suggestion` already accept both shapes for this reason.
+            # A bare string is as good as a list: Liquid iterates either.
             if isinstance(character, str):
                 character = [character] if character.strip() else []
             if not character:
@@ -3337,31 +1972,14 @@ def test_speciality_gin_declares_a_character():
     )
 
 
-# =============================================================================
-# 6 and 7 -- shape guards on the drinks themselves
-# =============================================================================
+# --- 6 and 7: shape guards on the drinks themselves ---
 
 def test_a_declared_character_vocabulary_is_enforced():
     """A `character` must be declared, for every family that closes its list.
 
-    WAS RUM-ONLY UNTIL 2026-08-29, and generalising it is the point rather than
-    a tidy-up. `whisky_characters` arrived with `peated` (#314, Helen: "so
-    single malt whisky, character: peated ???"), and a rum-shaped guard would
-    have left the new list declared and checked by nothing -- which is EXACTLY
-    the failure this test was written for. `rum_characters` sat unchecked for
-    four days while `sherry` and `Spanish-style` passed silently as generics.
-
-    NOT EVERY FAMILY, AND THAT ASYMMETRY IS DELIBERATE. Only families that
-    DECLARE a `<family>_characters` list are checked. Gin declares none, on
-    Helen's explicit call: a rum's character comes from a handful of production
-    traits and closes into a list, while a gin's is whatever went in the still,
-    so Spiced Negroni's cardamom is correctly undeclared and must not fire here.
-    Adding a list is what switches enforcement on, which means the vocabulary
-    and its guard can no longer drift apart.
-
-    Family-ness is derived through `family_of`, never pattern-matched on the
-    item name -- 61 ingredients in this collection are named only by brand,
-    which is the same reason `generic` is stored rather than computed.
+    Only families that declare a `<family>_characters` list are checked, so
+    adding a list is what switches enforcement on. Gin declares none on
+    purpose. The family comes through `family_of`, never from a name.
     """
     _, bad, declared = _character_scan()
     assert not bad, (
@@ -3392,9 +2010,7 @@ def test_the_character_vocabulary_is_exercised():
 def _character_scan():
     """(how many characters were checked, offenders, the declared vocabulary).
 
-    ONE SCAN, TWO TESTS. Re-typing the walk into the coverage test would let the
-    two drift, and they must agree about what "checked" means or the coverage
-    claim stops describing the rule it guards.
+    One scan for both tests above, so they agree about what "checked" means.
     """
     vocab = _vocab()
     family_of = vocab.get("family_of") or {}
@@ -3433,20 +2049,12 @@ def _character_scan():
 
 
 def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
-    """`card_names` covers the rum family exactly -- issue #501.
+    """Every rum generic has a `card_names` entry, and every entry names a
+    declared generic -- #501.
 
-    The card renders a rum's CATEGORY rather than the source's own words,
-    because those words could not be trusted: eight item strings in this
-    collection each name two or three different rums, `Overproof Navy rum`
-    among them. The substitution is driven by "does this generic have a card
-    name", so a rum missing from this map silently falls back to exactly the
-    ambiguous item text the map exists to replace -- and nothing on the page
-    would look wrong.
-
-    BOTH DIRECTIONS, and the second is the one that catches a rename. A card
-    name for a generic that no longer exists is dead weight that reads as
-    live coverage; `_declared_generics` cannot see it, because this is a
-    mapping rather than a list.
+    The card shows a rum's card name when its generic has one, so a rum missing
+    from the map silently falls back to the bare generic. An entry for a
+    renamed generic is dead weight that reads as live coverage.
     """
     vocab = _vocab()
     names = vocab.get("card_names") or {}
@@ -3463,13 +2071,8 @@ def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
           "the ambiguous colour vocabulary #314 retired. Add it to "
           "`card_names` in _data/cocktails/ingredients.yml."
     )
-    # THE SECOND HALF LOOSENED 2026-08-27, and only by one notch. It used to
-    # require the map to be EXACTLY the rum family, which was right while #501
-    # scoped card names to rum. Helen then added Ceylon arrack -- "is that a
-    # rum? Doesn't matter, the category list should eventually contain
-    # everything" -- so the map is growing past rum on purpose. What still bites
-    # is a card name for something that is not a declared generic at all, which
-    # is the typo case; what no longer bites is deliberate widening.
+    # The map may hold non-rum generics; only an entry that is not a declared
+    # generic at all fails.
     declared = _declared_generics(vocab)
     extra = sorted(set(names) - declared)
     assert not extra, (
@@ -3482,30 +2085,12 @@ def test_every_rum_generic_has_a_card_name_and_nothing_else_does():
 
 
 def test_rum_card_names_are_distinct():
-    """No two rums may read the same on a card -- issue #501.
+    """No two generics share a card name unless the collapse is declared -- #501.
 
-    THIS IS THE WHOLE POINT OF THE MAP, not a tidiness rule. The fault being
-    fixed is that `Overproof Navy rum` appeared on three cards meaning three
-    different rums. A duplicate card name rebuilds that fault in the very
-    mechanism introduced to remove it, and it would look completely fine on
-    the page -- two drinks reading "Demerara rum" is only wrong if you know
-    one of them is an overproof.
-
-    A COLLAPSE MAY BE DELIBERATE, and then it is declared rather than
-    forbidden. Helen collapsed both Jamaicans to `Jamaican rum` on 2026-08-27:
-    the funk is the shared trait and the caramel is a nuance of the same rum,
-    where both Demeraras and both agricoles keep their own names because proof
-    and age change what you are making. So the rule is not "never" but "not by
-    accident" -- `card_names_may_collide` carries the reason, the same shape
-    `family_less` uses, and an undeclared duplicate still fails.
-
-    THERE IS DELIBERATELY NO LENGTH RULE HERE. An earlier version of this test
-    asserted a card name was never longer than the generic it stands for, which
-    sounds obvious and was wrong within a day: Helen's names say the spirit word
-    out loud wherever the style alone would not read as a rum, so `Demerara,
-    overproof` -> `Demerara overproof rum` grows by three characters on purpose.
-    Brevity was the means and legibility was the point.
-    test_card_lines_do_not_get_longer holds the thing that actually mattered.
+    Two drinks reading the same words for rums that are not interchangeable
+    looks fine on the page. A deliberate collapse is listed with its reason in
+    `card_names_may_collide`, and an entry there that no longer collides fails.
+    There is no length rule on purpose.
     """
     vocab = _vocab()
     names = vocab.get("card_names") or {}
@@ -3542,26 +2127,12 @@ def test_rum_card_names_are_distinct():
 
 
 def test_showing_categories_still_shortens_the_index():
-    """Across the collection, card names must cost less room than items -- #501.
+    """Across the collection, card names cost less room than the generics they
+    replace -- #501.
 
-    AGGREGATE, NOT PER-CARD, and the difference is a correction rather than a
-    convenience. The first version of this asserted no single card got longer,
-    which sounds like the same thing and is not: 19 of the 62 rum-bearing cards
-    DO get longer, almost all of them the nine carrying a disjunctive rum, where
-    "either would do" spends a whole second name ("lightly aged rum or clear
-    blended rum" against an item reading `Light rum`). Those nine are the cards
-    where the category is doing the MOST work -- `White rum` concealing a choice
-    between a filtered rum and an agricole blanc -- so failing them would have
-    been the guard punishing the feature.
-
-    What was actually claimed when this shipped, and what this holds: the index
-    as a whole gets shorter. 39 cards shorter, 4 unchanged, 19 longer, median
-    -8 characters, and the collection's median card line 98 -> 94. The card body
-    clamps at two lines, so length is not cosmetic -- it is how many
-    ingredients a reader can see.
-
-    Deliberately loose: it permits any individual name, and fires only if the
-    whole set drifts long enough to stop paying for itself.
+    Aggregate, not per card: a disjunctive rum spends a whole second name, and
+    those are the cards where the category does the most work. The card body
+    clamps at two lines, so length is how many ingredients a reader can see.
     """
     vocab = _vocab()
     names = vocab.get("card_names") or {}
@@ -3575,14 +2146,8 @@ def test_showing_categories_still_shortens_the_index():
                 continue
             generic = item["generic"]
             generics = generic if isinstance(generic, list) else [generic]
-            # THE BASELINE IS THE GENERIC, NOT `item` -- corrected with #544's
-            # second move. It was `item` because that is what the card printed
-            # when #501 measured this; move 1 changed the fallback to the
-            # generic, so "what this card would say without card_names" has
-            # been the generic since, and the old baseline was measuring a
-            # counterfactual the template can no longer produce. Re-run on the
-            # day of the change: the claim holds either way and holds harder on
-            # the true baseline -- 8437 -> 7261 against 9956 -> 8960.
+            # The baseline is the generic, which is what the card prints for an
+            # ingredient with no card name.
             plain = " or ".join(str(g) for g in generics)
             before.append(plain)
             labels = [names[g] for g in generics if g in names]
@@ -3612,23 +2177,11 @@ def test_showing_categories_still_shortens_the_index():
 
 
 def test_no_card_shows_two_different_rums_under_one_name():
-    """One card, one name, one rum -- issue #501.
+    """No card shows two different generics under one name -- #501.
 
-    TWO DIFFERENT GENERICS, NOT TWO ENTRIES, and the distinction is Helen's,
-    2026-08-27: "where a recipe wants more than one kind of the same rum we
-    obviously should write the display name twice." A drink calling for two
-    pours of the same category genuinely prints its name twice and that is
-    correct -- each ingredient entry renders on its own. The failure this
-    catches is the opposite one: two ingredients that are NOT the same rum
-    arriving at the same words, which is #501's original fault (`Overproof Navy
-    rum` meaning three different things) rebuilt inside the fix for it.
-
-    The first version of this test asserted no card repeats a name at all, and
-    would have failed a correct drink the day one was written. Vocabulary-wide
-    distinctness (above) does not cover this either: a DECLARED collapse is
-    permitted there, and this is where that permission gets checked against real
-    drinks -- both Jamaicans read `Jamaican rum`, so a drink calling for both
-    would say one word for two rums and lose the difference silently.
+    Two entries of the same generic print the name twice and that is correct.
+    The failure is two different rums arriving at the same words, which a
+    declared collapse in `card_names_may_collide` makes possible.
     """
     vocab = _vocab()
     names = vocab.get("card_names") or {}
@@ -3639,10 +2192,7 @@ def test_no_card_shows_two_different_rums_under_one_name():
         # card name -> the set of generic-tuples that produced it
         shown = {}
         for item in (fm.get("ingredients") or []):
-            # Gated on `generic`, not `item` -- see the note in
-            # test_showing_categories_still_shortens_the_index. `item` is being
-            # retired (#544) and using it here would silently stop checking
-            # every entry that had already lost it.
+            # Gated on `generic`: an entry without one has no card name.
             if not isinstance(item, dict) or not item.get("generic"):
                 continue
             generic = item["generic"]
@@ -3676,16 +2226,9 @@ def test_no_card_shows_two_different_rums_under_one_name():
 def test_every_card_name_join_is_reachable():
     """A `card_name_joins` key must be a join some drink actually produces.
 
-    THE SAME BARGAIN `methods.yml` STRIKES with its proposals, and for the same
-    reason: this map duplicates live data -- the left-hand side is a string the
-    template builds elsewhere from two card names -- so it is only safe
-    alongside the check that keeps the duplicate honest.
-
-    Two ways it rots, and neither is visible on the page. A card name changes
-    and the key stops matching, so the replacement silently stops applying and
-    the clunky join comes back. Or a drink's generics change and the pair no
-    longer occurs, leaving an entry that reads as a live decision about how the
-    index looks while doing nothing at all.
+    The key duplicates a string the template builds from two card names. If a
+    card name changes, the replacement silently stops applying; if no drink
+    asks for the pair any more, the entry reads as live and does nothing.
     """
     _require_whole_collection("`card_name_joins`")
     vocab = _vocab()
@@ -3697,8 +2240,7 @@ def test_every_card_name_join_is_reachable():
     produced = set()
     for slug, fm in _load():
         for item in (fm.get("ingredients") or []):
-            # Gated on `generic`, not `item` -- see the note in
-            # test_showing_categories_still_shortens_the_index.
+            # Gated on `generic`: an entry without one has no card name.
             if not isinstance(item, dict) or not item.get("generic"):
                 continue
             generic = item["generic"]
@@ -3721,9 +2263,7 @@ def test_every_card_name_join_is_reachable():
     )
 
 
-# =============================================================================
-# The bottle dictionary -- #529, and the check it unblocks, #534
-# =============================================================================
+# --- The bottle dictionary -- #529, and the check it unblocks, #534 ---
 
 def _bottles():
     if not BOTTLES.exists():
@@ -3734,10 +2274,9 @@ def _bottles():
 def _bottle_index(data):
     """Every name a bottle answers to, lowercased -> its canonical name.
 
-    Case-insensitive because the collection writes `Plantation OFTD` and
-    `Planteray OFTD` for one bottle, and because a suggestion is prose typed by
-    hand. Aliases and canonical names share one namespace on purpose: an alias
-    that collides with another bottle's real name is the same bug either way.
+    Case-insensitive because a suggestion is typed by hand. Aliases and
+    canonical names share one namespace: an alias that collides with another
+    bottle's real name is the same bug either way.
     """
     out = {}
     for name, entry in (data.get("bottles") or {}).items():
@@ -3748,23 +2287,11 @@ def _bottle_index(data):
 
 
 def test_every_bottle_names_a_declared_generic():
-    """A bottle's `generic` is a real generic -- #529.
+    """A bottle's `generic` is a declared generic -- #529.
 
-    THE WHOLE VALUE OF THIS FILE IS THAT A BOTTLE KNOWS ITS CATEGORY, so a
-    generic that no longer exists makes the dictionary quietly wrong rather
-    than loudly broken -- nothing on any page would look different.
-
-    THE RUM-ONLY HALF CAME OFF ON 2026-08-30, Helen's call. This used to check
-    against `family_of`'s rum members, on the reasoning that "this file does not
-    cover gin or brandy, and a bottle typed `cognac` would be a scoping mistake
-    rather than a typo". That was true when #529 built it as a rum reference and
-    had already stopped being true: Ceylon arrack joined the card names, `Tesco
-    Finest` went into `unresolved_suggestions` for a kirsch and a sloe gin, and
-    the Kamaniwanalaya wanted Disaronno resolved.
-
-    The scoping argument does not survive the widening, but the TYPO argument
-    does and is the one worth keeping -- a generic that was renamed and not
-    followed here is still silent. So: declared, not rum.
+    A generic that was renamed and not followed here makes the dictionary
+    quietly wrong: nothing on any page looks different. Any declared generic
+    will do; a bottle need not be a rum.
     """
     data = _bottles()
     vocab = _vocab()
@@ -3791,16 +2318,9 @@ def test_every_bottle_names_a_declared_generic():
 def test_no_bottle_name_or_alias_is_claimed_twice():
     """One string, one bottle -- #529.
 
-    Aliases exist because twelve suggestion strings in the collection collapse
-    to about five bottles (ED3 / El Dorado 3 / El Dorado 3yo), and because
-    Planteray and Plantation are one brand renamed, which no string comparison
-    recovers. That only works while a string resolves to exactly one bottle: a
-    duplicate would make resolution order-dependent, and #534's cross-category
-    check would then depend on dictionary ordering rather than on fact.
-
-    Canonical names and aliases share one namespace deliberately -- an alias
-    colliding with another bottle's real name is the same bug as two aliases
-    colliding, and is likelier (`Planteray 3` against `El Dorado 3`).
+    A name claimed twice makes resolution order-dependent, and #534's
+    cross-category check would then turn on dictionary order. Canonical names
+    and aliases share one namespace.
     """
     data = _bottles()
     entries = data.get("bottles") or {}
@@ -3822,10 +2342,9 @@ def test_no_bottle_name_or_alias_is_claimed_twice():
 def test_an_excluded_bottle_is_not_also_listed():
     """`not_reached_for` and `bottles` must not both claim a bottle -- #529.
 
-    The two blocks say opposite things: `bottles` is what Helen would pour,
-    `not_reached_for` is what qualifies and is deliberately out (Lemon Hart
-    151). A bottle in both is a half-finished decision, and the reference page
-    would list it while the reason says it should not.
+    `bottles` is what Helen would reach for; `not_reached_for` is what
+    qualifies and is deliberately out. A bottle in both is a half-finished
+    decision.
     """
     data = _bottles()
     index = _bottle_index(data)
@@ -3842,32 +2361,12 @@ def test_an_excluded_bottle_is_not_also_listed():
 
 
 def test_every_suggested_bottle_resolves():
-    """Every `suggestion` names a bottle this file knows -- #529/#534.
+    """Every `suggestion` names a bottle `bottles.yml` knows -- #529, #534.
 
-    THE DIRECTION THAT MATTERS. Nothing requires a bottle to be used by a drink
-    -- Helen owns bottles no recipe names, Myers and Wood's among them -- but a
-    SUGGESTION that resolves to nothing is a bottle the site cannot reason
-    about, and #534's cross-category check silently skips it. Half a check is
-    worse than none, because it reports a clean run.
-
-    THE EXAMPLE HERE USED TO BE EL DORADO 151, "on the shopping list", and it
-    stopped being true on 2026-09-05: Helen moved it to `not_reached_for` --
-    "I don't own it, I just wanted to, but it looks like it's hard to get."
-    A docstring example that has quietly become false is the same species of
-    stale as the entry test_unresolved_suggestions_has_no_stale_entries exists
-    to catch, so it was changed rather than left to read plausibly.
-
-    THE WORD "rum" CAME OUT OF THAT FIRST LINE ON 2026-08-30, and it had been
-    doing a lot of quiet work: 54 of the collection's 91 distinct suggestions
-    were non-rum and so were checked by nothing at all. See `_suggested_bottle_scan`.
-
-    KNOWN FAILURES ARE DECLARED, NOT TOLERATED. What is left in
-    `unresolved_suggestions` is prose, two-bottles-in-one-string, or a BRAND
-    where a bottle belongs -- Briottet makes six of the things this collection
-    pours, so the string names a house and the drink names the product. Each
-    sits there with its reason, so this test bites on the NEXT one while those
-    are being fixed. Deleting a line there is how one gets retired -- the same
-    shape `methods.yml` uses for its proposals.
+    A bottle need not be used by any drink, but a suggestion that resolves to
+    nothing is skipped by the cross-category check, which then reports a clean
+    run. Known failures are declared in `unresolved_suggestions` with a
+    reason, so this fails on the next one; deleting a line there retires it.
     """
     _, unresolved = _suggested_bottle_scan()
     assert not unresolved, (
@@ -3881,23 +2380,11 @@ def test_every_suggested_bottle_resolves():
 
 
 def test_unresolved_suggestions_has_no_stale_entries():
-    """The other direction: a declared failure must still be a real one.
+    """Every `unresolved_suggestions` entry is a string a drink still says -- #585.
 
-    THE TEST ABOVE SAYS "deleting a line there is how one gets retired -- the
-    same shape `methods.yml` uses for its proposals". methods.yml has
-    `test_every_proposal_still_matches_a_real_step` enforcing exactly that.
-    This file had the sentence and not the test, so nothing ever deleted the
-    line, and #585 found seven entries naming strings no drink says any more --
-    every one of them a job that had been DONE and still read as outstanding.
-
-    That is the one thing a declared-exception block must never get wrong. A
-    stale entry is worse than a missing one in both directions at once: it
-    hides finished work, and it silently exempts whatever later happens to be
-    written with the same string.
-
-    NOT THE REVERSE. A bottle in `bottles` need not be used -- Helen owns
-    bottles no recipe names, Myers and Wood's among them. This asks only about
-    `unresolved_suggestions`, which is a list of live problems by definition.
+    A stale entry reads as outstanding work and silently exempts whatever is
+    later written with the same string. Whole collection only. Not the
+    reverse: a bottle in `bottles` need not be used by any drink.
     """
     _require_whole_collection("unresolved_suggestions")
     data = _bottles()
@@ -3933,37 +2420,13 @@ def test_unresolved_suggestions_has_no_stale_entries():
 
 
 def test_every_suggestion_is_the_declared_bottle_name():
-    """A `suggestion` IS the declared name, not merely something that resolves
-    to it -- #701, Helen's ruling of 2026-09-06: "full declared name everywhere".
+    """A `suggestion` is the bottle's declared name, not an alias of it -- #701.
 
-    WHY RESOLUTION IS NOT ENOUGH, AND WHY THIS IS A SEPARATE TEST.
-    `test_every_suggested_bottle_resolves` passes on `Havana 3` forever, because
-    `Havana 3` is a declared alias of `Havana Club 3 year old`. That is the
-    point of aliases and it is right for INPUT -- a person typing into the
-    ingredient search should reach the bottle however they spell it. It is wrong
-    for STORED DATA, for two reasons Helen weighed directly:
-
-      1. A `suggestion` RENDERS VERBATIM on the drink page. El Presidente used
-         to read "(ED3 or Havana 3)". The field is what you shop by, so the
-         collection was showing shorthand where it meant a product.
-      2. Using aliases to repair source data means an alias can never be
-         removed without silently changing what a drink says -- so the alias
-         table stops being a convenience and becomes load-bearing.
-
-    THE ALIASES STAY, and this test is why they can. Once the data says the
-    declared name everywhere, an alias is free to serve search alone, which is
-    the job it was written for (#529: "'wray and nephew' and 'wray & nephew'
-    should both collapse onto the latter").
-
-    THE PASS THIS GUARDS. 48 suggestion strings across 33 drinks were retyped on
-    2026-09-06 -- `Havana 3` (x7), `El Dorado 3` (x6), `Appleton 8` (x4),
-    `Velvet`, `Gosling's`, `JM`, `Hayman's` and the rest. Without this test the
-    next ingest reintroduces them one at a time and nothing notices, because
-    every one of them resolves.
-
-    A STRING THAT RESOLVES TO NOTHING IS NOT THIS TEST'S BUSINESS -- that is the
-    test above, which reports it properly. This one only fires where the right
-    answer is known, so its message can always name the exact rename.
+    A suggestion renders verbatim on the drink page, so an alias there is
+    shorthand the reader shops by, and an alias that repairs stored data can
+    never be removed. `test_every_suggested_bottle_resolves` passes on an
+    alias, so it cannot catch this; a string that resolves to nothing is that
+    test's business and is skipped here.
     """
     data = _bottles()
     index = _bottle_index(data)
@@ -3998,15 +2461,11 @@ def test_every_suggestion_is_the_declared_bottle_name():
 
 
 def test_the_bottle_index_is_exercised():
-    """Some ingredient in the collection actually carries a suggestion.
+    """Some ingredient in the collection carries a suggestion.
 
-    Zero would mean the loader went stale -- and the rule above would be green
-    over nothing. Whole collection only: see `_exercised`.
-
-    The word "rum" came out of this docstring on 2026-08-30 with the scoping it
-    described. Leaving it would be the trap this repo keeps meeting from the
-    other side: a comment that outlives the code it describes, which is how
-    `cocktails/index.html` spent three commits claiming to emit `item`.
+    Zero means the loader went stale and
+    `test_every_suggested_bottle_resolves` is green over nothing. Whole
+    collection only: see `_exercised`.
     """
     checked, _ = _suggested_bottle_scan()
     _exercised(
@@ -4019,20 +2478,9 @@ def test_the_bottle_index_is_exercised():
 def _suggested_bottle_scan():
     """(how many suggestions were checked, the ones naming no known bottle).
 
-    ONE SCAN, TWO TESTS -- see `_character_scan` for why they may not be
-    re-typed apart.
-
-    NOT RUM-ONLY SINCE 2026-08-30. It skipped any ingredient whose generic was
-    not in the rum family, which was right while `bottles.yml` was a rum
-    reference and left a real hole once it stopped being one: 54 of the 91
-    distinct suggestions in the collection resolved to nothing and no test
-    minded, because none of them was a rum. Beefeater, Cointreau, Tanqueray,
-    Luxardo, Suze, Punt e Mes -- all invisible.
-
-    Helen's call when shown that count: "are we now assuming every named bottle
-    should be in it, and classified? That feels right to me." So the scan covers
-    every ingredient, and the 43 whose category the collection already stated
-    were declared in the same pass.
+    One scan for two tests, as `_character_scan`. Every ingredient is scanned,
+    not only the rums: every bottle a drink names is declared
+    (DECISIONS §9.3.2).
     """
     data = _bottles()
     index = _bottle_index(data)
@@ -4048,10 +2496,9 @@ def _suggested_bottle_scan():
             suggestion = item.get("suggestion")
             for name in (suggestion if isinstance(suggestion, list)
                          else [suggestion] if suggestion else []):
-                # A `QQ` is not a bottle name to resolve -- it is the drink
-                # saying nobody has chosen one yet. Not counted as CHECKED
-                # either: counting it would inflate the coverage figure
-                # test_the_bottle_index_is_exercised reads.
+                # A `QQ` is the drink saying nobody has chosen a bottle yet: not
+                # resolved, and not counted as checked, or it would inflate the
+                # figure test_the_bottle_index_is_exercised reads.
                 if _unanswered([name]):
                     continue
                 checked += 1
@@ -4063,33 +2510,13 @@ def _suggested_bottle_scan():
 
 
 def test_a_cross_category_suggestion_carries_a_note():
-    """Suggesting a bottle from another category needs a note -- #534.
+    """A suggested bottle outside the ingredient's `generic` needs a `note` -- #534.
 
-    Helen: "Substituting it isn't straightforward and will vary by drink. Please
-    add notes for me on recipe pages when I've substituted in a surprising way."
-    A `suggestion` whose bottle sits in a different category than that
-    ingredient's `generic` IS the surprising case, by definition; everything
-    else is naming a bottle in the category the recipe already asked for. It
-    stops being a judgement call the moment a bottle knows its own category,
-    which is what _data/cocktails/bottles.yml is for.
-
-    PERMISSIVE, AT HELEN'S DIRECTION, and the permission has a precise shape:
-    the note must EXIST, and `QQ` counts. "Let's be permissive with the test,
-    but given we're pre-first-human-read please add the note field with QQ in it
-    if we don't have anything else." So a substitution can never ship silently
-    -- there is always a visible marker on the page -- while nothing demands
-    prose she has not written yet. QQ is the collection's existing idiom for
-    exactly this (see test_every_ingredient_has_a_generic_or_a_qq) and these are
-    drafts; a QQ is not near a published recipe.
-
-    A DISJUNCTIVE GENERIC CROSSES ONLY IF THE BOTTLE MATCHES NONE OF ITS
-    OPTIONS. A list means "either would do" (#441), so a suggestion satisfying
-    either half is not a substitution at all. Swizzle is why this rule needs
-    stating: it asks for two Demerara styles and suggests bottles in neither.
-
-    An unresolvable suggestion is SKIPPED here rather than failing twice --
-    test_every_suggested_bottle_resolves owns that, and reporting one fault as
-    two teaches you to skim the output.
+    The note must exist and `QQ` counts, so a substitution never ships
+    unmarked while nothing demands prose Helen has not written. A list generic
+    means either would do (#441): it crosses only if the bottle matches none
+    of its options. An unresolvable suggestion is skipped here;
+    `test_every_suggested_bottle_resolves` owns it.
     """
     _, bad = _cross_category_scan()
     assert not bad, (
@@ -4102,11 +2529,11 @@ def test_a_cross_category_suggestion_carries_a_note():
 
 
 def test_the_cross_category_check_is_exercised():
-    """Some rum suggestion in the collection resolves to a known bottle.
+    """Some suggestion in the collection resolves to a known bottle.
 
-    This rule can only see substitutions among suggestions that RESOLVE, so a
-    bottles.yml that stopped matching the collection's spellings would leave it
-    green over nothing. Whole collection only: see `_exercised`.
+    The rule only sees suggestions that resolve, so a bottles.yml that stopped
+    matching the collection's spellings would leave it green over nothing.
+    Whole collection only: see `_exercised`.
     """
     checked, _ = _cross_category_scan()
     _exercised(
@@ -4121,25 +2548,11 @@ _RATIO = re.compile(r"^\d+:\d+$")
 def _same_category(bottle_generic, ingredient_generic):
     """Does a bottle's own category cover the one an ingredient asks for?
 
-    THE SAME STRING, OR THE SAME STRING PLUS A RATIO -- and the second half is
-    Helen's, 2026-09-04, arriving with the Bee's Knees. `Acacia honey` is
-    declared under the flat `honey water`, because the ratio is what you DO with
-    the honey rather than a property of the jar: there is no `Acacia honey
-    (2:1)` on any shelf. She kept the ratio generics anyway ("I really do need
-    that generic here"), which left one drink asking for `honey water 2:1` and
-    suggesting a bottle typed `honey water`.
-
-    THAT IS NOT A SUBSTITUTION, and calling it one would be the worse failure of
-    the two available. #534 exists so a SURPRISING swap is visible -- Pernod
-    where absinthe was asked for. A note reading "QQ" on every honey drink,
-    saying nothing surprising happened, is how a marker stops being read; and
-    the day a genuine cross-category honey suggestion arrives it would sit in a
-    column of identical noise.
-
-    A REFINEMENT ONLY GOES ONE WAY. A bottle typed `honey water 2:1` suggested
-    for an ingredient asking for flat `honey water` is NOT covered here, and
-    should not be: that bottle is claiming a ratio the recipe did not ask for,
-    which is a real thing to look at. No such bottle exists today.
+    The same string, or the same string plus a ratio: a honey is declared
+    under flat `honey water`, because the ratio is what is done with it, so a
+    drink asking for `honey water 2:1` and suggesting it is not a substitution
+    and needs no note. One way only: a bottle typed with a ratio does not
+    cover an ingredient asking for the flat generic.
     """
     if bottle_generic == ingredient_generic:
         return True
@@ -4153,23 +2566,9 @@ def _same_category(bottle_generic, ingredient_generic):
 def _cross_category_scan():
     """(how many resolved suggestions were checked, the unexplained ones).
 
-    ONE SCAN, TWO TESTS -- see `_character_scan`.
-
-    NOT RUM-ONLY SINCE 2026-08-30, and the widening has a worked example behind
-    it rather than a principle. `bottles.yml` stopped being a rum file that
-    morning; this scan did not follow, so a cross-category substitution outside
-    rum was invisible -- and one was: Don's Mai Tai asks for `absinthe` and
-    suggests Pernod, which is a pastis. The drink has carried a note saying so
-    all along, so nothing was broken; nothing was CHECKING either, and the
-    session that widened the bottle file nearly declared Pernod an absinthe on
-    the strength of the generic beside it. That declaration would have made this
-    very check agree the pair matched.
-
-    Helen, asked whether a bottle's category may differ from the ingredient it
-    is suggested for: "Yes, and the note should be required." Her own example is
-    the reason it must be allowed at all -- "a recipe might call for cherry
-    brandy, and I suggest Cherry Heering OR Briottet cerise even though that's a
-    cherry liqueur not a brandy, leaving it to future Helen to choose."
+    One scan for two tests, as `_character_scan`. Every ingredient is scanned,
+    not only the rums. A bottle's category is its own entry in bottles.yml,
+    never the generic beside the suggestion, or every pair would match (#534).
     """
     data = _bottles()
     index = _bottle_index(data)
@@ -4204,12 +2603,7 @@ def _cross_category_scan():
     return checked, bad
 
 
-# =============================================================================
-# AMOUNTS -- one field, and a table that turns it into a number. Spec: #571
-# =============================================================================
-# `ml:` USED TO BE STORED BESIDE EVERY `amount:` and is gone. See the
-# `measures:` block in ingredients.yml for the measurement that made the
-# deletion safe and for why the conversions belong in data.
+# AMOUNTS -- one field, and a table that turns it into a number (#571)
 
 _AMOUNT_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*(?:/\s*(\d+))?\s*(.*?)\s*$")
 
@@ -4217,25 +2611,11 @@ _AMOUNT_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*(?:/\s*(\d+))?\s*(.*?)\s*$")
 def _millilitres(amount, measures):
     """(millilitres, unit) for one `amount` string; (None, unit) if not a volume.
 
-    Raises ValueError when the string cannot be read at all, which is the one
-    outcome that matters -- see test_every_amount_is_readable_as_a_quantity.
-
-    THE UNIT IS REQUIRED, and a bare number is deliberately an error rather
-    than an assumed millilitre figure. Nineteen amounts in the collection are
-    bare numbers, and they are NOT all the same unit: Port-au-Prince's ladder
-    (30, 22.5, 15, 7.5, 5) is plainly millilitres and Drunken Skull's
-    (0.75, 0.75, 0.5, 0.5) is just as plainly ounces. Guessing gets one of them
-    wrong by a factor of 30 and looks exactly as confident either way. Every
-    one of the nineteen already carries a `QQ - no unit in the source` note,
-    which is the right answer and the one this check preserves.
-
-    AN AMOUNT MAY BE AN ACTION RATHER THAN A COUNT, and then it has no number at
-    all. Helen's ruling, 2026-09-02: every ingredient has an `amount`, and for
-    one the method adds rather than measures it is a verb phrase -- "champagne,
-    to top", "absinthe, to rinse". Those two read by exactly the path `dash`
-    reads by, a lookup in `non_volumetric`, and nothing here names them: putting
-    the strings in the guard would move the vocabulary out of the data, which is
-    the bargain every other unit in `measures:` strikes.
+    Raises ValueError when the string cannot be read at all. A bare number is
+    an error, never an assumed millilitre figure: the unitless amounts are not
+    all one unit, and a wrong guess is out by a factor of thirty. An amount
+    with no number, such as `(top)` or `(rinse)`, reads by lookup in
+    `non_volumetric`, so the vocabulary stays in `measures:`.
     """
     text = str(amount)
     match = _AMOUNT_RE.match(text)
@@ -4265,7 +2645,7 @@ def _millilitres(amount, measures):
 def _amount_scan():
     """(how many amounts read cleanly, the ones that did not).
 
-    ONE SCAN, TWO TESTS -- see `_character_scan`.
+    One scan for two tests, as `_character_scan`.
     """
     measures = _vocab().get("measures") or {}
     read = 0
@@ -4278,13 +2658,9 @@ def _amount_scan():
             try:
                 _millilitres(item["amount"], measures)
             except ValueError as why:
-                # THE EXEMPTION IS THE DRINK'S OWN QQ, not a registry here.
-                # A hardcoded list of slugs cannot tell a gap that has been
-                # filled from one that has merely been deleted, and MANUAL 10
-                # records five guards going false-red on exactly that shape.
-                # A QQ note is per-drink, so it works on a partial corpus, and
-                # it fails in BOTH directions that matter: fill the unit in and
-                # forget the note, or drop the note without filling it in.
+                # The exemption is the drink's own QQ note, not a list of slugs
+                # here: a list cannot tell a filled gap from a deleted one, and
+                # a note works on a partial corpus.
                 if "no unit in the source" in notes or "carries no ml figure" in notes:
                     continue
                 bad.append(
@@ -4299,20 +2675,10 @@ def _amount_scan():
 def test_every_amount_is_readable_as_a_quantity():
     """Every `amount` yields millilitres, or names a declared non-volume -- #571.
 
-    THIS IS WHAT `ml:` WAS ACTUALLY FOR. The stored figure looked like the
-    guarantee that a drink's quantities are computable, and it was not one: it
-    could simply be absent, and on all nineteen unitless amounts it was. A
-    consumer reading `.get("ml")` got `None` and had no way to tell "this is a
-    dash, correctly numberless" from "this says 30 and nobody wrote the unit".
-
-    So the number is derived from `measures:` in ingredients.yml and this check
-    is the promise. #545 (scaler), #294/#297 (alcohol units) and #547 (cost)
-    can all be built against it.
-
-    AN UNDECLARED UNIT FAILS HERE RATHER THAN VANISHING. Adding a unit is one
-    line in `measures:` -- `per_ml` if it is a volume, `non_volumetric` if it
-    counts or weighs. Declaring it is what switches enforcement on, the same
-    bargain `canonical_glasses` and the `<family>_characters` lists strike.
+    The figure is derived from `measures:` in ingredients.yml, and this is the
+    promise the scaler, the alcohol units and the cost are built on. An
+    undeclared unit fails here instead of vanishing: add it to `per_ml` if it
+    is a volume, to `non_volumetric` if it counts or weighs.
     """
     _, bad = _amount_scan()
     assert not bad, (
@@ -4328,12 +2694,10 @@ def test_every_amount_is_readable_as_a_quantity():
 
 
 def test_the_amount_table_is_exercised():
-    """Amounts are actually being read, rather than all being exempted.
+    """Amounts are actually being read, not all exempted.
 
-    The QQ escape in `_amount_scan` is per-drink and generous by design, so the
-    failure mode this guards is the whole check quietly exempting itself -- a
-    parser change that raised on everything would look identical to a clean run
-    if nobody counted what got through.
+    The QQ escape in `_amount_scan` is per-drink and generous, so a parser
+    change that raised on everything would look identical to a clean run.
     """
     read, _ = _amount_scan()
     _exercised(
@@ -4342,18 +2706,10 @@ def test_the_amount_table_is_exercised():
         "all -- `measures:` or the `amount` key has moved.")
 
 
-# THE PAIRS THIS RULE CAN SPEAK ABOUT, and it is deliberately not every unit.
-# Helen, 2026-09-26: "'dashes' throughout please, but 'dash' when it's one."
-#
-# A UNIT NEEDS BOTH FORMS DECLARED IN `non_volumetric` BEFORE IT IS IN SCOPE.
-# `pinch`, `sprig`, `strip` and `each` have no declared plural, so a rule that
-# demanded one would be inventing vocabulary rather than enforcing it -- and
-# `each` never takes one at all ("8 each"). Declaring the plural is what
-# switches enforcement on, the same bargain `measures:` already strikes with
-# test_every_amount_is_readable_as_a_quantity one block up.
-#
-# `half` AND `whole` ARE ABSENT FOR A DIFFERENT REASON: they are units with no
-# number in front of them, so there is no count to agree with.
+# Only a unit with both forms declared in `non_volumetric` is in scope:
+# `pinch`, `sprig`, `strip` and `each` have no declared plural, and
+# demanding one would invent vocabulary. `half` and `whole` take no
+# number, so there is no count to agree with.
 PLURAL_UNITS = {"dash": "dashes", "drop": "drops",
                 "cube": "cubes", "leaf": "leaves"}
 
@@ -4363,7 +2719,7 @@ _COUNTED_AMOUNT = re.compile(r"^\s*(\d+(?:\.\d+)?)\s+(.+?)\s*$")
 def _plural_unit_scan():
     """(how many counted amounts were checked, the ones whose form is wrong).
 
-    ONE SCAN, TWO TESTS -- see `_character_scan`.
+    One scan for two tests, as `_character_scan`.
     """
     declared = set((_vocab().get("measures") or {}).get("non_volumetric") or [])
     pairs = {s: p for s, p in PLURAL_UNITS.items()
@@ -4394,24 +2750,11 @@ def _plural_unit_scan():
 
 
 def test_a_counted_unit_agrees_with_its_count():
-    """`1 dash`, `2 dashes` -- Helen's rule, 2026-09-26.
+    """`1 dash`, `2 dashes`: a counted unit agrees with its number.
 
-    "'dashes' throughout please, but 'dash' when it's one. Yes please to a
-    test." The collection had it both ways: 71 amounts already agreed and six
-    did not, all six of them `2 dash` or `6 dash`, across three published
-    drinks and three drafts.
-
-    IT IS A RENDERED STRING, WHICH IS WHY IT IS WORTH A TEST AND NOT A STYLE
-    NOTE. `amount` prints on the recipe page and on the shopping list exactly as
-    it is written, so "2 dash orange bitters" is a typo the reader sees. Nothing
-    derived reads the form -- `_millilitres` accepts either, since both are
-    declared in `non_volumetric` -- so before this test the two spellings were
-    invisible to every check in the suite and drifted for as long as the
-    collection has existed.
-
-    THE FIX IS ALWAYS THE AMOUNT, NEVER THE VOCABULARY. Both forms stay
-    declared: `1 dash` is right and so is `2 dashes`, and dropping either from
-    `measures:` would make one of them unreadable.
+    `amount` prints on the recipe page and the shopping list as written, and
+    `_millilitres` accepts either form, so nothing else sees a `2 dash`. The
+    fix is the amount, never `measures:`: both forms stay declared.
     """
     _, bad = _plural_unit_scan()
     assert not bad, (
@@ -4428,11 +2771,9 @@ def test_a_counted_unit_agrees_with_its_count():
 def test_the_plural_unit_rule_is_exercised():
     """Counted amounts are actually being read.
 
-    The scan silently skips an amount whose unit is outside `PLURAL_UNITS`, so
-    a rename in `measures:` -- or a change to how `amount` is spelled -- would
-    empty this check while leaving it green. That is the exact shape MANUAL 10
-    records five guards going quiet in, and counting what got through is the
-    only thing that notices.
+    The scan skips an amount whose unit is outside `PLURAL_UNITS`, so a rename
+    in `measures:`, or a change to how `amount` is spelled, would empty this
+    check and leave it green.
     """
     checked, _ = _plural_unit_scan()
     _exercised(
@@ -4445,45 +2786,19 @@ def test_the_plural_unit_rule_is_exercised():
 US_UNITS = {"oz", "ounce", "ounces", "tsp", "teaspoon", "teaspoons",
             "tbsp", "tablespoon", "tablespoons", "cup", "cups"}
 
-# NOT US, STILL NOT WANTED. A barspoon is a bar's own name for about a
-# teaspoon, and Helen's ruling on 2026-09-02 was the same as for the teaspoon
-# itself: "I prefer '5 ml' to barspoon". No drink carried one on that day, so
-# nothing was converted; the set exists for the next transcription from a book
-# that says barspoon, which is most of them. Checked by the same test as the
-# US units because the remedy is identical -- write the millilitres.
+# A barspoon is not a US unit and is still not wanted: it is written as
+# millilitres, the same remedy, so the same test checks it.
 NOT_UNITS = {"barspoon", "barspoons", "bar-spoon", "bar-spoons"}
 
 
 def test_no_amount_uses_a_us_unit():
-    """Volumes are millilitres. Helen's call, 2026-09-01: "I don't want any US
-    units, just ml."
+    """Volumes are millilitres: no oz, tsp, tbsp, cup or barspoon in an `amount`.
 
-    THE WHOLE COLLECTION WAS CONVERTED THE SAME DAY -- 191 amounts across 44
-    drinks, at the factors `measures:` already declared (1 oz = 30 ml, 1 tsp =
-    5 ml). Every one landed on a clean .0 or .5, so nothing was rounded and no
-    figure was judged.
-
-    WHY THIS IS A TEST AND NOT A LINE IN THE INGEST DOC. The conversion is the
-    easy half; staying converted is the half that fails. A recipe is transcribed
-    from a book that prints ounces, and writing what the page says is the
-    default behaviour of every ingest -- it is what happened on 2026-08-31, when
-    ten drinks came in wholly in ounces because the collection already had 177
-    of them and matching the neighbours looked like the careful choice. Prose
-    telling the next session otherwise is exactly the shape this repo has
-    watched fail repeatedly.
-
-    `oz` AND `tsp` STAY DECLARED IN `measures:` DELIBERATELY, which looks
-    contradictory and is not. That table is the CONVERSION record, and
-    test_the_declared_measures_produce_the_figures_the_data_used_to_store anchors
-    on `("0.5 oz", 15.0)` to prove the factors still say what the deleted `ml:`
-    key said. Deleting the unit would destroy that evidence to enforce a rule
-    that a three-line test enforces better -- and would make an old ounce
-    unreadable rather than loudly wrong.
-
-    NON-VOLUMETRIC UNITS ARE UNTOUCHED: a dash, a pinch, a cube, a leaf and a
-    sprig are not US units and have no millilitre figure. `tbsp` and `cup` are
-    on the list without ever having appeared, because the point is the next
-    transcription rather than the current data.
+    A test and not only an ingest instruction, because a transcription copies
+    the units its source prints. `oz` and `tsp` stay declared in `measures:`
+    on purpose: that table is the conversion record
+    test_the_declared_measures_produce_the_figures_the_data_used_to_store
+    reads. A dash, a pinch, a cube and a sprig are not US units.
     """
     measures = _vocab().get("measures") or {}
     ignored = {w.lower() for w in (measures.get("ignored_words") or [])}
@@ -4520,19 +2835,11 @@ def test_no_amount_uses_a_us_unit():
 
 
 def test_the_declared_measures_produce_the_figures_the_data_used_to_store():
-    """The conversions still say what `ml:` said before it was deleted -- #571.
+    """The conversions still give the figures the retired `ml:` key held -- #571.
 
-    ANCHORS, NOT A ROUND TRIP. The 521 stored figures are gone, so nothing can
-    re-derive and compare them; what survives is a handful of real pairs taken
-    from the collection on the day of the deletion, one per declared unit plus
-    the two shapes that nearly broke the parser.
-
-    THE FRACTION CASE IS HERE BECAUSE IT ALREADY FOOLED ME ONCE. A first pass
-    at this measurement read "2/3 oz" as 2 and reported Don's Mai Tai as the
-    only drink whose stored `ml` disagreed with its `amount`. The data was
-    right and the parser was wrong, which is the direction that would have
-    silently tripled two figures had it not been checked against what was
-    actually stored.
+    Anchors, not a round trip: a real pair per declared unit, plus the
+    fraction and the ignored word, the two shapes a parser most easily
+    misreads (`2/3 oz` read as 2 triples the figure).
     """
     measures = _vocab().get("measures") or {}
     cases = [
@@ -4562,14 +2869,10 @@ def test_the_declared_measures_produce_the_figures_the_data_used_to_store():
 
 
 def test_no_ingredient_stores_a_millilitre_figure():
-    """`ml:` is retired -- #571. The `amount` string is the only quantity.
+    """No ingredient carries `ml:`; `amount` is the only quantity -- #571.
 
-    A RETURNING KEY WOULD BE READ BY NOTHING AND WOULD DRIFT IN SILENCE, which
-    is the whole reason it went: 521 entries held the same fact twice, and the
-    duplicate's only possible future was to disagree with the string beside it.
-    An ingest session copying an older drink as a template is exactly how it
-    comes back -- the same route MANUAL 4.0 records for the hyphenated
-    `awaiting-fix` spelling reappearing across 34 files.
+    A returning key is read by nothing and can only drift from the string
+    beside it. Copying an older drink as a template is how it comes back.
     """
     bad = [f"{slug}: {item.get('item') or item.get('generic')!r} has ml: {item['ml']!r}"
            for slug, fm in _load()
@@ -4586,35 +2889,13 @@ def test_no_ingredient_stores_a_millilitre_figure():
 
 
 def test_every_drinks_moods_match_the_derivation():
-    """Stored moods equal what taxonomy.yml's own rules produce -- #452.
+    """Stored moods equal what taxonomy.yml's rules produce -- #452.
 
-    MOODS ARE STORED RATHER THAN COMPUTED AT RENDER, so that Helen can
-    override one -- and the cost of storing them is that they can go stale
-    against the rules while looking perfectly fine. They did, comprehensively.
-    Derived once on 2026-08-17 and frozen into 114 files; by 2026-08-30 the
-    derivation's ingredient sets held 34 strings naming nothing, 24 drinks
-    disagreed with the rules, and **23 drinks had no mood at all** -- including
-    `naked-and-famous`, which Helen rates `oh gods yes`, and
-    `martinique-swizzle`, which was carrying `fruity` and `tiki` inherited from
-    the drink it replaced despite containing no fruit and no tiki marker.
-
-    A DRINK WITH NO MOOD IS INVISIBLE TO BOTH QUESTIONS THE INDEX ASKS. It can
-    be reached by ingredient or by name and by nothing else, and the index --
-    which is a browsing tool first -- gives no sign it is there. Nothing failed,
-    because nothing compared the stored value to the rule that produced it.
-
-    HELEN'S CORRECTIONS ARE PART OF THE EXPECTED VALUE, not an exemption from
-    it: `mood_include` and `mood_exclude` in taxonomy.yml each name the single
-    mood they are about, so a corrected drink still tracks every later
-    improvement to the rules. The Sazerac keeps `strong brown drink` (its
-    discarded rinse water drags the volume rule to 44%) and still gained
-    nothing wrongly.
-
-    RE-RUN, DO NOT HAND-EDIT: `python3 scripts/derive_cocktail_moods.py`
-    reports the difference and `--write` applies it. If the derivation is
-    wrong about a drink, that is a rule to fix in taxonomy.yml or a correction
-    to record there -- never a mood typed into a file where the next run will
-    silently revert it.
+    Moods are stored so that Helen can override one, and a stored value goes
+    stale against the rules while looking fine; a drink with no mood cannot be
+    reached by browsing. Her corrections, `mood_include` and `mood_exclude`,
+    are part of the expected value. Never hand-edit a `mood:` block:
+    `python3 scripts/derive_cocktail_moods.py --write` reverts it.
     """
     sys.path.insert(0, str(ROOT / "scripts"))
     try:
@@ -4636,9 +2917,8 @@ def test_every_drinks_moods_match_the_derivation():
     bad = []
     for slug, fm in _load():
         stored = [str(m) for m in (fm.get("mood") or [])]
-        # THE SCRIPT'S OWN FUNCTION, not a second copy of its four steps. The
-        # copy that used to live here drifted the moment the derivation gained
-        # an input, and would have drifted again over `moods_by_hand`.
+        # The script's own function, not a second copy of its steps: a copy
+        # drifts when the derivation gains an input.
         derived = deriver.expected_moods(slug, fm, stored, taxonomy, sets,
                                          step_words, families)
         if derived != stored:
@@ -4660,22 +2940,11 @@ def test_every_drinks_moods_match_the_derivation():
 
 
 def test_every_mood_correction_is_reachable_and_needed():
-    """A correction names a real drink and still changes something -- #452.
+    """A mood correction names a real drink and still changes something -- #452.
 
-    A CORRECTION THAT SILENTLY DOES NOTHING is the failure this repo has met
-    before: `EXTRA_NOTES["Sazerac"]` was written, the ingest ran cleanly, and
-    the note never appeared because that drink was in SKIP. Nothing complained.
-
-    Two ways one dies here. It can name a drink that no longer exists, in
-    which case it is inert. Or the rules can improve until the drink derives
-    the mood on its own -- and then the correction reads as load-bearing while
-    doing nothing, which is worse, because the next reader trusts it. The
-    Swizzle's entry says exactly that of itself: it was expected to become
-    unnecessary once #335 typed its rums.
-
-    Same bargain `methods.yml`'s proposals strike, and the reason it is
-    WHOLE_COLLECTION_ONLY: on a partial corpus a correction whose drink is
-    merely absent looks identical to one whose drink is gone.
+    One naming a drink that is gone is inert; one whose mood the rules now
+    derive anyway reads as a live reason while doing nothing. Whole collection
+    only: on a partial corpus an absent drink looks the same as a deleted one.
     """
     _require_whole_collection("the mood corrections")
     sys.path.insert(0, str(ROOT / "scripts"))
@@ -4726,31 +2995,11 @@ def test_every_mood_correction_is_reachable_and_needed():
 
 
 def test_every_mood_ingredient_is_declared():
-    """The mood derivation's ingredient sets name real vocabulary -- #452.
+    """Every member of `mood_ingredients` is a declared generic or character -- #452.
 
-    THIS IS THE TEST WHOSE ABSENCE COST THE MOODS. Moods were derived once, on
-    2026-08-17, from nine hardcoded sets of generic names inside the drafts
-    repo's `ingest_from_csv.py`, and the output was frozen into 114 files. The
-    vocabulary then moved: #335 finished typing every generic, #314
-    reclassified the rums and moved `blackstrap` from a generic to a character,
-    #561 renamed ten generics including every rum and both gins, #568 added
-    five, the Chartreuses took their French names.
-
-    **34 of those strings named nothing at all** by the time anyone looked --
-    nine of `aged`'s 29, which is every rum and every whisky in it, so `strong
-    brown drink` could no longer fire on a rum; five of `clear`'s 17; five of
-    `tiki`'s 13; nine of `loud`'s 23.
-
-    A SET INTERSECTION AGAINST A RENAMED STRING RETURNS EMPTY. It does not
-    raise and it does not warn, and the derivation had already run, so the
-    drift was invisible from both ends at once. §9.12's bargain, from the other
-    side: duplicate live data only alongside the test that keeps the duplicate
-    honest. The duplicate was in a private repo's script, so there was no test
-    and could not have been one.
-
-    GENERICS **OR** CHARACTERS, because `blackstrap` is legitimately a
-    `rum_characters` value and appears in two sets. Reading generics alone was
-    one of the 34.
+    A renamed generic does not fail at derivation: the set intersection comes
+    back empty and the mood silently stops firing. Characters count as well as
+    generics, because a `<family>_characters` value may sit in a set.
     """
     vocab = _vocab()
     sets = _taxonomy().get("mood_ingredients") or {}
@@ -4781,28 +3030,13 @@ def test_every_mood_ingredient_is_declared():
           "`retired_*` maps in ingredients.yml record every successor."
     )
 
-    # `mood_up_glasses` USED TO BE CHECKED HERE and went with the `up` mood on
-    # 2026-08-30 -- see the deriver for why that mood lost. It was the only
-    # glass-valued list the moods read; if another appears, check it against
-    # glasses.yml the way this did, because an unmatched glass name narrows a
-    # mood silently rather than erroring.
-
 
 def test_every_icy_serve_value_is_a_real_one():
     """`mood_serve_ice` names declared `serve.ice` values -- #1147.
 
-    THE SAME BARGAIN AS THE TEST ABOVE, one field along. `serve.yml` declares
-    what `serve.ice` may say; `mood_serve_ice` in taxonomy.yml says which of
-    those are icy enough to earn `ice ice baby`. Two lists, because they answer
-    two questions -- and two lists is exactly the arrangement #452's renames
-    turned into 34 strings that named nothing.
-
-    A MISMATCH HERE FAILS SILENTLY AND IN THE SAFE-LOOKING DIRECTION. The rule
-    is `served_ice in set(...)`, so a value renamed in serve.yml and not here
-    does not raise: the comparison simply stops matching, and every drink
-    served that way loses the mood while the data still reads as though it
-    should have it. That is what nine drinks did on 2026-09-05 for the
-    equivalent mistake in prose.
+    The rule is a set membership, so a value renamed in serve.yml and not in
+    taxonomy.yml raises nothing: every drink served that way silently loses
+    `ice ice baby`.
     """
     taxonomy = _taxonomy()
     declared = (_serve_vocab() or {}).get("ice") or {}
@@ -4833,27 +3067,11 @@ def test_every_icy_serve_value_is_a_real_one():
 def test_every_mood_step_word_list_is_actually_read():
     """Every `mood_step_words` list is read by the derivation -- #1147.
 
-    THIS IS THE TEST WHOSE ABSENCE LEFT `ice` DEAD FOR FIFTEEN DAYS. That block
-    declared eight step words, sat beside `faff`, `churned` and `fire` which
-    are all genuinely read, and was read by nothing: the `ice ice baby` rule
-    kept its own hardcoded copy in `derive_cocktail_moods.py`. So the
-    vocabulary looked live, and editing it to change which steps make a drink
-    icy would have done exactly nothing -- no error, no failing test, no
-    difference in a single drink's moods.
-
-    IT ASKS THE RUNNING CODE, NOT THE SOURCE TEXT. A grep for `step_words.get(
-    "ice")` would pass on a call sitting in a branch nothing reaches, and would
-    fail on a legitimate refactor that reads the dict another way. So this runs
-    the real derivation over the real collection through a dict that records
-    which keys were fetched, and asks which were never touched. Same principle
-    as `test_every_priceable_pour_has_a_price` running from the drinks rather
-    than from the table: the table can be immaculate and unreached.
-
-    EVERY RULE THAT READS ONE READS IT UNCONDITIONALLY, which is what makes
-    "never fetched across the whole collection" mean "dead" rather than "not
-    exercised by these drinks". If a future rule fetches a list only inside a
-    branch, this test will report it dead on a collection that never takes that
-    branch -- and the fix is to hoist the fetch, not to weaken this.
+    A declared list nothing reads looks live, and editing it changes no drink.
+    This asks the running code, not the source: the real derivation runs over
+    the collection through a dict that records which keys were fetched. Every
+    rule fetches its list unconditionally; if one ever fetches inside a
+    branch, hoist the fetch instead of weakening this.
     """
     sys.path.insert(0, str(ROOT / "scripts"))
     try:
@@ -4907,28 +3125,11 @@ def test_every_mood_step_word_list_is_actually_read():
 
 
 def test_source_names_a_source_and_source_url_holds_the_url():
-    """`source` is who, `source_url` is where -- #454. A SHAPE rule only.
+    """`source` is who, `source_url` is where -- #454. A shape rule only.
 
-    NOTHING HERE ASKS FOR COVERAGE, and that is the whole design. 86 of 114
-    drinks have `source: ""` and Helen's ruling on 2026-08-30 is that this is
-    fine: "I sort of don't care about this. You can't copyright facts, and I am
-    taking no prose from anywhere. Some will be attributable to a big-name
-    inventor, bar or maybe hotel, and it's nice to note that, but I'm not going
-    to sweat it."
-
-    That is the right call and it is a real difference from food, not laziness.
-    `SOURCE_ATTRIBUTION_SPEC.md` and the eight `source_type` values exist
-    because a food recipe is ADAPTED PROSE and the promotion gate is about
-    copyright. A cocktail is a formula plus a build -- quantities and steps --
-    so there is nothing to attribute in that sense, and importing that
-    apparatus would be the encyclopaedia-of-drinks busywork #459 rules out.
-
-    WHAT IS STILL WRONG RATHER THAN ABSENT is one field being used as the
-    other. `witches-daiquiri` carried a raw Difford's URL in `source` with
-    `source_url` empty -- so the drink page printed a URL where it prints a
-    name, and the URL field it has sat unused beside it. One instance, fixed;
-    this stops the next, because the shape of a mistake is what recurs and an
-    empty field is not a mistake at all.
+    Nothing here asks for coverage: an empty `source` is fine, because a drink
+    is a formula and not adapted prose. A URL in `source` prints on the drink
+    page where a name belongs and leaves `source_url` unused.
     """
     checked = 0
     bad = []
@@ -4957,28 +3158,11 @@ def test_source_names_a_source_and_source_url_holds_the_url():
 def test_no_drink_uses_a_generic_that_is_helens_to_apply():
     """A style listed in `hers_to_apply` may not be inferred onto a drink -- #542.
 
-    THE FAILURE THIS EXISTS FOR IS INVISIBLE TO EVERY OTHER GUARD HERE, and
-    #542 says so in its own words: "a wrong-but-declared value with no
-    contradicting evidence is invisible to every guard in the suite". Every
-    value involved is declared and valid. `test_every_generic_is_declared` is
-    green. The suggestion that would have contradicted it was dropped, so
-    #534's cross-category check is green too. Nothing was left to notice.
-
-    What actually happened, twice: `caramel-forward Jamaican rum` has bottles
-    (Blackwell, Myers) and no drink, and a session read that as a gap and
-    retyped a drink into it from its own `item` text. Helen, 2026-08-30, after
-    the second time: "I have discussed this at least twice... If I have to deal
-    with this again I will simply delete those recipes."
-
-    MANUAL 9.3.2 ALREADY FORBADE IT IN PROSE -- "it is hers to apply: never
-    retype a drink into it from item text" -- which is the whole argument for
-    this being a test. Two hooks in `.claude/`, `meta.awaiting_fix` and
-    `meta.proofread` all reached the same conclusion first: a rule that gets
-    read and broken needs a mechanism.
-
-    THE LIST IS THE ENFORCEMENT AND REMOVING A LINE IS THE GRANT. Helen deletes
-    an entry in the same commit as the drink that earns the style; nobody else
-    does, and never to make this go green.
+    A wrong-but-declared generic is invisible to every other guard: the value
+    is valid and nothing contradicts it. The list is the enforcement and
+    removing a line is the grant: Helen deletes an entry in the same commit as
+    the drink that earns the style, and nobody else does, never to make this
+    go green.
     """
     reserved = _vocab().get("hers_to_apply") or {}
     assert reserved, (
@@ -5016,22 +3200,9 @@ def test_no_drink_uses_a_generic_that_is_helens_to_apply():
 def test_every_ingredient_entry_has_something_the_line_renders():
     """An entry with neither `amount` nor `generic` prints as a raw Hash.
 
-    `_layouts/cocktail.html` renders the structured ingredient line when the
-    entry carries one of those and otherwise falls through to a bare-string
-    branch, where Liquid stringifies a dict. Tried on Aperol Spritz: the page
-    printed `{"amount"=>"90 ml", "generic"=>"prosecco"}` with a clean build and
-    nothing in the log.
-
-    THE GATE NAMED `item` TWICE OVER AND NOW NAMES IT NEITHER TIME. It was
-    `item` alone until #544 move 1 stopped rendering that field, which primed
-    this to fire on move 2; it then named all three until the field was retired
-    on 2026-09-21. The gate must ask for what the branch RENDERS, and there are
-    two of those.
-
-    There are no bare-string ingredients today, and that branch is for a
-    genuinely unstructured one. A dict arriving there is not that shape, it is
-    this one with a key missing, which is why it must never be reachable by
-    omission.
+    `_layouts/cocktail.html` renders the structured line when the entry
+    carries one of those and otherwise falls to the bare-string branch, where
+    Liquid stringifies a dict on a clean build with nothing in the log.
     """
     checked = 0
     bad = []
@@ -5052,25 +3223,12 @@ def test_every_ingredient_entry_has_something_the_line_renders():
 
 
 def test_no_drink_writes_plantation():
-    """Planteray is the brand's name; `plantation` is only ever read -- #582.
+    """No drink writes `plantation`; Planteray is the brand's name -- #582.
 
-    Helen: "'plantation' is not permitted as a kind of rum and should always be
-    corrected to 'planteray'." Planteray is canonical (MANUAL 9.3.2,
-    2026-08-27) and the old spellings stay in `bottles.yml` as ALIASES, which is
-    not half a finished rename but the same division `canonical_glasses` draws:
-    **the rule governs what is WRITTEN, the alias map governs what can be
-    READ.** Most of these drinks predate the rebrand, so a suggestion has to
-    keep resolving whether or not its drink has been retyped.
-
-    SO THIS CHECKS THE DRINKS AND NOT THE DATA FILES, and deleting the eleven
-    aliases to "finish the job" would break every suggestion this rule has not
-    reached. `bottles.yml` is deliberately out of scope.
-
-    The last live case was a TITLE, which is why nothing caught it: every
-    ingredient, suggestion and generic had already been retyped, and
-    "Plantation Pineapple Daiquiri" was the only trace left -- on a drink whose
-    own `item` reads "Planteray pineapple-infused rum" two lines below it.
-    Renamed with its file on 2026-08-30.
+    The rule governs what is written; the aliases in `bottles.yml` govern what
+    can be read, and stay so that a suggestion keeps resolving. So this checks
+    the drinks (filename, title, generic, suggestion, note) and not the data
+    files.
     """
     checked = 0
     bad = []
@@ -5100,40 +3258,13 @@ def test_no_drink_writes_plantation():
 
 
 def test_a_qq_note_carries_a_qq_label():
-    """A drink note that is unresolved says so on its tab -- #572.
+    """A note whose text begins `QQ` is labelled `QQ` -- #572.
 
-    NOTES ARE `{label, text}` OR A BARE STRING, exactly as a food recipe's are
-    (MANUAL 4) -- and `_layouts/cocktail.html` has rendered both shapes since
-    the layout was written, falling back to the literal word "note". Nothing had
-    ever used the labelled form, so all 170 notes rendered identically.
-
-    THE SPLIT THAT MATTERS IS NOT TOPIC BUT AUTHORSHIP. 81 of the 170 are the
-    ingest audit trail -- "QQ - `generic` values INFERRED, not confirmed", "QQ -
-    method step 2 is TRUNCATED in the source" -- and they sat on the page
-    labelled "note" beside Helen's own "This drink is incredibly forgiving with
-    the rum". One is a remark about the drink; the other is a record that
-    something is unresolved, and reading it as the first is the failure.
-
-    ONE LABEL, NOT FIVE. The 81 sort into five kinds (inferred, no unit,
-    truncated, glass, mood) and Helen's call was a single `QQ` anyway: the tab
-    says "not ruled on yet", which is what `QQ` means everywhere else in this
-    repo, and a five-word vocabulary would need its own guard to stop a sixth
-    kind arriving untagged.
-
-    THE TEXT KEEPS ITS OWN `QQ - ` PREFIX, which is duplication on the page and
-    deliberate. MANUAL 5's house-style exemption matches `QQ` as a PREFIX on
-    the string, and every `grep -rn QQ` in this repo's history has found these
-    by their text. Moving the marker into the label alone would fail in the
-    direction where a future scanner silently stops seeing them.
-
-    THE CONVERSE WAS ASSERTED TOO, UNTIL 2026-10-02, AND #1258 RETIRED IT. A
-    `QQ` label over text that did not itself begin `QQ` used to fail here. The
-    2026-10-01 migration turned 34 bare-string drink notes into `label: ""`,
-    and Helen asked for those to be labelled `QQ` with the imported text left
-    as it stands: "this will stop them being published by accident (i.e.
-    without me having spotted and fixed the imported text)". So `QQ` on the
-    label now means "Helen has not read this yet", whatever the text says;
-    `test_no_published_drink_carries_a_qq` is what turns that into a gate.
+    An unresolved note under the default "note" tab reads as a remark about
+    the drink. The text keeps its own `QQ` prefix as well: every QQ scanner
+    matches the prefix. The converse is not asserted: a `QQ` label over other
+    text means Helen has not read it yet (#1258), and
+    `test_no_published_drink_carries_a_qq` is the gate.
     """
     checked = 0
     bad = []
@@ -5167,9 +3298,9 @@ def test_a_draft_drink_has_a_notes_slot_and_no_unlabelled_note():
     """#1258, the drinks half: somewhere to type, and no imported text unlabelled.
 
     `tests/test_drafts.py::test_a_draft_has_a_notes_slot_and_no_unlabelled_note`
-    is the food half and carries the argument. DRAFTS ONLY -- a published drink
-    with nothing to say still writes `notes: []`, and its notes are held to the
-    stricter filled-pair rule, `test_a_published_drink_note_is_a_filled_pair`.
+    is the food half and carries the argument. Drafts only: a published drink
+    with nothing to say may write `notes: []`, and its notes are held to
+    `test_a_published_drink_note_is_a_filled_pair`.
     """
     bad = []
     for drink in _load_draft_files():
@@ -5261,59 +3392,10 @@ def test_the_published_note_check_sees_each_broken_shape():
 def test_no_method_step_restates_to_serve_or_garnish():
     """A step that opens "Serve" or "Garnish" is another field's fact -- #573.
 
-    THE FIELDS ALREADY EXISTED AND THE DRINKS DISAGREED WITH EACH OTHER, which
-    is what #573 means by "we talked about this but it looks like we didn't
-    implement it". Mastiha Mojito said `to_serve: "Straw."`; Mai Tai and Coffey
-    Park Swizzle said `Serve with a straw.` as a method step. One fact, two
-    fields, decided per drink by which session last touched it. Don's Own Grog
-    and Man o' War went further and restated their own `garnish:` verbatim.
-
-    THE VERB IS THE TEST, NOT THE WORDS. This deliberately does not fire on a
-    step that merely NAMES a garnish, and the difference is the whole rule:
-
-        "Float the dehydrated lime slice wheel."     an ACTION -- stays
-        "Garnish with grated nutmeg."                 a RESTATEMENT -- goes
-
-    THAT FIRST EXAMPLE WAS THE 18TH CENTURY'S, AND HELEN DELETED IT ON
-    2026-09-09 (#880). The rule is unchanged and the example is now a bad one,
-    which is worth saying rather than quietly swapping. The verb test is right
-    -- "Float" IS an action and this test should not fire on it -- but that
-    drink's garnish was `dehydrated lime slice wheel`, so the page read:
-
-        Float the dehydrated lime slice wheel.
-        Garnish with a dehydrated lime slice wheel.
-
-    Helen: "We need to fix the repetition in the last two steps." A verb can be
-    a real action and still say nothing the generated garnish line does not,
-    and when it does the step is redundant even though this test is right to
-    allow it. THE FIX WAS THE DRINK, NOT THE RULE: exactly one drink in the
-    collection had a step naming its own garnish this way. The other two the
-    scan found are drinks MUDDLING an ingredient that is also the garnish
-    (east-river-underground's cucumber wheels, kill-devil-punch's raspberries),
-    which is a different thing and correct as written.
-
-    So: no test fires on this shape, and it stays that way deliberately -- a
-    rule that refused any step naming the garnish would delete those two
-    muddles. If a third redundant Float appears, delete the step; if a fourth
-    does, that is the point to reconsider the rule rather than now.
-
-    (It used to cite "Express lemon zest twist and use as garnish" as the
-    action that stays, and that step is gone: the LAYOUT writes it now, from the
-    garnish -- Helen's ruling, 2026-09-04. See
-    test_no_method_step_opens_with_express below, which is this rule applied to
-    the one action that turned out to be derivable after all.)
-
-    MANUAL 9.4 settles which is which: finishing ACTIONS are method steps
-    ("top with champagne", "squeeze the twist over the drink"), presentation is
-    `to_serve`. An imperative "Garnish with X" instructs you to do the thing the
-    `garnish:` list already states, in the way 9.12 describes for naming the
-    glass inside a strain step -- variance that looks informative and is not.
-
-    Nothing about this is caught by the build. A duplicated garnish renders
-    twice on the page and reads as a page with a redundant last step; a
-    presentation fragment stranded in `method` renders as an instruction and
-    quietly makes `to_serve` look like a field nobody uses, which is how it sat
-    empty on 111 of 114 drinks.
+    Presentation is `to_serve`, and "Garnish with X" restates `garnish:`,
+    which then renders twice. The verb is the test: a step that does something
+    to a garnish ("Float the lime wheel"), or muddles an ingredient that is
+    also the garnish, does not fire, on purpose. MANUAL §9.4.
     """
     checked = 0
     bad = []
@@ -5340,17 +3422,11 @@ def test_no_method_step_restates_to_serve_or_garnish():
     )
 
 
-# =============================================================================
-# THE GLASS GENERATOR -- #1214, 2026-09-28
-# =============================================================================
-# Helen: "Let's write the glass generator now please -- I've come up against
-# this a few times now, notably in the Sazerac on the live site."
-#
-# The strain step has composed its glass since 2026-09-05; nothing else did, so
-# a drink BUILT in the glass named it nowhere. `methods.yml in_the_glass` is
-# the mapping and `_layouts/cocktail.html` fills the slot. These three guard
-# the three ways that can rot: a key that is not a real step, a value that
-# cannot be filled, and a template that stops reading the table.
+# THE GLASS GENERATOR -- #1214
+# `methods.yml in_the_glass` maps a built-in-the-glass step to a sentence
+# with a `<glass>` slot, and `_layouts/cocktail.html` fills it. These
+# guard a key that is not a real step, a value that cannot be filled, and
+# a template that stops reading the table.
 
 GLASS_SLOT = "<glass>"
 
@@ -5360,12 +3436,10 @@ def _in_the_glass():
 
 
 def test_every_glass_step_key_is_a_canonical_step():
-    """The LEFT side is a step a drink may actually write.
+    """Every `in_the_glass` key is a step a drink may actually write.
 
-    A key that matches nothing is a rule that never fires, and it fires
-    silently -- the page just keeps saying "Add all ingredients." with no
-    glass, which is the very complaint #1214 was raised about. The same
-    bargain `proposals` strikes one block up.
+    A key that matches no canonical step is a rule that never fires, silently:
+    the page keeps its step with no glass named (#1214).
     """
     spec = _methods()
     table = _in_the_glass()
@@ -5384,16 +3458,11 @@ def test_every_glass_step_key_is_a_canonical_step():
 
 
 def test_every_glass_step_value_has_exactly_one_slot():
-    """The RIGHT side is a sentence with one `<glass>` and a full stop.
+    """Every `in_the_glass` value is a sentence with one `<glass>` and a full stop.
 
-    Zero slots is a rewrite that loses the glass -- worse than not composing at
-    all, because it looks done. Two would need the phrase twice in one
-    sentence, which no English here wants. The full stop matters because every
-    other canonical step is a whole sentence and these sit among them.
-
-    `<glass>` AND NOT `shapes:`'s `<X>`, deliberately: that slot is filled by
-    the DRINK with an ingredient it names, this one by the PAGE from a field.
-    Same-looking marker, opposite direction.
+    Zero slots is a rewrite that loses the glass and looks done. `<glass>` and
+    not the `<X>` of `shapes:`: that slot is filled by the drink with an
+    ingredient, this one by the page from a field.
     """
     table = _in_the_glass()
     bad = []
@@ -5410,17 +3479,12 @@ def test_every_glass_step_value_has_exactly_one_slot():
 
 
 def test_the_layout_takes_the_glass_sentences_from_methods_yml():
-    """The composed sentences are the data's, not literals in the template.
+    """The composed glass sentences are the data's, not literals in the template.
 
-    EXACTLY THE DRIFT test_the_layout_takes_the_twist_step_from_methods_yml was
-    written for, one field along: the twist sentence lived in both places,
-    Helen changed the wording, and the page kept emitting the old one with
-    nothing watching the pair. So the template must READ `in_the_glass` rather
-    than restate any of it.
-
-    Matching the ASSIGNMENT rather than the sentence, for that test's own
-    reason: a plain scan for the quoted string fires on the template's
-    COMMENTS, which quote the rule while explaining it (MANUAL 12).
+    A sentence held in both places drifts when one is reworded, so the
+    template must read `in_the_glass`. Matches the assignment, not the
+    sentence: a scan for the quoted string fires on the template's own
+    comments (MANUAL §12).
     """
     layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
 
@@ -5448,31 +3512,16 @@ def test_the_layout_takes_the_glass_sentences_from_methods_yml():
 def test_the_layout_takes_the_twist_step_from_methods_yml():
     """The page's twist sentence is methods.yml's, not a string in the template.
 
-    WRITTEN BECAUSE THE PAIR DRIFTED, 2026-09-09. `_layouts/cocktail.html` used
-    to spell both sentences out AND methods.yml declared them -- one fact in two
-    places, with nothing comparing them. Helen changed the wording under #880
-    (`and` -> `then`); editing the declaration left the template emitting the
-    old string, and the only thing that noticed was a test about the STANDALONE
-    DOCUMENT, three steps away, which reported it as a documentation problem.
-
-    So this asserts the template READS the data rather than restating it, which
-    is the only version of this that cannot drift. Two halves:
-
-      1. no literal `Express the twist...` sentence survives in the template;
-      2. it reads `canonical.express` by index, and the ORDER of that list is
-         load-bearing -- [0] is the drop-in form and [1] the discard form,
-         chosen by whether the garnish says "discard". Swapping them would
-         silently tell you to bin a peel you should drop in, on every
-         twist-garnished drink, with every other test still green.
+    No literal is assigned to `twist_step`, and the layout reads
+    `canonical.express` by index. The order of that list is load-bearing: [0]
+    is the drop-in form and [1] the discard form, chosen by whether the
+    garnish says "discard". Swapped, every twist-garnished drink gives the
+    wrong instruction with every other test green.
     """
     layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
 
-    # MATCH THE ASSIGNMENT, NOT THE SENTENCE. A plain scan for the quoted
-    # string fires on this template's own COMMENTS, which quote it while
-    # explaining the rule -- MANUAL §12's "a source-scanning guard will be
-    # fooled by the prose explaining it", and it fired on the unbroken file the
-    # first time this was run. What must not exist is a literal ASSIGNED to
-    # `twist_step`; a comment saying what the sentence is is documentation.
+    # Match the assignment, not the sentence: a scan for the quoted string
+    # fires on the template's own comments, which quote it (MANUAL §12).
     spelled_out = re.findall(
         r'assign\s+twist_step\s*=\s*"[^"]+"', layout
     )
@@ -5544,29 +3593,13 @@ def test_a_bracketed_amount_does_not_repeat_its_use():
 
 
 def test_no_method_step_opens_with_express():
-    """The twist step is the LAYOUT's, not a drink's -- Helen's ruling, 2026-09-04.
+    """No drink writes the twist step: the layout derives it from `garnish:`.
 
-    She was asked whether "a garnish of any citrus twist should automatically
-    add the step 'Express the twist over the drink and drop it in' at the end of
-    the method, so no drink has to write it", and said yes -- answering
-    `el-presidente`'s own QQ, which had asked for exactly that and said it
-    "should become canonical, for each type of citrus twist".
-
-    SO THE STEP IS DERIVED FROM `garnish:` AND WRITING IT IS A DUPLICATION. It
-    is the same fact twice, in two fields, which is what §9.12 means by variance
-    that looks informative and is not -- and it is worse than the usual case,
-    because the two copies can disagree: `man-o-war` said "discard" while its
-    garnish said `lemon twist`, so the page would have told you to drop the peel
-    in and to throw it away.
-
-    THREE DRINKS HAD WRITTEN IT, IN THREE WORDINGS, and all three were deleted
-    the day this landed: `corpse-reviver-no-2` ("Express lemon zest twist and use
-    as garnish"), `man-o-war` and `north-sea-oil`. The wording the layout emits
-    is canonical in methods.yml under `express`.
-
-    THE VERB IS THE TEST, as in its sibling above: this fires on a step that
-    OPENS with "Express" and nothing else. A step that expresses something in
-    passing is prose about a different action and stays.
+    A hand-written copy is the same fact in two fields, and the two can
+    disagree: a step saying "discard" beside a garnish that does not. The
+    emitted wording is `canonical.express` in methods.yml. Fires only on a
+    step that opens with "Express"; one that expresses something in passing
+    stays.
     """
     checked = 0
     bad = []
@@ -5591,21 +3624,11 @@ def test_no_method_step_opens_with_express():
 
 
 def test_optional_is_a_real_boolean():
-    """`optional` marks an ingredient the drink survives without -- #570.
+    """`optional` is a real boolean, never a quoted string -- #570.
 
-    A REAL BOOLEAN, NEVER A QUOTED STRING. The exact lesson `meta.awaiting_fix`
-    paid for in MANUAL 4.0: `optional: "true"` is a string, and every
-    truthiness test in Liquid and in Python agrees a non-empty string is true --
-    so a QUOTED value happens to work here and stops working the moment anything
-    compares it, while `optional: "false"` is true today and reads as false to
-    every human who looks at it. There is no spelling of this field that fails
-    loudly on its own, so the shape is guarded instead.
-
-    `false` is permitted and means the same as absent. It is not written into
-    any drink -- writing "this is not optional" on 617 entries is noise -- but a
-    drink that has been thought about and answered no is a legitimate thing to
-    record, and forbidding it would make the absence ambiguous in the other
-    direction.
+    `optional: "false"` is a non-empty string, so it is true to Liquid and to
+    Python while reading as false to a person. No spelling of the field fails
+    loudly on its own. `false` is permitted and means the same as absent.
     """
     seen = 0
     bad = []
@@ -5637,21 +3660,10 @@ def test_optional_is_a_real_boolean():
 def test_no_ingredient_says_optional_in_prose():
     """Optionality is the `optional` field and nothing else -- #570.
 
-    THIS IS THE HALF THAT MAKES THE FIELD STICK, and the reason it exists is
-    that the field was invented to replace exactly this: both live cases said
-    `item: "Gentian liqueur (optional)"` before #570, because `item` was the
-    only slot that would hold a fact no field had. #544 calls that out as the
-    one parenthetical in `item` that sorted into no other field.
-
-    A drink that writes the word back into prose renders it as part of the
-    ingredient's NAME, and nothing else notices: the ingredient line prints
-    whatever the generic says, so "sugar syrup (optional)" would read as a
-    category, sit in the search pool as one, and never reach `optional`'s own
-    rendering. Silent in every direction.
-
-    Scoped to the ingredient fields, NOT to the drink's prose. A method step or
-    a note may discuss what is optional in a sentence -- "the float is optional
-    if you are out of Wray" is a reason, which is a note's whole job.
+    The word written into `generic` or `suggestion` becomes part of the
+    ingredient's name: it reaches the card, the search pool and the recipe
+    line, and never reaches `optional`'s own rendering. A method step or a
+    note may still discuss what is optional.
     """
     checked = 0
     bad = []
@@ -5685,16 +3697,8 @@ def test_no_ingredient_says_optional_in_prose():
 def test_to_serve_is_a_string():
     """`to_serve` is one line of presentation, never a list.
 
-    NEW FIELD, NEW RISK. Not a single drink set `to_serve` until 2026-08-26,
-    when #291's three fragments moved into it -- so this field went from
-    documented-but-unused to live, with nothing checking its shape.
-
-    A LIST DOES NOT FAIL LOUDLY HERE. `_layouts/cocktail.html` renders it as
-    `{{ page.to_serve | markdownify | remove: '<p>' }}`, and Liquid will
-    happily stringify a list into that filter chain rather than raise -- the
-    same class of quiet nonsense as the `glass` scalar iterating as characters.
-    `glass`, `garnish` and `mood` each have a shape guard for exactly this
-    reason; this field had none because it had no data.
+    `_layouts/cocktail.html` pipes it through `markdownify`, and Liquid
+    stringifies a list into that chain without raising.
     """
     bad = [f"{slug}: to_serve is a {type(fm['to_serve']).__name__}"
            for slug, fm in _load()
@@ -5707,25 +3711,11 @@ def test_to_serve_is_a_string():
 
 
 def test_notes_is_a_list():
-    """`notes:` with nothing after it parses as null, not `[]`. Issue #706.
+    """`notes:` with nothing after it parses as null, not `[]` -- #706.
 
-    THE ONE REQUIRED KEY WHOSE TYPE NOTHING CHECKED. `REQUIRED_TOP_LEVEL` asks
-    whether the key is PRESENT, and it is; #667's schema guard covers unknown
-    keys, missing keys, ingredient shape, method shape, `to_serve`, `glass` and
-    `mood`. `notes` fell through the gap between the two.
-
-    IT RENDERS CORRECTLY BY LUCK. `_layouts/cocktail.html` guards with
-    `{% raw %}{% if page.notes.size > 0 %}{% endraw %}`, and Liquid's `nil.size`
-    is nil, so the comparison is falsy and the section is skipped. The luck runs
-    out on the obvious tidy-up: rewritten as a bare truthiness test, that guard
-    would try to iterate nil. Food has had `test_notes_is_a_list` all along.
-
-    HOW IT TURNED UP, and it is the argument for this test rather than a
-    footnote to it: Helen hit it by hand on 2026-09-04, proofreading the first
-    published batch -- she emptied Bee's Knees' notes and wrote `notes:` rather
-    than `notes: []`. Four OTHER tests failed on that same edit, so the suite
-    was doing its job everywhere except here. A gap you only find by making the
-    mistake is the kind worth closing.
+    `REQUIRED_TOP_LEVEL` only asks that the key is present. A null renders as
+    nothing only because the layout tests `page.notes.size > 0` and Liquid's
+    `nil.size` is nil.
     """
     bad = [f"{slug}: notes is {fm['notes']!r} ({type(fm['notes']).__name__})"
            for slug, fm in _load()
@@ -5739,10 +3729,10 @@ def test_notes_is_a_list():
 
 
 def test_glass_is_a_list():
-    """`glass` became an ordered list on 2026-08-17 so a drink could name more
-    than one acceptable serve. A leftover scalar still renders -- Liquid
-    iterates a string's characters happily enough to produce nothing visible --
-    so nothing else would catch one.
+    """`glass` is an ordered list, first entry preferred.
+
+    A leftover scalar still renders: Liquid iterates a string and produces
+    nothing visible, so nothing else would catch one.
     """
     bad = [f"{slug}: glass is a {type(fm['glass']).__name__}"
            for slug, fm in _load()
@@ -5753,49 +3743,18 @@ def test_glass_is_a_list():
 
 
 def test_every_glass_value_is_in_the_vocabulary():
-    """A drink naming a glass `glasses.yml` has never heard of renders NOTHING.
+    """Every glass a drink names is a key in glasses.yml `icons:` -- #500.
 
-    #500. The glass layer is guarded thoroughly in one direction -- every
-    mapped glass names a real icon, `all_icons` matches the directory both
-    ways, every icon has a height. All of that guards glasses.yml against
-    itself. Nothing guarded the DRINKS against glasses.yml, so a typo produced
-    a drink with no glass drawing and no complaint from anywhere.
-
-    THE SILENCE IS BY DESIGN, WHICH IS WHY IT NEEDS A TEST RATHER THAN A FIX.
-    "Absent means no icon" is the correct default -- it is what stops a missing
-    key becoming a broken image, and glasses.yml's own header says so -- but it
-    cannot tell a deliberate gap from a mistake. That was a fair trade while
-    three values were deliberately unmapped. It is a bad one now `any` is the
-    last of them: an unrecognised glass is far likelier to be a typo than a
-    decision.
-
-    `any` WAS AN EXEMPTION HERE AND IS NOW RETIRED, 2026-08-27. It meant "no
-    requirement", and exactly one drink ever used it -- Daisy de Santiago, as
-    `[collins, any]`, i.e. "anything, but preferably a Collins". Helen: "when
-    someone tells me to use an old fashioned glass I always automatically
-    assume I can use any glass I like, so there's no need to have 'any' as a
-    glass type."
-
-    That is the argument that kills it. The freedom `any` encoded is one she
-    applies to EVERY glass spec already, so recording it on one drink said
-    nothing true about that drink and false about the other 113. Dropping it
-    from Daisy left `[collins]`, which is what the source meant anyway --
-    "preferably a Collins" was always the whole content.
-
-    There is now NO exempt value: every glass a drink names must be in `icons:`.
-
-    Passes on arrival: all 19 distinct values in the collection are known
-    today. That is what makes it worth adding now -- it costs nothing to
-    introduce and catches the next one for free.
+    An unknown glass renders no icon and no complaint: "absent means no icon"
+    is the right default, and it cannot tell a typo from a decision. There is
+    no exempt value.
     """
     g = _glasses()
     icons = g.get("icons") or {}
     assert icons, "glasses.yml has no `icons:` -- see the sibling tests."
 
-    # No exemptions. `any` was the last one and was retired 2026-08-27 -- see
-    # the docstring. A new exemption here should be argued for in an issue
-    # first: the whole value of this check is that an unrecognised glass is a
-    # typo rather than a decision.
+    # No exemptions. A new one is argued for in an issue first: the value
+    # of this check is that an unrecognised glass is a typo, not a decision.
     deliberately_unmapped = set()
 
     unknown = {}
@@ -5806,13 +3765,10 @@ def test_every_glass_value_is_in_the_vocabulary():
                 continue
             unknown.setdefault(key, []).append(slug)
 
-    # Six icons are drawn and normalised but no spelling reaches them
-    # (hot-toddy, julep-cup, margarita, pina-colada, sherry, shot -- the
-    # `UNUSED ICONS` note in glasses.yml says why). For those, the generic
-    # advice below is actively WRONG: it says "and artwork", and the artwork
-    # already exists. Someone taking it at its word draws a second margarita,
-    # or maps the value to `coupe` and never learns `margarita.svg` was there.
-    # So say so, per value, at the moment it matters.
+    # Some icons are drawn but no spelling reaches them (the `UNUSED ICONS`
+    # note in glasses.yml). For those the generic advice below is wrong:
+    # the artwork exists and only a key in `icons:` is missing, so say so
+    # per value.
     lines = []
     for value, drinks in sorted(unknown.items()):
         line = f"{value!r} -- {', '.join(sorted(drinks))}"
@@ -5834,87 +3790,19 @@ def test_every_glass_value_is_in_the_vocabulary():
     )
 
 
-# The drinks that named no glass at all on 2026-08-27, when Helen settled that
-# every recipe should have one (#491). Sixteen of 114. Listed rather than
-# tolerated silently, and listed rather than fixed, because which glass a drink
-# wants is her call and not derivable -- a Zombie is not a Bellini.
-#
-# THE LIST ONLY SHRINKS. The test fails if a drink joins it, and fails again if
-# a drink on it gets a glass and is not removed, so it cannot quietly stop
-# describing the collection.
-#
-# WHO NAMED WHAT, 2026-08-30 -- kept because each is a ruling and several
-# turned on something only Helen knows.
-# kamaniwanalaya came off on 2026-08-30: Helen gave it a Collins, a
-# pineapple wedge, a maraschino cherry and a bouquet of mint sprigs. Fifteen
-# left of the original sixteen.
-#
-# FIVE MORE CAME OFF THE SAME DAY, Helen ruling on each in turn:
-#   anitas-attitude-adjuster  highball, "whatever we say for Long Island
-#                             Iced Tea" -- it is that drink with sparkling
-#                             wine in place of the cola, and says so in its
-#                             own tagline
-#   banana-boulevardier       double old fashioned over the ice block its
-#                             method already asks for, or up in a coupe
-#   biggles-sidecar           coupe
-#   cobra-effect              tiki mug -- "or anything you like because
-#                             it's a mad colour and you might want to see
-#                             it", hence the coupe second
-#   copenhagen-special        coupe, and it gained the orange zest twist
-#                             she named with it
-#   cynar-toronto             old fashioned
-#   el-mediterraneo           collins
-#   georgetown-punch          highball -- she wondered about a sling,
-#                             "they're awesome and underused", and does not
-#                             own one; recorded here rather than as data
-#   mai-tai-diffords-recipe   double old fashioned usually, tiki mug
-#                             sometimes, so both in that order
-#   milliners-punch           highball. "I made this up so I can say what
-#                             I like!"
-#   minty-pentones            old fashioned
-#   modern-zombie-makes-2     collins -- "zombie glass really", which the
-#                             vocabulary does not have and she does not
-#                             own, so the drink carries a note saying so
-#   pear-...-bellini          flute, which its own method already said
-#   tiki-max                  tiki mug
-#   zombie-intoxica           tiki mug
-#
-# AND THAT IS ALL SIXTEEN. The set is empty and stays declared: it is what
-# `test_the_glassless_list_has_no_stale_entries` reads, and that check now
-# asserts the emptiness rather than trusting it -- an empty registry that
-# nothing looks at is how a closed backlog quietly reopens.
-#
-# `set()` AND NOT `{}`: an empty pair of braces is a DICT, which is what
-# this became when the last name came out. Nothing about the braces says
-# so -- the tests below simply started failing with "unsupported operand
-# type(s) for -: 'dict' and 'set'", which is at least a loud way to learn.
+# The drinks that named no glass when #491 settled that every recipe has one.
+# A closed backlog: empty, and `test_the_glassless_list_has_no_stale_entries`
+# fails if a name is added back. `set()`, not `{}`: an empty brace literal is a
+# dict, and the set arithmetic below raises TypeError on one.
 GLASSLESS_ON_2026_08_27 = set()
 
 
 def test_every_drink_names_a_glass():
-    """#491. Helen, 2026-08-27: "All recipes should have a glass."
+    """Every drink names a glass (#491).
 
-    A drink with no `glass` renders no icon, and on a drink page the glass is
-    the hero -- it is drawn as tall as the whole title block. So an empty
-    `glass` is not a missing garnish-sized detail, it is a page with a hole
-    where its main image goes, and 16 of 114 have one.
-
-    WHY THIS IS A RATCHET AND NOT A FIX. Which glass a drink wants is Helen's
-    knowledge, not something derivable from the ingredients -- and guessing
-    would be worse than the gap, because a wrong glass looks exactly as
-    confident as a right one. So the existing sixteen were recorded and the
-    check bit on the seventeenth.
-
-    ALL SIXTEEN ARE DONE, 2026-08-30. She named every one, in three batches,
-    given the ingredients and the total volume of each -- and several answered
-    themselves once the volume was in front of her: the Bellini's own method
-    already said "add 25 ml syrup to a champagne flute", and Banana
-    Boulevardier's said "over a large ice block". The exemption set is empty,
-    so this test is now simply "every drink names a glass".
-
-    NOTE THE TEST ABOVE NO LONGER EXEMPTS `any`. The two changes are the same
-    decision from both ends: every drink names a glass, and there is no value
-    meaning "it does not matter".
+    On a drink page the glass is the hero image, so an empty `glass` is a hole
+    where the page's main picture goes. Which glass a drink wants is Helen's
+    call and is not derivable from the ingredients: ask, never guess.
     """
     missing = {slug for slug, fm in _load() if not (fm.get("glass") or [])}
 
@@ -5928,21 +3816,10 @@ def test_every_drink_names_a_glass():
 
 
 def test_the_glassless_list_has_no_stale_entries():
-    """GLASSLESS_ON_2026_08_27 only shrinks -- a drink that gains a glass comes off.
+    """GLASSLESS_ON_2026_08_27 is empty and stays empty (#491, #540).
 
-    SPLIT OUT OF THE RATCHET ABOVE, 2026-08-29, #540. The two halves ask
-    opposite-facing questions and only one of them survives a partial corpus:
-    "is there a seventeenth glassless drink" is true of each drink on its own,
-    while "is every name on this list still glassless" needs the whole book. In
-    CI the drafts are absent, so all sixteen names would read as fixed. See
-    WHOLE_COLLECTION_ONLY at the top of this file.
-
-    IT IS EMPTY NOW, and that is checked rather than assumed. An exemption set
-    that has emptied is the moment a ratchet stops doing anything, and an
-    unwatched empty set is how one gets quietly refilled -- so the assert below
-    fails if a name is ever added back. Deleting both the set and this test is
-    the right move only once nothing can regress; the sibling above is what
-    keeps the collection honest either way.
+    Whole collection only: with the drafts absent every listed name would read
+    as fixed. A new glassless drink is given a glass, never added to the set.
     """
     _require_whole_collection("GLASSLESS_ON_2026_08_27")
     missing = {slug for slug, fm in _load() if not (fm.get("glass") or [])}
@@ -5965,23 +3842,12 @@ def test_the_glassless_list_has_no_stale_entries():
 
 
 def test_every_mood_belongs_to_exactly_one_group():
-    """The index asks MOOD and HASSLE as separate questions, and the split
-    lives in `taxonomy.yml`'s `mood_groups` rather than in the template.
+    """Every mood in `taxonomy.yml` sits in exactly one of `mood_groups`.
 
-    THE FAILURE THIS CATCHES IS A DISAPPEARING BUTTON. cocktails/index.html
-    renders each group by iterating its list, so a mood added to `moods:`
-    without being added to a group renders NOWHERE -- no button, no error, and
-    the drinks carrying it become unreachable by mood. That is the same class
-    of silent gap as an unmapped glass (#500): the page is valid, the build is
-    green, and a filter simply does not exist.
-
-    Both directions, because both have a failure. An ungrouped mood vanishes
-    from the page; a grouped name that is not a real mood renders a button that
-    matches nothing, which is worse than no button because it looks like an
-    empty collection rather than a typo.
-
-    Overlap is checked too. A mood in both groups would render twice and toggle
-    both copies from one click, since the script keys on the mood name.
+    cocktails/index.html renders each group by iterating its list, so an
+    ungrouped mood gets no button and its drinks cannot be filtered for; a
+    grouped name that is not a mood renders a button matching nothing; and a
+    mood in two groups renders twice and one click toggles both copies.
     """
     tax = _taxonomy()
     moods = set(tax.get("moods") or {})
@@ -6023,10 +3889,10 @@ def test_every_mood_belongs_to_exactly_one_group():
 
 
 def test_garnish_is_a_list():
-    """Same reasoning as `glass` and `mood`: a bare string iterates in Liquid as
-    its own characters, which renders as nothing visible rather than as an
-    error. Cobra's Fang is why `garnish` is a list at all -- a mint sprig AND a
-    lime wheel -- and a leftover scalar would go unnoticed.
+    """`garnish` is a list, never a bare string.
+
+    `_layouts/cocktail.html` takes its `.size` and joins it; a string answers
+    both without raising, so a scalar renders wrongly and nothing fails.
     """
     bad = [f"{slug}: garnish is a {type(fm['garnish']).__name__}"
            for slug, fm in _load()
@@ -6044,9 +3910,8 @@ def _garnish_vocab():
 def _declared_garnishes(vocab):
     """Every string under `canonical`, plus the no-garnish marker.
 
-    Derived from the mapping's SHAPE rather than from a hardcoded list of group
-    names, so a group added to the data file is covered without touching this
-    file -- the same reasoning `_declared_generics` uses on ingredients.yml.
+    Derived from the mapping's shape, so a group added to garnish.yml is
+    covered without touching this file.
     """
     declared = set()
     for group in (vocab.get("canonical") or {}).values():
@@ -6062,24 +3927,11 @@ NO_GARNISH = "no garnish"
 
 
 def test_every_garnish_is_declared():
-    """Every garnish on every drink appears in `_data/cocktails/garnish.yml`.
+    """Every garnish on every drink is declared in `_data/cocktails/garnish.yml`.
 
-    A RATCHET, NOT A BACKLOG. The vocabulary was seeded from the collection's
-    own strings on 2026-08-31, odd ones included, so this cannot fail on
-    anything already here -- it bites on the NEXT new spelling. That is the
-    point: the census behind that file found 65 distinct strings for perhaps 35
-    real garnishes, and nothing was watching the gap.
-
-    ADDING A LINE IS WHAT SWITCHES ENFORCEMENT ON, the same bargain
-    `canonical_glasses` and the `<family>_characters` lists strike. A garnish
-    that genuinely wants a new word gets one; a garnish that is a second
-    spelling of an existing one fails here and says so.
-
-    IT DOES NOT ASK WHETHER THE VOCABULARY IS TIDY. `garnish.yml`'s `proposals`
-    block holds the strings that still want a judgement -- the compounds, the
-    counts, the brand -- and deliberately nothing enforces those. A check that
-    failed on a non-canonical garnish would be enforcing a decision Helen has
-    not made, which is exactly what methods.yml's own header refuses to do.
+    A second spelling of an existing garnish fails here; a new garnish gets a
+    line under `canonical`. Nothing requires a `proposals` row to be applied:
+    that judgement is Helen's (MANUAL §9.12.1).
     """
     declared = _declared_garnishes(_garnish_vocab())
     assert declared, "garnish.yml declares nothing -- has `canonical` been renamed?"
@@ -6113,22 +3965,16 @@ def test_every_garnish_is_declared():
 
 
 def test_every_garnish_proposal_still_matches_a_real_string():
-    """A proposal whose work is already done reads as outstanding.
+    """Every key of garnish.yml's `proposals` is a string some drink still says.
 
-    Same guard methods.yml carries, for the same reason and against the same
-    failure: the moment a drink stops saying the left-hand string, the row is
-    describing the collection as it was rather than as it is. MANUAL §11.2 --
-    an open proposal is a document too, and it rots.
+    A row whose string is gone reads as outstanding work that is already done.
+    Whole collection only.
     """
     _require_whole_collection("a garnish proposal's staleness")
 
     vocab = _garnish_vocab()
-    # THE KEY MUST EXIST; ITS BEING EMPTY IS FINE AND IS THE GOAL. This asserted
-    # non-emptiness for one day, which was wrong the moment the last row was
-    # resolved: proposals empty out by design -- that is what "resolved by
-    # deletion" means -- so a full map is the temporary state and an empty one is
-    # the settled one. What must not happen silently is the KEY going away, which
-    # would make every future proposal invisible to this check.
+    # The key must exist; empty is the settled state. A missing key would
+    # switch this guard off for whatever is proposed next.
     assert "proposals" in vocab, (
         "garnish.yml has no `proposals` key at all. An empty mapping says "
         "'nothing outstanding'; a missing one says nothing, and silently "
@@ -6153,31 +3999,12 @@ def test_every_garnish_proposal_still_matches_a_real_string():
 
 
 def test_no_garnish_is_stated_as_no_garnish_and_nothing_else():
-    """`["no garnish"]` means DECIDED: this drink takes one. `[]` means nobody
-    has filled it in. Helen settled the distinction on 2026-08-26 and the
-    WORDING on 2026-08-31.
+    """`["no garnish"]` means decided: this drink takes none. `[]` means nobody
+    has filled it in (MANUAL §9.12.1).
 
-    IT WAS `none` UNTIL THEN, AND THE RENAME IS ABOUT THE PAGE, NOT THE DATA.
-    `_layouts/cocktail.html` joins this list straight into the drink page, so
-    whatever is stored is what a reader sees -- and Helen's objection was that
-    the reader is not us: "'no garnish' actually, because none might read like
-    'not filled in' even though you and I know that's not the case." The
-    convention was already unambiguous to anyone who had read §9.5. The word on
-    the page was not.
-
-    ONE DRINK ALREADY SAID IT, WHICH IS HOW THE RENAME WAS FOUND. ti-punch
-    carried `no garnish` against fifteen `none`s, and the older version of this
-    test could not see it: it only inspected lists that CONTAINED `none`, so a
-    second spelling of the same decision passed silently -- the precise failure
-    the docstring below says it prevents. The check is now anchored on the
-    canonical string rather than on the one spelling it happened to know.
-
-    WHAT IT GUARDS is the risk §9.5 identified: that a "no garnish" value
-    "would pollute any future garnish vocabulary with a fake member". It cannot,
-    because it may only ever appear ALONE. A drink with
-    `["no garnish", "lime wheel"]` is a contradiction, and `["No garnish"]` is a
-    second spelling any vocabulary would have to carry twice. `garnish.yml`
-    declares it once, and `test_every_garnish_is_declared` reads it from there.
+    `_layouts/cocktail.html` prints the list, so the stored word is what a
+    reader sees. It stands alone and lowercase, and the retired spelling
+    `none` fails by name.
     """
     bad = []
     for slug, fm in _load():
@@ -6185,9 +4012,8 @@ def test_no_garnish_is_stated_as_no_garnish_and_nothing_else():
         if not isinstance(garnish, list):
             continue          # test_garnish_is_a_list owns that failure
         lowered = [str(g).strip().lower() for g in garnish]
-        # RETIRED SPELLINGS ARE CAUGHT HERE TOO, not merely undeclared. An
-        # undeclared value is a typo; `none` is a value that used to be right,
-        # and saying so beats "not in the vocabulary".
+        # `none` is the retired spelling, named as such rather than left to
+        # fail as merely undeclared.
         if "none" in lowered:
             bad.append(
                 f"{slug}: {garnish!r} -- `none` was renamed to "
@@ -6220,25 +4046,12 @@ GLASS_ICON_DIR = ROOT / "_includes" / "icons" / "glasses"
 
 
 def test_drinks_use_the_canonical_glass_spelling():
-    """A drink must write the canonical name, not one of its aliases.
+    """A drink writes the canonical glass name, not one of its aliases (#347).
 
-    THIS REVERSES A RULE THIS FILE USED TO STATE. glasses.yml said outright
-    that "a drink is never wrong for using the other word", and for nine months
-    that was the design. Helen retired it on 2026-08-26: "I decided to go with
-    old fashioned rather than rocks as the canonical name, so recipes that
-    still have rocks are fine to break a test."
-
-    THE ALIAS MAP IN `icons:` IS UNAFFECTED, and keeping both is not a
-    contradiction. The aliases do two jobs a rule cannot: they keep a drink
-    rendering if one slips through, and they absorb the spreadsheet's own
-    spellings on ingest, where the variance arrives whether or not the repo
-    approves of it. This rule governs what is WRITTEN into a drink; the alias
-    map governs what can be READ.
-
-    The vocabulary comes entirely from `canonical_glasses`, so adding a pair
-    there is what makes it enforced -- there is no second list here to keep in
-    step. An alias absent from that map is permitted, which is why `martini` /
-    `martini glass` does not fail: it is undecided, not blessed.
+    `canonical_glasses` in glasses.yml is the whole vocabulary: adding a pair
+    there is what enforces it, and an alias absent from it is undecided, not
+    blessed. The `icons:` alias map stays, so a slipped alias still draws and
+    ingest can read a source's spelling. MANUAL §9.11.1.
     """
     canonical = _glasses().get("canonical_glasses") or {}
     assert canonical, (
@@ -6270,12 +4083,11 @@ def _glass_survey():
 
 
 def test_glass_survey_statistics_are_current():
-    """`typical_ml` / `typical_height_mm` in glasses.yml ARE the survey's sums.
+    """`typical_ml` / `typical_height_mm` in glasses.yml are the survey's sums.
 
-    THE SAME CODE `--check` RUNS, imported rather than re-implemented (#1238).
-    The survey is the fact -- a figure and a source per product -- and the
-    statistics are its shadow, generated between a marker pair. A hand edit
-    inside the markers would be a number with no product behind it.
+    Runs the same `check` as the script's `--check` (#1238). The figures
+    between the markers are generated from glass_survey.yml; a hand edit there
+    is a number with no product behind it.
     """
     sys.path.insert(0, str(ROOT / "scripts"))
     from glass_survey_stats import check  # noqa: E402
@@ -6292,11 +4104,9 @@ def test_glass_survey_statistics_are_current():
 def test_glass_base_centres_are_current():
     """`base_centre` in glasses.yml is what the published drawings measure.
 
-    THE SAME CODE `--check` RUNS. The glasses page centres each label under a
-    drawing's BASE rather than its box (Helen, 2026-09-29: "the text under the
-    normal mug is way off to the right"), and the offsets are rasterised from
-    the icons -- so a redraw that moves a handle or a base goes stale here,
-    rather than leaving a label quietly off-centre again.
+    Runs the same `check` as the script's `--check`. The glasses page centres
+    each label under a drawing's base, not its box, from offsets rasterised
+    off the icons; a redraw that moves a handle or a base goes stale here.
     """
     sys.path.insert(0, str(ROOT / "scripts"))
     from glass_base_centres import check  # noqa: E402
@@ -6309,10 +4119,11 @@ def test_glass_base_centres_are_current():
 
 
 def test_every_glass_type_has_a_sourced_capacity_and_height():
-    """Every icon, plus any survey-only type -- Helen, 2026-09-28: "All 27
-    please." (28 since the mule mug got its own drawing, 2026-10-02.) An icon
-    with no drink yet still gets its numbers: the page that states them is a
-    spec, and a spec covers what it declares."""
+    """Every icon, and every survey-only type, has a capacity and a height.
+
+    An icon no drink uses yet still gets its numbers: the glasses page states
+    them for everything it declares.
+    """
     g = _glasses()
     want = set(g["all_icons"]) | set(g.get("survey_only_types") or {})
     for block in ("typical_ml", "typical_height_mm"):
@@ -6348,10 +4159,8 @@ def test_every_survey_row_is_a_sourced_figure():
 
 
 def test_a_survey_only_type_is_a_spelling_that_draws_another_icon():
-    """`mule-mug` WAS surveyed apart from `mug` because it holds a third more,
-    and drew AS the mug. It got its own drawing on 2026-10-02, became an icon,
-    and its declaration went -- which this test would have demanded. The map
-    is empty now and the test guards the next type that borrows a drawing."""
+    """A `survey_only_types` entry is not itself an icon, and each of its
+    spellings draws the icon it says it `draws_as`. The map may be empty."""
     g = _glasses()
     bad = []
     for key, spec in (g.get("survey_only_types") or {}).items():
@@ -6378,19 +4187,12 @@ def test_every_fit_rule_range_runs_low_to_high():
 
 
 def test_every_mapped_glass_names_an_icon_that_exists():
-    """A key pointing at a missing file is worse than a missing key.
+    """Every value in glasses.yml's `icons:` map names an SVG that exists.
 
-    A MISSING KEY COSTS AN ICON AND NOTHING ELSE -- the layout's
-    absent-means-no-icon rule handles it, and the page renders fine without
-    one. A key naming a file that is NOT THERE is the dangerous direction: it
-    sets `glass_icon` to a non-empty string, so the layout takes the branch
-    that builds `icons/glasses/<name>.svg` and hands it to {% include %}. That
-    is a HARD BUILD FAILURE, not a blank space, and it has already happened
-    once here in its empty-string form -- `glass_icon = ""` produced
-    "File contains invalid characters or sequences: icons/glasses/.svg".
-
-    Checked against the filesystem rather than against all_icons, because
-    all_icons is itself a written-down list and could be wrong in the same way.
+    A missing key only costs an icon. A key naming a missing file sets a
+    non-empty `glass_icon`, the layout hands `icons/glasses/<name>.svg` to
+    {% include %}, and the build fails. Checked against the directory, not
+    `all_icons`, which is itself a written-down list.
     """
     icons = _glasses()["icons"]
     assert icons, "glasses.yml has no `icons:` map -- this test would pass vacuously."
@@ -6410,20 +4212,11 @@ def test_every_mapped_glass_names_an_icon_that_exists():
 
 
 def test_all_icons_matches_the_icon_directory():
-    """The written-down inventory must equal the directory, both directions.
+    """`all_icons` equals the icon directory, in both directions.
 
-    all_icons EXISTS ONLY BECAUSE LIQUID CANNOT READ A DIRECTORY. `_includes/`
-    is never copied to the site, so it is not in `site.static_files` either,
-    and a template therefore has no way to ask what artwork exists -- it can
-    only look up what a key already names. That makes the most interesting
-    question invisible to the swatch page: which icons are UNREACHABLE.
-
-    Duplicating a directory listing into YAML is a rot risk taken deliberately,
-    and this test is the whole reason it is acceptable. It has to fail in BOTH
-    directions: an icon added without a list entry is invisible to the swatch
-    page (the failure the list exists to prevent), and a list entry whose file
-    has gone makes the swatch page ask {% include %} for a missing file, which
-    fails the build exactly as above.
+    Liquid cannot list `_includes/`, so the inventory is written down. An icon
+    with no entry is invisible to `_dev/glasses.html`; an entry with no file
+    makes that page {% include %} a missing file, which fails the build.
     """
     listed = _glasses().get("all_icons") or []
     assert listed, (
@@ -6449,22 +4242,13 @@ def test_all_icons_matches_the_icon_directory():
 
 
 def test_every_icon_has_a_real_world_height():
-    """`heights_mm` must cover every icon, and name no icon that is not there.
+    """`heights_mm` covers every icon and names no icon that is not there.
 
-    THE FAILURE IS A SILENT ZERO, not an error. /dev/glasses/ sizes its
-    relative-scale view by these millimetres, and Liquid resolves a missing key
-    to nil; `nil | times: 1.0` is 0, so a glass with no height renders at zero
-    height -- an invisible gap in a row of glasses, with nothing to say why.
-    The same nil-arithmetic family as `drink.glass.size == 0` counting zero
-    unglassed drinks while 28 sat unglassed.
-
-    A phantom entry is milder but still wrong: it inflates the tallest-glass
-    figure the whole row is scaled against, so every icon silently shrinks.
-
-    These numbers are PROVISIONAL and Claude wrote them (2026-08-18). Issue #295
-    -- the glasses Helen owns, with volumes -- supersedes them. This test only
-    asserts coverage, never the values: a wrong height is a judgement to be
-    corrected by eye, not something a test can know.
+    The templates scale each glass by these millimetres. A missing key is nil
+    in Liquid and `nil | times: 1.0` is 0, so that glass draws at zero height
+    with no error; a phantom entry can inflate the tallest-glass figure every
+    icon is scaled against. Coverage only: scripts/glass_survey_stats.py
+    writes the values.
     """
     g = _glasses()
     heights = g.get("heights_mm") or {}
@@ -6494,18 +4278,10 @@ def test_every_icon_has_a_real_world_height():
     )
 
 
-# `heights_mm` sizes an icon by its VIEWBOX, not by its ink, so a drawing that
-# does not fill its own canvas renders smaller than one that does at the same
-# declared height.
-#
-# NOT A UNIT: this is the fraction of the canvas HEIGHT that the ink spans.
-#
-# THE LIST IS EMPTY AND SHOULD STAY EMPTY. It held three entries for a few
-# hours on 2026-08-27 -- goblet at 69.5%, coupe at 82.5%, old-fashioned-double
-# at 85.5% -- and then `scripts/normalise_glass_icons.py` learned to fit every
-# canvas to its own artwork, which fixed all three at the source instead. An
-# entry appearing here again means a drawing reached _includes/ without going
-# through the normaliser, which is worth knowing about in itself.
+# `heights_mm` sizes an icon by its viewBox, not its ink, so a drawing that
+# does not fill its canvas renders small. Values are the percentage of the
+# canvas height the ink spans. Empty, and an entry appearing means a drawing
+# reached _includes/ without scripts/normalise_glass_icons.py.
 KNOWN_LOOSE_VIEWBOXES = {}
 VIEWBOX_FILL_FLOOR = 92.0
 VIEWBOX_FILL_TOLERANCE = 3.0
@@ -6514,30 +4290,10 @@ VIEWBOX_FILL_TOLERANCE = 3.0
 def test_no_glass_artwork_has_a_slack_viewbox():
     """#503. An icon must fill its own canvas, or it renders smaller than declared.
 
-    `heights_mm` says how tall a glass is in the real world and the template
-    scales the icon to match. But it scales the VIEWBOX, and the viewBox is
-    whatever the drawing was saved with -- `scripts/normalise_glass_icons.py`
-    deliberately preserves it ("the viewBox stays, so CSS decides"). So ink
-    sitting in the middle of a roomy canvas renders short, by exactly the
-    fraction of the canvas it leaves empty, and nothing anywhere says so.
-
-    THIS IS NOT VISIBLE BY READING THE FILES. It was found the first time by two
-    glasses looking wrong beside each other, and the viewBox numbers actively
-    misled -- see the note on KNOWN_LOOSE_VIEWBOXES above. It has to be
-    measured, which is why this test rasterises.
-
-    IMPORTING THE RASTERISER IS FINE HERE, and is not the mistake
-    tests/test_reference_data.py warns about when it reimplements
-    build_cooking_methods.py's parser rather than sharing it. That warning is
-    about a test agreeing with the generator it is checking. Nothing generates
-    these SVGs from the rasteriser -- Helen draws them, and the normaliser moves
-    XML around without ever rasterising -- so the measurement is independent of
-    the thing being measured.
-
-    THE TOLERANCE IS TWO-SIDED ON PURPOSE. A grandfathered icon that gets worse
-    fails, and one that gets FIXED also fails, telling you to drop it from the
-    list. A one-sided ratchet quietly keeps stale entries forever, which is how
-    a grandfather list stops describing anything real.
+    `heights_mm` scales the viewBox, so empty canvas is lost height, and it
+    cannot be seen by reading the file: this rasterises. The tolerance on a
+    KNOWN_LOOSE_VIEWBOXES entry is two-sided, so one that is fixed fails until
+    it is removed.
     """
     import sys
     sys.path.insert(0, str(ROOT / "scripts"))
@@ -6597,15 +4353,12 @@ def test_no_glass_artwork_has_a_slack_viewbox():
 
 
 def test_the_icon_parser_applies_nested_transforms():
-    """#599. A <g> inside a <g> composes, and reading only the outer one is the
-    bug this whole cluster came from.
+    """A <g> inside a <g> composes; reading only the outer one misplaces the
+    artwork (#599).
 
-    IT IS A SYNTHETIC SVG ON PURPOSE. Asserting against a real icon would only
-    say that today's drawings parse the way they parse; this states the rule,
-    so it still bites if every nested drawing is later flattened away. The
-    numbers are worked by hand: the inner matrix doubles x and shifts y by 10,
-    the outer group then translates by (100, 1000), so (1, 2) lands at
-    (2 + 100, 2 + 10 + 1000).
+    Synthetic on purpose, so the rule holds even if no real icon nests. The
+    inner matrix doubles x and shifts y by 10, the outer group translates by
+    (100, 1000), so (1, 2) lands at (102, 1012).
     """
     import sys
     sys.path.insert(0, str(ROOT / "scripts"))
@@ -6641,17 +4394,11 @@ def test_the_icon_parser_applies_nested_transforms():
 
 
 def test_the_normaliser_keeps_a_circle_and_refuses_a_shape_it_cannot_read():
-    """A <circle> in a source drawing is artwork, and it used to vanish.
+    """A <circle> in a source drawing is artwork and survives normalising.
 
-    Helen's mule mug, 2026-10-02, has nine dimples drawn as <circle>. The
-    normaliser read <path> only, so all nine were dropped and no guard fired:
-    each one counts paths and transforms, and a circle is neither. The mug
-    would have published smooth, with nothing to say why.
-
-    SYNTHETIC ON PURPOSE, for the reason the transform test above gives. Three
-    claims: a filled circle comes out as a path carrying `glass-icon-dot`
-    beside the line class; an unfilled one comes out as a plain line; and a
-    shape the script does not read stops it by name instead of being dropped.
+    Synthetic on purpose. A filled circle comes out as a path carrying
+    `glass-icon-dot` beside the line class; an unfilled one as a plain line;
+    and a shape the script does not read stops it by name, never dropped.
     """
     sys.path.insert(0, str(ROOT / "scripts"))
     import normalise_glass_icons as N  # inert on import: see its __main__ guard
@@ -6686,32 +4433,10 @@ VIEWBOX_MARGIN = 1.4
 def test_no_glass_artwork_is_drawn_outside_its_viewbox():
     """#599. A drawing must fit inside its own canvas, not merely fill it.
 
-    THIS IS THE OTHER DIRECTION FROM test_no_glass_artwork_has_a_slack_viewbox,
-    and neither substitutes for the other. That one rasterises INSIDE the
-    viewBox and measures what fraction of the canvas the ink spans, so it
-    catches a canvas bigger than its drawing -- and is structurally incapable of
-    seeing a drawing bigger than its canvas, because ink outside the frame is
-    simply not drawn into the raster it measures. Every icon scored 96-100% on
-    it while four had artwork hanging outside.
-
-    WHY IT MATTERS RATHER THAN BEING TIDINESS. `heights_mm` scales the VIEWBOX,
-    so ink outside the frame is height the template never accounted for: the
-    coupe was declared 150 mm and drew as if 179, the goblet 175 and drew as if
-    259 -- taller than the flute, which is the tallest glass in the file. And
-    because a root <svg> only clips by UA-stylesheet default, `.drink-card-glass
-    svg { overflow: visible }` (added so a stroke on the frame edge is not
-    sheared) meant all of it painted, hanging off the top of the panel. Helen
-    reported the coupe sitting high on a card; this is what that was.
-
-    HOW IT HAPPENS, so a red here is read correctly. Helen builds a glass by
-    editing an existing drawing, and Inkscape keeps the previous canvas silently
-    even when it reports the document as resized -- so the drawing arrives in a
-    frame belonging to a different glass. That is not carelessness and cannot be
-    fixed by remembering: the normaliser fits every canvas to its own artwork on
-    the way in, and this is the check that the fitting worked.
-
-    THE FIX IS NEVER TO EDIT THE PATH DATA. Re-run the fit (fit_viewbox rewrites
-    only the viewBox attribute); the artwork does not move.
+    The slack-viewBox test rasterises inside the frame and cannot see ink
+    outside it. `heights_mm` scales the viewBox and the cards do not clip the
+    svg, so that ink paints, taller than declared. Fix by re-running the fit
+    (`fit_viewbox` rewrites only the viewBox), never by editing the path data.
     """
     import sys
     sys.path.insert(0, str(ROOT / "scripts"))
@@ -6752,27 +4477,12 @@ def test_no_glass_artwork_is_drawn_outside_its_viewbox():
 
 
 def test_fitting_a_canvas_never_moves_the_artwork():
-    """`scripts/normalise_glass_icons.py` fits every icon's viewBox to its
-    own ink, and this is the guard on that step.
+    """Fitting a viewBox is a reframe, never a redraw, and is idempotent.
 
-    IT RUNS ON ARTWORK THAT CANNOT BE REGENERATED HERE. `SRC` is
-    `tmp/cocktail-glasses`, a gitignored inbox that is empty in a fresh
-    worktree, so the normaliser refuses to run and the fit step is never
-    exercised by anything else. Without this, a change to `fit_viewbox` would
-    be caught only the next time Helen imported a drawing -- by which point it
-    would have silently reframed all 26.
-
-    THE PROPERTY THAT MATTERS is that fitting is a reframe, never a redraw. The
-    path data and the <g transform> must come out byte-identical; only the
-    viewBox attribute may differ. If that holds, the step cannot distort a
-    drawing however wrong its arithmetic is -- the worst case is a badly
-    cropped frame, which the slack-viewBox guard above then catches.
-
-    IDEMPOTENCE is the second half. Fitting an already-fitted icon must be a
-    no-op, or every regeneration would creep the canvas -- and since the
-    normaliser runs on the PUBLISHED files' ancestors rather than on the
-    published files, a creep would be invisible until glasses drifted out of
-    proportion with each other over several imports.
+    Path data and the <g transform> come out identical; only the viewBox may
+    differ. The normaliser's source folder is gitignored and empty in a fresh
+    worktree, so nothing else exercises `fit_viewbox`. Fitting twice must equal
+    fitting once, or the canvas creeps on every import.
     """
     import sys
     sys.path.insert(0, str(ROOT / "scripts"))
@@ -6816,16 +4526,11 @@ def test_fitting_a_canvas_never_moves_the_artwork():
 
 
 def test_display_scale_names_only_real_icons():
-    """`display_scale` is a per-glass cheat and a phantom key does nothing.
+    """Every `display_scale` key is a real icon, and every value is in (0, 1].
 
-    Added with the cheat itself, 2026-08-26. It multiplies a glass's drawn
-    height on a CARD, and the failure mode is the quiet one: a key naming a
-    glass that does not exist -- a typo, or an icon later renamed -- has no
-    effect at all, so the glass it was meant to shrink goes on being wrong and
-    the line in the data file looks like it is handling it.
-
-    Coverage is NOT asserted in the other direction: absent means 1, and almost
-    every glass is absent on purpose. Only two glasses have ever needed this.
+    It multiplies a glass's drawn height on a card. A key naming no icon does
+    nothing, so the glass it was meant to shrink stays wrong while the data
+    file looks like it handles it. Absent means 1, so coverage is not asserted.
     """
     g = _glasses()
     scale = g.get("display_scale") or {}
@@ -6853,18 +4558,12 @@ def test_display_scale_names_only_real_icons():
 
 
 def test_the_cocktail_drafts_clone_is_in_step():
-    """This checkout's rules and `_cocktail_drafts/`'s data agree. Issue #624.
+    """This checkout's rules and `_cocktail_drafts/`'s data agree (#624).
 
-    THE FIRST TEST TO READ WHEN A COCKTAILS RUN GOES RED WITH DRINKS IN IT. A
-    rule lives here and the data that satisfies it lives in a separate private
-    repo, so tightening a rule is two merges -- and between them this suite
-    reports real drinks as breaking rules whose migration has not arrived. It
-    happened on 2026-08-31 (the garnish rename) and again on 2026-09-05
-    (`made_before`). `tests/drafts_schema.py` carries the full reasoning.
-
-    IT SKIPS WHEN THE DRAFTS ARE ABSENT, which is CI and a fresh worktree, and
-    is the condition that makes the whole problem invisible to the runner
-    rather than something this test can fix.
+    The first test to read when a cocktails run goes red with drinks in it: a
+    rule lives here and its data in a separate repo, so tightening a rule is
+    two merges, and between them real drinks fail rules whose migration has
+    not arrived. Skips when the clone is absent. See `tests/drafts_schema.py`.
     """
     if not drafts_schema.present("_cocktail_drafts"):
         pytest.skip(
@@ -6876,43 +4575,11 @@ def test_the_cocktail_drafts_clone_is_in_step():
 
 
 def test_meta_ship_is_a_rung_or_who_knows():
-    """Every drink's `meta.ship` is a rung on `ship_scale` or the string
-    "who knows". `QQ` is not a ship value. Helen, 2026-09-05.
+    """`meta.ship` is a rung on `ship_scale` or the string "who knows", on every
+    drink, drafts included. `QQ` is not a ship value: "nobody has asked" is
+    `made_before: false` (#722), and two markers for one fact drift.
 
-    HER RULING, asked as a question and answered in the same breath: "Should
-    drinks I haven't made yet have ship who knows? I think that's clearer than
-    QQ or leaving it unset, because it's a positive presence."
-
-    THE ABSENCE MOVED TO A FIELD OF ITS OWN, which is what makes this possible.
-    `QQ` on a ship meant "nobody has asked" -- and since 2026-09-05
-    `made_before: false` says exactly that, positively, in a field whose whole
-    job is to. Two markers for one fact is how they drift; "who knows" is a
-    real value in the vocabulary and `QQ` is the absence of one.
-
-    THIS REPLACED TWO PUBLISHED-DRINK GATES AND IS STRONGER THAN BOTH, which is
-    the only reason deleting a publish gate was the right move rather than a
-    weakening:
-
-      test_every_published_drink_names_a_rung_on_the_ship_scale -- Helen,
-          2026-08-30: "every cocktail we publish must have the ship field
-          filled in". "who knows" IS filled in, and reading that ruling as
-          "on the scale" is what this corrects. Its real content -- that ship
-          is never empty on a published drink -- is now guaranteed on EVERY
-          drink including the drafts it exempted, so there is nothing left for
-          a promotion-only version of it to catch.
-      test_every_published_drink_has_been_made -- deleted outright, and it was
-          never asked for. #722 wants a guard when `made_before` is "absent or
-          not filled in or filled in with anything other than true or false",
-          which is test_made_before_is_a_real_boolean below; it never said the
-          value had to be true. Helen, 2026-09-05: "made_before does not have
-          to be true for the recipe to publish. This isn't the same as food
-          recipes -- there's no prose except the tagline which I will always
-          write from scratch, so no copyright or author respect issue. It will
-          be much easier for me to browse drinks I want to try from the live
-          site than a local build."
-
-    SO AN UNMADE DRINK MAY PUBLISH, and that is the point rather than a
-    tolerated side effect: the live site is where she picks what to try next.
+    An unmade drink may publish (#722), so there is no promotion-only version.
     """
     scale = set(_taxonomy().get("ship_scale") or [])
     assert scale, "taxonomy.yml has no `ship_scale:` to check against."
@@ -6938,23 +4605,11 @@ def test_meta_ship_is_a_rung_or_who_knows():
 
 
 def test_made_before_is_a_real_boolean():
-    """`meta.made_before` is unquoted true or false on every drink. Issue #722.
+    """`meta.made_before` is unquoted true or false on every drink (#722).
 
-    THE SAME TRAP AS THE GATE FLAGS and it is worth its own test rather than a
-    sixth entry in GATE_FLAGS: that constant names what
-    `_plugins/publish_gate.rb` reads, and this key is not read by the plugin.
-    Widening it to mean "booleans in meta" would make the name lie about the
-    gate, which is the one thing that list is for.
-
-    HELEN NAMED THE FAILURE MODE HERSELF when she raised #722 -- a guard should
-    fire if the field is "absent or not filled in or filled in with anything
-    other than true or false". A string "false" is the sharp one: it is truthy
-    everywhere that matters and looks correct in the file.
-
-    THE VALUE ITSELF GATES NOTHING, and this is the whole of what #722 asked
-    for. `false` is a publishable state -- see
-    test_meta_ship_is_a_rung_or_who_knows for Helen's 2026-09-05 ruling on why
-    a drink she has never made belongs on the live site.
+    A quoted "false" is truthy and looks correct in the file; absent means
+    nobody has asked. The value gates nothing: `false` is publishable. Not in
+    GATE_FLAGS, which names only what `_plugins/publish_gate.rb` reads.
     """
     bad = []
     for slug, fm in _load():
@@ -6976,22 +4631,12 @@ def test_made_before_is_a_real_boolean():
 
 
 def test_the_off_scale_ship_has_a_word():
-    """`ship_unrated_word` exists and is a non-empty string. Issue #722.
+    """`ship_unrated_word` is a non-empty string and is not a rung (#722).
 
-    THE FAILURE IS SILENT AND LOOKS LIKE THE OLD BEHAVIOUR, which is the only
-    reason this is worth a test. `_includes/cocktails/ship.html` assigns this
-    to the word for any value not on `ship_scale`; Liquid resolves a missing
-    key to nil and prints nil as the empty string, so deleting this line does
-    not error -- it restores exactly the blank mark that existed before
-    2026-09-05, on 20 of 124 drinks, and nothing anywhere says why.
-
-    Helen, ruling on the word: "unambiguously not on the same rating scale.
-    (It's also funny)." The VALUE is hers to change; that there is one is not.
-
-    IT MUST NOT BE A RUNG. A word that also names a rating would be the sixth
-    term the whole scale is careful not to invent -- see the `ship_scale`
-    comment, and §9.9 on the near-miss when a template kept its own copy of
-    this vocabulary.
+    `_includes/cocktails/ship.html` prints it for any ship not on `ship_scale`.
+    A missing key is nil in Liquid and prints as nothing, so deleting it draws
+    the ship mark with no word beside it and no error. The word is Helen's to
+    change; it must never read as a rating (MANUAL §9.9).
     """
     taxonomy = _taxonomy()
     word = taxonomy.get("ship_unrated_word")
@@ -7012,19 +4657,11 @@ def test_the_off_scale_ship_has_a_word():
 
 
 def test_suggestion_is_a_string_or_a_list_of_strings():
-    """`suggestion` was the only ingredient field with no shape guard at all.
+    """`suggestion` is a string or a list of strings (#499).
 
-    #499. `generic` has five checks, `character` got one, and
-    `glass`/`garnish`/`mood` all have shape tests -- this had none, despite
-    being rendered by the same oxford-join loop that relies on its shape.
-
-    BOTH SHAPES ARE CORRECT AND MUST STAY correct: 116 strings and 6 lists
-    today. Liquid's `for` treats a bare string as a one-item sequence, which
-    MANUAL §9.10 verified against the real `liquid` gem rather than assuming,
-    and that is what lets one loop handle both with no type check in the
-    template. The risk is not a string or a list; it is a MAPPING or a
-    list-of-lists arriving from an ingest and rendering as `{"a"=>"b"}` or as
-    nothing, which is precisely what every sibling field is protected against.
+    Both shapes are correct: Liquid's `for` treats a bare string as a one-item
+    sequence, so one loop renders both (MANUAL §9.10). A mapping or a list of
+    lists from an ingest renders as `{"a"=>"b"}` or as nothing.
     """
     bad = []
     for slug, fm in _load():
@@ -7046,68 +4683,18 @@ def test_suggestion_is_a_string_or_a_list_of_strings():
     )
 
 
-# The suggestions #457's cleanup did not reach. `suggestion` is meant to be a
-# bottle NAME and nothing else -- #457 moved the reasoning out into `note` --
-# and these six still read as prose. Recorded rather than fixed: they are
-# Helen's words about her own drinks, and rewriting them is her call.
-#
-# THIS IS A RATCHET, NOT A TODO LIST. The test below asserts the flagged set
-# equals this set EXACTLY, in both directions, so a new prose suggestion fails
-# and a fixed one fails too until its line is deleted here. A one-directional
-# check would let the list rot into a record of things that used to be true --
-# the same both-ways contract `all_icons` and `heights_mm` already hold each
-# other to.
-# ---- WHAT HAS COME OFF THIS SET, AND WHY ----
-# EMPTY AS OF 2026-09-02, #585, and the key stays for the reason
-# methods.yml's `proposals` block does: this list will refill the next time
-# a prose suggestion is written, and the ratchet must still be armed for it.
-#
-# The last three came off together, each the way this contract intends:
-#
-#   apple-cart's "Avallen -- a round, fresh taste if you need to sub" is
-#   now `suggestion: "Avallen"` with the reason in a `note`, which is what
-#   #457 settled `note` is for.
-#
-#   sazerac's two bitters lines said only "or something else of the same
-#   kind" -- which the generic (`Creole bitters`, `aromatic bitters`) says
-#   better and already said. The bottles moved out of `item`, which #544 is
-#   retiring, into `suggestion` where they belong: Peychaud's and Angostura.
-#
-# Daisy de Santiago's "Havana 3 year old and Clément Agricole Blanc" came
-# off on 2026-08-31, retired the way this contract intends: the drink was
-# rewritten, not the string reworded. Helen: "let's chop down to just Havana
-# 3, 2 oz." The suggestion that could not resolve went with the disjunction
-# it was trying to cover.
-# Milliners Punch's "the cheapest white rum to hand; sometimes JW Spicers"
-# came off this set on 2026-08-27, retired the way this contract intends:
-# the suggestion is GONE, not reworded. Helen, "never name Spicers -- if I
-# have it skulking at the back of the nonsense shelf then I'll throw it in
-# where I can." What is cheap and what needs using up are facts about the
-# shelf on the day, and the generic already says what the drink requires.
-# The Swizzle's "Pusser's 151, or Planteray OFTD for a 138 Swizzle" came off
-# on 2026-08-30, and retired the way this contract intends: the drink was
-# rewritten rather than the string reworded. Helen: "Swizzle has got a bit
-# confused. It should be Martinique Swizzle" -- so it is a 60 ml unaged
-# agricole now, and neither Pusser's nor the OFTD is in it at all. The
-# suggestion that could not resolve went with the rum it was suggesting.
-#
-# `set()` AND NOT `{}`, WHICH IS THE WHOLE REASON THIS LINE IS SPELLED OUT.
-# Emptying a set literal turns it into a DICT, silently, and the two tests
-# below then fail with `TypeError: unsupported operand type(s) for -: 'dict'
-# and 'set'` rather than with anything about suggestions. It happened on the
-# commit that emptied it. A registry that changes TYPE when it empties is a
-# trap the other empty registries here do not have: garnish.yml's
-# `proposals: {}` really is a mapping, and methods.yml's really is too.
+# Suggestions that read as prose and are Helen's to reword (#457). A ratchet:
+# a new one fails `test_no_new_prose_suggestions`, and a fixed one fails
+# `test_the_known_prose_suggestion_list_has_no_stale_entries` until its line
+# goes. `set()`, not `{}`: an empty brace literal is a dict.
 KNOWN_PROSE_SUGGESTIONS = set()
 
 
 def _prose_suggestions():
     """Every (slug, suggestion) that reads as prose rather than a bottle name.
 
-    ONE DEFINITION, TWO TESTS. The ratchet and the staleness check split in
-    2026-08-29 (#540) and must keep asking the same question of the data --
-    re-typing this loop into both is how a "new offender" and a "fixed entry"
-    silently stop being complements of each other.
+    One definition for the ratchet and the staleness check, so "new offender"
+    and "fixed entry" stay complements of each other.
     """
     markers = re.compile(
         r"\b(or other|if you|because|rather than|instead|works|prefer|any\b|"
@@ -7128,22 +4715,12 @@ def _prose_suggestions():
 
 
 def test_no_new_prose_suggestions():
-    """A `suggestion` should name a bottle, not explain one -- #457, #499.
+    """A `suggestion` names a bottle, it does not explain one (#457, #499).
 
-    "Appleton Estate Reserve" is a suggestion. "or other Creole-style bitters"
-    is a note wearing a suggestion's clothes: the page renders suggestions as
-    the ingredient HEADLINE, so prose there becomes the thing you read first
-    and shop by.
-
-    HEURISTIC, AND DELIBERATELY SO. It looks for connective words and for
-    length, because there is no way to test "is this a bottle name" exactly.
-    That makes it unsuitable as a bare rule and fine as a ratchet: the six it
-    finds today are pinned above, and the assertion is equality, so the check
-    can only ever complain about a CHANGE rather than about the status quo.
-
-    If a new suggestion trips it and is genuinely fine, add it to the set with
-    a word about why. If one gets fixed, delete its line. Both are one-line
-    edits and both are the point.
+    The page renders a suggestion as the ingredient headline, so prose there is
+    what a reader sees first. The check is a heuristic on connective words and
+    length, so it runs as a ratchet against KNOWN_PROSE_SUGGESTIONS: a genuine
+    bottle name that trips it is added there with a word about why.
     """
     new = sorted(_prose_suggestions() - KNOWN_PROSE_SUGGESTIONS)
 
@@ -7157,13 +4734,10 @@ def test_no_new_prose_suggestions():
     )
 
 def test_the_known_prose_suggestion_list_has_no_stale_entries():
-    """KNOWN_PROSE_SUGGESTIONS only shrinks -- a reworded suggestion comes off.
+    """A reworded suggestion comes off KNOWN_PROSE_SUGGESTIONS (#540).
 
-    SPLIT OUT OF THE RATCHET ABOVE, 2026-08-29, #540, for the same reason as
-    test_the_glassless_list_has_no_stale_entries: "no NEW prose suggestion" is
-    a per-drink claim and survives a partial corpus, while "every pinned entry
-    still trips the check" needs the whole book -- a drink that is absent has
-    no suggestions at all, so every entry reads as fixed.
+    Whole collection only: an absent drink has no suggestions, so every pinned
+    entry would read as fixed.
     """
     _require_whole_collection("KNOWN_PROSE_SUGGESTIONS")
     fixed = sorted(KNOWN_PROSE_SUGGESTIONS - _prose_suggestions())
@@ -7177,20 +4751,11 @@ def test_the_known_prose_suggestion_list_has_no_stale_entries():
 
 
 def test_syrup_ratio_is_plausible_for_its_generic():
-    """FLAG ONLY. Never rewrite, and never fail on a deliberate choice.
+    """Flag only: a syrup-to-citrus ratio no recipe would use.
 
-    A 1:1 syrup is used at roughly twice the volume of a 2:1 for the same
-    sweetness, so syrup-against-citrus carries signal. But it CANNOT classify:
-    a declared 1:1 (Daisy de Santiago) and a declared 2:1 (Long Island) both sit
-    at 0.50, because Helen adjusts sugar deliberately -- by weather, by company,
-    and by halving it when she feels like it (MANUAL §9.4.1: the site is canon
-    and she deviates in the kitchen).
-
-    So the bounds here are deliberately WIDE. This is looking for a
-    transcription error -- a figure off by a factor, not off by taste -- and a
-    test that fired on ordinary variation would be switched off, which is the
-    reasoning test_notes_are_not_damaged gives for keeping its own checks exact
-    rather than heuristic.
+    The bounds are wide on purpose. Helen adjusts sugar deliberately (MANUAL
+    §9.4.1), so this looks for a transcription error, a figure off by a factor,
+    and never for taste.
     """
     _, problems = _syrup_ratio_scan()
     assert not problems, (
@@ -7219,21 +4784,16 @@ def test_the_syrup_ratio_check_is_exercised():
 def _syrup_ratio_scan():
     """(how many drinks had both figures, the implausible ratios).
 
-    ONE SCAN, TWO TESTS -- see `_character_scan`.
+    One scan for both tests: see `_character_scan`.
     """
     citrus = re.compile(r"lime juice|lemon juice|grapefruit juice", re.I)
     measures = _vocab().get("measures") or {}
 
     def ml(entry):
-        """Millilitres, or 0 for anything that is not a volume.
+        """Millilitres derived from `amount` (#571), or 0 for a non-volume.
 
-        DERIVED SINCE #571, where it used to be `entry.get("ml")`. Deleting
-        that key without repointing this would not have failed: both halves of
-        the ratio would have summed to zero, `if not (syrup and sour)` would
-        have skipped every drink, and the check would have reported green over
-        nothing -- MANUAL 12's "test that cannot fail" exactly. What would
-        have caught it is its own sibling, test_the_syrup_ratio_check_is
-        _exercised, which is why that test exists.
+        If this returned 0 for everything the scan would skip every drink and
+        pass; test_the_syrup_ratio_check_is_exercised is what catches that.
         """
         try:
             return _millilitres(entry.get("amount", ""), measures)[0] or 0
@@ -7244,29 +4804,19 @@ def _syrup_ratio_scan():
     checked = 0
     for slug, fm in _load():
         items = [i for i in (fm.get("ingredients") or []) if isinstance(i, dict)]
-        # `generic` may be a list -- see _ingredients() for why -- so normalise
-        # before matching. A bare .startswith() here raised AttributeError the
-        # moment the first list-valued generic landed, which is the good failure
-        # mode: loud, immediate, and at the one place that assumed a string.
+        # `generic` may be a list: see _ingredients().
         def generics(entry):
             g = entry.get("generic")
             return g if isinstance(g, list) else [g] if g else []
 
-        # `cane sugar syrup` SINCE 2026-09-04, when the generics gained their
-        # sugar. The prefix picks out exactly the same two generics it always
-        # did -- the demerara one is still outside it, as `demerara syrup` was
-        # -- so the scan's coverage is unchanged and the rename is followed
-        # rather than silently widened.
+        # The prefix picks out the cane syrups only; the demerara generic is
+        # outside it on purpose.
         syrup = sum(ml(i) for i in items
                     if any(str(g).startswith("cane sugar syrup")
                            for g in generics(i)))
-        # MATCHES THE GENERIC, NOT `item` -- moved with #544's second move, and
-        # it had to move in the same commit: 106 of the entries that lost their
-        # `item` are juices whose only contribution was the word "fresh", so
-        # every one of them is citrus. Left reading `item` this scan would have
-        # gone quietly blind to most of the sour side of every ratio it checks,
-        # and a ratio with half its numerator missing does not fail, it looks
-        # implausible or vanishes under `if not (syrup and sour)`.
+        # Matches the generic, not `item` (#544): most juice entries carry no
+        # `item`, and a sour side read from it would vanish under the
+        # `if not (syrup and sour)` skip below.
         sour = sum(ml(i) for i in items
                    if any(citrus.search(str(g)) for g in generics(i)))
         if not (syrup and sour):
@@ -7281,21 +4831,11 @@ def _syrup_ratio_scan():
     return checked, problems
 
 
-# =============================================================================
-# METHOD STEPS -- the dictionary, and NOT an enforcement layer. Spec: #290
-# =============================================================================
-# NOTHING HERE CHECKS A DRINK'S METHOD, deliberately. Helen, 2026-08-26, asked
-# for the choice to be recorded rather than taken -- "Prefer both, leaving my
-# original too, then I delete whatever I don't want" -- so methods.yml carries
-# her existing string beside the suggested canonical one, and a later pass
-# applies whatever survives her pruning. A test that failed on a
-# non-canonical step today would be enforcing a decision she has not made yet.
-#
-# What these DO check is that the map cannot rot into a lie: that it proposes
-# only real canonical forms, and that every string it claims to have found is
-# still out there. Both are the failure mode a written-down duplicate of live
-# data always has -- the same reason `all_icons` comes with a test rather than
-# after one.
+# ---- METHOD STEPS: the dictionary, not an enforcement layer (#290) ----
+# Nothing here checks a drink's method: a change to a canonical step is
+# proposed in methods.yml and Helen prunes (MANUAL §9.12). These check only
+# that the map proposes real canonical forms and that every string it claims
+# to have found is still in the collection.
 
 METHODS = ROOT / "_data" / "cocktails" / "methods.yml"
 
@@ -7309,8 +4849,7 @@ def _methods():
 def _canonical_steps(spec):
     """Every canonical step, flattened from the verb groups.
 
-    Derived from the mapping's shape, not a hardcoded group list -- same
-    reasoning as _declared_generics on ingredients.yml.
+    Derived from the mapping's shape, not a hardcoded group list.
     """
     out = set()
     for value in (spec.get("canonical") or {}).values():
@@ -7324,14 +4863,11 @@ SHAPE_SLOT = "<X>"
 
 def _shape_patterns(spec):
     """Every `shapes:` string as a compiled regex, `<X>` matching one non-empty
-    run of text -- 2026-09-10.
+    run of text.
 
-    A shape is a canonical sentence with ONE slot for the ingredient the drink
-    names ("Shake all ingredients other than the <X> with ice."). The slot is
-    the only thing that varies, so everything else is matched literally, and a
-    filled shape counts as canonical wherever a literal would. Derived from the
-    mapping's shape like `_canonical_steps`, so a group added tomorrow is
-    covered tomorrow.
+    A shape is a canonical sentence with one slot for the ingredient the drink
+    names; everything else matches literally, and a filled shape counts as
+    canonical wherever a literal would.
     """
     out = []
     for value in (spec.get("shapes") or {}).values():
@@ -7379,10 +4915,7 @@ def test_every_shape_has_exactly_one_slot():
 def _all_method_steps():
     """Every step in the collection, as (slug, text).
 
-    THROUGH `_steps`, which is what makes a `{step, note}` pair readable here:
-    the raw list went into a set below and a dict is not hashable, so the first
-    drink written in the pair shape turned this red with "cannot use 'dict' as a
-    set element" -- a schema addition breaking a check about method WORDING.
+    Through `_steps`, so a `{step, note}` pair arrives as hashable text.
     """
     return [(slug, s) for slug, fm in _load() for s in _steps(fm)]
 
@@ -7401,7 +4934,7 @@ def test_every_proposal_names_a_real_canonical_step():
         "methods.yml declares no canonical steps, so this check has nothing to "
         "enforce. Either the file changed shape or `canonical` was renamed."
     )
-    # A filled `shapes:` sentence is as canonical as a literal -- 2026-09-10.
+    # A filled `shapes:` sentence is as canonical as a literal.
     bad = sorted(f"{k!r} -> {v!r}" for k, v in (spec.get("proposals") or {}).items()
                  if v != "QQ" and not _is_canonical_step(v, spec))
     assert not bad, (
@@ -7431,34 +4964,12 @@ def test_no_proposal_rewrites_a_step_that_is_already_canonical():
 
 
 def test_every_proposal_still_matches_a_real_step():
-    """The left-hand side must still exist in the collection.
+    """Every key of methods.yml's `proposals` is a step some drink still says.
 
-    THE WHOLE FILE IS A WRITTEN-DOWN COPY OF LIVE DATA, which is a rot risk
-    taken deliberately -- and this test is what makes it acceptable, exactly as
-    test_all_icons_matches_the_icon_directory is for `all_icons`. Once a
-    proposal is applied, or Helen rewrites the step herself, the row is spent:
-    it describes a string nothing says any more. Left in place it reads as
-    outstanding work that has in fact been done.
-
-    NOT the reverse direction. A method step with no proposal is the normal
-    case -- it is either already canonical or part of the informative tail that
-    #290 explicitly does not touch.
-
-    AN EMPTY `proposals` IS THE GOAL, NOT A FAULT, and this test asserted the
-    opposite until 2026-09-01. It required the map to be NON-EMPTY, so clearing
-    the last row -- the entire point of #630 -- turned the work into a red
-    suite. `proposals` is a WORKLIST: rows are resolved by deletion, in either
-    direction, so a full map is the temporary state and an empty one is the
-    settled one.
-
-    THE IDENTICAL BUG WAS FOUND AND FIXED IN garnish.yml's TWIN ON 2026-08-31,
-    written up in MANUAL 12 as "a ratchet list and a worklist look identical
-    and want opposite assertions" -- and this sibling was never checked. A
-    lesson applied to one instance of a pattern and not swept for the rest is
-    half a fix. What is asserted now is that the KEY EXISTS, which is the thing
-    whose silent loss would switch this check off for whatever is proposed
-    next; GLASSLESS_ON_2026_08_27 is the genuine ratchet next door and asserts
-    emptiness, in the opposite direction, correctly.
+    A spent row reads as outstanding work. Not the reverse: a step with no
+    proposal is the normal case. `proposals` is a worklist, so empty is the
+    settled state; what is asserted is that the key exists, since losing it
+    would switch this check off. Whole collection only.
     """
     _require_whole_collection("methods.yml's proposal list")
     spec = _methods()
@@ -7479,9 +4990,7 @@ def test_every_proposal_still_matches_a_real_step():
     )
 
 
-# =============================================================================
-# MOOD -- the browsing vocabulary. Spec: _data/cocktails/taxonomy.yml, #292
-# =============================================================================
+# ---- MOOD: the browsing vocabulary (taxonomy.yml, #292) ----
 
 def _taxonomy():
     if not TAXONOMY.exists():
@@ -7492,11 +5001,9 @@ def _taxonomy():
 def test_every_mood_is_declared():
     """A drink's moods come from taxonomy.yml and nowhere else.
 
-    Moods are DERIVED at ingest and then written into the drink, so that Helen
-    can override one -- a drink she thinks is tiki is tiki, whatever the
-    ingredient count says. That is the point, and it is also the risk: a
-    hand-edited mood is free text, and a typo mints a category that renders as
-    a filter button nobody can ever match.
+    Moods are derived at ingest and stored on the drink so Helen can override
+    one; a hand-edited mood is free text, and a typo is a mood no filter
+    button matches.
     """
     declared = set(_taxonomy().get("moods") or {})
     assert declared, (
@@ -7512,9 +5019,8 @@ def test_every_mood_is_declared():
 
 
 def test_mood_is_a_list():
-    """Never a bare string. A string would iterate as characters in Liquid and
-    render a filter match for every letter in it, which is the same class of
-    silent nonsense as the `glass` scalar.
+    """`mood` is a list, never a bare string: the templates sort and loop it
+    as a list, and a scalar renders wrongly without raising.
     """
     bad = [f"{slug}: mood is a {type(fm['mood']).__name__}"
            for slug, fm in _load()
@@ -7525,10 +5031,8 @@ def test_mood_is_a_list():
 def test_every_drink_carries_a_mood_key():
     """Present even when empty, so "no mood yet" is visible rather than absent.
 
-    Same reasoning as the generic coverage check: an absent key reads as
-    "nothing to see", an empty list reads as "nothing matched". 17 drinks
-    currently have an empty list, mostly because their ingredients are still
-    QQ -- see #335 -- and that gap should be legible, not silent.
+    An absent key reads as "nothing to see"; `mood: []` reads as "nothing
+    matched".
     """
     missing = [slug for slug, fm in _load() if "mood" not in fm]
     assert not missing, (
@@ -7540,13 +5044,9 @@ def test_every_drink_carries_a_mood_key():
 def test_no_mood_covers_more_than_half_the_collection():
     """A mood matching most drinks is not a filter, it is noise.
 
-    Food retired `one-pot` for exactly this -- it "would cover 57% of the
-    collection honestly tagged". Two cocktail moods were caught this way before
-    they were ever written down: `fruity` counting citrus reached 51%, and
-    `sugar craving` defined as "has any sweetener" reached 68%.
-
-    A guard rather than a note, because the failure mode is gradual: a mood
-    stays useful until the collection grows past it, and nobody re-measures.
+    A guard rather than a note, because the failure is gradual: a mood stays
+    useful until the collection grows past it, and nobody re-measures. Whole
+    collection only.
     """
     _require_whole_collection("a mood's share of the collection")
     drinks = _load()
@@ -7565,36 +5065,16 @@ def test_no_mood_covers_more_than_half_the_collection():
     )
 
 
-# =============================================================================
-# THINGS A CARD NEVER MENTIONS -- #580
-# =============================================================================
+# ---- THINGS A CARD NEVER MENTIONS (#580) ----
 
 
 def test_nothing_on_the_not_on_cards_list_reaches_a_card_or_the_search():
-    """Bare `water` is on the recipe and never on the index.
+    """Bare `water` is never on a card and never in the search (#580).
 
-    Helen, 2026-08-29: "never write 'water' on a cocktail card and never return
-    it in a search. This is bare 'water', and does not apply to 'honey water' or
-    'sparkling water' or any such thing."
-
-    A card answers "what is this drink LIKE", and the answer is never water. It
-    is on the Sazerac because 60 ml of it is how that drink gets diluted, which
-    is a MAKING fact -- the same distinction §9.10.1 draws when it collapses
-    both syrup ratios to `sugar syrup`.
-
-    THE TWO COPIES ARE GONE AS OF 2026-09-06 AND THAT IS WHY THIS CHANGED.
-    Until then the suppression was written twice in cocktails/index.html -- once
-    on the `searchable` capture and once on the card's ingredient line -- with a
-    comment saying "the two must stay in step" and nothing making them. This
-    test counted the two copies, which was the best available check on a rule
-    that could not be shared.
-
-    #567/#691 moved all of it into _plugins/cocktail_card_ingredients.rb, so the
-    card line and the search pool now read ONE list, built once per drink. They
-    are the same list by construction and can no longer disagree, which is
-    strictly better than two copies that agree today. What is worth guarding now
-    is that both really do read it -- a template that went back to looping
-    `drink.ingredients` would silently reintroduce everything this hid.
+    `_plugins/cocktail_card_ingredients.rb` applies `not_on_cards` once per
+    drink, and the card line and the search pool both read its
+    `card_ingredients`. A template that went back to looping
+    `drink.ingredients` would bring back everything the list hides.
     """
     vocab = _vocab()
     hidden = vocab.get("not_on_cards")
@@ -7622,31 +5102,13 @@ def test_nothing_on_the_not_on_cards_list_reaches_a_card_or_the_search():
 
 
 def test_nothing_that_decides_a_drink_is_ever_kept_off_a_card():
-    """`soda water` is a real choosing fact and must survive.
+    """`not_on_cards` never hides a spirit, a lower-proof spirit, a juice or
+    bitters (#640).
 
-    THIS ASKED FOR ONE WORD UNTIL 2026-09-06, and the one-word rule was a PROXY
-    rather than the rule. It read: a compound like `soda water` or `cane sugar
-    syrup 2:1` is a reason to choose a drink, so refuse compounds. That held
-    perfectly while the list was `[water]`, and #640 retired it -- Helen: "don't
-    include things like sugar, water. lemon zest in the ingredient list that
-    appears on cocktail cards." `white sugar` and `lemon zest` are two words
-    each and neither is a reason to choose anything.
-
-    SO THE PROXY IS REPLACED BY WHAT IT WAS STANDING IN FOR. The disaster this
-    guards against is a real ingredient disappearing off every card that pours
-    it, and the mechanical form of that is hiding something the card ordering
-    ranks as a SPIRIT, a LOWER-PROOF SPIRIT, a JUICE or BITTERS -- tiers 1, 2, 3
-    and 6 of _plugins/cocktail_card_ingredients.rb. Hiding a gin, a Campari, a
-    lime juice or an Angostura is never right, and each is one line away from
-    happening by accident.
-
-    WHAT IT DELIBERATELY DOES NOT POLICE is tiers 4 and 5 -- the syrups, sugars,
-    fruit, herbs and odds and ends. That is where a staple legitimately lives and
-    where the judgement genuinely is a judgement: `orgeat` and `white sugar` are
-    both in tier 4's neighbourhood and only one of them belongs on a card. No
-    rule separates them, so the list stays a decision, made by Helen, and
-    `test_every_suppressed_word_is_a_declared_generic` below keeps it honest
-    about naming things that exist.
+    Those are tiers 1, 2, 3 and 6 of `_plugins/cocktail_card_ingredients.rb`,
+    and hiding one takes it off every card that uses it and out of the search.
+    Tiers 4 and 5 are not policed: which syrup, sugar or herb is a staple is
+    Helen's judgement, and no rule separates them.
     """
     vocab = _vocab()
     protected = {}
@@ -7680,20 +5142,11 @@ def test_every_suppressed_word_is_a_declared_generic():
         )
 
 
-# =============================================================================
-# THE CARD'S INGREDIENT LINE -- issues #567, #640, #691.
-# =============================================================================
-# _plugins/cocktail_card_ingredients.rb decides what a card lists and in what
-# order. It classifies a generic by WHICH SECTION OF ingredients.yml DECLARES IT,
-# which is the right classifier -- the sections are Helen's own idea of what kind
-# of thing something is, and writing a second list of "these are the strong ones"
-# would be a second truth that drifts.
-#
-# THE FAILURE THAT CLASSIFIER INVITES IS SILENT, AND IT IS WHAT THESE GUARD.
-# Rename `syrups:` in ingredients.yml and the plugin's TIERS still names
-# `syrups`, still finds nothing, and quietly drops every syrup into the
-# unclassified tier. The build prints a warning; a warning in a build that emits
-# 13 Sass deprecations is not a thing anybody sees.
+# ---- THE CARD'S INGREDIENT LINE (#567, #640, #691) ----
+# _plugins/cocktail_card_ingredients.rb ranks a generic by which section of
+# ingredients.yml declares it. A section renamed there and not in the plugin's
+# TIERS drops its generics into the unclassified tier with only a build
+# warning; these tests are what fails.
 
 CARD_PLUGIN = ROOT / "_plugins" / "cocktail_card_ingredients.rb"
 
@@ -7707,8 +5160,7 @@ def _plugin_source():
 def _tier_sections():
     """The section names the plugin's TIERS constant claims, tier by tier.
 
-    Parsed out of the Ruby rather than restated here, for the reason the whole
-    module exists: a copy of a list is a list that can disagree with the list.
+    Parsed out of the Ruby, not restated here, so the two cannot disagree.
     """
     src = _plugin_source()
     block = re.search(r"TIERS\s*=\s*\{(.*?)\}\.freeze", src, re.S)
@@ -7723,12 +5175,9 @@ def _tier_sections():
 def test_every_section_the_card_plugin_sorts_by_still_exists():
     """TIERS names sections of ingredients.yml, and all of them are real.
 
-    THE BUG THIS CATCHES LEAVES NOTHING BROKEN-LOOKING. A section renamed in
-    ingredients.yml and not followed here does not raise, does not empty a card
-    and does not fail a build -- it silently reclassifies every generic in that
-    section to the unknown tier, so the cards reorder themselves slightly and
-    nobody can say why. That is the shape of fault #653 and #654 were both
-    written about.
+    A section renamed in ingredients.yml and not in the plugin raises nothing:
+    every generic in it moves to the unclassified tier and the cards reorder
+    slightly (#653, #654).
     """
     vocab = _vocab()
     missing = []
@@ -7745,11 +5194,9 @@ def test_every_section_the_card_plugin_sorts_by_still_exists():
 
 
 def test_no_generic_is_declared_in_two_sections_the_plugin_ranks():
-    """A generic in two ranked sections has two tiers, and the lower wins by luck.
+    """A generic in two ranked sections has two tiers.
 
-    Nothing else in this repo cares whether a generic appears twice -- the search
-    vocabulary is a set and would not notice. The ORDER does care, and it would
-    resolve the ambiguity by whichever section the plugin happened to read last.
+    The card order would resolve it by whichever section the plugin read last.
     """
     vocab = _vocab()
     seen = {}
@@ -7769,11 +5216,10 @@ def test_no_generic_is_declared_in_two_sections_the_plugin_ranks():
 
 
 def test_every_poured_generic_has_a_tier(drink_file):
-    """Run from the drinks: can every ingredient on a card be placed?
+    """Every generic a drink's card lists is declared in a section TIERS ranks.
 
-    THE PLUGIN WARNS AND CARRIES ON, which is the right behaviour at build time
-    -- an unplaceable ingredient should still appear on the card, in the odds-and
-    -ends tier, rather than vanish. This is what makes somebody fix it.
+    The plugin only warns at build time and puts an unplaceable ingredient in
+    the unclassified tier, so this is what makes somebody fix it.
     """
     _require_drink(drink_file)
     vocab = _vocab()
@@ -7809,11 +5255,9 @@ def test_every_poured_generic_has_a_tier(drink_file):
 def test_things_kept_off_cards_are_real_generics():
     """`not_on_cards` names things that exist, and exactly.
 
-    EXACT MATCHES ONLY IS THE WHOLE RULE, per #580 -- bare `water` and never
-    `honey water` or `soda water`. A typo here therefore fails silently in the
-    most expensive direction: the entry matches nothing, the ingredient goes on
-    being printed, and the list looks like it is working because nine of its ten
-    entries are.
+    Matching is exact (#580): bare `water`, never `honey water` or `soda
+    water`. A typo matches nothing, so the ingredient goes on being printed
+    while the list looks as if it works.
     """
     vocab = _vocab()
     declared = set()
@@ -7830,16 +5274,11 @@ def test_things_kept_off_cards_are_real_generics():
 
 
 def test_always_fresh_juices_are_declared_generics_the_layout_reads():
-    """`always_fresh` (#707) names real generics, and the template actually uses it.
+    """`always_fresh` (#707) names declared generics, and the layout reads it.
 
-    Two ways this list could go stale in total silence: a typo or a retired
-    spelling would prefix "fresh " onto a generic no drink can ever pour (the
-    same failure mode `test_things_kept_off_cards_are_real_generics` guards for
-    `not_on_cards`); and a rename of the key in `_layouts/cocktail.html` without
-    a matching rename here would leave the data declared and never read, which
-    `test_the_layout_takes_the_twist_step_from_methods_yml`'s docstring is the
-    precedent for treating as its own failure rather than trusting the
-    cross-reference.
+    A typo prefixes "fresh " onto a generic no drink uses; a key renamed in
+    `_layouts/cocktail.html` alone leaves the list declared and never read.
+    Neither fails anywhere else.
     """
     vocab = _vocab()
     always_fresh = vocab.get("always_fresh") or []
@@ -7864,14 +5303,10 @@ def test_always_fresh_juices_are_declared_generics_the_layout_reads():
 
 
 def test_standing_notes_key_declared_generics_the_layout_reads():
-    """`standing_notes` (#707) keys real generics, and the template reads it.
+    """`standing_notes` (#707) keys declared generics, and the layout reads it.
 
-    A MAPPING, not a list -- `test_every_generic_is_declared` walks drinks
-    forward from a generic to check it is declared, never the other way, so a
-    typo'd KEY here would silently attach the pineapple note to nothing and
-    nobody would notice on a green suite. Checked here instead, the same
-    direction `test_things_kept_off_cards_are_real_generics` checks
-    `not_on_cards` in.
+    `test_every_generic_is_declared` walks from a drink to the vocabulary, so a
+    typo'd key here attaches its note to nothing on a green suite.
     """
     vocab = _vocab()
     standing_notes = vocab.get("standing_notes") or {}
@@ -7897,11 +5332,10 @@ def test_standing_notes_key_declared_generics_the_layout_reads():
 
 
 def test_the_citrus_that_sorts_first_is_juice_that_exists():
-    """#567 splits tier 3 -- "citrus then other juices" -- and CITRUS is that list.
+    """Every name in the card plugin's CITRUS list is a declared juice -- #567.
 
-    It is the one place the plugin overrides volume WITHIN a tier, so a name that
-    matches nothing silently returns tier 3 to plain volume order and a
-    Painkiller starts leading with its pineapple.
+    CITRUS is the one place the plugin overrides volume within a tier, so a name
+    that matches nothing silently returns the juices to plain volume order.
     """
     src = _plugin_source()
     block = re.search(r"CITRUS\s*=\s*\[(.*?)\]\.freeze", src, re.S)
@@ -7919,50 +5353,15 @@ def test_the_citrus_that_sorts_first_is_juice_that_exists():
     )
 
 
-# =============================================================================
-# HOUSE STYLE -- issue #670. What §7 has always demanded and nothing checked.
-# =============================================================================
-# `model_instructions/INGEST_ONE_COCKTAIL.md` §7 asks a drink for the same
-# typography and spelling the food formatter enforces on a recipe: an en dash in
-# a number range, a quoted string value, British spellings, an em dash for `--`,
-# `°C` with the degree sign, and the accents `_data/accented_words.yml` declares
-# -- a file whose own header says it lives in `_data/` rather than `_data/food/`
-# because "`crème de cassis` will want the same treatment `crème fraîche` gets".
-#
-# NOTHING CHECKED ANY OF IT. tests/test_style.py's ~40 rules are parametrised
-# over the food `recipe` fixture and tests/conftest.py says outright that it is
-# the food suite. So the ingest document demanded a house style that no test
-# could see, and the drinks drifted: measured across the 124 drinks on
-# 2026-09-03, seven hyphenated number ranges, six `--`, one `Demarara`.
-#
-# THE PREDICATES ARE conftest's, THE FIELD LISTS ARE OURS. That split is the
-# whole design. A missing accent is the same fault in either collection; WHERE
-# to look for one is not, and the two exclusions below are drink-specific and
-# have nothing to do with food.
+# ==== House style: INGEST_ONE_COCKTAIL.md §7 (#670) ==========================
+# tests/test_style.py is parametrised over the food recipes only, so these
+# apply the same predicates (conftest's) to a drink. The field lists are this
+# file's: where to look for a fault is drink-specific.
 
-# THE LINES A HOUSE-STYLE RULE MUST NOT TOUCH, and it is one reason four times.
-#
-# `QQ` lines are blanked for every collection by `conftest.checkable_text`:
-# they are the SOURCE's wording awaiting a rewrite, and correcting a dash there
-# tidies text that is about to be deleted, by editing someone else's words
-# (MANUAL §5, issue #426). These three keys are the drink-shaped rest of that
-# same sentence:
-#
-#   `item` WAS THE FOURTH AND IS GONE (2026-09-21). It held the source's own
-#   wording for a pour; that wording now lives in `generic` behind a `QQ `,
-#   where `conftest.checkable_text` already blanks it for being a QQ line. So
-#   the exclusion this list used to grant it is granted by the predicate
-#   instead, which is one mechanism rather than two.
-#
-#   `suggestion`  -- a bottle, and §7's own rule is "reproduce a bottle or brand
-#                    exactly as it spells itself, accents and all". A rule that
-#                    accented `Briottet Creme d'Abricot` would be correcting the
-#                    distiller's own label.
-#   `source`,     -- a citation, reproduced as the publication writes it. Food
-#   `source_url`     excludes `source:` from its accent rule for exactly this
-#                    reason ("Cafe Delites" is a real name), and
-#                    scripts/tidy_drafts.py never touches it either.
-#
+# Lines no house-style rule may touch, beside the `QQ` lines
+# `conftest.checkable_text` blanks: a `suggestion` is a bottle, spelled as its
+# label spells it, and `source` / `source_url` are a citation reproduced as
+# published.
 VERBATIM_KEYS = ("suggestion", "source", "source_url")
 _VERBATIM_LINE = re.compile(
     rf"^(?:-\s*)?(?:{'|'.join(VERBATIM_KEYS)}):(?P<value>.*)$"
@@ -7972,14 +5371,9 @@ _VERBATIM_LINE = re.compile(
 def _checkable(drink):
     """`drink.raw` with QQ lines and verbatim-field lines blanked.
 
-    Blanked, never dropped, so line COUNT survives -- the same reason
-    `conftest.checkable_text` does it, and these strings feed failure messages.
-
-    A verbatim key whose value is empty opens a BLOCK (`suggestion:` followed by
-    an indented list is how a couple of dozen drinks name two bottles), so the
-    lines under it go too. Matching the key line alone would have blanked the
-    header and left the bottle names in scope, which is the shape of exclusion
-    that looks right in the file and does nothing.
+    Blanked, not dropped, so line numbers survive into failure messages. A
+    verbatim key with an empty value opens a block (`suggestion:` then an
+    indented list), so the lines under it are blanked too.
     """
     out, block_indent = [], None
     for line in checkable_text(drink.raw).split("\n"):
@@ -8003,16 +5397,10 @@ def _checkable(drink):
 def _prose_fields(drink):
     """Every stretch of Helen's own prose on a drink, tagged with where it is.
 
-    FREE PROSE, NOT VOCABULARY, and that is the whole selection rule. `glass`,
-    `garnish`, `mood`, `generic` and `character` are closed vocabularies
-    declared in `_data/cocktails/` and enforced against those files by the tests
-    above -- the declaration is the authority on how each is spelled, and a
-    second authority here could only ever disagree with it. `item`,
-    `suggestion` and `source` are somebody else's words (see VERBATIM_KEYS).
-    What is left is what Helen wrote: the title, the tagline, the method, the
-    notes, an ingredient's own note, and the serving line.
-
-    `QQ` values are dropped exactly as `conftest.checkable_prose` drops them.
+    Free prose only. The closed vocabularies (`glass`, `garnish`, `mood`,
+    `generic`, the characters) are spelled by their declarations in
+    `_data/cocktails/`, and VERBATIM_KEYS are somebody else's words. `QQ`
+    values are dropped.
     """
     fields = []
     for key in ("title", "tagline", "to_serve"):
@@ -8020,11 +5408,8 @@ def _prose_fields(drink):
         if isinstance(value, str) and value.strip():
             fields.append((key, value))
     for i, step in enumerate(drink.fm.get("method") or [], 1):
-        # BOTH HALVES OF A `{step, note}` PAIR ARE HELEN'S OWN PROSE, so both go
-        # through the typography checks. Reading only `isinstance(step, str)`
-        # here would have quietly exempted every step written in the new shape
-        # -- an addition to the schema switching a check off for the files that
-        # use it, which is the failure mode MANUAL 10 records five times.
+        # Both halves of a `{step, note}` pair are prose. Reading only a string
+        # step would exempt every step written in the mapping shape.
         if isinstance(step, str):
             fields.append((f"method step {i}", step))
         elif isinstance(step, dict):
@@ -8045,24 +5430,19 @@ def _prose_fields(drink):
     return [(location, text) for location, text in fields if not is_qq(text)]
 
 
-# The string-valued top-level keys, and nothing else: `glass`, `garnish`,
-# `mood`, `method` and `notes` are lists, `ingredients` is a list of mappings,
-# and `meta` holds the three booleans that must NEVER be quoted -- quoting one
-# turns it into the string "true", which the publish gate reads as neither true
-# nor false and which holds the drink back for ever (test_the_gate_flags_are_
-# real_booleans above). `meta.ship` is the one quoted scalar under `meta:`, and
-# test_meta_ship_is_a_rung_or_who_knows is what checks it.
+# The string-valued top-level keys only. The `meta:` booleans must never be
+# quoted: a quoted one is the string "true", which the publish gate reads as
+# neither true nor false (test_the_gate_flags_are_real_booleans). `meta.ship`
+# is checked by test_meta_ship_is_a_rung_or_who_knows.
 DRINK_SCALAR_FIELDS = ["title", "tagline", "snippet", "source", "source_url",
                        "to_serve"]
 
 
 def test_the_quoted_scalar_list_names_real_drink_fields():
-    """A field renamed out from under this list would take the rule with it.
+    """Every name in DRINK_SCALAR_FIELDS is a key TOP_LEVEL_KEYS declares.
 
-    `unquoted_scalars` finds nothing to complain about when a field is simply
-    absent -- correctly, because `to_serve` is optional -- so a typo or a rename
-    here does not fail, it stops checking. TOP_LEVEL_KEYS is the schema, so
-    asking it is the cheap way to keep this list honest.
+    `unquoted_scalars` passes an absent field, correctly, since `to_serve` is
+    optional -- so a typo or a rename here stops checking instead of failing.
     """
     unknown = sorted(set(DRINK_SCALAR_FIELDS) - TOP_LEVEL_KEYS)
     assert not unknown, (
@@ -8076,12 +5456,8 @@ def test_the_quoted_scalar_list_names_real_drink_fields():
 def test_drink_scalar_fields_are_quoted(drink_file):
     """Every string value is quoted -- INGEST_ONE_COCKTAIL §7.
 
-    Read from the raw front matter, never from the parsed value: a quoted and an
-    unquoted scalar parse identically, so the parsed value cannot tell you how
-    it was written. Same rule and same helper as a recipe's
-    (test_front_matter.py::test_scalar_fields_are_quoted), a different field
-    list, and the same purely-editing-convenience justification -- it changes
-    formatting, not data.
+    Read from the raw front matter: a quoted and an unquoted scalar parse
+    identically, so the parsed value cannot show how it was written.
     """
     _require_drink(drink_file)
     match = re.match(r"\A---\n(.*?\n)---", drink_file.raw, re.S)
@@ -8095,40 +5471,11 @@ def test_drink_scalar_fields_are_quoted(drink_file):
 
 
 def test_drink_front_matter_has_no_duplicate_keys(drink_file):
-    """A repeated key in a YAML mapping is DISCARDED, silently, last one wins.
+    """A repeated YAML key is discarded silently; the last one wins -- #1077.
 
-    #1077, and #983 split it out. **Food has had this guard since 2026-08-16
-    and the drinks have never had one**, which is the whole issue: the two
-    collections have the same shape, the same ingest routes and the same
-    hand-editing, and only one of them was covered.
-
-    THE FOOD CASE IS WHAT IT LOOKS LIKE IN REAL LIFE. An ingredient entry in
-    `indonesian-chicken-curry-gulai-ayam.md` declared `item:` twice, and the
-    first line -- a whole flavourings note -- was simply gone. Not from the
-    derived index: from the recipe page, for as long as it had been there. The
-    file parses, the build succeeds, the page renders, and EVERY OTHER TEST IN
-    THIS SUITE READS THE PARSED FRONT MATTER, which by then is missing the line
-    entirely. Nothing could see it.
-
-    A DRINK IS IF ANYTHING MORE EXPOSED. Its ingredient entries are mappings of
-    four or five short keys -- `amount`, `item`, `generic`, `suggestion`,
-    `note` -- repeated once per pour down a file that is edited by hand, by an
-    ingest, and by `derive_cocktail_moods.py`. A `generic:` written twice in
-    one entry loses the first silently, and the drink goes on pouring something
-    nobody declared.
-
-    THE SAME LOADER, IMPORTED, NOT A SECOND COPY. `_StrictLoader` and its
-    constructor live in tests/test_front_matter.py; this is the argument
-    `test_agent_edited_drinks_are_not_marked_proofread` already makes about
-    `_git` and `_only_invisible_keys_changed`, and it is stronger here because
-    the whole mechanism is nine lines that would drift the first time either
-    was fixed. `yaml.safe_load` accepts duplicates by specification, so
-    catching this needs a loader that refuses them, and that is the entire
-    test.
-
-    THERE ARE NO DUPLICATES TODAY (#1077 says so and this confirms it over
-    every drink on the machine, drafts included). A guard written while the
-    collection is clean is the cheap moment to write one.
+    `yaml.safe_load` accepts duplicates, and every other test reads the parsed
+    front matter, where the lost line is already gone. `_StrictLoader` is
+    imported from test_front_matter.py so both collections share one loader.
     """
     from test_front_matter import _StrictLoader
 
@@ -8149,22 +5496,10 @@ def test_drink_front_matter_has_no_duplicate_keys(drink_file):
 
 
 def test_drink_number_ranges_use_en_dashes(drink_file):
-    """`3–4 dashes`, not `3-4 dashes` -- §7's first line.
+    """`3–4 dashes`, not `3-4 dashes` -- INGEST_ONE_COCKTAIL §7, #670.
 
-    Over the whole file rather than the prose fields, on the same ruling that
-    put food's there: Helen, of `cook_time: "20-25 mins"`, "These still render
-    to the user, so correct to en dash please." An amount, a method step and a
-    note all reach the page.
-
-    THE LAST HYPHENATED RANGE WAS NOT A RANGE PROBLEM. anitas-attitude-adjuster's
-    Prosecco pour said `amount: "Top (30-45) ml"`, with a QQ note quoting that
-    string back verbatim, so en-dashing the amount would have desynchronised
-    the note from the value it describes -- a two-field judgement, not a
-    formatting fix, and it was left red for that reason. The answer came from
-    the amount ruling instead (#669, 2026-09-02): a top-up's amount is the verb
-    phrase `"to top"`, so the range left the amount altogether and the QQ note
-    stays as the record of what the source printed. Every range in the
-    collection was fixed on 2026-09-03 (#670).
+    Over the whole file, not only the prose fields: an amount, a method step
+    and a note all reach the page (DECISIONS §5).
     """
     _require_drink(drink_file)
     hits = number_range_hits(_checkable(drink_file))
@@ -8175,49 +5510,19 @@ def test_drink_number_ranges_use_en_dashes(drink_file):
     )
 
 
-# A KNOWN FAILURE WITH ITS REASON ATTACHED, the shape `unresolved_suggestions`
-# uses one file over: declaring it lets this test bite on the NEXT one instead
-# of being loosened. `test_no_drink_note_exception_is_stale` stops it outliving
-# the problem.
-# EMPTY SINCE 2026-09-10, AND THAT IS THE EXEMPTION MECHANISM WORKING RATHER
-# THAN A REASON TO DELETE IT. Its one entry was `tailspin`'s "Not good with
-# Brecon Botanicals or" -- truncated mid-sentence, flagged 2026-09-06, and
-# deliberately NOT given a full stop by #711's mechanical pass because that
-# would have turned an unfinished thought into a finished-looking one. Asked
-# what it should say, Helen answered on #799: "Tailspin: delete the note." So
-# the note is gone from the draft and the exemption goes with it, which is
-# exactly what `test_no_drink_note_exception_is_stale` exists to force.
-#
-# THE TWO HALVES ARE IN DIFFERENT REPOSITORIES AND MUST MERGE TOGETHER. The note
-# is in `_cocktail_drafts`; this is the public repo. Either order leaves a red
-# suite in the gap -- drafts first and this entry is stale, this first and the
-# note is unexempted and fails `test_drink_note_is_a_sentence`. That is #855's
-# window, and it is unavoidable here rather than an oversight.
+# Note text -> reason, for a note exempt from `test_drink_notes_are_sentences`.
+# `test_no_drink_note_exception_is_stale` fails an entry whose note has gone.
+# A draft's note lives in another repository, so removing a note and its entry
+# leaves one suite red until both merge.
 DRINK_NOTE_EXCEPTIONS: dict[str, str] = {}
 
 
 def test_no_drink_note_exception_is_stale():
-    """A declared exception must still name a note some drink has.
+    """Every DRINK_NOTE_EXCEPTIONS entry still names a note some drink has.
 
-    The same rot `test_unresolved_suggestions_has_no_stale_entries` catches: an
-    exemption that outlives its note reads as an outstanding problem while
-    quietly exempting that exact string for whoever writes it next.
-
-    IT NEEDS THE WHOLE COLLECTION, AND IT LEARNED THAT THE HARD WAY ON
-    2026-09-10 -- the day the first drinks were promoted and this test ran in
-    CI for the first time. It went red on `Not good with Brecon Botanicals or`,
-    an exception for a note on `tailspin`, which is a DRAFT: CI has no drafts,
-    so from there the note does not exist and the exception looks stale. The
-    entry was not stale; the corpus was partial.
-
-    That is exactly what `_require_whole_collection` is for, and its own
-    docstring had already stated the general case -- "an entry naming an ABSENT
-    drink is indistinguishable from one naming a FIXED drink". The call was
-    simply missing here, invisibly, because until that day CI had NO drinks at
-    all and `_load()` returned an empty corpus, so `live` was empty, so
-    `DRINK_NOTE_EXCEPTIONS` was... also skipped by the emptiness. Promotion is
-    what made the corpus partial rather than absent, and partial is the state
-    this guard cannot read.
+    An exemption that outlives its note exempts that string for whoever writes
+    it next. Needs the whole collection: with the drafts absent, an entry for a
+    draft's note is indistinguishable from a stale one.
     """
     _require_whole_collection("a stale note exception")
 
@@ -8235,14 +5540,9 @@ def test_no_drink_note_exception_is_stale():
 def test_ingredient_as_is_declared(drink_file):
     """`as:` carries a value `ingredient_as` declares -- #754.
 
-    THE SAME GUARD `rum_characters` HAS, for the same reason: a closed
-    vocabulary that nothing checks is an open one, and a typo mints a new member
-    in silence. `as: floar` would simply stop sorting to tier 7 and nobody would
-    see it, because the card would look plausible either way.
-
-    IT IS DELIBERATELY NOT A FREE-TEXT FIELD. Adding a member is a decision
-    about what the collection is willing to say about a pour, which is Helen's
-    (the same argument that made rum's characters closed and gin's free text).
+    A closed vocabulary nothing checks is an open one: a typo'd `as:` stops
+    sorting on the card, and the card still looks plausible. Adding a member is
+    Helen's decision.
     """
     _require_drink(drink_file)
     declared = set(_vocab().get("ingredient_as") or [])
@@ -8263,34 +5563,21 @@ def test_ingredient_as_is_declared(drink_file):
     )
 
 
-# The verbs a method uses for the three things `as:` records. Deliberately
-# narrow -- these are the words the collection actually writes, not every
-# synonym English offers.
+# The method verbs that imply an `as:` value. Narrow on purpose: the words the
+# collection writes, not every synonym English offers.
 _AS_VERBS = {"float": ("float",), "rinse": ("rinse",), "muddle": ("muddle",)}
 
-# A KNOWN FAILURE WITH ITS REASON ATTACHED, the shape `unresolved_suggestions`
-# uses: declaring it lets this guard bite on the NEXT one instead of being
-# loosened, and the staleness test below retires it automatically.
-# EMPTY, AND IT HAS BEEN USED EXACTLY ONCE -- which is the whole life cycle this
-# block is for. `port-authority` went in on 2026-09-07, the day this guard was
-# written: its method opened "Muddle blackberries gently in a shaker" and the
-# drink had no blackberries at all. Not a naming slip either, since its fruit is
-# creme de cassis, which is blackcurrant. Helen read the ingredient list against
-# the book the same afternoon, found the count -- four -- and the entry came
-# straight back out.
-#
-# THE GUARD FOUND A MISSING INGREDIENT, not a missing field, and that is worth
-# keeping in mind for the next entry: an exemption here is a claim that a drink
-# is wrong, not that the rule is.
+# (slug, `as` value) -> reason, for a drink whose method says the verb and
+# whose ingredients do not. An entry claims the drink is wrong, not the rule;
+# `test_no_as_exception_is_stale` fails it once the gap closes.
 _AS_EXCEPTIONS: dict[tuple[str, str], str] = {}
 
 
 def test_no_as_exception_is_stale():
-    """A declared `as:` exception must still describe a live problem.
+    """Every `_AS_EXCEPTIONS` entry still describes a live gap.
 
-    The same rot `test_unresolved_suggestions_has_no_stale_entries` catches: an
-    exemption that outlives its defect reads as outstanding work while quietly
-    excusing that drink for whoever writes the next one.
+    An exemption that outlives its defect reads as outstanding work while
+    excusing that drink for whoever edits it next.
     """
     live = []
     for slug, fm in _load():
@@ -8315,22 +5602,11 @@ def test_no_as_exception_is_stale():
 
 
 def test_a_method_that_floats_or_rinses_says_so_in_a_field(drink_file):
-    """If the METHOD floats, rinses or muddles, some ingredient says `as:` --
-    #754, Helen's ruling of 2026-09-07 ("`as:` on every one, and a test that
-    finds the rest").
+    """If the method floats, rinses or muddles, an ingredient says `as:` (#754).
 
-    THE GAP THIS CLOSES IS THE ONE THAT MADE #754 UNDERCOUNT. That issue said
-    three drinks float and all three record it in QQ prose. Five do, and two of
-    them -- fog-cutter-bramble-style and kamaniwanalaya -- say so properly in a
-    method step, which is exactly why a search for the problem missed them. A
-    fact recorded only in prose is a fact no plugin can read, and the next
-    ingest will write it in prose again unless something asks.
-
-    A GARNISH FLOAT IS NOT A POUR AND IS NOT COUNTED. Three drinks float a
-    dehydrated lime wheel, coffee beans or a passion fruit shell; those are
-    garnishes, and `garnish:` is where they live. The check therefore looks at
-    whether the method's object could be an ingredient at all, by requiring that
-    the drink HAS an ingredient still unaccounted for -- see the skip below.
+    A float recorded only in prose is a fact the card ordering cannot read. A
+    garnish float (a lime wheel, coffee beans) is not an ingredient: a float
+    whose method names a word of the drink's `garnish` is skipped.
     """
     _require_drink(drink_file)
     steps = " ".join(
@@ -8378,33 +5654,12 @@ def _shell_patterns():
 
 
 def test_a_shell_pour_is_written_one_way(drink_file):
-    """A fruit shell of flaming rum is one ingredient line and three steps --
-    #1256, Helen's rulings of 2026-10-01.
+    """A fruit shell of flaming rum is one ingredient and three steps -- #1256.
 
-    IT HAD BEEN WRITTEN FIVE WAYS ON FIVE DRINKS: `as: float` (Zombie
-    Intoxica), no role at all (Modern Zombie), `amount: "(garnish)"` (Milliners
-    Punch), and as `to_serve` prose on Cobra's Fang and Tiki Max, where the rum
-    was in no ingredient list and so in no unit count. Each was a reasonable
-    thing to write on the day, which is why it needed a rule and not a tidy-up.
-
-    THE RULE, all of it checkable:
-
-      * the rum is ONE ingredient with `as: "shell"` and a millilitre amount
-        ("let's do real ml") -- 25 ml by default, which is hers to vary per
-        drink and therefore NOT asserted here;
-      * it comes last, with only a `(sprinkle)` allowed after it;
-      * the method ENDS on the three canonical steps -- a filled
-        `shapes.shell` sentence naming that rum, then `canonical.fire`'s two;
-      * the shell IS in `garnish`, once, and it is the fruit the method fills.
-        The first version of this test said the opposite, after DECISIONS
-        §9.1.1 (2026-09-09), and Helen read the result: "(shell)" after the
-        rum and "Fill the passion fruit shell" in the method, on a page that
-        had not mentioned a shell. The garnish line is what introduces it;
-        the LAYOUT drops the generated "Garnish with ..." for a filled shell,
-        which is the repetition that ruling was about.
-
-    AND THE CONVERSE, which is what stops a sixth spelling: a method that
-    fills a shell has an ingredient that says so.
+    One ingredient with `as: "shell"` and a millilitre amount, last but for a
+    `(sprinkle)`; the method ends on a `shapes.shell` sentence naming that rum,
+    then `canonical.fire`; `garnish` names the shell once, the fruit the method
+    fills. Conversely, a method that fills a shell has such an ingredient.
     """
     _require_drink(drink_file)
     fm = drink_file.fm
@@ -8479,15 +5734,9 @@ def _to_serve_items(text):
 def test_every_to_serve_item_is_declared(drink_file):
     """Each thing a drink is served with is a declared item -- #1256, #1249.
 
-    THE FIELD STAYS ONE STRING AND THE ITEMS ARE WHAT IS CLOSED. Helen asked
-    for "canonical language for fun presentation decorations like plastic
-    giraffes"; serve.yml's `to_serve` block is that language and its header
-    says why the separators were left alone.
-
-    WHAT THIS CATCHES THAT NOTHING DID: "Cocktail umbrella." beside "paper
-    umbrella", and a pour described in prose -- "passion fruit shells filled
-    with Overproof rum and fire" is not an item, so a drink writing it is told
-    to put the rum in its ingredients, where the units are counted.
+    The field stays one string; the items, split on `.` and `,`, are what is
+    closed (`to_serve` in serve.yml). Rum in a shell written here as prose is
+    not an item: it belongs in the ingredients, where the units are counted.
     """
     _require_drink(drink_file)
     text = drink_file.fm.get("to_serve")
@@ -8512,24 +5761,9 @@ def test_every_to_serve_item_is_declared(drink_file):
 def test_drink_notes_are_sentences(drink_file):
     """A note starts with a capital and ends with a full stop -- #711.
 
-    THE SAME RULE FOOD HAS, from the same two helpers in conftest, and the
-    drinks were where it actually bit: 103 of 125 human-written notes failed it
-    when Helen raised this, against 3 of 100 published recipes. Almost all of
-    them were a missing full stop on otherwise finished prose.
-
-    Helen, 2026-09-06, on how she wanted it done: "I'd prefer you add tests for
-    this then fix them for me!!!! Or flag if my copy is too garbled to fix."
-
-    A QQ NOTE IS NEVER CHECKED -- `notes_of` drops it. Those are ingest
-    placeholders addressed to her, written by an agent and meant to be deleted,
-    and holding a machine annotation to a copy rule would be enforcing house
-    voice on something that is not in it. That exemption is why this test sees
-    125 notes on 124 drinks rather than 201.
-
-    BOTH SHAPES OF NOTE ARE COVERED: the drink-level `notes:` list, whose
-    entries are `{label, text}` on this side, and the per-ingredient `note:`.
-    Method-step notes have their own older test in the food suite and are
-    deliberately not folded in.
+    Covers the drink-level `notes:` list and each ingredient's `note:`. A QQ
+    note is never checked: `notes_of` drops it. DRINK_NOTE_EXCEPTIONS exempts a
+    note by its text.
     """
     _require_drink(drink_file)
     problems = [
@@ -8547,13 +5781,10 @@ def test_drink_notes_are_sentences(drink_file):
 @pytest.mark.parametrize("name,pattern,fix", SHARED_TYPOGRAPHY,
                          ids=[name for name, _, _ in SHARED_TYPOGRAPHY])
 def test_drink_typography(drink_file, name, pattern, fix):
-    """The two typography rules that are about English, not about food.
+    """The typography rules that are about English, not about food.
 
-    The table is conftest's, spliced into test_style.py's larger one for
-    recipes. The three rules NOT shared are food's own: Unicode fractions (a
-    drink's amounts are decimal millilitres, so a fraction in one is a different
-    conversation -- it went to Helen in the #670 hand-back list), and the two
-    markdown link shapes, which are about a recipe page's cross-links.
+    SHARED_TYPOGRAPHY is conftest's, and test_style.py splices it into its
+    larger table for recipes; the rest of that table is food's own.
     """
     _require_drink(drink_file)
     hits = re.findall(pattern, _checkable(drink_file))
@@ -8565,20 +5796,12 @@ def test_drink_typography(drink_file, name, pattern, fix):
     )
 
 
-# TITLE CASE -- #1089, Helen, 2026-10-08: "Title case for all titles. Qualifiers
-# in brackets don't get capital letters, unless they're a proper noun, e.g.
-# 'Margarita (classic)' and 'Fog Cutter (Bramble style)'", and then "Add title
-# case to cocktail drafts too please ... Add that to our draft-tidying script."
-#
-# THE RULE ONLY EVER RAISES A LETTER, and that is what makes it mechanical. A
-# word outside brackets that opens with a lowercase letter is capitalised
-# unless it is one of the small words below; nothing is ever lowered, so
-# "Voodoo That You Do" and "The Last Wall Highball" are left as written. Inside
-# brackets nothing is touched at all: whether "Bramble" or "Difford's" is a
-# proper noun is a judgement, and "Del Famoso (The Famous)" is hers to keep.
-# Only the FIRST letter of a spaced word is looked at, so "Pic-a-de-Crop" and
-# "Kill-Devil" are untouched, and a word opening with a digit, a quote or a
-# `#` ("6th", "'n'", "#2") is not a word this rule has a view on.
+# Title Case (#1089). The rule only ever raises a letter: a word outside
+# brackets that opens in lowercase is capitalised unless it is a small word
+# below, and nothing is lowered. Inside brackets nothing is touched, because
+# whether a qualifier is a proper noun is a judgement. Only a spaced word's
+# first letter is read, so a hyphenated word is left alone, as is a word
+# opening with a digit, a quote or `#`.
 TITLE_SMALL_WORDS = frozenset(
     "a an and as at au aux by de del des di du el en for from in la le les "
     "of on or the to with y".split()
@@ -8651,10 +5874,7 @@ def test_drink_titles_are_title_case(drink_file):
 
 
 def test_drink_spellings(drink_file):
-    """The declared non-house spellings, shared with the recipes.
-
-    Seeded here by a real one: royal-bermuda-yacht-club said `OVD Demarara`.
-    """
+    """The declared non-house spellings, shared with the recipes."""
     _require_drink(drink_file)
     problems = spelling_problems(_checkable(drink_file))
     assert not problems, (
@@ -8664,11 +5884,10 @@ def test_drink_spellings(drink_file):
 
 
 def test_drink_temperatures_use_degree_c(drink_file):
-    """`°C`, never a bare `C` -- §7.
+    """`°C`, never a bare `C` -- INGEST_ONE_COCKTAIL §7.
 
-    A regression guard rather than a backlog: the collection is clean today, and
-    a drink names a temperature rarely enough -- a hot buttered rum, a mulled
-    wine -- that the first one to arrive unmarked would arrive unnoticed.
+    A drink names a temperature rarely enough that the first one to arrive
+    unmarked would arrive unnoticed.
     """
     _require_drink(drink_file)
     bad = degreeless_temperatures(_checkable(drink_file))
@@ -8679,20 +5898,15 @@ def test_drink_temperatures_use_degree_c(drink_file):
 
 
 def test_drink_accents(drink_file):
-    """Words that take an accent have one, checked against the curated list.
+    """Words that take an accent have one, per `_data/accented_words.yml`.
 
-    `_data/accented_words.yml` is shared with the food site by design -- its own
-    header says so -- and `crème`, `piña` and `purée` all turn up in a drink.
-
-    Scope is `_prose_fields`: Helen's own writing, never a bottle name and never
-    a citation. See VERBATIM_KEYS for why that is a rule about authorship rather
-    than a convenience.
+    The list is shared with the food site. Scope is `_prose_fields`: Helen's
+    own writing, never a bottle name or a citation (see VERBATIM_KEYS).
     """
     _require_drink(drink_file)
     words = accented_words()
-    # An `if not words: return` here would silence the accent rule across the
-    # whole collection while reporting green -- the exact bug test_style.py's
-    # own copy of this assert was written to close on 2026-08-14.
+    # Asserted, not returned early: an empty list would silence the accent
+    # rule across the whole collection while reporting green.
     assert words, (
         "_data/accented_words.yml has no `words:` map, so there is nothing to "
         "check any drink against. That file IS this test's specification -- an "
@@ -8708,21 +5922,11 @@ def test_drink_accents(drink_file):
     )
 
 
-# =============================================================================
-# COSTINGS -- _data/cocktails/costs.yml and _plugins/cocktail_costs.rb
-# =============================================================================
-# Helen, 2026-09-05: "I want to add approximate costings to my cocktails, which
-# I expect means adding costs to each bottle in our dictionary." The data has
-# two layers -- a bottle's own price, and a per-generic fallback for the 438
-# pours of 685 that name no bottle -- and these guard the joins between them.
-#
-# THE FAILURE THESE EXIST TO CATCH IS SILENT, which is the reason they are here
-# at all. A generic with no price does not raise: the Ruby skips the pour and
-# the drink's total is quietly a little too low, on a page that says "roughly"
-# and so gives nobody a reason to look. Only a test comparing the vocabulary
-# against the price table can see it, and it has to be run from the drinks
-# rather than from the table -- MANUAL 12's rule about generating the check
-# from the other end.
+# ==== Costings: _data/cocktails/costs.yml, _plugins/cocktail_costs.rb ========
+# A bottle has its own price; a generic has a fallback for an ingredient that
+# names no bottle. A generic with no price does not raise: the plugin skips it
+# and the drink's total is quietly too low. So the checks that matter run from
+# the drinks, not from the price table (MANUAL §12).
 
 COSTS = ROOT / "_data" / "cocktails" / "costs.yml"
 
@@ -8748,12 +5952,9 @@ def _declared_bottles():
 def test_every_declared_bottle_carries_a_price():
     """bottles.yml and costs.yml name exactly the same bottles.
 
-    BOTH DIRECTIONS, AND THE SECOND ONE IS THE INTERESTING ONE. A bottle with no
-    price silently drops out of every total that pours it. A PRICE with no
-    bottle is worse than useless: it is almost always a bottle that was renamed
-    in bottles.yml and not followed here, so the old row goes on looking correct
-    while the new name resolves to nothing -- exactly the drift the alias map
-    exists to prevent for spellings.
+    A bottle with no price drops out of every total that uses it. A price with
+    no bottle is usually a bottle renamed in bottles.yml and not followed here,
+    so the new name resolves to nothing.
     """
     bottles = _declared_bottles()
     priced = _costs().get("bottles") or {}
@@ -8776,16 +5977,9 @@ def test_every_declared_bottle_carries_a_price():
 def test_the_price_check_date_is_less_than_two_years_old():
     """costs.yml's `checked:` date is within the last 730 days -- #749.
 
-    Helen, 2026-09-25: "Build log line always with elapsed time, and also a
-    test that shouts after two years." The plugin's `Costs:` log line carries
-    the elapsed time on every build; this is the shout. `checked:` is the day
-    the `high` rows were read and "everything here decays from this date" (the
-    file's own words), so a figure two years stale is a figure nobody has
-    looked at, printed under "roughly" where nothing else would notice.
-
-    The date is parsed rather than string-compared so that a `checked:` that
-    is not a date at all fails here too, by name, instead of silently never
-    ageing.
+    The build's `Costs:` log line reports the age; this fails once it passes
+    two years. Parsed as a date, so a `checked:` that is not one fails here
+    instead of never ageing.
     """
     import datetime
 
@@ -8807,14 +6001,10 @@ def test_the_price_check_date_is_less_than_two_years_old():
 
 
 def test_every_bottle_price_has_a_size_and_a_confidence():
-    """A price without a size is not a price.
+    """Every priced bottle has a positive `size_ml` and `gbp`, and a confidence.
 
-    ANGOSTURA IS THE CASE THAT MAKES THIS WORTH A TEST: GBP 11.75 is dear or
-    cheap entirely depending on the 200 ml, and the bitters are the only rows in
-    the file where the bottle is not 70cl. Vermouth and sherry are 75cl, Carpano
-    is a litre, Lustau Don Nuno is 50cl, Acacia honey is a 340 g jar. A missing
-    `size_ml` would not raise -- the Ruby skips the bottle -- so nothing but
-    this would notice.
+    Bottles are not all one size, so a price means nothing without one, and
+    the plugin skips a bottle that lacks it without raising.
     """
     priced = _costs().get("bottles") or {}
     problems = []
@@ -8840,28 +6030,12 @@ def test_every_bottle_price_has_a_size_and_a_confidence():
 
 
 def test_a_generic_priced_both_ways_is_deliberate_and_declared():
-    """A generic may be BOTH bought and made, but it must say so.
+    """A generic may be both bought and made, but it must say so.
 
-    THIS TEST ORIGINALLY FORBADE THE OVERLAP AND WAS WRONG, which is worth
-    recording because the reasoning sounded right. It asserted that a generic
-    with priced bottles under it must not also carry a `gbp_per_litre` -- two
-    truths that must agree will eventually disagree, the argument
-    _plugins/publish_gate.rb makes for refusing a `published:` key beside
-    `meta.awaiting_fix`.
-
-    It failed on its first run against `cane sugar syrup 2:1`, and the failure
-    was the data being right rather than the data being wrong. That syrup is
-    Monin Pure Cane Sugar at about GBP 10 a litre AND two bags of sugar at
-    about 90p, and both are things Helen actually does. Ranking one over the
-    other would have priced 34 pours -- the third most-poured ingredient in the
-    collection -- a factor of ten out in whichever direction the rule picked.
-    The plugin now spans both, which is what a range is for.
-
-    SO THE RULE THAT SURVIVES IS NARROWER AND STILL WORTH HAVING: an overlap
-    must be a MAKE-OR-BUY, carrying a `basis` that says which sum produced the
-    made figure. An overlap with no basis is the accident the first version was
-    reaching for -- somebody pricing a generic that already had bottles, not
-    realising, and widening every total that pours it.
+    A generic with priced bottles under it and a row in `generics:` is a
+    make-or-buy (the sugar syrups), and the plugin spans both. The row must
+    carry a `basis`: an overlap without one is an accident that silently
+    widens every total using that generic.
     """
     costs = _costs()
     bottles = _declared_bottles()
@@ -8891,11 +6065,9 @@ def test_a_generic_priced_both_ways_is_deliberate_and_declared():
 def test_from_fruit_costs_resolve_to_a_yield_and_a_price():
     """`from_fruit` is a join across three blocks; check it lands.
 
-    A SQUEEZED JUICE IS PRICED FROM #546's OWN FIGURES rather than from a
-    per-litre number typed twice, so `lime juice` points at `juice_yields:` in
-    ingredients.yml and at `fruit_prices:` here. Three files, two hops, and a
-    typo in either key costs the collection's most-poured ingredient (lime, 58
-    pours) its price without a murmur.
+    A squeezed juice is priced from `juice_yields:` in ingredients.yml and
+    `fruit_prices:` here (#546), so a typo in either key costs the juice its
+    price without a murmur.
     """
     costs = _costs()
     vocab = _vocab()
@@ -8933,13 +6105,11 @@ WEIGHED_AMOUNT = re.compile(r"^\s*([\d.]+)\s+g\s*$")
 
 
 def test_fruit_and_weight_price_rows_are_well_formed():
-    """#748. A per-piece or per-kilo row is a pair, ordered, on a real generic.
+    """A per-piece or per-kilo row is an ordered pair on a real generic -- #748.
 
-    `fruit_prices` prices a squeezed juice (through `juice_yields`) AND, since
-    2026-09-24, a counted fruit; `weight_prices` prices a weighed solid. The
-    plugin reads both by generic name and skips a row it cannot read, so a
-    typo'd key or an inverted range fails nothing on its own -- the pour just
-    goes back to being free. This is what notices.
+    `fruit_prices` prices a squeezed juice (through `juice_yields`) and a
+    counted fruit; `weight_prices` prices a weighed solid. The plugin skips a
+    row it cannot read, so a typo'd key or an inverted range fails nothing.
     """
     costs = _costs()
     vocab = _vocab()
@@ -8982,17 +6152,12 @@ def test_fruit_and_weight_price_rows_are_well_formed():
 
 
 def test_every_counted_fruit_and_weighed_solid_has_a_price(drink_file):
-    """#748, from the drinks. A pear with no row is the Bellini going dark again.
+    """A counted fruit or a weighed solid finds a price row -- #748.
 
-    Helen ruled that whole fruit and weighed solids are priced, so a counted
-    pour of anything in `fruit_and_herbs` and any `N g` pour must find a row --
-    otherwise the plugin silently treats it as the flourish it was before the
-    ruling, and the drink either loses its figure or prints one that is short
-    by the fruit. Runs from the DRINKS because the failure is a drink using a
-    generic the price table has not caught up with.
-
-    A counted pour OUTSIDE `fruit_and_herbs` (a sugar cube, an egg white) is
-    still a flourish by the standing rule and is not asked for here.
+    A counted ingredient in `fruit_and_herbs` and any `N g` amount must have a
+    row, or the plugin treats it as free and the drink's figure is short by it.
+    Counted things outside `fruit_and_herbs` (a sugar cube) are free and are
+    not asked for.
     """
     _require_drink(drink_file)
     costs = _costs()
@@ -9026,19 +6191,11 @@ def test_every_counted_fruit_and_weighed_solid_has_a_price(drink_file):
 
 
 def test_excluded_cost_units_are_real_declared_units():
-    """Everything costs.yml refuses to price must be a unit that exists.
+    """Each `excluded_units` entry in costs.yml is a `non_volumetric` unit.
 
-    THE RULE IS HELEN'S -- "None of these come into the estimated cost. I'm
-    catering for family, not running a bar" -- and it is implemented as a list
-    of UNIT NAMES. A typo in that list does not fail: it just quietly starts
-    pricing something she excluded. The units are ingredients.yml's
-    `non_volumetric` and this holds the two files together.
-
-    `to top` IS DELIBERATELY ABSENT from the excluded list even though it is a
-    non-volumetric unit, because Helen asked for it back -- "I'd like that to be
-    captured actually so it can be added into the shopping list feature" -- and
-    `top_up_ml` prices it instead. So this checks one direction only: everything
-    excluded is a real unit, not that every non-volumetric unit is excluded.
+    A typo in that list excludes nothing, and quietly prices something Helen
+    ruled out (#547). One direction only: `(top)` is non-volumetric and
+    deliberately not excluded, because `top_up_ml` prices it.
     """
     costs = _costs()
     vocab = _vocab()
@@ -9056,24 +6213,17 @@ def test_excluded_cost_units_are_real_declared_units():
 
 
 def test_top_up_volumes_cover_every_to_top_pour(drink_file):
-    """Every `to top` in the collection has a declared volume.
+    """Every `(top)` ingredient's generic has a volume in costs.yml `top_up_ml`.
 
-    HELEN ASKED FOR THIS FEATURE BY NAME and it has two consumers: the costing,
-    where a splash of champagne is the dearest thing in the seven glasses that
-    take one, and assets/js/shopping-list.js, which reports an unquantified pour
-    as "to top (x3)" for want of a figure.
-
-    A new drink topped with something undeclared would silently cost nothing and
-    silently go back to being a count on the shopping list, so this runs from
-    the DRINKS rather than from the table.
+    Read by the costing and by assets/js/shopping-list.js. An undeclared top
+    costs nothing and falls back to a count on the shopping list, so this runs
+    from the drinks.
     """
     _require_drink(drink_file)
     declared = _costs().get("top_up_ml") or {}
     missing = []
     for ing in drink_file.fm.get("ingredients") or []:
-        # `(top)` SINCE #1217. This compared against `to top` until 2026-10-04
-        # and so had examined no pour at all since the rename -- the same
-        # fault as #1273, in the one test `top_up_ml`'s fallback rests on.
+        # `(top)` is how a top's amount is spelled (#1217).
         if not isinstance(ing, dict) or str(ing.get("amount", "")).strip() != "(top)":
             continue
         generics = ing.get("generic")
@@ -9091,17 +6241,11 @@ def test_top_up_volumes_cover_every_to_top_pour(drink_file):
 
 
 def test_every_priceable_pour_has_a_price(drink_file):
-    """A pour measured in a volume must resolve to a price, by bottle or generic.
+    """A volume-measured ingredient has a price, by bottle or by generic.
 
-    THIS IS THE ONE THAT MATTERS, and it runs from the drinks because the
-    failure it catches is a drink using a vocabulary the price table has not
-    caught up with -- which no reading of the table alone can see.
-
-    IT DELIBERATELY IGNORES EXCLUDED POURS. A dash, a leaf, a sugar cube and
-    half a lime are free by Helen's ruling and must NOT be dragged back in by a
-    test that thinks completeness means pricing everything. The question here is
-    narrower and it is the right one: of the things she DID agree to count, is
-    anything unpriced?
+    Runs from the drinks: the failure is a drink using a vocabulary the price
+    table has not caught up with. Excluded amounts (a dash, a leaf, a sugar
+    cube) are free by ruling (#547) and are not asked for.
     """
     _require_drink(drink_file)
     costs = _costs()
@@ -9171,24 +6315,12 @@ def test_every_priceable_pour_has_a_price(drink_file):
 
 
 def test_default_bottles_are_declared_priced_and_in_the_right_category():
-    """`default_bottles` may only name real, priced bottles of that generic.
+    """`default_bottles` names only real, priced bottles of that generic.
 
-    THIS BLOCK IS HELEN'S SHELF RULES -- "London dry gin let's say the default is
-    tanqueray", "orgeat is always Monin" -- and it OVERRIDES the bottles
-    declared under a generic when pricing it. That is a lot of power for a list
-    of strings, and every way it can go wrong is silent:
-
-      a typo'd name        -> contributes no rate; the category quietly prices
-                              from whatever else is listed, or falls through to
-                              the `generics:` fallback as if no default existed
-      an unpriced bottle   -> same, invisibly
-      a bottle of the WRONG generic -> prices `London dry gin` from a rum, and
-                              the number is merely wrong rather than missing
-
-    The third is the one worth the extra assert. Nothing else in the repo would
-    object: the string names a real bottle, it has a real price, and the
-    arithmetic runs. Only asking whether it belongs to the category it is
-    defaulting FOR can catch a line pasted under the wrong heading.
+    The block overrides the bottles declared under a generic when pricing it,
+    and each mistake is silent: a typo'd or unpriced name contributes no rate,
+    and a bottle of the wrong generic prices the category from another spirit
+    and still computes cleanly.
     """
     costs = _costs()
     bottles = _declared_bottles()
@@ -9228,20 +6360,10 @@ def test_default_bottles_are_declared_priced_and_in_the_right_category():
     )
 
 
-# =============================================================================
-# UNITS OF ALCOHOL -- issue #297. _data/cocktails/abv.yml, _plugins/cocktail_units.rb
-# =============================================================================
-# THE SAME SHAPE AS THE COST TESTS ABOVE AND FOR THE SAME REASON: the checks that
-# matter are run FROM THE DRINKS, not from the table. A table can be internally
-# perfect and still fail to answer a pour that names something it has never heard
-# of, and the pour is what renders.
-#
-# WHY A MISSING STRENGTH IS WORSE THAN A MISSING PRICE. An unpriced bottle drops
-# out of a total and makes a drink look cheap, which is wrong but obviously so --
-# nobody believes a Negroni costs 40p. An unmeasured SPIRIT drops out and makes a
-# drink look WEAK, and 1.4 units where the truth is 2.6 is entirely believable.
-# It is the failure mode that does not announce itself, which is why abv.yml
-# declares `abv: 0` for water and juice rather than letting absence mean zero.
+# ==== Units of alcohol (#297): abv.yml, _plugins/cocktail_units.rb ===========
+# As with the costs, the checks that matter run from the drinks. A spirit with
+# no strength drops out and the drink reads believably weak, so a zero is
+# declared in abv.yml and absence never means zero.
 
 ABV = ROOT / "_data" / "cocktails" / "abv.yml"
 
@@ -9249,13 +6371,11 @@ ABV = ROOT / "_data" / "cocktails" / "abv.yml"
 ABV_CONFIDENCE = {"high", "medium", "low"}
 
 # 96 is roughly the azeotrope: nothing bottled is stronger, so a figure above it
-# is a typo rather than a spirit. The floor is 0 and it is a REAL value -- see
-# the syrups.
+# is a typo. The floor is 0, which is a real value (the syrups).
 ABV_MAX = 96
 
-# A UK unit is 10 ml of pure ethanol, so `ml * abv / 1000` units. Pinned here as
-# well as in the plugin because the two must agree, and a constant that lives in
-# one place is a constant nothing checks.
+# A UK unit is 10 ml of pure ethanol, so `ml * abv / 1000` units. Pinned here
+# as well as in the plugin, because the two must agree.
 ML_PER_UNIT = 1000.0
 
 
@@ -9273,13 +6393,8 @@ def _generics_with_bottles():
 def test_every_declared_bottle_has_an_abv():
     """bottles.yml and abv.yml name exactly the same bottles.
 
-    BOTH DIRECTIONS, exactly as `test_every_declared_bottle_carries_a_price`
-    checks both -- and the second direction caught two real rows the day this was
-    written. `Grand Marnier` had been given a bottle row when it is only ever a
-    generic, and `Ottoman 10 Year Tawny` had been given one after Helen retired
-    it to `not_reached_for` on the price check. Neither would have raised: the
-    plugin simply never looks them up, so both would have sat there looking
-    authoritative and meaning nothing.
+    A bottle with no strength counts as water. A row naming no bottle is never
+    looked up by the plugin, so it sits there looking authoritative.
     """
     bottles = _declared_bottles()
     strengths = _abv().get("bottles") or {}
@@ -9302,10 +6417,8 @@ def test_every_declared_bottle_has_an_abv():
 def test_every_strength_is_plausible_and_says_how_sure_it_is():
     """An `abv` is a number from 0 to 96, and every row declares a confidence.
 
-    THE LOWER BOUND IS ZERO AND NOT ONE, ON PURPOSE. Monin's syrups, the acacia
-    honey and the cranberry juice are declared at 0 rather than omitted, so that
-    a MISSING key is a failure and a zero is a statement. Losing that distinction
-    is exactly how a gin would end up totalling as water.
+    The lower bound is zero on purpose: a syrup is declared at 0, so a missing
+    key is a failure and a zero is a statement.
     """
     data = _abv()
     problems = []
@@ -9330,22 +6443,11 @@ def test_every_strength_is_plausible_and_says_how_sure_it_is():
 
 
 def test_a_low_confidence_strength_says_what_helen_has_to_check():
-    """`confidence: low` without a `qq:` is a guess nobody can act on.
+    """A `confidence: low` row carries a `qq:` saying what Helen has to check.
 
-    THE FILE'S OWN HEADER PROMISES THIS -- "`grep -n 'qq:'` is the worklist" --
-    and a worklist that silently loses rows is worse than no worklist. A low row
-    is not a defect; it is the file admitting which figures Helen should overwrite
-    first, and the `qq` is the sentence saying why this one could not be settled
-    without her bottle. Rhum JM is bottled at 50 and at 55: that is a question,
-    not an error.
-
-    BITTERS ARE EXEMPT SINCE 2026-09-14, because the question has no answer
-    worth her time. Helen, #1012: "Don't include bitters in our ABV
-    calculations." A bitters bottle's strength can never reach a unit figure,
-    so a `qq:` on one would be a question for her shelf about a number nothing
-    reads. The rows stay `low` -- they are still guesses, and if bitters ever
-    count again they are the ones to overwrite first -- but they are no longer
-    on her worklist, and scripts/abv_worklist.py skips them the same way.
+    The `qq:` rows are her worklist, so a low row without one never reaches
+    it. Bitters are exempt (#1012): their strength never reaches a unit figure,
+    and scripts/abv_worklist.py skips them the same way.
     """
     data = _abv()
     bitters = set(_vocab().get("bitters") or [])
@@ -9370,13 +6472,10 @@ def test_a_low_confidence_strength_says_what_helen_has_to_check():
 
 
 def test_no_generic_gets_its_strength_from_two_places():
-    """A generic derives from its bottles, or declares a figure, never both.
+    """A generic takes its strength from its bottles or a figure, never both.
 
-    costs.yml states the rule this follows: "A generic that DOES have bottles is
-    deliberately absent: its range is computed from those bottles, so writing a
-    figure here too would be a second truth." Two truths do not fail loudly --
-    the plugin takes the bottles, and the declared figure sits there consulted by
-    nobody, drifting from the bottles it was meant to summarise.
+    The plugin takes the bottles, so a declared figure beside them is consulted
+    by nobody and drifts. A `non_alcoholic` generic has no strength anywhere.
     """
     data = _abv()
     declared = set(data.get("generics") or {})
@@ -9407,26 +6506,12 @@ def _unique_mode(values):
 
 
 def test_every_bottled_generic_resolves_to_one_strength():
-    """A category with bottles has a mode, or Helen has named its default.
+    """A bottled category has a mode strength, or a default Helen has named.
 
-    #1016, Helen, 2026-09-14: "if a bottle isn't stated for a cocktail recipe,
-    assume the MODE ABV of bottles we've declared. This will be more meaningful
-    than mean or median." cocktail_units.rb takes an unbottled pour's strength
-    from the most common strength among the category's bottles.
-
-    A MODE DOES NOT ALWAYS EXIST, and that is what this guards. The day the rule
-    landed, seven categories had every bottle at a different strength -- bourbon
-    was 40, 43.2, 45 and 47 -- so the rule had no answer. Asked what should
-    happen, Helen chose "name a default bottle" over the highest, the mean or
-    the median, and named all seven. So the plugin's fallback to the mean is a
-    last resort that keeps a page building, and THIS is what keeps it from ever
-    being read: a new bottle that breaks a category's mode, in a category with
-    no default, fails here and names the category that needs one.
-
-    TWO KINDS OF CATEGORY ARE NOT ASKED. One with a `default_bottles` ruling --
-    her ruling decides it whatever the strengths are, and a two-bottle default
-    (blanco tequila) is a range she chose and is averaged. And the bitters,
-    which never reach a unit figure at all (Helen, #1012).
+    An ingredient naming no bottle takes the mode of its category's bottles
+    (#1016). Where no single mode exists the plugin falls back to the mean,
+    which she ruled against, so this fails and names the category that needs a
+    `default_bottles` entry. Bitters are not asked (#1012).
     """
     abv_bottles = _abv().get("bottles") or {}
     defaults = _costs().get("default_bottles") or {}
@@ -9460,18 +6545,12 @@ def test_every_bottled_generic_resolves_to_one_strength():
 
 
 def test_every_counted_pour_can_reach_a_strength(drink_file):
-    """Of the pours that COUNT, is anything unmeasured?
+    """Every measured ingredient that counts toward units reaches a strength.
 
-    THE QUESTION IS NARROWER THAN "does everything have an ABV", deliberately.
-    Dashes, leaves, cubes and half a lime are free under Helen's rule -- the same
-    rule that governs cost -- and a test that dragged them back in would be
-    asking a question she has already answered. What must not happen is a
-    MEASURED pour of something with no route to a strength, because that pour
-    silently contributes zero and the drink reads weaker than it is.
-
-    RUN FROM THE DRINK, NOT FROM THE TABLE. MANUAL 12's rule. abv.yml can be
-    internally immaculate and still have never heard of the generic a new drink
-    pours; only walking the drinks finds that.
+    Dashes, leaves and cubes are free, as for cost, and bitters never count
+    (#1012). A measured ingredient with no route to a strength contributes
+    zero and the drink reads weaker than it is. Runs from the drinks: abv.yml
+    cannot answer for a generic it has never heard of.
     """
     _require_drink(drink_file)
     data = _abv()
@@ -9510,16 +6589,12 @@ def test_every_counted_pour_can_reach_a_strength(drink_file):
         generics = ing.get("generic")
         generics = [generics] if isinstance(generics, str) else (generics or [])
 
-        # Bitters never count, whatever the amount -- Helen, #1012, and
-        # cocktail_units.rb's DIFFERENCE 5. Matching the plugin exactly.
+        # Bitters never count, whatever the amount (#1012), as in the plugin.
         if generics and all(str(g) in bitters for g in generics):
             continue
 
-        # `(top)`, NOT `to top`, SINCE #1217. This was an EIGHTH literal the
-        # rename missed (#1273 found the seventh), found on 2026-10-04 while
-        # #1179 was changing what a top pours: on the old spelling a top fell
-        # through to the regex below, matched nothing and was skipped, so no
-        # topper was ever asked for a strength.
+        # `(top)` is how a top's amount is spelled (#1217). A top is asked for
+        # a strength only when `top_up_ml` gives its generic a volume.
         if amount == "(top)":
             if not any(str(g) in top_up for g in generics):
                 continue  # not a topped-up volume we model; contributes nothing
@@ -9555,16 +6630,11 @@ def test_every_counted_pour_can_reach_a_strength(drink_file):
 
 
 def test_serves_is_a_count_and_only_where_a_recipe_makes_more_than_one():
-    """`serves:` is present on nine drinks and means what it says.
+    """`serves:`, where present, is a whole number of two or more.
 
-    IT IS NARROW ON PURPOSE and the narrowness is the whole design -- see the
-    note by TOP_LEVEL_KEYS. Absent means one. A `serves: 1` would therefore be
-    noise saying nothing, and a `serves: 0` would divide the unit count by zero
-    or, worse, be quietly clamped and produce a figure nobody could account for.
-
-    THIS DOES NOT POLICE WHICH DRINKS HAVE IT. Whether the Bali Hai is one drink
-    or two is Helen's judgement, not a rule -- the test's job is that the value,
-    where it exists, is a usable count.
+    Absent means one, so `serves: 1` says nothing and `serves: 0` would divide
+    the unit count by zero. Which drinks carry it is Helen's judgement and is
+    not checked.
     """
     problems = []
     for slug, fm in _load():
@@ -9586,16 +6656,10 @@ def test_serves_is_a_count_and_only_where_a_recipe_makes_more_than_one():
 def test_the_unit_formula_and_its_worked_example_still_agree():
     """60 ml of Tanqueray is 2.6 units, and this pins every part of that.
 
-    A WORKED EXAMPLE RATHER THAN A RESTATEMENT OF THE FORMULA. Asserting
-    `ml * abv / 1000 == ml * abv / 1000` proves nothing; this ties the constant,
-    the arithmetic and one real row of abv.yml together, so that any of the three
-    moving on its own goes red with a number a human can check by hand.
-
-    TANQUERAY BECAUSE IT IS NOT A ROUND NUMBER. At 43.1% an off-by-one in the
-    data shows up in the first decimal place; at 40% several plausible mistakes
-    (a 4 for a 40, a percentage read as a fraction) still land on a tidy figure.
-    It is also the bottle Helen's `default_bottles` ruling puts behind every
-    unqualified `London dry gin`, so this row is load-bearing for 19 pours.
+    A worked example ties the constant, the arithmetic and one row of abv.yml
+    together, so any of the three moving alone goes red. Tanqueray because
+    43.1% is not round: a slip shows in the first decimal place, and it is the
+    default bottle behind an unqualified `London dry gin`.
     """
     tanqueray = (_abv().get("bottles") or {}).get("Tanqueray")
     assert tanqueray, "Tanqueray has no row in abv.yml; the example needs one."
@@ -9609,45 +6673,15 @@ def test_the_unit_formula_and_its_worked_example_still_agree():
     )
 
 
-# =============================================================================
-# The reference page's own reading of the data -- #529
-# =============================================================================
+# ==== The reference page's reading of the data (#529) ========================
 
 def test_retired_rum_style_keys_split_by_case():
-    """A capitalised `retired_rum_styles` key names a BOTTLE; a lowercase one
-    names a WORD -- and cocktails/reference/rum-categories.html shows only the
-    words.
+    """A capitalised `retired_rum_styles` key is a bottle; a lowercase, a word.
 
-    THE PAGE NEEDS THE SPLIT AND THE DATA DOES NOT DECLARE IT. Eleven entries
-    live in that block and they are two different kinds of thing. Eight are
-    words other people's recipes will keep asking for forever -- `navy`,
-    `black`, `dark` -- and the page's "not categories" section exists precisely
-    to answer those with a recipe book open. Three are the brand-generics
-    retired on 2026-08-29 when #314's amendment generalised them (Malibu, the
-    two Planterays): those record a VOCABULARY change, and a reader looking up
-    "what does my book mean by dark rum" is not helped by being told that
-    Malibu used to be its own generic.
-
-    LIQUID CANNOT ASK WHICH KIND AN ENTRY IS, so the page tests the first
-    character's case, which works because the three brand entries name bottles
-    and a bottle name is capitalised. That is an inference from a spelling
-    convention rather than from a declared field, so it needs a guard: this
-    test is what stops a future retired BOTTLE written in lowercase (or a
-    retired WORD written with a capital) from silently changing what the page
-    prints, with nothing failing.
-
-    THE ASSERTION IS THE CONVENTION, NOT THE PAGE. Each capitalised key must
-    name a bottle and each lowercase key must not. If the day comes that a
-    retired word genuinely wants a capital, the honest fix is a declared field
-    in the data and a page that reads it, not a looser test here.
-
-    "NAMES A BOTTLE" IS A PREFIX MATCH IN EITHER DIRECTION, NOT AN EXACT ONE,
-    and the case that forced it is worth recording rather than smoothing over:
-    `Planteray O.F.T.D. Overproof` was the retired GENERIC's spelling and the
-    bottle is `Planteray O.F.T.D.` -- the same product, one word longer,
-    because the generic had to say "overproof" and the bottle does not. A
-    retired brand-generic is keyed on what the DATA used to say, and that was
-    never required to equal what bottles.yml calls the bottle today.
+    cocktails/reference/rum-categories.html shows only the lowercase keys, and
+    tells them apart by the first character's case because the data declares no
+    kind. "Names a bottle" is a prefix match either way: a retired generic's
+    spelling need not equal the bottle's name in bottles.yml.
     """
     vocab = _vocab()
     retired = vocab.get("retired_rum_styles") or {}
@@ -9682,23 +6716,11 @@ def test_retired_rum_style_keys_split_by_case():
 
 
 def test_rum_groups_partition_the_styles():
-    """`rum_groups` is a second reading of `rum_styles`, not a second list.
+    """`rum_groups` places every `rum_styles` member exactly once.
 
-    THE PAGE RENDERS THE GROUPS, SO A STYLE MISSING FROM THEM IS A STYLE THAT
-    HAS SILENTLY LEFT THE SITE. cocktails/reference/rum-categories.html walks
-    `rum_groups` rather than `rum_styles`, because the sections are Helen's own
-    shelves (Jamaican, Demerara, cane juice, by age, flavoured) and no rule
-    derives them from the names. That is the right call and it opens exactly one
-    hole: add a fourteenth style tomorrow, forget to place it, and the page
-    quietly stops listing it while every other check stays green -- the failure
-    `hers_to_apply` and the retired blocks all exist to prevent, arriving from a
-    new direction.
-
-    EXACTLY ONCE, IN BOTH DIRECTIONS. A style in no group vanishes from the
-    page; a style in two groups appears twice, which reads as two categories
-    with one name -- the precise confusion `card_names` was built to end
-    (#501). And a group naming a style that does not exist is a typo that would
-    render an empty row.
+    cocktails/reference/rum-categories.html walks `rum_groups`, so a style in
+    no group silently leaves the page, a style in two is listed twice, and a
+    group naming an undeclared style is a typo. Each group has a name to print.
     """
     vocab = _vocab()
     styles = vocab.get("rum_styles") or []
@@ -9740,23 +6762,11 @@ def test_rum_groups_partition_the_styles():
 
 
 def test_rum_adjacent_before_names_a_real_group():
-    """`rum_adjacent_before` must name a shelf, or a whole block leaves the page.
+    """`rum_adjacent_before` names a shelf in `rum_groups` -- #919.
 
-    WHAT IT GUARDS. Helen, 2026-09-10 (#919): "render rum-adjacent section
-    before flavoured". The rum page walks `rum_groups` in order and renders the
-    Rum-adjacent block when the current shelf's name matches this key, so the
-    key is the block's POSITION -- and a Liquid `{% if %}` that never matches
-    fails silently. Cachaca, Batavia arrack and coconut-flower arrack would
-    simply stop appearing, with every other check green.
-
-    WHY THE VALUE IS DECLARED RATHER THAN WRITTEN INTO THE TEMPLATE. Every other
-    name on that page is a lookup and not a literal -- the categories, the card
-    names, the shelves, the retired words. A literal "Flavoured" in the template
-    would break the same way on a rename, just without anywhere to put this test.
-
-    THE FAILURE IS A RENAME, not a typo, and that is why it is worth a test: the
-    person renaming a shelf is editing `rum_groups` and has no reason to look at
-    a key twenty lines further down.
+    The rum page renders the Rum-adjacent block when the current shelf's name
+    matches this key, and a Liquid `if` that never matches fails silently: a
+    renamed shelf would drop the whole block with every other check green.
     """
     vocab = _vocab()
     groups = vocab.get("rum_groups") or []
@@ -9780,18 +6790,10 @@ def test_rum_adjacent_before_names_a_real_group():
 
 
 def test_bottle_origin_is_declared():
-    """An `origin:` must be a value `bottle_origins` declares -- #591.
+    """A bottle's `origin:` is a value `bottle_origins` declares -- #591.
 
-    THE SAME GUARD `rum_characters` AND `ingredient_as` HAVE, for the same
-    reason: a closed vocabulary that nothing checks is an open one, and a typo
-    mints a new member in silence. `origin: "Martinque"` would simply sit there
-    being wrong, and nothing renders it yet, so nobody would ever see it.
-
-    CLOSED RATHER THAN FREE TEXT IS HELEN'S CALL, ruled 2026-09-07 with the
-    field itself: "a closed vocabulary for it, in `_data/cocktails/
-    ingredients.yml` alongside `rum_characters` -- so a typo cannot mint an
-    origin in silence, which is the argument that file already makes for rum's
-    characters."
+    A closed vocabulary nothing checks is an open one, and a typo mints a new
+    member in silence. Adding a value is Helen's decision.
     """
     declared = set(_vocab().get("bottle_origins") or [])
     assert declared, (
@@ -9815,35 +6817,12 @@ def test_bottle_origin_is_declared():
 
 
 def test_cane_juice_bottles_declare_an_origin():
-    """Every bottle on the cane-juice shelf says where it is from -- #591.
+    """Every bottle on the Cane juice shelf declares an `origin` -- #591.
 
-    WHAT IT IS FOR, in Helen's words on the ruling: "a test requiring `origin`
-    on any bottle whose generic is an agricole or clairin one, so the next
-    agricole bottle cannot arrive without it." Agricole is the one cane family
-    whose origin is NOT in its generic -- `rhum agricole blanc` covers
-    Martinique, Guadeloupe and Haiti at once -- so it is the family where a
-    missing origin actually loses something.
-
-    THE SHELF IS READ FROM `rum_groups`, NOT RETYPED HERE, so the list cannot
-    drift from the one the reference page renders. That makes a RENAME the
-    failure mode worth guarding, and it is asserted rather than assumed: rename
-    the shelf and this test would otherwise find no styles, check nothing, and
-    stay green -- the exact shape of rot `test_rum_groups_partition_the_styles`
-    and `test_there_are_prose_pages_to_check` both exist to refuse.
-
-    THE ARRACKS ARE DELIBERATELY NOT COVERED -- they are not on the Cane juice
-    shelf at all, but on `cane_and_palm_spirits`, so this test never reads them.
-    `Batavia arrack` carries its origin in the generic, the way the three
-    Jamaicans and both Demeraras do -- Batavia is Jakarta. The other arrack did
-    too until #796 (2026-09-14): it was `Ceylon arrack`, and is now
-    `coconut-flower arrack`, named for what it is made from rather than where.
-    So its origin now lives nowhere, and whether the Ceylon Arrack BOTTLE should
-    say `origin: "Sri Lanka"` is an open question (adding a value to
-    `bottle_origins` is Helen's), not an oversight. That is the coexistence
-    Helen's ruling describes: in the generic where it changes the category, on
-    the bottle where it changes the flavour.
-    Cachaça is seeded with Brazil for the same reason it is not required here --
-    it is Brazilian by definition.
+    Agricole is the cane family whose origin is not in its generic, so a bottle
+    without one loses it. The shelf's styles are read from `rum_groups`, and
+    the shelf is asserted to exist: renamed, this would find no styles and
+    check nothing.
     """
     SHELF = "Cane juice"
     groups = _vocab().get("rum_groups") or []

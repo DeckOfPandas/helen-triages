@@ -1,42 +1,22 @@
 """Derive real stroke centrelines from FILLED, uniform-width icon artwork.
 
-REPRODUCES NO NUMBER -- a TOOL, named as the method for fill-only artwork by
-MANUAL.md §9.11 and §9.13 and by `_includes/icons/ship.svg`.
-
-Written for the tiki mug (#355) and kept because the problem recurs: stock
-glass artwork is very often fill-only, and a fill cannot take a stroke-width
-because there is no centreline in it to give a width to. Three careful hand
-redraws missed before this was written. The problem was not care, it is method
--- eyeballing a 30-stroke drawing reproduces the parts you notice and quietly
-normalises the parts you do not.
-
-  1. rasterise the original FILLED, at high resolution -- it is filled ink, so
-     this is the drawing as drawn;
-  2. thin it to a one-pixel skeleton (Zhang-Suen), which for a constant-width
-     stroke IS its centreline;
-  3. walk the skeleton into polylines (see `trace` -- the obvious algorithm
-     does not work, and the docstring says why);
-  4. prune spurs, simplify each polyline (Ramer-Douglas-Peucker), map back into
-     viewBox units and emit.
-
-WHEN THIS IS VALID, AND WHEN IT IS NOT. The medial axis of a CONSTANT-width
-stroke is that stroke's centreline, which is exactly what is wanted. On
-artwork with varying weight it is not: the skeleton still comes out, it is
-just no longer the line the artist drew, and nothing here can tell you that
-happened. Check the source is uniform width before trusting the output --
-for the tiki mug every cap was a 0.85-radius arc, so the ink was a uniform
-1.7 units throughout.
-
-THE OUTPUT IS POLYLINES, not curves, so it is wordier than a hand drawing --
-46 paths against a set median of 4 for the mug, which is a real cost and is
-what #355 is still open about. At icon size the difference between a fitted
-curve and a 0.2-unit-tolerance polyline is not visible, but the path count is
-not free. Consider whether a simplified redraw would serve better before
-reaching for this.
-
-Usage:
     python3 scripts/trace_centrelines.py IN.svg -o OUT.svg
     python3 scripts/trace_centrelines.py IN.svg            # stats only, no write
+
+A fill cannot take a stroke-width because it has no centreline; this finds
+one (MANUAL §9.11). `--height`, `--rdp-tol` and `--min-branch` tune the steps:
+
+  1. rasterise the original filled, at high resolution;
+  2. thin it to a one-pixel skeleton (Zhang-Suen), which for a constant-width
+     stroke is its centreline;
+  3. walk the skeleton into polylines (see `trace`);
+  4. drop short spurs, simplify each polyline (Ramer-Douglas-Peucker), map
+     back into viewBox units and emit.
+
+Valid only for uniform-width ink: on artwork of varying weight the skeleton
+still comes out, is not the line the artist drew, and nothing here can tell.
+The output is polylines, not curves, so it has many more paths than a hand
+drawing (#355). Look at the result before trusting it.
 """
 import argparse
 import math
@@ -46,9 +26,8 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import svgrender
 
-# Defaults tuned on the tiki mug at 48x84 units. HEIGHT_PX wants to put roughly
-# ten pixels across the ink -- too coarse and thinning eats detail, too fine and
-# it is slow for no gain.
+# HEIGHT_PX wants roughly ten pixels across the ink: too coarse and thinning
+# eats detail, too fine and it is slow for no gain.
 HEIGHT_PX = 760
 RDP_TOL_PX = 1.6                # ~0.18 units at the default height
 MIN_BRANCH_PX = 7               # shorter than half a stroke width is a spur
@@ -130,17 +109,12 @@ def build_neighbours(W, H, g):
 def trace(adj, W):
     """Skeleton -> polylines, by direction-preserving greedy walk.
 
-    THE OBVIOUS ALGORITHM DOES NOT WORK HERE. Splitting the graph at every
-    pixel whose degree is not 2 assumes a 4-connected skeleton; a Zhang-Suen
-    skeleton is 8-connected, so a pixel on a plain diagonal run routinely has
-    three neighbours and nearly every pixel classifies as a junction. That
-    version returned 2,966 polylines for a drawing with about thirty strokes.
-
-    What is actually wanted is not the graph's topology, it is long drawable
-    strokes. So: start at an endpoint where there is one, and at each step take
-    the unvisited neighbour whose direction best continues the current one.
-    Strokes then run straight THROUGH crossings instead of stopping at them,
-    which is also what the original drawing does.
+    Splitting the graph at every pixel whose degree is not 2 does not work: a
+    Zhang-Suen skeleton is 8-connected, so a pixel on a plain diagonal run
+    often has three neighbours and classifies as a junction. So start at an
+    endpoint where there is one, and at each step take the unvisited neighbour
+    whose direction best continues the current one. Strokes then run straight
+    through crossings, as the original drawing does.
     """
     unvisited = set(adj)
     polys = []
@@ -262,8 +236,6 @@ def main(argv=None):
     print(f'\nwrote {args.output} ({len(paths)} paths)')
 
 
-# Guarded, and not decoratively: scripts/normalise_glass_icons.py had a bare
-# main() at import once, and importing it to read a constant deleted all 26
-# icons (its first act is shutil.rmtree). Every script here stays importable.
+# Guarded: every script here stays importable without running.
 if __name__ == '__main__':
     main()

@@ -1,17 +1,9 @@
 """guard-sed.py, guard-awk.py and guard-inline-script.py refuse inline programs.
 
-The three belong together because they are one rule seen from three sides: an
-inline program in a quoted argument is opaque to the permission checker, whether
-it is spelled `sed 's/a/b/'`, `awk '{print}'` or `python3 -c '...'`. CLAUDE.md
-says so in as many words -- "when a command needs to be clever, put the
-cleverness in a file and run the file".
-
-Neither text-tool hook had a test until 2026-09-15, when guard-awk.py was
-written: Helen's README listed "Never `awk` (same)" beside "Never `sed`", and
-nothing enforced the first. guard-inline-script.py had none until #1198, which
-found it one of three hooks with no test at all. A guard nobody has broken on
-purpose is a claim, not a guard (CLAUDE.md's hooks, passim) -- so all three are
-exercised here, through the same JSON the harness hands them.
+The three are one rule: an inline program in a quoted argument is opaque to the
+permission checker, whether it is spelled `sed 's/a/b/'`, `awk '{print}'` or
+`python3 -c '...'`. Each hook is run here through the same JSON the harness
+hands it (#1198).
 """
 from __future__ import annotations
 
@@ -86,9 +78,8 @@ def test_guard_sed_leaves_mentions_and_lookalikes_alone(command):
 
 
 def test_guard_sed_no_longer_recommends_python_dash_c():
-    """Its refusal used to suggest `python3 -c '...'`, which
-    guard-inline-script.py has refused since 2026-09-10 -- advice that walked
-    straight into the next guard."""
+    """guard-sed.py's refusal must not suggest `python3 -c '...'`, which
+    guard-inline-script.py refuses: advice that walks into the next guard."""
     text = (HOOKS / "guard-sed.py").read_text(encoding="utf-8")
     assert "single-quoted `python3 -c" not in text
 
@@ -96,9 +87,8 @@ def test_guard_sed_no_longer_recommends_python_dash_c():
 def _denied_reason(hook: str, command: str) -> str | None:
     """The refusal text, or None if the hook allowed the call.
 
-    `_denied` above answers yes-or-no, which is enough for sed and awk. The
-    inline-script guard's refusal has to TEACH -- it is the one that pushes you
-    towards `Write tmp/thing.py` -- so its content is worth asserting on.
+    The inline-script guard's refusal has to say what to do instead, so its
+    content is asserted on, where `_denied` only answers yes or no.
     """
     result = subprocess.run(
         ["python3", str(HOOKS / hook)],
@@ -115,10 +105,6 @@ def _denied_reason(hook: str, command: str) -> str | None:
 
 
 @pytest.mark.parametrize("command", [
-    # The two shapes from 2026-09-09 that got the hook written: a `python3 -c`
-    # to inspect a YAML file's shape, and one to strip markup out of a rendered
-    # page. Helen, for the second time in one session: "please please please
-    # write those long lines to files rather than running them all together."
     "python3 -c 'import yaml,sys; print(yaml.safe_load(open(sys.argv[1])))' _data/x.yml",
     'python3 -c "print(1)"',
     "python -c 'print(1)'",
@@ -146,16 +132,11 @@ def test_guard_inline_script_refuses_every_inline_program(command):
     "node -e '1'",
 ])
 def test_guard_inline_script_has_no_length_or_quoting_carve_out(command):
-    """PINNED AGAINST REINSTATEMENT. Until 2026-09-10 this hook allowed a
-    single-quoted one-liner under 100 characters, justified by a
-    `Bash(python3 -c ' *)` allow rule that does not exist and never did. Helen
-    hit a prompt on a 78-character single-quoted one-liner -- inside every limit
-    the carve-out set -- and asked to either be asked less or not at all.
+    """No inline program is short enough or quoted well enough to be allowed.
 
-    The threshold was measuring the wrong thing: three calibrations (160 -> 120
-    -> 100) all looked for a length at which an opaque command stops being
-    opaque, and no such length exists. The hook's own refusal ends "Do not
-    reinstate it by shortening your program"; this is that sentence with teeth.
+    Pinned against reinstatement: there is no length at which an opaque
+    command stops being opaque, and a carve-out for short single-quoted
+    one-liners still prompts Helen on every one.
     """
     assert _denied("guard-inline-script.py", command), (
         f"allowed {command!r} -- a length or quoting carve-out is back"
@@ -163,16 +144,14 @@ def test_guard_inline_script_has_no_length_or_quoting_carve_out(command):
 
 
 @pytest.mark.parametrize("command", [
-    # The thing the hook is pushing you towards, and the reason it is silent
-    # under blockReadsOutsideWorkingDirectories: one static path.
+    # What the hook pushes towards: one static path.
     "python3 tmp/fix_thing.py",
     "python3 scripts/verify.py",
     "python3 -m pytest -q",
     "node --test tests/js/*.test.js",
     "ruby -w scripts/parse_amounts.rb",
     # `sh -c` and `bash -c` are deliberately absent from INTERPRETERS: `sh -c`
-    # is how a git credential helper is spelled, which is CLAUDE.md's documented
-    # push shape. Blocking it would break the documented workflow.
+    # is how a git credential helper is spelled.
     "sh -c 'git credential fill'",
     "bash -c 'echo hello'",
     "sh scripts/git-push-agent.sh branch:branch",
@@ -192,10 +171,9 @@ def test_guard_inline_script_leaves_files_and_lookalikes_alone(command):
 
 
 def test_guard_inline_script_allows_what_it_cannot_parse():
-    """Unbalanced quotes mean `shlex.split` raises, and the hook allows rather
-    than guessing -- another guard, or the permission checker, can have that
-    one. Its docstring's reason: a guard that blocks on parse failure blocks its
-    own bug reports."""
+    """Unbalanced quotes make `shlex.split` raise, and the hook allows the call
+    instead of guessing: another guard, or the permission checker, has it. A
+    guard that blocks on parse failure blocks its own bug reports."""
     command = "python3 -c 'unterminated"
     assert not _denied("guard-inline-script.py", command), (
         f"refused {command!r}, which shlex cannot tokenise -- the hook is "
@@ -226,10 +204,9 @@ def test_all_three_guards_are_wired_into_settings():
     for name in ("guard-sed.py", "guard-awk.py", "guard-inline-script.py"):
         wired = [h for h in entries if h["command"].endswith(f'/.claude/hooks/{name}"')]
         assert wired, f"{name} exists but no PreToolUse hook runs it"
-        # UNGATED, UNLIKE THE TWO GIT GUARDS. Those carry `"if": "Bash(git *)"`,
-        # which is a prefix match. An interpreter can appear anywhere in a
-        # command line -- `env python3 -c`, or after a redirection -- so an `if`
-        # here would be a hole rather than an optimisation.
+        # Ungated: an `if` is a prefix match, and an interpreter can appear
+        # anywhere in a command line (`env python3 -c`), so an `if` here
+        # would be a hole.
         assert "if" not in wired[0], (
             f"{name} has been gated on {wired[0].get('if')!r}. An `if` is a "
             "prefix match, and an inline program need not start the command."

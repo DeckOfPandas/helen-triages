@@ -3,33 +3,22 @@
 
     python3 scripts/check_slug_keys.py
 
-THE MISTAKE THIS CATCHES, AND WHY IT IS FOUND TOO LATE TODAY. `mood_include`
-and `mood_exclude` live in the PUBLIC `_data/cocktails/taxonomy.yml` and are
-keyed by drink slug -- but most of the drinks they name are DRAFTS, which live
-in a separate private repo. So the only checkout that can tell a correction
-naming a real draft from one naming nothing at all is a checkout with the
-drafts clone in it, and CI has never been one. `test_every_mood_correction_is_
-reachable_and_needed` knows this and calls `_require_whole_collection`, which
-SKIPS. The entry that names nothing therefore merges, and is found afterwards.
+`mood_include` and `mood_exclude` in the public `_data/cocktails/taxonomy.yml`
+are keyed by drink slug, and most of the drinks they name are drafts in the
+private repo. Only a checkout with the drafts clone can tell an entry naming a
+real draft from one naming nothing, and CI is not one: there
+`test_every_mood_correction_is_reachable_and_needed` skips. So a drink renamed
+or promoted on a private branch can leave a public entry keyed by its old slug
+(#855). Run this before the merge, on a machine that has both.
 
-#855 recorded the ordering trap that produces one: a drink is promoted or
-renamed on a private branch, the public correction keyed by its old slug merges
-first, and nothing anywhere can see the mismatch until both halves are on one
-machine. This is #855's option 3 -- the check itself, run before the merge, on
-the machine that has both.
+Reads every `_data/cocktails/*.yml`, `_cocktail_recipes/` and
+`_cocktail_drafts/`; writes nothing. Exit 0 when every entry resolves, 1 when
+one names no drink, 2 when it checked nothing: with no drafts clone (MANUAL
+§9.1) it skips and says so, and never passes.
 
-IT SKIPS RATHER THAN PASSES WITH NO DRAFTS CLONE, and says so in as many words.
-A green line that verified nothing is the failure mode this whole script exists
-to remove, so the exit code is 2 for "checked nothing", never 0. Every worktree
-starts without the clone (MANUAL §9.1 has the command); this is not an error,
-it is simply not an answer.
-
-DISCOVERY, NOT A HARDCODED LIST, for everything past the two declared
-registries. Any mapping anywhere in `_data/cocktails/` whose keys name real
-drinks is treated as slug-keyed and checked, and reported as newly found so it
-can be declared. A hardcoded list is exactly how `mood_ingredients` came to
-hold 34 strings naming nothing (#452): the list and the data drift, and the
-list is the half nobody re-reads.
+Past the two declared registries it discovers: any mapping whose keys name
+real drinks is treated as slug-keyed, checked, and reported so that it can be
+added to DECLARED.
 """
 from __future__ import annotations
 
@@ -61,10 +50,8 @@ def collection_slugs(root):
 def mappings(node, path=""):
     """Every (dotted key path, mapping) in a loaded YAML document.
 
-    The path NEVER includes the filename, which is carried separately: a
-    filename has a dot in it, and splitting one back off a joined string is how
-    the first draft of this reported `yml.mood_include` as an undeclared
-    registry and then failed to match it against DECLARED.
+    The path never includes the filename, which is carried separately: a
+    filename has a dot in it and cannot be split back off a joined string.
     """
     if isinstance(node, dict):
         if path:

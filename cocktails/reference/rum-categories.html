@@ -6,20 +6,11 @@ permalink: /cocktails/reference/rum-categories/
 
 {% comment %}
   RUM CATEGORIES (#529). Cards name categories, not bottles (#501); the bottles
-  column here is where "which of mine is a Demerara rum?" is answered.
-
-  Every name is a lookup, not a literal: shelves are `rum_groups`, short names
-  `card_names`, bottles the bottles.yml entries whose `generic` is that
-  category, retired words `retired_rum_styles`. The bottles are the ones Helen
-  would reach for, not all that qualify; a category with none is correct.
-
-  The prose and every heading are Helen's and are not to be polished (MANUAL
-  §13.12). Her straight quotes stand; `test_prose_page_typography` requires em
-  dashes.
-
-  The front-matter title and the sites.yml link text ("rum categories") are the
-  wayfinding label and the h1 is the headline: do not make them agree. Rum only;
-  widening the page to other families is Helen's decision.
+  column says which bottle is which; a category with none is correct. Rum only.
+  Every name is a lookup: `rum_groups`, `card_names`, `retired_rum_styles`,
+  and the bottles.yml entries whose `generic` matches. The prose and headings
+  are Helen's, not to be polished (MANUAL §13.12). The title and the sites.yml
+  link text are the wayfinding label, the h1 the headline: do not align them.
 {% endcomment %}
 
 {% assign ing = site.data.cocktails.ingredients %}

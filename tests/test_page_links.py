@@ -1,82 +1,21 @@
-"""Links between the site's own HTML pages -- GitHub issue #220.
+"""Links between the site's own HTML pages -- #220.
 
-WHY THIS FILE EXISTS. tests/test_taxonomy.py's link tests are thorough -- four
-separate tests, each written after a real bug -- but every one of them reads
-`_food_recipes/*.md` front matter. Not one looks at an `href` written into an
-HTML template. Two real bugs got through that gap:
+Scans every `<a href>` in food/**/*.html, cocktails/**/*.html, the root
+*.html pages, _layouts/ and _includes/, and checks the path against the
+published pages and the fragment against the ids its target can emit.
+Run: pytest tests/test_page_links.py
 
-  1. food/reference/index.html linked to `internal-temperatures/` for a day
-     after that page was deleted. (That page is gone too now, so this exact
-     link is history -- but it is why this file exists.)
-  2. food/reference/cooking-methods.html linked to `../temperatures/#steak`
-     and `../temperatures/#fish`, twice each. Those fragments never existed --
-     the real ids are `#beef-steak` and `#fish-salmon`. A wrong fragment does
-     not 404: the page loads and the browser lands at the top, so the symptom
-     reads as "the scroll doesn't work", not "the link is broken". (That page
-     was deleted by #382 and the temperatures page renamed by #384; the bug is
-     kept because it is why fragments are checked at all.)
+Published pages are derived from each page's `permalink:` (or Jekyll's
+default, `/:path:output_ext`) and from `_config.yml`'s `collections:`. An
+`output: false` collection and a `published: false` page are not targets.
 
-WHAT THIS FILE SCANS. Every `<a href="...">` in food/**/*.html,
-cocktails/**/*.html, _layouts/*.html, _includes/**/*.html and the root
-index.html. `<link>` tags (stylesheet, favicon) are not `<a>` tags and are not
-in scope -- this is about navigation between the site's own pages.
+A wrong fragment does not 404: the page loads and lands at the top. So
+fragments are checked, a bare `href="#top"` included, and ids are resolved
+across `{% include %}` edges and the layout chain (`_ids_visible_from`).
 
-WHAT "PUBLISHED" MEANS, AND WHERE IT COMES FROM. Derived, not hardcoded, from
-the same two places Jekyll itself reads:
-  - an ordinary page's own front matter `permalink:` (falling back to
-    Jekyll's own default, `/:path:output_ext`, for any page that doesn't set
-    one -- food/swatch.html and food/swatch-scribbles.html used to be the
-    only examples this repo actually needed, until GitHub issue #276
-    deleted them; the fallback itself is still live code, exercised the day
-    the next permalink-less page shows up);
-  - `_config.yml`'s `collections:` block, which gives each collection's
-    `permalink:` pattern and whether it publishes at all (`output: true`) --
-    `_food_drafts/` is `output: false` and is correctly NOT a valid link
-    target, the same rule test_taxonomy.py's PUBLISHED set already applies to
-    markdown links.
-A page added tomorrow, in either form, is covered tomorrow without this file
-changing.
-
-PURE-FRAGMENT LINKS (`href="#top"`). Checked here, not skipped. Bug #2 above
-is a same-page-shaped mistake wearing a cross-page hyperlink -- nothing stops
-the identical typo happening in a same-page `href="#top"`, and the symptom
-(loads fine, scrolls nowhere) is identical either way. There is no principled
-reason to check a fragment only when it happens to follow a path.
-
-IDS INSIDE AN INCLUDE, AND INSIDE A LOOP. The worked example below is history
-as of 2026-08-19 -- issue #382 deleted both the partial and the page -- but the
-MECHANISM it forced is live, general, and the reason `_ids_visible_from()` looks
-the way it does, so it is kept rather than replaced with a lesser example.
-
-`_includes/food/method_table.html` emitted `<h2 ... id="{{ include.id }}">` -- a
-Liquid parameter, not a literal, so scanning that file's own text found no id
-there at all. Every call site passed a literal (`id="beef"`, `id="chicken"`,
-...), so this file resolves such an id by reading the literal argument at each
-`{% include %}` call site instead of trying to read the partial in isolation.
-The reverse problem happened too: that same partial's own `href="#top"` targeted
-an id living not in its own text but in whichever page included it
-(food/reference/cooking-methods.html's `<article id="top">`). So id resolution
-for any one file floods outward along both `{% include %}` edges (in either
-direction) and the `layout:` chain, rather than looking at a single file's text
-alone -- see `_ids_visible_from()`.
-
-There is no id generated inside a genuine `{% for %}` loop that this file
-checks statically anywhere in this codebase today (checked by hand against
-every `id="..."` in the templates). The one place a link fragment IS built
-from a loop-like indirection -- `_includes/food/doneness_chart.html`'s
-`#{{ _anchor }}`, where `_anchor` comes from a recipe's `internal_temp_ref`
-resolving into `_data/food/internal_temperatures.yml`'s `chart_anchor:`
-field -- is handled by a separate, narrower test
-(`test_chart_anchor_fragments_exist_on_the_temperatures_page`) that reads
-every declared `chart_anchor:` value directly from the data file, rather than
-by simulating the recipe -> data lookup here.
-
-EXTERNAL LINKS, `mailto:`, AND THE PDF LINK. A scheme (`http:`, `mailto:`) or
-a protocol-relative `//` is skipped -- genuinely out of this site's control.
-`.pdf` links (recipe.html's own "pdf" button) are skipped too: the target
-isn't an HTML page Jekyll publishes, and the two ends of that link (the href
-here, and the directory scripts/generate_pdfs.py writes into) are already
-guarded by tests/test_site_config.py::test_pdf_link_points_where_the_pdfs_are_written.
+Skipped: a scheme, `//`, `mailto:`, and `.pdf` links, which
+tests/test_site_config.py::test_pdf_link_points_where_the_pdfs_are_written
+holds at both ends.
 """
 from __future__ import annotations
 
@@ -88,9 +27,6 @@ from urllib.parse import urljoin, urlsplit
 import pytest
 import yaml
 
-# Suite marker, so `pytest -m shared` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.shared
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -109,29 +45,12 @@ def front_matter(path: Path) -> dict:
 # --- the corpus of files whose <a href> we check ----------------------------
 
 # The two site page directories, plus every ordinary page at the repo root.
+# The root level is globbed, not listed: a page this corpus cannot see is not
+# a link target, and its own outbound links go unscanned (#374).
 #
-# THE ROOT LEVEL IS GLOBBED, NOT LISTED, and that is a fix rather than a style
-# preference. It was `[ROOT / "index.html"]` -- correct on the day it was
-# written, when the redirect was the only root-level page there had ever been.
-# Issue #374 added about.html beside it, and a named file cannot see a sibling:
-# every link to /about/ read as pointing at a page nothing published, because
-# this corpus simply did not contain the file that publishes it. The failure at
-# least announced itself; the mirror image is the one to fear, since a page this
-# list cannot see is also a page whose own outbound links go unscanned.
-#
-# `published: false` PAGES ARE EXCLUDED, and this is not a loophole. Jekyll does
-# not build them: they get no URL, so they have no base for a relative href to
-# resolve against and nothing to publish for anyone to link to. Scanning one
-# produces confident nonsense -- food/reference/cooking-methods-prose-archive
-# .html (issue #400) has fourteen `../internal-temperatures/#anchor` links that
-# were correct on the page they came from, and resolving them against a URL that
-# does not exist reported all fourteen as broken.
-#
-# The exclusion is narrow on purpose: it drops a file from BOTH sides at once,
-# so an unpublished page neither has its own links checked nor counts as a link
-# target. That second half is the important one -- if this only stopped scanning
-# them, an unpublished page would still look like a valid destination and every
-# link into it would pass while 404ing in production.
+# A `published: false` page is dropped from both sides. Jekyll gives it no
+# URL, so its relative hrefs have no base to resolve against (#400), and it
+# must not count as a target: a link into it would 404 in production.
 _PUBLISHED_FALSE = re.compile(
     r"\A---\n(?:.*\n)*?published:\s*false\s*(?:#.*)?\n(?:.*\n)*?---\n", re.M)
 
@@ -174,25 +93,18 @@ def page_url(path: Path) -> str:
 
 PAGE_URL_BY_FILE: dict[Path, str] = {f: page_url(f) for f in PAGE_FILES}
 
-# THE OTHER HALF OF THE `published: false` FILTER, and it exists so a
-# `local_only` footer link can be CHECKED rather than exempted -- see
-# test_site_nav_links_resolve_to_real_pages (#529, 2026-09-06). A page in here is
-# one the repo holds and production does not build: it carries a real permalink,
-# which is the URL the link points at locally, and it has no URL at all in a
-# production build. Nothing else may use this set -- it is deliberately NOT a
-# link target anywhere, which is the whole point of the exclusion above.
+# Permalinks of the `published: false` pages: real locally, absent from a
+# production build. Only test_site_nav_links_resolve_to_real_pages reads this,
+# to check a `local_only` footer link (#529). It is never a link target.
 UNPUBLISHED_PAGES: set[str] = {page_url(f) for f in UNPUBLISHED_PAGE_FILES}
 
 
 def _collection_pages() -> dict[str, Path]:
     """url -> source file, for every PUBLISHED collection document.
 
-    Reads _config.yml directly rather than assuming food_recipes/
-    cocktail_recipes -- a collection added later is picked up the same way.
-    `output: false` (food_drafts) is deliberately excluded: those pages get
-    no public URL, so a link to one would 404 in production even though the
-    file exists on disk, exactly the rule test_taxonomy.py's PUBLISHED set
-    already applies to markdown-to-markdown links.
+    Read from _config.yml, so a collection added later is picked up. An
+    `output: false` collection (the drafts) is excluded: its pages get no
+    public URL, so a link to one 404s in production though the file exists.
     """
     config = yaml.safe_load((ROOT / "_config.yml").read_text(encoding="utf-8")) or {}
     pages: dict[str, Path] = {}
@@ -228,9 +140,8 @@ PASSTHROUGH_ID = re.compile(r'id="\{\{\s*include\.(\w+)\s*\}\}"')
 def _includes_of(path: Path) -> list[tuple[Path, dict]]:
     """(partial file, literal call-site params) for every {% include x.html
     ... %} in `path` whose target is a literal path. `{% include {{ var }} %}`
-    (default.html's site-icon/switch-icon includes) has a computed target and
-    is skipped -- it never carries an id or an href in this codebase, only an
-    SVG partial.
+    has a computed target and is skipped: those includes are SVG icons, which
+    carry no id and no href.
     """
     text = path.read_text(encoding="utf-8")
     out = []
@@ -267,13 +178,10 @@ def _ids_visible_from(start: Path) -> frozenset:
     anything that {% include %}s IT, with `id="{{ include.X }}"` resolved
     against that specific call site's literal params.
 
-    Floods outward rather than looking at one file alone, because a fragment
-    link written inside a partial or a layout targets an id that may not live
-    in that file's own text at all (method_table.html's own `href="#top"`
-    targets `<article id="top">`, which is only in the page that includes
-    it). Used both to check a same-file `#fragment` link (start = the file
-    the link was found in) and to check a cross-page `path/#fragment` link
-    (start = the target page's own file).
+    Floods outward because a fragment link written in a partial or a layout
+    can target an id that lives only in the page that includes it. `start` is
+    the file a `#fragment` link was found in, or the target page's file for a
+    `path/#fragment` link.
     """
     seen: set[Path] = set()
     ids: set[str] = set()
@@ -308,146 +216,62 @@ ASSIGN_LITERAL = re.compile(
     r'\{%-?\s*assign\s+(\w+)\s*=\s*"([^"]+)"\s*\|[^%]*?relative_url[^%]*?-?%\}', re.S
 )
 
-# The wordmark and header-nav hrefs are built from Liquid variables read out of
-# _data/sites.yml (`this_site` for the page's own site, `nav_site` for each
-# entry in the shared nav's loop), and the two per-item loop links are built
-# from Jekyll's own `.url` on each document. Neither is a literal this scanner
-# can read out of the template text, so both are resolved a different way
-# instead of being silently skipped:
-#   - this_site.home / nav_site.home ->
-#     test_site_nav_links_resolve_to_real_pages, which reads sites.yml
-#     directly.
-#   - recipe.url / cocktail.url -> not checked at all, deliberately: Jekyll
-#     computes `.url` from the document's own permalink, so it is correct by
-#     construction and there is nothing for a link-shape test to add.
-# A new href this scanner can't trace to a literal, and that isn't one of
-# these, fails test_no_link_shape_is_silently_unresolved instead of quietly
-# passing.
-#
-# `sibling_site.home` and `this_site.about_url` were here until issue #374 and
-# are deliberately gone rather than left harmlessly. The header no longer asks
-# sites.yml which site it is on: it loops every site, and the about link is a
-# literal `/about/` that LIQUID_RELATIVE resolves and the ordinary published-page
-# check covers. A stale entry on this list is a hole -- it would trust a shape
-# nothing emits, and go on trusting the day something emits it again for a
-# different reason.
+# Href shapes this scanner cannot trace to a literal, each with what checks it
+# instead. A new untraceable href that is not listed fails
+# test_no_link_shape_is_silently_unresolved. Remove an entry when its shape
+# leaves the templates: a stale one trusts whatever emits that shape next.
+# `<x>_site.home` and `link.url` are values out of _data/sites.yml, which
+# test_site_nav_links_resolve_to_real_pages checks against the published pages.
+# A document's `.url` is computed by Jekyll from its own permalink.
 TRUSTED_DYNAMIC = (
     re.compile(r"^\{\{\s*this_site\.home\s*\|\s*default:\s*'/'\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*nav_site\.home\s*\|\s*relative_url\s*\}\}$"),
-    # The footer reference column's HEAD -- the site's icon and bracketed word,
-    # one link to that site's index (#1149, 2026-09-19, _layouts/default.html).
-    # Identical in kind to `nav_site.home` on the line above and checked by the
-    # identical mechanism: the value is a site's `home` out of _data/sites.yml,
-    # and test_site_nav_links_resolve_to_real_pages below reads that file and
-    # asserts every site's `home` is a published page. It is the same key the
-    # header's own door uses, so there is one value and one check behind both.
+    # The head of the footer reference column (#1149, _layouts/default.html).
     re.compile(r"^\{\{\s*ref_site\.home\s*\|\s*relative_url\s*\}\}$"),
-    # The back arrow on a recipe/cocktail page (issue #387,
-    # _includes/back-to-index.html). Same shape and same treatment as the two
-    # above: the value is a site's `home` in _data/sites.yml, which
-    # test_site_nav_links_resolve_to_real_pages already checks against the
-    # published-page set for EVERY site, so this href is covered by that rather
-    # than being unchecked.
+    # The back arrow on a recipe or drink page (#387,
+    # _includes/back-to-index.html).
     re.compile(r"^\{\{\s*back_site\.home\s*\|\s*relative_url\s*\}\}$"),
-    # The see-shortlist link beside the shortlist pill (#1005/#1011,
-    # 2026-09-14, _includes/page-actions.html): the same site `home` as the
-    # back arrow, checked the same way by
-    # test_site_nav_links_resolve_to_real_pages, with `?shortlist=1` appended
-    # -- a query both indexes read (MANUAL 8.9), and a query is not a path, so
-    # the target page is the home page either way. `#results` since #1057
-    # (2026-09-15): both indexes carry that id on the count line above their
-    # list (test_the_search_box_searches_for_anything_on_a_local_build in
-    # tests/test_site_config.py), so this is the same fragment #1050's
-    # search-dropdown links already end in, checked the same way.
+    # The see-shortlist link (#1011, _includes/page-actions.html). The query
+    # does not change the page fetched, and `#results` is an id both indexes
+    # carry (test_the_search_box_searches_for_anything_on_a_local_build,
+    # tests/test_site_config.py).
     re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1#results$"),
-    # The footer's reference links, added 2026-08-16. Same shape and same
-    # treatment as the three above: the value lives in _data/sites.yml, so this
-    # scanner cannot read it out of the template, and
-    # test_site_nav_links_resolve_to_real_pages checks every one of them
-    # against the published-page set instead.
+    # The footer's reference links.
     re.compile(r"^\{\{\s*link\.url\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*(?:recipe|cocktail)\.url\s*\|\s*relative_url\s*\}\}$"),
-    # The related-drinks row at the foot of a drink page (#927, 2026-09-10,
-    # `rel` in _layouts/cocktail.html). Provably correct for the same reason as
-    # `recipe.url` / `cocktail.url` above -- Jekyll computes `url` from the
-    # document's own permalink -- and `rel` is looked up out of
-    # `site.cocktail_recipes` by url, so it is a document from that collection
-    # or nothing at all.
-    #
-    # AND IT IS CHECKED, unlike those two, which is the difference worth
-    # recording: test_every_published_drink_page_offers_four_other_published_drinks
-    # in tests/test_rendered_pages.py reads the PRODUCTION build and asserts
-    # every one of these four hrefs lands on a published drink page. That is
-    # the check `recipe.url` does not need and this one earns anyway -- the row
-    # is CHOSEN by a score, so the interesting failure is not a broken URL but
-    # the wrong number of them, or a drink offering itself.
+    # The related-drinks row on a drink page (#927, _layouts/cocktail.html).
+    # Also checked on the production build, since the row is chosen by a
+    # score: test_every_published_drink_page_offers_four_other_published_drinks
+    # in tests/test_rendered_pages.py.
     re.compile(r"^\{\{\s*rel\.url\s*\|\s*relative_url\s*\}\}$"),
-    # The related-recipes row at the foot of a RECIPE page (#1005, 2026-09-14,
-    # `_rel` in _layouts/recipe.html): the food twin of the line above, looked
-    # up out of `site.food_recipes` by url the same way, and checked the same
-    # way -- test_every_published_recipe_page_offers_three_other_published_recipes
-    # reads the production build and asserts each of the three lands on a
-    # published recipe page.
+    # The related-recipes row on a recipe page (#1005, _layouts/recipe.html),
+    # checked on the production build by
+    # test_every_published_recipe_page_offers_three_other_published_recipes.
     re.compile(r"^\{\{\s*_rel\.url\s*\|\s*relative_url\s*\}\}$"),
-    # The cocktails index's draft cards, added 2026-08-23. Provably correct
-    # for the same reason as recipe.url/cocktail.url on the line above --
-    # Jekyll computes `url` from the document's own permalink, so it cannot
-    # point at a page that does not exist. Note these are DRAFTS, which have
-    # no published URL at all in production: the loop that emits them is
-    # gated on `site.show_drafts`, a key only _config_local.yml declares, so
-    # the href never reaches a production build. See cocktails/index.html.
+    # A card on the cocktails index. A draft's card is emitted only under
+    # `site.show_drafts`, which only _config_local.yml sets, so its href never
+    # reaches a production build.
     re.compile(r"^\{\{\s*drink\.url\s*\|\s*relative_url\s*\}\}$"),
-    # _layouts/cocktail.html's source link, added 2026-08-16 with the cocktail
-    # schema. DIFFERENT REASON FROM EVERY OTHER ENTRY ABOVE, and worth saying
-    # so plainly rather than letting it inherit their justification: the others
-    # are internal links this scanner cannot read but something else checks.
-    # `source_url` is an EXTERNAL address typed into a drink's front matter --
-    # a magazine, a bar's site, a video. It is out of scope for exactly the
-    # reason _scan() already skips a literal `http://` href: it points
-    # somewhere this site does not control.
-    #
-    # So it is UNCHECKED, not checked elsewhere. Nothing here or anywhere else
-    # verifies a source_url resolves, and a dead one will rot silently. If that
-    # ever matters, the answer is a link-rot checker run deliberately and
-    # offline, not a rule in this file -- which asserts about the site's own
-    # pages and would have to make a network call to say anything at all.
+    # A drink's source link (_layouts/cocktail.html). Unlike the rest, this is
+    # unchecked, not checked elsewhere: `source_url` is an external address in
+    # front matter, out of scope as a literal `http://` href is. A dead one
+    # rots silently; checking it would take a network call.
     re.compile(r"^\{\{\s*page\.source_url\s*\}\}$"),
-    # A drink page's mood chips, added 2026-09-05 -- links to the cocktails
-    # index pre-filtered by that mood, echoing food's badges
-    # (_includes/recipe_badges.html, issue #40).
-    #
-    # THE PATH HALF IS COVERED THE SAME WAY THE BACK ARROW'S IS: `index_home` is
-    # `site.data.sites[page.site_key].home`, which
-    # test_site_nav_links_resolve_to_real_pages already checks against the
-    # published-page set for every site. This scanner cannot follow the
-    # subscript, and does not have to. (It was `chip_home` until 2026-09-12,
-    # when #994's see-all link became its second reader and the assign moved to
-    # the top of the layout.)
-    #
-    # THE QUERY HALF IS DELIBERATELY NOT A LINK QUESTION. `?mood=...` does not
-    # change which page is fetched, so a mood that no longer exists still lands
-    # on a real, working index -- assets/js/cocktail-index.js drops a value that
-    # matches no button in silence, which is food's own policy for `?tag=`.
-    # There is nothing here for a link checker to resolve, and a stale mood is a
-    # taxonomy question that tests/test_cocktails.py owns.
-    #
-    # `#filter-{{ chip }}` SINCE #1059 (2026-09-15) IS THE SAME KIND OF
-    # QUESTION, ONE LEVEL DOWN. `chip` is computed to "mood" or "hassle" a few
-    # lines above in the layout, and cocktails/index.html's own two section ids
-    # (test_filter_sections_carry_the_id_their_badges_and_chips_link_to in
-    # tests/test_site_config.py) are exactly those two words with `filter-`
-    # in front, so this scanner cannot trace the fragment but does not need to:
-    # the two possible values are both real ids on the target page, checked by
-    # that test rather than this one.
+    # A drink page's mood chips, linking to the cocktails index filtered by
+    # that mood. `index_home` is `site.data.sites[page.site_key].home`. The
+    # `?mood=` query does not change the page fetched, and a stale mood is a
+    # taxonomy question for tests/test_cocktails.py. `chip` is "mood" or
+    # "hassle", and `filter-` plus either is an id on the index
+    # (test_filter_sections_carry_the_id_their_badges_and_chips_link_to,
+    # tests/test_site_config.py).
     re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?mood="
                r"\{\{\s*m\s*\|\s*url_encode\s*\}\}#filter-\{\{\s*chip\s*\}\}$"),
 )
 
 
 def _assigns(path: Path) -> dict[str, str]:
-    """{% assign name = "literal" | ... relative_url ... %} in `path` --
-    index.html builds its redirect target this way (`redirect_url`), one hop
-    away from the href itself.
+    """{% assign name = "literal" | ... relative_url ... %} in `path`: an
+    href built one hop away from its literal.
     """
     return dict(ASSIGN_LITERAL.findall(path.read_text(encoding="utf-8")))
 
@@ -526,11 +350,8 @@ _PROBLEMS = _scan()
 # --- the tests -----------------------------------------------------------------
 
 def test_the_scanned_link_corpus_is_not_empty():
-    """The whole-corpus guard tests/test_suite_hygiene.py enforces: every
-    test below only means something if there was something to scan. If this
-    ever legitimately hits zero -- every <a href> removed from every page,
-    layout and include at once -- delete the checks below with it, rather
-    than letting them pass while checking nothing.
+    """The whole-corpus guard: every test below only means something if
+    there was something to scan, and a scan that finds nothing passes.
     """
     assert PAGES, (
         "No published pages were derived from front matter permalink: or "
@@ -571,14 +392,10 @@ def test_internal_link_fragments_exist_on_their_target():
 
 
 def test_no_link_shape_is_silently_unresolved():
-    """Guards the scanner itself, not the content. A href this test cannot
-    trace back to a literal path is either explicitly trusted above
-    (TRUSTED_DYNAMIC, each checked a different way -- see
-    test_site_nav_links_resolve_to_real_pages and
-    test_chart_anchor_fragments_exist_on_the_temperatures_page) or it is new,
-    and a link this test cannot see is a link it cannot catch breaking --
-    exactly the "found nothing, so nothing failed" trap
-    tests/test_suite_hygiene.py exists to catch, wearing a per-item mask.
+    """Guards the scanner, not the content. An href it cannot trace to a
+    literal path is either on TRUSTED_DYNAMIC, where each entry says what
+    checks it instead, or it is new: a link the scanner cannot see is a link
+    it cannot catch breaking.
     """
     problems = _PROBLEMS["unresolved"]
     assert not problems, (
@@ -594,16 +411,12 @@ def test_no_link_shape_is_silently_unresolved():
 
 
 def test_site_nav_links_resolve_to_real_pages():
-    """_layouts/default.html's header nav and footer reference block build their
-    hrefs from _data/sites.yml rather than from a literal path in the template
-    -- TRUSTED_DYNAMIC above only records that this shape is accounted for, it
-    does not check where the values actually point. This reads sites.yml
-    directly and checks each one.
+    """Every link _data/sites.yml feeds the header nav and the footer
+    reference block points at a real page. TRUSTED_DYNAMIC only records that
+    those href shapes are accounted for; this checks where the values point.
 
-    Every site's `home` matters to EVERY page now, not just to its own. Since
-    issue #374 the header emits one icon per site on every page in the repo, so
-    a broken `home` on cocktails is a dead link on all 82 food recipes, not a
-    dead link on the cocktails index.
+    The header emits one icon per site on every page (#374), so a broken
+    `home` on one site is a dead link on every page of the other.
     """
     path = ROOT / "_data" / "sites.yml"
     sites = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
@@ -618,10 +431,9 @@ def test_site_nav_links_resolve_to_real_pages():
         if home not in PAGES:
             problems.append(f"sites.yml: {key}.home = {home!r}, no published page there")
 
-        # Every site owes the shared nav an icon, because the shared nav gives
-        # every site a slot whether or not it has declared one. A missing `icon`
-        # renders `{% include icons/.svg %}`, which is a BUILD FAILURE rather
-        # than a quiet gap -- caught here so the message names the site.
+        # The shared nav gives every site a slot, so a missing `icon` renders
+        # `{% include icons/.svg %}`, a build failure. Caught here so the
+        # message names the site.
         icon = site.get("icon")
         if not icon:
             problems.append(
@@ -635,23 +447,12 @@ def test_site_nav_links_resolve_to_real_pages():
                 f"_includes/icons/{icon}.svg does not exist"
             )
 
-        # The footer reference block (2026-08-16). Absent is fine -- the
-        # template draws no column for a site with none -- but a link that IS
-        # listed has to go somewhere real.
-        #
-        # `local_only: true` INVERTS THE CHECK RATHER THAN SKIPPING IT (#529,
-        # 2026-09-06). Such a link points at a page that is deliberately
-        # `published: false`, so it is NOT in PAGES and never can be; the
-        # template drops it unless _config_local.yml's
-        # `show_local_reference_links` is set, so production never emits it.
-        #
-        # Two flags have to agree for that to hold, and an exemption would let
-        # them drift apart in silence in both directions: clear the page's
-        # `published: false` and the footer stops linking a page that now
-        # exists; drop `local_only` and production gets a link to a 404. So a
-        # local-only link must point at a file that IS unpublished, and an
-        # ordinary one at a page that is published. `_UNPUBLISHED` is the same
-        # front-matter scan `_is_published` runs, keyed by permalink.
+        # The footer reference block. A site with no links is fine; a listed
+        # link has to go somewhere real. `local_only: true` inverts the check,
+        # it does not skip it (#529): the template drops such a link unless
+        # `show_local_reference_links` is set, so it must point at a page in
+        # UNPUBLISHED_PAGES, and an ordinary one at a page in PAGES. Otherwise
+        # production links a 404, or a page that now exists goes unlinked.
         for entry in site.get("reference_links") or []:
             entry = entry or {}
             url = entry.get("url")
@@ -676,11 +477,8 @@ def test_site_nav_links_resolve_to_real_pages():
                     f"points at {url!r}, which no published page serves"
                 )
 
-        # Keys the chrome used to read, removed by issue #374. Left here as an
-        # assertion rather than deleted, because re-adding one would look like
-        # configuration and would in fact do nothing at all: the template no
-        # longer asks. A key that is silently ignored is worse than one that is
-        # missing.
+        # Keys no template reads (#374). Asserted absent, because setting one
+        # looks like configuration and does nothing.
         for retired, why in RETIRED_SITE_KEYS.items():
             if retired in site:
                 problems.append(
@@ -691,9 +489,8 @@ def test_site_nav_links_resolve_to_real_pages():
     assert not problems, "Header nav link(s) resolve nowhere:\n  " + "\n  ".join(problems)
 
 
-# Chrome configuration that used to live per-site in _data/sites.yml, with what
-# replaced it. Issue #374: the header and the footer are one artefact for the
-# whole repo, so none of these is a per-site decision any more.
+# Per-site keys _data/sites.yml must not carry, each with what replaced it
+# (#374): the header and the footer are one artefact for the whole repo.
 RETIRED_SITE_KEYS = {
     "home_icon": "renamed `icon`; the nav gives every site a slot, not just this one.",
     "switch_site": "the nav loops every site in this file, so there is nothing to switch to.",
@@ -706,16 +503,13 @@ RETIRED_SITE_KEYS = {
 
 
 def test_chart_anchor_fragments_exist_on_the_temperatures_page():
-    """_includes/food/doneness_chart.html links a recipe's 'more temperatures'
-    line to /food/reference/internal-temperatures/#<chart_anchor>, where chart_anchor
-    comes from that recipe's own internal_temp_ref resolving into
-    _data/food/internal_temperatures.yml -- a fragment this test's generic
-    scanner deliberately does not try to compute (it isn't a literal in any
-    template, and simulating the recipe -> data_ref -> chart_anchor lookup
-    here would just be a second, weaker copy of what recipe.html itself
-    does). Simpler and just as strong: every chart_anchor: value the data
-    file actually declares must be a real id on the temperatures page, full
-    stop -- checked directly, not through a recipe at all.
+    """Every `chart_anchor:` value in _data/food/internal_temperatures.yml
+    is an id on the temperatures page.
+
+    _includes/food/doneness_chart.html links a recipe to
+    /food/reference/internal-temperatures/#<chart_anchor>, a fragment that is
+    a literal in no template, so the generic scanner cannot see it. The
+    declared values are checked directly, not through a recipe.
     """
     path = ROOT / "_data" / "food" / "internal_temperatures.yml"
     anchors = sorted(set(re.findall(r"chart_anchor:\s*(\S+)", path.read_text(encoding="utf-8"))))
@@ -735,54 +529,21 @@ def test_chart_anchor_fragments_exist_on_the_temperatures_page():
     )
 
 
-# Paths this file's other checks cannot see, because they do not exist until a
-# script runs. A quoted `../slug/` or `/food/...` inside assets/js/ is a real
-# link the moment the page is used, and is invisible to every scan above.
+# A quoted `../slug/` or `/food/...` in a script or a data file becomes a link
+# only at runtime, so every scan above is blind to it.
 JS_PATH_LITERAL = re.compile(r"""['"](\.\./[a-z0-9\-/]+/|/food/[a-z0-9\-/]+/)""")
 
 
 def test_links_built_outside_templates_still_resolve():
     """A URL that is not an `<a href>` in a template is still a URL, and rots.
 
-    THIS WAS A LIVE BROKEN LINK FOR A DAY. Issue #384 renamed
-    /food/reference/temperatures/ to /food/reference/internal-temperatures/, and
-    every reference to it was updated except one: cook-timer.js builds the "see
-    other doneness" link by string concatenation, `"<a href='../temperatures/#"
-    + protein.chart_anchor`. It pointed at a deleted page on every visit to the
-    methods page.
+    A link built by string concatenation in assets/js/, or carried as raw HTML
+    in a _data/ file and emitted inside a JSON blob, is an `<a href>` in no
+    template and in no built page, so the template scan here and the
+    built-html scan in tests/test_rendered_pages.py both miss it (#384).
 
-    NEITHER EXISTING CHECK COULD HAVE FOUND IT, and the reasons are worth
-    keeping because they are the shape of the hole rather than the instance:
-
-      - test_internal_links_point_at_a_published_page reads `<a href="...">`
-        attributes out of TEMPLATES. This link is a string in a .js file; there
-        is no attribute to match.
-      - test_no_link_in_the_production_build_points_at_a_file_that_isnt_there
-        reads the BUILT html. This link does not exist in the built html either
-        -- it is created at runtime, in the browser, from data.
-
-    So the rename was verified twice, thoroughly, by two scanners that between
-    them could not see the one place it was wrong.
-
-    IT WAS TEN MORE PLACES, in fact, and they hid better. `cooking_methods.yml`
-    carries per-method asides and safety notes as raw HTML strings, which the
-    page emits inside a `<script type="application/json">` blob. In the built
-    file those read `href=\\"../temperatures/#pork\\"` -- escaped, inside JSON,
-    inside a script tag -- so the built-html scanner's `<a href="...">` pattern
-    cannot match them either. They were rendered into live links by the
-    calculator on every visit.
-
-    `scripts/build_cooking_methods_prose.py` is not scanned directly: its
-    LINK_FIXES table rewrites these links on the way into the data, so a stale
-    entry there shows up as stale data, which IS scanned. Scanning the script as
-    well would flag the prose in its own comments, which is the trap MANUAL
-    §12 records four times over.
-
-    Deliberately blunt: it matches quoted path-shaped literals in assets/js/ and
-    checks each against the published-page set, with no attempt to understand
-    the surrounding code. A false positive means a script holds a string that
-    looks like a site path and is not one, which is worth a comment and a moment
-    of thought rather than a cleverer regex.
+    Blunt on purpose: quoted path-shaped literals, each checked against the
+    published pages, with no reading of the code around them.
     """
     sources = sorted((ROOT / "assets" / "js").glob("*.js")) + \
               sorted((ROOT / "_data").rglob("*.yml"))
@@ -799,10 +560,9 @@ def test_links_built_outside_templates_still_resolve():
             if raw.startswith("/food/"):
                 target = raw
             else:
-                # `../slug/` in a script on a /food/reference/<page>/ URL. Only
-                # the reference pages build relative links today, so that is the
-                # base assumed; a script elsewhere doing this wants its own case
-                # here rather than a silent guess.
+                # `../slug/` is resolved as if on a /food/reference/<page>/
+                # URL. A script building relative links from any other page
+                # needs its own case here.
                 target = "/food/reference/" + raw[len("../"):]
             if target not in PAGES:
                 problems.append(f"{path.name}: '{raw}' -> {target}, no published page there")

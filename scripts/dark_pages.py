@@ -4,30 +4,20 @@
     python3 scripts/dark_pages.py                 # the working tree
     python3 scripts/dark_pages.py origin/main     # what is dark on the live site
 
-A DARK PAGE IS INVISIBLE BY DESIGN AND THAT IS THE PROBLEM THIS SOLVES. The
-publish gate fails closed: a held file stays in the public repo and its page
-simply stops existing, and the cards deliberately do not show the flags (#562 --
-"a work-state note on every unfinished row is a to-do list down the side of the
-page you use to decide what to drink"). So nothing on the site, in a build log
-or in a green test says a recipe has gone dark. Counting is the only thing that
-does.
+The publish gate fails closed: a held file stays in the public repo and its
+page stops existing, and the cards do not show the flags (#562). Nothing on
+the site, in a build log or in a green test says a page has gone dark, so
+counting is the only thing that does (PIPELINE.md §5).
 
-Smokestack Lightning proved it on 2026-09-19: `proofread: false` since
-2026-09-16, off the live site for three days, found only because a promotion
-check happened to print 65 files against 64 pages. Helen, 2026-09-20: "Are
-there any other recipes currently sitting dark, on either site?" -- this is the
-answer to that question, repeatably.
-
-TAKE A REF, NOT JUST THE WORKING TREE. On a feature branch the two differ, and
-the question is almost always about what is live. `origin/main` needs
-`sh scripts/git-fetch-main.sh` first or it answers about a stale main -- which
-it did on 2026-09-20, reporting 18 dark recipes that had been fixed by a merge
-an hour earlier.
+It reads `_food_recipes/` and `_cocktail_recipes/` from the working tree, or
+from the ref given, through git, and writes nothing. On a feature branch the
+two differ, and the question is usually about what is live: run
+`sh scripts/git-fetch-main.sh` before asking about `origin/main`, or it
+answers about a stale main.
 
 Exit status is 0 whether or not anything is dark: a held page is usually
-deliberate, and this reports rather than judges. Use it before opening a
-`blocked-on-helen` batch issue (`scripts/needs_helen.py`) to check the batch is
-the whole story, and after a promotion to check nothing was left behind.
+deliberate. Use it before opening a `blocked-on-helen` batch issue
+(`scripts/needs_helen.py`), and after a promotion.
 """
 from __future__ import annotations
 
@@ -38,9 +28,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# `rewritten` is a leg for DRINKS only, since #1137: on `cocktail_recipes` it
-# decides whether the page exists at all. Food keeps two legs, and widening it
-# there is a separate ruling with its own blast radius (MANUAL §9.1.1).
+# `rewritten` is a leg for drinks only (#1137, MANUAL §9.1.1); food has two.
 COLLECTIONS = [
     ("food", "_food_recipes", ("awaiting_fix", "proofread")),
     ("drinks", "_cocktail_recipes", ("awaiting_fix", "proofread", "rewritten")),

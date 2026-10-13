@@ -2,25 +2,19 @@
 
 `scripts/ingest_inbox.py` turns a GitHub Issue raised from Helen's phone into a
 file in `_food_drafts/` or `_cocktail_drafts/`. INGEST_INBOX_DESIGN.md §6 is the
-envelope's specification and §8 is the threat model; this module is the proof
-that the script implements the first and honours the second.
+envelope's specification and §8 is the threat model.
 
-NOTHING HERE TOUCHES THE NETWORK OR HER REAL DRAFTS, and both halves of that are
-deliberate. The script has exactly one function that reaches GitHub
-(`fetch_issues`) and one that writes to it (`post_comment`), so a test replaces
-the first and forbids the second, and a suite that would fail on a train stays
-green on one. The drafts roots are never read: every case that needs existing
-files builds them under this repo's own `tmp/` and removes them again, which is
-also what lets the collision and duplicate cases exist at all -- the private
-repos are absent in a worktree and in CI.
+Nothing here touches the network or her real drafts. The script has one
+function that reaches GitHub (`fetch_issues`) and one that writes to it
+(`post_comment`); a test replaces the first and forbids the second. Every case
+that needs existing files builds them under this repo's own `tmp/`, because
+the private repos are absent in a worktree and in CI.
 
-THE TWO VALID FIXTURES ARE THE DOCUMENTS' OWN WORKED EXAMPLES, copied
-character for character out of `INGEST_ONE_RECIPE.md` §9 and
-`INGEST_ONE_COCKTAIL.md` §9, and each is re-checked here against the schema
-constants in `test_front_matter.py` and `test_cocktails.py`. A fixture that
-drifts from the document teaches this parser a shape no browser will ever send
-it, which is a green test guarding nothing -- the failure mode
-`tests/test_suite_hygiene.py` exists for.
+The two valid fixtures are the documents' own worked examples
+(`INGEST_ONE_RECIPE.md` §9, `INGEST_ONE_COCKTAIL.md` §9), re-checked here
+against the schema constants in `test_front_matter.py` and `test_cocktails.py`.
+A fixture that drifts from its document teaches this parser a shape no browser
+sends.
 """
 from __future__ import annotations
 
@@ -32,9 +26,6 @@ from pathlib import Path
 import pytest
 import yaml
 
-# Suite marker, so `pytest -m shared` runs this. test_suite_hygiene.py asserts
-# every module declares one -- an unmarked file is silently missed by every
-# filtered run. `shared` because the inbox serves both sites.
 pytestmark = pytest.mark.shared
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -59,8 +50,7 @@ def envelope_text(name: str) -> str:
 def drafts():
     """A drafts root under this repo's own `tmp/`, removed afterwards.
 
-    NOT `tmp_path`, and CLAUDE.md is why: nothing in this project writes under
-    the system `/tmp`, for any reason. `tmp/` is gitignored here.
+    Not `tmp_path`: nothing in this project writes under the system `/tmp`.
     """
     root = ROOT / "tmp" / "test_ingest_inbox_drafts"
     if root.exists():
@@ -70,9 +60,7 @@ def drafts():
     shutil.rmtree(root)
 
 
-# =============================================================================
-# THE TWO VALID ENVELOPES
-# =============================================================================
+# ---- The two valid envelopes ----
 
 @pytest.mark.parametrize("name,site,slug", [
     ("valid_food", "food", "crispy-sage-butter-gnocchi"),
@@ -94,11 +82,10 @@ def test_a_valid_envelope_parses_and_names_its_file(name, site, slug):
 def test_the_fixture_fingerprint_is_the_one_its_document_prints(name, site, doc):
     """§0 of each document prints the fingerprint for its own worked example.
 
-    That printed line is what a repo-less browser copies the SHAPE of, so it and
-    the rebuild in `ingest_inbox.fingerprint` have to agree exactly -- a
-    disagreement rejects every envelope the document teaches, and rejects it for
-    the one reason (`fingerprint does not match`) that reads like the browser's
-    fault.
+    A repo-less browser copies the shape of that line, so it and the rebuild
+    in `ingest_inbox.fingerprint` must agree exactly. A disagreement rejects
+    every envelope the document teaches, for the one reason (`fingerprint does
+    not match`) that reads like the browser's fault.
     """
     env = inbox.parse_envelope(envelope_text(name), site)
     printed = (DOCS / doc).read_text(encoding="utf-8")
@@ -129,9 +116,9 @@ def test_the_food_fixture_obeys_the_food_schema():
 def test_the_cocktail_fixture_obeys_the_drink_schema():
     """`_drink_problems` is the check the cocktail document's own example gets.
 
-    Reusing it rather than re-listing the rules is the point: a fixture judged by
-    a second, private copy of the schema is a fixture that can be valid here and
-    rejected by `pytest -m cocktails` the moment it lands in `_cocktail_drafts/`.
+    Reused, not re-listed: a fixture judged by a private copy of the schema
+    can be valid here and rejected by `pytest -m cocktails` the moment it
+    lands in `_cocktail_drafts/`.
     """
     from test_cocktails import (INGREDIENT_KEYS, META_KEYS_IN_ORDER,
                                 REQUIRED_TOP_LEVEL, TOP_LEVEL_KEYS)
@@ -149,13 +136,11 @@ def test_the_cocktail_fixture_obeys_the_drink_schema():
         )
 
 
-# =============================================================================
-# EVERY REJECTION, ONE LINE EACH
-# =============================================================================
-# The design's whole claim about a bad body is that it can do nothing beyond
-# earn a reason (§8). Each case below is one rule from §6, and the substring is
-# the part of the message that names WHICH rule -- if a reason is reworded the
-# test should still pass, and if a rule stops being enforced it must not.
+# ---- Every rejection, one line each ----
+# A bad body can do nothing beyond earn a reason (INGEST_INBOX_DESIGN.md §8).
+# Each case is one rule from §6, and the substring is the part of the message
+# that names which rule: a reworded reason still passes, an unenforced rule
+# does not.
 
 @pytest.mark.parametrize("name,site,expected", [
     ("no_marker", "food", "is not an `<!-- ingest v<N> <site> -->` marker"),
@@ -209,12 +194,10 @@ FOOD_NOTE = (
      "note 1 is a bare string"),
 ])
 def test_a_note_that_is_not_labelled_qq_is_rejected(name, site, old, new, expected):
-    """#1120. The rule has been in both documents since 2026-09-04; this is the
-    first place anything checked it.
+    """A note is `{label: "QQ", text: "QQ ..."}` or the envelope is refused (#1120).
 
-    Built by replacing the valid fixture's note rather than keeping four more
-    files, so the assert below is what stops a reworded fixture turning the
-    replacement into a silent no-op that "rejects" nothing.
+    Built by replacing the valid fixture's note, so the `old in text` assert
+    is what stops a reworded fixture turning the replacement into a no-op.
     """
     text = envelope_text(name)
     assert old in text, f"the {name} fixture's note has moved; update this test"
@@ -231,7 +214,7 @@ def test_a_note_that_is_not_labelled_qq_is_rejected(name, site, old, new, expect
     ("valid_food", "food"),
 ])
 def test_an_envelope_with_no_notes_is_not_a_rejection(name, site):
-    """The rule is about the notes that ARE there. A source that answers
+    """The rule is about the notes that are there. A source that answers
     everything has nothing to ask, and an empty `notes` must not be refused."""
     text = envelope_text(name)
     old = COCKTAIL_NOTE if site == "cocktail" else FOOD_NOTE
@@ -239,8 +222,8 @@ def test_an_envelope_with_no_notes_is_not_a_rejection(name, site):
     swapped = text.replace("notes:\n" + old, "notes: []\n")
     assert swapped != text
     assert inbox.parse_envelope(swapped, site).fm["notes"] == []
-    # The empty pair is what both documents now ask for in that case (#1258),
-    # and it is a slot rather than a note, so the `QQ` rule does not apply.
+    # The empty pair is what both documents ask for in that case (#1258): a
+    # slot, not a note, so the `QQ` rule does not apply.
     slot = text.replace(old, '  - label: ""\n    text: ""\n')
     assert inbox.parse_envelope(slot, site).fm["notes"] == \
         [{"label": "", "text": ""}]
@@ -280,9 +263,7 @@ def test_a_rejection_never_reaches_the_writing_half(drafts):
     assert not list(drafts.rglob("*.md"))
 
 
-# =============================================================================
-# WHAT IS ALREADY IN THE DRAFTS
-# =============================================================================
+# ---- What is already in the drafts ----
 
 def _plan(name, site, drafts, number=None):
     existing = inbox.scan_drafts(drafts, site)
@@ -317,7 +298,7 @@ def test_a_slug_that_is_taken_gains_a_number_and_says_so(drafts):
 
 
 def test_the_same_formula_is_a_probable_duplicate_and_is_not_written(drafts):
-    """§6: the duplicate check compares FORMULAS, never titles."""
+    """§6: the duplicate check compares formulas, never titles."""
     first = _plan("valid_food", "food", drafts)
     inbox.write(first)
     again = _plan("valid_food", "food", drafts)
@@ -330,9 +311,7 @@ def test_the_same_formula_is_a_probable_duplicate_and_is_not_written(drafts):
 def test_the_same_title_with_a_different_formula_is_the_sazerac_case(drafts):
     """Two recipes, one name -- written separately and reported, never merged.
 
-    MANUAL §9.2.1: Helen's Sazerac and Death & Co's share a name, four of her
-    own bottle suggestions, and nothing else. `sazerac` and
-    `sazerac-death-and-co` live side by side because she named the second one.
+    `sazerac` and `sazerac-death-and-co` live side by side (MANUAL §9.2.1).
     The consumer's job is to notice and say so, not to choose.
     """
     inbox.write(_plan("valid_food", "food", drafts))
@@ -345,10 +324,9 @@ def test_the_same_title_with_a_different_formula_is_the_sazerac_case(drafts):
 
 
 def test_a_draft_in_a_staging_subfolder_still_counts(drafts):
-    """`rglob`, not `glob`. `_food_drafts/` has `2-make/` and friends under it
-    (`to-cook/` until 2026-09-14, PIPELINE.md §3), and food's own loader
-    silently stopped seeing seven files -- the seven closest to promotion --
-    the day that pipeline appeared (MANUAL §4).
+    """`rglob`, not `glob`: `_food_drafts/` has staging folders such as
+    `2-make/` under it (PIPELINE.md §3), and a flat scan silently stops seeing
+    the drafts closest to promotion.
     """
     (drafts / "2-make").mkdir()
     inbox.write(_plan("valid_food", "food", drafts))
@@ -360,17 +338,13 @@ def test_a_draft_in_a_staging_subfolder_still_counts(drafts):
     assert plan.duplicate_of == "crispy-sage-butter-gnocchi"
 
 
-# =============================================================================
-# THE CLI, WITH THE ONE NETWORK DOOR STUBBED
-# =============================================================================
+# ---- The CLI, with the one network door stubbed ----
 
 def test_the_run_writes_what_the_dry_run_promised(drafts, monkeypatch, capsys):
-    """End to end over the ONE function the design says tests replace.
+    """End to end, with `fetch_issues` stubbed and `post_comment` forbidden.
 
-    Stubbing `fetch_issues` and forbidding `post_comment` is the whole
-    isolation story: if a second door to GitHub is ever added, this test keeps
-    passing while the suite quietly starts needing a network, which is why the
-    door count is part of the design rather than an implementation detail.
+    That is the whole isolation: a second door to GitHub would leave this
+    test passing while the suite quietly starts needing a network.
     """
     issues = [{"number": 12, "body": envelope_text("valid_food")},
               {"number": 13, "body": envelope_text("no_marker")}]
@@ -404,11 +378,10 @@ def test_comment_is_a_no_op_with_from_file(drafts, monkeypatch, capsys):
 
 
 def test_comment_carries_the_hand_back_list(drafts, monkeypatch, capsys):
-    """`--comment` posts the outcome AND the browser's hand-back bullets.
+    """`--comment` posts the outcome and the browser's hand-back bullets.
 
-    Helen, 2026-09-03: "Bullets too please." The issue is where she reads on
-    her phone, so the list of what the browser could not know goes there,
-    not only into a terminal she is not looking at.
+    The issue is where Helen reads on her phone, so the list of what the
+    browser could not know goes there, not only into a terminal.
     """
     posted = []
     issues = [{"number": 21, "body": envelope_text("valid_food")}]
@@ -426,10 +399,10 @@ def test_comment_carries_the_hand_back_list(drafts, monkeypatch, capsys):
 
 
 def test_slug_is_the_whole_title():
-    """Helen, 2026-09-03: "Slug the whole title." Not the head clause.
+    """The slug is the whole title, not its head clause.
 
-    Two "with" dishes sharing a head clause would otherwise collide and the
-    second would land as `-2` for no reason a reader could see in the name.
+    Two "with" dishes sharing a head clause otherwise collide, and the second
+    lands as `-2` for no reason a reader can see in the name.
     """
     assert inbox.slug_for("Roast Chicken with Lemon and Thyme") == "roast-chicken-with-lemon-and-thyme"
     assert inbox.slug_for("Crème Brûlée") == "creme-brulee"
@@ -440,7 +413,7 @@ def test_an_absent_drafts_repo_is_a_loud_refusal(capsys):
     """The absent-repo case, in the shape `tidy_drafts.py` set (#537).
 
     A worktree and CI both lack the private repos, so "found nothing" is the
-    NORMAL state here and must never be reported as a clean run.
+    normal state here and must never be reported as a clean run.
     """
     with pytest.raises(SystemExit) as caught:
         inbox.main(["--site", "cocktail", "--drafts-dir",
@@ -451,17 +424,14 @@ def test_an_absent_drafts_repo_is_a_loud_refusal(capsys):
     assert caught.value.code != 0
 
 
-# =============================================================================
-# THE VERSION HANDSHAKE
-# =============================================================================
+# ---- The version handshake ----
 
 def test_both_documents_name_a_supported_version():
     """§8's one silent failure: a document teaching v2 to a browser that reaches
     a consumer implementing v1.
 
-    The marker carries the version so the mismatch is loud AT PARSE TIME, and
-    this is the other end of the same wire -- it makes the mismatch loud at
-    COMMIT time instead, which is where it can still be free to fix.
+    The marker carries the version so the mismatch is loud at parse time;
+    this makes it loud at commit time, where it is still free to fix.
     """
     pattern = re.compile(r"<!--\s*ingest\s+v(\d+)\s+([a-z]+)\s*-->")
     expected = {"INGEST_ONE_RECIPE.md": "food",

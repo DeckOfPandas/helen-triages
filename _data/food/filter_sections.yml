@@ -1,50 +1,17 @@
-# =============================================================================
-# FILTER SECTION PRESENTATION
-#
-# Label text, CSS class, and the order sections appear in on the index.
-# Presentation only.
-#
-# `brush_colour:` was removed on 2026-08-01 with the watercolour washes. Each
-# section's hue now lives in _sass/food/_layout.scss beside the rule, the active
-# button text and the clear link it also drives — one value, three uses, and it
-# is a colour rather than an asset-name slug, so the palette is the right home
-# for it. It only sat here because a wash had to pick a FILE.
-#
-# WHICH tags exist is _data/taxonomy.yml. Each entry under `tag_groups:` has a
-# `name:` that keys straight into taxonomy.tags — so adding a tag is a taxonomy
-# edit and never needs touching this file.
-#
-# Renamed from index_tags_sections.yml on 2026-07-29: it stopped holding tags
-# when the taxonomy moved out, and the old name had become actively misleading.
-#
-# The square brackets that used to wrap these strings were removed on
-# 2026-07-31 and are not coming back here. They read as a second type system
-# beside the heavy stroked caps, and they are the WORDMARK's device — [ FOOD ]
-# in the site header, where the bracketed word genuinely is a variable read
-# from _data/sites.yml. Presentation like that belongs in a template anyway,
-# never baked into a label string.
-# =============================================================================
+# Filter section presentation on the food index: label text, CSS class and
+# order. Which tags exist is _data/food/taxonomy.yml: each `tag_groups` entry's
+# `name` keys into `taxonomy.tags`, so adding a tag never touches this file.
+# Colour is in _sass. A label is plain text: no square brackets, which are the
+# wordmark's device and belong to a template.
 
 star: 
   label: "STAR INGREDIENT"
   class: category--star
 
 ingredients:
-  # "HAS TO HAVE" since issue #583. It was "SEARCH MAIN INGREDIENTS", which
-  # named the MECHANISM (a search, over the main_ingredients field) rather than
-  # the question being asked. The cocktails index already asks "HAS TO HAVE",
-  # and the two sites asking the same question in different words was the whole
-  # of the complaint.
+  # The same words as the cocktails index, which asks the same question (#583).
   label: "HAS TO HAVE"
 
-# LEAVE OUT was the one section whose heading was NOT in this file, and the
-# reason was real at the time: the reveal button "(I know what I don't want)"
-# WAS the section's heading, so inventing a `label:` here would have put half
-# the section's copy in one file and half in another.
-#
-# Issue #586 deleted the reveal button -- the picker is always visible now, on
-# one line with HAS TO HAVE -- so the section has an ordinary heading like
-# every other, and it belongs here like every other.
 exclude:
   label: "LEAVE OUT"
 

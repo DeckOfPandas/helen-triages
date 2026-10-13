@@ -177,15 +177,12 @@
   }
 
   /* --- working backwards from the plate -----------------------------------
-     Given a resolved range, the rest time and the time you are eating at (all
-     minutes; serveAt is minutes from midnight), when does it go in?
-
-     The LONGER estimate drives `inAt`: ready early and holding is
-     recoverable, late is not. `hasRange` uses the same round5 as the printed
-     duration, so a card cannot show a duration that disagrees with its times.
-
-     Results are minutes from midnight, negative if they run back past it;
-     clock() formats that. Nothing here knows what time it is now. */
+     From a resolved range, the rest time and serveAt (all minutes; serveAt is
+     minutes from midnight): when does it go in? The LONGER estimate drives
+     `inAt`: ready early and holding is recoverable, late is not. `hasRange`
+     uses the same round5 as the printed duration, so a card cannot show a
+     duration that disagrees with its times. Results are minutes from
+     midnight, negative if they run back past it; clock() formats that. */
   function scheduleBack(lo, hi, serveAt, rest) {
     var outAt = serveAt - (rest || 0);
     var longest = round5(hi), shortest = round5(lo);

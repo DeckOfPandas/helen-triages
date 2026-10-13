@@ -7,44 +7,22 @@
     python3 scripts/needs_helen.py _food_recipes/a.md _cocktail_recipes/b.md \\
         --batch "#711's note sentences" --why "..." --dry-run
 
-PIPELINE.md §5 is the procedure; this is the engine for its middle row. When an
-agent edits a published file in any way bigger than a word or a number, the
-file's `meta.proofread` goes to `false` in the SAME commit (MANUAL §4.0) -- the
-publish gate then hides the page -- and Helen gets an issue labelled
-`blocked-on-helen` so she can see that something is waiting on her without
-reading a build log. Her idea, 2026-09-14: "when Claude touches a published
-file in a way that flips proofread to false, raise a github issue labelled
-blocked on Helen so I know I need to do something".
+The engine for the "anything else" row of PIPELINE.md §5: an agent edit to a
+published file that is more than a word, a number or a derived value. Pass
+every file being demoted in one call. `--batch` names the cause for the issue
+title, `--why` says what changed, `--dry-run` flips and writes nothing.
 
-ONE ISSUE PER BATCH, NOT ONE PER FILE -- CHANGED 2026-09-20, AND THE REASON IS
-THE REASON THIS TOOL NEARLY KILLED ITSELF. The original rule was one issue per
-demoted file, and that is precisely the shape that got the agent account
-flagged as spam on 2026-09-14: twenty issues in under an hour hid the account's
-entire history from everyone but itself. CLAUDE.md's rule from that day -- "a
-batch of issues is ONE issue with a checklist, never one issue per file" -- was
-in direct contradiction with PIPELINE.md §5 from the moment it was written, and
-this tool implemented the losing side. Helen, 2026-09-20: "We need to put that
-rule back in place, but add the list of dark recipes to one issue per batch
-rather than one issue per file."
+It validates every path before changing any; sets each `meta.proofread` to
+`false` by a textual edit of the one line (a YAML round-trip would lose
+comment placement and key order); finds every other file in the collection
+that links to each, because those links 404 in production; writes one issue
+body with a checklist to tmp/needs-helen-batch.md; and prints the one command
+that opens it. It opens no issue and makes no commit.
 
-So: pass every file you are demoting in one call, get one body with a
-checklist, and open one issue.
-
-WHAT IT DOES. Flips each flag by a textual edit of the one line (never a YAML
-round-trip, which would lose comment placement and key order); finds every
-other published page that links to each one, because a demotion turns those
-links into 404s in production and she should know the cost; writes one issue
-body to tmp/needs-helen-batch.md; and prints the ONE command that opens it. It
-does not open the issue itself and does not commit: the wrapper call is
-allow-listed as a direct command and a commit is the session's to make with
-the rest of the change.
-
-BEFORE OPENING IT, check the tracker for an open `blocked-on-helen` issue that
-already names one of your slugs. A page demoted twice does not want two live
-issues; comment on the open one and leave that slug out of the new body.
-
-`scripts/dark_pages.py` lists everything the gate is currently hiding, which is
-the way to check afterwards that the batch is the whole story.
+One issue per batch, never one per file (DECISIONS §4.0). Before opening it,
+check the tracker for an open `blocked-on-helen` issue naming one of the
+slugs: comment there and leave that slug out of the new body.
+`scripts/dark_pages.py` lists everything the gate is hiding.
 """
 from __future__ import annotations
 

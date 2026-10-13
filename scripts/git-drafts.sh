@@ -1,16 +1,8 @@
 #!/bin/sh
 # Run a short, fixed list of git commands INSIDE one of the two nested drafts
-# repos, without a `cd` and without a `git -C` at the call site.
-#
-# WHY THIS EXISTS (2026-10-02, #1258's tidy pass). `_food_drafts/` and
-# `_cocktail_drafts/` are their own repos, so branching, reading a diff and
-# committing there has to run git from inside them -- and the two ordinary ways
-# to say that, `cd _food_drafts && git ...` and `git -C _food_drafts ...`, are
-# both refused by guard-unanalyzable-bash.py, rightly. `tidy-drafts.md` still
-# taught the first. So a session wrote a throwaway `tmp/` script, which asks
-# Helen on every call (test_no_allow_rule_runs_a_tmp_script: "keep asking me
-# please") -- eight prompts for one drafts pass. Helen, shown that: "gotcha,
-# thanks. Yes please do it."
+# repos, without a `cd` and without a `git -C` at the call site:
+# guard-unanalyzable-bash.py refuses both, and a tmp/ script asks Helen on
+# every call. DECISIONS §11.
 #
 # USAGE:
 #   sh scripts/git-drafts.sh <dir> <verb> [args]
@@ -22,7 +14,7 @@
 #   sh scripts/git-drafts.sh _food_drafts add -- .
 #   sh scripts/git-drafts.sh _food_drafts commit -F tmp/commit-msg.txt
 #
-# WHAT IT ACCEPTS IS A LIST, NOT A PATTERN, because an allow rule covers it and
+# What it accepts is a list, not a pattern, because an allow rule covers it and
 # whatever it accepts runs without asking Helen:
 #
 #   dir       `_food_drafts` or `_cocktail_drafts`, spelled exactly.
@@ -38,16 +30,16 @@
 #             and a path is how uncommitted work is discarded.
 #   add       `--` then plain paths (`.` included). The `--` is what makes every
 #             later word a path and never `--chmod`.
-#   commit    `-F <file under tmp/>` and nothing else. Never on `main`: the
-#             guard-main-branch.py hook reads the command text, sees no `-C`,
-#             and would check THIS repo's branch, so the refusal is made here.
-#             Not `-a`, not `--amend`, not `--no-verify`.
+#   commit    `-F <file under tmp/>` and nothing else. Never on `main` or a
+#             detached HEAD: the guard-main-branch.py hook reads the command
+#             text, sees no `-C`, and would check THIS repo's branch, so the
+#             refusal is made here. Not `-a`, not `--amend`, not `--no-verify`.
 #
 # Everything else -- push, fetch, clone, reset, restore, stash, merge, rebase,
 # config -- is refused. The three `git-*-agent.sh` wrappers do the network
 # half; the destructive ones are Helen's.
 #
-# "PLAIN" MEANS letters, digits and `_ . / @ ~ ^ -`, not starting with `-` or
+# "Plain" means letters, digits and `_ . / @ ~ ^ -`, not starting with `-` or
 # `/` and containing no `..` -- so no option, no absolute path and no way out
 # of the folder can be smuggled in as a ref or a path.
 #

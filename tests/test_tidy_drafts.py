@@ -1,25 +1,12 @@
-"""What `/tidy-drafts` does to a DRINK, proved on a fixture and not on Helen's.
+"""What `scripts/tidy_drafts.py` does, proved on fixtures and never on Helen's drafts.
 
-`scripts/tidy_drafts.py` grew a cocktails half on 2026-09-05, at Helen's
-request: *"Widen please -- cocktail drafts passing will save me a lot of time."*
-The food half has been run for real three times and its evidence is the diff it
-left behind; the drinks half had no such history, and the first thing anyone
-would want to do to get one is point it at `_cocktail_drafts/`. That is exactly
-what must not happen while she is proofreading the staged drinks, so this module
-is the evidence instead.
+Nothing here reads or writes a real drafts repo: every case builds one file
+under this repo's own `tmp/` and removes it again, because the system `/tmp`
+is forbidden and both private repos are absent in a worktree and in CI.
 
-NOTHING HERE READS OR WRITES A REAL DRAFTS REPO. Every case builds one drink
-under this repo's own `tmp/` and removes it again -- the same construction
-`tests/test_ingest_inbox.py` uses and for the same two reasons: `/tmp` is
-forbidden by CLAUDE.md, and both private repos are absent in a worktree and in
-CI, so a test that needed one would be a test that mostly skips.
-
-THE ASSERTION IS BYTE-FOR-BYTE, and that is the design. "It fixed the six
-faults" is easy to satisfy, and easy to satisfy while also doing something else
-to the other thirty lines; a script whose whole safety story is "read the diff
-afterwards" has to be provable by comparing whole files. So `AFTER` below is the
-entire expected output, and every line of it that is not one of the four changed
-lines is a line the pass must have left exactly alone.
+The assertions are byte for byte: `AFTER` is the entire expected output, so
+every line of it that is not a changed line is one the pass must leave alone.
+"It fixed the faults" is satisfied by a script that also edits something else.
 """
 from __future__ import annotations
 
@@ -33,52 +20,20 @@ from pathlib import Path
 
 import pytest
 
-# Suite marker, so `pytest -m shared` runs this. test_suite_hygiene.py asserts
-# every module declares one -- an unmarked file is silently missed by every
-# filtered run. `shared` because the script serves both collections, which is
-# also why test_ingest_inbox.py chose it.
 pytestmark = pytest.mark.shared
 
 ROOT = Path(__file__).resolve().parent.parent
 SCRIPT = ROOT / "scripts" / "tidy_drafts.py"
 
 
-# =============================================================================
-# ONE DRINK, CARRYING EVERY CLASS THE PASS TOUCHES AND EVERY CLASS IT MUST NOT
-# =============================================================================
-# The faults it MUST fix -- six of them across four lines, all in Helen's own
-# prose and every one named by tests/test_cocktails.py:
-#
-#   1. `tagline:` is an unquoted scalar   test_drink_scalar_fields_are_quoted
-#   2. `--` in the tagline                test_drink_typography[double hyphen]
-#   3. `--` in an ingredient's note       test_drink_typography[double hyphen]
-#   4. `2-3` in the tagline               test_drink_number_ranges_use_en_dashes
-#   5. `2-3` in an ingredient's note      test_drink_number_ranges_use_en_dashes
-#   6. `2-3` in a note's text             test_drink_number_ranges_use_en_dashes
-#
-# THE SAME FAULT APPEARS IN MORE THAN ONE PLACE ON PURPOSE. A tagline is the
-# obvious prose field and the one anybody would remember to allow; an
-# ingredient's `note:` sits two lines below an `amount:` and a `generic:` that
-# are both off limits, and a `notes:` entry's `text:` sits directly above a `QQ`
-# one. Those are the boundaries worth having a fixture for.
-#
-# Everything else in the file is a fault of the same MECHANICAL SHAPE sitting
-# somewhere the pass does not go, and each is here because leaving it out would
-# make the byte-for-byte assertion below prove less than it looks like it does.
-#
-# THE FIRST POUR USED TO CARRY AN `item:`, and it was the off-limits case for
-# "somebody else's words on an ingredient". The field was retired on 2026-09-21,
-# and its content moved to where the page can actually show it -- `generic`,
-# behind a `QQ `. The fixture followed, which makes it a better case than it
-# was: `item` was excluded by being named in a key list, while this line is
-# excluded twice over, by `generic` being a closed vocabulary AND by the QQ
-# predicate. Both mechanisms have to fail for the `--` in it to be "corrected".
-#
-# THE KEYS ARE IN PAGE ORDER, since #1213 added the `order` rule to the default
-# pass: `meta` and `mood` sit under `garnish`, where the page prints SHIP IT?
-# and the mood chips. So the stock fixture gives that rule nothing to do, and
-# every count below is still the count of the prose faults alone. The rule's own
-# fixture is `ORDER_BEFORE`, further down.
+# ---- One drink: every fault the pass fixes, and the same faults off limits ----
+# To fix: the unquoted `tagline:` (test_drink_scalar_fields_are_quoted), `--`
+# in the tagline and an ingredient note (test_drink_typography), and `2-3` in
+# the tagline, that note and a note's text
+# (test_drink_number_ranges_use_en_dashes). The same `--` and `2-3` sit in an
+# `amount`, a `QQ` generic, a `suggestion` and a `QQ` note, where the pass does
+# not go. Keys are in page order (#1213), so the `order` rule has nothing to
+# do and every count below is the prose faults alone; see `ORDER_BEFORE`.
 BEFORE = '''---
 title: "Test Drink"
 tagline: Sharp -- and bright, 2-3 dashes of it
@@ -117,10 +72,9 @@ source_url: ""
 ---
 '''
 
-# FOUR LINES DIFFER FROM `BEFORE` AND NO OTHERS: the tagline (quoted, em dash,
-# en dash), the ingredient note (em dash, en dash), and note 1 (en dash). Every
-# other line here is copied from BEFORE character for character, including the
-# four that carry the identical faults in places the pass does not go.
+# Four lines differ from `BEFORE` and no others: the tagline (quoted, em dash,
+# en dash), the ingredient note (em dash, en dash), and note 1 (en dash).
+# Every other line is copied character for character.
 AFTER = '''---
 title: "Test Drink"
 tagline: "Sharp — and bright, 2–3 dashes of it"
@@ -164,8 +118,7 @@ source_url: ""
 def drinks():
     """A drafts root under this repo's own `tmp/`, removed afterwards.
 
-    NOT `tmp_path`, and CLAUDE.md is why: nothing in this project writes under
-    the system `/tmp`, for any reason. `tmp/` is gitignored here.
+    Not `tmp_path`: nothing in this project writes under the system `/tmp`.
     """
     root = ROOT / "tmp" / "test_tidy_drafts_drinks"
     if root.exists():
@@ -175,19 +128,11 @@ def drinks():
     shutil.rmtree(root)
 
 
-# CALLED IN THIS PROCESS, NOT AS A SUBPROCESS -- #1271.
-#
-# Every test here used to start a fresh Python for the script, and the script
-# imports its rules from the suite (conftest, test_front_matter,
-# test_cocktails, test_style), so each start re-read and re-parsed every
-# recipe, draft and drink before looking at the one fixture file. Measured
-# 2026-10-02: about 1.7s a test, 54s for the module. This process has those
-# modules loaded already, so `main(argv)` costs milliseconds.
-#
-# THE COMMAND LINE ITSELF STILL HAS ONE TEST,
-# `test_the_command_line_runs_as_helen_types_it`, because an in-process call
-# cannot see a script that no longer starts: a broken import at the top, a
-# `main()` that stopped reading `sys.argv`, the `__main__` guard going missing.
+# Called in this process, not as a subprocess (#1271): the script imports its
+# rules from the suite, so each fresh Python re-parses every recipe, draft and
+# drink before it looks at the one fixture file.
+# `test_the_command_line_runs_as_helen_types_it` is the one real subprocess,
+# because an in-process call cannot see a script that no longer starts.
 sys.path.insert(0, str(ROOT / "scripts"))
 import tidy_drafts  # noqa: E402
 
@@ -253,13 +198,9 @@ def test_the_report_names_every_fault_and_writes_nothing(drinks):
 
 
 def test_apply_fixes_exactly_those_and_touches_nothing_else(drinks):
-    """Byte-for-byte, because "it fixed six things" is the weaker claim.
+    """Byte for byte, because "it fixed six things" is the weaker claim.
 
-    A LINE-BY-LINE DIFF IN THE FAILURE MESSAGE, not a 34-line repr against
-    another 34-line repr. The one bug this script has ever had produced output
-    that looked entirely plausible in a diff -- it was caught by parsing the
-    result, not by reading it -- so when this does fail, the thing to see first
-    is which lines moved.
+    The failure names the lines that moved, not two whole-file reprs.
     """
     path = write_drink(drinks)
     run(drinks, "--apply")
@@ -282,23 +223,10 @@ def test_apply_fixes_exactly_those_and_touches_nothing_else(drinks):
 def test_the_lines_the_pass_must_not_touch_survive_apply(drinks, line):
     """Each of these carries a fault the pass fixes elsewhere in the same file.
 
-    That is the whole point of the parametrisation: `2-3` and `--` are fixed
-    three lines up, so a rule that had leaked out of Helen's prose would show
-    here rather than in a general "nothing changed" assertion that a
-    do-nothing script would also pass.
-
-    A `QQ` NOTE IS THE FIRST CASE AND THE LOAD-BEARING ONE. On a drink the
-    marker sits behind a key -- `text: "QQ - ..."` -- and the drinks half asks
-    `conftest.checkable_text`, which knows that. This is the test that fails if
-    anybody ever "simplifies" it to something that does not.
-
-    THE FOOD PATTERN DID NOT KNOW THAT UNTIL 2026-09-22, and this docstring said
-    so approvingly for three weeks -- "the food QQ pattern ... matches that line
-    not at all" was written as a reason the DRINKS side is careful, and never
-    read as the statement about FOOD that it also was. It was a real hole: 534
-    lines in `_food_drafts/` were QQ lines the food pass could not see, five of
-    them carrying a fault it would have "corrected". See the test below, which
-    is the food half of this one.
+    So a rule that leaks out of Helen's prose shows here; a general "nothing
+    changed" assertion is one a do-nothing script also passes. The `QQ` note
+    is the load-bearing case: on a drink the marker sits behind a key
+    (`text: "QQ - ..."`), which `conftest.checkable_text` knows.
     """
     path = write_drink(drinks)
     assert line in path.read_text(encoding="utf-8"), (
@@ -311,18 +239,9 @@ def test_the_lines_the_pass_must_not_touch_survive_apply(drinks, line):
     )
 
 
-# =============================================================================
-# THE FOOD HALF, WHICH DID NOT EXIST UNTIL 2026-09-22
-# =============================================================================
-# Every test above runs `--site cocktails`. The food rules had no test of which
-# lines they must not touch at all, which is how `QQ_LINE` went three weeks
-# allowing only a list dash in front of the marker while the drinks half was
-# carefully asking a pattern that knew about keys.
-#
-# THE FIXTURE CARRIES THE SAME FAULT IN BOTH PLACES, exactly as the drinks one
-# does: `2-3` and `--` in prose the pass SHOULD fix, and the identical `2-3` and
-# `--` behind a `QQ` where it must not. A "nothing changed" assertion would pass
-# on a do-nothing script; this one cannot.
+# ---- The food half ----
+# The fixture carries `2-3` and `--` in prose the pass should fix, and the
+# identical faults behind a `QQ` where it must not.
 
 FOOD_BEFORE = '''---
 title: "Test Recipe"
@@ -376,17 +295,11 @@ def run_food(root, *extra):
     '  - "QQ original Fry for 2-3 mins -- until golden."',
 ])
 def test_a_food_qq_behind_a_key_survives_apply(food, line):
-    """A marker behind a KEY is still a marker, and the food pass now knows it.
+    """A marker behind a key is still a marker.
 
-    THE FOUR CASES ARE THE FOUR SHAPES THE OLD PATTERN MISSED. It allowed an
-    optional list dash and an optional quote and nothing else, so only the
-    fourth of these -- the method step -- was ever skipped. The other three
-    carry `2-3` and `--` that the pass fixes two lines away in the same file,
-    so a leak shows here rather than hiding in a general assertion.
-
-    MEASURED WHEN THIS WAS WRITTEN: 534 lines in `_food_drafts/` were QQ lines
-    the old pattern could not see, 248 of them taglines added the day before,
-    and five in four files carried a fault it would have rewritten.
+    Three cases sit behind a key and the fourth behind a list dash. Each
+    carries a `2-3` or a `--` that the pass fixes elsewhere in the same file,
+    so a pattern that sees only the list-dash shape leaks here.
     """
     path = food / "test-recipe.md"
     path.write_text(FOOD_BEFORE, encoding="utf-8")
@@ -401,13 +314,11 @@ def test_a_food_qq_behind_a_key_survives_apply(food, line):
 
 
 def test_a_food_qq_claude_line_is_still_held_to_house_style(food):
-    """The one QQ shape the pass MAY edit, and it must still edit it.
+    """The one QQ shape the pass may edit, and it must still edit it.
 
-    A widened skip that swallowed `QQ Claude` would be the opposite failure and
-    just as invisible: that line is our own paraphrase, and MANUAL §4 holds it
-    to house style like any other prose. Fifteen hyphenated ranges were hiding
-    behind an over-wide pattern on 2026-09-01, which is why this is a test and
-    not a comment.
+    A `QQ Claude` line is our own paraphrase, held to house style like any
+    other prose (MANUAL §5). A skip wide enough to swallow it hides faults as
+    invisibly as a leak edits them.
     """
     path = food / "test-recipe.md"
     path.write_text(FOOD_BEFORE, encoding="utf-8")
@@ -432,18 +343,12 @@ def test_food_prose_outside_a_qq_is_still_fixed(food):
     )
 
 
-# =============================================================================
-# THE UNIT SPACE -- Helen, 2026-10-01
-# =============================================================================
-# "Please add unit spaces (15ml -> 15 ml) as a mechanical fix to perform at
-# ingest, and check when I ask you to check drafts."
-#
-# One fixture carrying every shape the rule meets on the real corpus: a food
-# `amount:` (the 13 that drifted from 1,461), an `item:` with a unit mid-phrase,
-# a `QQ Claude` line that MUST be fixed, a `QQ original` line that must not, and
-# the three near-misses that would be silent if the pattern were loose -- `2kg`
-# (which a short-first alternation turns into `2k g`), an already-spaced amount,
-# and a temperature, which wants a degree sign from a different rule.
+# ---- The unit space (DECISIONS §5) ----
+# One fixture carrying every shape the rule meets: a food `amount:`, an `item:`
+# with a unit mid-phrase, a `QQ Claude` line that must be fixed, a `QQ original`
+# line that must not, and three near-misses that are silent if the pattern is
+# loose -- `2kg` (a short-first alternation gives `2k g`), an already-spaced
+# amount, and a temperature, which wants a degree sign from a different rule.
 UNITS_BEFORE = '''---
 title: "Test Recipe"
 tagline: "A test"
@@ -477,10 +382,7 @@ meta:
 def test_unit_spacing_fixes_an_amount_an_item_and_prose(food):
     """The three places food carries a unit, all fixed.
 
-    THE AMOUNT IS THE ONE WORTH A TEST. Measured 2026-10-01 across both food
-    collections: `amount:` reads `40 g` 1,461 times and `40g` 13 times, so the
-    spaced form is the house form by a factor of 112 and the thirteen are drift.
-    On a DRINK the same rule must not reach an amount at all -- see
+    On a drink the same rule must not reach an amount at all:
     test_unit_spacing_never_touches_a_drinks_amount.
     """
     path = food / "test-recipe.md"
@@ -501,14 +403,9 @@ def test_unit_spacing_fixes_an_amount_an_item_and_prose(food):
 def test_unit_spacing_matches_the_longest_unit_first(food):
     """A short-first alternation corrupts the unit, and plausibly.
 
-    THIS IS THE ONLY FAILURE IN THE RULE THAT PRODUCES A WRONG ANSWER WHICH
-    READS ALMOST RIGHT: `2kg` -> `2k g` and `5inches` -> `5 in ches` both parse
-    fine and would survive a skim of the diff. Nothing else here would say so.
-
-    The script sorts `UNITS` by length in code rather than relying on a
-    hand-ordered list, so the class is impossible rather than merely tested
-    against -- and adding a unit tomorrow cannot reintroduce it. This pins the
-    outcome anyway, because the sort is the kind of line somebody "tidies".
+    `2kg` -> `2k g` and `5inches` -> `5 in ches` both parse and survive a skim
+    of the diff. The script sorts `UNITS` by length in code; this pins the
+    outcome because that sort is a line somebody tidies away.
     """
     path = food / "test-recipe.md"
     path.write_text(UNITS_BEFORE, encoding="utf-8")
@@ -530,9 +427,9 @@ def test_unit_spacing_leaves_a_qq_original_alone_and_fixes_qq_claude(food):
     """The pair, in one test, because they are one decision.
 
     A `QQ original` line is the source's own wording awaiting Helen's rewrite,
-    and respacing it is editing someone else's text (MANUAL 5). `QQ Claude` is
-    OUR paraphrase and is held to house style. A skip wide enough to swallow
-    both would pass every other test in this file.
+    and respacing it is editing someone else's text (MANUAL §5). `QQ Claude` is
+    our paraphrase and is held to house style. A skip wide enough to swallow
+    both passes the other unit tests.
     """
     path = food / "test-recipe.md"
     path.write_text(UNITS_BEFORE, encoding="utf-8")
@@ -552,10 +449,9 @@ def test_unit_spacing_leaves_a_qq_original_alone_and_fixes_qq_claude(food):
 def test_unit_spacing_leaves_a_temperature_to_its_own_rule(food):
     """`180C` is not this rule's business.
 
-    It wants a DEGREE SIGN, which this script reports and never fixes -- "a
-    spelling is a word, not a character". Spacing it to `180 C` would half-fix
-    it and make the real fault harder to see, so `C` is deliberately absent from
-    the unit list.
+    It wants a degree sign, which this script reports and never fixes. Spacing
+    it to `180 C` half-fixes it and hides the real fault, so `C` is
+    deliberately absent from the unit list.
     """
     path = food / "test-recipe.md"
     path.write_text(UNITS_BEFORE, encoding="utf-8")
@@ -572,15 +468,11 @@ def test_unit_spacing_leaves_a_temperature_to_its_own_rule(food):
 def test_unit_spacing_never_touches_a_drinks_amount(drinks):
     """On a drink the rule reaches Helen's prose and nothing else.
 
-    THE RECORDED HARM, from this script's own doc:
-    anitas-attitude-adjuster said `amount: "Top (30-45) ml"` beside a QQ note
-    quoting that string back verbatim, so editing the amount desynchronised the
-    note from the value it describes. Food has no such pairing and is fixed.
-
-    A drink cannot actually carry `15ml` -- `measures:` declares the unit and
-    not the glue, so it would fail test_every_amount_is_readable_as_a_quantity
-    first -- which is why this pins the WIRING rather than waiting for a drink
-    to prove it.
+    A `QQ` note may quote an amount back verbatim, so editing the amount
+    desynchronises the note from the value it describes (the script's
+    docstring has the case). A drink cannot carry `15ml` anyway --
+    test_every_amount_is_readable_as_a_quantity fails first -- so this pins
+    the wiring, not a live fault.
     """
     path = write_drink(drinks)
     before = path.read_text(encoding="utf-8")
@@ -598,14 +490,12 @@ def test_unit_spacing_never_touches_a_drinks_amount(drinks):
     )
 
 
-# =============================================================================
-# THE SIZE WORD, #577 -- excluded 2026-08-29, scripted 2026-09-24
-# =============================================================================
-# One fixture carrying every shape the `size` rule meets on the real corpus, in
-# the proportions that matter: the four it MUST move (quoted, bare, item-first,
-# two-word `extra large`), and every shape it must NOT -- a weight, a fraction,
-# a missing amount, an `or` remainder, `baby`, and a size word behind a `QQ`.
-# The file is otherwise clean, so the count in the report is the rule's alone.
+# ---- The size word, #577 ----
+# One fixture carrying every shape the `size` rule meets: the four it must move
+# (quoted, bare, item-first, two-word `extra large`), and every shape it must
+# not -- a weight, a fraction, a missing amount, an `or` remainder, `baby`, and
+# a size word behind a `QQ`. The file is otherwise clean, so the count in the
+# report is the rule's alone.
 SIZE_BEFORE = '''---
 title: "Test Recipe"
 tagline: "A test"
@@ -652,10 +542,8 @@ meta:
 ---
 '''
 
-# EIGHT LINES DIFFER FROM `SIZE_BEFORE` AND NO OTHERS: the amount and the item
-# of the first four entries. Every other line is copied character for
-# character, including the six entries that carry a size word the rule must
-# leave where it is.
+# Eight lines differ from `SIZE_BEFORE` and no others: the amount and the item
+# of the first four entries.
 SIZE_AFTER = '''---
 title: "Test Recipe"
 tagline: "A test"
@@ -723,12 +611,8 @@ def test_size_words_report_names_the_moves_and_the_refusals_and_writes_nothing(f
 
 
 def test_size_words_apply_moves_exactly_four_and_touches_nothing_else(food):
-    """Byte for byte, as the drink fixture is, and for the same reason.
-
-    The one bug this script has ever had produced a plausible-looking diff on
-    341 files; the size rule rewrites two fields per hit, which is exactly the
-    shape Helen excluded it for on 2026-08-29, so the proof is the whole file.
-    """
+    """Byte for byte: the size rule rewrites two fields per hit, so the proof
+    is the whole file (#577)."""
     path = food / "test-recipe.md"
     path.write_text(SIZE_BEFORE, encoding="utf-8")
     run_food(food, "--only", "size", "--apply")
@@ -743,13 +627,11 @@ def test_size_words_apply_moves_exactly_four_and_touches_nothing_else(food):
 
 
 def test_size_words_apply_parses_and_satisfies_the_recipe_rule(food):
-    """Parsed both sides, on a copy -- the check that caught the `meta:` bug.
+    """Parsed on both sides: a plausible diff can still be an unparseable file.
 
-    The recipe rule's own predicate, imported and not retyped, must find
-    nothing left in the file that the script had the standing to move; what
-    remains is the six shapes it refused on purpose, every one of which the
-    rule either does not flag (weight, fraction, no amount, QQ) or was left for
-    an eye (`or`, `baby`).
+    The recipe rule's own predicate, imported and not retyped, finds nothing
+    left that the script could move. What remains flagged is the two shapes
+    left for an eye (`or`, `baby`).
     """
     import yaml
     sys.path.insert(0, str(ROOT / "tests"))
@@ -783,8 +665,8 @@ def test_size_words_apply_parses_and_satisfies_the_recipe_rule(food):
 def test_size_words_never_run_on_a_drink(drinks):
     """`--only size` on the drinks site changes nothing and says so.
 
-    A drink's `amount` is the recorded harm the module docstring names, and a
-    drink has no `item` since 2026-09-21. The rule is in FOOD_FIXERS alone.
+    A drink's `amount` is off limits and a drink has no `item`. The rule is in
+    FOOD_FIXERS alone.
     """
     path = write_drink(drinks)
     out = run(drinks, "--only", "size", "--apply")
@@ -795,11 +677,9 @@ def test_size_words_never_run_on_a_drink(drinks):
 def test_a_range_in_an_amount_is_reported_rather_than_silently_declined(drinks):
     """The drinks suite fails on it, so the report has to say why it did not.
 
-    `test_drink_number_ranges_use_en_dashes` checks amounts -- Helen, of
-    `cook_time: "20-25 mins"`: "These still render to the user, so correct to en
-    dash please." This script declines them on a recorded harm
-    (anitas-attitude-adjuster, see the module docstring), and a decline that
-    prints nothing is indistinguishable from a rule that is not running.
+    `test_drink_number_ranges_use_en_dashes` checks amounts, and this script
+    declines to edit one. A decline that prints nothing is indistinguishable
+    from a rule that is not running.
     """
     write_drink(drinks)
     out = run(drinks)
@@ -811,9 +691,8 @@ def test_a_range_in_an_amount_is_reported_rather_than_silently_declined(drinks):
 def test_a_file_with_no_front_matter_is_named_and_left_alone(drinks):
     """`_cocktail_drafts/README.md` is the live case and it is prose.
 
-    The three line-wise fixers do not parse front matter, so before 2026-09-05
-    a README containing `--` was a file this pass would have em-dashed. Absent
-    this test the only symptom would be an em dash in a README nobody diffs.
+    The line-wise fixers do not parse front matter, so without the guard the
+    only symptom is an em dash in a README nobody diffs.
     """
     write_drink(drinks)
     readme = drinks / "README.md"
@@ -827,13 +706,10 @@ def test_a_file_with_no_front_matter_is_named_and_left_alone(drinks):
 
 
 def test_a_drink_in_a_staging_subfolder_is_reached(drinks):
-    """`4-promote/` (`to-promote/` until 2026-09-14) is half the collection and
-    a flat glob would miss it.
+    """A drink in a staging subfolder (`4-promote/`) is reached.
 
-    22 of the 124 drinks live there. The food side went recursive on 2026-08-20
-    for the same reason and the failure was invisible: a flat glob reports the
-    files it found, all of them clean, and says nothing about the ones it did
-    not look for.
+    A flat glob reports the files it found, all of them clean, and says
+    nothing about the ones it did not look for.
     """
     (drinks / "4-promote").mkdir()
     path = write_drink(drinks, "4-promote/staged.md")
@@ -843,9 +719,7 @@ def test_a_drink_in_a_staging_subfolder_is_reached(drinks):
     assert path.read_text(encoding="utf-8") == BEFORE
 
 
-# =============================================================================
-# THE NOTES SLOT, #1258
-# =============================================================================
+# ---- The notes slot, #1258 ----
 # Three notes, one of each kind the rule has to tell apart: imported text with
 # an empty label (labelled), the empty pair (a slot, left exactly alone), and a
 # note Helen has already headed (hers, left exactly alone).
@@ -876,11 +750,7 @@ def test_notes_rule_labels_imported_text_and_nothing_else(drinks, site):
 
 @pytest.mark.parametrize("empty", ["notes: []\n", "notes:\n", "notes:  [ ]\n"])
 def test_notes_rule_turns_an_empty_list_into_a_slot(drinks, empty):
-    """`notes: []` -> the empty pair, and the file still parses to exactly that.
-
-    PARSED AS WELL AS COMPARED, because the one bug this script has had wrote a
-    plausible diff and an unparseable file.
-    """
+    """`notes: []` -> the empty pair, and the file still parses to exactly that."""
     import yaml
     path = write_drink(drinks, text=BEFORE.replace("notes:\n" + STOCK_NOTES,
                                                    empty))
@@ -900,11 +770,9 @@ def test_notes_rule_is_idempotent_and_leaves_a_finished_file_alone(drinks):
     assert path.read_text(encoding="utf-8") == BEFORE
 
 
-# =============================================================================
-# KEY ORDER, #1213
-# =============================================================================
-# A drink in the order every draft was in before the rule: body first, `mood`
-# after the method, `meta` last. It carries every optional key (`serve`,
+# ---- Key order, #1213 ----
+# A drink out of page order: body first, `mood` after the method, `meta` last.
+# It carries every optional key (`serve`,
 # `serves`, `to_serve`), a comment INSIDE a block, a nested mapping, a flow
 # list, a `{step, note}` pair and a `QQ` line with a `--` in it -- each a thing
 # that must arrive in its new place exactly as it left the old one. The prose
@@ -1010,14 +878,13 @@ def test_key_order_report_names_the_move_and_writes_nothing(drinks):
 @pytest.mark.parametrize("only", [("--only", "order"), ()],
                          ids=["only-order", "the-full-pass"])
 def test_key_order_apply_moves_whole_blocks_and_edits_no_line(drinks, only):
-    """Byte for byte, and then the three claims the 2026-08-29 lesson asks for.
+    """Byte for byte, and three claims asserted separately so a failure says
+    which: the same lines as a multiset, the same parsed data, the declared
+    order.
 
-    THE DIFF OF A REORDER IS UNREADABLE BY CONSTRUCTION -- every moved block is
-    a deletion in one place and an insertion in another -- so "read the diff"
-    is worth even less here than it was for the `meta:` rewrite that broke 341
-    drafts behind a plausible one. Hence: the same lines as a multiset, the
-    same parsed data, and the declared order, each asserted separately so a
-    failure says which.
+    A reorder's diff is unreadable by construction -- every moved block is a
+    deletion in one place and an insertion in another -- so reading it proves
+    nothing.
     """
     from test_cocktails import TOP_LEVEL_KEYS_IN_ORDER
 
@@ -1044,9 +911,7 @@ def test_key_order_apply_moves_whole_blocks_and_edits_no_line(drinks, only):
                     + "\n".join(moved or ["(line counts differ)"]))
 
 
-# =============================================================================
-# TITLE CASE, #1089
-# =============================================================================
+# ---- Title case, #1089 ----
 
 def _titled(title, tagline='"A test"'):
     return BEFORE_CLEAN.replace('title: "Test Drink"', f"title: {title}") \
@@ -1117,8 +982,8 @@ def test_key_order_refuses_what_needs_an_eye_and_says_so(drinks, before, why):
 
 
 def test_key_order_never_runs_on_food(food):
-    """`--only order` on the food site changes nothing. Helen asked for
-    cocktails; a food recipe's order is not this rule's."""
+    """`--only order` on the food site changes nothing: the rule is for
+    cocktail drafts (#1213)."""
     path = food / "test-recipe.md"
     path.write_text(FOOD_BEFORE, encoding="utf-8")
     out = run_food(food, "--only", "order", "--apply")
@@ -1129,12 +994,10 @@ def test_key_order_never_runs_on_food(food):
 def test_food_only_rules_do_not_run_on_a_drink(drinks):
     """`--only meta` on the drinks site changes nothing, and says so.
 
-    The #429 `meta:` migration drops two retired keys and reorders three flags.
-    A drink's `meta:` is five keys in its own order (test_cocktails.
-    META_KEYS_IN_ORDER), two of which food RETIRED -- so the food migration
-    pointed at a drink would strip them and reorder what is left, quietly, on
-    all 124 files. The rules are in two tables precisely so this cannot happen;
-    this is the test that says the tables are still two.
+    Food's `meta:` migration (#429) drops keys a drink still carries
+    (test_cocktails.META_KEYS_IN_ORDER) and reorders the rest, quietly, on
+    every drink it is pointed at. The rules are in two tables so that cannot
+    happen; this pins that the tables are still two.
     """
     path = write_drink(drinks)
     out = run(drinks, "--only", "meta", "--apply")
@@ -1145,12 +1008,7 @@ def test_food_only_rules_do_not_run_on_a_drink(drinks):
         "still omits fix_meta_block."
     )
 
-# =============================================================================
-# A FOOD GROUP'S NAME IS QUOTED -- Helen, 2026-10-04
-# =============================================================================
-# "Let's make future recipes quote group titles, so add that to the tidy pass
-# instructions, and ingestion instructions." Asked after #814 left
-# `- name: cake` beside `- name: "Make the batter"` in one file.
+# ---- A food group's name is quoted (#814) ----
 
 GROUP_NAMES_BEFORE = (
     "---\n"

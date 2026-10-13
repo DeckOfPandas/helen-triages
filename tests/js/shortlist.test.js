@@ -1,25 +1,16 @@
-// =============================================================================
-// Tests for HTF.shortlist in assets/js/assets.js — GitHub issue #546.
+// Tests for HTF.shortlist in assets/js/assets.js (#546).
 //
 // Run from the repo root:
 //
 //   node --test tests/js/*.test.js
 //
-// (tests/js/ingredient-search.test.js documents the local .node-runtime this
-// repo normally uses; it is gitignored and so is absent from a worktree.)
+// Every failure mode here is invisible from an ordinary browser: private mode
+// throws on setItem, blocked site data makes the getter throw, and a record
+// from an older build parses fine in the wrong shape. A failed write must not
+// cost the click that asked for it.
 //
-// WHY THIS FILE EXISTS, and it is the same argument index-memory.test.js makes
-// about its own module: every failure mode here is invisible from a browser you
-// happen to have open. Private mode throws on setItem; a browser with site data
-// blocked can make the getter throw; a record left by an older build parses
-// fine and is the wrong shape. And this one has a rule index memory does not —
-// a failed WRITE must not cost you the click you just made, because you asked
-// for it. That is a behaviour with no way to produce it by clicking around.
-//
-// WHAT IS NOT TESTED HERE: the DOM half. assets/js/shortlist.js finds the
-// controls, paints them and dispatches the event; it needs a real document and
-// this harness stubs only enough page for a script to read two meta tags.
-// =============================================================================
+// Not tested here: the DOM half, assets/js/shortlist.js, which needs a real
+// document. This harness stubs only enough page to read two meta tags.
 'use strict';
 
 const test = require('node:test');
@@ -28,13 +19,10 @@ const { makePage, load } = require('./stub-dom.js');
 
 const FOOD_KEY = 'htf-shortlist-food-v1';
 
-/* ACROSS THE REALM BOUNDARY, so array comparisons go through JSON.
-   `assert.deepStrictEqual` checks prototypes, and an array built inside the vm
-   context is an instance of THAT context's Array, not this one's — so an
-   otherwise identical list fails with "same structure but not reference-equal".
-   The same fact filter-state.js's own comments cite as the reason it duck-types
-   Sets rather than using `instanceof`. Round-tripping through JSON rebuilds the
-   value in this realm and compares what the test is actually about. */
+/* Array comparisons go through JSON: `assert.deepStrictEqual` checks
+   prototypes, and an array built inside the vm context is an instance of that
+   context's Array, so an identical list fails. The round trip rebuilds the
+   value in this realm. */
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
 /** A working localStorage: the browser's, minus everything unused here. */
@@ -135,9 +123,8 @@ test('what a previous visit wrote is read back', () => {
 });
 
 test('the two sites keep two lists, from one localStorage', () => {
-  // Both sites are served from one origin, so this is the same store. Helen
-  // asked for two lists rather than a mixed one; HTF.site is what separates
-  // them, and this is the check that it does.
+  // Both sites are served from one origin, so this is the same store;
+  // HTF.site is what separates the two lists (#546).
   const shared = workingStorage();
   const food = pageWith(shared, 'food');
   const cocktails = pageWith(shared, 'cocktails');
@@ -253,9 +240,8 @@ test('the two sites keep separate counts, like separate lists', () => {
 });
 
 // --- storage that fights back --------------------------------------------------
-// The rule this module has and HTF.indexMemory does not: a failed WRITE must
-// still leave the click working for this visit. Nobody asked for an index-memory
-// record, so losing one costs nothing; somebody just pressed this control.
+// A failed write must still leave the click working for this visit: somebody
+// just pressed this control.
 
 test('setItem throwing (private mode) does not lose the click', () => {
   const { HTF } = pageWith({
@@ -278,8 +264,7 @@ test('getItem throwing (site data blocked) reads as empty and still works', () =
 });
 
 test('no localStorage in the context at all is survivable', () => {
-  // A bare `localStorage` reference is a ReferenceError, not undefined — the
-  // third failure mode HTF.indexMemory's own comment names.
+  // A bare `localStorage` reference is a ReferenceError, not undefined.
   const page = makePage({ 'base-url': '/', 'site-key': 'food' });
   load(['assets/js/assets.js'], page);
   assert.doesNotThrow(() => page.HTF.shortlist.list());
@@ -288,9 +273,8 @@ test('no localStorage in the context at all is survivable', () => {
 });
 
 // --- portions — GitHub issue #801 ---------------------------------------------
-// The third map, and the one place it is genuinely not `glasses` under another
-// name: a missing GLASSES entry is one glass, because a drink is a drink; a
-// missing PORTIONS entry is "however many this recipe makes", which only the
+// Not `glasses` under another name: a missing glasses entry is one glass, but
+// a missing portions entry is "however many this recipe makes", which only the
 // build knows. So `null` is the unset answer and `1` is a real, storable one.
 
 test('an unset recipe answers null, not a number', () => {
@@ -299,8 +283,7 @@ test('an unset recipe answers null, not a number', () => {
 });
 
 test('one portion is a real answer and survives a reload', () => {
-  // The whole reason this is not setGlasses, which deletes a 1 as its default.
-  // One portion of a thing that serves six is a Tuesday.
+  // Unlike setGlasses, which deletes a 1 as its default.
   const { HTF, storage } = pageWith();
   assert.strictEqual(HTF.shortlist.setPortions('/a/', 1), 1);
   HTF.shortlist._forget();
@@ -320,7 +303,6 @@ test('anything below one forgets the entry rather than storing it', () => {
 });
 
 test('a stored value that is not a positive number is not read back', () => {
-  // Untrusted input, the standing everything else in this module already has.
   const { HTF } = pageWith(workingStorage({
     'htf-shortlist-portions-food-v2':
       JSON.stringify({ '/a/': 0, '/b/': -1, '/c/': 'six', '/d/': null, '/e/': 4 })
@@ -375,9 +357,8 @@ test('a failed portions write does not lose the number just typed', () => {
 });
 
 // --- how many BATCHES -- #1297 --------------------------------------------------
-// On the shopping list a `makes:` recipe's box counts batches since 2026-10-09
-// (Helen: "X batches of 18 Peanut Butter Cookies"). A FOURTH map, because a
-// stored 6 cannot say whether it meant people or batches.
+// On the shopping list a `makes:` recipe's box counts batches. A map of its
+// own, because a stored 6 cannot say whether it meant people or batches.
 
 test('#1297: an unset recipe has no batch count, which the caller reads as one', () => {
   const { HTF } = pageWith();

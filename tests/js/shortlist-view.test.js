@@ -1,21 +1,11 @@
-// shortlist-view.test.js
-// =============================================================================
-// THE SHORTLIST IS A VIEW, NOT A FACET -- GitHub issue #918.
-// =============================================================================
-// Helen, 2026-09-10, fourteen steps and four surprises, all of them the
-// shortlisted filter ANDing with a title search: shortlist one recipe, type
-// "lasa", shortlist the lasagne, press `shortlisted (2)` and see ONE recipe;
-// type "duck" while the view is on and see NONE. She called it a bug rather
-// than a preference, and the rule that removes it is two functions in
-// filter-state.js, generated here across BOTH field tables so neither index
+// The shortlist is a view, not a facet (#918, DECISIONS §8.3): `shortlisted`
+// never ANDs with another filter. The rule is two functions in
+// filter-state.js, generated here across both field tables so neither index
 // can quietly keep composing:
 //
 //   enterShortlistView()          everything cleared, `shortlisted` true
 //   reconcileShortlistView(state) the view gives way to any other set field,
 //                                 except a half-typed search (`keepsView`)
-//
-// Pure functions over a spec, no DOM -- the same argument filter-state.test.js
-// makes for everything else in that module.
 'use strict';
 
 const test = require('node:test');

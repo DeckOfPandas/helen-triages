@@ -10,18 +10,12 @@ permalink: /cocktails/
 
 {% comment %} COCKTAILS INDEX. Mood and chaos above the fold, ingredient include
    then exclude below: the order is the design. No glass filter, as a rule: the
-   drawings are the site's identity, not an axis.
-
-   Recipes always, drafts only locally (#668). `output: false` stops Jekyll
-   writing a draft but leaves it in `site.cocktail_drafts`, so looping that
-   collection unconditionally prints private drink names into public HTML
-   (#235). The drafts are gated on `site.show_drafts`, a key only
-   _config_local.yml declares: do not widen that condition. The empty-state test
-   is on `all_drinks`, which has already had the draft question asked of it.
-
-   Every card is in the DOM and filtering only toggles `hidden`. Filter state
-   lives in data- attributes written at build time, so the script never parses
-   text to decide what a card is. {% endcomment %}
+   drawings are the site's identity, not an axis. Every card is in the DOM and
+   filtering only toggles `hidden`, on data- attributes written at build time.
+   Recipes always, drafts only locally (#668): `output: false` leaves a draft in
+   `site.cocktail_drafts`, so looping it unconditionally prints private drink
+   names into public HTML (#235). The gate is `site.show_drafts`, which only
+   _config_local.yml declares: do not widen that condition. {% endcomment %}
 
 {% assign all_drinks = site.cocktail_recipes %}
 {% if site.show_drafts %}
@@ -56,23 +50,14 @@ permalink: /cocktails/
      what she wants, the ingredient fields to narrow, and the name search last
      because it is the way past all of it. {% endcomment %}
 
-  {% comment %} THE UNIVERSE SAYS: one random drink dealt above the panel, with
-     a control to deal again. One line, not a card (#719): a three-column grid
-     of label, offer and `deal again` at the far right (#693). No ship mark and
-     no moods. Food has no such panel (MANUAL §13.4). Absent JavaScript the
-     section is empty and hidden. {% endcomment %}
-  {% comment %} It deals from the top two rungs only (#692), and names them in
-     `data-universe-rows`, deliberately not through `data-chaos`: that attribute
-     is the YOLO? filter's word, and widening `no chaos please` must not
-     silently change what the site offers unprompted.
-
-     universe.js copies the parts `data-universe-parts` names, in the order it
-     lists them. It returns before unhiding when the rows selector matches
-     nothing, so the section stays `hidden`. {% endcomment %}
-  {% comment %} Three grid children and no wrappers. `.universe-pick` does not
-     carry `drink-card`: the tape, the ingredient line and the glass are styled
-     through their own child classes, and the card's height, border, fill and
-     padding would all have to be undone. {% endcomment %}
+  {% comment %} THE UNIVERSE SAYS: one random drink dealt above the panel, as
+     one line, not a card (#719, #693). Food has no such panel (MANUAL §13.4).
+     Absent JavaScript the section is empty and hidden. {% endcomment %}
+  {% comment %} It deals from the top two rungs only (#692), named in
+     `data-universe-rows`, deliberately not through `data-chaos`: widening `no
+     chaos please` must not change what the site offers unprompted. {% endcomment %}
+  {% comment %} `.universe-pick` does not carry `drink-card`: the card's height,
+     border, fill and padding would all have to be undone. {% endcomment %}
   <section class="universe" data-universe-rows=".drink-cards > li[data-ship='yes'], .drink-cards > li[data-ship='oh gods yes']" data-universe-parts=".drink-card-name, .drink-card-glass, .drink-card-ingredients" hidden>
     <span class="universe-label">the universe says…</span>
     <div class="universe-pick" aria-live="polite"></div>
@@ -188,18 +173,14 @@ permalink: /cocktails/
     </div>
   </div>
 
-  {% comment %} "survivors", matching food's results heading (#489). Liquid
-     pluralises for the first render only; assets/js/cocktail-index.js rewrites
-     the number and the word as filters change, so the two must agree on the
-     rule. {% endcomment %}
+  {% comment %} "survivors", matching food's (#489). cocktail-index.js rewrites
+     the number and the word, so it must agree with this plural rule. {% endcomment %}
   {% comment %} A plain paragraph, not a flex row: a flex container discards the
-     whitespace between its items, which here is the word space after the number
-     (#675). {% endcomment %}
+     word space after the number (#675). {% endcomment %}
   {% comment %} `id="results"` is where a search result lands (#1050), as on the
      food index. {% endcomment %}
   {% comment %} `.results-count-number` sets the digits in the label face
-     (_sass/shared/_results-bar.scss); the word stays bare. It stays a <strong>:
-     the count is the emphasis of the sentence. {% endcomment %}
+     (_sass/shared/_results-bar.scss). A <strong>: the count is the emphasis. {% endcomment %}
   <p class="drink-count" id="results">
     <strong class="results-count-number" id="drink-count-n">{{ all_drinks.size }}</strong>
     <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
@@ -279,26 +260,16 @@ permalink: /cocktails/
         {% assign chaos = "yolo" %}
       {% endif %}
 
-      {% comment %} The searchable ingredient text, built at build time so the
-         script never reads the rendered markup, and lowercased so it need not
-         lower every string on each keystroke. It is the plugin's
-         `card_ingredients`, the list the visible line prints, so the search
-         pool and the line cannot drift. {% endcomment %}
-      {% comment %} The order of this string does not matter: cocktail-search.js
-         splits on `|` and asks set questions of the pieces. {% endcomment %}
-      {% comment %} What is hidden, how it is labelled and how a list generic is
-         joined are _plugins/cocktail_card_ingredients.rb's; this only joins the
-         `search` strings it built. {% endcomment %}
+      {% comment %} The searchable text is the plugin's `card_ingredients`, the list
+         the visible line prints, so the search pool and the line cannot drift. {% endcomment %}
+      {% comment %} Order does not matter: cocktail-search.js splits on `|`. {% endcomment %}
+      {% comment %} This only joins the `search` strings the plugin built. {% endcomment %}
       {% capture searchable %}{% for ing in drink.card_ingredients %}{{ ing.search }}|{% endfor %}{% endcapture %}
 
-      {% comment %} `data-url` is the shortlist's key (#546): `drink.url`, not
-         its `relative_url`, because the baseurl is deployment configuration and
-         the key must match the one the drink's own page emits (HTF.shortlist,
-         assets/js/assets.js). {% endcomment %}
-      {% comment %} `.drink-card--draft` marks the card, and cocktail-index.js
-         reads it for the hide-drafts toggle. The visible badge is a child,
-         emitted below by _includes/cocktails/draft-badge.html. Both ask
-         `collection`, food/index.html's idiom (#562). {% endcomment %}
+      {% comment %} `data-url` is the shortlist's key (#546): `drink.url`, not its
+         `relative_url`, to match the key the drink's own page emits. {% endcomment %}
+      {% comment %} `.drink-card--draft` is what cocktail-index.js reads for the
+         hide-drafts toggle; it and the badge both ask `collection` (#562). {% endcomment %}
       <li class="drink-card{% if drink.collection == 'cocktail_drafts' %} drink-card--draft{% endif %}{% if drink.tagline and drink.tagline != 'QQ' %} drink-card--tagline{% endif %}"
           data-url="{{ drink.url }}"
           data-ship="{{ ship }}"
@@ -355,19 +326,14 @@ permalink: /cocktails/
              hover or by the card's tagline mark where there is no hover; the
              include is below and _cards.scss has the rest. {% endcomment %}
           {% if drink.ingredients.size > 0 %}
-            {% comment %} Items only, no amounts. `data-ing` is `|`-separated
-               and carries one ingredient's search terms, so the script can ask
-               whether this ingredient answers a chip without a substring probe
-               matching across two of them. A rum shows its category, never the
-               source's words for it (#501); the plugin applies `card_names`. {% endcomment %}
-            {% comment %} `card_ingredients` arrives hidden, labelled, joined
-               and sorted by _plugins/cocktail_card_ingredients.rb (#567, #640,
-               #691): this loop must not re-sort it. {% endcomment %}
-            {% comment %} No whitespace between the <p> tag and the loop, on
-               either side (#917). In the universe pick
-               `.drink-card-ingredients::before` inserts "(" ahead of the
-               content, so leading whitespace stops being leading and renders as
-               a gap after the bracket. {% endcomment %}
+            {% comment %} Items only, no amounts. `data-ing` is one ingredient's
+               `|`-separated search terms, so a chip is matched per ingredient,
+               never by a substring probe across two of them. {% endcomment %}
+            {% comment %} `card_ingredients` arrives sorted by
+               _plugins/cocktail_card_ingredients.rb (#691): do not re-sort it. {% endcomment %}
+            {% comment %} No whitespace between the <p> tag and the loop, on either
+               side (#917): the universe pick's `::before` inserts "(" ahead of
+               the content, and leading whitespace renders as a gap after it. {% endcomment %}
             <p class="drink-card-ingredients">{% for ing in drink.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">·</span> {% endunless %}<span class="drink-card-ing" data-ing="{{ ing.search }}">{{ ing.label }}</span>{% endfor %}</p>
           {% endif %}
           {% include cocktails/card-tagline.html doc=drink part="line" %}
@@ -526,10 +492,9 @@ permalink: /cocktails/
   </script>
 
   {% comment %} Local only: both blocks below are absent on the deployed site,
-     because `site.show_costs` is declared in _config_local.yml and nowhere
-     else. `drink-costs`, the second, is what a glass of each drink costs,
-     copied from the `drink.cost` that _plugins/cocktail_costs.rb computed. A
-     drink whose `cost.complete` is false is omitted, not emitted as zero. {% endcomment %}
+     because only _config_local.yml declares `site.show_costs`. `drink-costs` is
+     a glass of each drink, copied from the `drink.cost` of
+     _plugins/cocktail_costs.rb; `cost.complete` false is omitted, not zero. {% endcomment %}
   {% comment %} `drink-rates` is GBP per litre by ingredient, already resolved
      by _plugins/cocktail_costs.rb (#820), so the browser multiplies millilitres
      by a number and holds no copy of the costing rules. A shopping list totals
@@ -554,11 +519,9 @@ permalink: /cocktails/
   </script>
   {% endif %}
 
-  {% comment %} Order matters: each of these is read at startup, so a page that
-     loads them out of order fails immediately. cocktail-search.js needs
+  {% comment %} Order matters: each is read at startup. cocktail-search.js needs
      ingredient-search.js; cocktail-index.js needs filter-state.js,
-     cocktail-search.js and shopping-list.js (it calls HTF.shoppingList.foldKey
-     as it starts).
+     cocktail-search.js and shopping-list.js.
      tests/test_site_config.py::test_the_cocktail_index_scripts_load_in_dependency_order
      guards all but shopping-list.js. {% endcomment %}
   {% comment %} list-view.js is shared with the food index (#694), so the two

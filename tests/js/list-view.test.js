@@ -1,13 +1,9 @@
-// =============================================================================
-// Tests for assets/js/list-view.js — the pure shuffle and pagination-maths
-// behind the index's recipe list, no DOM required.
+// Tests for assets/js/list-view.js: the pure shuffle and pagination maths
+// behind the index's recipe list. No DOM required.
 //
 // Run from the repo root, with the local Node runtime:
 //
 //   .node-runtime/node/bin/node --test
-//
-// See tests/js/ingredient-search.test.js for why not the system node.
-// =============================================================================
 'use strict';
 
 const test = require('node:test');

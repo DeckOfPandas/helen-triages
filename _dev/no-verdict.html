@@ -8,22 +8,13 @@ excerpt_separator: ""
 ---
 
 {% comment %} Drinks with no verdict: internal worklist, never published (#722, #728).
-
-   Every drink with no ship rating, for Helen to rate or mark unmade. Kept in
-   place because every freshly ingested drink lands with `ship: "QQ"`. The page
-   writes nothing: it reads drink files and never touches one, so it cannot
-   edit a recipe behind a proofread (#367). Answers live in localStorage under
-   one key, and the copy box is how they leave the page.
-
-   "No verdict" is derived from `ship_scale`, not from a list of bad values
-   (MANUAL 9.9): the test is whether the ship value is on the scale, so `QQ`
-   and `who knows` are unrated because taxonomy.yml puts them off it. The row
-   shows which of the two a drink carries.
-
-   `site_key: cocktails` is load-bearing: without it default.html links no
-   stylesheet. Never published is a config fact: the `dev` collection is
-   `output: false` in _config.yml and true only in _config_local.yml. That
-   matters here, because this page lists private drink names (#235). {% endcomment %}
+   The page writes nothing: it reads drink files and never touches one, so it
+   cannot edit a recipe behind a proofread (#367). Answers live in localStorage
+   and leave through the copy box. "No verdict" means the ship value is not on
+   `ship_scale`, never a list of bad values (MANUAL 9.9). `site_key: cocktails`
+   is load-bearing: without it default.html links no stylesheet. The `dev`
+   collection must stay `output: false` in _config.yml: this page lists private
+   drink names (#235). {% endcomment %}
 
 {% assign taxonomy = site.data.cocktails.taxonomy %}
 {% assign scale = taxonomy.ship_scale %}

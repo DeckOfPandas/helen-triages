@@ -3,53 +3,19 @@
 
     python3 scripts/verify.py
 
-FIVE CHECKS, AND THE POINT IS THAT THEY ARE ONE COMMAND. MANUAL §1 lists them
-separately and they were being typed separately after every change, which has
-two costs. The small one is five invocations instead of one. The real one is
-that the last three are EASY TO FORGET -- `derive_cocktail_moods.py` is the
-only thing that says whether a vocabulary edit silently moved a drink's moods,
-`build_ingest_vocab.py --check` is the only thing that says the standalone
-ingest documents still match the data they are rendered from, and
-`check_slug_keys.py` is the only thing that can see a public entry keyed by a
-drink slug that no longer names a drink. Both of the first two have been
-skipped in sessions that ran the two test suites and called it verified.
-
   pytest                              content and structure
   node --test tests/js/*.test.js      the JS suite
   derive_cocktail_moods.py            did a vocabulary change move a mood?
   build_ingest_vocab.py --check       are the standalone docs in step?
   check_slug_keys.py                  does every slug-keyed entry name a drink?
 
-A CHECK MAY REPORT **SKIP**, WHICH IS NOT A PASS AND NOT A FAILURE. Exit code 2
-means "I verified nothing", and `check_slug_keys.py` returns it whenever the
-drafts clone is absent -- which is every fresh worktree and all of CI. The run
-still goes green, because a missing private repo is not a defect; the line says
-SKIP so that nobody reads a check that ran over half a corpus as one that
-passed. That distinction is the entire content of #1106.
+A check may report SKIP, which is neither a pass nor a failure (#1106). Exit
+code 2 from `check_slug_keys.py` means the drafts clone is absent and it
+verified nothing; the run stays green and the line says SKIP.
 
-WHY THIS FILE IS COMMITTED AND NOT IN tmp/. It started as a scratch runner, and
-`tests/js/cocktail-scale.test.js`'s own header explains why that was the wrong
-place: the check it replaced lived in `tmp/smoke_scale_total.js`, "a scratch
-file, gitignored, which is exactly the shape of check that stops being run".
-Helen asked the same question the first day this existed. A verification step
-nobody else can run is a verification step that stops happening.
-
-THE JS FILES ARE GLOBBED HERE, NOT LISTED. The first version named all fourteen
-so the shell never saw a `*`, and that is a trap rather than a tidiness: a test
-file added tomorrow would be silently skipped and the run would still say PASS.
-MANUAL §10 says the glob is required, and Python's glob satisfies it without
-handing a wildcard to bash.
-
-ONE PYTEST AT A TIME, still (MANUAL §1) -- but no longer for the reason this
-paragraph used to give. It said `test_rendered_pages.py` writes throwaway
-`zzz-gate-` recipes into the collections, so a second concurrent run collects
-them as real files and reports failures that vanish on a clean rerun. Since
-#1153 (2026-09-20) those fixtures go into a COPY of the tree and the real
-collections are never written to, so that particular collision cannot happen.
-Two concurrent runs still share one `.jekyll-cache` and one `tmp/`, which is
-reason enough.
-
-Exits non-zero if anything fails, so it works as a gate.
+The JS test files are globbed here, not listed, so a new test file cannot be
+left out silently. Never run two of these at once: concurrent runs share one
+`.jekyll-cache` and one `tmp/`. Exits non-zero if anything fails.
 """
 from __future__ import annotations
 
@@ -64,16 +30,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def js_suite() -> list[str]:
     """`node --test` over every JS test file there is.
 
-    THE REPORTER IS PINNED, AND IT HAD TO BE -- 2026-09-29. This check asserts
-    the output contains `# fail 0`, which is TAP. Node's DEFAULT reporter is
-    not a fixed thing: v24 emits the `spec` format (`ℹ fail 0`) where the
-    older runtime emitted TAP, so the moment the devcontainer's Node was
-    upgraded this check began reporting FAIL on a suite that passed 767 of 767.
-
-    A check that says the opposite of the truth is worse than no check: it
-    trains the next reader to skim past a red line. So the format is asked for
-    explicitly rather than inherited, and the next runtime upgrade cannot
-    silently change what this means.
+    The reporter is pinned to TAP: the `# fail 0` this check looks for is TAP,
+    and Node's default reporter differs between versions.
     """
     files = sorted(glob.glob(os.path.join(ROOT, "tests", "js", "*.test.js")))
     return ["node", "--test", "--test-reporter=tap", *files]
@@ -89,9 +47,8 @@ def checks() -> list[tuple[str, list[str], str | None, int | None]]:
          None),
         ("ingest vocab", ["python3", "scripts/build_ingest_vocab.py", "--check"],
          "matches its generator", None),
-        # 2 means "no drafts clone, so I verified nothing" -- see #1106 and
-        # this file's header. Not a failure: the private repo is legitimately
-        # absent in every fresh worktree and in CI.
+        # 2 means "no drafts clone, so I verified nothing" (#1106). Not a
+        # failure: the private repo is absent in a fresh worktree and in CI.
         ("slug keys", ["python3", "scripts/check_slug_keys.py"], None, 2),
     ]
 
@@ -109,8 +66,7 @@ def main() -> int:
             r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
                                timeout=1800)
         except FileNotFoundError as exc:
-            # A MISSING BINARY IS A FAILURE, not a skip, whatever it prints:
-            # the check did not run and nobody chose that.
+            # A missing binary is a failure, not a skip: the check did not run.
             print("%-14s FAIL   %s" % (name, exc))
             failed.append(name)
             continue

@@ -19,17 +19,13 @@
 }
 
 // The unit lives inside this span (_layouts/recipe.html), so one highlighter
-// covers "400 g" as a single run (#54). .highlighted (shared/_base.scss)
-// supplies the positioning context the injected SVG needs.
-//
-// align-items: baseline overrides .highlighted's `center`: with no
-// baseline-aligned item an inline-flex box's own baseline is synthesised from
-// its first item's edge, which drops the box below the ingredient name.
-//
-// No right padding and no right margin: the highlighter SVG overflows this box
-// by a fixed amount whatever its size, so padding only gives it more room to
-// paint over the space before the name, and .ingredient-amount's margin-right
-// is already the gap.
+// covers "400 g" as a single run (#54). align-items: baseline overrides
+// .highlighted's `center` (shared/_base.scss): with no baseline-aligned item
+// an inline-flex box's baseline is synthesised from its first item's edge,
+// which drops the box below the ingredient name. No right padding or margin:
+// the highlighter SVG overflows this box by a fixed amount, so padding only
+// lets it paint over the space before the name, and .ingredient-amount's
+// margin-right is already the gap.
 .ingredient-amount-number {
   padding: 0 0 0 0.2em;
   align-items: baseline;

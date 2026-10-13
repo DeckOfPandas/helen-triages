@@ -1,27 +1,25 @@
 """Leopard candidates on the real pages: the CANDIDATES PAGE of MANUAL 13.11. Ships nothing.
 
-REPRODUCES NO NUMBER -- it rebuilds the page Helen chose the leopard from, and
-is kept so the next round does not start from a script that was in tmp/ and is
-gone, which is what happened to round two's (LEOPARD.md section 4).
-
-THIS IS ROUND FIVE'S STATE, 2026-10-06, the last round before it shipped.
-LOCKED into the page: fur crinkle, the darkest ground (#060607), nap texture,
-on the page ground; the footer a plain band with no print; cards not touched.
-ON THE BAR: how dark the header and footer bands should be, whether the repeat
-is offset, and whether the header carries the print. She chose "same as the
-page", offset, plain -- then, seeing the built bands were flat where this page
-has the nap on them, "darker still" (b2), and after seeing THAT live,
-"darker" (b1, #111113), which is what shipped. THIS PAGE'S BANDS STILL CARRY THE
-NAP AND THE LIVE ONES DO NOT; fix that before asking about a band again.
-All of that is on the live site now, so a NEW round
-starts by changing GROUPS and the rules below to whatever the new question is;
-the overrides here sit on top of the built stylesheet.
-
 Build first:
   bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock
+Then:
+  python3 scripts/leopard_candidates.py
+
 Writes tmp/leopard/index.html (the Artifact's body) and tmp/leopard/drink.html
 (published beside it as a supporting file). Parse tmp/leopard/switcher.js
-before publishing: one bad character in it once cost a whole round.
+before publishing. Committed so that the next round starts from a script that
+exists (LEOPARD.md §4).
+
+Its state is the last round before the print shipped. Locked into the page:
+the fur crinkle and the nap texture on the page ground, the footer a plain
+band, cards untouched. On the bar: how dark the header and footer bands are,
+whether the repeat is offset, and whether the header carries the print. All of
+that is decided and live, so a new round starts by changing GROUPS and
+CANDIDATE_RULES to the new question.
+
+Two things here differ from the live site and want fixing before a band is
+asked about again: this page's bands carry the nap where the live ones are
+flat, and GROUND is not the live `$color-paper`.
 """
 import json, os, sys
 

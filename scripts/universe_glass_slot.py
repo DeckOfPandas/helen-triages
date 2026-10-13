@@ -1,28 +1,18 @@
 """How wide must the universe line's glass slot be, if every glass is one height?
 
-REPRODUCES `$universe-glass-slot` (2.3rem) in `_sass/cocktails/_universe.scss`,
-and checks it: on 2026-09-29 the punch bowl needs 2.107rem.
-
-THE TWO RULES THAT PULL AGAINST EACH OTHER, both Helen's, both 2026-09-05:
-"don't scale -- all the same height", and "leave a fixed width for the glass so
-the name tape doesn't jump around on redeal". One height across the 27 drawings
-means their WIDTHS diverge, so a slot narrower than the widest drawing would cap
-it and render it shorter than the others -- breaking the first rule in order to
-keep the second. The slot therefore has to clear the widest drawing at whatever
-height is chosen, and this is the script that says which drawing that is and by
-how much.
-
-IT PRODUCED $universe-glass-slot IN `_sass/cocktails/_universe.scss` (2.3rem,
-against $universe-glass-height's 1.4rem). Kept in the repo rather than left in
-tmp/ because the answer moves whenever the artwork does: a new glass wider than
-the punch bowl, or a change to the chosen height, and the slot in that file is
-silently wrong -- a wide glass quietly shorter than its neighbours is exactly the
-kind of thing nobody notices. Re-run it, do not re-guess it.
-
-The height is taken from the stylesheet rather than restated here, so the two
-cannot disagree about what is being measured.
-
     python3 scripts/universe_glass_slot.py
+
+Derives and checks `$universe-glass-slot` in `_sass/cocktails/_universe.scss`
+(MANUAL §13.11). Every glass on the universe line is drawn at one height and
+sits in a slot of fixed width, so the name tape does not jump on redeal. One
+height means the widths diverge, and a slot narrower than the widest drawing
+would cap it and render it shorter than the others. So the slot must clear the
+widest drawing at `$universe-glass-height`, and this says which drawing that
+is and by how much. It exits non-zero if the slot is too narrow.
+
+Reads the viewBox of every drawing in `_includes/icons/glasses/` and both
+variables from the stylesheet; writes nothing. Re-run it when a glass is added
+or redrawn, or the height changes.
 """
 import glob
 import os

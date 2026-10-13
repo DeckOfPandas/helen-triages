@@ -581,15 +581,12 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
 
   // The header stacks: three tracks leave the wordmark about a third of a
   // phone, so each row gets the full width. Placement, not a DOM change: the
-  // nav stays first in the markup for the tab order.
-  //
-  // `minmax(0, 1fr)`, not `1fr`: a bare `1fr` track cannot be narrower than
-  // the wordmark's min-content, which on a narrow phone is wider than the
-  // container, and the door's row would then end past the cards' edge. With
-  // one column there is no neighbour for the wordmark to spill over, which is
-  // the reason `min-width: 0` is refused for the centre track above.
-  //
-  // No `gap`: the row's own 0.9rem margin is all the space over it (#1322).
+  // nav stays first in the markup for the tab order. `minmax(0, 1fr)`, not
+  // `1fr`: a bare `1fr` track cannot be narrower than the wordmark's
+  // min-content, which on a narrow phone is wider than the container, so the
+  // door's row would end past the cards' edge. One column has no neighbour
+  // for the wordmark to spill over, the reason the centre track above refuses
+  // `min-width: 0`. No `gap`: the row's margin is the space over it (#1322).
   .site-header-inner {
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;
@@ -641,11 +638,9 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
 }
 
 // The mark at two thirds on a phone (#1086). 600px, not $header-stack-width:
-// that is where the wordmark and the nav stop fitting on one line; this is a
-// size judgement, and a tablet between the two has room for the full mark.
-// It must stay after the $header-stack-width block: its rules override ones
-// there at the same specificity, so source order decides.
-//
+// this is a size judgement, and a tablet between the two has room for the
+// full mark. It must stay after the $header-stack-width block: its rules
+// override ones there at the same specificity, so source order decides.
 // Each row's font-size moves; nothing is `transform: scale()`d. A transform
 // paints smaller and reports the unscaled box, so `.site-logo`'s column, and
 // the tape whose width derives from it, would stay sized for the larger mark.

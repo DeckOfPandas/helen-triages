@@ -104,21 +104,14 @@
      header tag: `-%}` eats this comment's newline, and the two spaces before
      its opening tag are what indent the header. {% endcomment -%}
 {%- if page.site_neutral %}<header class="site-header site-neutral">{% else %}<header class="site-header">{% endif %}
-  {% comment %} ── One header for both sites (#374) ────────────────────────────
-     One template and one loop over _data/sites.yml, in that file's order, with
-     no per-site key; test_the_header_and_footer_are_identical_on_every_page
-     holds it. `.site-header-inner` takes the content column's width
-     (_layout.scss) so the nav can align with the cards' right edge.
-     {% endcomment %}
+  {% comment %} ── One header for both sites (#374): one template and one loop
+     over _data/sites.yml, in that file's order, with no per-site key;
+     test_the_header_and_footer_are_identical_on_every_page holds it. {% endcomment %}
   {% comment %} The wordmark and the nav are siblings in a `1fr auto 1fr` grid
-     (#551), so the wordmark's middle track cannot grow into the nav's. The nav
-     stays first in the markup because it is first in the tab order on purpose;
-     its column is assigned in CSS. {% endcomment %}
-  {% comment %} The row is the door to the other site. The loop skips
-     `page.site_key`, because the tape already names the site you are on; a
-     `site_neutral` page shows every site. The about link is not a site, so it
-     sits outside the nav, at the left end of the row's line (#965).
-     {% endcomment %}
+     (#551), so the wordmark's track cannot grow into the nav's. The nav stays
+     first in the markup because it is first in the tab order on purpose. {% endcomment %}
+  {% comment %} The loop skips `page.site_key`; a `site_neutral` page shows every
+     site. The about link is not a site, so it sits outside the nav (#965). {% endcomment %}
   <div class="site-header-inner">
     <nav class="site-nav-icons">
       {% for entry in site.data.sites %}
@@ -207,14 +200,9 @@
         {% comment %} The site's icon heads its column (#1122). No `class`
            parameter on the include: both partials carry their classes in the
            file, where test_every_chrome_class_has_a_rule_in_every_site_stylesheet
-           finds them with a pattern that skips anything holding Liquid braces.
-           The assign is how a dynamic include is spelled: `include` takes a
-           variable only in the `{% include {{ var }} %}` form.
-        {% endcomment %}
-        {% comment %} Icon and word on one line (#1139). The second column is
-           mirrored by `flex-direction: row-reverse` in the stylesheet, not by a
-           branch here, so each icon sits on the outside of its own word and
-           the footer stays one shape per site. {% endcomment %}
+           finds them. The assign is how a dynamic include is spelled. {% endcomment %}
+        {% comment %} Icon and word on one line (#1139); the second column is
+           mirrored by `flex-direction: row-reverse` in the stylesheet, not here. {% endcomment %}
         {% comment %} The head is one link to the site's index (#1149), from
            `ref_site.home`, the key the header's door uses. {% endcomment %}
         {% assign ref_icon_file = "icons/" | append: ref_site.icon | append: ".svg" %}

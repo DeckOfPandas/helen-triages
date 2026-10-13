@@ -313,17 +313,12 @@
   }
 
   /**
-   * Split "22.5 ml" into a number and a unit.
-   *
-   * Returns null when the string is not a quantity at all (`(top)`, `some`);
-   * the caller counts those entries instead of summing them.
-   *
+   * Split "22.5 ml" into a number and a unit. Null when the string is not a
+   * quantity at all (`(top)`, `some`); the caller counts those entries.
    * `max` and `approx` are present only when the source said so: "30–50 g"
    * gives {quantity: 30, max: 50}, "~2 tbsp" gives {approx: true}.
-   *
    * @param {string} amount
-   * @returns {{quantity: number, unit: string, max?: number,
-   *            approx?: boolean}|null}
+   * @returns {{quantity: number, unit: string, max?: number, approx?: boolean}|null}
    */
   function parseAmount(amount) {
     /* `half` is 0.5 of a `whole`, so scaling and totalling need no rule of
@@ -415,36 +410,17 @@
     return Math.round(n * 1000) / 1000;
   }
 
-  /**
-   * Total up a shortlist.
-   *
-   * @param {Array} entries - one per ingredient of every shortlisted drink:
-   *        { amount: string, generic: string|string[], bottle: string|string[],
-   *          glasses?: number }
+  /** Total up a shortlist.
+   * @param {Array} entries - { amount, generic, bottle, glasses? } per ingredient of every shortlisted drink
    * @param {Object} [options]
    * @param {number} [options.multiplier=1] - glasses of each drink
-   * @param {string[]} [options.exclude=[]] - generics to leave out, folded the
-   *        same way the keys are (pass `not_on_cards`)
-   * @param {Object} [options.bottleAliases] - folded spelling -> canonical
-   *        bottle name, so one bottle written several ways is one bottle
-   * @param {Object} [options.juiceYields] - generic -> {fruit, ml_min, ml_max},
-   *        `juice_yields` from _data/cocktails/ingredients.yml
-   * @param {Object} [options.topUpMl] - generic -> {ml_min, ml_max}, `top_up_ml`
-   *        from _data/cocktails/costs.yml. Absent, a top stays a count.
-   * @param {Object} [options.rates] - {generics: {name: [lo, hi]}, bottles:
-   *        {name: rate}}, GBP per litre, from _plugins/cocktail_costs.rb, plus
-   *        `fruit: {name: [lo, hi]}` (GBP per piece) and `weight: {name:
-   *        [lo, hi]}` (GBP per kilo). Absent, no row carries a price.
-   * @param {Object} [options.shelves] - {order: string[], of: {generic: shelf}},
-   *        `shopping_shelves` and `shelf_of` from ingredients.yml. Absent,
-   *        rows sort by volume alone.
-   * @returns {Array} one row per ingredient, sorted by shelf, then descending
-   *        millilitres, then label:
-   *        { label, note, generic, bottles: string[],
-   *          totals: [{quantity, quantityMax, unit, text}],
-   *          unquantified: [{text, drinks}], fruit, price, millilitres,
-   *          millilitresMax, shelf, text }
-   */
+   * @param {string[]} [options.exclude=[]] - generics to leave out, folded as the keys are (`not_on_cards`)
+   * @param {Object} [options.bottleAliases] - folded spelling -> canonical bottle name
+   * @param {Object} [options.juiceYields] - generic -> {fruit, ml_min, ml_max}: `juice_yields` in ingredients.yml
+   * @param {Object} [options.topUpMl] - `top_up_ml` in costs.yml; absent, a top stays a count
+   * @param {Object} [options.rates] - from _plugins/cocktail_costs.rb; absent, no row carries a price
+   * @param {Object} [options.shelves] - `shopping_shelves` and `shelf_of`; absent, rows sort by volume alone
+   * @returns {Array} one row per ingredient, sorted by shelf, then descending millilitres, then label */
   function build(entries, options) {
     var opts = options || {};
     var multiplier = typeof opts.multiplier === 'number' && opts.multiplier > 0

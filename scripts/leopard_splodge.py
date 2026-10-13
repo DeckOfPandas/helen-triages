@@ -1,13 +1,13 @@
 """Seamless black-on-black leopard tiles, drawn as crinkled, tufted splodges.
 
-REPRODUCES NO NUMBER -- the second GENERATOR for `model_instructions/LEOPARD.md`,
-written 2026-10-06 after Helen brought two reference pictures: rosettes made of
-lumpy, ragged-edged blobs around an empty middle, each blob filled with a fine
-crinkle a step lighter than itself. Every shape here is generated from `seed`;
-nothing is traced. `scripts/build_leopard.py` writes the two files the site
-ships from it; a change here changes the live print once that is re-run.
+The generator `model_instructions/LEOPARD.md` §3 describes. Every shape is
+generated from `seed`; nothing is traced. `scripts/build_leopard.py` writes
+the two files the site ships from it, so a change here changes the live print
+once that is re-run.
 
-THE TILE HAS NO GROUND AND NO TONES OF ITS OWN. Everything is white at a very
+    python3 scripts/leopard_splodge.py [--svg | --uri]    one tile, or its size
+
+The tile has no ground and no tones of its own. Everything is white at a very
 low alpha, so the same file sits on the page, on the header band or on a darker
 page and keeps the same distance from whatever is under it. `ground=` paints
 one in, for looking at a tile by itself.

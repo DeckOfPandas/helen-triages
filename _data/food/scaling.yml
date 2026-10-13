@@ -1,149 +1,50 @@
-# =============================================================================
-# HOW THE RECIPE PAGE'S PORTION SCALER TREATS A MEASURE TAKEN BY HAND -- #1125
+# How the food scalers treat an amount: the recipe page's portion scaler, the
+# index's shopping list, the yield reader and the half-recipe judge. Vocabulary
+# only; every rule is in the code named beside each list. DECISIONS §8.2.
 #
-# Helen, raising it: "Currently some recipes scale 1 handful to e.g. 1.17
-# handfuls, which is obvious nonsense." And, 2026-10-04, asked what should
-# happen instead: 'If a recipe calls for "a handful of parsley", three orders
-# of that recipe should call for "3 handfuls of parsley".' And then: "Handfuls
-# can scale in half steps."
-#
-# _layouts/recipe.html emits this list onto the scaler control as
-# `data-half-step-measures`, assets/js/recipe-scale.js hands it to
-# assets/js/food-scale.js, and that is the whole route: adding a measure is a
-# line here and no code.
-# =============================================================================
+# The three step lists, as one rule:
+#   quarter_step_measures  handful, sprig, bunch: the nearest quarter
+#   half_step_measures     pinch, dash, splash, knob: the nearest half
+#   half_step_counts       drop, twist, lot, pat: the nearest half
+# The recipe page prints the stepped figure. The shopping list buys the next
+# whole one and quotes the recipes' figure in brackets, stepped the same way.
+# A word is on one list only. One lowercase word each, singular; the scalers
+# match it anywhere after the number, plural included, and a measure written
+# with no number ("a handful of parsley") counts as one.
+# `large`, `medium` and `small` must never be added to a step list: they are
+# sizes of a counted thing, and "2 large" eggs doubled is "4 large".
 
-# -----------------------------------------------------------------------------
-# Half-step measures -- a measure taken by HAND OR EYE. It SCALES, but only to
-# a figure a person could act on: the nearest half, never less than a half.
-#
-#     1 handful   x3    ->  3 handfuls
-#     1 handful   x1.5  ->  1½ handfuls
-#     1 handful   x7/6  ->  1 handful        (not 1.17)
-#     1 handful   x2/3  ->  ½ handfuls
-#
-# THE ROUNDING IS NOT HERE. It is `halfStep` in assets/js/food-scale.js, one
-# function, so that changing it is one line. This file only says WHICH
-# measures get it.
-#
-# HER SENTENCE NAMES HANDFULS; the rule is applied to the whole list below as
-# one. A measure she wants treated differently comes out of the list, and
-# then scales linearly like a pat.
-#
-# The word is matched whole, anywhere after the number, singular or plural
-# (`s` or `es`): `1 handful`, `2 handfuls`, `1 small handful`,
-# `1 large handful each` and `1 pinch` are all caught, and the plural is
-# written back to match the new number.
-#
-# SINGULAR, LOWERCASE, ONE WORD EACH.
-#
-# THE SAME WORDS SCALE A MEASURE WRITTEN WITH NO NUMBER. A recipe that wrote
-# it into `item:` -- "a handful of fresh parsley", "pinch of salt", "A large
-# handful of fresh coriander, to serve" -- has `a`, `an`, `one` or nothing
-# read as ONE, and scales in place: "3 handfuls of fresh parsley". "a few",
-# "some" and "a couple of" are not numbers; those lines stay as written and
-# are named on the "(Not scaled: ...)" line, with the measure phrase cut from
-# the name: "a few dashes of Tabasco sauce to taste" is listed as "Tabasco
-# sauce", which is what Helen's own example of the line reads like.
-#
-# EVERY WORD HERE WAS IN THE COLLECTION WHEN IT WAS ADDED (2026-10-04, counted
-# over _food_recipes/ and _food_drafts/):
-#
-#   handful   15 numbered amounts in 13 files, and the opening of 51 items
-#   pinch      4 numbered amounts in  3 files, and the opening of 37 items
-#   splash     1 numbered amount ("1 splash" of red wine vinegar), 2 items
-#   knob       1 numbered amount ("1 knob" of salted butter), 4 items
-#   dash       0 numbered; it opens 2 items, one of them Helen's own example
-#              ("a few dashes of Tabasco sauce to taste")
-#
-# WHAT IS ABSENT IS RULED, NOT FORGOTTEN -- Helen, 2026-10-04, asked about
-# each. A COUNT of a thing you can pick up scales like any other number: "Yes,
-# 4 sprigs double is 8, and so on." So `sprig` (3 amounts), `bunch` (5),
-# `drop` (1, "3–4 drops" of vanilla), `twist` (1, "5 twists" of black pepper)
-# and `lot` (2, batches of another recipe) are not here. They can print a
-# fraction (5 twists at two thirds is 3⅓ twists); that is known and reported,
-# not an oversight. (`sprig` and `bunch` moved to `quarter_step_measures`
-# below on 2026-10-10; they are still not half-step measures.)
-#
-# `pat` WAS HERE FOR A FEW HOURS AND CAME OUT ON HER WORD: '"pat" is a correct
-# term, and should be scaled linearly as "pats"'. "2 large pats" doubled is
-# "4 large pats". (2 amounts in 2 published recipes.)
-#
-# `large`, `medium` and `small` MUST NEVER BE ADDED. Helen, on #1005: "Things
-# like '2 large' can scale, surely" -- "2 large eggs" doubled is "4 large".
-# They are sizes of a counted thing, and 240 amounts use them.
-# `handful` WAS THE FIRST WORD ON THIS LIST AND LEFT IT ON 2026-10-10 for
-# `quarter_step_measures` below ("Recipe page handfuls and sprigs in 1/4 too
-# please"). It is still a by-eye measure to the half-recipe judge: see
-# `half_recipe.by_eye_also`.
+# By-eye measures stepped in halves, never less than a half (`halfStep` in
+# assets/js/food-scale.js). This list is also what the half-recipe judge is
+# handed as "a by-eye measure, which always halves", so a count never goes here.
 half_step_measures:
   - pinch
   - dash
   - splash
   - knob
 
-# -----------------------------------------------------------------------------
-# COUNTS that scale in half steps. Helen, 2026-10-10: "Drops, twists, lots etc,
-# please round to the nearest 1/2 -- these are smaller than handfuls and
-# sprigs." This REPLACES "scale like any other number" (2026-10-04) for the
-# four below, `pat` among them: her "etc" answered a sentence that listed
-# drops, twists, lots and pats. "5 twists" at two thirds was 3⅓ and is 3½.
-#
-# WHY THEY ARE NOT SIMPLY ADDED TO `half_step_measures`. That list is also
-# handed to the half-recipe judge (_plugins/food_half_recipe.rb), which lets a
-# by-eye measure halve ALWAYS. These are counts of things: "1 lot" of another
-# recipe must go on refusing a half recipe (Helen, 2026-10-04: "Neither mince
-# pies nor sweet cream base halve"), and an odd count of anything here still
-# does. So the SCALERS read both lists as one and the judge reads only the
-# first. _layouts/recipe.html and food/index.html do the joining.
-# -----------------------------------------------------------------------------
+# Counts stepped in halves. A list apart from `half_step_measures` because the
+# half-recipe judge must go on treating these as counts: an odd one, "1 lot" of
+# another recipe included, refuses the half recipe. _layouts/recipe.html and
+# food/index.html join the two lists for the scalers.
 half_step_counts:
   - drop
   - twist
   - lot
   - pat
 
-# -----------------------------------------------------------------------------
-# Measures that scale in QUARTER steps. Helen, 2026-10-10, shown that the
-# recipe page printed "1.17 sprigs" and "1.17 bunches" at seven portions for
-# six: "Sprigs: Let's round to 1/4 please, and express in fractions not
-# decimals."
-#
-# The nearest quarter, never less than a quarter: 1 sprig for seven where it
-# was written for six is 1¼ sprigs, 4 sprigs doubled is still 8. This REPLACES
-# "scales like any other number" for these two (2026-10-04, above) and leaves
-# `drop`, `twist`, `lot` and `pat` exactly as they were ruled.
-#
-# Read by the recipe page's scaler (food-scale.js, `quarterStep`) and by the
-# index's shopping list, which buys whole ones and says the quarter figure
-# beside them: "2 sprigs thyme (1¼ in the recipes)". One lowercase
-# word each, singular, and never also in `half_step_measures`.
-# -----------------------------------------------------------------------------
-#
-# `handful` JOINED THEM THE SAME DAY. The shopping list had just been ruled to
-# quote a handful in quarters ("1.17 handfuls should buy 2", bracket 1¼), which
-# left the recipe page saying "1 handful" for the same amount. Told so:
-# "Recipe page handfuls and sprigs in 1/4 too please." Her sentence names the
-# handful; pinch, dash, splash and knob stay in halves.
+# Stepped in quarters, never less than a quarter (`quarterStep` in
+# assets/js/food-scale.js).
 quarter_step_measures:
   - handful
   - sprig
   - bunch
 
-# -----------------------------------------------------------------------------
-# Yields -- the words _plugins/food_yield.rb needs to read a `makes:` line, so
-# that the scaler on a `makes:` recipe counts THE THING MADE. GitHub issue
-# #1286, Helen, 2026-10-04: "Never tell me how many cookies are in a portion!!!"
-#
-# The plugin's header has the rules and her words for each. These four lists
-# are everything in it that is vocabulary rather than rule.
-# -----------------------------------------------------------------------------
+# The words _plugins/food_yield.rb needs to read a `makes:` line, so the scaler
+# on a `makes:` recipe counts the thing made and never portions of it (#1286).
 yields:
   # A word in front of the number that says it is not exact. Kept on the page,
-  # as written, in front of the box ("about 300 ml" -> "about 600 ml"). Every
-  # one of these opens a real `makes:` line except `approximately`, `roughly`
-  # and bare `approx`, which are here so the next recipe does not fall through
-  # to the portions box for the sake of a spelling.
+  # as written, in front of the box ("about 300 ml" -> "about 600 ml").
   approx_words:
     - about
     - approx.
@@ -153,12 +54,8 @@ yields:
     - estimated
     - roughly
 
-  # A count written as a word. ONLY AT THE START of the line: "Plenty for two
-  # people" and "Enough for one normal lemon meringue pie" are not counts, and
-  # the 8 of "one 8-inch cake" is never read at all. `one` is the only one the
-  # collection writes today (7 lines: six cakes and a pie, one tin); the rest
-  # are here because "two 8-inch cakes" is the very next thing anyone would
-  # write. NOT `a` or `an`: "a batch" is prose, and nothing writes it.
+  # A count written as a word, read only at the start of the line. Not `a` or
+  # `an`: "a batch" is prose.
   number_words:
     one: 1
     two: 2
@@ -173,9 +70,8 @@ yields:
     eleven: 11
     twelve: 12
 
-  # A yield measured rather than counted. It scales by WHOLE ORDERS of the
-  # recipe: "950 ml for one order of a recipe becomes 1900 ml for 2". As
-  # written in the collection: ml (15 lines), g (3), litre (3), kg (1).
+  # A yield measured rather than counted. It scales by whole orders of the
+  # recipe: 950 ml becomes 1900 ml.
   measures:
     - ml
     - l
@@ -184,18 +80,15 @@ yields:
     - g
     - kg
 
-  # A word that is itself the thing counted and does not change with the
-  # number: '"1 dozen" doubled can be "two dozen"'. The count stays in dozens
-  # and is never turned into 12.
+  # A word that is itself the thing counted: "1 dozen" doubled is "2 dozen",
+  # never 24.
   group_words:
     - dozen
 
-  # A thing that HOLDS what the recipe makes, for the shopping list's row
-  # only (assets/js/filters.js `rowWords`). Helen, 2026-10-11: 'please write
-  # "[2] jars of peanut sauce", "[3] rainbow confetti traybakes"'. A jar is
-  # full OF the sauce, so the title follows it; a traybake IS the cake, so it
-  # follows the title. Singular; the last word of the yield is what is
-  # looked up ("large jar", '9"-square tin').
+  # A thing that holds what the recipe makes, for the shopping list's row only
+  # (`rowWords` in assets/js/filters.js). A container comes before the title
+  # with "of" ("2 jars of peanut sauce"); any other thing follows the title.
+  # Singular; the last word of the yield is what is looked up.
   container_words:
     - jar
     - tin
@@ -207,26 +100,17 @@ yields:
     - dish
     - loaf
 
-# -----------------------------------------------------------------------------
-# Half a recipe -- the words _plugins/food_half_recipe.rb judges by. A `makes:`
-# recipe steps x1, x2, x3; it is offered ONE step below, x½, only where
-# halving gives figures a person could act on. Helen, #1286: "Half a recipe
-# would be great where the numbers aren't insane! Can we judge that?"
-#
-# The plugin's header has the rule. One ingredient that will not halve refuses
-# the whole recipe; an amount in a unit on NONE of these lists is a count of
-# things and halves only if it is even.
-# -----------------------------------------------------------------------------
+# The words _plugins/food_half_recipe.rb judges by. A `makes:` recipe is offered
+# x½ only where every line halves to a figure a person could act on; one line
+# that will not halve refuses the whole recipe. An amount in a unit on none of
+# these lists is a count of things and halves only if it is even (#1286).
 half_recipe:
-  # A by-eye measure that is NOT in `half_step_measures` and must still halve
-  # ALWAYS. The judge is handed `half_step_measures` and adds this itself. `handful`
-  # moved to quarter steps on 2026-10-10, which changed how it is printed and
-  # nothing about whether half a recipe of it is sane. `sprig` and `bunch` are
-  # deliberately NOT here: they are counts to the judge, and an odd one
-  # refuses.
+  # By-eye measures that are not in `half_step_measures` and must still halve
+  # always; the judge adds this list to that one itself. `sprig` and `bunch`
+  # are deliberately absent: they are counts to the judge.
   by_eye_also:
     - handful
-  # Always halves, whatever the number: the scaler already prints 31 g.
+  # Always halves, whatever the number.
   divisible_units:
     - g
     - kg
@@ -240,8 +124,8 @@ half_recipe:
     - inch
     - inches
 
-  # Halves when the amount is a multiple of a QUARTER, because an eighth is
-  # the smallest fraction the page has a glyph for (¼ tsp -> ⅛ tsp).
+  # Halves when the amount is a multiple of a quarter: an eighth is the
+  # smallest fraction the page has a glyph for (¼ tsp -> ⅛ tsp).
   quarter_units:
     - tsp
     - tbsp
@@ -250,30 +134,17 @@ half_recipe:
     - pint
     - pints
 
-  # Halves when the amount is a multiple of a HALF: a cup goes down to a
-  # quarter and no further. Helen saw "⅞ cups whole milk" on half a batch of
-  # waffles (1¾ cups, halved) and took the half step off them: "2-3 waffles
-  # isn't enough!!!!" Nobody measures seven eighths of a cup.
+  # Halves when the amount is a multiple of a half: a cup goes down to a
+  # quarter and no further, so the page never prints "⅞ cups".
   half_units:
     - cup
     - cups
 
-  # A counted thing of which HALF IS A REAL THING, so an odd count is fine:
-  # half a lemon, half an onion. STARTED SMALL ON PURPOSE -- every word here
-  # lets a recipe through, and the judge is meant to refuse when unsure.
-  #
-  # IN: fruit and alliums you cut anyway, the two sticks you snap, and the
-  # seven Helen added on 2026-10-04: "In: leaf, star anise, nutmeg, stock
-  # cube, sachet, tin, jar. Rest correct." (`leaves` is `leaf` written twice:
-  # the judge adds `s` or `es` to a word and that does not reach it.)
-  #
-  # OUT, AND RULED: `egg` (and so yolk, white) -- "Eggs: not halvable for food
-  # recipes." Also out, as she left them: `sprig`, `bunch`, `can`, `pack`,
-  # and a `lot` of another recipe ("Neither mince pies nor sweet cream base
-  # halve").
-  #
-  # THIS LIST IS ABOUT INGREDIENTS. A YIELD of "1 jar" still does not halve:
-  # that is the yield rule, which asks for at least one of the thing made.
+  # A counted ingredient of which half is a real thing, so an odd count is
+  # fine. Every word here lets a recipe through, and the judge is meant to
+  # refuse when unsure. `leaves` is listed beside `leaf` because the judge only
+  # adds `s` or `es`. Ruled out: `egg`, `sprig`, `bunch`, `can`, `pack`, `lot`.
+  # About ingredients only: a yield of "1 jar" still does not halve.
   halvable:
     - lemon
     - lime
@@ -294,26 +165,13 @@ half_recipe:
     - tin
     - jar
 
-# -----------------------------------------------------------------------------
-# Nouns bought by count -- the INDEX's shopping list. GitHub issue #1297,
-# Helen, 2026-10-10: 'Can we fix the "2 lemon" thing?'
-#
-# A row is labelled with the first spelling a recipe used, so one lemon from
-# each of two recipes read "2 lemon". For a row that is one bare count, the
-# label now agrees with the number: plural above one, singular at one or less.
-# A spelling some recipe actually wrote is used where there is one; a form
-# nobody wrote is made ONLY for a noun on this list.
-#
-# WHY A LIST. Making a plural from any name's last word was measured against
-# both collections and was wrong for about a quarter of 251 names: "sprigs
-# thyme" -> "sprigs thymes", "spoons butter" -> "spoons butters", "goose" ->
-# "gooses", "skinless" (a name cut at its comma) -> "skinlesses".
-#
-# WHAT GOES ON IT: the LAST word of an ingredient's name, singular, lowercase,
-# whose plural is regular -- an `s`, or `es` after a sibilant ("peach"). Not
-# `leaf` (the plural is made, the singular is not), `tomato` or `potato`
-# (`es`), `chilli`, `goose`, or anything sold by weight.
-# -----------------------------------------------------------------------------
+# Nouns the index's shopping list may make plural or singular so a counted
+# row's label agrees with its number ("2 lemons", #1297). A spelling some
+# recipe wrote is used first; a made form only for a noun here, because a
+# general plural rule gets "sprigs thyme" and "goose" wrong.
+# The last word of an ingredient's name, singular, lowercase, with a regular
+# plural (`s`, or `es` after a sibilant). Not `leaf`, `tomato`, `potato`,
+# `chilli`, `goose`, or anything sold by weight.
 count_nouns:
   - lemon
   - lime
@@ -366,27 +224,17 @@ count_nouns:
   - bulb
   - wedge
 
-# -----------------------------------------------------------------------------
-# One fruit, two parts -- the INDEX's shopping list. GitHub issue #1297, Helen,
-# 2026-10-09: 'I would like to cleverly combine e.g. "zest of 1 lemon" and
-# "juice of 1 lemon" to make "1 lemon" in the shopping list.'
-#
-# _plugins/food_shopping.rb reads these to mark an ingredient line with the
-# PART of the fruit it uses; assets/js/food-shopping-list.js does the merging.
-# Both forms the collection writes are read:
-#
+# One fruit, two parts, on the index's shopping list (#1297): "zest of 1 lemon"
+# and "juice of 1 lemon" buy one lemon. _plugins/food_shopping.rb marks a line
+# with the part it uses; assets/js/food-shopping-list.js merges. Both written
+# forms are read:
 #   item: "juice of 1 lemon"                      the count is in the item
 #   amount: "1", item: "lemon, zested and juiced" the part is after the comma
-#
-# WITHIN ONE RECIPE, different parts of the same fruit are the same fruit: the
-# juice of 1 and the zest of 1 is 1 lemon, and 4 zested with 2½ juiced is 4.
-# The same part twice adds up, and so do two recipes.
-#
-# `fruits` is matched as the LAST word of the ingredient's name, singular or
-# plural, so "unwaxed lemons" is a lemon and "lemon juice" is not: a spoonful
-# of juice is not some number of lemons, and nothing here converts one.
-# -----------------------------------------------------------------------------
+# Within one recipe different parts of a fruit take the larger count; the same
+# part twice adds up, and so do two recipes.
 whole_fruit:
+  # Matched as the last word of the ingredient's name, singular or plural:
+  # "unwaxed lemons" is a lemon, "lemon juice" is not.
   fruits:
     - lemon
     - lime
@@ -417,11 +265,10 @@ whole_fruit:
     - big
     - juicy
     - unwaxed
-  # A line with NO amount whose note opens this way points at another line of
+  # A line with no amount whose note opens this way points at another line of
   # the same ingredient and buys nothing more: "olive oil, the rest of the oil
-  # above". "the zest of the one juiced for the pears" is the same and is read
-  # from `parts`. NOT every no-amount line: "salted butter, extra, for
-  # greasing" and "olive oil, to drizzle" really are extra, and stay counted.
+  # above". Not every no-amount line: "olive oil, to drizzle" is extra, and
+  # stays counted.
   pointers:
     - the rest of
     - the remainder of

@@ -1,33 +1,23 @@
 """Where does the universe line stop fitting on one row?
 
-REPRODUCES `$universe-stack-width` (820px) in `_sass/cocktails/_universe.scss`,
-and checks it: on 2026-09-29 the 90th-percentile name needs 805px.
-
-THE NUMBER THIS PRODUCED is `$universe-stack-width` (820px) in
-`_sass/cocktails/_universe.scss` -- the width at which the ingredients drop below
-the name. Helen, 2026-09-05: "please allow the line to stack, first line name,
-second line ingredients."
-
-WHY IT IS CALCULABLE AT ALL: Courier Prime is monospace, so a name's tape is
-arithmetic rather than a measurement, and every other thing on the row is a fixed
-token. The row holds, left to right: the label, the glass slot, the name on its
-tape, the ingredients, and `deal again`.
-
-THE NAME IS THE PART THAT VARIES, AND THE RELEVANT SET IS NOT EVERY DRINK. Since
-#692 the universe deals only from ship `yes` and `oh gods yes`, so it is THAT
-distribution that decides the breakpoint. Feeding it all 124 would overstate the
-tail and push the number too high.
-
-RE-RUN IT WHEN THE COLLECTION GROWS, and especially after a promotion batch: one
-long name entering the dealable set moves the 90th percentile, and the symptom of
-a stale breakpoint is silent -- an ingredient line squeezed to two words with the
-brackets holding nothing, on exactly the drinks Helen rated best.
-
     python3 scripts/universe_line_width.py
 
-It reads the drinks off the collections rather than off a build, so it needs no
-`jekyll build` first. The drafts repo is gitignored and may be absent in a fresh
-worktree; it says so and carries on with whatever it can see.
+Derives and checks `$universe-stack-width` in
+`_sass/cocktails/_universe.scss`, the width below which the ingredients drop
+under the name (MANUAL §13.11). It reads that stylesheet and the titles in
+`_cocktail_recipes/` and `_cocktail_drafts/`, needs no build, and writes
+nothing. An absent drafts clone is reported and its drinks are not counted.
+
+Courier Prime is monospace, so a name's tape is arithmetic, and everything
+else on the row is a fixed token: the label, the glass slot, the name on its
+tape, the ingredients, and `deal again`.
+
+Only the dealable drinks count (#692): the universe deals from ship `yes` and
+`oh gods yes`, and feeding it every drink would overstate the tail.
+
+Re-run it when the collection grows. One long name entering the dealable set
+moves the 90th percentile, and a stale breakpoint shows only as an ingredient
+line squeezed to almost nothing.
 """
 import glob
 import os
@@ -39,11 +29,10 @@ UNIVERSE_SCSS = os.path.join(ROOT, "_sass", "cocktails", "_universe.scss")
 COURIER_ADVANCE = 0.6      # em, monospace
 ROOT_PX = 16
 
-# The dealable rungs. Kept in step with the `data-universe-rows` selector in
-# cocktails/index.html and with `chaos` in the same file.
+# The dealable rungs: the `data-universe-rows` selector in cocktails/index.html.
 DEALABLE = ("yes", "oh gods yes")
 
-# The label, verbatim from cocktails/index.html.
+# The label in cocktails/index.html, with its ellipsis typed as three dots.
 LABEL = "the universe says..."
 
 # An ingredient line worth showing at all: roughly two short items before the

@@ -111,12 +111,10 @@ $emboss-vars-emitted: false !default;
 // --- The blocky rule: a bar overlapping the base of a heading -----------------
 // Shared because both sites draw the same mark, and two implementations of
 // one mark do not stay equal. Every colour is an argument, so this file names
-// no site's palette.
-//
-// A `linear-gradient` background, not `text-decoration`: the bar has to sit
-// behind the lettering, and an underline at a negative offset crosses the
-// glyphs. `display: inline` with `box-decoration-break: clone` gives each
-// line of a wrapped heading its own bar at its own width.
+// no site's palette. A `linear-gradient` background, not `text-decoration`:
+// the bar has to sit behind the lettering, and an underline at a negative
+// offset crosses the glyphs. `display: inline` with `box-decoration-break:
+// clone` gives each line of a wrapped heading its own bar at its own width.
 
 // A background is clipped to its box and cannot overhang, so the two ends are
 // separate mechanisms: the left indent shifts the gradient, the right
@@ -266,7 +264,6 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 // mark: a background positioned from the top of a box lands somewhere else
 // when the box differs. Mixins, not placeholders, because the two sites' class
 // names differ and `@extend` would merge their selector lists.
-//
 // `position: relative` is load-bearing: the absolutely positioned clear-all
 // anchors to the panel. `padding-top`, not margin, so it adds to the first
 // section's top margin and does not collapse into it.

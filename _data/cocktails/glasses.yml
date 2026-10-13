@@ -1,46 +1,17 @@
-# =============================================================================
-# GLASS → ICON. The vocabulary layer for cocktail glassware.
-# =============================================================================
-# `_layouts/cocktail.html` renders the icon for a drink's `glass:` value by
-# looking it up here and inlining `_includes/icons/glasses/<icon>.svg`. Adding
-# a glass is a YAML edit, never a template edit — the same contract
-# _data/food/taxonomy.yml has.
+# Glassware: which icon a `glass:` value draws, the canonical spellings, the
+# serving phrases, and what each glass type measures.
 #
-# ABSENT MEANS NO ICON, not a broken one. A glass with no entry here (or an
-# entry pointing at a file that does not exist) renders no icon at all rather
-# than a 404 or an empty box — the same absent-means-nothing convention
-# `reference_links` already uses in _data/sites.yml. (It used to cite
-# `footer_svg` and `about_url`; both were retired by issue #374, when the header
-# and footer stopped being per-site configuration. The convention is unchanged.)
-#
-# KEYS ARE THE GLASS STRING AS WRITTEN IN A DRINK'S FRONT MATTER, lowercased.
-# The spreadsheet spells several glasses more than one way and those spellings
-# are carried through the ingest verbatim rather than silently unified, so the
-# aliases are handled HERE, where the variance is visible, instead of being
-# tidied away in the data. If the drinks are ever normalised to one spelling
-# each, these alias lines are what to delete.
-# =============================================================================
+# `icons:` keys are the glass string as a drink writes it, lowercased, aliases
+# included. `_layouts/cocktail.html` inlines `_includes/icons/glasses/<icon>.svg`
+# for the value, so adding a glass is an edit here, never to a template. A
+# glass with no key renders no icon, silently; a drink naming a glass that is
+# not a key fails test_every_glass_value_is_in_the_vocabulary (#491).
 
 icons:
   # --- one spelling, one icon ------------------------------------------------
-  # Coupe is the collection's commonest glass by a wide margin -- 37 drinks
-  # across the book. Helen drew it 2026-08-16; before that it was the one big
-  # gap here and every coupe drink rendered iconless.
   coupe: coupe
-  # Helen's spreadsheet also spells the coupe this way.
-  #
-  # "champage saucer" (sic) WAS HERE TOO AND IS GONE — issue #677, 2026-09-05.
-  # It was her own typo, carried through the ingest verbatim rather than
-  # silently corrected, and that was the right call while a drink still said it.
-  # None does now, and since #671 both this map and `canonical_glasses` below
-  # are GENERATED into `INGEST_ONE_COCKTAIL.md` -- so the typo had become a
-  # spelling the document taught a repo-less reader to expect from a source.
-  #
-  # REMOVING IT FROM `canonical_glasses` ALONE WOULD HAVE MADE IT WORSE, which
-  # is worth knowing before anyone retires another alias: the generator prints
-  # every `icons:` key that `canonical_glasses` does NOT correct, so dropping
-  # the correction promotes the typo from the wrong-spellings table into the
-  # list of spellings to use. It had to leave both, and it did.
+  # An alias. Retiring one means removing it here AND from `canonical_glasses`:
+  # the ingest document prints every key here that the map does not correct.
   champagne saucer: coupe
   sour: sour
   collins: collins
@@ -48,195 +19,52 @@ icons:
   highball: highball
   hurricane: hurricane
   nick and nora: nick-and-nora
-  # DECLARED 2026-09-29, when Helen moved Fanny Chu's Piña Colada off the
-  # hurricane and onto its own glass. EVERYTHING ELSE FOR IT ALREADY EXISTED --
-  # `pina-colada.svg` is drawn, and the survey and `heights_mm` have carried
-  # the slug for weeks -- so this was the one missing key, and without it the
-  # drink rendered NO icon, silently.
-  #
-  # ACCENTED IN THE NAME, PLAIN IN THE SLUG, which is the split this file
-  # already makes for `nick and nora` / `nick-and-nora`: `icons:` and `serving:`
-  # key on the glass NAME, which is prose a reader sees, while the survey and
-  # the heights key on the icon SLUG.
+  # The name is accented prose and the icon slug is plain, as with
+  # `nick and nora`.
   piña colada: pina-colada
   punch bowl: punch-bowl
   tiki mug: tiki-mug
 
-  # --- two mugs: one drawing until 2026-10-02, two since ----------------------
-  # `mule-mug.svg` was renamed `mug.svg` on 2026-08-26 and both spellings point
-  # at it. The drawing is a plain tapered mug with a handle; the only thing that
-  # ever made it a MULE mug is that a real one is copper, which a monochrome
-  # line icon cannot say. Nothing was using it, and Apple and Ginger Mulled Wine
-  # wanted precisely this shape -- Helen, asked whether to draw a new one: "I
-  # actually use a mug for this like I do for tea!"
-  #
-  # `mule mug` is kept as an alias rather than dropped, because a Moscow Mule
-  # will want it one day and will get the same correct drawing.
-  #
-  # TWO DRAWINGS SINCE 2026-10-02. Helen redrew the mule mug as its own glass:
-  # a barrel body, a looped handle, and nine dimples for the hammered copper --
-  # the thing the paragraph above says a line icon cannot say. So `mule mug`
-  # draws `mule-mug.svg` now and `mug` keeps the plain mug.
+  # --- two mugs, two drawings --------------------------------------------------
   mug: mug
   mule mug: mule-mug
 
-  # --- SIX DRINKS THAT WERE RENDERING NO ICON FOR NO REASON -------------------
-  # Found 2026-08-17 by checking every `glass:` value in the collection against
-  # this map, rather than by noticing a blank space on a page. Two shapes of
-  # miss, and both are silent by design -- "absent means no icon" is the right
-  # default and it cannot tell a deliberate gap from a forgotten one:
-  #
-  #   - martini and wine: the ARTWORK existed all along and simply had no key.
-  #   - pilsner: the artwork did not exist until today (#303).
-  #
-  # This is why tests/test_cocktails.py now asserts the map and the icon
-  # directory agree in both directions. A missing key costs an icon; a key
-  # naming a missing file is worse, because `glass_icon = ""` once sent
-  # `icons/glasses/.svg` to {% include %} and took the whole build down.
   martini: martini
   martini glass: martini
   wine: wine
   pilsner: pilsner
   sling: sling
-  # A SEVENTH, 2026-09-09, AND THE SAME SHAPE AS `martini` AND `wine` ABOVE --
-  # the artwork existed all along and simply had no key. Helen moved the classic
-  # Margarita off `old fashioned` proofreading, and the drink rendered NO ICON,
-  # silently, exactly as the six did. `margarita.svg` is in
-  # `_includes/icons/glasses/`, `heights_mm` already carries 175 and `all_icons`
-  # already lists it -- so this glass was three-quarters declared and only the
-  # lookup was missing. That is why the test asserts the map and the directory
-  # agree in BOTH directions: half a declaration reads exactly like none.
   margarita: margarita
 
-  # --- icons added 2026-08-17, ahead of any drink asking for them -------------
-  # Spec, not inventory -- the same principle as declaring Plymouth and Genever
-  # gin while owning neither. Helen has tiki recipes not yet ingested.
+  # --- declared ahead of demand: an icon with no drink is normal here ----------
   absinthe: absinthe
   goblet: goblet
   chalice: goblet
   pineapple: pineapple
   hollowed pineapple: pineapple
-  # NO DRINK USES THIS YET -- added 2026-08-31 with the drawing (#528), because
-  # Helen drew one to see whether it earns a place: "we might not use it, but
-  # why not try". An icon with no drink is the normal state for this file
-  # (nine others are in it), and declaring the spelling now is what lets a
-  # future drink simply say `glass: [coconut]` and render.
   coconut: coconut
   coconut shell: coconut
 
-  # --- four spellings of one glass, all live in the data -----------------------
-  # `rocks` used to point at a genuinely different (panelled) drawing -- see
-  # the retirement note below. It is an alias now, matching the canonical
-  # vocabulary rule ("old fashioned, not rocks") for real rather than in name
-  # only.
+  # --- four spellings of one glass ---------------------------------------------
   old-fashioned: old-fashioned
   old fashioned: old-fashioned
   old-fashioned glass: old-fashioned
   rocks: old-fashioned
 
-  # `old-fashioned-double` redrawn 2026-08-26 to match the new single glass --
-  # see the RESOLVED note below. Re-mapped now that the artwork exists.
   double rocks: old-fashioned-double
   double old fashioned: old-fashioned-double
   double old-fashioned: old-fashioned-double
 
-  # --- judgement calls, worth checking by eye before trusting -----------------
-  # `brandy glass` is the CANONICAL name and `snifter` is the alias, which is
-  # the opposite of the usual convention -- snifter is the commoner word behind
-  # a bar. Helen's call, 2026-08-17, and the reason is that she dislikes the
-  # word itself on synaesthetic grounds. Recorded because nobody would ever
-  # rediscover it, and a future tidy-up would otherwise "correct" it straight
-  # back to snifter.
+  # `brandy glass` is canonical and `snifter` the alias, against bar
+  # convention. Helen's choice: do not "correct" it.
   brandy glass: brandy
   snifter: brandy
 
-# =============================================================================
-# GLASSES IN THE DATA WITH NO ICON — deliberately unmapped, not forgotten.
-# =============================================================================
-# Listed rather than silently absent so the gap is a fact in the repo instead
-# of something to rediscover. Nothing reads this list; it is documentation.
-#
-#   any      NOT A GLASS AND MUST NEVER BE MAPPED. It is a real member of a
-#            drink's `glass:` list meaning "no requirement" -- Daisy de
-#            Santiago is "anything, but preferably a Collins". The layout
-#            takes the first entry that HAS an icon, so `[collins, any]`
-#            draws a Collins and `[any]` alone draws nothing, which is right.
-#
-# ALL THREE OF THIS SECTION'S OWN QQs WERE RESOLVED ON 2026-08-26, by asking
-# Helen with the drink in front of her rather than reasoning about the word:
-#
-#   todo   Coffey Park Swizzle, and it was literally the word "todo". Now
-#          `highball`, along with every other swizzle — Helen: "Please swap
-#          all my Swizzles into highball glasses." Each carries a QQ note to
-#          check by eye.
-#   mug    Apple and Ginger Mulled Wine, and the answer was neither of the two
-#          candidates guessed at here. See the mug/mule-mug entry above: one
-#          drawing, renamed, serving both -- until 2026-10-02, when the mule
-#          mug got a drawing of its own and the plain mug kept this one.
-#   long   Long Island Iced Tea. It did read as a serve rather than a glass,
-#          and Helen's call was `highball`. `long` is NOT kept as an alias —
-#          it is not a glass name, and mapping it would make it look like one.
-#
-# UNUSED ICONS, the other side of the same ledger: julep-cup, margarita,
-# pina-colada, sherry, shot, plus the three added ahead of demand (absinthe,
-# goblet, pineapple). Several will find a glass once the non-rum drinks are
-# ingested — margarita and julep-cup especially — so an unused icon is not
-# evidence of a mistake. `hot-toddy` left this list on 2026-08-26 only in the
-# sense that it was CONSIDERED for the mulled wine and rejected: the drawing is
-# a footed handled glass, not a mug.
-#
-# `any` IS RETIRED, 2026-08-27, and this note used to say it must stay
-# permanently — so the reversal is worth the space. It meant "no requirement",
-# and exactly one drink ever used it: Daisy de Santiago, as [collins, any].
-#
-# Helen: "when someone tells me to use an old fashioned glass I always
-# automatically assume I can use any glass I like, so there's no need to have
-# 'any' as a glass type." The freedom it encoded is one she applies to EVERY
-# glass spec, so recording it on one drink said nothing true about that drink
-# and something false about the other 113. Daisy now reads [collins], which is
-# what "anything, but preferably a Collins" always meant.
-#
-# THERE IS NOW NO UNMAPPED VALUE. Every glass a drink names must appear in
-# `icons:` above — see #491, and test_every_glass_value_is_in_the_vocabulary,
-# which no longer carries an exemption set.
-#
-# =============================================================================
-# THE CANONICAL VOCABULARY — Helen, 2026-08-17, ENFORCED from 2026-08-26
-# =============================================================================
-# When two words mean one glass, these are the ones to use in a drink.
-#
-#   coupe                 not "champagne saucer"
-#   old fashioned         not "rocks"
-#   double old fashioned  not "double rocks"
-#   brandy glass          not "snifter"
-#
-# THIS USED TO BE A PREFERENCE AND IS NOW A RULE. The line here read "the
-# aliases above stay live regardless: the point of this file is that a drink is
-# never wrong for using the other word." Helen retired that on 2026-08-26 —
-# "I decided to go with old fashioned rather than rocks as the canonical name,
-# so recipes that still have rocks are fine to break a test." So
-# `canonical_glasses` below is enforced by
-# tests/test_cocktails.py::test_drinks_use_the_canonical_glass_spelling, and 17
-# drinks were retyped in the same commit rather than left failing.
-#
-# WHY IT WAS SAFE TO RETYPE ALL SEVENTEEN AT ONCE: `rocks` has been a plain
-# ALIAS to `old-fashioned` since #347 was resolved — one drawing, not two — so
-# the change carries no meaning whatsoever, only spelling. Every one of those
-# drinks rendered the same icon before and after. That would NOT have been true
-# before #347, when the two names pointed at genuinely different artwork.
-#
-# THE ALIASES IN `icons:` STAY LIVE, and that is not a contradiction. They do
-# two jobs a rule cannot: they keep a drink rendering if one slips through, and
-# they absorb the spreadsheet's spellings on ingest, where the variance is real
-# and arrives whether or not this file disapproves. The rule governs what is
-# WRITTEN into a drink; the alias map governs what can be READ.
-#
-# `martini` vs `martini glass` is deliberately NOT here — see the note on
-# `canonical_glasses`.
-
-# ALIAS (as it may appear in a drink) -> the spelling a drink must use.
-# The test derives its whole vocabulary from this map, so adding a pair here is
-# what makes it enforced; there is no second list to keep in step.
+# When two words mean one glass, this is the one a drink must write: alias ->
+# canonical. test_drinks_use_the_canonical_glass_spelling derives its whole
+# vocabulary from this map. The aliases stay in `icons:` regardless, so a drink
+# that slips through still renders. An alias absent from this map is permitted
+# in a drink: nobody has ruled on it yet.
 canonical_glasses:
   "rocks": "old fashioned"
   "old-fashioned": "old fashioned"
@@ -248,172 +76,30 @@ canonical_glasses:
   "martini glass": "martini"
   "pineapple": "hollowed pineapple"
   "coconut": "coconut shell"
-  # 2026-09-29. Helen typed the SLUG into the drink -- `glass: "pina-colada"` --
-  # which is the spelling the artwork and the survey use, and a reasonable guess
-  # from looking at either. The canonical name is the prose one, so the slug is
-  # corrected here rather than the drink being retyped: the same service this
-  # map does for `old-fashioned`.
+  # The icon slug, corrected to the prose name.
   "pina-colada": "piña colada"
   "pina colada": "piña colada"
 
-# THE THREE THAT WERE "NOT IN THE MAP, ON PURPOSE" ARE NOW DECIDED — issue
-# #676, Helen, 2026-09-05: "hollowed pineapple, coconut shell". `martini glass`
-# resolves to `martini` in the same pass.
-#
-# WHAT MADE THEM A PROBLEM was not the drinks — it was the DOCUMENT. Since #671
-# the glass list in `INGEST_ONE_COCKTAIL.md` is generated as "every `icons:` key
-# that `canonical_glasses` does not correct", so all six spellings printed side
-# by side and a repo-less reader had to guess between four near-duplicates.
-# Silence meant "undecided" to the test and "either is fine" to the reader.
-#
-# TWO OF THE THREE COST NOTHING: no drink says `pineapple` or `coconut` today,
-# so those lines decide a question before it is ever asked in anger. `martini
-# glass` retyped two drinks (espresso-martini, porn-star-martini) onto the
-# spelling tomato-martini already used; all three rendered the same icon before
-# and after, so the change carries spelling and no meaning — the same argument
-# that made retyping seventeen `rocks` drinks safe above.
-#
-# `champage saucer` (sic) LEFT THE MAP in the same pass — issue #677. It was
-# only ever here because a drink once spelled it that way; none does now, and
-# #671's generated table had turned it into a typo the document actively taught
-# as a spelling a source might use. A typo is not a source's spelling.
-#
-# An alias absent from the map is still permitted in a drink. That remains the
-# honest default: this map records DECISIONS, and silence means the question has
-# not been asked rather than that either form is blessed.
-#
-# =============================================================================
-# RESOLVED 2026-08-25 — the four-tumbler-icon problem this section used to
-# document.
-# =============================================================================
-# Choosing `old fashioned` over `rocks` as the canonical word left the ARTWORK
-# unresolved for a while: four tumbler icons (plain old-fashioned, its double,
-# panelled rocks, panelled rocks-tall) against two canonical names, with
-# `rocks` and `old fashioned` pointing at two different drawings — invisible
-# on any single page, real the moment you looked at the whole set together
-# (`_dev/glasses.html`, built for exactly this).
-#
-# Helen's call, having looked: none of the three options originally floated
-# here (panelled wins / plain wins / keep both as different named glasses).
-# Instead, `old-fashioned.svg` itself got a fresh redraw, and `rocks.svg` /
-# `rocks-tall.svg` / the old `old-fashioned-double.svg` are all retired.
-# `rocks` is now a plain alias to `old-fashioned` (see the canonical-vocabulary
-# mapping above) rather than its own drawing.
-#
-# The double variant followed on 2026-08-26: `old-fashioned-double.svg`
-# redrawn to match the new single glass (same body, uniformly scaled up,
-# same four facet lines) rather than as an independent drawing. `double
-# rocks` / `double old fashioned` / `double old-fashioned` are mapped to it
-# now — Fancy-Free, Vieux Carré and Ti Punch get an icon again.
-# =============================================================================
-
-# =============================================================================
-# EVERY ICON FILE, and yes this duplicates the directory listing on purpose.
-# =============================================================================
-# Liquid cannot read a directory. `_includes/` is not copied to the site, so it
-# is not in `site.static_files` either, which means a template has NO way to ask
-# "what icons exist?" — it can only look up the ones a key already names. That
-# makes the most interesting question invisible to the swatch page: which
-# artwork is UNREACHABLE, drawn and normalised and pointed at by nothing.
-#
-# So the inventory is written down, and tests/test_cocktails.py asserts it
-# matches the directory exactly, in both directions. The duplication is real but
-# it cannot drift: the test fails the moment an icon is added or removed without
-# this list following. Without the test this would be a lie waiting to happen,
-# which is the whole reason the assertion comes with it rather than after it.
-# =============================================================================
-# REAL-WORLD HEIGHTS IN MILLIMETRES — `heights_mm`, WHAT DRAWS EVERY GLASS.
-# =============================================================================
-# SOURCED SINCE 2026-09-29. Until then these were typical heights Claude wrote
-# on 2026-08-18, unmeasured, so that the relative-scale view on /dev/glasses/
-# had something honest to size from. Now `heights_mm` is GENERATED, in the
-# marked block below, as each glass's surveyed MEDIAN height (#1238, 317
-# products) -- except where `height_overrides` just below keeps a number on
-# purpose. Helen, shown the two side by side: "I love the side by side view on
-# the ref page, the version based on real glasses. Leave punchbowl as we
-# currently have it -- what we have is perfectly clear." And of the two
-# old fashioneds: "leave them, this isn't important."
-#
-# TO CHANGE A HEIGHT, add or fix a survey row, or add an override with its
-# reason. Never type a number into the generated block.
-#
-# WHY THIS IS NOT THE viewBox HEIGHT, which is the obvious thing to use and is
-# wrong. A viewBox records how the artwork was DRAWN, not how big the glass IS,
-# and the two disagree badly: `shot` is drawn 77 units tall against `rocks` at
-# 68, so at viewBox scale a shot glass stands TALLER than a rocks glass. It is
-# about 60mm against 85mm in the real world. Same for `hot-toddy`, drawn
-# shortest of everything at 60 units and actually one of the taller vessels.
-# Helen, 2026-08-18: "Old fashioned glass needs to be smaller, and shot glass
-# much smaller".
-#
-# Separating the two also means the ARTWORK NEVER HAS TO BE REDRAWN to fix a
-# proportion: a wrong size is a number here, not an Inkscape session. That
-# matters because redrawing is how you lose a glass's character by accident.
-#
-# The real site uses these now, 2026-08-25 (#298) -- `_layouts/cocktail.html`
-# scales `--glass-icon-height` from this list against the tallest real glass,
-# the same calculation `_dev/glasses.html`'s relative-scale view already
-# proved out. #299, the proportion pass (fixing individual drawings once this
-# exposes one that looks wrong at its real height), is still open.
-# =============================================================================
-# SERVING PHRASE — how a strain step names this glass.
-# =============================================================================
-# `_layouts/cocktail.html` builds the final strain step out of three fields:
-# the technique from `method`, this phrase, and the ice clause from
-# _data/cocktails/serve.yml. "Strain." + "an old fashioned glass" +
-# ", over a large ice cube" = "Strain into an old fashioned glass, over a large
-# ice cube."
-#
-# WHY GENERATED AND NOT STORED. Helen, 2026-09-05, asked for the glass and the
-# ice back in the method: "I'd like to name the glass too where it appears."
-# She is right that the method is what you follow while making the drink, and
-# looking up to the metadata panel for the glass and down to "To serve" for the
-# ice is worse than one sentence.
-#
-# But STORING that sentence is what produced seventeen spellings of "strain"
-# and two truncated ones. So the sentence is composed at render time from
-# fields that each hold their fact once. Change the glass and the method
-# follows; nothing can drift, because there is only ever one copy.
-#
-# THE ARTICLE IS PART OF THE PHRASE, deliberately. "an old fashioned glass"
-# needs `an`, "a coupe" needs `a`, and no rule short of a dictionary gets that
-# right from the key. Writing it out is one word per glass and never wrong.
-#
-# THE WORD "GLASS" IS PART OF THE PHRASE TOO, and it is not always there.
-# Helen's own examples set the pattern: "an old fashioned glass" but "a
-# highball" and "a coupe". An old fashioned is also a DRINK, so the noun does
-# real work; a coupe is only ever a glass.
-#
-# KEYED ON THE CANONICAL NAME, so `rocks`, `old-fashioned` and
-# `old-fashioned glass` all arrive here as `old fashioned` via
-# `canonical_glasses` above. A glass in use with no phrase here fails
-# test_every_glass_in_use_has_a_serving_phrase rather than rendering a step
-# with a hole in it.
+# How a generated step names the glass. `_layouts/cocktail.html` composes
+# "Strain into <phrase><ice clause>." from the method's technique, this phrase
+# and serve.yml `in_the_glass`, so the sentence is never stored. Keyed on the
+# canonical name. The article and the word "glass" are part of each phrase,
+# because no rule gets them right from the key. A glass in use with no phrase
+# fails test_every_glass_in_use_has_a_serving_phrase.
 serving:
   brandy glass: "a brandy glass"   # kept, Helen 2026-09-25 (#1186): no drink uses it yet
   collins: "a collins glass"
-  # NEW 2026-10-07, for Electro Batida: the FIRST drink to use the coconut
-  # Helen drew on 2026-08-31 (#528, "we might not use it, but why not try").
-  # The icon and the canonical name were declared then; only this phrase was
-  # missing, exactly as with `mule mug` below.
   coconut shell: "a coconut shell"
   coupe: "a coupe"
   double old fashioned: "a double old fashioned glass"
   flute: "a flute"
   highball: "a highball"
   hurricane: "a hurricane glass"
-  # WITH ITS ARTICLE, like every phrase here -- the layout drops this straight
-  # into "Strain into ___." and a bare noun would read as a telegram.
   margarita: "a margarita glass"
   martini: "a martini glass"
   martini glass: "a martini glass"   # kept, Helen 2026-09-25 (#1186): no drink uses it yet
   mug: "a mug"
-  # NEW 2026-09-20, for the Moscow Mule (#1068): the first drink to use it. The
-  # source says "copper mug" and `mule mug` is the declared spelling; the icon
-  # was the plain mug's until 2026-10-02 (see `icons:` above), so only the
-  # phrase was missing.
   mule mug: "a mule mug"
-  # NEW 2026-09-29, with the `icons:` key above, for Fanny Chu's Piña Colada.
   piña colada: "a piña colada glass"
   nick and nora: "a Nick and Nora"
   old fashioned: "an old fashioned glass"
@@ -424,58 +110,31 @@ serving:
   tiki mug: "a tiki mug"
   wine: "a wine glass"
 
-# THE HEIGHTS THAT ARE NOT THE SURVEY'S MEDIAN, each with its reason. Every
-# other glass draws at its surveyed median; see the generated `heights_mm`.
+# The heights that are not the survey's median, each with its reason.
+# scripts/glass_survey_stats.py writes these into `heights_mm` in place of the
+# median.
 height_overrides:
-  # 130 AGAINST A SURVEYED 256. The tallest glass is the scale's denominator,
-  # so at its real height the bowl would outrank the flute and shrink every
-  # other glass on the site. Helen: "Leave punchbowl as we currently have it
-  # -- what we have is perfectly clear."
+  # 130 against a surveyed 256. The tallest glass is the scale's denominator,
+  # so at its real height the bowl would shrink every other glass on the site.
   punch-bowl: 130
-  # 85 and 100 against surveyed 89 and 98. Helen: "Old fashioned glasses:
-  # leave them, this isn't important." The pair were drawn and sized together
-  # (the double is the single scaled up, #347), and /dev/glasses/ section 5
-  # is the page that measures the one against the other.
+  # Kept by Helen against surveyed 89 and 98. The double is the single scaled
+  # up (#347).
   old-fashioned: 85
   old-fashioned-double: 100
 
-# =============================================================================
-# TYPICAL CAPACITY AND HEIGHT — SOURCED, FROM THE SURVEY (#1238)
-# =============================================================================
-# What each glass type measures ON THE MARKET: n products, min, median, mean,
-# max. Capacity in ml, overall height in mm. Every product behind these is in
-# `glass_survey.yml` beside this file, with the page its figure came from, so
-# any number here can be walked back to a source.
-#
-# A SPEC, NOT AN INVENTORY. Helen, 2026-09-28: "I don't want inventory, just
-# spec. I might buy new glasses (okay I certainly will). The 'right' glasses
-# might be dirty. I might have more guests than 'right' glasses. Basically, as
-# usual with this site, let's offer rules, then I'll happily break them in the
-# kitchen." #295's own title asked for "glasses I own"; this is the answer to
-# the question under it, and the cupboard is deliberately not recorded.
-#
-# GENERATED, NEVER TYPED. `python3 scripts/glass_survey_stats.py --write`
-# rewrites the block between the markers, and
-# test_glass_survey_statistics_are_current fails the moment it is stale. Fix a
-# number in the survey, never here.
-#
-# `heights_mm`, WHAT DRAWS THE ICONS, IS GENERATED HERE TOO, since 2026-09-29:
-# the median of `typical_height_mm` for every icon, or its `height_overrides`
-# entry above where one exists.
-#
-# KEYED BY ICON, like `heights_mm`, with ONE exception declared below: a
-# surveyed type that shares another's drawing but not its size. The copper
-# mule mug draws the plain mug (see the `mug` entry in `icons:`) and holds
-# about a third more -- median 473 ml against a tea mug's 350, at almost the
-# same height -- so a Moscow Mule is checked against mule mugs, not mugs.
-# `spellings` are the `glass:` values that mean it.
-#
-# EMPTY SINCE 2026-10-02: the mule mug has its own drawing now, so it is an
-# icon like any other and is keyed as one. The paragraph above is how the
-# mechanism works for the next type that borrows a drawing; the key stays
-# because the glasses page, the survey script and the fit report all read it.
+# A surveyed type that shares another type's drawing but not its size, with
+# the `glass:` spellings that mean it. Empty today; the key stays because the
+# glasses page, scripts/glass_survey_stats.py and scripts/glass_fit_report.py
+# read it.
 survey_only_types: {}
 
+# What each glass type measures on the market (capacity in ml, overall height
+# in mm), and `heights_mm`, the height every icon is drawn at: the surveyed
+# median, or its `height_overrides` entry. A spec, not an inventory of Helen's
+# cupboard (#1238). Icons are sized from these and never from the viewBox,
+# which records how the artwork was drawn. To change a number, fix a row in
+# glass_survey.yml or add an override, then run
+# `python3 scripts/glass_survey_stats.py --write`.
 # >>> GENERATED by scripts/glass_survey_stats.py from glass_survey.yml -- do not edit by hand
 typical_ml:
   absinthe:             {n: 9, min: 163, median: 229, mean: 236, max: 296}
@@ -566,20 +225,10 @@ heights_mm:
   wine:                 215
 # <<< END GENERATED
 
-# =============================================================================
-# WHERE EACH GLASS STANDS — so a label is centred under its base, not its box.
-# =============================================================================
-# Helen, 2026-09-29: "the text under the normal mug is way off to the right,
-# and the text for mule mug and pineapple are slightly right of centre." The
-# labels were centred on each drawing's viewBox, which includes a mug's handle
-# and the pineapple's umbrella. The eye centres a glass on what it stands on.
-#
-# A signed fraction of the drawing's width: the centre of its bottom band of
-# ink, measured from the centre of its viewBox. Negative is left of centre.
-# /cocktails/reference/glasses/ shifts each drawing by minus this. Glasses
-# under 1% are omitted -- that much is the stroke, not the drawing.
-# GENERATED by rasterising the published icons; never typed, because a number
-# read off a screenshot is wrong after the next redraw.
+# Where each glass stands, so a label is centred under its base and not under
+# its box (a mug's handle is in the box). A signed fraction of the drawing's
+# width, from the centre of the viewBox; negative is left. Glasses under 1%
+# are omitted. /cocktails/reference/glasses/ shifts each drawing by minus this.
 # >>> GENERATED by scripts/glass_base_centres.py -- do not edit by hand
 base_centre:
   coconut: 0.038
@@ -589,80 +238,14 @@ base_centre:
   pineapple: -0.089
 # <<< END GENERATED base_centre
 
-# =============================================================================
-# FIT RULES — how much drink a glass takes. SOURCED WHERE A SOURCE EXISTS.
-# =============================================================================
-# The recipe is not what ends up in the glass: shaking or stirring with ice
-# ADDS water, and ice served in the glass TAKES room. These are the factors
-# `scripts/glass_fit_report.py` uses to flag drinks that do not fit their
-# glass, and the rules the glasses reference page states. Rules, to be broken
-# in the kitchen.
-#
-# EVERY FACTOR IS A RANGE, {low, high}, because the sources genuinely
-# disagree and a single number would hide which way. THE REPORT FLAGS ON THE
-# FORGIVING END: a drink is flagged only if it does not fit even on the
-# kindest reading of the sources, so a flag means something. The first run
-# took every factor from the middle of its range and flagged 63 of 137 drinks,
-# a Tom Collins in a highball among them -- the stacked middles were the
-# fault, not the drinks. The page shows the whole range.
-#
-# The research is in the PR for #1238. Every dilution figure is a fraction of
-# the RECIPE volume (Arnold's denominator), not of the finished drink (most
-# magazines' -- 25% of the final drink is 33% of the recipe):
-#
-#   dilution.shake        low 0.33: PUNCH's timed daiquiris took "just over an
-#                         ounce" on a ~3 oz spec. high 0.60: Dave Arnold,
-#                         Liquid Intelligence (2014) p.125, "50-60%"; his
-#                         measured whiskey sour took 63%.
-#   dilution.short_shake  low 0.15, high 0.30: "less than 50% complete" of a
-#                         full shake (Nathan Robertson), which is also a whip
-#                         shake's "few pieces of crushed ice". Derived.
-#   dilution.stir         low 0.25: America's Test Kitchen, 25% at 30 s.
-#                         high 0.50: two measured Manhattans (Arnold; Joey
-#                         Smith for VinePair).
-#   build, swizzle 0      ice melting IN the glass shrinks ~8% as it melts
-#                         (ice is 0.917 g/ml), so it never adds volume; the
-#                         ice_space term does the work instead.
-#   blended               the finished volume as a multiple of the recipe:
-#                         ice of roughly the liquid's weight, all of it
-#                         staying in the drink. low 1.9 (Difford's frozen
-#                         daiquiri, 0.9x), high 2.1 (the Washington Post's
-#                         formula, 1.1x).
-#
-#   washline 0.75 / 0.90  how full a drink is poured, as a share of the brim:
-#                         the median across 13 Difford's glassware pages that
-#                         give both "to brim" and "to washline". A flared
-#                         stemmed bowl holds much of its volume near the rim,
-#                         which is why its line sits lower. Not a range: it
-#                         IS the rule, "pour to here".
-#   ice_space             the share of the glass the serving ice takes from
-#                         the drink. cubed low 0.31: a retailer's table for an
-#                         8 oz rocks glass, cubes displacing 2.5-3 oz; high
-#                         0.61, loose cubes by bulk density. crushed low 0.50
-#                         (the same table, 4-5 oz of 8), high 0.70 (bulk
-#                         density, FAO/INFOODS). The low end is the right one
-#                         for a full glass: ice floats, and what rides above
-#                         the liquid displaces none of it.
-#   half_fill 0.5         serve.fill: half, the Milliners Punch's
-#                         "half-filled with crushed ice".
-#   large_cube_ml         low 120, a 2-inch cube afloat (it displaces its own
-#                         weight); high 131, the whole cube, by geometry.
-#   punch_cup_ml 90-120   PUNCH's "two- to three-ounce" cups, Difford's 90 ml
-#                         servings, and the common 4 oz punch cup.
-#   lost_below 0.5        NOT SOURCED -- a judgement. A drink served UP in a
-#                         STEMMED glass filling under half its wash line reads
-#                         as a mistake. Tumblers are exempt: a short neat pour
-#                         in a rocks glass is how a Sazerac is meant to look.
-#
-# THE THREE WET DILUTIONS ARE HELEN'S FIGURES SINCE 2026-10-04 (#1179), and no
-# longer a range: "Let's use these figures for dilution please: stirred: 20%.
-# Shaken: 27.5%. Short shake 15%." She gave them on seeing what a `(top)`
-# would pour once it was sized from the glass, which is the first thing on the
-# site these figures decide rather than merely flag. Both ends carry her
-# number, so every reader of {low, high} keeps working and none can pick a
-# different one. The sourced ranges above are what she chose against, kept as
-# the record of what the sources say: shake 0.33-0.60, short shake 0.15-0.30,
-# stir 0.25-0.50. Do not put them back from the research.
+# Fit rules: how much drink a glass takes. scripts/glass_fit_report.py flags
+# drinks that do not fit and _plugins/cocktail_units.rb sizes a top from them.
+# A {low, high} range is where the sources disagree (they are in the PR for
+# #1238); the report flags on the forgiving end, so a flag means the drink
+# fits on no reading. Dilution is a fraction of the RECIPE volume, not of the
+# finished drink. shake, short_shake and stir are Helen's figures (#1179):
+# both ends carry her number on purpose, so do not restore a sourced range.
+# `lost_below` is a judgement, not sourced.
 fit_rules:
   dilution:
     shake:          {low: 0.275, high: 0.275}
@@ -700,80 +283,22 @@ fit_rules:
   large_cube_ml: {low: 120, high: 131}
   punch_cup_ml: {low: 90, high: 120}
   lost_below: 0.5
-  # TWO MORE JUDGEMENTS, NOT SOURCED, from auditing the first list line by
-  # line (#1244, 2026-10-04). Both are the report's alone; nothing on the site
-  # reads them.
-  #
-  # tolerance      A drink is flagged only when it is over by more than this
-  #                share. Every figure the report compares is a survey median
-  #                times a wash line times an ice allowance, and four of the
-  #                first list's 22 lines were over by 2.5% to 7.5%. That is
-  #                the model's noise, not a finding about a drink.
-  # top_room_min   "Hardly any room for a top": the room a build leaves, as a
-  #                share of the least the house range says a top pours. The
-  #                flag used to fire below the WHOLE minimum, which stopped
-  #                meaning anything when a top began to be sized from the
-  #                glass (#1179) -- a Tom Collins with 91 ml of room against a
-  #                range starting at 100 was flagged. A quarter keeps the one
-  #                case it is for: a build that fills its glass.
+  # Two more judgements (#1244). `tolerance`: a drink is flagged only when it
+  # is over by more than this share, which is the model's noise.
+  # `top_room_min`: "hardly any room for a top" fires when a build leaves less
+  # than this share of the least a top pours.
   tolerance: 0.10
   top_room_min: 0.25
 
-# =============================================================================
-# DISPLAY SCALE — the cheat, and it is a cheat on purpose.
-# =============================================================================
-# A multiplier applied to a glass's true-relative height when it is DRAWN on a
-# card. Absent means 1, which is almost every glass.
-#
-# WHY IT EXISTS. Helen, 2026-08-26, looking at the card grid: coupe,
-# nick-and-nora and tiki mug look right at the card's size, but "Collins and
-# hurricane are so tall that their proportions aren't right". True relative
-# height is correct information and, past a certain point, a bad drawing: a
-# 180mm Collins next to an 85mm old-fashioned is accurate and reads as a stripe.
-#
-# A MULTIPLIER RATHER THAN PADDING, which was the first suggestion. Padding
-# moves a glass's baseline while leaving it exactly as tall as it was; what is
-# wrong at this size is the SIZE, so the size is what gives.
-#
-# IT IS DATA RATHER THAN CSS because every value is a judgement about ONE
-# drawing rather than a fact about glassware, and the honest place for a set of
-# per-item judgements is somewhere you can see all of them at once. This file
-# already holds the other per-glass judgement (`heights_mm`), so this is its
-# neighbour rather than a new idea.
-#
-# THE GLOBAL CURVE EXISTS NOW AND THIS MAP IS EMPTY -- Helen, 2026-08-31,
-# #599/#601, choosing from /dev/card-glasses/.
-#
-# This paragraph used to say "TRY THE GLOBAL CURVE FIRST if a third glass ever
-# wants a line here. The card template raises every ratio to a power before
-# applying it." The advice was right and the fact was false: no curve existed,
-# on the card or anywhere but the drink page, and `git log -S` over
-# cocktails/index.html and _cards.scss confirms one never had. So the file told
-# the next reader to reach for a knob that was not there, at exactly the moment
-# a third glass wanted a line -- the flute, which is the tallest glass declared
-# here and therefore 1.0 BY CONSTRUCTION, filling the whole panel.
-#
-# The curve is real now: `ratio * 0.5 + 0.5` in cocktails/index.html, with the
-# headroom in $card-glass-scale. It does for every glass what these two lines
-# did for the two that were noticed, so both came off. Measured on the
-# collision they existed to fix -- a Collins beside an old-fashioned -- the pair
-# stood 1.74x apart with the cheats and stand 1.34x apart with the curve.
-#
-# THE MECHANISM STAYS AND THE MAP IS DELIBERATELY EMPTY. `display_scale` is
-# still read, still composes with the curve, and is still the right home for a
-# judgement about ONE drawing rather than about the range. An empty map is the
-# honest state: the range problem has a range answer now, and nothing is
-# currently a special case. Add a line only when a specific drawing is wrong in
-# a way the curve cannot see.
-#
-# WHY A DRAWING ARRIVES IN THE WRONG FRAME, since it will happen again. Helen
-# builds a glass by editing an existing one, and Inkscape keeps the previous
-# canvas silently even when it reports the document as resized. Four icons had
-# artwork hanging outside their own viewBox that way (#599). The normaliser
-# fits every canvas to its own ink on the way in, and
-# test_no_glass_artwork_is_drawn_outside_its_viewbox is the check that it took.
+# A multiplier on a glass's height when it is drawn on a CARD; absent means 1.
+# The curve in cocktails/index.html, with `$card-glass-scale`, already
+# compresses the range for every glass, so this map is empty. Add a line only
+# for one drawing that is wrong in a way the curve cannot see.
 display_scale: {}
 
+# Every icon file. Liquid cannot list `_includes/`, so the inventory is typed
+# here, and tests/test_cocktails.py holds it to the directory in both
+# directions.
 all_icons:
   - absinthe
   - brandy

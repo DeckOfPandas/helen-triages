@@ -9,15 +9,11 @@ excerpt_separator: ""
 
 {% comment %} The tape wordmark's bevel (#470). Local only: the `dev` collection is
    `output: false`.
-
-   This tunes the real element. .site-logo-word lives in the shared header,
-   which this page renders like any other, so the dials override the live
-   wordmark at the top of the page, not a copy of it: a reproduction is a
-   second thing to keep in step. There are no heading dials here; the heading
-   emboss values are settled, in _sass/shared/_rule.scss.
-
-   This is light type on black tape, not dark type on a light ground, so it has
-   its own numbers and is not the headings' treatment. MANUAL 13.4.1. {% endcomment %}
+   The dials override the live .site-logo-word in the shared header at the top
+   of this page, not a copy of it: a reproduction is a second thing to keep in
+   step. The heading emboss values are settled, in _sass/shared/_rule.scss, and
+   have no dials here: this is light type on black tape, with its own numbers.
+   MANUAL 13.4.1. {% endcomment %}
 
 <style>
   /* Chrome for the dials only. Nothing here touches the specimens. */

@@ -4,46 +4,37 @@
     python3 scripts/build_ingest_vocab.py --check    # diff, exit 1 if stale
     python3 scripts/build_ingest_vocab.py --write    # rewrite the blocks
 
+One of the two flags is required. `--check` prints a unified diff and any
+structural problem, and exits 1 if there is either. `--write` rewrites the
+blocks in place and exits 1 only on a structural problem. The test in
+tests/test_standalone_docs.py calls `check()`, so the flag and the suite
+cannot disagree about what stale means.
+
 `model_instructions/INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md` are
-handed to a Claude with no checkout, so each PRINTS the closed vocabularies as
-literal text. That is the only deliberate duplication of data in this
-repository -- tests/test_standalone_docs.py's header argues for it at length --
-and until now the guard ran in ONE direction: everything printed had to still
-be declared, nothing required the document to print everything declared.
-
-WHAT THE ONE-WAY GUARD LET THROUGH, measured 2026-09-02 (INGEST_INBOX_DESIGN
-§3): the cocktail document printed 42 of the 48 declared garnishes, and the
-food document listed a dozen of the 45 accented words and none of the eight
-words that deliberately keep NO accent. Nothing was wrong; the reader was
-simply under-served, and an under-served reader "corrects" a valid string to a
-near one -- which is a real edit to a real file, made confidently.
-
-SO THE DUPLICATION IS NOW GENERATED, and only the duplication. Each vocabulary
-sits between a pair of HTML-comment markers:
+read by a Claude with no checkout, so each prints the closed vocabularies as
+literal text. That duplication is generated, so that a document cannot print
+less than is declared: a reader who cannot see a valid string "corrects" it to
+a near one. Each vocabulary sits between a pair of HTML-comment markers:
 
     <!-- vocab:garnish start -->
-    **Citrus peel:** lemon twist * lemon twist (discarded) * ...
+    **Citrus peel:** lemon twist · lemon twist (discarded) · ...
     <!-- vocab:garnish end -->
 
-Everything outside a marker pair is prose -- the "meanings you would not guess"
-bullets, the four garnish rules, the worked examples -- and stays hand-written
-under the existing one-way tests. INGEST_INBOX_DESIGN §4: the documents' value
-is judgement and calibration, and a generator over the prose would preserve the
-words and lose the point.
+It writes only between marker pairs. Everything outside one is hand-written
+prose and stays under the one-way tests in tests/test_standalone_docs.py.
+`required_blocks()` says which blocks each document must carry; a marker with
+no renderer, or a required block with no marker, is a structural problem.
 
-EVERY BLOCK IS SOURCED FROM AN IMPORTED LOADER, NEVER FROM A LIST TYPED HERE.
-Same rule as scripts/ingest_preflight.py, and the reason is sharper for a
-GENERATOR than for a reporter: a script carrying its own copy of the vocabulary
-would write a stale document that then passes the drift check, because the
-check would be comparing the copy against itself. If an import here breaks
-because a loader moved, that is the mechanism working.
+The rules:
 
-THE FORMATTING IS NOT FREE EITHER. tests/test_standalone_docs.py scrapes these
-sections with regexes tuned to the documents' own shapes -- middle-dot
-separators, `**Group:**` prefixes, backticked terms, the two-column correction
-table. The rendering functions below emit exactly those shapes, and the
-existing scrapers are the check that they do. If a scraper stops matching, the
-generator's output is what is wrong.
+  - Every block is sourced from a loader imported from `tests/`, never from a
+    list typed here. A generator carrying its own copy of a vocabulary would
+    write a stale document that then passes the drift check. An import that
+    breaks because a loader moved is the mechanism working.
+  - The rendering functions emit the shapes the scrapers in
+    tests/test_standalone_docs.py parse: middle-dot separators, `**Group:**`
+    prefixes, backticked terms, the two-column correction table. If a scraper
+    stops matching, the generator's output is what is wrong.
 """
 from __future__ import annotations
 
@@ -77,21 +68,14 @@ MARKER = re.compile(
 )
 
 
-# =============================================================================
-# RENDERING -- the shapes the scrapers in test_standalone_docs.py already parse
-# =============================================================================
+# --- Rendering: the shapes the scrapers in test_standalone_docs.py parse ---
 
 def _wrap(atoms, prefix: str = "") -> str:
-    """Hard-wrap at 80, breaking only BETWEEN entries and never inside one.
+    """Hard-wrap at WIDTH, breaking only between entries and never inside one.
 
-    textwrap.fill would do this in one line and was the first version. It
-    wraps on any space, so it broke the star ingredient "oily fish" across two
-    lines in the middle of its backticks. Every entry in these lists is a
-    string a reader COPIES into a file, and a term split over a line break gets
-    copied with the break in it or retyped from memory. So the unit of wrapping
-    is one entry plus its trailing separator -- which is also what the
-    hand-written versions of these lists did: they broke after a separator,
-    never inside a term.
+    Every entry is a string a reader copies into a file, and `textwrap.fill`
+    wraps on any space, so it would split "oily fish" inside its backticks.
+    The unit of wrapping is one entry plus its trailing separator.
     """
     lines, line = [], prefix
     for atom in atoms:
@@ -124,24 +108,18 @@ def _commas(items) -> str:
 def _label(key: str) -> str:
     """`citrus_peel` -> `Citrus peel`, the heading a grouped block prints.
 
-    DERIVED RATHER THAN DECLARED, deliberately. Every group key in garnish.yml
-    and methods.yml is lowercase words joined by underscores, and this produces
-    exactly the six garnish headings and five method headings the documents
-    printed by hand before they were generated. A group whose display name
-    needs a capital in the middle -- a proper noun -- would need a label map in
-    the data file; there is none today and inventing the key for a case that
-    does not exist is the encyclopaedia trap (#459).
+    Derived, not declared: every group key in garnish.yml and methods.yml is
+    lowercase words joined by underscores. A group whose display name needs a
+    capital in the middle would need a label map in the data file.
     """
     return key.replace("_", " ").capitalize()
 
 
 def _grouped(groups: dict, tick: bool) -> str:
-    """One paragraph per group, `**Label:** a * b * c`, blank line between.
+    """One paragraph per group, `**Label:** a · b · c`, blank line between.
 
-    Group ORDER is the data file's own order, which is the order somebody
-    thought about when they wrote it -- alphabetising here would put `cherries`
-    before `citrus peel` for no reason and churn the document the day a group
-    is renamed.
+    Group order is the data file's own; alphabetising would churn the document
+    the day a group is renamed.
     """
     out = []
     for key, members in groups.items():
@@ -151,9 +129,7 @@ def _grouped(groups: dict, tick: bool) -> str:
     return "\n\n".join(out)
 
 
-# =============================================================================
-# THE BLOCKS -- one function each, every one over an imported loader
-# =============================================================================
+# --- The blocks: one function each, every one over an imported loader ---
 
 def _tags(group: str) -> str:
     return _commas(_food_taxonomy()["tags"][group])
@@ -164,29 +140,19 @@ def _stars() -> str:
 
 
 def _source_types() -> str:
-    """The eight declared citation types -- `VALID_TYPES`, imported above.
+    """The declared citation types, `VALID_TYPES`, sorted because it is a set.
 
-    `VALID_TYPES` is a set, so the order has to come from somewhere: sorted,
-    because any other order here would be a preference typed into this script
-    and the table below the block already teaches the meaningful grouping
-    (published work takes "Adapted from", a bare label does not).
-
-    THE BLOCK IS NAMED `source_types`, PLURAL, AND THAT IS LOAD-BEARING.
+    The block is named `source_types`, plural, and must stay so.
     `test_invisible_keys_are_really_invisible` in test_front_matter.py scans
-    every file under `scripts/` for the singular key name and fails if one
-    appears, because the whole basis for exempting that key from the proofread
-    rule is that nothing on the render surface reads it. This script does not
-    read it off a recipe -- it renders the list of values a citation may
-    declare, from the suite -- but the guard is deliberately blunt and its
-    message says not to narrow it. Naming the block in the plural keeps it
-    honest without arguing with it. See SOURCE_ATTRIBUTION_SPEC.md for the
+    every file under `scripts/` for the singular key name, docstrings
+    included, and fails if it appears. See SOURCE_ATTRIBUTION_SPEC.md for the
     field itself.
     """
     return _dots(sorted(VALID_TYPES), tick=True)
 
 
 def _accents() -> str:
-    """The 45 curated accented spellings, as the words a reader should type.
+    """The curated accented spellings, as the words a reader should type.
 
     The map is unaccented -> accented and the document wants the right-hand
     side; the left-hand side is a lookup key, not a word anybody writes.
@@ -195,12 +161,11 @@ def _accents() -> str:
 
 
 def _no_accents() -> str:
-    """The words that deliberately keep NO accent.
+    """The words that deliberately keep no accent.
 
-    Read straight from the data file rather than through a loader because the
-    suite has none for this half: test_style.py's `_accented_words()` returns
-    only the `words:` map. `SHARED_DATA_DIR` is imported so the path is still
-    stated in exactly one place.
+    Read straight from the data file: the suite's `_accented_words()` returns
+    only the `words:` map. `SHARED_DATA_DIR` is imported so the path is stated
+    in one place.
     """
     data = yaml.safe_load(
         (SHARED_DATA_DIR / "accented_words.yml").read_text(encoding="utf-8")
@@ -213,21 +178,14 @@ def _wrong_glass_spellings() -> dict:
 
 
 def _glass_spellings() -> str:
-    """Every glass spelling a drink may WRITE.
+    """Every glass spelling a drink may write.
 
-    `icons:` maps both canonical names and aliases, because it exists to keep a
-    drink rendering whatever it says. `canonical_glasses` is the map of
-    spellings that get corrected. So what a document should print is the
-    difference: every key that is not corrected away.
-
-    THAT IS WIDER THAN THE 23 THE DOCUMENT USED TO PRINT, by `martini glass`,
-    `pineapple` and `coconut`. Those three are aliases that `canonical_glasses`
-    does not declare, and test_drinks_use_the_canonical_glass_spelling says
-    exactly what that means: "an alias absent from that map is permitted, which
-    is why `martini` / `martini glass` does not fail: it is undecided, not
-    blessed." Printing them is honest -- a drink writing one passes every test
-    in the suite. Deciding they are wrong is Helen's call and would be made in
-    `canonical_glasses`, where this block would then follow it.
+    `icons:` maps both canonical names and aliases; `canonical_glasses` maps
+    the spellings that get corrected. The block prints the difference: every
+    `icons:` key that is not corrected away. An alias absent from
+    `canonical_glasses` is undecided, not blessed
+    (test_drinks_use_the_canonical_glass_spelling), and is printed because a
+    drink writing one passes the suite.
     """
     wrong = _wrong_glass_spellings()
     icons = _glasses().get("icons") or {}
@@ -256,8 +214,7 @@ def _garnishes() -> str:
 
 def _method_steps() -> str:
     """The literal groups, then the `shapes:` groups with their `<X>` slot
-    printed as-is -- 2026-09-10. The prose around the block says what the
-    slot means; this only has to show the sentences."""
+    printed as-is. The prose around the block says what the slot means."""
     spec = _methods()
     literal = _grouped(spec.get("canonical") or {}, tick=True)
     shapes = spec.get("shapes") or {}
@@ -268,34 +225,21 @@ def _method_steps() -> str:
 
 
 def _measures() -> str:
-    """The units an amount may carry that are NOT converted to millilitres.
+    """The units an amount may carry that are not converted to millilitres.
 
-    Straight from `measures.non_volumetric` in ingredients.yml, so the day
-    `to top` or `to rinse` is declared the document teaches it. The prose the
-    document had before this block listed `1 barspoon`, `1 whole egg`,
-    `1 sugar cube` and `top` -- three of which are undeclared units that
-    test_every_amount_is_readable_as_a_quantity rejects outright. That is the
-    exact failure the one-way guard could not see: the document was not stale,
-    it was inventing.
+    Straight from `measures.non_volumetric` in ingredients.yml. A unit not
+    declared there is rejected by test_every_amount_is_readable_as_a_quantity,
+    so the document must not teach one.
     """
     measures = (_vocab().get("measures") or {})
     return _dots(measures.get("non_volumetric") or [], tick=True)
 
 
 def _serve_ice() -> str:
-    """The `serve.ice` vocabulary, with what each value MEANS.
+    """The `serve.ice` vocabulary, with what each value means.
 
-    DECLARED SINCE THE FIELD EXISTED AND NEVER PRINTED, which is the same gap
-    `vocab:generics` filled: `serve.yml` holds six values and a paragraph of
-    reasoning for each, and the repo-less document described the field in prose
-    and named none of them. A session that cannot see the six either guesses or
-    omits, and `ice` is the field #290 created specifically to stop seventeen
-    spellings of "strain".
-
-    THE GLOSSES COME FROM THE DATA, not from here. Each value's own note in
-    serve.yml opens with a sentence that IS the definition, so the first
-    sentence is what prints -- and a value whose meaning is rewritten there
-    rewrites the document on the next `--write`.
+    The glosses come from the data: each value's note in serve.yml opens with
+    a sentence that is its definition, and that first sentence is what prints.
     """
     ice = (_serve_vocab().get("ice") or {})
     rows = []
@@ -306,33 +250,18 @@ def _serve_ice() -> str:
 
 
 def _to_serve() -> str:
-    """The `to_serve` items, grouped as serve.yml groups them -- #1256.
-
-    Declared 2026-10-01 and printed the same day, so this vocabulary never had
-    the declared-but-unprinted gap `_serve_ice` and `_generics` closed late.
-    """
+    """The `to_serve` items, grouped as serve.yml groups them (#1256)."""
     return _grouped(_serve_vocab().get("to_serve") or {}, tick=True)
 
 
 def _sources() -> str:
     """The publications a drink's `source` names, and their canonical spelling.
 
-    NOT A CLOSED VOCABULARY, AND IT MUST NOT BECOME ONE. Helen ruled on
-    2026-08-30 that coverage here is optional and always will be: "I sort of
-    don't care about this. You can't copyright facts ... I'm not going to sweat
-    it." 86 of 114 drinks say `source: ""` and that is correct.
-
-    WHAT THIS FIXES IS SPELLING, NOT COVERAGE. `Difford's` appears on 24 drinks
-    and `Difford's Guide` on two -- one publication, two spellings, and nothing
-    to tell the next ingest which is the house style. This is the same shape
-    `bottles.yml` uses for bottles: a canonical name, its known aliases, and a
-    document that prints the canonical one.
-
-    THE COMPOUND ATTRIBUTIONS ARE NOT VARIANTS AND ARE NOT LISTED. "Difford's /
-    Rémy Martin" and "Henry Craddock, Savoy Hotel, London / Death & Co" name two
-    sources each, on purpose, and so do Helen's own jokes ("life", "spitting out
-    weird soapy drinks every time I accidentally use Blanc"). Free text stays
-    free.
+    Not a closed vocabulary, and it must not become one: a drink's `source` is
+    optional, and an empty one is correct. This block fixes spelling only
+    (`Difford's`, not `Difford's Guide`): a canonical name and its known
+    aliases, as `bottles.yml` does for bottles. A compound attribution naming
+    two sources, or free text, is not a variant and is not listed.
     """
     sources = _sources_data().get("publications") or {}
     rows = []
@@ -346,32 +275,14 @@ def _sources() -> str:
 def _generics() -> str:
     """Every declared generic, grouped by the list that declares it.
 
-    THE BLOCK THIS FILE EXISTED FOR AND NEVER RENDERED -- added 2026-09-21,
-    after a data-model review asked why the one vocabulary the cocktail document
-    tells a session to `QQ` on every single line was the one vocabulary it did
-    not print. It already printed six: measures, glasses, glass corrections,
-    garnishes, methods, accents. `.claude/commands/ingest.md` said the repo-less
-    Project "cannot see the vocabulary", and that was a choice rather than a
-    constraint, because THIS IS THE MECHANISM FOR MAKING IT SEE ONE.
+    Derived from the file's own shape as `_declared_generics` in
+    tests/test_cocktails.py does it: a `<family>_characters` list is
+    characters, not generics, and `NOT_GENERIC_LISTS` names the lists that
+    refer to the vocabulary. Both tests are imported, not restated.
 
-    It costs about 3,200 characters, which is 8% of the cocktail document and
-    less than its method and garnish blocks together.
-
-    DERIVED FROM THE FILE'S OWN SHAPE, exactly as `_declared_generics` in
-    tests/test_cocktails.py does it, and the two exclusions are that function's:
-    a `<family>_characters` list is a vocabulary of characters, not generics,
-    and `NOT_GENERIC_LISTS` names the lists that REFER to the vocabulary rather
-    than declaring any of it. Importing the test module's own constants rather
-    than restating them is the rule this whole script is built on -- a generator
-    carrying its own copy would write a stale document that then passes the
-    drift check, because the check would compare the copy against itself.
-
-    `hers_to_apply` IS EXCLUDED AND IS THE ONE JUDGEMENT HERE. It is a mapping,
-    so `_declared_generics` already skips it, and that is correct twice over:
-    a style Helen has reserved for herself must not be offered to a session that
-    cannot know she has reserved it (`test_no_drink_uses_a_generic_that_is_
-    helens_to_apply`), and a document that printed one would be teaching a value
-    the suite refuses.
+    `hers_to_apply` is a mapping, so it is skipped, and must be: a style Helen
+    has reserved for herself must not be offered to a session
+    (`test_no_drink_uses_a_generic_that_is_helens_to_apply`).
     """
     from test_cocktails import NOT_GENERIC_LISTS, _is_character_list
 
@@ -389,11 +300,10 @@ def _generics() -> str:
 def renderers() -> dict:
     """Block name -> the function that renders it.
 
-    THE TAG BLOCKS ARE BUILT FROM THE TAXONOMY'S OWN GROUPS, not named here.
-    The food document glosses each group in prose ("what you feel like eating,
-    a craving"), so the groups cannot live inside one block -- and a group
-    added to taxonomy.yml must still be loud rather than silently missing, so
-    `required_blocks()` below asks for one block per declared group.
+    The tag blocks are built from the taxonomy's own groups, one block per
+    group, because the food document glosses each group in prose.
+    `required_blocks()` asks for each, so a new group cannot go missing
+    silently.
     """
     out = {
         "stars": _stars,
@@ -418,11 +328,9 @@ def renderers() -> dict:
 def required_blocks() -> dict:
     """Which blocks each document must carry.
 
-    A manifest, not a vocabulary: it says where a block belongs, and every
-    block's CONTENT still comes from the loaders above. The tag groups are
-    derived so that declaring a third group in taxonomy.yml fails this until
-    the food document has a section for it -- the one direction the old guard
-    could not point in.
+    A manifest, not a vocabulary: every block's content still comes from the
+    loaders above. The tag groups are derived, so declaring another group in
+    taxonomy.yml fails `--check` until the food document has a section for it.
     """
     tags = {f"tags:{group}" for group in _food_taxonomy()["tags"]}
     return {
@@ -434,9 +342,7 @@ def required_blocks() -> dict:
     }
 
 
-# =============================================================================
-# THE PASS ITSELF
-# =============================================================================
+# --- The pass itself ---
 
 def render(path: Path) -> tuple[str, list[str]]:
     """(the document with every block re-rendered, problems found).

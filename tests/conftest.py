@@ -1,13 +1,14 @@
-"""Shared fixtures and helpers for the Helen Triages Food test suite.
+"""Shared fixtures and helpers for the food test suite, and the house-style
+predicates the cocktails suite shares.
 
 Run from the repo root:
 
-    pytest -q                  # everything
-    pytest -q tests/test_times.py   # one file
-    pytest -q -k cavolo             # everything touching one recipe
+    pytest -q                               # everything
+    pytest -q tests/test_front_matter.py    # one file
+    pytest -q -k cavolo                     # everything touching one recipe
 
-Every test is parametrised per recipe file, so a failure names the file it
-came from rather than making you go and find it.
+A test that takes `recipe`, `draft` or `magic_bag` is parametrised per file,
+so its failure names the file it came from.
 """
 from __future__ import annotations
 
@@ -23,28 +24,19 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 
 
-# =============================================================================
-# THE TWO SESSION BUILDS -- moved here from test_rendered_pages.py for #1200
-# =============================================================================
-# Two modules now load pages out of the same builds: test_rendered_pages.py
-# reads the HTML, and test_browser_smoke.py runs it in Chromium. A session
-# fixture defined in one module and IMPORTED into another is a second fixture
-# definition with its own cache, so it builds twice; defined here it is one
-# definition, one build per run, whoever asks first. The builds are the
-# slowest thing in the suite (~5.5s each), which is the whole reason to share.
+# --- the two session builds ---------------------------------------------------
+# Defined here, not in a test module: a session fixture imported into a second
+# module is a second definition with its own cache, so the site would build
+# twice. test_rendered_pages.py reads the HTML and test_browser_smoke.py runs
+# it in Chromium (#1200).
 
 BUILD_DIR = ROOT / "tmp" / "_test_site"
 PROD_BUILD_DIR = ROOT / "tmp" / "_test_site_prod"
 
 
-# A SKIP IS A LIE IN CI. Locally, "no bundler on this machine" is a fair reason
-# to stand down: not every contributor has a Ruby toolchain, and the rest of the
-# suite is still worth running. In CI the toolchain is installed on purpose, so
-# a missing bundler means the setup step did not do its job -- and skipping
-# would report green for the two tests that are the only ones checking BUILT
-# output, including the production-only 404s that nothing local can reproduce.
-#
-# GitHub Actions sets CI=true. Fail there, skip here.
+# In CI a missing bundler fails rather than skips: the toolchain is installed
+# on purpose there, and a skip would report green for the only tests that
+# check built output. GitHub Actions sets CI=true.
 def _require_bundler():
     if shutil.which("bundle") is not None:
         return
@@ -84,21 +76,11 @@ def site() -> Path:
 
 @pytest.fixture(scope="session")
 def prod_site() -> Path:
-    """A SECOND build, with the production config alone -- no _config_local.yml.
+    """A second build, with the production config alone -- no _config_local.yml.
 
-    Worth the extra four seconds because the `site` fixture above cannot see
-    this entire class of bug, and one of them shipped. Locally, drafts have
-    `output: true`, so every link to one resolves and the page looks right. In
-    production `output: false`, and a link to a draft is a 404 that nothing on
-    a developer's machine can reproduce.
-
-    That is not hypothetical: GitHub issue #235. food/index.html tested
-    `{% if site.food_drafts %}` before concatenating drafts into the list --
-    which is a test of whether the collection is DECLARED, always true, rather
-    than whether it PUBLISHES. Ten drafts with meta.rewritten: true were listed
-    on the live index, each linking to /helen-triages/food_drafts/<slug>.html,
-    Jekyll's default URL for a document it never wrote. Helen found it by
-    looking at the production mockup on :4002.
+    Locally drafts have `output: true`, so every link to one resolves. In
+    production `output: false`, and a link to a draft is a 404 that the `site`
+    fixture cannot see (#235).
     """
     _require_bundler()
 
@@ -116,58 +98,29 @@ def prod_site() -> Path:
     yield PROD_BUILD_DIR
     shutil.rmtree(PROD_BUILD_DIR, ignore_errors=True)
 
-# This is a mono-repo: food and cocktails are built from one Jekyll site, so a
-# collection's source directory carries the site in its name. Jekyll only finds
-# a collection at `_<name>` directly under the repo root — `food/_recipes/` is
-# not discovered, and fails silently — so the directories cannot nest under
-# food/ however much tidier that would read. See _config.yml.
-#
-# This suite is the FOOD suite. When cocktails has real files, these tests
-# either get parametrised by collection or gain a sibling
-# test_cocktail_front_matter.py; the food schema does not apply to a cocktail.
+# Jekyll only finds a collection at `_<name>` directly under the repo root, so
+# the source directories carry the site in their name and cannot nest under
+# food/. These are the food collections; tests/test_cocktails.py has its own
+# loader and schema.
 RECIPES_DIR = ROOT / "_food_recipes"
 DRAFTS_DIR = ROOT / "_food_drafts"
 
-# THE MAGIC BAG — dishes Helen makes without a recipe, added 2026-08-26.
-#
-# A THIRD COLLECTION AND A THIRD FIXTURE, not a widening of `recipe`. Every
-# structural rule in test_front_matter.py is unconditional on purpose, and
-# folding these in would force each one to grow an `if` — a magic-bag entry has
-# no method, no source and no method_short, all of which a recipe MUST have. The
-# separate list keeps the recipe rules absolute and gives the new shape its own
-# spec in test_magic_bag.py, exactly as the `recipe`/`draft` split already does.
-#
-# IT IS IN THIS PUBLIC REPO, unlike _food_drafts/, so DRAFTS_PRESENT has no
-# equivalent here: CI sees the whole collection. If that ever changes, this
-# needs the same treatment issue #378 gave drafts, and test_suite_hygiene.py's
-# registries are where it would have to be declared.
-#
-# "CI SEES THE WHOLE COLLECTION" WAS TRUE AND WAS NOT ENOUGH -- #1201. The
-# whole collection was EMPTY from 2026-09-07 (its one entry was a placeholder
-# Helen had deleted), the folder left the checkout with it, and every
-# `magic_bag`-parametrised test collected zero cases for four weeks and
-# reported green. So the fixture below is parametrised alongside the real
-# entries: the schema is exercised on every run whatever the collection holds.
-# It lives under tests/, which Jekyll excludes, so it can never become a page,
-# and it is NOT in ALL_MAGIC_BAG -- the cross-collection sweeps in
-# test_style.py and test_taxonomy.py read real dishes only.
-#
-# WHY NOT "THE COLLECTION MUST BE NON-EMPTY", which is what #1201 first asked
-# for. The dishes come out of Helen's head, on her time. An assertion that is
-# red until she writes one turns `main` red, and a red `main` stops every
-# deploy (CLAUDE.md). An empty magic bag is not a defect; a schema nothing
-# runs is. `_report_empty_magic_bag` below says so at the end of the run.
+# The magic bag is a third collection with its own fixture, not a widening of
+# `recipe`: an entry has no method, no source and no method_short, all of which
+# a recipe must have. Its spec is tests/test_magic_bag.py.
+# The fixture file is parametrised alongside the real entries, so the schema is
+# exercised while the collection is empty (#1201). It lives under tests/, which
+# Jekyll excludes, and is not in ALL_MAGIC_BAG: the cross-collection sweeps
+# read real dishes only. An empty magic bag is not a defect, so nothing asserts
+# it is non-empty; `_report_empty_magic_bag` says so at the end of the run.
 MAGIC_BAG_DIR = ROOT / "_food_magic_bag"
 MAGIC_BAG_FIXTURE_PATH = ROOT / "tests" / "fixtures" / "magic_bag" / "zzz-fixture-dish.md"
 
 # Food's own vocabulary: taxonomy, filter sections, pantry, ingredient words.
 DATA_DIR = ROOT / "_data" / "food"
 
-# Data that is genuinely shared across the mono-repo. accented_words.yml lives
-# here rather than under food/ because it is HOUSE STYLE, not food vocabulary —
-# British spellings and the curated unaccented→accented map apply to a cocktail
-# recipe exactly as they do to a food one, and `crème de cassis` will want the
-# same treatment `crème fraîche` gets.
+# Shared across the mono-repo: accented_words.yml is house style, not food
+# vocabulary, and applies to a drink as it does to a recipe.
 SHARED_DATA_DIR = ROOT / "_data"
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---\s*(.*)\Z", re.S)
@@ -200,15 +153,9 @@ class Recipe:
                     out.append(item["item"])
                 elif isinstance(item, str):
                     out.append(item)
-        # THE MAGIC BAG'S FLAT `ingredients:` LIST, added 2026-08-26. A recipe
-        # carries `ingredient_groups` and no `ingredients`; a magic-bag entry
-        # carries `ingredients` and no `ingredient_groups`, and both halves are
-        # enforced (test_front_matter.py, test_magic_bag.py). So this branch is
-        # a no-op on every recipe rather than a behaviour change to them, and
-        # the ingredient-vocabulary rules — salted vs unsalted butter, which
-        # soy, which sugar — reach the new collection without being rewritten
-        # for it. Those rules are about the WORDS, and a magic-bag entry's words
-        # go on the page like any other.
+        # The magic bag's flat `ingredients:` list. A recipe carries
+        # `ingredient_groups` and no `ingredients`, so this is a no-op there,
+        # and the ingredient-vocabulary rules reach the magic bag unchanged.
         for item in self.fm.get("ingredients") or []:
             if isinstance(item, dict) and item.get("item"):
                 out.append(item["item"])
@@ -253,9 +200,8 @@ class Recipe:
             for item in group.get("items") or []:
                 if isinstance(item, dict) and item.get("note"):
                     out.append((f"note on '{item.get('item')}'", item["note"]))
-        # Magic-bag ingredient notes — see ingredient_items above for why this
-        # is a no-op on a recipe. A note here renders exactly as a recipe's
-        # does, so it is held to the same typography and house style.
+        # Magic-bag ingredient notes; a no-op on a recipe, as in
+        # `ingredient_items`.
         for item in self.fm.get("ingredients") or []:
             if isinstance(item, dict) and item.get("note"):
                 out.append((f"note on '{item.get('item')}'", item["note"]))
@@ -265,29 +211,13 @@ class Recipe:
 def _load(directory: Path) -> list[Recipe]:
     """Every .md at or below `directory`, recursively.
 
-    RECURSIVE SINCE 2026-08-20, AND IT MATTERS. This used to be `glob("*.md")`,
-    which was correct while `_food_drafts/` was flat. Helen then built a
-    three-stage staging pipeline -- `to-cook/`, `to-rewrite/`, `to-promote/`;
-    numbered `1-rewrite/`, `2-make/`, `3-keep/`, `4-promote/` since
-    2026-09-14, PIPELINE.md §3 --
-    and moved drafts into it, at which point every draft test stopped seeing
-    them. Not failing on them: not looking at them, and reporting green.
+    Recursive because `_food_drafts/` holds staging subfolders (PIPELINE.md
+    §3): a flat glob stops reading the staged drafts and reports green.
+    `sorted()` over `rglob` orders by full path; ids still come from the stem.
 
-    That is the same failure `DRAFTS_PRESENT` below exists to prevent, arriving
-    through a new door: a suite that is honest about the files it read and
-    silent about the ones it never opened. The staged drafts are the ones
-    closest to publication, so they were precisely the wrong ones to stop
-    checking.
-
-    `sorted()` over `rglob` orders by full path, so a staged draft sorts under
-    its folder rather than among the flat ones. Ids still come from the stem.
-
-    A `README.md` AT THE ROOT IS NOT A RECIPE, and it is the ONLY name skipped.
-    `_food_drafts/` gained one on 2026-09-03 (the private repos had described
-    themselves nowhere) and this loader raised on it at import, taking the
-    whole suite down before a test ran. The skip is by exact name rather than
-    "anything without front matter", because a draft that has lost its
-    delimiters is exactly the file that should fail loudly, not vanish.
+    A `README.md` at the root is the only name skipped, and by exact name: a
+    draft that has lost its front matter delimiters must fail loudly, not
+    vanish.
     """
     if not directory.is_dir():
         return []
@@ -302,21 +232,13 @@ ALL_MAGIC_BAG = _load(MAGIC_BAG_DIR)
 # stands between this spec and testing nothing.
 MAGIC_BAG_FIXTURE = Recipe(MAGIC_BAG_FIXTURE_PATH)
 
-# ARE THE PRIVATE DRAFTS EVEN HERE? -- GitHub issue #378.
-#
-# `_food_drafts/` is a separate, private, gitignored repository. A CI checkout
-# therefore has the ~82 published recipes and NONE of the ~290 drafts, so
-# ALL_DRAFTS is an empty list there and every draft-reading check silently
-# examines a fraction of what it does locally.
-#
-# That is this repository's own worst failure mode wearing a new hat (MANUAL
-# 12): the tests do not fail, they find fewer offenders and report green. The
-# green is true of what they scanned and misleading about what they did not.
-#
-# Exposed as a value rather than left for each test to re-derive from
-# `if not ALL_DRAFTS`, so tests/test_suite_hygiene.py can insist every
-# draft-reading test makes a deliberate choice about it. See
-# test_every_draft_reading_test_says_what_it_does_without_drafts.
+# Are the private drafts here? (#378) `_food_drafts/` is a separate, private,
+# gitignored repository, so a CI checkout has the published recipes and none of
+# the drafts: ALL_DRAFTS is empty there, and a draft-reading check finds fewer
+# offenders and reports green.
+# Exposed as a value so tests/test_suite_hygiene.py can insist every
+# draft-reading test makes a deliberate choice about it
+# (test_every_draft_reading_test_says_what_it_does_without_drafts).
 DRAFTS_PRESENT = bool(ALL_DRAFTS)
 
 # Written once. A skip reported as bare "skipped" is barely better than a pass.
@@ -329,24 +251,11 @@ NO_DRAFTS_REASON = (
 
 
 def pytest_generate_tests(metafunc):
-    """Parametrise any test that asks for a `recipe` or `draft` argument.
+    """Parametrise any test that asks for `recipe`, `draft` or `magic_bag`.
 
-    A `draft`-parametrised hook lived here until 2026-08-10 with zero
-    consumers, and was removed rather than kept "in case" — added back
-    2026-08-11 for tests/test_drafts.py, the day one actually needed it.
-    `recipe` and `draft` are deliberately separate fixtures over separate
-    lists (ALL_RECIPES vs ALL_DRAFTS) so a recipe-only rule (e.g. a blank
-    tagline, a missing `QQ`) never gets silently enforced against a draft,
-    and vice versa — see test_drafts.py's own module docstring for which
-    rules apply to both and which don't.
-
-    The five tests that read `_food_drafts/` directly via the ALL_DRAFTS
-    list rather than this fixture (test_no_main_ingredient_spelling_
-    collisions, test_pantry_entries_are_actually_used, test_no_recipe_uses_
-    the_retired_instructions_field, test_accents_in_drafts, test_pan_and_
-    ingredient_sizes_use_digits_in_drafts) are cross-collection or module-
-    level checks that don't want a per-file failure id, so they're left as
-    they are rather than converted.
+    `recipe` and `draft` are separate fixtures over separate lists
+    (ALL_RECIPES, ALL_DRAFTS), so a recipe-only rule is never silently
+    enforced against a draft, or the reverse.
     """
     if "recipe" in metafunc.fixturenames:
         metafunc.parametrize("recipe", ALL_RECIPES, ids=[r.slug for r in ALL_RECIPES])
@@ -363,38 +272,13 @@ def pytest_generate_tests(metafunc):
                 + [m.slug for m in ALL_MAGIC_BAG])
 
 
-# =============================================================================
-# WHAT THIS RUN NEVER LOOKED AT -- 2026-09-22
-# =============================================================================
-# Helen, asked whether a test should FAIL when the drafts are absent: "I don't
-# want to run tests locally with the expectation that some will fail, because
-# a suite with failures starts to get ignored...plus it's very annoying." She
-# is right, and the reason is hers too: the drafts are legitimately unfinished
-# until she has cooked from them, so their state is not a defect to flag.
-#
-# So this reports and never fails. Nothing here can turn a run red.
-#
-# WHY A REPORT IS NEEDED AT ALL, when DRAFTS_PRESENT and NO_DRAFTS_REASON
-# above already make each draft-reading test say what it did. Those work
-# test by test. What neither can show is the AGGREGATE: a test parametrised
-# per file produces NO TESTS AT ALL when the files are absent -- not a
-# failure, not even a skip, simply nothing. So the run is quieter, not
-# noisier, and the skip count FALLS as coverage collapses. Measured
-# 2026-09-21: 10,660 tests collected in a bare worktree against 30,901 with
-# both clones, with skips falling from 110 to 27. Re-measured here on
-# 2026-09-22 by cloning both into a bare worktree mid-session: 30,917
-# collected, and `tests/test_drafts.py` alone went from 50 tests to 16,370.
-# Fifty green dots and sixteen thousand green dots are the same word.
-#
-# A lower skip count reads as better news. That is the whole problem, and it
-# is invisible from inside any single test.
-#
-# `UNCREATED` counts by NAME, filled at collection time above, so the figure
-# is computed from this run rather than quoted from a measurement that will
-# age. It covers food's `draft` fixture only -- the cocktails suite has its
-# own loader and mostly SKIPS with a reason (test_suite_hygiene.py's
-# SKIPS_WITHOUT_DRAFTS registry insists on it), and a skip is already visible.
-# The asymmetry is stated rather than papered over.
+# --- what this run never looked at --------------------------------------------
+# Reports, never fails: nothing here can turn a run red (DECISIONS §11).
+# When the drafts are absent, the per-file cases of a `draft`-parametrised test
+# are never created, so the run is quieter, not noisier, and no single test can
+# show how much went unopened. `UNCREATED` names those tests at collection
+# time. It covers food's `draft` fixture only: the cocktails suite has its own
+# loader and skips with a reason, which is already visible.
 COCKTAIL_DRAFTS_DIR = ROOT / "_cocktail_drafts"
 
 UNCREATED: list[str] = []
@@ -437,11 +321,9 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         pass
 
 
-# THE MAGIC BAG, WHEN IT IS EMPTY, SAID AT THE END (#1201, 2026-10-04). The
-# schema tests always run, against the fixture. What they cannot be while the
-# collection holds nothing is evidence about a real dish, and a green run
-# should not read as one. Reports, never fails, for the reason the drafts
-# caveat gives above; silent the moment the collection has an entry.
+# Said at the end when the magic bag is empty (#1201): the schema tests ran
+# against the fixture, which is not evidence about a real dish. Reports, never
+# fails; silent once the collection has an entry.
 def _report_empty_magic_bag(write, entries=None):
     entries = ALL_MAGIC_BAG if entries is None else entries
     if entries:
@@ -470,14 +352,10 @@ def _report_absent_drafts(write):
           "suite whole.")
 
 
-# THE BROWSER SMOKE TEST'S SKIP, SAID AT THE END (#1200, 2026-09-29). It skips
-# whenever Chromium cannot launch -- in CI today, which installs the Python
-# binding and no browser, and on any machine where the browser has gone
-# missing. A skip that happens on every run is a test that never runs, and one
-# `s` among thirty thousand dots is not a report. So the run says so where the
-# drafts caveat does, with the probe's own reason, and stays silent when the
-# test ran. Computed from THIS run's skip reports, not from state the test
-# module sets, so it cannot claim a skip that did not happen.
+# The browser smoke test skips whenever Chromium cannot launch (#1200). A skip
+# on every run is a test that never runs, so the run says so at the end, with
+# the probe's own reason. Computed from this run's skip reports, not from state
+# the test module sets, so it cannot claim a skip that did not happen.
 BROWSER_SMOKE = "test_browser_smoke.py"
 
 
@@ -539,74 +417,14 @@ def internal_temperatures() -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-# =============================================================================
-# UN-REWRITTEN `QQ` TEXT IS NOT CHECKED FOR HOUSE STYLE. Issue #426.
-# =============================================================================
-# Helen: "don't normalise oven temp, the dash, or 'minutes' -- ideally just skip
-# the whole line for simple normalisation tasks", of a step like
-#
-#     - step: "QQ bake at 150C for 30-40 minutes"
-#
-# `QQ` is her marker for "not rewritten yet" (MANUAL.md §4/§12): the line
-# is still the SOURCE's wording, sitting in the file waiting to be replaced
-# wholesale. Correcting its degree sign or its dash is tidying text that is
-# about to be deleted, and it does it by editing someone else's words -- which
-# is the one thing the marker exists to stop.
-#
-# THE SAME ARGUMENT IS ALREADY IN THIS MODULE'S DOCSTRING, for
-# test_no_oven_conversions, which was left out of this file entirely because it
-# "would fire on exactly the unrewritten `QQ`/`PLACEHOLDER` source text those
-# markers exist to protect". #426 is that judgement applied at the granularity
-# it should always have had: per LINE, not per test. A test can then keep
-# guarding every rewritten step in a file that still has un-rewritten ones,
-# instead of being dropped wholesale or firing wholesale.
-#
-# THIS OVERTURNS ONE EARLIER DECISION, explicitly rather than quietly.
-# test_temperatures_use_degree_c's docstring argued a degree sign is "pure
-# formatting, no information lost either way -- safe to enforce even inside an
-# un-rewritten `QQ`/`PLACEHOLDER` step". That is true about the character and
-# wrong about the line: the edit is safe, the habit of editing there is not, and
-# Helen has now ruled the other way. The 2026-08-11 bug it was seeded from --
-# 14 drafts writing "180C" -- is still caught everywhere it matters.
-#
-# WHAT IT IS WORTH, measured on the drafts present 2026-08-21: 66 of the 67
-# house-style violations in the whole drafts folder were inside QQ lines, and 29
-# of the 30 failing files failed for no other reason. The one real failure was
-# invisible underneath them.
-#
-# ONLY AT THE START OF THE VALUE, never anywhere in it. A rewritten step that
-# happens to mention QQ mid-sentence is finished prose and gets checked like any
-# other. The marker is a prefix, and treating it as a substring would let any
-# line opt out of house style by mentioning it.
-# LIVES IN conftest, NOT IN test_drafts.py, SINCE 2026-08-21 -- and the move is
-# what let the draft/recipe rule duplication collapse. These read a `Recipe`,
-# and `Recipe` is the same class for both collections, so the natural home is
-# beside it.
-#
-# APPLYING THEM TO A PUBLISHED RECIPE IS A NO-OP, measured before relying on it:
-# across every file in `_food_recipes/`, `checkable_raw(r) == r.raw` and
-# `checkable_prose(r) == r.prose`, because `test_no_qq_placeholder` forbids the
-# marker there at all. That is what makes it safe for ONE shared rule to blank
-# QQ lines unconditionally and be correct for both collections -- rather than
-# two copies of the rule differing by a call nobody can tell is deliberate.
-#
-# `QQ Claude` IS THE ONE EXCEPTION AND IT IS NOT AN EXEMPTION FROM THE RULE --
-# it is the rule read correctly. The marker means "SOMEBODY ELSE'S wording,
-# awaiting a rewrite", which is why correcting its dash is off limits: it edits
-# words that are about to be deleted. A `QQ Claude` line is the opposite. It is
-# the paraphrase, written here, and MANUAL §4 says outright that it "IS held
-# to normal house style, same as any other prose it writes".
-#
-# FOUND BY MEASUREMENT ON 2026-09-01, after the interleaved format became the
-# default for every draft and the corpus gained ~1,000 of these lines. 15 number
-# ranges were sitting in `QQ Claude` prose with hyphens instead of en dashes --
-# invisible to test_number_ranges_use_en_dashes, and to `scripts/tidy_drafts.py`,
-# which carries its own copy of this pattern for the same reason. Every one was
-# in a file paired BEFORE that session, so the hole had been open since the
-# format was invented on 2026-08-21 and only showed when the volume grew.
-#
-# The lookahead is what a reader most needs to see here: the pattern is not
-# "starts with QQ", it is "starts with QQ and is not the rewrite".
+# --- un-rewritten `QQ` text is not checked for house style (#426) --------------
+# A `QQ` line is still the source's wording, waiting to be replaced whole;
+# correcting its dash edits someone else's words (MANUAL §5).
+# Only at the start of the value: treating the marker as a substring would let
+# any line opt out of house style by mentioning it.
+# `QQ Claude` is not exempt: that line is the paraphrase written here and is
+# held to house style, hence the lookahead. `QQ_LINE` in scripts/tidy_drafts.py
+# mirrors this pattern; keep the two in step.
 _QQ_LINE = re.compile(r"""^\s*             # indent
                           (?:-\s*)?        # optional list dash
                           (?:[a-z_]+:\s*)? # optional key, e.g. `step: `
@@ -630,22 +448,21 @@ def is_qq(value) -> bool:
 def checkable_text(raw: str) -> str:
     """One file's raw text with every un-rewritten `QQ` line blanked.
 
-    Blanked rather than dropped so line COUNT is preserved: these strings feed
-    failure messages, and a report whose line numbers are off by however many
-    QQ lines happened to precede it is worse than no line numbers at all.
-
-    TAKES TEXT, NOT A `Recipe`, since 2026-09-03 (#670). The cocktails
-    collection has no `Recipe` object -- tests/test_cocktails.py has its own
-    loader and its own schema -- but it has the same `QQ` marker meaning the
-    same thing, so the exemption has to be reachable from a plain string.
-    `checkable_raw` below is the food-shaped door onto it and is unchanged.
+    Blanked rather than dropped so the line count is preserved: these strings
+    feed failure messages that cite line numbers. Takes text, not a `Recipe`,
+    because tests/test_cocktails.py has its own loader and the same marker
+    (#670).
     """
     return "\n".join("" if _QQ_LINE.match(line) else line
                      for line in raw.split("\n"))
 
 
 def checkable_raw(recipe) -> str:
-    """`recipe.raw` with every un-rewritten `QQ` line blanked."""
+    """`recipe.raw` with every un-rewritten `QQ` line blanked.
+
+    A no-op on a published recipe, where `test_no_qq_placeholder` forbids the
+    marker, so one shared rule is correct for both collections.
+    """
     return checkable_text(recipe.raw)
 
 
@@ -656,13 +473,8 @@ def checkable_prose(recipe) -> list[tuple[str, str]]:
 def _relative(recipe: Recipe) -> str:
     """The file's real path from the repo root.
 
-    REBUILT FROM recipe.path, NOT FROM THE SLUG, since 2026-08-21. These used to
-    return f"{collection}/{slug}.md", which was true while both collections were
-    flat. `_load` went recursive on 2026-08-20 to pick up Helen's staging
-    subfolders, and from that moment a failure in `to-promote/foo.md` reported
-    itself as `_food_drafts/foo.md` -- a path with no file at it. You cannot open
-    what the message names, and the one place it matters is the moment you are
-    trying to fix a red test.
+    Built from `recipe.path`, not from the slug: `_load` is recursive, so a
+    staged draft sits in a subfolder and a slug-built path names no file.
     """
     return recipe.path.resolve().relative_to(ROOT).as_posix()
 
@@ -680,47 +492,20 @@ def where_draft(draft: Recipe, detail: str = "") -> str:
     return _relative(draft) + (f" — {detail}" if detail else "")
 
 
-# =============================================================================
-# HOUSE STYLE THAT IS NOT ABOUT FOOD — GitHub issue #670
-# =============================================================================
+# --- house style that is not about food (#670) ---------------------------------
 # An en dash, an accent, a quoted scalar and a degree sign are properties of
-# Helen's WRITING, not of a recipe. `model_instructions/INGEST_ONE_COCKTAIL.md`
-# §7 demands every one of them of a drink in the same words the food formatter
-# uses — and until 2026-09-03 nothing checked a single one, because
-# tests/test_style.py is parametrised over the food `recipe` fixture and this
-# module is explicitly the food suite (see the header, L28–32).
-#
-# So the CORE of each corpus-agnostic rule lives here, taking a string, and the
-# per-collection test keeps its own assert, its own message and its own
-# parametrisation. Three surfaces already consume these — recipes and drafts
-# (tests/test_style.py, tests/test_drafts.py), the prose pages
-# (tests/test_prose_pages.py, which imported them from test_style.py by name
-# from the day it was written) and now drinks (tests/test_cocktails.py).
-#
-# WHY NOT MOVE THE TESTS THEMSELVES. A food failure message says "recipe", cites
-# a food issue number and names food fields; a drink's cannot. Sharing the
-# PREDICATE and not the message is what lets the drink rules exist at all
-# without touching a single food test id — `pytest --collect-only` is
-# byte-identical across this change on the food half.
-#
-# WHY NOT LEAVE THEM IN test_style.py AND IMPORT FROM THERE. That is what
-# test_prose_pages.py does, and it works; but test_style.py is `pytest.mark.food`
-# and a cocktails module importing the food suite to borrow its spelling list
-# reads as an accident waiting to be tidied away. A rule that belongs to neither
-# collection belongs beside `checkable_text`, which is already exactly that.
+# the writing, not of a recipe. The core of each corpus-agnostic rule lives
+# here and takes a string; each collection's test keeps its own assert, message
+# and parametrisation, so sharing a predicate changes no test id.
 
-# ISO DATES ARE BLANKED BEFORE THE RANGE RULE RUNS, not excluded by a cleverer
-# pattern: `2026-08-12` is three number pairs joined by hyphens and matches a
-# range perfectly. See test_style.py::test_number_ranges_use_en_dashes.
+# ISO dates are blanked before the range rule runs: `2026-08-12` is three
+# number pairs joined by hyphens and matches a range.
 ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 NUMBER_RANGE = re.compile(r"(?<![\d.])\d+(?:\.\d+)?\s*-\s*\d+(?:\.\d+)?(?![\d.])")
 
-# The two typography rules that are true of any English prose this site
-# publishes. The rest of test_style.py's TYPOGRAPHY table is food's own —
-# fractions, wikilinks and the reversed-bracket link shape are about a recipe
-# page's markdown conventions — so the table there splices these in rather than
-# moving wholesale. Order is preserved exactly: reordering it would reorder
-# every `test_typography[...]` id.
+# The two typography rules true of any prose this site publishes; the rest of
+# test_style.py's TYPOGRAPHY table is food's own. That table splices these in,
+# in order: reordering would reorder every `test_typography[...]` id.
 SHARED_TYPOGRAPHY = [
     ("double hyphen", r"(?<!-)--(?!-)", "use an em dash —"),
     ("ASCII arrow", r"->", "use →"),
@@ -756,33 +541,12 @@ def degreeless_temperatures(text: str) -> list[str]:
     return DEGREELESS_TEMPERATURE.findall(text)
 
 
-# --- notes are sentences -----------------------------------------------------
-# #711, Helen 2026-09-06: "notes should always start with a capital letter and
-# end with a full stop", and she asked for the test before the fix.
-#
-# THE RULE ALREADY EXISTED FOR ONE FIELD. `test_method_step_notes_are_sentences`
-# in test_style.py has held method-step notes to it since long before this, with
-# the same two clauses. #711 is that rule reaching the fields it always should
-# have: the drink/recipe-level `notes:` list and the per-ingredient `note:`.
-# Shared from here rather than copied, the same reasoning as SHARED_TYPOGRAPHY.
-#
-# LEADING PUNCTUATION IS SKIPPED BEFORE THE CAPITAL IS LOOKED FOR, because the
-# strict form gets three real notes wrong and every one of them is correct
-# English:
-#
-#     '00' flour can be swapped for strong white bread flour.   toms-flatbread-dough
-#     'Spoon' here means tablespoon ish.                        chocolate-cake-in-a-mug
-#
-# A quoted term opening a sentence is not a missing capital, and `'00'` is not
-# capitalisable at all. So the test looks at the first character that could
-# CARRY a case, and a digit satisfies it.
-#
-# A QQ NOTE IS NOT PROSE AND IS NEVER CHECKED. It is an ingest placeholder
-# addressed to Helen, written by an agent, and `is_qq` already knows the shape.
-# Holding machine annotations to a copy rule would be enforcing house style on
-# something that is not in the house voice and is meant to be deleted.
-#
-# AN ELLIPSIS IS A CONTINUATION AND IS DELIBERATE -- see NOTE_EXCEPTIONS below.
+# --- notes are sentences (#711) -----------------------------------------------
+# A note starts with a capital and ends with a full stop. Leading punctuation
+# is skipped before the capital is looked for: a quoted term opening a sentence
+# is not a missing capital, and `'00' flour` cannot carry a case, so a digit
+# satisfies it. A `QQ` note is a placeholder, not prose, and is never checked.
+# An ellipsis is deliberate: see NOTE_EXCEPTIONS in tests/test_style.py.
 _NOTE_LEADING = "\"'“‘‘’([`*"
 
 
@@ -817,11 +581,9 @@ def note_problems(text: str) -> list[str]:
 def notes_of(fm: dict) -> list[tuple[str, str]]:
     """(where, text) for every human-written note on a recipe or a drink.
 
-    TWO SHAPES, because the two collections write notes differently: food's
-    `notes:` is a list of strings, a drink's is a list of `{label, text}`. Both
-    reach this as plain text. Method-step notes are NOT here -- they have their
-    own older test, and folding them in would make one failure report two
-    unrelated fields.
+    A note is a string or a `{label, text}` mapping; both reach this as plain
+    text. Method-step notes are not here: they have their own test, and
+    folding them in would make one failure report two unrelated fields.
     """
     out = []
     for note in fm.get("notes") or []:

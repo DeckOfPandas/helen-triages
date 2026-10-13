@@ -1,31 +1,21 @@
 """Add per-group prose and column sets to _data/food/cooking_methods.yml.
 
-Run AFTER scripts/build_cooking_methods.py, which writes the methods; this adds the
-surrounding page furniture so cooking-methods.html can render from the data
-instead of duplicating it.
+DO NOT RUN THIS. It is a spent migration tool, kept as the record of how the
+page's prose reached the data. It has no flags and no `__main__` guard:
+running or importing it rewrites `_data/food/cooking_methods.yml` through a
+YAML dumper. That file has been edited by hand since and no longer carries
+`groups` (DECISIONS §14).
 
-WHY ORDERED PROSE BLOCKS RATHER THAN NAMED FIELDS. The obvious design is
-`weight_note`, `safety_note`, `caveat`, `sources` -- one key per kind. It was
-rejected after actually reading the page: there are at least seven kinds
-(weight-range, weight-calculus, FOOD SAFETY, group intro, Caveat, a fish timing
-rule of thumb, a dated correction), they don't appear in a consistent order,
-beef/pork/lamb/ham have TWO of several, and any kind I failed to anticipate
-would be silently dropped on the floor.
+It ran after scripts/build_cooking_methods.py. It reads the page as it stood
+at the commit PRE_MIGRATION, through `git show`, and the data file, with the
+repository root as the working directory, and adds `groups` and `see_also` to
+each section that has methods.
 
-So each group keeps two ORDERED LISTS -- prose before its table and prose after
-it -- with each item carrying its original class and its inner HTML verbatim.
-Nothing has to be recognised to survive. The classifier only labels things for
-the template's benefit; an unrecognised paragraph still renders, in the right
-place, with its markup intact.
-
-INNER HTML IS PRESERVED, not stripped. These paragraphs carry <strong> weight
-figures, <em>, and the page's only four outbound links (Waitrose x2, Jamie
-Oliver, Good To Know) -- and those links live INSIDE recipe-source notes, which
-is exactly what a flatten-to-text would lose without anyone noticing.
-
-Steak, fish and shellfish are deliberately not touched: they carry no timings,
-so there is no page/data divergence to close, and the fish table uses 11
-rowspans and empty cells that a generic rows-loop would silently reshape.
+Each group keeps two ordered lists, prose before its table and prose after
+it, each item carrying a `kind` label and its inner HTML verbatim. Ordered
+lists and not named fields, so that a paragraph of a kind nobody anticipated
+survives in place; inner HTML and not text, because the paragraphs carry the
+page's outbound links. Sections with no timings are not touched.
 """
 import pathlib
 import re
@@ -35,24 +25,9 @@ import yaml
 
 SRC = pathlib.Path("food/reference/cooking-methods.html")
 OUT = pathlib.Path("_data/food/cooking_methods.yml")
-# ---------------------------------------------------------------------------
-# THE SOURCE IS PINNED TO GIT, NOT READ FROM THE WORKING TREE, and it has to be.
-#
-# This script parses food/reference/cooking-methods.html's tables. That page now
-# RENDERS FROM THIS SCRIPT'S OUTPUT -- so reading the working copy makes the
-# generator its own consumer: it finds no tables, emits an empty data file, and
-# the page it feeds goes blank. That happened once, and the completeness test
-# caught it within a minute; without the pin it would happen every time anyone
-# ran this again.
-#
-# So this is a MIGRATION TOOL, run against the last version of the page that
-# still held the tables. Re-running it reproduces that migration exactly rather
-# than reflecting whatever the page says today. The data file is the source of
-# truth from here on. EDIT IT DIRECTLY. Do NOT edit this script and re-run:
-# the data file has been hand-edited since the migration -- the venison section
-# and its own header were both written by hand and exist nowhere in the pinned
-# page -- so a re-run does not regenerate it, it OVERWRITES it, dropping 166
-# lines. Verified by measurement on 2026-08-21, after nearly doing it.
+# The source is pinned to git, not read from the working tree: the page now
+# renders from the data, so the working copy holds no tables. A re-run
+# reproduces the migration and overwrites every hand edit made since.
 PRE_MIGRATION = "8bdbd27"
 html = subprocess.run(
     ["git", "show", f"{PRE_MIGRATION}:food/reference/cooking-methods.html"],
@@ -75,15 +50,11 @@ def plain(fragment):
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", fragment)).strip()
 
 
-# Removing a method from the table isn't enough: the prose around it can vouch
-# for it too. Beef's sources note carried "Closed-oven-off wasn't re-checked; it
-# was already appropriately hedged" -- a citation for a row that no longer
-# exists, which reads as a missing row rather than a deleted one.
-#
-# Kept as a list of DISPLAY NAMES rather than ids, because prose refers to
-# methods the way a person would. Sentence-level removal, using the same
-# capital-after-whitespace boundary the notes cleaner uses, so a decimal point
-# can't truncate a paragraph.
+# Removing a method from the table is not enough: the prose around it can
+# vouch for it too, and a citation for a row that is gone reads as a missing
+# row. Display names, not ids, because prose refers to a method as a person
+# would. Removal is by sentence, on the capital-after-whitespace boundary, so
+# a decimal point cannot truncate a paragraph.
 EXCLUDED_NAMES = ["Closed-oven-off"]
 SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z(\u201c])")
 
@@ -96,27 +67,11 @@ def drop_excluded(html):
     return " ".join(kept).strip()
 
 
-# The source page's prose links to /food/reference/internal-temperatures/, which
-# was retired on 2026-08-14 in favour of the charts. Its anchors changed too --
-# the charts split beef three ways where the old tables had one #beef -- and it
-# still called the figures "pull temps", the word this reference layer stopped
-# using. Rewritten on the way through, so regenerating keeps it.
-#
-# THE PAGE IS CALLED internal-temperatures AGAIN, which makes this table read
-# oddly until you know the history. There have been two pages of that name: the
-# original tables page, retired 2026-08-14 when it was split into temperatures +
-# timings, and the CURRENT charts page, which issue #384 renamed from
-# `temperatures` back to `internal-temperatures` on 2026-08-19. So several
-# mappings below now have the same path on both sides and only change the
-# ANCHOR -- which is the part that still genuinely differs, because the charts
-# split beef three ways and salmon out of fish.
-#
-# The right-hand sides pointed at `../temperatures/` until 2026-08-20, i.e. at a
-# page deleted the day before, and regenerating would have re-broken ten links
-# in cooking_methods.yml. Nothing caught that: the links live inside a JSON blob
-# as escaped HTML, so neither the template scanner nor the built-html scanner in
-# tests/test_page_links.py can see them. test_links_built_outside_templates_
-# still_resolve now can.
+# The source page's links and wording predate the temperature charts: the
+# charts split beef three ways and salmon out of fish, so the anchors differ
+# where the path does not. These links end up as escaped HTML inside data,
+# where only test_links_built_outside_templates_still_resolve
+# (tests/test_page_links.py) can see them.
 LINK_FIXES = [
     ('../internal-temperatures/#beef"', '../internal-temperatures/#beef-tender-roasting-cuts"'),
     ('../internal-temperatures/#pork"', '../internal-temperatures/#pork"'),
@@ -127,8 +82,7 @@ LINK_FIXES = [
     (">internal temperatures</a>", ">temperature charts</a>"),
     ("Doneness pull temps:", "Doneness temperatures:"),
     ("the internal-temperatures page", "the temperature charts"),
-    # Prose mentions of the page by name, not as a link -- "(90–95°C on the
-    # internal-temperatures page)". Same retired page, no anchor to fix.
+    # Prose mentions of the page by name, not as a link.
     ("internal-temperatures page", "temperature charts page"),
     ("on the <a", "on the <a"),
 ]
@@ -165,7 +119,7 @@ for i in range(1, len(sections), 2):
     if sid not in TIMING_SECTIONS:
         continue
 
-    # Walk the section in DOCUMENT ORDER. Position is the whole point: beef runs
+    # Walk the section in document order. Position is the point: beef runs
     # subtitle -> table -> weight -> source -> subtitle -> intro -> table ->
     # weight -> source, and a template that assumed one shape would reorder it.
     tokens = []

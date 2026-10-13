@@ -103,10 +103,8 @@ $color-label-stroke:         lighten($color-text, 30%);   // 20% -> 30%, Helen, 
 // Links, the short-method toggle and the other link-like controls on the
 // recipe page share one resting colour and one hover. Resting is the title
 // rule's magenta darkened until it clears 4.5:1 on $color-bg: an existing hue,
-// not a fifth.
-//
-// Hover goes LIGHTER, to the raw magenta, which is under the 4.5:1 body-text
-// floor. Helen's ruling, having seen the figures: a hover is transient, and
+// not a fifth. Hover goes lighter, to the raw magenta, which is under the
+// 4.5:1 body-text floor: Helen's ruling, because a hover is transient and
 // the bigger colour jump is worth it (#199).
 $color-recipe-link: $color-dazzling-dragonfruit-dark;
 $color-recipe-link-hover: $color-dazzling-dragonfruit;
@@ -124,20 +122,13 @@ $color-accent: $color-dazzling-dragonfruit;
 $color-marker-accent: mix($color-marauding-mint, $color-bg, 35%);
 
 // --- The recipe page's colour budget -----------------------------------------
-// The recipe page spends FOUR hues, and the count is the design (MANUAL
-// §13.2):
-//
-//   magenta       the rule under the title; darkened, links and link-like
-//                 controls; the footer hearts
-//   spring green  the upper rule under the section names
-//   violet        the lower rule; the quiet structural colour for the box
-//                 tints, the doneness chart and the annotation arrow
-//   yellow        the highlighter on ingredient amounts
-//
-// Everything else is $color-text, $color-clear-text or $color-border. Colour
-// is on what you navigate by and off what you read. Magenta means
-// "interactive", so decoration that is not clickable takes violet. Before
-// proposing a fifth hue, ask whether one of these four can do the job.
+// The recipe page spends four hues, and the count is the design (MANUAL
+// §13.2): magenta (the title rule; darkened, links; the footer hearts),
+// spring green (the upper section rule), violet (the lower rule, box tints,
+// doneness chart and annotation arrow) and yellow (the amount highlighter).
+// Everything else is $color-text, $color-clear-text or $color-border.
+// Magenta means "interactive", so decoration that is not clickable takes
+// violet. Before proposing a fifth hue, ask whether one of these can do it.
 
 // The two colours of the blocky rule under INGREDIENTS / METHOD / NOTES.
 $color-section-underline: $color-marauding-mint;

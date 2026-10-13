@@ -1,132 +1,45 @@
 #!/usr/bin/env python3
-"""Refuse a Bash command that would expand a secret into its own output.
+"""Refuse a Bash command that would put a secret where it can be read.
 
-WHY THIS EXISTS, AND WHY IT IS A HOOK RATHER THAN A FIRMER SENTENCE.
-`CLAUDE.md` has said since 2026-09-06: "Never test whether it is set with a
-shell form that expands it -- `echo ${GH_TOKEN:-unset}` prints the whole token
-when it IS set, and did." The rule was then broken twice more, both times in
-the same session, both times by an agent that had read it:
+An `echo` or `printf` never mentions a secret, with no exceptions for a human
+to verify; to learn whether a credential is there, use it and read the 401 or
+403. DECISIONS §11.
 
-  * 2026-09-08, start of session: `${GH_TOKEN:-unset-marker-check}`. The
-    permission checker happened to refuse the call for an unrelated reason, so
-    nothing leaked, and the agent wrote "the denial was correct, I won't probe
-    it that way again."
-  * 2026-09-08, later, on the NEW token: `${AGENT_GH_TOKEN:-MISSING}`. Helen
-    rejected the call by hand. Nothing leaked, because she was watching.
+Refused:
 
-Twice out of three the only thing between the token and the transcript was
-luck or a human. That is the exact situation this repository already has a
-verdict on, from guard-main-branch.py's own history: **a rule that is read and
-broken needs enforcement, not rewording.**
+  1. The default-value expansions of a secret, `${TOK:-x}`, `${TOK:=x}`,
+     `${TOK-x}`, `${TOK=x}`: each evaluates to the variable's own value when
+     it is set, which is the case a probe is asking about.
+  2. Any reference to a secret in an `echo` or `printf`, in any segment of a
+     pipeline or list: `$TOK`, `${TOK}`, and also `${TOK:+set}` and `${#TOK}`,
+     which cannot render the value but look like a leak to a reader.
+  3. A command that runs `gh` (bare, by path, or through `gh-agent.sh` or
+     `gh-read.sh`) and mentions `env` or `$ENV`: gh's built-in jq reads the
+     process environment, and `scripts/gh-agent.sh` hands gh the token there
+     as `GH_TOKEN`. Matched on the raw text, since a jq expression is
+     single-quoted.
+  4. A secret in a URL's userinfo (`scheme://user:$TOK@host`), whatever the
+     quoting: git stores a clone's URL in `.git/config`, and `git remote -v`
+     then prints it. The git wrappers pass
+     `scripts/git-credential-agent-token.sh` per invocation instead.
+  5. A literal GitHub token (`ghp_`, `gho_`, `ghu_`, `ghs_`, `ghr_`,
+     `github_pat_`), whatever the quoting.
 
-WIDENED 2026-09-10 AFTER A FOURTH, DIFFERENT LEAK -- NOT AN ECHO AT ALL.
-CLAUDE.md's own documented pattern for the private repos --
-`git clone "https://DeckOfPandas-agentic:${AGENT_GH_TOKEN}@github.com/..."` --
-was followed exactly as written. Git then stored that URL, token included, as
-the clone's `origin` remote. A routine `git remote -v`, run for an unrelated
-and legitimate reason (MANUAL §2.1 says to check which remote a clone points
-at), printed the token in full. No echo, no printf, no default-expansion --
-the value sat in `.git/config` and any later command that shows a remote URL
-would have surfaced it the same way. Two things follow, and this file now does
-both:
+Checks 4 and 5 also run on the content of a script the command runs (`sh`,
+`bash`, `python`, `python3`, `ruby`, `node` or `perl`, and a file inside the
+project), because every guard here says to move a refused command into a file.
+Checks 1 to 3 read the command text only: a script's own `printf` of the token
+is not flagged, since the credential helper must write it to git's pipe.
 
-  1. `_secret_in_url` refuses embedding a secret in a URL's userinfo at all,
-     regardless of quoting -- see its own comment for why quoting doesn't
-     save this one the way it saves an echo. The fix is
-     `scripts/git-credential-agent-token.sh`: a per-repo git credential
-     helper that hands the token to git at the moment of use and never
-     writes it to a remote URL or to `.git/config` in the first place. Use a
-     PLAIN url (`https://github.com/OWNER/REPO.git`) everywhere from now on.
-  2. `_literal_token` refuses a real GitHub-token-shaped string anywhere in a
-     command, leak vector aside -- the token above is now sitting in this
-     session's transcript, so a future command that pastes it back in (from
-     the transcript, from a stray note) is exactly as dangerous as one that
-     expands it fresh.
+Allowed on purpose: `$TOK` or `${TOK}` where the value is consumed rather than
+printed, and, for checks 1 and 2, anything inside SINGLE quotes or a heredoc
+with a quoted delimiter, so prose may discuss those forms.
 
-AND WIDENED THE SAME DAY FOR WHERE IT LOOKS. Every other guard in this
-directory tells you, when it refuses a command, to move the cleverness into a
-script in `tmp/` and run the file -- and that is exactly how the leak above
-was written: the risky line went into `tmp/clone_food_drafts.sh` to get past
-`guard-unanalyzable-bash.py`'s complaint about the URL's complexity, and
-nothing scanned the file it ran. `_scan` now also opens the argument of any
-`sh`/`bash`/`python3`/`ruby`/`node`/`perl` invocation that names a real file
-inside the working directory, and runs every check in this module against
-its contents too. A command is judged by what it will actually run, not by
-how many characters of it are visible on the command line.
+The stripping differs from `guard-sed.py`, which also strips double-quoted
+spans: that is right for a command name and wrong for an expansion, because
+the shell expands `$VAR` inside double quotes.
 
-WHAT IT BLOCKS, AND WHY EACH FORM HAS NO DEFENSIBLE USE.
-
-  1. THE DEFAULT-VALUE EXPANSIONS: `${TOK:-x}`, `${TOK:=x}`, `${TOK-x}`,
-     `${TOK=x}`. Every one of these evaluates to THE VARIABLE'S OWN VALUE when
-     it is set, and to `x` only when it is not. The only reason anyone writes
-     one against a secret is to probe whether it is set -- and that probe
-     prints the secret in the case where the answer is yes, which is the case
-     you were asking about.
-
-  2. ECHOING ONE AT ALL, IN ANY FORM: `echo $TOK`, `printf "%s" "${TOK}"`,
-     and -- WIDENED 2026-09-09 -- the placeholder probes too, `echo
-     "${TOK:+set}"` and `echo ${#TOK}`, neither of which can render the value.
-
-     HELEN'S REASON IS THE WHOLE POINT, and it is not about what leaks. The
-     `+` form is genuinely safe; she still had to REJECT THE CALL BY HAND to
-     establish that, because `echo "${GH_TOKEN:+GH_TOKEN set}"` looks exactly
-     like a leak until you have run this file's regex in your head. *"I
-     shouldn't have to reject the call!! I'm only human!"* A guard that leaves
-     the human doing the parsing has not removed the work, it has moved it. So
-     the rule is now one a human can check at a glance, with no exceptions to
-     hold in mind: **an `echo` or `printf` never mentions a secret.**
-
-     AND NOTHING IS GIVEN UP, which is what made this easy to widen. Every
-     probe was only ever asking "is the credential there?", and the honest
-     answer to that is to USE it and read the status code -- a 401 or a 403
-     settles it without the name ever reaching an `echo`. Helen: *"I can't
-     imagine why we wouldn't do that having thought of it."*
-
-  3. WIDENED 2026-09-11 -- A `gh` CALL WHOSE --jq EXPRESSION READS THE
-     ENVIRONMENT. gh's built-in jq has `env` and `$ENV`, measured that day
-     (`--jq 'env | length'` printed 38), and `scripts/gh-agent.sh` hands gh
-     the token through its environment -- as `GH_TOKEN`, a name that appears
-     nowhere on the command line. So `sh scripts/gh-agent.sh issue list --jq
-     '<env>.GH_TOKEN'` would have printed it, through an ALLOW-LISTED
-     subcommand, without a prompt and without any check above firing: no
-     echo, no expansion, no URL, no literal. Any command that runs gh (bare,
-     or through either wrapper) and mentions `env` or `$ENV` anywhere is
-     refused -- the jq expression is single-quoted, so this reads the RAW
-     text. No jq expression this repo has needed reads the environment.
-
-WHAT IT DELIBERATELY ALLOWS, because these are how the token is legitimately
-used and a guard that blocked them would be routed around within a day:
-
-  * `${TOK}` or `$TOK` anywhere that is not an echo, a URL, or a literal --
-    `scripts/gh-agent.sh` exporting it as `GH_TOKEN` for gh, or
-    `scripts/git-credential-agent-token.sh` reading it to answer git's
-    credential protocol, are both CONSUMING the value rather than printing
-    it. (A leading `GH_TOKEN=... gh` on a command line is refused by
-    guard-unanalyzable-bash.py; use the wrapper.)
-  * The whole thing inside SINGLE quotes, for the echo/default-expansion
-    checks only -- so prose and commit messages may discuss those forms. See
-    the stripping note below, which is where this hook differs from its
-    siblings. The URL and literal-token checks are NOT quoting-sensitive;
-    see their own comments for why.
-  * A script's own `printf`/`echo` of the token is not flagged by opening the
-    file -- only the URL-embedding and literal-token shapes are checked
-    inside a referenced script. `scripts/git-credential-agent-token.sh`
-    genuinely must write the token to its stdout; that is git's own
-    credential protocol reading a pipe, not a transcript, and is exactly the
-    sanctioned exception the module docstring names.
-
-STRIPPING IS NOT THE SAME HERE AS IN guard-sed.py, AND THE DIFFERENCE IS THE
-WHOLE CORRECTNESS ARGUMENT. That hook strips single AND double quoted spans,
-which is right for detecting a command NAME: `"sed"` inside double quotes is
-just a word. It is wrong for detecting a variable EXPANSION, because the shell
-expands `$VAR` inside double quotes and not inside single ones. `echo
-"$GH_TOKEN"` is a real leak wearing double quotes. So this strips only the
-spans where expansion genuinely cannot happen: single-quoted spans, and
-heredocs whose delimiter is quoted.
-
-Invoked as `python3 .claude/hooks/guard-token-expansion.py` so it needs no
-execute bit -- CLAUDE.md forbids changing file permissions without asking, and
-a hook that required a chmod to install would be self-defeating.
+Invoked as `python3 <path>` so it needs no execute bit.
 """
 from __future__ import annotations
 
@@ -135,14 +48,10 @@ import os
 import re
 import sys
 
-# WHICH NAMES COUNT AS A SECRET. Deliberately a short, high-signal list rather
-# than anything containing "key": `$SSH_KEY_PATH` and `$API_KEY_FILE` are
-# paths, not secrets, and a guard that fired on those would be noise. Covers
-# AGENT_GH_TOKEN, the only credential this repo still carries since GH_TOKEN
-# was retired on 2026-09-09, plus the obvious siblings -- and GH_TOKEN itself
-# still matches, which is wanted: the name survives as the variable `gh` reads
-# (scripts/gh-agent.sh sets it) and a guard should not stop covering a name
-# just because the secret behind it was rotated away.
+# Which names count as a secret. A short, high-signal list rather than anything
+# containing "key": `$SSH_KEY_PATH` is a path, not a secret. `GH_TOKEN` matches
+# as well as `AGENT_GH_TOKEN`: it is the variable `gh` reads, which
+# scripts/gh-agent.sh sets.
 SECRET_NAME = re.compile(r"^(.*_)?(TOKEN|SECRET|PASSWORD|PASSWD)$")
 
 # `${NAME:-`, `${NAME:=`, `${NAME-`, `${NAME=` -- the four expansions that
@@ -150,21 +59,9 @@ SECRET_NAME = re.compile(r"^(.*_)?(TOKEN|SECRET|PASSWORD|PASSWD)$")
 # deliberately absent: none of them can emit the value.
 DEFAULT_EXPANSION = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\s*:?[-=]")
 
-# ANY reference to a secret's name, for the echo check. Three shapes:
-#
-#   $NAME                      bare
-#   ${NAME<anything>}          including `:+`, `+`, `:?` and `?`
-#   ${#NAME}                   the length
-#
-# UNTIL 2026-09-09 THIS CARRIED AN EXCLUSION -- `(?! :?[+?] )` -- so that the
-# `+` forms, which evaluate to the replacement word and cannot render a value,
-# stayed legal. It is gone deliberately; see the docstring. The test is no
-# longer "can this leak" but "does an echo mention a secret", because the first
-# question is one only a regex can answer and Helen was the one answering it.
-#
-# `${#NAME}` is matched now for the same reason, though it emits a length
-# rather than a value: once the `+` probe is refused it is the obvious next
-# thing to reach for, and it is a probe with the same non-existent use case.
+# Any reference to a secret's name, for the echo check: `$NAME`,
+# `${NAME<anything>}` (the `:+`, `+`, `:?` and `?` forms included) and
+# `${#NAME}`. The test is "does an echo mention a secret", not "can this leak".
 SECRET_REFERENCE = re.compile(
     r"""\$(?:
           \{ \#? \s* ([A-Za-z_][A-Za-z0-9_]*) [^}]* \}
@@ -186,35 +83,24 @@ QUOTED_HEREDOC = re.compile(
     re.DOTALL | re.MULTILINE,
 )
 
-# A secret referenced inside a URL's userinfo segment: `scheme://user:PASS@`.
-# Deliberately NOT run against the quote-stripped text -- see the module
-# docstring's 2026-09-10 addition. A single-quoted `'https://u:$TOK@host'`
-# would not actually expand in a real shell, but it is still refused, because
-# the pattern itself -- not just whether it happens to fire this time -- is
-# what gets stored in `.git/config` and printed by some unrelated later
-# command. There is no longer a reason to write this shape at all; see
-# `scripts/git-credential-agent-token.sh`.
+# A secret in a URL's userinfo, `scheme://user:PASS@`. Run on the raw text, not
+# the quote-stripped text: a single-quoted URL would not expand, but the shape
+# is what ends up stored in `.git/config`, and nothing needs to write it.
 SECRET_IN_URL = re.compile(
     r"://[^\s/@'\"]*:\s*\$?\{?\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}?\s*@"
 )
 
-# A real GitHub token, by its own prefix: classic PAT (ghp_), OAuth (gho_), a
-# GitHub App's installation/user token (ghu_/ghs_), a refresh token (ghr_), or
-# a fine-grained PAT (github_pat_). The length floor (20) is chosen to clear a
-# short illustrative example in prose ("a ghp_-prefixed token") while catching
-# a real one, which runs much longer. Checked regardless of where the text
-# came from or how it is quoted: a leaked token pasted back in from a
-# transcript is exactly as dangerous printed a second time.
+# A real GitHub token, by its prefix: classic PAT (ghp_), OAuth (gho_), an app's
+# installation or user token (ghu_/ghs_), a refresh token (ghr_), a fine-grained
+# PAT (github_pat_). The floor of 20 characters clears an example in prose
+# ("a ghp_-prefixed token"). Checked whatever the quoting.
 LITERAL_TOKEN = re.compile(
     r"\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{20,}\b"
     r"|\bgithub_pat_[A-Za-z0-9_]{20,}\b"
 )
 
-# Interpreters whose first non-flag argument is a script FILE to run, per the
-# pattern every guard in this directory recommends as the fix for its own
-# refusal ("write it to a file in tmp/ and run the file"). A command shaped
-# like this is judged by what the file actually contains, not by how little
-# of it is visible on the command line -- see the module docstring.
+# Interpreters whose first non-flag argument is a script file to run. Such a
+# command is judged by what the file contains.
 _SCRIPT_INTERPRETERS = {"sh", "bash", "python3", "python", "ruby", "node", "perl"}
 
 
@@ -403,9 +289,8 @@ def main() -> int:
         return 0
     stripped = _strip(command)
 
-    # The default-expansion and echo/printf probes stay scoped to the literal
-    # Bash command text -- see the module docstring's 2026-09-10 addition for
-    # why a referenced script's own printf is a different question.
+    # The default-expansion and echo checks read the command text only; a
+    # referenced script's own printf is the credential helper's business.
     name = _default_expansion_of_a_secret(stripped)
     if name:
         form = (
@@ -439,10 +324,8 @@ def main() -> int:
             "this repository reads from GitHub lives in the environment."
         )
 
-    # The URL-embedding and literal-token checks run against the command text
-    # AND, if this command runs one, the referenced script's own content --
-    # closing the gap where the risky text was moved into a file specifically
-    # to get past a different guard's complaint about the command line.
+    # The URL and literal-token checks read the command text and, if the
+    # command runs one, the referenced script's content.
     try:
         found_via = [("this command", command)]
         script_path = _referenced_script_path(command)

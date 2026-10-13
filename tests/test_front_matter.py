@@ -1,7 +1,7 @@
 """Structural rules: what a recipe file must contain, and what it must not.
 
-These come from MANUAL section 7. Each one asserts a single rule so that a
-failure tells you exactly which rule broke, on which file.
+One rule per test, so a failure names the rule and the file. The schema is
+MANUAL §4. Run: `pytest -q tests/test_front_matter.py`.
 """
 from __future__ import annotations
 
@@ -12,18 +12,11 @@ import yaml
 
 from conftest import where, unquoted_scalars
 
-# Suite marker, so `pytest -m food` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.food
 
-# `source_type` joined this list on 2026-08-20 (issue #406). It is not
-# decoration: nothing in a source STRING says whether it is a magazine or a
-# book -- `Adapted from Good Food` and `Adapted from Gordon Ramsay's Ultimate
-# Cookery Course` are the same shape -- so every rule in
-# tests/test_source_attribution.py reads the type rather than guessing. A recipe
-# without one is a recipe none of those rules can judge, which is worse than a
-# recipe that breaks them.
+# `source_type` is required because nothing in a source string says whether it
+# is a magazine or a book; tests/test_source_attribution.py reads the type
+# rather than guessing (#406).
 REQUIRED = ["title", "tagline", "source", "source_type", "main_ingredients",
             "tags", "ingredient_groups", "method_short", "meta"]
 
@@ -44,28 +37,6 @@ RETIRED = {
 }
 
 # Fields that belong under `meta:` and are silently ignored at the top level.
-#
-# cooked_before and date_last_edited CAME OFF THIS LIST on 2026-08-21 (#429) and
-# went onto RETIRED instead. They are still caught if someone writes one at the
-# top level -- the advice just changed from "move it into meta" to "this field
-# is gone", which is the true answer now. RETIRED is checked against the TOP
-# LEVEL only, which is what made the move safe for the drafts that shared the
-# keys at the time.
-#
-# THAT CAVEAT IS SPENT, AND THE SENTENCE SAYING SO WAS STALE FOR A FORTNIGHT.
-# It read "_food_drafts/ still carries both keys, all 344 of them inside
-# `meta:`" until 2026-09-05, when counting said otherwise: of 339 drafts, ZERO
-# carry either key. (One names `meta.cooked_before` inside the PROSE of a note,
-# which is not the key.) They were cleared out at some point after #429 and
-# nothing updated the note -- the ordinary fate of a count written into a
-# comment, and the reason the tests around here recount rather than quote.
-#
-# `meta.date_last_edited` IS NOW GONE FROM THE COCKTAIL SIDE TOO -- issue #712,
-# 2026-09-05, on the same reasoning #429 gave for food: a hand-maintained date
-# that git already knows exactly, read by no layout, include, plugin or script.
-# So the field exists nowhere in either collection, and both entries below
-# outlive their keys deliberately (see meta.cooked_before's own note in
-# INVISIBLE_KEYS).
 MISPLACED_META = ["rewritten", "proofread", "claude_rewritten"]
 
 
@@ -80,11 +51,9 @@ def test_required_field_present(recipe, field):
 def test_tagline_is_not_blank(recipe):
     """Present is not the same as written.
 
-    `test_required_field_present` only checks the key exists — a recipe with
-    `tagline: ""` passes it happily. A blank tagline is a real gap on a
-    published recipe (it's the one line of prose every recipe page shows
-    unconditionally), distinct from `_food_drafts/`, where a blank tagline is
-    completely normal for a stub not written up yet.
+    `test_required_field_present` only checks the key exists, so
+    `tagline: ""` passes it. A blank tagline is a gap on a published recipe
+    and normal in `_food_drafts/`.
     """
     tagline = recipe.fm.get("tagline")
     assert isinstance(tagline, str) and tagline.strip(), (
@@ -95,17 +64,12 @@ def test_tagline_is_not_blank(recipe):
 
 
 def test_doneness_names_a_real_level(recipe, internal_temperatures):
-    """`doneness` has to name a level the resolved node actually offers, and the
-    node has to be one that offers levels at all.
+    """`doneness` names a level the resolved node offers, and the node is one
+    that offers levels at all (#189).
 
-    Both failures are silent in Liquid. A typo'd level resolves to nothing, so
-    the meta line renders its label and its link with no figure between them;
-    and `doneness` on a single-figure node (poultry, a tough cut) does nothing
-    while looking like it configures something.
-
-    This became worth testing when issue #189's doneness chart landed: the front
-    matter now drives which row is marked as the recipe's own suggestion, so a
-    wrong level means a chart that recommends nothing, with no error anywhere.
+    Both failures are silent in Liquid: a typo'd level renders the label and
+    its link with no figure between them, and `doneness` on a single-figure
+    node does nothing while looking like it configures something.
     """
     ref, level = recipe.fm.get("internal_temp_ref"), recipe.fm.get("doneness")
     if not ref or not level:
@@ -128,13 +92,11 @@ def test_doneness_names_a_real_level(recipe, internal_temperatures):
 
 
 def test_internal_temp_ref_resolves(recipe, internal_temperatures):
-    """`internal_temp_ref` (+ optional `doneness`) must resolve to a real
+    """`internal_temp_ref` (+ optional `doneness`) resolves to a real path in
+    _data/food/internal_temperatures.yml.
 
-    path in _data/food/internal_temperatures.yml. _layouts/recipe.html
-    resolves this the same way, dot-segment by dot-segment, via Liquid's
-    `hash[variable]` lookup — Liquid has no equivalent of this assertion, so
-    a typo'd path there doesn't error, it just silently renders no "Internal
-    temp" line at all. This is the only thing that would ever catch that.
+    _layouts/recipe.html walks it the same way, dot-segment by dot-segment,
+    and a typo'd path there renders no "Internal temp" line with no error.
     """
     ref = recipe.fm.get("internal_temp_ref")
     doneness = recipe.fm.get("doneness")
@@ -197,24 +159,11 @@ _StrictLoader.add_constructor(
 
 
 def test_front_matter_has_no_duplicate_keys(recipe):
-    """A repeated key in a YAML mapping is DISCARDED, silently, last one wins.
+    """A repeated key in a YAML mapping is discarded silently; the last one wins.
 
-    Found for real 2026-08-16 in indonesian-chicken-curry-gulai-ayam.md, which
-    had an ingredient entry declaring `item:` twice:
-
-        - amount: "200 ml"
-        - item: "flavourings to taste, like chicken stock cubes, fish sauce..."
-          item: coconut cream
-
-    The flavourings line was gone -- not just from the derived ingredient index
-    that surfaced it, but from the recipe page itself, for as long as it had
-    been there. Nothing could see it: the file parses, the build succeeds, the
-    page renders, and every other test in this suite reads the PARSED front
-    matter, which by then is missing the line entirely. The only symptom is an
-    ingredient that isn't there, on a page nobody re-reads once it is written.
-
-    yaml.safe_load accepts duplicates by specification, so catching this needs
-    a loader that refuses them. That is the whole test.
+    yaml.safe_load accepts duplicates, and every other test reads the PARSED
+    front matter, where the lost line is already gone -- so this loads with a
+    loader that refuses them.
     """
     match = re.match(r"\A---\n(.*?\n)---", recipe.raw, re.S)
     try:
@@ -258,18 +207,9 @@ def test_meta_block_complete(recipe):
     )
 
 
-# The order is the point, not a tidiness preference. Helen, issue #429: the three
-# flags are meant to be read together at a glance, and `rewritten -> awaiting_fix
-# -> proofread` is the order the recipe actually moves through. A file that keeps
-# the same three keys in a different order reads as a different kind of file when
-# you are scanning 86 of them.
-#
-# CHEAP TO OBEY, WHICH IS WHY IT CAN BE ENFORCED. Reordering a meta block changes
-# no value, so _only_invisible_keys_changed treats it as invisible and fixing a
-# failure here costs no proofread. That was not true until #429 -- the exemption
-# read an empty change set as "unknown" rather than "nothing a reader can see",
-# so this test could not have existed without demanding 86 re-proofreads to
-# satisfy it.
+# The three flags are read together, in the order a recipe moves through them
+# (#429). Reordering a meta block changes no value, so
+# `_only_invisible_keys_changed` exempts it and a fix here costs no proofread.
 META_ORDER = ["rewritten", "awaiting_fix", "proofread"]
 
 
@@ -285,12 +225,8 @@ def test_meta_block_is_exactly_the_three_flags_in_order(recipe):
 
 
 def test_claude_rewritten_is_a_real_boolean(recipe):
-    """`meta.claude_rewritten` is optional and additive (issue #418) -- most
-    files won't have it, and that's fine, unlike `rewritten`/`proofread`/
-    `cooked_before` this doesn't gate anything today. But a quoted "true"
-    would be the same silent trap `awaiting_fix` already had, so it's worth
-    catching before anything ever comes to depend on the value being a real
-    bool rather than a truthy string.
+    """`meta.claude_rewritten` is optional (#418), and where it appears it is
+    a real boolean: a quoted "true" is a truthy string.
     """
     meta = recipe.fm.get("meta")
     if not isinstance(meta, dict) or "claude_rewritten" not in meta:
@@ -299,57 +235,6 @@ def test_claude_rewritten_is_a_real_boolean(recipe):
         f"{where(recipe)} has `meta.claude_rewritten: {meta['claude_rewritten']!r}`, "
         f"not a real boolean. Never quote it."
     )
-
-
-# =============================================================================
-# GONE WITH THE FIELD: test_cooked_before_is_true. Issue #429, 2026-08-21.
-# =============================================================================
-# THIS IS A TOMBSTONE, NOT A TIDY-UP, because a real guarantee died here and the
-# next person to wonder where it went deserves the whole story rather than a
-# blank space in the file.
-#
-# It read `meta.cooked_before` and required it to be True on every published
-# recipe. `_food_recipes/` is `output: true`, so every file in it gets a live
-# URL unconditionally, and Helen's rule is "I never want to publish anything I
-# haven't tested." A recipe she is still collecting belongs in `_food_drafts/`
-# (`output: false`, no URL) until she has actually cooked it.
-#
-# IT LOOKED LIKE A TEST THAT ASSERTED A CONSTANT, and it was not. All 82 tracked
-# recipes said `true`, so it had never once fired -- but 330 of the 344 drafts
-# say `false`, and the check sat exactly on the boundary those files cross. It
-# was a promotion gate: promote a draft you have not cooked, and it went red.
-# Measured both sides before removing it rather than inferring "never fired,
-# therefore useless", which is the reasoning that quietly deletes real guards.
-#
-# WHAT NOW ENFORCES IT: Helen, and she is the right enforcement. Asked directly
-# whether losing the gate mattered, 2026-08-21, she gave the reason the field
-# should never have existed -- promotion is not a step where the question can be
-# open. Every recipe is one of three things:
-#
-#   a) cooked, liked -> she promotes it from drafts to recipes
-#   b) cooked, disliked -> she deletes it
-#   c) not cooked -> "why would I put it on my battle tested site?"
-#
-# There is no fourth case, and no path into `_food_recipes/` that does not go
-# through her deciding between them. `cooked_before` was a field recording an
-# answer that promotion itself already gives: true on all 82 published recipes
-# because it could not have been anything else. The test was not guarding the
-# boundary, it was restating it.
-#
-# THE DRAFT-SIDE MEASUREMENT ABOVE STAYS ON THE RECORD ANYWAY, because it was
-# the honest reading of the evidence available before asking her, and the next
-# person to find 330 `false` values in the drafts folder will have exactly the
-# same worry. The answer is that those 330 are the "not cooked yet" pile, which
-# is what a drafts folder IS -- not a queue of things at risk of slipping past a
-# missing check.
-#
-# TO RESTORE IT: put `cooked_before` back in META_ORDER and INVISIBLE_KEYS, undo
-# its RETIRED entry, and bring this test back. The draft side never lost the
-# field -- all 344 still carry it -- so a promotion-time check remains possible
-# without re-adding anything to the published recipes, if a cleverer version is
-# ever wanted. It would have to cope with `_food_drafts/` being absent in CI
-# (#378), which is why it is not being attempted here on the way past.
-# =============================================================================
 
 
 def test_serves_xor_makes(recipe):
@@ -378,15 +263,11 @@ def test_method_xor_method_groups(recipe):
 
 
 def test_method_groups_have_name_and_steps(recipe):
-    """A method_groups entry needs both `name` and a non-empty `steps` --
-    neither is a rendering requirement pytest can infer from
-    test_method_xor_method_groups above, so a key typo (`step:` singular
-    instead of `steps:`) or a missing `name` doesn't error, it just
-    silently produces a group with no content. Caught for real on
-    garam-masala-powder.md: every group used `step:` with no `name:` at
-    all, so recipe.method_steps returned [] even though the file had three
-    real steps -- invisible to every prose-scanning test, since there was
-    nothing left for them to scan.
+    """A method_groups entry needs both `name` and a non-empty `steps`.
+
+    A key typo (`step:` for `steps:`) or a missing `name` raises nothing: the
+    group has no content, `recipe.method_steps` returns [] and every
+    prose-scanning test has nothing left to scan.
     """
     for i, group in enumerate(recipe.fm.get("method_groups") or []):
         assert group.get("name"), (
@@ -400,12 +281,9 @@ def test_method_groups_have_name_and_steps(recipe):
 
 
 def test_method_produces_actual_steps(recipe):
-    """Defense in depth alongside test_method_groups_have_name_and_steps
-    above: whatever the specific cause, a recipe that declares `method` or
-    `method_groups` but ends up with recipe.method_steps == [] has a real
-    content bug that every prose-scanning test (typography, time-word
-    abbreviations, ingredient annotation style...) would otherwise
-    silently skip rather than fail, since they all iterate method_steps.
+    """A recipe that declares `method` or `method_groups` yields at least one
+    step. Every prose-scanning test iterates `method_steps`, so an empty list
+    is skipped by all of them rather than failed.
     """
     if "method" not in recipe.fm and "method_groups" not in recipe.fm:
         return
@@ -427,16 +305,11 @@ def test_notes_is_a_list(recipe):
 
 
 def test_note_dicts_have_label_and_text(recipe):
-    """GitHub issue #141. Every note is `{label, text}`, both present — the
-    bare-string form (allowed since 2026-08-03 so each note box could carry
-    a topical label like "Sinking"/"Portion size" instead of every box in
-    the Notes grid saying the same static "note") is retired for published
-    recipes as of this issue. A bare string, or a dict missing either key,
-    renders blank or unlabelled with no error, so this is worth catching
-    here rather than by eye. Zero recipes needed fixing when this landed --
-    every published note was already `{label, text}`; the bare-string form
-    is still deliberately allowed in _food_drafts/ (MANUAL.md §4/§9),
-    which this test never reads.
+    """Every note is `{label, text}`, both present (#141).
+
+    A bare string, or a dict missing either key, renders blank or unlabelled
+    with no error. Published recipes only: this test never reads
+    `_food_drafts/`, which has its own rule in tests/test_drafts.py.
     """
     for i, note in enumerate(recipe.fm.get("notes") or [], 1):
         assert isinstance(note, dict) and note.get("label") and note.get("text"), (
@@ -496,29 +369,19 @@ def test_group_names_omit_leading_article(recipe):
     )
 
 
-# --- scalar front-matter values are always double-quoted --------------------
-# GitHub issue #168, open, picked up 2026-08-12 -- the broader sibling of
-# #170 (main_ingredients specifically, test_taxonomy.py) and applied to
-# tags there too. Same Sublime-editing convenience, same "formatting, not
-# data" safety -- EXCEPT this is deliberately NOT "every value in the
-# file": `meta:` booleans are excluded on purpose. Quoting `rewritten: true`
-# would silently turn it into the STRING "true", and
-# `meta.get("cooked_before") is True` (test_cooked_before_is_true, this
-# file) would then read False for every recipe -- checked against the
-# actual test code before touching a single meta value, not assumed safe.
-# 284 unquoted scalars across 76 recipes fixed 2026-08-12 via a line-by-line
-# raw-text substitution restricted to these nine top-level scalar fields
-# specifically -- not a YAML dump (CLAUDE.md), and not the nested list/dict
-# fields (ingredient items, method steps, notes), which is a larger, separate
-# piece of work than this pass covers.
+# --- scalar front-matter values are always double-quoted (#168) -------------
+# Top-level string scalars only. A `meta:` boolean is never in this list:
+# quoting `proofread: true` makes it the string "true", which the publish gate
+# and every `is True` check read as not set.
 SCALAR_STRING_FIELDS = ["title", "tagline", "source", "prep_time",
                          "cook_time", "star_ingredient", "makes", "serves"]
 
 
 def test_scalar_fields_are_quoted(recipe):
-    """The scan itself is `conftest.unquoted_scalars`, shared with the drinks
-    since 2026-09-03 (#670) -- a bare scalar is a bare scalar in either
-    collection, and only the FIELD LIST differs. This message is unchanged.
+    """The named top-level scalars are double-quoted in the raw front matter.
+
+    The scan is `conftest.unquoted_scalars`, shared with the drinks (#670);
+    only the field list differs.
     """
     match = re.match(r"\A---\n(.*?\n)---", recipe.raw, re.S)
     bad = unquoted_scalars(match.group(1), SCALAR_STRING_FIELDS)
@@ -528,30 +391,12 @@ def test_scalar_fields_are_quoted(recipe):
     )
 
 
-# =============================================================================
-# PROVENANCE: IF AN AGENT WAS LAST TO TOUCH A RECIPE, IT IS NOT PROOFREAD.
-# GitHub issue #367.
-# =============================================================================
-# Helen is the last human judgement before a recipe publishes. If Claude edited
-# a file after she blessed it, the blessing no longer covers what is in the
-# file -- so `meta.proofread` must go back to false in the same commit that
-# made the edit.
-#
-# WHY THIS IS A TEST AND NOT ONLY A WRITTEN RULE. A written rule works when the
-# agent reads and follows it, which is precisely what failed on 2026-08-18:
-# twelve proofread recipes were edited without their flags being touched, and
-# nothing anywhere noticed. The flag is the gate the whole publish decision
-# hangs off (#331), so it cannot depend on good intentions.
-#
-# GRANDFATHERED, ON PURPOSE. Everything up to and including the baseline commit
-# below is exempt. Helen's call, 2026-08-18: those 34 recipes include the 45
-# second-person changes she reviewed one at a time and decided personally, so
-# she WAS the last judgement even though an agent's commit wrote the bytes.
-# Flipping them would mean re-proofreading work she had just finished. The rule
-# applies from the baseline forward.
-#
-# Ancestry, not dates, decides what is grandfathered -- a rebase rewrites dates
-# but not the shape of history.
+# --- provenance: an agent-edited recipe is not proofread (#367) --------------
+# Helen's proofread covers the words she read. An agent edit after it must set
+# `meta.proofread` back to false in the same commit. The flag is a leg of the
+# publish gate, so this is a test and not only a written rule.
+# Ancestry, not dates, decides what the baseline exempts: a rebase rewrites
+# dates but not the shape of history.
 import pathlib
 import subprocess
 
@@ -559,362 +404,15 @@ from conftest import FRONT_MATTER, DRAFTS_PRESENT, ALL_DRAFTS
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-# MOVED 2026-09-11, FOR A PROMOTION -- the ham and the coleslaw. `047dba0`
-# copies two drafts Helen had rewritten and moved to `to-promote/` into
-# `_food_recipes/` with `proofread: true`, on her word: "Ham and coleslaw are
-# ready to promote to the best of my knowledge... Please do it for me." The
-# same case PUBLISHING_A_COCKTAIL.md step 6 records for the first 48 drinks: this
-# test reads the public repo's history only, so it cannot tell a promotion
-# from an edit, and sees two proofread recipes appearing in an agent's commit.
-# The public suite then named three mechanical things the drafts suite does
-# not check (a sugar's vocabulary spelling, `whole cloves`, a duplicate
-# serving estimate), fixed in the same commit and listed in its message;
-# none is a word she would read as prose. Proved with the old value first:
-# the test named exactly these two. Covers 047dba0 and nothing after it.
-# MOVED 2026-09-16, FOR THREE MECHANICAL FAULTS IN A PROOFREAD SHE HAD JUST
-# DONE. Her PR #1126 set `proofread: true` on the meringue swans and rewrote a
-# good deal of their method; two style tests then failed on the new text (a
-# method note missing its full stop, and "dark chocolate, melted" without the
-# cacao percentage house style requires), so `main` was red and nothing was
-# deploying. Asked how to fix recipes she had just read -- flip the flags and
-# have her re-read on the branch, or keep `proofread: true` and move the
-# baseline -- she chose: "Fix and keep proofread true". Neither fix changes a
-# word she would read as prose: one adds a full stop, one restores the "70%
-# cacao" her own earlier version carried. `3039210` also fixes the Arrack
-# Christmas Punch's `suggestion` (see COCKTAIL_BASELINE_COMMIT, moved the same
-# way in this commit). Proved with the old value first: the test named
-# meringue-swans-with-diplomat-cream.md and nothing else. Covers 3039210 and
-# nothing after it.
-# EVERY MENTION OF `HELEN_CLEARED` BELOW AND ABOVE IS HISTORY: the list was
-# DELETED on 2026-09-20 and this constant is now the only way Helen can grant a
-# change without the flip. Those older entries are kept unedited because they
-# record real reasoning at the time -- several of them chose the list OVER a
-# baseline move, and that trade-off is still worth understanding even though
-# one side of it no longer exists.
-#
-# MOVED 2026-09-19 FOR #982's 18 RECIPES, AND THE BLUNTNESS THAT USUALLY ARGUES
-# AGAINST A BASELINE IS WHY IT IS RIGHT HERE. `4390dfc` sets `proofread: true`
-# on the 18 still-false recipes of `e27753a` ("Move 24 ingredients' measures
-# from item: into amount: (#982)"), which is precisely the "sweeping and
-# content-free" case HELEN_CLEARED's own comment names as the baseline's job --
-# fifteen entries would have been fifteen lines saying the same sentence.
-#
-# HER GRANT: "the 24 files in this commit are perfect... Please find them, set
-# proofread to true, and PR. I just tried to cook mussels and they weren't
-# there!" One recipe of the twenty was the one she went looking for and could
-# not find; the gate had been holding all eighteen since 2026-09-12.
-#
-# THE HAZARD THIS COMMENT WARNS ABOUT WAS MEASURED, NOT WAVED AWAY. A baseline
-# "grandfathers EVERYTHING at or before a commit", and the 2026-08-21 en-dash
-# pass chose thirteen HELEN_CLEARED entries over one baseline move precisely
-# because #406's citation work was being held at `proofread: false` behind it.
-# Nothing is being held now: all 90 recipes are `proofread: true` and
-# `awaiting_fix: false` (`tmp/held_food.py`), 90 files produce 90 pages, and
-# running this test against `4390dfc` named ONLY that commit's own files -- so
-# there is no other recipe whose agent edit this move could silence.
-#
-# `e27753a` ITSELF IS NOT THE BASELINE, deliberately. The flag flip is a later
-# commit and the test reads each file's NEWEST commit, so the baseline has to
-# cover the flip. Three of the twenty needed nothing: beef-wellington,
-# indonesian-chicken-curry-gulai-ayam and lemon-meringue-pie are already in
-# HELEN_CLEARED, which is why the guard named fifteen and not eighteen.
-#
-# Proved with the old value first, as every move before it: the test named the
-# fifteen files of `4390dfc` and nothing else. Covers 4390dfc and nothing after.
-#
-# MOVED 2026-09-22 FOR ONE WORD ON ONE RECIPE, AND IT IS THE CHEAPEST SHAPE THIS
-# MECHANISM HAS. `da31a37` puts `proofread: true` back on `ajitsuke-tamago`,
-# whose `main_ingredients[0]` went from `medium eggs` to `eggs`.
-#
-# THE PAGE NEVER WENT DARK, which is the whole point of doing it this way.
-# MANUAL 4.0: "if she reads the rendered pages ON THE BRANCH before it merges
-# and says so, flip the flags back in a second commit and move the baseline in a
-# third". The flip to `false` landed on the branch, she read it there, and the
-# flip back and this move follow -- so `main` never sees the dark state and the
-# recipe is live throughout. Three commits instead of one, and no 404.
-#
-# HER GRANT: "Ajitsuke Tamago: please flip proofread to true."
-#
-# WHAT IT COVERS IS ONE FIELD AND NOT THE PAGE. The ingredient list is
-# untouched and still reads `amount: "4 medium"` with `item: "eggs"` -- the size
-# riding with the count, which is the schema's own rule -- so nothing about how
-# to shop for or cook this recipe changed. The only difference a reader could
-# find is which filter button the index files it under, which is the change she
-# asked for: `main_ingredients` is the BROWSE axis, and across both collections
-# 81 entries say plain `eggs` against the one that said `medium eggs`.
-#
-# NOTHING ELSE IS SILENCED BY IT, checked rather than assumed: run against
-# `4390dfc` this test named `_food_recipes/ajitsuke-tamago.md` and nothing else,
-# so there is no other recipe whose agent edit this move could cover.
-#
-# Proved with the old value first, as every move before it. Covers da31a37 and
-# nothing after.
-#
-# MOVED 2026-10-04 FOR ONE WORD ON ONE RECIPE, WITHOUT THE FLAG EVER FLIPPING.
-# `d1cde707` changes Delia's Classic Pancakes from `makes: "about 8"` to
-# `makes: "about 8 pancakes"`, and leaves `proofread: true`.
-#
-# SHE ASKED FOR THE WORD ITSELF. #1286 made a `makes:` recipe's scaler count
-# the thing made, and this yield named nothing to count: "Can Delia's pancakes
-# please scale as "8 pancakes", "16 pancakes"." Told that the edit would take
-# the page off the live site unless she read it on the branch first:
-#
-# HER GRANT: "Delia's pancakes: fine to make the update and not flip the flag.
-# Explicit grant."
-#
-# A DIFFERENT SHAPE FROM THE THREE-COMMIT ONE ABOVE, and hers to choose: no
-# flip to `false`, no read on the branch, because the change is a word she
-# dictated. What it covers is that word. The ingredients and the method are
-# untouched.
-#
-# NOTHING ELSE IS SILENCED BY IT: run against `da31a37` this test named
-# `_food_recipes/delias-classic-pancakes.md (last touched by d1cde707)` and
-# nothing else. Covers d1cde707 and nothing after.
-#
-# MOVED 2026-10-07 FOR ONE LETTER ON FIVE RECIPES, WITHOUT THE FLAG FLIPPING.
-# `1747b85b` lowercases the d of `Demerara sugar` in dark-chocolate-souffles,
-# old-fashioned-cherry-cake, peanut-butter-cookies, grandmas-spice-cake and
-# gluten-free-crumble-topping -- eleven changes, each that letter and nothing
-# else. Her rule the same day: lowercase when the word has become the thing
-# (maraschino cherry, parmesan, demerara sugar), a capital when it still names
-# the place (`Demerara rum`, Dijon mustard).
-#
-# HER GRANT, told the change needed one to stay live: "Lower case d for sugar.
-# Please fix live...carefully!" The Delia shape above: no flip, because the
-# change is one she dictated and can see whole.
-#
-# NOTHING ELSE IS SILENCED BY IT: run against `d1cde707` this test named
-# exactly those five files, each "last touched by 1747b85b", and nothing else.
-# Covers 1747b85b and nothing after. (That move was made on the branch
-# `worktree-opus-misc-ingest`, in parallel with the one below, which reached
-# `main` first; the two are reconciled at the foot of this block.)
-#
-# MOVED AGAIN, 2026-10-08 -- #1089's COPY SITTING, THE THREE-COMMIT SHAPE. It
-# was `d1cde707`, the grant above, which is history now. `3df50ce4` sets
-# `proofread: true` on eight recipes and changes nothing else: caramel,
-# chocolate ganache, five-spice crispy duck legs, macarons, pineapple and
-# ginger spatchcock chicken, and the three Ben & Jerry's sweet cream bases.
-# Each had been edited on the branch to her own wording from #1089 and set to
-# `false` in the same commit.
-#
-# HER GRANT, having read the rendered pages on the branch before it merged:
-# "#1341 is proofread! Let's go."
-#
-# Proved with the old value first: against `d1cde707` this test named exactly
-# those eight files, each "last touched by 3df50ce4", and nothing else.
-# Covers 3df50ce4 and nothing after. Savoury plum sauce is NOT among them: it
-# was `proofread: false` on `main` before the branch touched it and still is.
-#
-# MOVED TO A MERGE, 2026-10-08, TO HOLD TWO GRANTS MADE IN PARALLEL. The
-# demerara move above (`1747b85b`) was made on `worktree-opus-misc-ingest`
-# while #1341's (`3df50ce4`) was made on its own branch and merged first.
-# Neither commit is an ancestor of the other, so neither value covers both.
-# `91431cf6` is the merge of `main` into that branch and has both behind it.
-#
-# NO NEW GRANT IS IN THIS MOVE, only the two already quoted above. Proved in
-# the merge itself, with `3df50ce4` still in place: this test named exactly the
-# five demerara recipes, each "last touched by 1747b85b", and nothing else. So
-# the merge covers her eight, her five, and no page besides.
-#
-# MOVED 2026-10-10 FOR THREE LINES, ONE IN EACH OF THREE RECIPES -- #1356.
-# `c89d3ae9` adds `incidental: true` to a greasing butter in the parsnip,
-# cranberry and chestnut loaf, a greasing butter in the raspberry baked
-# cheesecake, and the frying oil in the youvetsi, and changes nothing else in
-# any of them. The flag hides the line from the recipe page's ingredients and
-# from the shopping list, so it is NOT an invisible key and this is the
-# exception, not INVISIBLE_KEYS.
-#
-# HER GRANT, asked for before the edit and given for exactly this: "Incidentals:
-# agree, thanks. I grant an exception for those six live and 71 drafts-- no
-# great shakes to be wrong, and you won't be! You can grant incidental here,
-# and you don't need to flip the proofread flag."
-#
-# THREE OF HER SIX, NOT SIX. The other three lines the survey had shown her are
-# untouched and so need no cover: icing sugar to dust (meringue swans, mince
-# pies) and Dijon mustard to brush (beef wellington) are bought for the dish.
-#
-# Proved with the old value first: against `91431cf6` this test named exactly
-# those three files, each "last touched by c89d3ae9", and nothing else. Covers
-# c89d3ae9 and nothing after.
-#
-# MOVED TO A MERGE, 2026-10-10, FOR EIGHT RECIPES -- #1343 AND #1348.
-# `92a132f6` replaces the tagline of seven recipes with Helen's own words,
-# verbatim from her comments on #1343 (classic masala chai, lemon feather
-# sponge, the one true chocolate brownies, dark chocolate soufflés, macarons,
-# chicken à la king, teriyaki salmon), and sets `proofread: true` on the
-# savoury plum sauce, which she proofread on 2026-10-08 (#1348). Nothing else
-# in any of the eight changes.
-#
-# HER GRANT, asked for before the edit ("I'd want your grant up front to move
-# the baseline for these") and given 2026-10-10: "Explicit grant now to update
-# all those files, including the live ones -- I'll need to reproofread anyway
-# (argh), and these changes are minor so I trust you!"
-#
-# A MERGE, FOR THE REASON `91431cf6` WAS: `c89d3ae9` above reached `main`
-# through #1355 while `92a132f6` was made on its own branch, and neither is an
-# ancestor of the other. `efe55b56` is the merge of `main` into that branch and
-# has both behind it. The branch's other commits touch no recipe.
-#
-# Proved in the merge, with `c89d3ae9` still in place: this test named exactly
-# those eight files, each "last touched by 92a132f6", and nothing else.
-#
-# MOVED AGAIN THE SAME DAY, 2026-10-10, FOR THE TAG REVIEW -- NINETEEN RECIPES.
-# Helen asked for every published food recipe to be read against the tag
-# meanings written down that afternoon, and ruled on each proposal. `f7f6f1f1`
-# (eight files) and `135e4487` (eleven) hold what she took: seventeen tag
-# lines -- among them the rename of `sweets` to `sweet snack` -- and two
-# `cook_time` values she gave ("B&J: yes please, fix the cooking time", "Creme
-# Pat: cook time is 15 mins"). One line changes in each file and nothing else.
-#
-# HER GRANT, asked for before the first edit: "You have the grant -- edit the
-# live files without flipping the flag please -- this is under the 'life is
-# too short' test..."
-#
-# `135e4487` is the later of the two and has `f7f6f1f1` and `efe55b56` behind
-# it, so no merge is needed this time. Proved with `efe55b56` still in place:
-# this test named exactly those nineteen files, eight "last touched by
-# f7f6f1f1" and eleven "by 135e4487", and nothing else.
-#
-# AND ONCE MORE THAT DAY, FOR A TAG THAT DID NOT EXIST AT BREAKFAST. `d563db61`
-# declares the mood `fiddly and fun` and adds it to twelve published recipes,
-# one tag appended to one line in each and nothing else. She was shown the
-# twelve by name and answered "Yes! Great! Let's do it -- declare the tag". The
-# grant is the one above, for editing the live files in this tag review without
-# flipping the flag. Proved with `135e4487` still in place: this test named
-# exactly those twelve, each "last touched by d563db61", and nothing else.
-#
-# MOVED 2026-10-11, FOR ANOTHER NEW TAG AND ONE LINE SHE DICTATED. `d920e1f9`
-# declares the practicality `main` and appends it to 31 published recipes, the
-# ones the subtraction rule leaves no doubt about (none of ten tags); the 40
-# it could not settle were not touched. Her grant, given before the edit:
-# "when we're in agreement about the main tag, you can edit the live recipes to
-# add it without flipping the flag", after "Declare it, please seed by
-# subtraction ... Please go ahead." `9575761d`, behind it, is the scones'
-# `makes:` in her own words ('Grandma's scones should have makes: 8 scones (2
-# large rounds of 4)'), with "Please edit the live scones recipe, no need to
-# flip the proofreading flag". Proved with `d563db61` still in place: this test
-# named exactly those 32 files, 31 "last touched by d920e1f9" and one "by
-# 9575761d", and nothing else.
-#
-# AND FOR HER RULINGS ON THE EDGE CASES, THE SAME DAY. `54f4915b` appends one
-# tag to each of six published recipes she ruled on by name, from a numbered
-# table: `main` on the quiche and the moules ("These are: ..." and the rows of
-# the proposal she did not strike), `extras` on the cauliflower cheese, Mum's
-# rice salad and the two sprout salads ("These are sides: 19, 20, 22, 23, 33,
-# 37."). The grants are the two above. Proved with `d920e1f9` still in place:
-# this test named exactly those six, each "last touched by 54f4915b".
+# The newest commit whose agent edits Helen has read herself. A recipe whose
+# newest commit is this one, or an ancestor of it, is exempt from the proofread
+# flip. Moving it is Helen's grant, never a way to turn a red test green
+# (DECISIONS §4.0):
+#   1. run the test with the old value; it must name only the granted files;
+#   2. move it in a commit of its own, quoting her grant in the message;
+#   3. move it before the next agent edit, or it covers that too.
+# Grants made on parallel branches need the merge commit with both behind it.
 BASELINE_COMMIT = "54f4915b"   # `main` and `extras` on six published recipes, Helen's row-by-row rulings
-#
-# MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
-# HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
-# tarragon salad (agent edit since her last read: two commas, #806) and the
-# raspberry baked cheesecake (her answers applied -- "Butter is salted. golden
-# caster. 3 large eggs." -- plus a group name, an en dash and a longer
-# main_ingredients at her request). `main` was red and deploys blocked: the
-# salad's gate hid a page the roast beef fillet links to, and the cheesecake
-# failed five style tests. Her grant, before the read: "Please just fix all
-# those. Break the rule, explicit permission, and get everything up on the site
-# with proofread=true. Then hand on heart I'll look at them myself to confirm
-# everything is fine." A HELEN_CLEARED entry exempts a recipe FOR EVER, which
-# is more than she granted; the baseline covers ae13155 and nothing after, so
-# the next agent edit to either file trips this test again. The grant is hers,
-# explicit, and quoted, which is the only thing that has to stay true.
-#
-# MOVED 2026-09-10, FOR SEVEN WORDS. #874 dictated the ganache's "how much
-# this makes" note: delete the lead-in, start with "Enough", "for a thick
-# filling". Flipping `proofread` instead would have pulled the recipe from
-# production and 404'd the five pages that link to it, which
-# test_no_link_in_the_production_build_points_at_a_file_that_isnt_there refuses
-# -- so the exception it is, in its own commit. Covers 86c7919 and nothing
-# after it.
-#
-# MOVED AGAIN 2026-09-07, HOURS LATER, AND THIS IS THE STRONGEST CASE THE
-# MECHANISM HAS EVER HAD: she read the 43 numbers, dictated seventeen
-# replacements in a comment on #808, and dictated the two notes verbatim as
-# well ("Please add all this as a note on the recipe and I will tidy up
-# later"). Every word now in those files came out of her own message. There is
-# no version of "her proofread describes a file she has not read" that survives
-# that.
-#
-# It covers 9a8a324 and nothing after it, which is the ordering the note below
-# insists on.
-#
-# MOVED 2026-09-07 (#815), AND HELEN NAMED THIS MECHANISM HERSELF. Asked which
-# of two ways to pay for `serves_estimate:` landing in 43 proofread recipes,
-# she quoted the exception back: "Use the documented exception. If she reviews
-# the change herself line by line, she was the last judgement, and
-# BASELINE_COMMIT in test_agent_edited_recipes_are_not_marked_proofread moves
-# forward. This is an unusually good fit: the change is ONE integer per file,
-# all 43 are already listed together in servings.yml with the source quoted,
-# and checking them is a single pass down one page rather than 43 file reads."
-#
-# WHAT THE 43 FILES GAINED IS ONE LINE EACH: `serves_estimate: 12` under the
-# `makes:` it is read from. No word of any recipe changed, so her proofread
-# still describes every one of them exactly -- the same test the awaiting_fix
-# rename passed below.
-#
-# MOVED IN ITS OWN COMMIT, AFTER 62874fa AND BEFORE ANYTHING ELSE, which is
-# what the ordering note below demands: a baseline that lands with the edits it
-# covers and nothing after them sweeps nothing up.
-#
-# MOVED 2026-08-20 (second move that day), AND THIS IS THE CASE THE MECHANISM
-# WAS BUILT FOR -- the one the failure message describes as "reviewed by Helen
-# line by line". She was not told a summary and asked to bless it. She asked to
-# be taken through the backlog one recipe at a time, was shown the old line, the
-# new line and the reason for each, and answered each individually. Two she
-# changed rather than approved. So her proofread describes those files more
-# exactly than it describes most of the corpus.
-#
-# COST, MEASURED BEFORE MOVING, as the entry below insists: the number of
-# recipes correctly sitting at proofread:false that this move would release is
-# ZERO. The backlog is empty because she just emptied it. The 72 other recipes
-# whose newest commit is an agent's are held by INVISIBLE_KEYS instead, not by
-# the baseline, and that stays true after the move -- so this does not quietly
-# take over their protection either.
-#
-# The previous entry, kept because its reasoning is the precedent:
-#
-#   366f392 -- moved 2026-08-20, with Helen's explicit permission, given IN
-#   ADVANCE and unprompted: she specified the change and then said, of it, "I
-#   trust you to make that change without making others, so no need to flip the
-#   proofread flag again." She was the author of that edit in every sense that
-#   mattered; the agent only typed it.
-#
-# WHAT THE MOVE ACTUALLY COVERS, measured rather than assumed. Before moving it,
-# the question "which recipes is this rule currently holding to proofread:false?"
-# was put to git, and the answer was NONE -- Helen's own c07104a had just
-# re-proofread the backlog of eight and set them back to true. So sliding the
-# baseline from 9c70675 to 366f392 stops checking exactly nothing. That is the
-# check to run before ever touching this line, and the reason the move is
-# defensible today when the identical move last week would not have been: a
-# baseline says "everything at or before here predates the rule", and moving it
-# over recipes that ARE being held quietly asserts something false about all of
-# them.
-#
-# The previous entry, kept because the reasoning is the precedent:
-#
-#   9c70675 -- moved 2026-08-18, with Helen's explicit permission, asked for
-#   before the commit rather than after. The awaiting_fix rename touched all 82
-#   recipes, so every one of them has an agent commit as its newest -- and this
-#   rule would have demanded proofread: false on all 82.
-#
-#   That would have been the letter of the rule against its purpose. It exists
-#   so her proofread never describes a file she has not read. A key name changing
-#   from hyphen to underscore changes no word of any recipe, so her proofread
-#   still describes every one of them exactly.
-#
-# The one before that was dc2a7bf, moved for the same kind of reason: 45
-# second-person edits she reviewed one at a time.
-#
-# ORDERING MATTERS AND IS EASY TO GET BACKWARDS. Move the baseline BEFORE making
-# the next batch of agent edits, never after: a baseline moved afterwards sweeps
-# those edits up too, which is the exact accident this comment block exists to
-# prevent. The citation work of #406 lands after 366f392 for that reason, and is
-# still held to proofread: false like anything else.
-#
-# NEVER MOVE THIS TO MAKE A RED TEST GREEN. It is Helen's to grant, and the
-# question to put to her is whether she has read what is now in the files --
-# not whether the change felt small.
 AGENT_TRAILER = "co-authored-by: claude"
 
 
@@ -924,42 +422,12 @@ def _git(*args):
                           cwd=ROOT).stdout
 
 
-# =============================================================================
-# KEYS THAT CHANGE NOTHING HELEN READS — the general answer, Helen 2026-08-20
-# =============================================================================
-# "Adding source_type to every recipe doesn't change how they render, so no need
-# to flip the proofread flag. Does this sound reasonable? Can we allow for this
-# formally so we don't keep asking the same question?"
-#
-# It is reasonable, and it is a better statement of the rule than the one it
-# replaces. Her proofread is of the WORDS ON THE PAGE. An agent editing a recipe
-# invalidates it because the words changed -- not because bytes changed. A front
-# matter key that no template, plugin or script ever reads renders nothing, so
-# the page she proofread is the page that is still there.
-#
-# This is the same reasoning that moved BASELINE_COMMIT to 9c70675 for the
-# awaiting_fix rename; the difference is that this does it by rule instead of by
-# asking her again each time, which is what she asked for.
-#
-# WHY THIS IS NOT THE USUAL "AN AGENT CAN JUST ADD AN ENTRY" HOLE, AND WHY IT
-# IS THE ONLY ESCAPE HATCH LEFT THAT ISN'T. The claim "no template reads this
-# key" is a FACT ABOUT THE REPOSITORY, and test_invisible_keys_are_really_
-# invisible checks it: a key cannot be added here unless it is genuinely
-# unread, and the day someone starts rendering one, that test goes red and the
-# entry has to come out. The guard is mechanical, not social.
-#
-# THE CONTRAST USED TO BE WITH `HELEN_CLEARED`, WHICH WAS DELETED 2026-09-20.
-# That list was protected only by being legible -- nothing could check whether
-# Helen had really cleared a recipe -- and it matched on FILENAME, so an entry
-# never expired and covered every future edit to that recipe as well. All 17 of
-# its entries were measured spent on the day it went. What is left is this
-# list, which a test can verify, and BASELINE_COMMIT, which at least names a
-# point in history rather than a file for ever.
-#
-# WHAT IT DELIBERATELY DOES NOT COVER: the body text, and any key that IS read.
-# A commit qualifies only if every single difference between the two versions of
-# the file is confined to these keys and the body is byte-identical. Change one
-# word of a method in the same commit and the whole exemption is off.
+# --- keys that change nothing Helen reads -------------------------------------
+# Her proofread is of the words on the page. A commit whose every difference
+# is confined to INVISIBLE_KEYS, with the body byte-identical, needs no flip
+# (DECISIONS §4.0). "Nothing reads this key" is a fact about the repository:
+# `test_invisible_keys_are_really_invisible` scans RENDER_SURFACE for each key,
+# so an entry cannot be added unless it is true, and must go the day it is not.
 RENDER_SURFACE = ("_layouts", "_includes", "_plugins", "assets/js", "scripts")
 
 INVISIBLE_KEYS = {
@@ -970,29 +438,6 @@ INVISIBLE_KEYS = {
         "Gordon Ramsay's Ultimate Cookery Course` are the same string shape and "
         "no regex separates them. Read by tests only. Issue #406."
     ),
-    # `meta.rewritten` STOOD HERE UNTIL #1137, 2026-09-17, AND ITS OWN ENTRY IS
-    # WHAT WENT FALSE. It read: "Read by nothing that builds a page -- the index
-    # badge and the publish gate hang off meta.awaiting_fix and meta.proofread,
-    # not this." True for five weeks, and untrue the moment the gate grew a
-    # third leg for drinks: on `cocktail_recipes` the key now decides whether a
-    # page exists at all.
-    #
-    # SO THE EXEMPTION HAD TO GO WITH IT, and that is the point rather than a
-    # chore. This list exists so a commit touching only keys NOTHING RENDERS can
-    # leave `proofread: true` standing -- Helen's judgement still covers what a
-    # reader sees. Flipping `rewritten` now changes what a reader sees to the
-    # extent of adding or removing a page, so such a commit cannot claim her
-    # proofread is untouched.
-    #
-    # It is also moot in practice from the same day: `rewritten` is Helen's
-    # keystroke now and an agent never writes it (MANUAL 9.1.1), so the only
-    # commits that could have claimed this exemption are ones that may no longer
-    # be made. The entry goes anyway -- a list of "invisible" keys that names a
-    # gate leg is wrong even when nothing is currently relying on it.
-    #
-    # This test found it unprompted on the first run after the plugin changed,
-    # which is the whole argument for scanning `_plugins/` rather than trusting
-    # the note in an entry.
     "meta.cooked_before": (
         "Retired 2026-08-21, issue #429. Recorded whether Helen had cooked the "
         "recipe before; read by no layout, include, plugin or script, and "
@@ -1008,30 +453,14 @@ INVISIBLE_KEYS = {
     ),
 }
 
-# ---------------------------------------------------------------------------
-# STRIPPING COMMENTS BEFORE MATCHING. Issue #428.
-#
-# The scan below used to be `grep -rlw <key>` over RENDER_SURFACE. A word-grep
-# cannot tell code from prose, so a key whose name is an ordinary English word
-# was reported as rendered the moment anyone used that word in a comment. That
-# is what kept `meta.rewritten` off the list above: one comment in
-# ingredient-search.js, about ingredient text, not about the key.
-#
-# THIS IS THE FOURTH TIME PROSE HAS DEFEATED A SOURCE-SCANNING GUARD here
-# (MANUAL §12), and the escalation was already written down after the third:
-# strip comments before matching, or parse rather than grep.
-#
-# STRINGS ARE DELIBERATELY KEPT. The obvious companion move -- strip string
-# literals too -- would be a bug, because a string literal is exactly how a key
-# gets read: `page["source_type"]`, `data['meta']['rewritten']`. Stripping them
-# would turn a real read into a silent miss, which is the one direction this
-# guard must never fail in. So strings are tracked (a scanner that did not track
-# them would see the `//` in "https://..." as a comment and eat the rest of the
-# line, which fails the same dangerous way) but their contents are preserved.
-#
-# WHAT IT DOES NOT DO: it is not a parser. Liquid comments and HTML comments are
-# matched as blocks; a `<!--` inside a Liquid string would confuse it. That has
-# never happened, and the 90% is what the previous three instances all needed.
+# --- stripping comments before matching (#428) -------------------------------
+# A word-grep cannot tell code from prose: a key named like an English word
+# reads as rendered the moment a comment uses the word.
+# Strings are deliberately kept. A string literal is how a key gets read
+# (`page["source_type"]`), so stripping them would turn a real read into a
+# silent miss. They are tracked, or the `//` in "https://..." would read as a
+# comment and eat the rest of the line.
+# Not a parser: a `<!--` inside a Liquid string would confuse it.
 LINE_COMMENT = {".js": "//", ".py": "#", ".rb": "#"}
 BLOCK_COMMENT = {".js": ("/*", "*/")}
 QUOTES = {".js": "\"'`", ".py": "\"'", ".rb": "\"'"}
@@ -1125,11 +554,9 @@ def test_invisible_keys_are_really_invisible():
     )
 
 
-# The guard above is only as good as its scanner, and the scanner is the part
-# that has now been wrong four times. So the scanner gets tested too, on both
-# sides: prose must not register as a read, and a real read must not be lost.
-# The second half is the one that matters -- a false negative here would let a
-# genuinely rendered key sit on INVISIBLE_KEYS unnoticed. Issue #428.
+# The scanner is tested on both sides: prose must not register as a read, and
+# a real read must not be lost. The second matters more: a false negative lets
+# a rendered key sit on INVISIBLE_KEYS unnoticed (#428).
 SCANNER_CASES = [
     (".js", "// main_ingredients text is rewritten in the include", False),
     (".js", "/* rewritten\n   across lines */", False),
@@ -1165,11 +592,9 @@ def test_the_invisible_keys_scanner_tells_code_from_prose(suffix, source, is_rea
     )
 
 
-# A docstring in .py is a string literal, and strings are kept on purpose -- so
-# the case above passes for the right reason but for the WRONG kind of file. A
-# Python docstring really is prose. It is left alone because telling a docstring
-# from `KEYS = ["rewritten"]` needs the AST, and no key on INVISIBLE_KEYS has
-# ever collided with one. If that day comes, the fix is ast.parse, not a regex.
+# The `.py` docstring case passes because strings are kept, though a docstring
+# is prose. Telling one from `KEYS = ["rewritten"]` needs `ast.parse`, not a
+# regex.
 
 
 def _file_at(commit, relpath):
@@ -1208,15 +633,8 @@ def _only_invisible_keys_changed(commit, relpath):
     changed = {k for k in set(new_data) | set(old_data)
                if new_data.get(k, object()) != old_data.get(k, object())}
 
-    # meta is a nested mapping, so compare it key by key rather than wholesale --
-    # otherwise a change to any key under it reads as "meta changed", which no
-    # entry in INVISIBLE_KEYS can ever match.
-    #
-    # EXPANDED UNCONDITIONALLY since 2026-08-21. This used to run only when meta
-    # was the SOLE difference, so a commit that set source_type AND flipped
-    # meta.rewritten fell through to the flat comparison, saw a bare "meta", and
-    # said no. That failed in the safe direction, but for the wrong reason: it
-    # was a gap in the comparison, not a judgement about the keys.
+    # meta is a nested mapping, so it is compared key by key: a bare "meta" in
+    # `changed` matches no entry in INVISIBLE_KEYS.
     if "meta" in changed:
         new_meta = new_data.get("meta") if isinstance(new_data.get("meta"), dict) else {}
         old_meta = old_data.get("meta") if isinstance(old_data.get("meta"), dict) else {}
@@ -1224,27 +642,13 @@ def _only_invisible_keys_changed(commit, relpath):
         changed |= {f"meta.{k}" for k in set(new_meta) | set(old_meta)
                     if new_meta.get(k, object()) != old_meta.get(k, object())}
 
-    # Keys are compared by their FULL DOTTED NAME. INVISIBLE_KEYS lists
-    # `meta.rewritten`, not `rewritten`, because the two are different keys and a
-    # top-level one must not be exempted by its namesake under meta.
+    # Keys are compared by full dotted name, so a top-level key is not exempted
+    # by its namesake under meta.
     #
-    # AN EMPTY `changed` MEANS EXEMPT, NOT UNKNOWN. Issue #429, 2026-08-21. This
-    # used to read `bool(changed) and changed <= ...`, so a commit that changed
-    # no value at all fell to False and the proofread rule applied in full. That
-    # conflated two opposite situations: "I could not tell what changed", which
-    # must fail closed, and "nothing changed that a reader could see", which is
-    # the exemption's entire purpose.
-    #
-    # It matters for the case Helen asked about directly, of reordering the meta
-    # block for legibility: YAML key order is not a value, so a pure reorder
-    # produces an empty set here. Under the old line that would have demanded
-    # `proofread: false` on all 86 recipes for moving two lines up the page.
-    #
-    # It cannot swallow a real edit. The body is compared byte-for-byte above and
-    # returns early, and any front matter value that actually differs lands in
-    # `changed` and is checked against the list as before. What reaches this line
-    # with an empty set has an identical body and identical values in every key:
-    # the same file, spelled differently.
+    # An empty `changed` means exempt, not unknown (#429): a pure reorder of
+    # the meta block changes no value. It cannot swallow a real edit, because
+    # the body is compared above and every differing value lands in `changed`;
+    # anything unreadable has already returned False.
     return changed <= set(INVISIBLE_KEYS)
 
 
@@ -1300,27 +704,12 @@ def _agent_claimed_rewrites(repo, pathspec, adjudicated=frozenset()):
     return offenders
 
 
-# =============================================================================
-# COMMITS HELEN HAS PERSONALLY RULED ON. Her call, never an agent's. 2026-09-05.
-# =============================================================================
-# WHY THIS EXISTS AT ALL, and it is not a softening of the rule below. The scan
-# walks the WHOLE history, so ONE violation fails that test FOREVER: setting the
-# flag back to false does not clear it, and neither does Helen re-setting it
-# herself, because the offending commit still sits in history flipping
-# false -> true under an agent trailer. Without this list the only remedies are
-# rewriting a repo's history or leaving the suite permanently red -- and a
-# permanently red test is worse than no test, because the SECOND violation hides
-# behind the first.
-#
-# So the guard needed a way to record "looked at, ruled on, closed". Same bargain
-# `BASELINE_COMMIT` strikes for the proofread rule, and CLAUDE.md says the same
-# thing of it: the exception is Helen's to grant, never an agent's, and never to
-# make a red test go green.
-#
-# AN ENTRY IS A RULING, NOT A SUPPRESSION. Write what she decided and why, in her
-# own words where there are any. The meta-test below refuses an entry that no
-# longer matches anything, so this cannot quietly become a list of SHAs nobody
-# can account for.
+# --- commits Helen has personally ruled on ------------------------------------
+# The scan walks the whole history, so one violation fails the test for ever:
+# setting the flag back does not remove the commit that flipped it. An entry
+# records "ruled on, closed". It is Helen's to grant, never an agent's, and
+# never to turn a red test green. Write what she decided and why;
+# `test_every_adjudicated_rewrite_still_offends` refuses a dead entry.
 ADJUDICATED_REWRITES = {
     "_food_drafts": {
         "1fbd2f81": (
@@ -1340,16 +729,11 @@ def _adjudicated(repo_key):
 
 
 def test_every_adjudicated_rewrite_still_offends():
-    """No dead entries in ADJUDICATED_REWRITES. Helen's rulings, kept honest.
+    """No dead entries in ADJUDICATED_REWRITES.
 
     A SHA that no longer flips `meta.rewritten` false -> true under an agent
-    trailer is dead weight, and dead weight in an exception list is how the list
-    stops being read -- the argument `WHOLE_COLLECTION_ONLY`'s own meta-test
-    makes, and the reason every `INVISIBLE_KEYS` entry says out loud why it
-    outlives its key.
-
-    It cannot check `_food_drafts` in CI, where the repo is absent. That is the
-    same blindness the test below documents, not a new one.
+    trailer is dead weight, and an exception list with dead weight stops being
+    read. Skips where `_food_drafts/` is absent, which includes CI.
     """
     drafts = ROOT / "_food_drafts"
     if not (DRAFTS_PRESENT and (drafts / ".git").exists()):
@@ -1369,47 +753,20 @@ def test_every_adjudicated_rewrite_still_offends():
 
 
 def test_no_agent_commit_claims_helens_rewrite():
-    """`meta.rewritten` is Helen's claim. An agent must never set it true.
+    """`meta.rewritten` is Helen's claim; an agent commit never sets it true.
 
-    THE HOLE THIS CLOSES. `meta.claude_rewritten` was added (issue #418) exactly
-    so an assisted tidy-up pass -- main_ingredients, ingredient and method
-    groups, wording nudged toward her voice -- could be recorded WITHOUT being
-    mistaken for Helen's own rewrite. `meta.rewritten` stays the real claim:
-    that the prose is genuinely hers.
+    An assisted pass records itself with `meta.claude_rewritten` (#418).
+    Helen's rulings on past violations are in ADJUDICATED_REWRITES.
 
-    Nothing enforced that separation. The tests checked `rewritten` exists and
-    is nested under `meta:`, and nothing checked who set it or what it changed
-    from. A tidy-up pass could have set it true and the only thing that would
-    have caught it was Helen reading the diff. That is a documented convention
-    with nothing behind it, which in this repository has a perfect record of
-    eventually being broken -- see the destructive-git rule, `awaiting_fix`,
-    `proofread`, and the citation spec, all documented at length before anything
-    checked them.
+    Not caught: a file created by an agent already saying `rewritten: true`.
+    Only a false-to-true transition is flagged, because `before` is also None
+    for a rename or a promotion, and failing those would fail Helen's own
+    workflow.
 
-    Zero violations existed when this was written, in either repository. It is a
-    regression guard, not a backlog -- and exactly ONE has happened since, on
-    2026-09-05, which is what ADJUDICATED_REWRITES above records.
-
-    WHAT IT DELIBERATELY DOES NOT CATCH, said plainly rather than left to be
-    found: a file CREATED by an agent already saying `rewritten: true`. Only a
-    false-to-true transition is flagged, because `before` is also None for an
-    ordinary rename or a promotion moving a file between collections, and
-    failing those would be a false positive on Helen's own normal workflow.
-    Narrow and correct beats broad and noisy -- but it does mean a brand-new
-    file is on trust.
-
-    BOTH REPOSITORIES, because the drafts are where the risk actually lives:
-    tidy-up passes happen on drafts, and 15 of them already say true.
-    `_food_drafts/` is a separate private repo with its own history, so it is
-    asked separately.
-
-    WHAT A GREEN RUN IN CI MEANS, and it is less than it looks: `_food_drafts/`
-    is absent there (issue #378), so CI checks the 82 published recipes and NONE
-    of the 314 drafts. This does not skip, because the published half is the
-    half that ships and losing it to be honest about the other half would be a
-    bad trade -- but the half that matters most is the one CI cannot see. Run
-    the suite locally before believing this check has passed. Registered in
-    tests/test_suite_hygiene.py's PARTIAL_IN_CI for exactly this reason.
+    In CI `_food_drafts/` is absent (#378), so a green run there covers the
+    published recipes and none of the drafts, which is where tidy-up passes
+    happen. It does not skip, because the published half is the half that
+    ships; it is registered in tests/test_suite_hygiene.py's PARTIAL_IN_CI.
     """
     assert (ROOT / ".git").exists(), "Not a git checkout -- this test cannot run."
 
@@ -1417,10 +774,8 @@ def test_no_agent_commit_claims_helens_rewrite():
                                         _adjudicated("_food_recipes"))
 
     drafts = ROOT / "_food_drafts"
-    # Named so tests/test_suite_hygiene.py's registry can see this test reads
-    # drafts at all -- it generates its list from ALL_DRAFTS references, and a
-    # test reaching drafts by path alone would be invisible to it. That gap is
-    # called out in its own docstring; this opts in rather than widening it.
+    # Names ALL_DRAFTS so the registry in tests/test_suite_hygiene.py, which
+    # finds draft-reading tests by that token, sees this one.
     if DRAFTS_PRESENT and ALL_DRAFTS and (drafts / ".git").exists():
         offenders += [f"_food_drafts/  {line}"
                       for line in _agent_claimed_rewrites(
@@ -1516,15 +871,10 @@ def test_agent_edited_recipes_are_not_marked_proofread():
     )
 
 
-# =============================================================================
-# THE PUBLISH GATE'S DATA SIDE — GitHub issue #331
-# =============================================================================
-# _plugins/publish_gate.rb reads `meta.awaiting_fix` and `meta.proofread` and
-# publishes only on `false` and `true` respectively -- it drops the document on
-# anything else. tests/test_site_config.py guards the MECHANISM
-# (plugin present, configs disagreeing correctly, workflow still plugin-capable).
-# These two guard the DATA the mechanism reads, and both failure modes are
-# silent: the page publishes, and nothing anywhere says why.
+# --- the publish gate's data side (#331) -------------------------------------
+# _plugins/publish_gate.rb publishes a recipe only on `awaiting_fix: false` and
+# `proofread: true`, and drops the document on anything else.
+# tests/test_site_config.py guards the mechanism; these guard the data it reads.
 
 def test_every_recipe_declares_awaiting_fix():
     """The flag is present on every recipe, so its absence is never the answer.
@@ -1569,20 +919,12 @@ def test_awaiting_fix_is_a_real_boolean():
 
 
 def test_no_recipe_uses_the_old_hyphenated_awaiting_fix_key():
-    """`awaiting-fix` was renamed to `awaiting_fix` on 2026-08-18. Nothing may
-    carry the old spelling, in any file, ever again.
+    """No recipe carries the old hyphenated `awaiting-fix` key.
 
-    THE HYPHEN IS A HAZARD, NOT A STYLE PREFERENCE, which is why this is a test
-    and not a note. Ruby reads `meta["awaiting-fix"]` happily, so the plugin
-    never minded -- but LIQUID PARSES `page.meta.awaiting-fix` AS SUBTRACTION.
-    Any template or index filter reading the publish gate through the hyphenated
-    name would evaluate it as false, i.e. "not flagged", i.e. publish the page
-    that was flagged. The failure is arithmetic silently standing in for a
-    boolean.
-
-    A recipe carrying only the old key also has no `awaiting_fix` at all, so the
-    plugin's fail-closed rule holds it back -- but silently. This makes it loud,
-    and because the suite gates the deploy (#369), loud means the build stops.
+    Liquid parses `page.meta.awaiting-fix` as subtraction, so a template
+    reading the flag through that name gets arithmetic, not the flag. A recipe
+    with only the old key also has no `awaiting_fix`, so the gate holds it
+    back without saying why; this names the file.
     """
     offenders = []
     for path in sorted((ROOT / "_food_recipes").glob("*.md")):

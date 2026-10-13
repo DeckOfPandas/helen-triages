@@ -1,29 +1,24 @@
-// =============================================================================
-// Tests for the store half of the SHARE LINK — GitHub issue #1093.
-//
-// Run from the repo root:
+// Tests for the store half of the share link (#1093).
 //
 //   node --test tests/js/*.test.js
 //
-// `?shortlist=negroni,aviation` opens an index showing those drinks. Helen's
-// ruling, 2026-09-15: "Show it, don't save it" -- so the store's part is two
-// questions and one deliberate write:
+// `?shortlist=negroni,aviation` opens an index showing those drinks without
+// saving them (DECISIONS §8.3), so the store's part is:
 //
 //   1. slugOf()       the one spelling of a key's slug
 //   2. resolveSlugs() which live keys a link names, and which it names that
-//                     nothing on the page answers to. WRITES NOTHING.
+//                     nothing on the page answers to. Writes nothing.
 //   3. addAll()       "keep these": a merge, persisted once.
 //
 // The URL grammar is filter-state.js's (filter-state.test.js); the wiring is
 // each index's (food-index-startup.test.js, cocktail-index-startup.test.js).
-// =============================================================================
 'use strict';
 
 const test = require('node:test');
 const assert = require('node:assert');
 const { makePage, load } = require('./stub-dom.js');
 
-/* ACROSS THE REALM BOUNDARY, so structural comparisons go through JSON --
+/* Structural comparisons go through JSON, across the vm realm boundary:
    shortlist.test.js's own note explains why. */
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
@@ -73,7 +68,6 @@ test('resolveSlugs reports what nothing on the page answers to, rather than drop
 });
 
 test('resolveSlugs WRITES NOTHING -- opening a link must not save it', () => {
-  // Helen, 2026-09-15: "Show it, don't save it".
   const storage = workingStorage();
   const s = store(storage);
   s.resolveSlugs(['aviation', 'negroni'], LIVE);
@@ -114,9 +108,7 @@ test('addAll of nothing new writes nothing', () => {
 });
 
 test('the JSON export and restore are gone -- #1100', () => {
-  // Helen: "Remove the rest of the apparatus: no JSON export or import, no
-  // clear." The share link is the only way a list leaves a browser. If these
-  // come back, they come back on purpose, with tests of their own.
+  // The share link is the only way a list leaves a browser.
   const s = store();
   assert.strictEqual(typeof s.snapshot, 'undefined');
   assert.strictEqual(typeof s.restore, 'undefined');

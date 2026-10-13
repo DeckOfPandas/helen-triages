@@ -1,11 +1,9 @@
 """`scripts/glass_fit_report.py` -- the judgement in `check`, with no build.
 
-The report itself is not a test, on purpose (its header says why: every line
-is a question for Helen about one drink). What IS testable is the arithmetic
-that decides a line, and #1244's first list is why it needs pinning: audited
-line by line on 2026-10-04, 10 of its 22 flags were the model's fault -- drinks
-watered for things that were never shaken, drinks over by 3%, and a top flag
-comparing against a range the site had stopped spending.
+The report itself is not a test, on purpose: every line is a question for Helen
+about one drink. What is pinned is the arithmetic that decides a line (#1244):
+only what was shaken is watered, a drink over by less than the tolerance is not
+flagged, and the top flag fires only when there is hardly any room.
 
 Synthetic glasses and rules, so a re-survey or a new ruling on dilution moves
 nothing here. One glass: 200 ml, stemmed, wash line 0.75, so it takes 150 ml.
@@ -68,11 +66,10 @@ def test_too_big_for_the_largest_glass_also_needs_the_margin():
 
 
 def test_only_what_was_shaken_is_watered():
-    """THE DARK 'N' STORMY CASE: ginger beer added after the shake.
+    """Ginger beer added after the shake is not diluted.
 
     140 ml of recipe with 60 of it added afterwards is 80 x 1.25 + 60 =
-    160 ml, which fits. Watering all 140 gives 175 ml, which is flagged --
-    and that was the fault in the first list.
+    160 ml, which fits. Watering all 140 gives 175 ml, which is flagged.
     """
     assert _verdict(140) == "tight", "all of it watered: 175 ml"
     assert _verdict(140, after=60) == "ok", "60 ml added after the shake: 160 ml"
@@ -87,9 +84,8 @@ def test_what_is_not_in_the_glass_is_not_counted_in_it():
 def test_the_top_flag_fires_only_when_there_is_hardly_any_room():
     """The house range says a top is at least 80 ml; a quarter of that is 20.
 
-    A build leaving 60 ml was flagged by the first list ("less room than the
-    house range expects") and is not now: since #1179 the site sizes the top
-    from that room, so 60 ml IS the top. A build leaving 10 ml still is.
+    A build leaving 60 ml is not flagged: the site sizes the top from that
+    room (#1179), so 60 ml is the top. A build leaving 10 ml is.
     """
     assert _verdict(72 + 60, top=60) == "ok", "72 x 1.25 = 90 ml of build, 60 ml of room"
     assert _verdict(112 + 10, top=10) == "top", "112 x 1.25 = 140 ml of build, 10 ml of room"

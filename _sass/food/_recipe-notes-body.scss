@@ -68,17 +68,13 @@
 }
 
 // --- Body Content (long-form prose via {{ content }}) -----------------------
-// A recipe's Markdown body below its front matter, and the wrapper the
-// reference and about pages reuse. MANUAL §4.1.
-//
-// Section headings in here are peers of INGREDIENTS/METHOD/NOTES. A plain
-// `## Heading` cannot be one: kramdown gives it no class and no nested span,
-// and the mark needs both. Write raw HTML in the body, blank-line-separated:
-//
-//   <h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
-//
-// A subtitle under a peer heading is a <p class="recipe-section-subtitle">
-// straight after it.
+// A recipe's Markdown body, and the wrapper the reference and about pages
+// reuse (MANUAL §4.1). Section headings in here are peers of
+// INGREDIENTS/METHOD/NOTES, and a plain `## Heading` cannot be one: kramdown
+// gives it no class and no nested span, and the mark needs both. Write raw
+// HTML, blank-line-separated: <h2 class="recipe-section-heading"> around
+// <span class="section-heading-text">, and any subtitle as a
+// <p class="recipe-section-subtitle"> straight after it.
 article.recipe .recipe-body-content {
   margin-top: 0;
   // No padding-top: a peer heading brings its own $spacing-section-top, and a
@@ -95,16 +91,12 @@ article.recipe .recipe-body-content {
     margin: $spacing-section-gap 0 $space-md 0;
   }
 
-  // Same voice as .recipe-tagline, under a peer heading.
-  //
-  // Above: the negative margin is the only way to shrink the gap, because it
-  // collapses against .recipe-section-heading's 2rem bottom margin and a
-  // positive and a negative margin sum. 2rem - 0.75rem leaves 1.25rem, the
-  // title-to-tagline distance.
-  //
-  // Below: $space-xl (#339). $space-lg reads as the first line of the
-  // paragraph that follows; the tagline's own 3rem reads as a missing
-  // paragraph.
+  // Same voice as .recipe-tagline, under a peer heading. Above: the negative
+  // margin is the only way to shrink the gap, because it collapses against
+  // .recipe-section-heading's bottom margin and a positive and a negative
+  // margin sum; what is left is the title-to-tagline distance. Below:
+  // $space-xl (#339); $space-lg reads as the first line of the paragraph
+  // that follows.
   .recipe-section-subtitle {
     font-size: 0.9rem;
     font-style: italic;
@@ -161,17 +153,13 @@ article.recipe .recipe-body-content {
   }
 
   // --- Labelled lists (Tips) -----------------------------------------------
-  // A top-level list whose items each open with a bold lead-in. The lead-in
-  // becomes a Courier label on its own line and the marker goes: the label is
-  // the marker. Not uppercase, because these run to a sentence. Same size as
-  // the prose under it.
-  //
-  // :has() rather than a class, because kramdown emits a bare <ul>. It must be
-  // `> ul >`, a direct child, so it cannot reach the nested causes inside a
-  // diagnostic block below, which open with a bold lead-in too.
-  //
-  // Authoring: the lead-in carries its closing punctuation inside the bold
-  // (`**Use clarified butter.**`), or the stray full stop starts the next line.
+  // A top-level list whose items each open with a bold lead-in: the lead-in
+  // becomes a Courier label on its own line and replaces the marker. Not
+  // uppercase, because these run to a sentence. :has() rather than a class,
+  // because kramdown emits a bare <ul>. It must be `> ul >`, a direct child,
+  // so it cannot reach the nested causes in a diagnostic block below, which
+  // open with a bold lead-in too. Authoring: the closing punctuation goes
+  // inside the bold, or the stray full stop starts the next line.
   > ul > li:has(> strong:first-child) {
     padding-left: 0;
     margin-bottom: $space-xl;
@@ -197,12 +185,10 @@ article.recipe .recipe-body-content {
   // --- Diagnostic blocks ---------------------------------------------------
   // A numbered list's <li>s, each a failure name, a symptom and a nested <ul>
   // of causes. Unnumbered on purpose: these are independent failure modes,
-  // not a sequence (#185). Not tinted cards either: a tinted box on this page
-  // means "aside". The failure name takes the single violet rule, one tier
-  // below a section heading (overlapping-rule-single, shared/_rule.scss).
-  //
-  // Authoring: kramdown must emit `<strong>Name</strong> <em>symptom</em>` as
-  // the first two inline children of the <li>, then the nested `<ul>`. No
+  // not a sequence (#185). Not tinted cards: a tinted box on this page means
+  // "aside". The failure name takes the single violet rule, one tier below a
+  // section heading. Authoring: `<strong>Name</strong> <em>symptom</em>` must
+  // be the first two inline children of the <li>, then the nested `<ul>`. No
   // colon after the name: it sits on top of the rule.
   ol {
     list-style: none;

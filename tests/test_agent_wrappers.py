@@ -1,17 +1,11 @@
 """The agent wrappers in scripts/ refuse what their allow rules must not allow.
 
-WHY THIS FILE EXISTS (2026-09-11). Helen: "Please work out how to run sh
-commands in a way that can be statically analysed, so things remain safe
-without harrassing me for permissions all the time." The answer was allow rules
-in `.claude/settings.json` for a handful of committed wrappers -- and an allow
-rule ending in ` *` is only as narrow as the wrapper's own argument checks.
-
-Before that day every wrapper call prompted, so the prompt WAS the guard, and
-two of them needed it: `git-push-agent.sh feature:main` would have moved the
-public `main` without a PR, and `git-clone-agent.sh <repo> --template=<dir>`
-would have run whatever hooks that directory held. The question DECISIONS §11
-asks of any widening -- "what was that prompt the last guard of" -- is answered
-here, in tests, so a later edit to a wrapper cannot quietly re-open it.
+`.claude/settings.json` allow-lists a handful of committed wrappers so they
+run without a prompt, and an allow rule ending in ` *` is only as narrow as the
+wrapper's own argument checks. The prompt was the last guard of two things:
+`git-push-agent.sh feature:main` moves the public `main` without a PR, and
+`git-clone-agent.sh <repo> --template=<dir>` runs whatever hooks that directory
+holds. These tests are the guard now (DECISIONS §11).
 
 Every wrapper case runs under AGENT_WRAPPER_DRY_RUN=1, which makes the wrapper
 print the command it would run and exit, and with both token variables removed
@@ -32,9 +26,6 @@ import subprocess
 
 import pytest
 
-# Suite marker, so `pytest -m shared` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.shared
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -125,8 +116,8 @@ def test_gh_read_passes_a_read_through_as_an_explicit_get(args, tail):
     assert lines[5:] == tail
 
 
-# --fields and --each, 2026-09-15: a bracketed --jq made Claude Code ask Helen
-# even though gh-read.sh is allow-listed, so the script builds that expression.
+# --fields and --each: a bracketed --jq makes Claude Code ask Helen even though
+# gh-read.sh is allow-listed, so the script builds that expression.
 
 PR = "repos/DeckOfPandas/helen-triages/pulls/1091"
 
@@ -180,7 +171,7 @@ def _unanalyzable_denies(command: str) -> bool:
 
 
 @pytest.mark.parametrize("command", [
-    # the exact call Helen was asked about, 2026-09-15
+    # a real call Helen was asked about
     "sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/pulls/1091 "
     "--jq '[.state, .merged_at] | @tsv'",
     "sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/issues --jq '.[].title'",
@@ -208,7 +199,7 @@ def test_the_hook_leaves_plain_wrapper_calls_and_other_quoted_text_alone(command
 # --- guard-unanalyzable-bash.py shape 8: a leading env assignment -----------
 
 @pytest.mark.parametrize("command", [
-    # the exact call Helen was asked about, 2026-09-15
+    # a real call Helen was asked about
     "PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright "
     "NODE_PATH=/opt/playwright/node_modules node tmp/repro.js",
     "FOO=bar node tmp/x.js",
@@ -237,7 +228,7 @@ def test_the_hook_leaves_non_leading_or_empty_assignments_alone(command):
 # --- guard-unanalyzable-bash.py shape 9: an unquoted parenthesis -------------
 
 @pytest.mark.parametrize("command", [
-    # the exact call Helen was asked about and declined, 2026-09-15
+    # a real call Helen was asked about, and declined
     "git log origin/main -25 --format=%h%x09%s%x09%(trailers:key=Fixes,valueonly,separator=%x2C)",
     "(git status)",
     "echo (x)",
@@ -261,15 +252,13 @@ def test_the_hook_leaves_quoted_or_escaped_parentheses_alone(command):
 
 # --- guard-unanalyzable-bash.py shape 10: `git -C` ---------------------------
 #
-# Helen, 2026-09-21: "please refuse git -C across the board". Every one of the
-# refused commands below was actually run in the session that prompted the
-# rule, and every one of them interrupted her: an allow rule is a PREFIX match,
-# so a `-C` between `git` and its subcommand makes `Bash(git status *)`,
+# Refused across the board (DECISIONS §11). An allow rule is a prefix match, so
+# a `-C` between `git` and its subcommand makes `Bash(git status *)`,
 # `Bash(git add -- *)`, `Bash(git commit -F *)` and the exact
-# `Bash(git branch --show-current)` all fail to match.
+# `Bash(git branch --show-current)` all fail to match, and each call prompts.
 
 @pytest.mark.parametrize("command", [
-    # the four real calls from 2026-09-21, one per allow rule they missed
+    # real calls, one per allow rule they missed
     "git -C /workspace/.claude/worktrees/opus-improve-devops status --short",
     "git -C /workspace/.claude/worktrees/opus-improve-devops branch --show-current",
     "git -C /workspace/.claude/worktrees/opus-improve-devops add -- .claude/settings.json",
@@ -304,14 +293,13 @@ def test_the_hook_leaves_lowercase_dash_c_and_bare_git_alone(command):
 
 # --- guard-unanalyzable-bash.py shape 11: `$[` outside single quotes ---------
 #
-# Helen, 2026-10-10, having declined the first command below: "Can we adjust
-# settings to allow non-scary requests of this sort?" Settings cannot: the
-# checker's parser reads `$[` in double quotes as legacy arithmetic and asks
-# her whatever the allow list says. So the shape is refused, and the same
-# pattern in single quotes -- which is inert -- goes through.
+# Settings cannot allow this shape: the checker's parser reads `$[` in double
+# quotes as legacy arithmetic and asks Helen whatever the allow list says. So
+# it is refused, and the same pattern in single quotes, which is inert, goes
+# through (DECISIONS §11).
 
 @pytest.mark.parametrize("command", [
-    # the exact call she was asked about
+    # a real call she was asked about
     'grep -n -E "max-width: *\\\\$|^\\\\$[a-z-]*(phone|stack|width)[a-z-]*:" -r _sass/shared/_tokens.scss',
     'grep -n "^$[a-z]" _sass/shared/_tokens.scss',
     "echo $[1+2]",
@@ -336,12 +324,10 @@ def test_the_hook_leaves_single_quoted_and_escaped_dollar_brackets_alone(command
 
 # --- session-ground-truth.py: the one hook that TELLS rather than refuses ----
 #
-# Added 2026-09-21. Every other hook here refuses something; this one reports
-# where the session is, because CLAUDE.md had been asking sessions to remember
-# to look ("am I still where I left off" -- the branch can move under a running
-# session, /workspace being a bind mount). A report that fails is worse than no
-# report, so what is pinned is that it always emits usable JSON and never
-# blocks.
+# Every other hook here refuses something; this one reports where the session
+# is, because the branch can move under a running session (/workspace is a
+# bind mount). A report that fails is worse than no report, so what is pinned
+# is that it always emits usable JSON and never blocks.
 
 GROUND_TRUTH_HOOK = ROOT / ".claude" / "hooks" / "session-ground-truth.py"
 
@@ -385,19 +371,13 @@ def test_the_ground_truth_hook_never_blocks_a_session():
     assert payload.get("decision") != "block"
 
 
-# --- the hook reported the WRONG REPOSITORY, 2026-09-24 ----------------------
+# --- the report is about the session's checkout, and says which --------------
 #
-# On its first real outing it opened a session in
-# `.claude/worktrees/opus-improve-devops` by announcing `branch: main`,
-# `1 uncommitted change`, `13 behind`. Every word was true of `/workspace` and
-# none of it was true of the session, because the root came from
-# `Path(__file__).parent.parent.parent` -- the checkout the SCRIPT was loaded
-# from, which for a worktree session is the primary clone ($CLAUDE_PROJECT_DIR).
-# The session read its own hook and nearly acted on it.
-#
-# A fact with no subject attached is what made that misleading rather than
-# merely wrong, so the fix is two things and the second is the durable one: pick
-# the root from the session's cwd, AND print which path the report is about.
+# The checkout the script is loaded from is the primary clone
+# ($CLAUDE_PROJECT_DIR), which for a worktree session is the wrong repository:
+# every word of the report is then true of `/workspace` and none of it of the
+# session. So the root comes from the session's cwd, and the report prints
+# which path it is about.
 
 def _load_ground_truth():
     spec = importlib.util.spec_from_file_location("ground_truth", GROUND_TRUTH_HOOK)
@@ -457,7 +437,11 @@ def test_a_cwd_that_is_not_a_repository_is_skipped_rather_than_reported(tmp_path
     ["feature:main"],
     ["+feature:main"],
     ["feature:refs/heads/main"],
+    ["feature:heads/main"],
+    ["feature:refs/remotes/origin/main"],
+    ["feature:x:main"],
     [":main"],
+    [":heads/main"],
     ["HEAD"],
     ["feature"],
     ["--force"],
@@ -476,7 +460,7 @@ def test_git_push_agent_refuses_the_public_main_and_anything_ambiguous(args):
     ([":merged-branch"], "helen-triages", ".", ":merged-branch"),
     (["feature:feature", "helen-triages-food-private", "_food_drafts"],
      "helen-triages-food-private", "_food_drafts", "feature:feature"),
-    # Helen, 2026-08-29: "Pushing to main in the private repos is fine."
+    # A small change may go straight to a private repo's `main` (DECISIONS §9.1).
     (["content/x:main", "helen-triages-cocktails-private", "_cocktail_drafts"],
      "helen-triages-cocktails-private", "_cocktail_drafts", "content/x:main"),
 ])
@@ -651,10 +635,9 @@ def test_git_clone_agent_clones_one_of_the_three(args):
 
 # --- gh-write.sh: three REST writes, the body always a file under tmp/ --------
 #
-# Helen, 2026-09-15: "When you want to run commands that build paths at
-# runtime, please find a way into scripts that can be statically analysed so
-# read/write scope can be checked without asking me." The `api -X` calls this
-# replaces could never be allow-listed: `api` is also the door to a merge.
+# A command that builds a path at run time gets a wrapper the checker can
+# analyse (DECISIONS §11). The `api -X` calls this replaces can never be
+# allow-listed: `api` is also the door to a merge.
 
 BODY = "tmp/test-agent-wrappers-body.md"
 
@@ -781,13 +764,10 @@ def test_github_public_status_asks_for_a_status_and_nothing_else(url):
 
 # --- main-ci-status.sh: is the site deploying? ------------------------------
 #
-# Added 2026-09-22. A red `main` is a DEPLOY OUTAGE -- the suite gates the
-# deploy, so one red merge stops every later one going live, silently, for as
-# long as nobody looks (three days in September; DECISIONS §12). The manual has
-# asked sessions to check since 2026-09-15 and nobody did, partly because the
-# instruction sat on an unmerged branch and partly because the form it
-# prescribed was a bracketed `--jq` that prompts Helen. This wrapper takes NO
-# arguments, so there is no repo, path or option for a caller to steer.
+# A red `main` is a deploy outage: the suite gates the deploy, so one red merge
+# stops every later one going live, silently, for as long as nobody looks
+# (DECISIONS §12). This wrapper takes no arguments, so there is no repo, path
+# or option for a caller to steer, and it never prompts.
 
 @pytest.mark.parametrize("args", [
     ["main"],
@@ -850,10 +830,10 @@ _PUSH = {"event": "push",
 
 
 def test_main_ci_status_calls_a_cancelled_run_undeployed_and_not_an_outage():
-    """2026-10-02: #1276's deploy run was cancelled by a pull-request check
-    that joined the same concurrency group while it waited. The suite was not
-    red and the next merge deployed it, so "every later merge ships nothing"
-    was false -- but the merge WAS undeployed, so it is still not a green."""
+    """A deploy run can be cancelled by a pull-request check that joins the
+    same concurrency group while it waits (#1276). The suite is not red and
+    the next merge deploys it, so it is no outage -- but that merge is
+    undeployed, so it is not a green either."""
     result = _main_ci_verdict([
         {**_PUSH, "conclusion": "cancelled", "created_at": "2026-10-02T20:37:23Z",
          "display_title": "Merge pull request #1276"},
@@ -867,9 +847,8 @@ def test_main_ci_status_calls_a_cancelled_run_undeployed_and_not_an_outage():
 
 def test_main_ci_status_ignores_a_fork_whose_branch_is_called_main():
     """`branch=main` also matches a pull request FROM a branch called `main`,
-    which is what a fork that never branched sends. #1274's run from
-    `Jah-yee:main` sat in this list as a failure; as the newest row it would
-    have been reported as this repository's deploy being down."""
+    which is what a fork that never branched sends (#1274). A failed one, as
+    the newest row, reads as this repository's deploy being down."""
     fork = {"event": "pull_request", "conclusion": "failure",
             "head_repository": {"full_name": "Jah-yee/helen-triages"},
             "created_at": "2026-10-02T20:59:00Z", "display_title": "fix test"}
@@ -890,11 +869,11 @@ def test_main_ci_status_ignores_a_fork_whose_branch_is_called_main():
 
 # --- scripts/browser/styles.sh, gaps.sh, click-crop.sh: arguments only -------
 #
-# Added 2026-09-15 alongside guard-unanalyzable-bash.py's new env-assignment
-# refusal, so a Playwright question rarely needs a one-off tmp/ script that
-# names PLAYWRIGHT_BROWSERS_PATH/NODE_PATH by hand. None of the three touches
-# the network or a real build; every case here is refused before `. env.sh`
-# runs, so nothing is exercised but the argument checks themselves.
+# These exist so a Playwright question rarely needs a one-off tmp/ script that
+# names PLAYWRIGHT_BROWSERS_PATH/NODE_PATH by hand, which
+# guard-unanalyzable-bash.py refuses as a leading assignment. Every case here
+# is refused before `. env.sh` runs, so nothing is exercised but the argument
+# checks themselves.
 
 @pytest.mark.parametrize("args", [
     [],
@@ -992,35 +971,14 @@ def _rules(kind: str) -> list[str]:
     return rules
 
 
-# Every allow rule that ends in ` *`, and so accepts ANY further arguments.
-# Each was checked for an option that runs a program before it went in:
-# `git fetch --upload-pack=`, `git clone --template=`, `node --import` are why
-# those three are NOT here, and `git ls-remote` came out on 2026-09-11 for the
-# same reason as fetch. The four scripts/ wrappers are here because their
-# arguments are tested above. Adding to this set is a decision, not a chore:
-# say in the commit which options of the tool you checked.
-#
-# FIVE CAME OUT ON 2026-09-21, and removing one is a decision too. Helen:
-# "I'm keen to prune rules with *, so let's discuss", then, asked the one
-# question that settled four of them -- does Claude ever run on the host? --
-# "Claude always runs in a container, never on the host (any more). This will
-# be my setup indefinitely."
-#   * `Bash(.gh-runtime/bin/gh issue *)`, `Bash(.gh-runtime/bin/gh pr create *)`
-#     and `Bash(.node-runtime/node/bin/node --test *)` named extracted runtimes
-#     that only ever existed in a HOST checkout. Measured in the container the
-#     same day: `which gh node` gives /usr/bin/gh and /usr/bin/node. Dead paths.
-#     `Bash(.gh-runtime/bin/gh auth status)` went with them (exact, not open).
-#   * `Bash(gh pr create *)` was superseded by the wrapper rules below and by
-#     `sh scripts/gh-write.sh pr-create`.
-#   * `Bash(curl -s "https://api.github.com/repos/DeckOfPandas/helen-triages/*)`
-#     was the interesting one, and it had been REVIEWED AGAINST THE WRONG
-#     CRITERION. The standard above is "an option that runs a program"; `curl`
-#     has none, but `-o <path>` WRITES A FILE ANYWHERE, and the trailing `*`
-#     accepted it. `scripts/gh-read.sh` does these reads now, GET-only and
-#     three repos only. The lesson for the next addition: ask what the option
-#     can WRITE as well as what it can RUN.
-# The matching DENY rules were deliberately left alone. A deny on a dead path
-# costs nothing, and removing safety rails is not pruning.
+# Every allow rule that ends in ` *`, and so accepts any further arguments.
+# Before one goes in, check the tool for an option that runs a program
+# (`git fetch --upload-pack=`, `git clone --template=`, `node --import` are
+# why those three are not here) and for one that writes a file anywhere
+# (`curl -o <path>`). The scripts/ wrappers are here because their arguments
+# are tested above. Adding to this set is a decision: say in the commit which
+# options of the tool you checked. A deny rule on a dead path stays; it costs
+# nothing.
 REVIEWED_OPEN_RULES = {
     "Bash(pytest *)",
     "Bash(python3 -m pytest *)",
@@ -1050,21 +1008,19 @@ REVIEWED_OPEN_RULES = {
     "Bash(sh scripts/git-push-agent.sh *)",
     "Bash(sh scripts/git-fetch-agent.sh *)",
     "Bash(sh scripts/git-clone-agent.sh *)",
-    # Added 2026-10-02 (Helen: "Yes please do it"). Local git inside the two
-    # drafts clones and nowhere else, from a fixed list of verbs and options;
-    # checked for `diff --output=` and `--no-index`, `checkout` of anything but
-    # a new branch, `commit` of anything but `-F tmp/<file>`, and every verb
-    # that discards work or talks to a remote. The refusals are tested above.
+    # Local git inside the two drafts clones and nowhere else, from a fixed
+    # list of verbs and options; checked for `diff --output=` and
+    # `--no-index`, `checkout` of anything but a new branch, `commit` of
+    # anything but `-F tmp/<file>`, and every verb that discards work or talks
+    # to a remote. The refusals are tested above.
     "Bash(sh scripts/git-drafts.sh *)",
     "Bash(sh scripts/browser/shoot.sh *)",
     "Bash(sh scripts/browser/crop.sh *)",
-    # Added 2026-09-15, alongside guard-unanalyzable-bash.py's env-assignment
-    # refusal (Helen: "I want to reduce the number of interruptions to a
-    # minimum"). All three only ever GET the local build through the local
-    # server (a path validated to start with `/`, contain no `..` and no
-    # scheme), and the only one that writes a file (click-crop.sh) writes
-    # solely under tmp/shots/, to a name validated as [a-z0-9-]+. None takes
-    # an option that runs a program or reads/writes anywhere else.
+    # All three only ever GET the local build through the local server (a
+    # path validated to start with `/`, contain no `..` and no scheme), and
+    # the only one that writes a file (click-crop.sh) writes solely under
+    # tmp/shots/, to a name validated as [a-z0-9-]+. None takes an option
+    # that runs a program or reads/writes anywhere else.
     "Bash(sh scripts/browser/styles.sh *)",
     "Bash(sh scripts/browser/gaps.sh *)",
     "Bash(sh scripts/browser/click-crop.sh *)",
@@ -1087,7 +1043,7 @@ def test_every_open_ended_allow_rule_has_been_reviewed():
 
 def test_no_allow_rule_opens_the_gh_api_door():
     """`api` writes as well as reads -- PUT .../pulls/N/merge is a merge, and
-    since 2026-09-09 only a rule stands in front of merging. Reads go through
+    only a rule stands in front of merging. Reads go through
     scripts/gh-read.sh, which cannot write."""
     for rule in _rules("allow"):
         assert not rule.startswith("Bash(sh scripts/gh-agent.sh api"), rule
@@ -1108,10 +1064,9 @@ def test_merging_and_approving_stay_denied():
 
 def test_no_allow_rule_names_a_host_only_runtime():
     """`.gh-runtime/` and `.node-runtime/` are host-checkout artefacts, and
-    Claude runs only in the container now (Helen, 2026-09-21: "never on the
-    host (any more). This will be my setup indefinitely"). In there `gh` and
-    `node` are on PATH at /usr/bin. An allow rule naming those paths grants
-    nothing and reads as though the host setup were still live."""
+    Claude runs only in the container (DECISIONS §11), where `gh` and `node`
+    are on PATH. An allow rule naming those paths grants nothing and reads as
+    though the host setup were live."""
     for rule in _rules("allow"):
         assert ".gh-runtime" not in rule, rule
         assert ".node-runtime/node/bin" not in rule, rule
@@ -1120,16 +1075,16 @@ def test_no_allow_rule_names_a_host_only_runtime():
 def test_no_allow_rule_lets_curl_choose_where_to_write():
     """`curl -o <path>` writes anywhere, and a rule ending ` *` accepts it.
     GitHub reads go through scripts/gh-read.sh, which is GET-only and cannot
-    write at all. Removed 2026-09-21; this keeps it removed."""
+    write at all."""
     for rule in _rules("allow"):
         assert not rule.startswith("Bash(curl"), rule
 
 
 def test_no_allow_rule_runs_a_tmp_script():
-    """Helen, 2026-09-11, asked whether tmp/ scripts should run without asking:
-    "keep asking me please". A tmp/ script is code nobody has reviewed, and the
-    checker sees only its name -- it could read outside the project, which
-    `blockReadsOutsideWorkingDirectories` exists to stop."""
+    """A tmp/ script keeps asking Helen, on her ruling (DECISIONS §11). It is
+    code nobody has reviewed, and the checker sees only its name -- it could
+    read outside the project, which `blockReadsOutsideWorkingDirectories`
+    exists to stop."""
     for rule in _rules("allow"):
         assert "tmp/" not in rule, rule
 

@@ -5,14 +5,13 @@
    label   the row's name, already human-readable
    spec    a node holding out_at_min/out_at_max, and optionally rested_min/max
 
-   This file only hands over numbers: the arithmetic that turns °C into a
-   position is in the stylesheet, so the axis is re-scalable from the
-   $tc-min/$tc-max pair in _sass/food/_temperature-chart.scss. No hover text
-   (#1326). Read parameters as include.x, never as bare names: a bare name
-   resolves against the including page's scope. The display wording is "out
-   at", never "pull at"; the data keys are `out_at_min`/`out_at_max`. The
-   carryover bar is drawn only when the rested range starts clear of the out-at
-   range, or the connector would sit on top of the bars it joins.
+   This file only hands over numbers: the stylesheet turns °C into a position,
+   so the axis re-scales from $tc-min/$tc-max in
+   _sass/food/_temperature-chart.scss. No hover text (#1326). Read parameters
+   as include.x: a bare name resolves against the including page's scope. The
+   display wording is "out at", never "pull at". The carryover bar is drawn
+   only when the rested range starts clear of the out-at range, or the
+   connector would sit on top of the bars it joins.
 {% endcomment %}
 
 {% assign spec = include.spec %}

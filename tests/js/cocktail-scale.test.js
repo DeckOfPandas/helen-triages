@@ -1,29 +1,16 @@
-// =============================================================================
-// Tests for assets/js/cocktail-scale.js — the scaler's DOM half.
+// Tests for assets/js/cocktail-scale.js, the scaler's DOM half.
 //
 //   node --test tests/js/*.test.js
 //
-// WHY THIS FILE EXISTS AT ALL, when scale.test.js already covers the maths.
-// Helen's bug on 2026-09-04 was not arithmetic: "I can't delete numbers in the
-// target ml input field. I can add numbers, then increasing the number of
-// servings causes the numbers in the target field to update." Every figure
-// HTF.scale produced was right; the WIRING wrote one of them back into the box
-// she was typing in. A pure test of scale.js cannot see that, and the previous
-// agent checked it by hand against `tmp/smoke_scale_total.js` — a scratch file,
-// gitignored, which is exactly the shape of check that stops being run.
+// scale.test.js covers the maths. This covers the wiring, which a pure test of
+// scale.js cannot see: what the script writes back into a box while someone is
+// typing in it.
 //
-// SO THE PAGE IS STUBBED, the way tests/js/stub-dom.js stubs one for
-// assets.js and for the same stated reason: run the SHIPPED source byte for
-// byte inside a fake `window`, and read what it did. The elements below carry
-// only what cocktail-scale.js actually touches — `querySelector`, `closest`,
-// `hidden`, `value`, `textContent`, attributes and one listener per event —
-// because a fuller DOM would be a second browser to keep honest.
-//
-// `document.activeElement` IS THE WHOLE POINT and is settable here, which a
-// real browser makes hard and which is why the bug survived a manual look:
-// clicking into a field and pressing Backspace is the only way to reproduce it,
-// and nobody does that twice.
-// =============================================================================
+// The page is stubbed and the shipped source run byte for byte inside a fake
+// `window`, as tests/js/stub-dom.js does for assets.js. The elements carry only
+// what cocktail-scale.js touches; a fuller DOM would be a second browser to
+// keep honest. `document.activeElement` is settable here, because a write-back
+// bug shows only while a field has focus.
 'use strict';
 
 const test = require('node:test');
@@ -101,27 +88,21 @@ function page(pours, opts) {
   opts = opts || {};
   const article = el('cocktail');
   const control = article.add(el('cocktail-scale-controls'));
-  /* THE TWO STEP BUTTONS — #731 — SIT EITHER SIDE OF THE INPUT IN THE REAL
-     MARKUP ("-  [1] x  +"), and are added here in that order for the same
-     reason the input and mark are: the shipped source is run byte for byte,
-     so a query for `.cocktail-scale-minus` or `.cocktail-scale-plus` must
-     find the same element cocktail-scale.js does. */
+  /* The two step buttons sit either side of the input in the real markup (#731)
+     and are added here in that order: the shipped source must find the same
+     `.cocktail-scale-minus` and `.cocktail-scale-plus` it finds on the page. */
   const minus = control.add(el('cocktail-scale-step cocktail-scale-minus'));
   const input = control.add(el('cocktail-scale-multiple'));
   const plus = control.add(el('cocktail-scale-step cocktail-scale-plus'));
-  /* NO `.cocktail-scale-note` -- #1088 deleted the floor message and its
-     paragraph, and this fixture has to keep matching the shipped layout. It
-     matters more than an unused element usually would: that paragraph was in
-     cocktail-scale.js's init guard, so a fixture still supplying one would go
-     on passing even if the script still demanded it, which is the exact
-     regression that would blank every drink's scaler in production. */
+  /* No `.cocktail-scale-note` (#1088): the shipped layout has none. A fixture
+     that supplied one would go on passing if cocktail-scale.js's init guard
+     demanded it again, which would blank every drink's scaler in production. */
   const list = article.add(el('cocktail-ingredients'));
 
-  /* THE BATCH NOTE AND THE TWO FIGURE LINES ARE OPT-IN, because in PRODUCTION
-     none of them is rendered: all three are gated on `show_costs` /
-     `show_units`, which exist only in _config_local.yml. A test page without
-     them is therefore the production shape, not a degenerate one, and every
-     pre-existing test in this file is exercising exactly that. */
+  /* The batch note and the two figure lines are opt-in, because each is
+     conditional in the layout: the note is rendered only for a drink with
+     dashes, and the cost line only where `site.show_costs` is set. A page
+     without them is a real shape, not a degenerate one. */
   const batch = opts.batch === false ? null : article.add(el('cocktail-scale-batch'));
   if (batch) {
     batch.setAttribute('data-has-dashes', opts.hasDashes ? 'true' : 'false');
@@ -137,22 +118,20 @@ function page(pours, opts) {
     units.setAttribute('data-serves', opts.units[1] === undefined ? 1 : opts.units[1]);
   }
 
-  /* `opts.totalMl` IS THE PLUGIN'S VOLUME, ON THE CONTROLS, AND NOTHING READS
-     IT -- #1257. It was a line under the scaler that moved with the box
-     (#1121) until Helen removed it; the attribute stays on the page for the
-     glass-fit report. It is set here so the test below can say the script
-     leaves it alone. */
+  /* `opts.totalMl` is the plugin's volume, on the controls, and the script
+     never reads it (#1257); the attribute is on the page for the glass-fit
+     report. It is set here so a test can say the script leaves it alone. */
   if (opts.totalMl !== undefined) {
     control.setAttribute('data-total-ml', opts.totalMl);
   }
 
-  /* A THIRD ELEMENT IS A ROW THE LAYOUT MARKED QUIET -- #1132. `written` is
-     the recipe's own amount, which _layouts/cocktail.html keeps in
-     `data-amount` while printing the number alone; `slot` is the unit it
-     moved to the end of the name, absent for an `each` row. */
+  /* A third element is a row the layout marked quiet (#1132). `written` is the
+     recipe's own amount, which _layouts/cocktail.html keeps in `data-amount`
+     while printing the number alone; `slot` is the unit it moved to the end of
+     the name, absent for an `each` row. */
   const slots = [];
-  /* A FOURTH ELEMENT, `'dashes'`, IS A ROW THE LAYOUT MARKED -- #1293. The
-     layout puts `data-dashes` on the amount and a hidden `*` beside it. */
+  /* A fourth element, `'dashes'`, is a row the layout marked (#1293):
+     `data-dashes` on the amount and a hidden `*` beside it. */
   const stars = [];
   const spans = pours.map(([amount, name, quiet, dashes]) => {
     const li = list.add(el('cocktail-ingredient'));
@@ -275,11 +254,10 @@ test('#1132: an unmarked row is written exactly as before', () => {
   assert.deepStrictEqual(p.amounts(), ['32 cubes', '6 leaves']);
 });
 
-// --- the keystroke guard, which outlived the box it was written for ----------
-// The millilitre box went on 2026-09-05 (#721) and took the cross-writing with
-// it, but `input` still fires on every keystroke and clearing the box to type a
-// new number still passes through the empty string. Answering that with a floor
-// message scolds someone for pressing Backspace.
+// --- the keystroke guard -------------------------------------------------------
+// `input` fires on every keystroke, and clearing the box to type a new number
+// passes through the empty string. Neither is answered, and nothing is written
+// over what is being typed.
 
 test('the box can be emptied — nothing is written back into it', () => {
   const p = page(AVIATION);
@@ -295,9 +273,7 @@ test('the box can be emptied — nothing is written back into it', () => {
 
 test('a decimal rounds to the nearest whole recipe', () => {
   const p = page(AVIATION);
-  // Whole recipes only, since 2026-09-05. `1.5` used to become `1.6667` -- the
-  // nearest multiple of this drink's own third-of-a-recipe step -- and now
-  // becomes 2, which is a number a person can see themselves having asked for.
+  // Whole recipes only (#721): `1.5` becomes 2.
   p.type(p.input, '1.5');
   assert.deepStrictEqual(p.amounts(), ['105 ml', '30 ml', '15 ml', '30 ml']);
   p.leave(p.input);
@@ -318,8 +294,6 @@ test('one recipe is the floor, and a smaller ask settles there', () => {
 
 test('every amount stays on the 2.5 ml grid at every multiple', () => {
   // The claim integers were chosen for, checked rather than asserted in prose.
-  // Aviation's 7.5 ml of creme de violette is the one that used to force a
-  // third-of-a-recipe step; nothing forces anything now.
   const p = page(AVIATION);
   for (const n of ['2', '3', '4', '7', '12']) {
     p.type(p.input, n);
@@ -338,10 +312,10 @@ test('the ratios are exactly the recipe, multiplied', () => {
 });
 
 // --- the − and + step buttons, #731 ------------------------------------------
-// "-  [1] x  +", Helen's sketch. Both buttons go through `apply()`, the exact
-// function a typed value reaches (`step()` in cocktail-scale.js calls
-// `apply(last ± 1)` and nothing else), so these tests are really asking one
-// question: does a click land on the same code a keystroke does.
+// Both buttons go through `apply()`, the function a typed value reaches
+// (`step()` in cocktail-scale.js calls `apply(last ± 1)` and nothing else), so
+// these tests ask one question: does a click land on the same code a keystroke
+// does.
 
 test('the plus button steps the multiple up by one, through the same apply() a typed value uses', () => {
   const p = page(AVIATION);
@@ -368,9 +342,7 @@ test('the minus button steps the multiple down by one', () => {
 test('the minus button cannot take the multiple below ×1 -- the same floor typing respects', () => {
   const p = page(AVIATION);
   // Already at the recipe as written. `apply` rounds `last - 1` (zero) up to
-  // one the same way it rounds a typed zero or a negative number up -- see
-  // `apply`'s own `Math.max(1, ...)` -- so the button has nothing further to
-  // give and the drink stays exactly as poured.
+  // one, as it does a typed zero: its own `Math.max(1, ...)`.
   p.click(p.minus);
   assert.strictEqual(p.input.value, '1',
     'one fewer than the recipe as written is still the recipe as written');
@@ -379,21 +351,11 @@ test('the minus button cannot take the multiple below ×1 -- the same floor typi
 });
 
 test('a refusal reached by clicking − behaves exactly like a refusal reached by typing', () => {
-  // Every real drink's ×1 is always allowed (scale.js's own proof — the floor
-  // is capped there), so this scenario cannot arise from any amount in the
-  // collection today. What is being tested is the WIRING, not the arithmetic:
-  // HTF.scale.scale is the one thing cocktail-scale.js asks, per the ONE
-  // PARSER rule (MANUAL §9.13), so patching its answer proves the button
-  // reaches `refuse()` exactly as a keystroke would, without assuming a
-  // dataset the floor can no longer produce.
-  //
-  // WHAT A REFUSAL IS, SINCE #1088: the box snaps back and nothing is said.
-  // This test used to assert the floor message's text and the ingredient it
-  // named; Helen deleted that message ("We don't go lower than the recipe
-  // amounts, because the scaler is an integer and doesn't go below 1"), so
-  // what is left to prove is the half that was always the point -- that a
-  // click and a keystroke reach the same code and leave the box saying what
-  // is actually being poured.
+  // Every real drink's ×1 is allowed, so no amount in the collection reaches
+  // this. What is tested is the wiring: HTF.scale.scale is the one thing
+  // cocktail-scale.js asks, so patching its answer proves the button reaches
+  // `refuse()` exactly as a keystroke would. A refusal snaps the box back to
+  // what is being made and says nothing (#1088).
   const p = page(AVIATION);
   p.type(p.input, '2');
   p.leave(p.input);
@@ -433,23 +395,11 @@ test('a blank box on blur restores what is being poured rather than refusing', (
 
 
 // --- the amount column ---------------------------------------------------
-// THREE TESTS STOOD HERE AND WENT WITH THE MECHANISM THEY PINNED (#1088,
-// 2026-09-20). They asserted `cocktail-ingredients--wide-amounts` went on when
-// a written or scaled amount passed nine characters and came off again, which
-// was the right check while the column had two fixed widths and this script
-// chose between them by counting.
-//
-// The column is `max-content` on the list now, shared down by `subgrid`, so it
-// is measured from whatever the amounts currently say and there is no class,
-// no threshold and nothing for this file to decide. There is deliberately NO
-// replacement assertion about the width: it is the browser's, it depends on a
-// font this suite does not load, and a test that re-implemented the
-// measurement would only be asserting its own arithmetic.
-//
-// WHAT WAS WORTH KEEPING is below — that scaling writes the amounts, which is
-// the event the column now sizes itself from. The "9 dashes" drink is kept
-// because it is the case that actually grows under scaling: millilitre figures
-// tend to SHORTEN, since the decimal falls off ("52.5 ml" doubles to "105 ml").
+// The column is `max-content` on the list, shared down by `subgrid`: the
+// browser measures it from whatever the amounts say, with a font this suite
+// does not load, so there is no width to assert here (#1088). What is pinned is
+// that scaling writes the amounts. "9 dashes" is the case that grows under
+// scaling; millilitre figures tend to shorten ("52.5 ml" doubles to "105 ml").
 
 test('scaling writes the amounts, which is what the column now measures', () => {
   const p = page([['9 dashes', 'Angostura'], ['30 ml', 'rye']]);
@@ -465,25 +415,11 @@ test('scaling writes the amounts, which is what the column now measures', () => 
     'to get stuck on');
 });
 
-// =============================================================================
-// THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE — #1121, 2026-09-17
-// =============================================================================
-// It was #713 (Helen, 2026-09-06: "Bitters text appearing next to the scaler if
-// it's edited to >1. Cost and units on a note.") and it carried the batch's cost
-// and units totals until she saw them under the new ml line: "I like the line.
-// But the cost and units line below has come back and I don't want it to be
-// there."
-//
-// THE TOTALS' OWN ARGUMENT IS WORTH KNOWING, because it was sound when made:
-// the cost line and the units line are both PER GLASS and invariant under
-// scaling, so a note repeating them would restate the footer, while "what is on
-// the table" had no other answer. #1121 gave it one — `Approximately X ml`,
-// directly above this note, at the multiple actually set.
-//
-// THE CAVEAT SURVIVED BECAUSE IT IS NOT A TOTAL. It answers what does NOT scale
-// linearly. The tests below are what stop it being deleted along with the
-// figures it used to sit beside.
-// =============================================================================
+// --- the batch note is the bitters caveat and nothing else (#1121) -------------
+// The cost line and the units line are per glass and do not change with
+// scaling, so the note carries no totals. The caveat is not a total: it says
+// what does not scale linearly, and the tests below stop it being deleted along
+// with the figures.
 
 /** The Aviation with a price and a strength on it. */
 function priced(opts) {
@@ -506,9 +442,8 @@ test('above ×1 the note says the bitters caveat and nothing else', () => {
 });
 
 test('no price or unit count reaches the note, however loudly the page states them', () => {
-  // THE REGRESSION THIS EXISTS FOR. The element still has a cost line and a
-  // units line on the page beside it, both carrying data attributes the note
-  // used to read. Helen asked for those figures to stop appearing here.
+  // The page has a cost line and a units line beside the note, both carrying
+  // data attributes. None of their figures may appear in it (#1121).
   const p = priced({ hasDashes: true, cost: [4, 6], units: [2.1, 4] });
   p.type(p.input, '3');
   assert.ok(!/£|unit|ingredients|×3/.test(p.batch.textContent),
@@ -516,10 +451,9 @@ test('no price or unit count reaches the note, however loudly the page states th
 });
 
 test('a drink that pours no dash gets no note at all', () => {
-  // #720.1: the caveat that fired on Aperol Spritz is why this is conditional --
-  // "a caveat that fires where it does not apply teaches you to stop reading
-  // caveats". With the totals gone there is nothing else the note could say, so
-  // such a drink now renders no element (the layout gates on `has_dashes`).
+  // A caveat that fires where it does not apply teaches people to stop reading
+  // caveats (#720). The layout renders no element for such a drink: it gates on
+  // `has_dashes`.
   const without = priced({ hasDashes: false });
   without.type(without.input, '4');
   assert.strictEqual(without.batch.textContent, '',
@@ -536,8 +470,8 @@ test('the note goes away again on the way back down to ×1', () => {
 });
 
 test('production renders none of these elements, and nothing breaks', () => {
-  // show_costs and show_units live only in _config_local.yml, so the built
-  // public page has no cost line, no units line and no batch note at all.
+  // The layout renders no batch note for a drink without dashes; the scaler
+  // must not need one.
   const p = page(AVIATION, { batch: false });
   assert.strictEqual(p.batch, null);
   p.type(p.input, '3');
@@ -545,15 +479,10 @@ test('production renders none of these elements, and nothing breaks', () => {
     'the scaler itself is unaffected by the note it cannot find');
 });
 
-// =============================================================================
-// THERE IS NO LINE UNDER THE SCALER — #1257, 2026-10-02.
-//
-// #1121 put "Approximately X ml" there, the batch total, and it moved with the
-// box. Helen removed it. What is left to hold is the other half of the old
-// guarantee: NOTHING about volume or strength moves when the box does. The
-// recipe's volume is still on the page as `data-total-ml`, on the controls, for
-// the glass-fit report — and the script must leave it alone.
-// =============================================================================
+// --- there is no line under the scaler (#1257) ---------------------------------
+// Nothing about volume or strength moves when the box does. The recipe's volume
+// is on the controls as `data-total-ml`, for the glass-fit report, and the
+// script leaves it alone.
 
 test('the volume attribute on the controls is not touched by the scaler', () => {
   // The Aviation as the plugin totals it: 52.5 + 15 + 7.5 + 15 = 90 ml.
@@ -566,9 +495,9 @@ test('the volume attribute on the controls is not touched by the scaler', () => 
 });
 
 test('the units line does not move with the scaler', () => {
-  // THE GUARANTEE #713 AND #1001 BOTH REST ON. The units figure is per serving
-  // and invariant; scaling ×6 makes six drinks, not a stronger one. Nothing in
-  // cocktail-scale.js writes to `.cocktail-units`, and this is what says so.
+  // The units figure is per serving: scaling ×6 makes six drinks, not a
+  // stronger one. Nothing in cocktail-scale.js writes to `.cocktail-units`
+  // (#713, #1001).
   const p = page(AVIATION, { totalMl: 90, units: [2.4] });
   p.units.textContent = 'Roughly 2.4 units of alcohol in a serving of 90 ml.';
   p.type(p.input, '6');
@@ -578,8 +507,7 @@ test('the units line does not move with the scaler', () => {
 });
 
 test('a drink with no stated volume scales like any other', () => {
-  // Two published drinks have no `page.volume` — the Caipirinha and the pear
-  // Bellini — so their controls carry no `data-total-ml` at all.
+  // A drink with no `page.volume` has no `data-total-ml` on its controls.
   const p = page(AVIATION);
   assert.strictEqual(p.control.getAttribute('data-total-ml'), undefined);
   p.type(p.input, '3');
@@ -587,8 +515,8 @@ test('a drink with no stated volume scales like any other', () => {
 });
 
 test('a bitters-only drink still gets its caveat with no figures to show', () => {
-  // The batch element is rendered when EITHER switch is on, so one of the two
-  // halves can be missing. The note must not read as a stray fragment.
+  // No cost or units line on the page: the note must not read as a stray
+  // fragment.
   const p = page(AVIATION, { hasDashes: true });
   p.type(p.input, '2');
   assert.strictEqual(p.batch.textContent,
@@ -596,17 +524,10 @@ test('a bitters-only drink still gets its caveat with no figures to show', () =>
     'no leading "×2:" with nothing after it');
 });
 
-// =============================================================================
-// THE LINE THE NOTE IS ABOUT SAYS SO TOO — #1293, 2026-10-04.
-//
-// Helen: "make it more obvious that bitters shouldn't be scaled by updating the
-// ingredient line as well as showing the note under the scaler... e.g.
-// strikethrough text for the amount, then a *, and a * before" the note.
-//
-// Above ×1 a pour in dashes has its scaled amount struck through with a star
+// --- the line the note is about says so too (#1293) ----------------------------
+// Above ×1 an amount in dashes has its scaled figure struck through with a star
 // beside it, and the note opens with the same star. The amount still scales:
-// the figure under the line is the multiplied one.
-// =============================================================================
+// the struck figure is the multiplied one.
 
 const OLD_FASHIONED = [
   ['60 ml', 'bourbon'],

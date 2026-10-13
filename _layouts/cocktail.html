@@ -244,17 +244,13 @@ layout: default
           <li class="cocktail-ingredient">
             <div class="cocktail-ingredient-top">
               {% comment %} `as` ("(float)", "(shell)") sits under the amount
-                 (#1263). It is a sibling of `.cocktail-amount`, never inside
-                 it, because cocktail-scale.js reads that span's whole text as a
-                 quantity. Where the amount already IS the mark -- an unmeasured
-                 rinse is `amount: "(rinse)"` and `as: "rinse"` -- it is not
-                 printed twice. MANUAL §9.3. {% endcomment %}
+                 (#1263), a sibling of `.cocktail-amount`, never inside it:
+                 cocktail-scale.js reads that span's whole text as a quantity. Not
+                 printed twice where the amount already is the mark. MANUAL §9.3. {% endcomment %}
               {% comment %} An amount in dashes or drops carries `data-dashes`
-                 and a `*` beside it, hidden until cocktail-scale.js goes above
-                 x1 (#1293). The same test as `has_dashes` below, on purpose:
-                 the star and the note it points at appear together or not at
-                 all. The star is a sibling of `.cocktail-amount`, never inside
-                 it, for the reason `.cocktail-use` is. {% endcomment %}
+                 and a `*`, a sibling too, hidden until cocktail-scale.js goes
+                 above x1 (#1293). The same test as `has_dashes` below, on purpose:
+                 the star and its note appear together or not at all. {% endcomment %}
               {% capture use_mark %}({{ item.as }}){% endcapture %}
               {% assign amount_lower = item.amount | append: "" | downcase %}
               {% assign in_dashes = false %}

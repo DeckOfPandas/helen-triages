@@ -3,30 +3,11 @@
 `model_instructions/SOURCE_ATTRIBUTION_SPEC.md` is the prose version and the
 thing to read first; this is the same contract as assertions.
 
-WHY THIS FILE EXISTS AT ALL, given the corpus was clean when it was written.
-The spec was settled with Helen on 2026-08-20 and applied by judgement twice --
-once by an Opus pass over 82 published recipes, once by a Sonnet pass over 301
-drafts -- with nothing checking either. That produced exactly one violation in
-396 files, which sounds like an argument that no guard was needed. It is the
-opposite. On the same day, having just written the spec down, Helen filled in
-two `QQ` citations by hand and one of them came out three ways wrong: a
-`source_type` outside the eight (`magazine`), a missing "Adapted from", and a
-publication name matching none of the five already in the corpus. A spec three
-days old, freshly documented, with its author typing -- and it still drifted.
-
-That is the repository's oldest lesson wearing another hat: a rule that is
-written down and not checked is a rule that will be broken by someone who has
-read it. See the destructive-git hook, `meta.awaiting_fix`, and `meta.proofread`.
-
-THE RULES ARE ENFORCED OVER DRAFTS TOO, deliberately. A draft is allowed to be
-unfinished -- a blank tagline, no method, `QQ` anywhere -- and test_drafts.py is
-careful about which published-recipe rules it declines to apply. These are not
-in that category. A citation is either in the house shape or it is not, at any
-stage, and a draft is simply a published recipe that has not happened yet: 314
-of them are waiting, and every one that drifts is a promotion that will drift.
-The two collections get separate tests rather than one over a merged list,
-matching conftest's deliberate split, so a failure names which collection it is
-in without reading the path.
+The rules are enforced over drafts too, deliberately. A draft may be
+unfinished, but a citation is either in the house shape or it is not, at any
+stage, and a draft that drifts is a promotion that will drift. The two
+collections get separate tests, matching conftest's split, so a failure names
+which collection it is in.
 """
 from __future__ import annotations
 
@@ -36,47 +17,37 @@ import pytest
 
 from conftest import where, where_draft
 
-# Suite marker, so `pytest -m food` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.food
 
 SPEC = "model_instructions/SOURCE_ATTRIBUTION_SPEC.md"
 
-# The eight, and nothing else. `magazine` is the near-miss that has already been
-# typed once by hand -- it is `publication`.
+# `magazine` is the near-miss: it is `publication`.
 VALID_TYPES = {
     "publication", "book", "website", "author",
     "person", "place", "joke", "unknown",
 }
 
-# Work published by other people. Helen, 2026-08-20: "Bare labels don't need
-# 'adapted from', only work published by other people."
+# Only work published by other people takes the prefix; a bare label must not.
 PREFIXED = {"publication", "book", "website", "author"}
 BARE = {"person", "place", "joke", "unknown"}
 
 PREFIX = "Adapted from "
 
-# A date is Month+Year, or a year on its own. Helen, 2026-08-20: "Online
-# magazines don't have a publication schedule like print ones do... a year alone
-# is enough." So "Adapted from Good Food, 2025" and "Adapted from Good Food,
-# May 2026" are both complete, and "Adapted from Good Food 2026 calendar"
-# carries its date inside the title.
+# A date is a month and year, or a year on its own, anywhere in the string:
+# "Adapted from Good Food 2026 calendar" carries its date inside the title.
 DATE = re.compile(
     r"(?:January|February|March|April|May|June|July|August|September|October|"
     r"November|December)\s+\d{4}\b"
     r"|\b(?:19|20)\d{2}\b"
 )
 
-# The separator that distinguishes a site-with-author from a book-with-author.
-# `Adapted from X, Y` is a book and its author; `Adapted from X, recipe Y` is a
-# site and the person who wrote the recipe on it. Without this the two shapes
-# are identical and only `source_type` tells them apart -- which is fine for a
-# machine and useless for a reader.
+# Tells a site-with-author from a book-with-author. `Adapted from X, Y` is a
+# book and its author; `Adapted from X, recipe Y` is a site and the person who
+# wrote the recipe on it. Without it only `source_type` tells them apart, which
+# a reader cannot see.
 RECIPE_BY = ", recipe "
 
-# A citation names its source, not who printed it. Helen's ruling 8, which took
-# "(Hodder & Stoughton)" off beef-wellington -- the only one in the corpus.
+# A citation names its source, not who printed it (the spec's rule 5).
 TRAILING_BRACKET = re.compile(r"\([^)]*\)\s*$")
 
 
@@ -124,12 +95,10 @@ def _bad_prefix(source, kind):
 
 
 def _bad_unknown(source, kind):
-    # TWO STRINGS SINCE 2026-09-11, not one. `QQ` while the question is open
-    # (and it blocks the build); `unknown` once Helen has closed it -- the
-    # apple coleslaw was ready to publish with its source still QQ, and she
-    # ruled: "Please write 'unknown' for the source on coleslaw." Spec rule
-    # 7a. Lowercase and exact: `Unknown` still reads like a finished answer
-    # someone typed without thinking, and a blank like nothing to see.
+    # Two strings: `QQ` while the question is open (it blocks the build), and
+    # `unknown` once Helen has closed it (the spec's rule 7a). Lowercase and
+    # exact: `Unknown` reads like a finished answer typed without thinking,
+    # and a blank like nothing to see.
     if kind == "unknown" and source not in ("QQ", "unknown"):
         return (
             f"`source_type: unknown` must have `source: \"QQ\"` (question open, "
@@ -151,11 +120,9 @@ def _bad_unknown(source, kind):
 def _bad_date(source, kind):
     """The discriminator, both ways round.
 
-    Nothing in a source STRING says whether it is a magazine or a book --
-    `Adapted from Good Food` and `Adapted from Gordon Ramsay's Ultimate Cookery
-    Course` are the same shape. The date is what separates the print issue from
-    the website, and Good Food is genuinely both: 11 drafts cite the October
-    2025 issue and 31 cited no date at all.
+    The date is what separates a print issue from the website of the same
+    name, and Good Food is both: a `publication` carries one and a `website`
+    does not.
     """
     if kind == "publication" and not DATE.search(source):
         return (
@@ -210,49 +177,15 @@ def _bad_publisher(source, kind):
 
 
 # --- a book names its author, in one shape or the other ----------------------
-# Added 2026-08-21, after the spec's own gap put two wrong citations live.
-#
-# TWO SHAPES, BOTH CARRYING THE AUTHOR:
-#
 #     Adapted from Feed Your Soul, Wagamama        title, then author
 #     Adapted from Delia Smith's Book of Cakes     author possessively, then title
-#
-# The possessive is the MORE COMMON of the two here -- 44 of 89 book citations --
-# and it is ordinary English. Requiring a comma everywhere would have produced
-# "Delia Smith's Book of Cakes, Delia Smith", which is why this accommodates the
-# shape rather than the corpus accommodating the rule.
-#
-# WHAT IT REPLACES WAS UNFALSIFIABLE. The spec offered the comma form plus an
-# "author not recorded" fallback that accepts ANY string, so all 44 possessive
-# citations were passing through the fallback and the rule could not reject
-# anything at all. `Adapted from Wagamama Feed Your Soul` -- a publisher glued to
-# a title, author nowhere -- passed on two published pages until Helen asked why
-# it was allowed. A rule that accepts everything is not lenient, it is absent.
-#
-# THE HEURISTIC FAILS TOWARDS ACCEPTING, deliberately and knowably: a title that
-# merely CONTAINS a possessive ("The Baker's Year") would satisfy it without
-# naming an author. That is a missed flag, not a false alarm, and a false alarm
-# here would be worse -- it would push someone to mangle correct prose.
+# The heuristic fails towards accepting, on purpose: a title that merely
+# contains a possessive ("The Baker's Year") satisfies it without naming an
+# author. A false alarm would push someone to mangle correct prose. There is
+# no exception list (DECISIONS §4, #406): if a book seems to have no author,
+# check first that it is a book, then ask Helen.
 COMMA_AUTHOR = re.compile(r",\s*\S")
 POSSESSIVE_AUTHOR = re.compile(r"\b\w[\w&.\-]*(?:\s+[\w&.\-]+)*'s\s+\S")
-
-# NO BOOK MAY OMIT ITS AUTHOR. There is no exception list, and there was very
-# nearly one.
-#
-# Helen, 2026-08-21: "I can't imagine knowing the name of a book but not its
-# author." A single citation appeared to contradict her --
-# sweet-potato-chocolate-brownies.md, `Adapted from Healthier Baking` -- and it
-# was about to be added to a declared-exceptions set when she recognised it:
-# not a book at all, but a one-off section in Good Food magazine. Retyped as a
-# dateless `website` (the date discriminator, above), and the exception set was
-# deleted before it ever held anything.
-#
-# THE NEAR-MISS IS THE POINT. An exception list with one entry looks like
-# diligence and reads, later, as evidence that the rule has legitimate
-# exceptions -- and the next odd case gets added to it rather than questioned.
-# The one entry here was a misfiled citation, and asking a person beat
-# accommodating it. If a genuine authorless book ever turns up, add the list
-# back deliberately, with the recipe named beside it.
 
 
 def _bad_book_author(source, kind):
@@ -296,12 +229,11 @@ def test_recipe_citation_follows_the_spec(recipe, rule):
 
 @pytest.mark.parametrize("rule", RULE_FUNCS, ids=RULE_IDS)
 def test_draft_citation_follows_the_spec(draft, rule):
-    """Same rules, same reasons -- see this module's docstring.
+    """The same rules on drafts: see this module's docstring.
 
     Reached through the `draft` fixture rather than the ALL_DRAFTS list, so
-    when `_food_drafts/` is absent (a CI checkout: it is a separate private
-    repo, issue #378) this parametrises to nothing and collects zero tests,
-    rather than passing and claiming the drafts were checked.
+    where `_food_drafts/` is absent (CI: it is a private repo, #378) this
+    collects no tests instead of passing and claiming the drafts were checked.
     """
     source, kind = _citation(draft)
     problem = rule(source, kind)

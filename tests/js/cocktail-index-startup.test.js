@@ -1,27 +1,13 @@
-// =============================================================================
-// The cocktails index actually RUNS — issue #633.
+// The cocktails index runs to the end (#633).
 //
 // Run from tests/js with `node --test`.
-// =============================================================================
-// WHAT THIS IS FOR. On 2026-08-31 cocktail-index.js read
-// `FilterState.arrivedByGoingBack` — which is on the filter-state MODULE and
-// not on the binding `create(SPEC)` returns. That is `undefined`, calling
-// undefined throws, and so THE ENTIRE TAIL OF THE FILE STOPPED RUNNING: the
-// back/forward restore, `apply()` at startup (the index stopped applying its
-// own filters and its shuffle), and the `pagehide` listener that saves the
-// list.
 //
-// Every JS test stayed green. All of them ask a pure module a question and get
-// a correct answer; the fault was in the WIRING between two modules, which is
-// the one place a suite of pure-function tests cannot look. This file looks
-// there, by loading the five real scripts in the real order against a stub DOM
-// and asking whether the program got to the end.
-//
-// THE CANARY IS THE `pagehide` LISTENER, and it is the right one because it is
-// the LAST statement in the file. Anything that throws anywhere above it stops
-// it being registered, so one assertion covers every line before it. A test
-// that checked some feature in the middle would have passed on the 2026-08-31
-// revision right up until the line that broke.
+// Pure-module tests cannot see a fault in the wiring between two modules: one
+// throw in cocktail-index.js stops the rest of the file, and the page renders,
+// looks complete and does nothing. This loads the real scripts in the real
+// order against a stub DOM (index-harness.js) and asks whether the program got
+// to the end. The canary is the `pagehide` listener, the last statement in
+// the file: anything that throws above it stops it being registered.
 'use strict';
 
 const test = require('node:test');
@@ -90,9 +76,8 @@ test('every index script loads and the whole of cocktail-index.js runs', () => {
 });
 
 test('startup actually applied the filters rather than merely not crashing', () => {
-  // The difference matters: `apply()` at startup is one of the things the
-  // 2026-08-31 throw killed, and a page where nothing crashed but nothing ran
-  // looks identical until you touch a control.
+  // `apply()` at startup is in the tail a throw kills, and a page where
+  // nothing crashed but nothing ran looks identical until you touch a control.
   const r = boot({ drinks: DRINKS });
   assert.strictEqual(r.doc.getElementById('drink-count-n').textContent, '3');
   assert.strictEqual(r.doc.getElementById('drink-count-word').textContent, 'survivors');
@@ -105,9 +90,9 @@ test('startup actually applied the filters rather than merely not crashing', () 
 // --- the guard's own guard ---------------------------------------------------
 
 test('the harness FAILS on the 2026-08-31 bug, rather than only passing today', () => {
-  // Reconstructed by reintroducing the exact mistake into the real source: read
-  // `arrivedByGoingBack` off the create() BINDING instead of off the module.
-  // Without this, every assertion above could be vacuous and nobody would know.
+  // Reintroduces the mistake into the real source: `arrivedByGoingBack` read
+  // off the create() binding instead of off the module. Without this, every
+  // assertion above could be vacuous.
   const src = fs.readFileSync(path.join(ROOT, 'assets', 'js', 'cocktail-index.js'), 'utf8');
   const broken = src.replace(
     'HTF.filterState.arrivedByGoingBack', 'FilterState.arrivedByGoingBack');
@@ -156,17 +141,12 @@ test('the script list matches the order cocktails/index.html loads them in', () 
 });
 
 test('the card measurement passes follow _layouts/default.html', () => {
-  // #1107. These two are NOT in cocktails/index.html -- the shared layout
-  // loads them for both sites, below {{ content }}, so they run after every
-  // script the page itself loads. The harness has to keep both facts: that it
-  // loads them, and that it loads them in the layout's order.
-  //
-  // THE ORDER IS THE ONE card-line-budget.js SAYS IT NEEDS: the name pass
-  // decides how much room the ingredient line gets, and the ingredient line
-  // decides how much the chips get. Running the budget first is not a crash,
-  // it is a budget computed against a name that had not been fitted yet --
-  // which is exactly the kind of wrong a harness in the wrong order would
-  // report as fine.
+  // #1107. The shared layout loads these two for both sites, below
+  // {{ content }}, so they run after every script the page itself loads. The
+  // harness loads them in the layout's order: the name pass decides how much
+  // room the ingredient line gets, and that decides how much the chips get.
+  // The budget run first does not crash; it is computed against a name that
+  // has not been fitted.
   const layout = fs.readFileSync(path.join(ROOT, '_layouts', 'default.html'), 'utf8');
   const inLayout = [];
   const re = /<script src="\{\{\s*'\/assets\/js\/([a-z-]+\.js)'/g;
@@ -190,9 +170,8 @@ test('the card measurement passes follow _layouts/default.html', () => {
 });
 
 test('the fixture uses the ids the script actually reaches for', () => {
-  // The script asks for these by id. A fixture that spells one differently
-  // quietly exercises the null-guard instead of the real path, which is the
-  // same kind of silent miss this whole file exists to stop.
+  // A fixture that spells an id differently exercises the null-guard instead
+  // of the real path.
   const src = fs.readFileSync(path.join(ROOT, 'assets', 'js', 'cocktail-index.js'), 'utf8');
   const wanted = [];
   const re = /getElementById\('([^']+)'\)/g;
@@ -202,19 +181,12 @@ test('the fixture uses the ids the script actually reaches for', () => {
   const r = boot({ drinks: DRINKS });
   const missing = wanted.filter(function (id) { return !r.doc.getElementById(id); });
 
-  // `drink-costs`, `drink-rates` and `shopping-list` belong to features this
-  // harness does not build; they are named here so the exemption is a decision
-  // rather than a gap that grew.
-  //
-  // THE TWO PRICE BLOCKS ARE ALSO ABSENT IN PRODUCTION, which is the stronger
-  // reason to leave them out: both sit behind `site.show_costs`, declared in
-  // _config_local.yml and nowhere else, so a page WITHOUT them is the deployed
-  // page and the null path is the one most readers get. `drink-top-ups` is
-  // deliberately NOT here — it is emitted ungated, so a page missing it is a
-  // real anomaly and the fixture carries the real rows (#746).
-  //
-  // `drafts-toggle` (#1358) is absent in production for the same reason: it
-  // sits behind `site.show_drafts`, so the null path is the deployed page.
+  // Ids for features this harness does not build, named so the exemption is
+  // a decision. `drink-costs` and `drink-rates` sit behind `site.show_costs`
+  // and `drafts-toggle` (#1358) behind `site.show_drafts`, both declared in
+  // _config_local.yml only, so the null path is the deployed page.
+  // `drink-top-ups` is not here: it is emitted ungated, and the fixture
+  // carries its rows (#746).
   const NOT_BUILT = ['drink-costs', 'drink-rates', 'shopping-list',
                      'shopping-list-setall', 'drafts-toggle'];
   const unexpected = missing.filter(function (id) { return NOT_BUILT.indexOf(id) === -1; });
@@ -223,16 +195,7 @@ test('the fixture uses the ids the script actually reaches for', () => {
     unexpected.join(', '));
 });
 
-// --- what the harness makes testable for the first time ----------------------
-
-/* #732's third YOLO button IS NOT TESTED HERE, and the omission is deliberate.
-   That button lives on its own branch (`fix/cocktail-search-and-index`) and
-   this harness on another, so a test for it here would fail on this branch and
-   pass on the merge -- which is the worst of both. The fixture already carries
-   `data-made-before` on every card, so once both land the test is four lines:
-   click `[data-chaos='unmade']` and assert only Bamboo survives. Same for the
-   card ingredient ordering (#567/#691). Both were unreachable before this file
-   existed; that is the point of it. */
+// --- mood ranking, #695 --------------------------------------------------------
 
 test('#695: answering both mood questions outranks answering one of them twice', () => {
   const r = boot({ drinks: DRINKS });
@@ -247,8 +210,8 @@ test('#695: answering both mood questions outranks answering one of them twice',
 });
 
 test('#695: with only one section asked, the order is unchanged', () => {
-  // The other half of the ruling: it must not reshuffle anything when only one
-  // question has been asked, because every survivor answers that one.
+  // Nothing is reshuffled when only one question has been asked: every
+  // survivor answers that one.
   const r = boot({ drinks: DRINKS });
   clickByData(r.page, 'data-mood', 'sharp');
   assert.deepStrictEqual(visibleTitles(r.page).sort(), ['Daiquiri', 'Negroni'],
@@ -256,13 +219,6 @@ test('#695: with only one section asked, the order is unchanged', () => {
 });
 
 // --- pagination, #694 --------------------------------------------------------
-//
-// THESE ARE THE FIRST TESTS THIS FEATURE COULD HAVE HAD. Paging lives inside
-// cocktail-index.js's IIFE like everything else here, so before the harness the
-// only way to check "does next actually advance" was to open a browser. The
-// harness caught a real break while this was being written: #694 added
-// `list-view.js` to the page and the script threw on its first apply() until
-// the harness was told, with every other test green.
 
 function manyDrinks(n) {
   const out = [];
@@ -292,8 +248,8 @@ test('#694: only the first twenty of a long list are shown', () => {
 });
 
 test('#694: a list that fits on one page shows no pager at all', () => {
-  // Hidden rather than disabled: "page 1 of 1" beside two dead arrows is
-  // furniture answering a question nobody asked.
+  // Hidden rather than disabled: "page 1 of 1" beside two dead arrows answers
+  // a question nobody asked.
   const r = boot({ drinks: manyDrinks(5) });
   assert.strictEqual(r.page.pager.style.display, 'none');
   assert.strictEqual(visibleTitles(r.page).length, 5);
@@ -322,8 +278,8 @@ test('#694: next advances, prev goes back, and the ends disable', () => {
 });
 
 test('#694: the pages between them cover every drink exactly once', () => {
-  // The property that matters and the one an off-by-one breaks silently: a
-  // reader paging through must see all 45, and no drink twice.
+  // An off-by-one breaks this silently: a reader paging through must see
+  // every drink, and none twice.
   const r = boot({ drinks: manyDrinks(45) });
   const next = r.doc.getElementById('drink-page-next');
   const seen = [];
@@ -344,9 +300,8 @@ test('#694: (see all) drops the pager and shows everything', () => {
 });
 
 test('#694: changing a filter returns you to page one', () => {
-  // The whole difference between paging and filtering. Landing on page 3 of a
-  // set that now has one page -- or of a different set entirely -- is
-  // disorienting in a way that going back to the top is not.
+  // Landing on page 3 of a set that now has one page is disorienting; going
+  // back to the top is not.
   const r = boot({ drinks: manyDrinks(45) });
   r.doc.getElementById('drink-page-next').dispatch('click');
   assert.strictEqual(r.doc.getElementById('drink-page-status').textContent, 'page 2 of 3');
@@ -357,20 +312,14 @@ test('#694: changing a filter returns you to page one', () => {
 });
 
 // --- matched chips lead the row, #757 ----------------------------------------
-//
-// Helen's own example, and her diagnosis was right: "'no juicing' returns
-// Caribbean Sazerac first, but the chip isn't on the card, presumably because
-// the full list of chips doesn't fit on the two lines we give them."
-//
-// `.drink-card-moods` clips past its row cap, so on a chip-heavy drink the word
-// that EXPLAINS why the card is here could be the one cut off -- which is the
-// one job the card's foot has.
+// `.drink-card-moods` clips past its row cap, so on a chip-heavy drink the
+// chip that explains why the card is here could be the one cut off.
 
 const CHIPPY = [{
   url: '/sazerac',
   name: 'caribbean sazerac',
   title: 'Caribbean Sazerac',
-  // As #710 renders them: alphabetical.
+  // Alphabetical, as the page renders them (#710).
   moods: ['aperitivo', 'clear', 'nightcap', 'no juicing', 'tiki', 'warming'],
   ingredients: ['rye|rye'],
   chaos: 'good',
@@ -410,9 +359,9 @@ test('#757: a matched chip moves to the front of the row', () => {
 });
 
 test('#757: alphabetical order survives inside both groups', () => {
-  // The two lists are built by walking `d.moodEls`, which is read once at
-  // startup in document order -- so #710's sort is preserved within the matched
-  // group and within the rest, rather than being undone by the regrouping.
+  // Both lists are built by walking `d.moodEls`, read once at startup in
+  // document order, so #710's sort survives within the matched group and
+  // within the rest.
   const r = boot({ drinks: CHIPPY, moods: CHIP_MOODS, hassles: CHIP_HASSLES });
   clickByData(r.page, 'data-mood', 'tiki');
   clickByData(r.page, 'data-mood', 'aperitivo');
@@ -434,11 +383,10 @@ test('#757: clearing the filter puts the row back in plain alphabetical order', 
 });
 
 test('#757: the chips are moved in the DOM, not merely reordered visually', () => {
-  // Load-bearing, and the reason flex `order` was not used: the separator dot
-  // is drawn by `.drink-card-mood + .drink-card-mood::before`, a DOM-order
-  // selector. Reordering visually would leave the dot on whichever chip is
-  // second in the MARKUP -- a leading dot on the row and a missing one inside
-  // it. Asserting document order is asserting the dot lands correctly.
+  // Not flex `order`: the separator dot is drawn by
+  // `.drink-card-mood + .drink-card-mood::before`, a DOM-order selector, so a
+  // visual reorder would leave the dot on whichever chip is second in the
+  // markup.
   const r = boot({ drinks: CHIPPY, moods: CHIP_MOODS, hassles: CHIP_HASSLES });
   clickByData(r.page, 'data-mood', 'no juicing');
 
@@ -453,25 +401,12 @@ test('#757: the chips are moved in the DOM, not merely reordered visually', () =
 });
 
 // --- arriving at the shortlist by URL, #994 ----------------------------------
-//
-// `?shortlist=1` is the one query the index reads besides `?mood=`. It was
-// added for a drink page's see-all link, and #1000 removed that link two days
-// later -- so nothing on the site points here now and the query is kept
-// deliberately (cocktail-index.js says why). These tests are half of what
-// keeps it honest: a URL nothing links to is a URL nobody would notice
-// breaking.
-//
-// What they assert is that the index turns the VIEW on when it arrives, and
-// specifically that it calls the same `enterShortlistView()` the
-// `shortlisted (N)` button calls, so the two doors lead to one state
-// (#918, MANUAL 8.9).
-//
-// THE SHORTLIST IS EMPTY IN THIS HARNESS, deliberately and not by accident:
-// HTF.shortlist keys its storage on `HTF.site`, which comes from a meta tag the
-// stub page does not carry, so the store is a no-op here. That is enough for
-// what these assert -- the view is ON and it has narrowed to nothing -- and it
-// keeps them about the wiring rather than about the store, which
-// shortlist.test.js and shortlist-view.test.js already own.
+// The index turns the view on through the same `enterShortlistView()` the
+// `shortlisted (N)` button calls, so the two doors lead to one state (#918,
+// MANUAL 8.9). The shortlist is empty in this harness: HTF.shortlist keys its
+// storage on `HTF.site`, from a meta tag the stub page does not carry, so the
+// store is a no-op. These assert the view is on and narrowed to nothing; the
+// store belongs to shortlist.test.js and shortlist-view.test.js.
 
 function shortlistViewIsOn(r) {
   const btn = r.doc.getElementById('shortlist-only');
@@ -499,18 +434,17 @@ test('#994: without the query the view stays off', () => {
 });
 
 // --- arriving with a name, #1024 -----------------------------------------------
-// `?q=` is what the search box sends (the header's, on a local build, since
-// #1210; a drink page's furniture line before that). The
-// index must put it into I KNOW WHAT I WANT and apply it, exactly as typing
-// there would, so the two boxes are one control in two places.
+// `?q=` is what the site's search box sends. The index puts it into I KNOW
+// WHAT I WANT and applies it as typing there would, so the two boxes are one
+// control in two places.
 
 test('#1024: ?q= fills the name box and narrows the list', () => {
   const r = boot({ drinks: DRINKS, search: '?q=negroni' });
   assert.strictEqual(r.doc.getElementById('drink-name').value, 'negroni',
     'the box should show what the reader typed on the page they came from.');
-  // BY KEY, NOT BY TITLE. A matched name is re-rendered with a <mark> through
-  // innerHTML, which this stub CLEARS rather than parses (dom-stub.js), so
-  // the matched card's title reads as '' here and nowhere else.
+  // By key, not by title: a matched name is re-rendered with a <mark> through
+  // innerHTML, which this stub clears rather than parses (dom-stub.js), so
+  // the matched card's title reads as '' here.
   const visible = r.page.list.children.filter(function (li) { return !li.hidden; });
   assert.deepStrictEqual(visible.map(function (li) { return li.getAttribute('data-url'); }),
     ['/b'], 'the query must reach apply(), not only the box.');
@@ -534,16 +468,10 @@ test('#1050: ?ing= adds the chip to HAS TO HAVE and narrows the list', () => {
 });
 
 test('#1130: either half of a joined "X or Y" pour finds the drink', () => {
-  // THE CLAIM THE SEARCH FEED NOW MAKES, CHECKED AT THE OTHER END. A
-  // disjunctive `generic` means "either would do" (#441), so the card prints
-  // "cherry brandy or cherry liqueur" and cocktails/search.json offers the two
-  // halves separately -- because the joined string names no chip, while each
-  // half does. That is only true if `?ing=<half>` actually resolves, which is
-  // this test: the Singapore Sling's real pour, and a click on either word.
-  //
-  // It is the Sling because it is the case that has no other route. Neither
-  // generic is poured alone by any published drink, so before #1130 the box
-  // did not carry either word at all and the drink was findable only by name.
+  // A disjunctive `generic` means "either would do" (#441): the card prints
+  // "cherry brandy or cherry liqueur" and cocktails/search.json offers the
+  // two halves separately, because the joined string names no chip while each
+  // half does. That holds only if `?ing=<half>` resolves, for either half.
   const vocabulary = { liqueurs: ['cherry brandy', 'cherry liqueur'] };
   const drinks = [
     { url: '/sling', name: 'sling', title: 'Singapore Sling', moods: ['sharp'],
@@ -581,11 +509,9 @@ test('#1050: an ingredient no card names is dropped in silence', () => {
   assert.deepStrictEqual(on, []);
 });
 
-// --- the two pools' chosen chips, 2026-10-11 ------------------------------------
-// Helen, with #1219: "match the styling of the chips in the has to have and
-// leave out search results -- match cocktails to food", and "the food site
-// shows e.g. 'hiding cranberries' when using the leave out filter. Please do
-// the same for the cocktail site's leave out filter."
+// --- the two pools' chosen chips (#1219) ---------------------------------------
+// As on food: a chosen HAS TO HAVE chip is taped, a chosen LEAVE OUT chip is
+// not, and the LEAVE OUT pool says what it is hiding.
 
 function chooseFrom(r, inputId, poolId, typed) {
   const input = r.doc.getElementById(inputId);
@@ -648,11 +574,9 @@ test('#1093: a slug beginning with 1 is not read as the own-list flag', () => {
 });
 
 test('#994: shortlist=1 beats a mood in the same URL', () => {
-  // It is a VIEW, not a facet (#918): pressing the button clears every other
-  // filter, and arriving by the link must mean the same thing or the two doors
-  // lead somewhere different. The order in the file is what decides it, so
-  // this is the assertion that a later edit reordering those two blocks would
-  // trip.
+  // A view, not a facet (#918): pressing the button clears every other
+  // filter, and arriving by the link must mean the same. The order of the two
+  // startup blocks in cocktail-index.js is what decides it.
   const r = boot({ drinks: DRINKS, search: '?mood=sharp&shortlist=1' });
   assert.ok(shortlistViewIsOn(r));
   const lit = r.page.filters.querySelectorAll("[data-mood='sharp']")
@@ -663,12 +587,9 @@ test('#994: shortlist=1 beats a mood in the same URL', () => {
 });
 
 // --- arriving at a fragment, #1057 and #1059 ------------------------------------
-// food-index-startup.test.js carries the fuller set and the reasoning; this is
-// the cocktails half of the same widening -- any element id named by
-// location.hash, not only the literal string "results" -- since a drink
-// page's own mood chips (_layouts/cocktail.html) end their href in
-// `#filter-mood` or `#filter-hassle`, and the drink page's "see shortlist"
-// link ends in `#results` the same way a search result does.
+// The cocktails half of food-index-startup.test.js's set: the startup block
+// scrolls to any element id `location.hash` names. `filter-mood` and
+// `filter-hassle` are the ids cocktails/index.html gives its two sections.
 
 test('#1050/#1057: arriving at #results scrolls the count line into view', () => {
   const r = boot({ drinks: DRINKS, hash: '#results' });

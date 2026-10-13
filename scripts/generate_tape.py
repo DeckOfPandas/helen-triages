@@ -1,66 +1,50 @@
 #!/usr/bin/env python3
 """Generate a tape background SVG for assets/img/chrome/tape/ (issue #122).
 
-The output directory moved out of assets/img/food/ in issue #374: the wordmark
-is shared chrome, so there is one tape set for the whole repo rather than a copy
-per site. Regenerating no longer has a "and copy it across to cocktails" step --
-that chore, and the drift it was there to prevent, are both gone.
-
-WHAT THIS IS: the tool behind the current tape-1.svg..tape-15.svg (seven until
-2026-09-11; DECISIONS.md 13.9 has every file's seed and mode). Each file
-is one polygon body (viewBox 0 0 1400 170, fill #0d0d0d) plus two kinds of
-<line> texture: an edge bevel suggesting the tape sits raised off the page,
-and "machine marks" -- clusters of near-vertical, slightly overlapping
-scratch lines -- printed on top of it.
-
-THE DESIGN, decided interactively against real renders, not guessed:
-
-  - Corners: the two BOTTOM corners of the polygon can each be acute (<90,
-    the bottom edge flares past the top edge) or obtuse (>90, it insets
-    under it), independently -- corner_mode picks both-acute, both-obtuse,
-    or one of each ("mixed"). The top edge stays flat. See make_polygon().
-
-  - Machine marks: 5-7 narrow clusters (centred on 6), each a handful of
-    jittered near-vertical lines. The tape is split into three zones --
-    left flank, the "letter zone" behind the lettering, right flank -- and
-    every generation guarantees at least one cluster per zone, with the
-    single clearest and second-clearest cluster on the whole tape always
-    landing one per flank (which flank gets which is randomised). Gaps
-    between clusters are wide and irregular, closer to how a physical
-    machine actually marks tape than an even scatter. See generate_marks_v3().
-
-  - Edge bevel: a highlight pair on the top and left edges, a much subtler
-    pair on bottom and right, both hard-offset with no blur -- same
-    light-from-top-left, two-hard-copies logic as the wordmark's own
-    punched(raised) mixin (_sass/shared/_rule.scss), not a new effect. See
-    make_edge_bevel().
-
-LEFT_FLANK_FRAC / RIGHT_FLANK_FRAC (how much of the tape's width counts as
-"outside the lettering") are a guess, not measured against real font
-metrics -- the source viewBox is stretched non-uniformly
-(preserveAspectRatio="none") to whatever the real wordmark width ends up
-being. Revisit by eye against the real render if the flank starts reading
-too wide or too narrow.
-
-HOW TO USE IT:
-
     python3 scripts/generate_tape.py --corner-mode both_acute --seed 30 \\
         --out assets/img/chrome/tape/tape-1.svg
 
     # print to stdout instead of writing a file
     python3 scripts/generate_tape.py --corner-mode mixed --seed 99
 
-    # same corners, different marks (useful once you like a shape but want
-    # to see other mark layouts on it)
+    # same corners, different marks
     python3 scripts/generate_tape.py --corner-mode both_acute --seed 2 \\
         --marks-seed 202
 
---seed drives the corner shape; --marks-seed (defaults to --seed) drives
-the machine marks independently, so the two can vary separately. There is
-no "pick a good one automatically" mode -- generate a batch of candidates
-across all three corner_modes, look at them against the real header (a
-throwaway HTML mockup using the actual .site-logo-* CSS from
-_sass/shared/_layout.scss is the fastest way), and hand-pick.
+--corner-mode (required) is both_acute, both_obtuse or mixed. --seed
+(required) drives the corner shape; --marks-seed (defaults to --seed) drives
+the machine marks independently, so the two can vary separately. --out writes
+that file; without it the SVG goes to stdout. It reads nothing.
+
+There is no "pick a good one automatically" mode: generate a batch across the
+three corner modes, look at them against the real header, and hand-pick. A
+tape whose clearest cluster lands on the left is not used. The tapes are one
+shared set for the whole site (#374), and `tape_count` in `_data/chrome.yml`
+must match the directory. DECISIONS §13.9 has each file's seed and mode.
+
+Each file is one polygon body (viewBox 0 0 1400 170, fill #0d0d0d) with an
+edge bevel and machine marks drawn over it as <line>s:
+
+  - Corners: the two bottom corners can each be acute (the bottom edge flares
+    past the top edge) or obtuse (it insets under it), independently. The top
+    edge stays flat. See make_polygon().
+
+  - Machine marks: five to seven narrow clusters of jittered vertical lines.
+    The tape is split into three zones: left flank, the letter zone behind
+    the lettering, right flank. Every generation puts at least one cluster in
+    each zone, and the clearest and second-clearest clusters land one per
+    flank, never in the letter zone. Gaps between clusters are wide and
+    irregular. See generate_marks().
+
+  - Edge bevel: a highlight pair on the top and left edges and a subtler pair
+    on the bottom and right, hard-offset with no blur, lit from the same
+    top-left as the lettering's punched-tape effect (MANUAL §13.4.1). See
+    make_edge_bevel().
+
+LEFT_FLANK_FRAC and RIGHT_FLANK_FRAC, the share of the width that counts as
+outside the lettering, are a guess and are not measured against font metrics:
+the SVG is stretched non-uniformly (preserveAspectRatio="none") to the width
+of whatever it sits behind.
 """
 from __future__ import annotations
 
@@ -136,18 +120,11 @@ def corner_angle(corner, a, b):
 
 
 # --- edge bevel: "raised off the page" -------------------------------------
-#
-# Same light-from-top-left convention as the wordmark's own punched(raised)
-# mixin -- two hard, unblurred offset copies, light side visible and solid,
-# dark side subtle rather than truly darker (against a near-black #0d0d0d
-# fill, a "dark" tone that isn't pushed hard toward true black just reads
-# as LIGHTER than the tape, not recessed -- see MANUAL.md 13.4.1).
-#
-# Because .site-logo-tape carries the whole rotate(-1.75deg) transform
-# around BOTH the tape-bg and the lettering together, defining "top-left"
-# in this SVG's own local, pre-rotation coordinate space keeps it
-# automatically consistent with the lettering's own text-shadow (also
-# defined pre-rotation) -- no compensation for the rotation needed here.
+# Lit from the top-left, as the lettering is (MANUAL §13.4.1): two hard,
+# unblurred offset copies. The dark side is pushed close to true black, since
+# against the #0d0d0d fill a milder dark tone reads as lighter than the tape.
+# `.site-logo-tape` rotates the tape and the lettering together, so "top-left"
+# in this SVG's own pre-rotation space needs no compensation.
 
 def _edge_normal_inward(p1, p2, centroid):
     dx, dy = p2[0] - p1[0], p2[1] - p1[1]
@@ -185,8 +162,7 @@ def make_edge_bevel(top_left, top_right, bottom_left, bottom_right):
 
         lit = name in lit_edges
         color = BEVEL_LIGHT_COLOR if lit else BEVEL_SHADOW_COLOR
-        # Two hard offset copies, no blur -- "stroke sets weight, two copies
-        # set direction", same logic as punched(), not a soft gradient.
+        # Two hard offset copies, no blur: not a soft gradient.
         passes = [(1.6, 0.62), (3.4, 0.30)] if lit else [(1.4, 0.30), (3.0, 0.16)]
         for offset, opacity in passes:
             x1, y1 = a[0] + nx * offset, a[1] + ny * offset
@@ -199,14 +175,9 @@ def make_edge_bevel(top_left, top_right, bottom_left, bottom_right):
 
 
 # --- machine marks: zone-aware, clarity-ranked clusters ---------------------
-#
-# The tape is split into three zones -- left flank, the letter zone (behind
-# the lettering), right flank. Every generation guarantees at least one
-# cluster per zone, and the single clearest and second-clearest cluster on
-# the whole tape always land one per flank (never both on the same side,
-# never in the letter zone) -- enforced by construction, not checked after
-# the fact: the two ranks are assigned high clarity values before anything
-# else is drawn, and every other cluster is capped below the lower of the two.
+# The clearest and second-clearest clusters land one per flank by
+# construction, not by a check afterwards: those two ranks are assigned high
+# clarity first, and every other cluster is capped below the lower of the two.
 
 def _clarity_style(rng, clarity):
     """clarity in [0, 1] -> opacity/width/color for one line, continuous

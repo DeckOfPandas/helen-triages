@@ -118,12 +118,10 @@
 
   /**
    * A millilitre figure as whole half-millilitres, or null if it is not on
-   * the 2.5 ml grid to begin with.
-   *
-   * The grid test is what keeps ×1 allowed: the allowed multiples are 5k/G,
-   * so ×1 needs 5 to divide G, which holds when every number entering the gcd
-   * is a whole number of 2.5 ml. An off-grid amount stays out of G and is
-   * simply multiplied when scaled.
+   * the 2.5 ml grid. The grid test is what keeps ×1 allowed: the allowed
+   * multiples are 5k/G, so ×1 needs 5 to divide G, which holds when every
+   * number entering the gcd is a whole number of 2.5 ml. An off-grid amount
+   * stays out of G and is simply multiplied when scaled.
    */
   function toUnits(ml) {
     if (typeof ml !== 'number' || !isFinite(ml) || ml <= 0) return null;
@@ -138,11 +136,8 @@
   }
 
   /**
-   * The step this drink's own amounts allow, as an exact fraction.
-   *
-   * `{n, d}` is in lowest terms; `value` is the decimal, for display only.
-   * Every decision is made on the integers.
-   *
+   * The step this drink's own amounts allow, as an exact fraction. `{n, d}`
+   * is in lowest terms; `value` is the decimal, for display only.
    * @returns {{n: number, d: number, value: number, grid: number}} `grid` is G,
    *          in half-millilitre units, and is 0 when the drink has no amount
    *          this file can keep exact.
@@ -242,12 +237,10 @@
   }
 
   /**
-   * The smallest number of allowed steps this drink can be made at.
-   *
-   * Mostly 1: the grid divides every gridded amount, so at one step the
-   * smallest is already at least 2.5 ml. An off-grid volume is outside G and
-   * can still push the floor up.
-   *
+   * The smallest number of allowed steps this drink can be made at. Mostly
+   * 1: the grid divides every gridded amount, so at one step the smallest is
+   * already at least 2.5 ml. An off-grid volume is outside G and can still
+   * push the floor up.
    * @returns {{steps: number, offender: number|null}} offender indexes into
    *          `entries`, and is null when nothing on the page is a volume
    */
@@ -299,29 +292,8 @@
   }
 
   /**
-   * The multiple that gets this drink to a target volume, before snapping.
-   *
-   * @param {string[]} amounts
-   * @param {number} millilitres
-   * @returns {number|null} null when the drink has no volume to scale (nothing
-   *          but dashes) or the target is not a positive number
-   */
-  function multipleForTotal(amounts, millilitres) {
-    var target = Number(millilitres);
-    if (!isFinite(target) || target <= 0) return null;
-    var here = plan(amounts);
-    // The base is the drink at ×1, which is always an allowed multiple.
-    var atOne = stepsFor(here.step, 1);
-    if (atOne === null) return null;
-    var base = totalFor(here.entries, here.step, atOne);
-    if (!(base > 0)) return null;
-    return tidy(target / base);
-  }
-
-  /**
    * The nearest multiple this drink can actually be poured at. Nearest, not
    * next one down, and never below the floor.
-   *
    * @param {string[]} amounts
    * @param {number} wanted
    * @returns {{multiple: number, steps: number, text: string, moved: boolean}|null}
@@ -356,12 +328,7 @@
   }
 
   /**
-   * Scale a page's worth of amounts.
-   *
-   * Refused two ways: a multiple below the floor (`why: 'floor'`), and one
-   * that is not a whole number of allowed steps (`why: 'grid'`), so nothing
-   * can quietly go back to rounding the amounts.
-   *
+   * Refused below the floor (`why: 'floor'`) or off the allowed steps ('grid').
    * @param {string[]} amounts - the strings as printed, in page order
    * @param {number} multiple - what the reader asked for
    * @returns {{ok: boolean, amounts: string[], multiple: number, text: string}|
@@ -420,13 +387,10 @@
   }
 
   /**
-   * A printed amount, split into its number and its one-word unit (#1132).
-   *
-   * For the rows _layouts/cocktail.html marks `data-unit-quiet`: which rows
-   * are quiet is the layout's decision. The split is at the LAST space,
-   * because a range prints as "1 to 2 cubes" and the unit on a quiet row is
-   * one word. An amount with no space in it is all number.
-   *
+   * A printed amount split into its number and its one-word unit (#1132), for
+   * the rows _layouts/cocktail.html marks `data-unit-quiet`. Split at the LAST
+   * space, because a range prints as "1 to 2 cubes"; an amount with no space
+   * in it is all number.
    * @param {string} text - "2 cubes", "3 each", "1 to 2 cubes", "3"
    * @returns {{number: string, unit: string}}
    */
@@ -442,7 +406,6 @@
     splitUnit: splitUnit,
     floorMultiple: floorMultiple,
     totalMl: totalMl,
-    multipleForTotal: multipleForTotal,
     snapMultiple: snapMultiple,
     allowedStep: allowedStep,
     multipleText: multipleText,

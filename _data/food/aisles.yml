@@ -1,52 +1,20 @@
-# =============================================================================
-# GROCERY AISLES — where each ingredient is found in a shop.
-#
-# GitHub issue #801, Helen: "Group the shopping list by grocery aisle, e.g.
-# produce, dairy, fish, meat, non-perishable etc." She chose the ten below and
-# their order, which is the order you walk a supermarket rather than any
-# alphabet: fresh around the outside first, dry goods in the middle, `other`
-# last because it is the swept-up remainder and not a department.
-#
-# THIS IS A KEYWORD TABLE, NOT A LIST OF INGREDIENTS, and that is forced by the
-# data: the 86 recipes carry 500 distinct `item:` strings, of which 395 survive
-# the shopping list's truncation, and they are free text — "a few sprigs of
-# fresh rosemary", "thumb-sized piece of fresh ginger", "chopped roasted
-# peanuts". A per-item list would be 395 lines that go stale the first time a
-# recipe writes "3 sprigs of rosemary" instead. A keyword table answers for
-# strings nobody has written yet, which is the only way this survives the next
-# ingest.
-#
-# THE LONGEST KEYWORD WINS, and that single rule is what makes the table
-# readable instead of a pile of special cases. `milk` is dairy and
-# `coconut milk` is a tin, `butter` is dairy and `peanut butter` is not,
-# `garlic` is produce and `garlic paste` is a jar, `mint` is a herb and
-# `dried mint` is a spice. In every pair the more specific string is the longer
-# one, so the exceptions are simply entries — they need no precedence
-# machinery and no ordering between aisles.
-#
-# MATCHING IS ON WHOLE WORDS, folded to lowercase with the curly apostrophe
-# flattened. Whole words rather than substrings because `ice` is in `rice`,
-# `juice` and `spice`, and the ice cube is a real ingredient in this
-# collection. Non-alphanumerics are boundaries, so `paste-based` contains the
-# word `paste`.
-#
-# WHERE THE RULE IS APPLIED: _plugins/food_shopping.rb, at build, once per
-# ingredient. The browser is handed the answer, never the table — the same
-# division _plugins/cocktail_costs.rb already keeps, and it is what lets
-# tests/test_rendered_pages.py check the assignment of every real ingredient
-# against the real build.
-#
-# AN UNMATCHED INGREDIENT IS `other` AND THAT IS NOT A BUG. It is a heading on
-# the list with things under it, which is what a shopping list wants; a miss
-# costs you a glance, not an item. test_the_shopping_list_assigns_an_aisle_to
-# _almost_everything holds the count down so the heading stays small, and
-# growth in it is the signal to add a keyword here.
-# =============================================================================
+# Grocery aisles for the food shopping list (#801, DECISIONS §8.2): a keyword
+# table, not a list of ingredients, because `item:` strings are free text.
+# _plugins/food_shopping.rb applies it at build, once per ingredient; the
+# browser is handed the answer and never this table.
+# - The longest keyword wins, so an exception is simply a longer entry:
+#   `milk` is dairy and `coconut milk` is a tin. There is no precedence
+#   between aisles.
+# - Matching is on whole words, lowercased, the curly apostrophe flattened;
+#   non-alphanumerics are boundaries. Whole words because `ice` is inside
+#   `rice`, `juice` and `spice`.
+# - An unmatched ingredient lands in `other`, which is a heading and not a
+#   bug. test_the_shopping_list_assigns_an_aisle_to_almost_everything keeps
+#   that heading small; growth in it is the signal to add a keyword.
 
-# -----------------------------------------------------------------------------
-# The aisles, in the order they appear down the page. Helen's ten, her words.
-# `key` is what the plugin stamps on an ingredient; `label` is what is printed.
-# -----------------------------------------------------------------------------
+# The aisles in the order they appear down the page, which is the order you
+# walk a shop. `key` is what the plugin stamps on an ingredient; `label` is
+# what is printed.
 order:
   - key: produce
     label: "produce"
@@ -69,23 +37,17 @@ order:
   - key: other
     label: "other"
 
-# -----------------------------------------------------------------------------
-# NEVER ON THE LIST. Matched on the WHOLE folded name, not as a keyword, so
+# Never on the list. Matched on the whole folded name, not as a keyword, so
 # "water mixed with 3 tsp cornstarch" is still an ingredient and plain "water"
-# is not. The cocktails shopping list refuses water the same way and for the
-# same reason (`not_on_cards` in _data/cocktails/ingredients.yml): nobody buys
-# it, and a line for it is a line you read past every week.
-# -----------------------------------------------------------------------------
+# is not. Nobody buys it.
 never:
   - water
   - cold water
   - ice
 
-# -----------------------------------------------------------------------------
-# THE KEYWORDS. Longest match wins; see the header. Each aisle's list is
-# alphabetical so a keyword can be found by eye, and an entry only needs to be
-# here if a SHORTER entry elsewhere would otherwise claim it.
-# -----------------------------------------------------------------------------
+# The keywords. Each aisle's list is alphabetical so a keyword can be found by
+# eye; an entry is needed only where a shorter entry elsewhere would otherwise
+# claim it.
 keywords:
 
   # --- produce -----------------------------------------------------------
@@ -142,10 +104,9 @@ keywords:
     - fresh ginger
     - galangal
     - garlic
-    # `cloves` IS THE SPICE and also the unit garlic is counted in, and the two
-    # words are the same length -- so "garlic cloves" needs spelling out or the
-    # tie-break sends it to the spice rack. "freshly ground cloves" and "whole
-    # cloves" are still the spice, which is the half this must not break.
+    # `cloves` is the spice and also the unit garlic is counted in, and the two
+    # words are the same length, so "garlic cloves" is spelled out or the
+    # tie-break sends it to the spice rack. "whole cloves" stays the spice.
     - garlic cloves
     - cloves garlic
     - cloves of garlic
@@ -359,9 +320,8 @@ keywords:
 
   # --- frozen ------------------------------------------------------------
   # `frozen` itself is a keyword, so "frozen peas" lands here even though
-  # `peas` is produce — but "fresh or frozen cranberries" stays in produce,
-  # because `cranberries` is the longer word. That is the right way round: the
-  # first names the aisle, the second names a choice.
+  # `peas` is produce. "fresh or frozen cranberries" stays in produce, because
+  # `cranberries` is the longer word.
   frozen:
     - filo
     - filo pastry
@@ -376,8 +336,7 @@ keywords:
 
   # --- store cupboard ----------------------------------------------------
   # Everything ambient: tins, jars, bottles, dry goods, baking, nuts, oils and
-  # the sugar shelf. The biggest aisle by a distance, which is what a recipe
-  # collection looks like once the fresh things are taken out of it.
+  # the sugar shelf.
   cupboard:
     - almond butter
     - almond extract
@@ -618,8 +577,8 @@ keywords:
 
   # --- drinks ------------------------------------------------------------
   # Beer, wine, spirits and the tea shelf. `wine vinegar` and `cider vinegar`
-  # are longer keywords in the cupboard, which is the whole of the trick that
-  # keeps "splash of red wine vinegar" off this aisle.
+  # are longer keywords in the cupboard, which keeps "splash of red wine
+  # vinegar" off this aisle.
   drinks:
     - ale
     - bailey's
@@ -651,8 +610,7 @@ keywords:
     - wine
 
   # --- other -------------------------------------------------------------
-  # Declared and deliberately empty. Nothing MATCHES its way here; it is where
-  # an ingredient lands when no keyword claims it, and a cross-recipe link is
-  # sent here outright (see _plugins/food_shopping.rb — "[grandma's lemon
-  # curd]" is a pointer to another ingredient list, not a thing in a shop).
+  # Declared and deliberately empty. Nothing matches its way here: it is where
+  # an ingredient lands when no keyword claims it, and where
+  # _plugins/food_shopping.rb sends a cross-recipe link outright.
   other: []

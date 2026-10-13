@@ -8,9 +8,11 @@
 // ground you read on and `$color-ink` is the marks you read, whichever way
 // round the two values sit.
 //
-// Every colour has a job; the table is above the accents. Before adding a hue,
-// say what it names, and check it separates from the others for a dichromat:
-// `scripts/palette_measure.py --separation <a> <b>`.
+// Every colour has a job, stated above it. Before adding or moving a hue, say
+// what it names, and check it separates from the others for a dichromat:
+// `scripts/palette_measure.py --separation <a> <b>`. Colour that carries
+// meaning with no word beside it (the ship mark, the matched ingredient, a mood
+// chip) must stay apart; a heading bar sits under its own name and need not.
 
 // --- Raw palette -------------------------------------------------------------
 $color-ink:          #e8e6e2;   // was #1b1b1f
@@ -23,48 +25,35 @@ $color-grey-mid:     #97959a;   // 6.50:1 on the old ground -- de-emphasised UI 
 $color-grey-light:   #2c2c31;   // borders; L* 18.2 against the old ground's 4.0
 
 // --- The accents -------------------------------------------------------------
-// Each is named after the drink it is the colour of (#555). Each has a job, and
-// the job is a fact the cards also show:
+// Each is named after the drink it is the colour of (#555), and its job, stated
+// above it, is a fact the cards also show. MOOD and HASSLE take the two ramp
+// steps declared with the heading bars below; LEAVE OUT has no hue on purpose.
 //
-//   absinthe      the home colour: the shared chrome ($color-accent), the glass
-//                 line work, structural rules, the drink page's heading bars
-//   reposado      YOLO? and goodness: the ship mark on a card
-//   woowoo        HAS TO HAVE and the matched ingredient; on hover, "this one"
-//   violette      I KNOW WHAT I WANT and the matched run of a drink's name
-//   lagoon        the drink page's notes
-//
-// MOOD and HASSLE take the two ramp steps declared with the heading bars below.
-// LEAVE OUT deliberately has no hue.
-//
-// Up to three values per hue, and mixing them up is the easy mistake:
-//   (bare)  a band or a rule
-//   -deep   safe as text on a card. On this ground a hue is lightened to make
-//           text, and only violette needs it; the others equal the bare value.
-//   -wash   a tint of the hue over a card, for a field. Text on a wash is ink.
-//
-// Colour that carries meaning with no word beside it (the ship mark, the
-// matched ingredient, a mood chip) must stay apart for a dichromat; a heading
-// bar sits under its own name and need not. Re-check with
-// `scripts/palette_measure.py --separation <a> <b>` if one of them moves.
+// Up to three values per hue: the bare name is a band or a rule; `-deep` is
+// safe as text on a card (only violette's differs from the bare value); `-wash`
+// is a tint over a card for a field, and text on a wash is ink.
 
-// The home colour. Absinthe.
+// The home colour. Absinthe. The shared chrome ($color-accent), the glass line
+// work, structural rules and the drink page's heading bars.
 $color-electric-absinthe:      #30E88C;   // rule
 $color-electric-absinthe-deep: #30E88C;   // text  11.11:1 on a card
 // Unread, and kept on purpose (#651): one of five washes derived as a set.
 // Do not delete because grep finds no consumer.
 $color-electric-absinthe-wash: #1A342A;   // 14% of the hue over a card
 
-// YOLO? and goodness. Tequila reposado.
+// YOLO? and goodness: the ship mark on a card. Tequila reposado.
 $color-raucous-reposado:      #F47E25;  // rule
 $color-raucous-reposado-deep: #F47E25;  // text  6.69:1 on a card
 
-// HAS TO HAVE, and hover. A Woo Woo. It is food's hot magenta, undarkened:
-// on this ground it is readable as text, which it is not on paper. The known
-// cost (#636): under protanopia it nearly disappears against black.
+// HAS TO HAVE, the matched ingredient, and hover. A Woo Woo. It is food's hot
+// magenta, undarkened: on this ground it is readable as text, which it is not
+// on paper. The known cost (#636): under protanopia it nearly disappears
+// against black.
 $color-wicked-woowoo:      #FF00C8;    // rule
 $color-wicked-woowoo-deep: #FF00C8;    // text  5.18:1 on a card
 
-// I KNOW WHAT I WANT. Crème de Violette. The bare hue is too dark to be text
+// I KNOW WHAT I WANT and the matched run of a drink's name. Crème de Violette.
+// The bare hue is too dark to be text
 // on a card, so this is the one `-deep` with a derived, lightened value.
 $color-ultra-violette:      #9233E6;  // rule
 $color-ultra-violette-deep: #AE68EC;  // text  5.10:1 on a card
@@ -83,14 +72,12 @@ $color-luminous-lagoon-wash:  #1A3137;
 
 // --- The heading bars --------------------------------------------------------
 // The index's five headings, top to bottom: a ramp from reposado to woowoo
-// through two interpolated steps, then violette. The two steps are points on a
-// line between two accents, not accents of their own.
+// through two interpolated steps (points on a line between two accents, not
+// accents of their own), then violette.
 //
-// A section's colour is a promise the card keeps. Each is worn by the heading's
-// bar, by the chosen filter button under it, and by the thing it lit on a card:
-// the ship mark, a mood word, a hassle word, a matched ingredient, the matched
-// run of a name. Use these names, not the hues behind them, wherever a rule
-// means "this section".
+// A section's colour is a promise the card keeps: the heading's bar, the chosen
+// filter button under it and the thing it lit on a card all wear it. Use these
+// names, not the hues behind them, wherever a rule means "this section".
 $color-banging-bellini:        #FD6758;   // coral,    1/3 of the way to pink
 $color-charismatic-cosmopolitan: #FD5289; // hot pink, 2/3 of the way
 

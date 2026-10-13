@@ -1,37 +1,26 @@
 // last-line-rule.js
 // The double rule sits under the LAST line of a wrapped heading only.
-//
 // `overlapping-rule-double` (_sass/shared/_rule.scss) paints its bars as
 // backgrounds on an inline box with `box-decoration-break: clone`, so every
 // line fragment gets its own copy. No CSS selects "the last line of a wrapped
-// inline box" and `slice` does not do it either, so this measures: it finds
-// the first word on the last line and rebuilds the element as
-//
-//     <span class="rule-lines">…every earlier line…</span>
-//     <span class="rule-last">…the last line…</span>
-//
-// with `rule-split` on the element. The Sass is the other half: the element's
-// own rule is the no-JS fallback, `.rule-split` switches it off and
-// `.rule-last` wears the mark. A one-line title gets no `.rule-lines`.
+// inline box", so this measures: it finds the first word on the last line and
+// rebuilds the element as `<span class="rule-lines">` (every earlier line)
+// then `<span class="rule-last">` (the last), with `rule-split` on the
+// element. The Sass is the other half: the element's own rule is the no-JS
+// fallback, `.rule-split` switches it off and `.rule-last` wears the mark.
 //
 // Text only: rebuilding from `textContent` would flatten child elements, so an
 // element that has any is skipped. An element whose text another script
-// rewrites opts out with `data-last-line-rule="skip"` (the cooking-methods
-// page's protein heading, rewritten by cook-timer.js), or the rewrite would
+// rewrites opts out with `data-last-line-rule="skip"`, or the rewrite would
 // leave it carrying `rule-split` with nothing to paint.
-//
-// Site-agnostic: it queries a class list and does nothing where none match.
 
 (function () {
   // The elements that carry `overlapping-rule-double` AND can wrap. Each
-  // selector must match the stylesheet's own:
-  //   .recipe-title-text, .section-heading-text   food titles and section
-  //       headings (the --modifier classes are second classes, so the base
-  //       selector reaches them)
-  //   .ref-section-heading span                   cocktails' reference pages
-  //       (_sass/cocktails/_reference.scss, #920)
-  //   .cocktail-section-heading--related > span   the drink page's one
-  //       sentence-length heading (_sass/cocktails/_cocktail.scss)
+  // selector must match the stylesheet's own: food titles and section
+  // headings (the --modifier classes are second classes, so the base selector
+  // reaches them), cocktails' reference pages (_sass/cocktails/_reference.scss,
+  // #920), and the drink page's one sentence-length heading
+  // (_sass/cocktails/_cocktail.scss).
   // Not the index's `.category-label-text`: a one-word label never wraps.
   var TARGETS = '.recipe-title-text, .section-heading-text, .ref-section-heading span, ' +
     '.cocktail-section-heading--related > span';

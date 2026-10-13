@@ -3,13 +3,10 @@
 // =============================================================================
 // LONGFORM: THE VARIANT NOT TAKEN ("C")
 // =============================================================================
-// Kept on purpose, at Helen's request, so the runner-up can be looked at:
-//
-//   /food/longform-demo/ganache/
-//   /food/longform-demo/hollandaise/
-//
-// Loaded only by those two pages, via a <link> in their own markup, and every
-// rule is scoped to `.lf-c`, a class only they carry.
+// Kept on purpose, at Helen's request, so the runner-up can be looked at, at
+// /food/longform-demo/ganache/ and /food/longform-demo/hollandaise/. Loaded
+// only by those two pages, via a <link> in their own markup, and every rule
+// is scoped to `.lf-c`, a class only they carry.
 //
 // It overrides the live styling ("B", in _sass/food/_recipe-notes-body.scss)
 // and does not copy it, so it cannot go stale: the two rules below undo the

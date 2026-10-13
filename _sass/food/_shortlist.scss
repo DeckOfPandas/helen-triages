@@ -1,23 +1,18 @@
 // =============================================================================
 // THE SHORTLIST (#546)
 // =============================================================================
-// Two controls, and they are different kinds of thing:
-//
-//   .btn-shortlist       marks ONE recipe. On a row at the right-hand end of the
-//                        index, and on a recipe page as a pill (#1210; the pill
-//                        is shared/_furniture.scss's, the colours are below).
-//   .btn-shortlist-only  shows only what is marked. One per index, under the
-//                        count it changes.
+// Two controls of different kinds. .btn-shortlist marks one recipe: on an
+// index row's right-hand end, and on a recipe page as a pill (#1210; the pill
+// is shared/_furniture.scss's, the colours are below). .btn-shortlist-only
+// shows only what is marked: one per index, under the count it changes.
 //
 // Grey off, magenta on. $color-recipe-link for the on state, not the raw
 // $color-dazzling-dragonfruit: the darkened one is the text-carrying member of
-// the pair (_palette.scss). Hover goes to the raw, lighter hue, as every link
-// here does.
+// the pair (_palette.scss). Hover goes to the raw, lighter hue.
 //
 // The word never changes and the mark does: `+` off, `✓` on, drawn in ::before
 // (shortlist.js sets the class and aria-pressed). So the control cannot change
 // width, and a row does not move when one is pressed.
-// =============================================================================
 
 // --- The mark ----------------------------------------------------------------
 // A fixed box: `+` and `✓` are not the same width in the face, and would shift
@@ -76,15 +71,11 @@
 // --- On an index row ---------------------------------------------------------
 // The `<li>` is `display: flex` with `.recipe-row-content` at `flex: 1`
 // (_recipe-list.scss), so the button is the second flex item and lands at the
-// right-hand end.
-//
-// Level with the title (#961), by construction: it starts at the row's top and
-// takes the title's own line box as its line-height, in rem because its font
-// is smaller than the title's. Its word then sits on the centre of the title's
-// first line however many lines the title runs to.
-//
-// flex-shrink: 0 because the label is nowrap, so a shrinkable box would let it
-// spill.
+// right-hand end. Level with the title (#961) by construction: it starts at
+// the row's top and takes the title's line box as its line-height, so its
+// word sits on the centre of the title's first line however many lines the
+// title runs to. flex-shrink: 0 because the label is nowrap, so a shrinkable
+// box would let it spill.
 .recipe-list .btn-shortlist {
   align-self: flex-start;
   line-height: $recipe-title-size * $recipe-title-line-height;
@@ -96,11 +87,9 @@
 // A pill on its own line under the count (`.results-count-row`,
 // food/index.html), the same shape and placement as cocktails' in food's
 // colours. Not in META FILTERS: that block is gated on show_source_wording and
-// so is local-only, and this filter is for a visitor.
-//
-// A border, not the tape shape (`.tag-shape`) food's filter chips wear: the
-// tape is the filter matrix's own mark, and this is not a filter on a recipe's
-// properties.
+// so is local-only, and this filter is for a visitor. A border, not the tape
+// shape (`.tag-shape`) food's filter chips wear: the tape is the filter
+// matrix's own mark, and this is not a filter on a recipe's properties.
 .btn-shortlist-only {
   font-family: $font-headings;
   font-size: 0.8rem;

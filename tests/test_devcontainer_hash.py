@@ -2,18 +2,13 @@
 
 `run.sh` stamps every image it builds with this hash and rebuilds when the stamp
 no longer matches, so this function decides when Helen gets a fresh container.
-Two directions matter and they are NOT symmetric:
+The two ways of being wrong are not symmetric. A hash that changes when it
+should not costs one cached rebuild. A hash that does not change when it
+should means the image silently no longer matches the Dockerfile (#1180).
 
-  * A hash that changes when it should not costs one fully-cached rebuild:
-    a second, no network. Noise.
-  * A hash that does NOT change when it should means the image silently no
-    longer matches the Dockerfile — which is the exact bug the stamp was built
-    for (#1180, Helen: "I'd rebuilt the image... but my containers were being
-    created from an older one").
-
-So every test here that pins an exclusion is paired with one proving a real
-build input still counts, and the `.dockerignore` parser's failure mode is
-"hash everything" rather than "hash less than you thought".
+So every test that pins an exclusion is paired with one proving a real build
+input still counts, and the `.dockerignore` parser fails towards hashing
+everything.
 """
 from __future__ import annotations
 
@@ -72,7 +67,7 @@ def test_editing_the_dockerfile_changes_the_hash(tmp_path, hasher):
 
 
 def test_editing_an_ignored_file_does_not_change_the_hash(tmp_path, hasher):
-    """#1191: editing the README or run.sh used to cost a rebuild each time."""
+    """Editing the README or run.sh costs no rebuild (#1191)."""
     context = _context(tmp_path, {"Dockerfile": "FROM ruby:3.3\n",
                                   ".dockerignore": "README.md\nrun.sh\n",
                                   "README.md": "docs\n",
@@ -99,10 +94,8 @@ def test_changing_what_is_excluded_changes_the_hash(tmp_path, hasher):
 def test_a_pattern_it_cannot_parse_falls_back_to_hashing_everything(tmp_path, hasher, capsys):
     """A half-understood pattern must widen the hash, never narrow it.
 
-    With `*.md` in the ignore file this could plausibly have decided nothing was
-    excluded by NAME and quietly matched neither README.md nor anything else --
-    which is fine here, but the same shortcut on `Dockerfile*` would stop the
-    Dockerfile counting. So it refuses to guess and hashes the lot.
+    A guess at what `*.md` excludes is harmless here, but the same guess on
+    `Dockerfile*` would stop the Dockerfile counting. So it hashes the lot.
     """
     context = _context(tmp_path, {"Dockerfile": "FROM ruby:3.3\n",
                                   ".dockerignore": "*.md\n",
@@ -143,16 +136,10 @@ def test_renaming_a_file_changes_the_hash(tmp_path, hasher):
 def _copied_paths(dockerfile: str) -> list[str]:
     """Every path a COPY or ADD pulls out of the build context.
 
-    ONLY those instructions, and this precision is the point rather than
-    pedantry: the first version of this test substring-matched the whole
-    Dockerfile and failed on the word "README.md" inside a prose comment
-    (`see .devcontainer/README.md on why that's deliberate`). A guard that fires
-    on a harmless mention is one you learn to route around, which this
-    repository has recorded about four other hooks.
-
-    Continuation lines are joined first, so a multi-line COPY is read whole.
-    The last argument of a COPY is the DESTINATION inside the image, not a
-    context path, so it is dropped.
+    Only those instructions: a substring match over the whole Dockerfile
+    fires on a filename mentioned in a comment. Continuation lines are joined
+    first, so a multi-line COPY is read whole. The last argument of a COPY is
+    the destination inside the image, not a context path, so it is dropped.
     """
     joined = dockerfile.replace("\\\n", " ")
     paths: list[str] = []

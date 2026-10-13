@@ -11,10 +11,8 @@
 // selectors, not document order; do not merge them into one querySelectorAll.
 //
 // Load order matters: this runs before decorations.js's cardTapes() and
-// before card-name-fit.js, both loaded by _layouts/default.html after the
-// page's own scripts, so the first deal is taped and measured by their own
-// load passes.
-// =============================================================================
+// card-name-fit.js, both loaded by _layouts/default.html after the page's own
+// scripts, so the first deal is taped and measured by their load passes.
 
 (function () {
   var section = document.querySelector('.universe');

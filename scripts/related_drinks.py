@@ -1,43 +1,22 @@
 """What "If you liked this, how about …" would offer, and how thin it gets.
 
-REPRODUCES "every drink's fourth pick shares at least 2" in
-`tests/test_rendered_pages.py`, `_layouts/cocktail.html` and MANUAL.md §9.13.
-
-THE FEATURE (#927, 2026-09-10) is four related drinks at the foot of every
-drink page, chosen in Liquid by `_layouts/cocktail.html`. It was three until
-2026-09-24 -- Helen: "Let's bump to four related cards for cocktails." -- because
-the cards sit two across and three always orphaned one. The score is:
-
-    shared moods  +  shared ingredient generics
-
-with ties broken by title, and nothing else -- Helen: "Not a full recommendation
-engine! But I expect we can do something with coincidental tagging.", and then
-"Keep it simple." This script is that scoring, in Python, over the same corpus,
-and it exists for one reason:
-
-THE TEMPLATE ONLY OFFERS A DRINK SCORING ABOVE ZERO, so the row would silently
-render three items, or a heading over nothing, for a drink that shares no mood
-and no generic with anything in the collection. That is invisible on every page
-but that drink's. When this was built the answer was comfortable -- 48 published
-drinks, and every one of them had a THIRD pick still sharing 3 or more -- and
-when the row went to four (65 published, 2026-09-24) every FOURTH pick still
-shared at least 2, most 4. But that is a fact about today's collection, not a
-property of the rule.
-
     python3 scripts/related_drinks.py            # the distribution, and the tail
     python3 scripts/related_drinks.py negroni    # one drink's picks, with why
 
-RE-RUN IT AFTER A PROMOTION BATCH, and after any vocabulary edit that moves
-moods (`scripts/derive_cocktail_moods.py` is the one that says whether they
-moved). A new drink whose ingredients and moods are unlike everything else is
-exactly the drink this would find, and
-`test_every_published_drink_page_offers_four_other_published_drinks` is what
-turns that into a red build rather than a quiet row of three.
+The related drinks at the foot of a drink page are chosen in Liquid by
+`_layouts/cocktail.html` (MANUAL §9.13): score = shared moods + shared
+ingredient generics, ties broken by title, and nothing else. This is that
+scoring in Python over `_cocktail_recipes/`, read directly, so it needs no
+build. It writes nothing.
 
-It reads `_cocktail_recipes/` directly rather than a build, so it needs no
-`jekyll build` first -- and it applies the publication gate itself
-(`awaiting_fix: false` AND `proofread: true`), because the row a reader sees is
-built from the published set.
+The template offers only a drink scoring above zero, so a drink unlike
+everything else would render a short row on its own page and nowhere else.
+`test_every_published_drink_page_offers_four_other_published_drinks` turns
+that red; this shows which drink and why. Re-run it after a promotion batch,
+and after a vocabulary edit that moves moods.
+
+A drink counts as published here on `awaiting_fix: false` and `proofread:
+true`. It does not read the gate's third cocktail flag, `rewritten`.
 """
 import os
 import sys
@@ -81,11 +60,11 @@ def generics(doc):
 
 
 def published():
-    """The gate, applied here rather than assumed: both flags, explicitly.
+    """Drinks with `awaiting_fix: false` and `proofread: true`, explicitly.
 
-    `_plugins/publish_gate.rb` fails closed on anything other than
-    `awaiting_fix: false` and `proofread: true` -- a missing flag, the old
-    hyphenated spelling, a quoted string. Same test here, for the same reason.
+    `_plugins/publish_gate.rb` fails closed on a missing flag, the hyphenated
+    spelling or a quoted string, so this tests identity, not truthiness. It
+    does not read the gate's third cocktail flag, `rewritten`.
     """
     out = []
     for name in sorted(os.listdir(DRINKS)):
@@ -143,9 +122,8 @@ def main():
         print(f"no published drink called {wanted!r}")
         return 1
 
-    # THE INTERESTING NUMBER IS THE LAST PICK, not the first. A drink always
-    # has something at the top of its list; what says whether the row can be
-    # filled at all is how much the LAST of the four still shares.
+    # The number that matters is the last pick, not the first: what says
+    # whether the row can be filled is how much the last one still shares.
     thin = []
     for slug, doc in corpus:
         rows = scored_against(slug, doc, corpus)

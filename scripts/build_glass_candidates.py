@@ -1,30 +1,17 @@
 """Normalise every source drawing into _includes/icons/glass-candidates/.
 
-REPRODUCES NO NUMBER -- it GENERATES `_data/dev_glass_candidates.yml` (whose
-header names this script) and the drawer on /dev/glasses/, MANUAL.md §9.16.
+    python3 scripts/build_glass_candidates.py
 
-VIEWING COPIES FOR /dev/glasses/ SECTION 6, and nothing else. Not published
-icons, not in `all_icons`, never referenced by a real page.
+Reads `_design_sources/cocktails/glasses/` and rewrites
+`_includes/icons/glass-candidates/` and `_data/dev_glass_candidates.yml`, the
+list of names, since Jekyll cannot enumerate a directory. Both are for the
+drawer on /dev/glasses/ (MANUAL §9.16): viewing copies, not published icons,
+and not in `all_icons`.
 
-WHY A SECOND DIRECTORY IS NEEDED AT ALL. `_design_sources/cocktails/glasses/`
-holds Helen's raw Inkscape exports, and Jekyll cannot reach them: `include`
-reads only from `_includes/`, and there is no plugin here that loads an
-arbitrary path. So the swatch page needs normalised copies somewhere
-includable.
-
-WHY NOT `_includes/icons/glasses/`. That directory IS the published set and
-`tests/test_cocktails.py::test_all_icons_matches_the_icon_directory` asserts it
-matches `all_icons` in both directions. Dropping 38 candidates in there fails
-that test immediately, and rightly -- a reject sitting beside the shipped icons
-is exactly the confusion the test exists to prevent. This sibling directory is
-invisible to it, because that test globs non-recursively.
-
-AND WHY THE LIST GOES TO `_data/`. Jekyll cannot enumerate a directory, so the
-page has to be handed the names. `_data/dev_glass_candidates.yml` is written
-here, in the same run, so regenerating the copies and updating the page is one
-step rather than two that can drift.
-
-Run from anywhere: `python3 scripts/build_glass_candidates.py`.
+The copies exist because `include` reads only from `_includes/`. They sit in a
+sibling of `_includes/icons/glasses/`, not in it, because
+`tests/test_cocktails.py::test_all_icons_matches_the_icon_directory` asserts
+that directory matches `all_icons`, and globs it non-recursively.
 """
 import importlib.util
 import pathlib
@@ -34,10 +21,8 @@ SRC = ROOT / "_design_sources" / "cocktails" / "glasses"
 DST = ROOT / "_includes" / "icons" / "glass-candidates"
 LISTING = ROOT / "_data" / "dev_glass_candidates.yml"
 
-# Reuse the real normaliser, guards and all -- the transform-count check
-# especially, since several candidates carry nested transforms. Importing it is
-# safe: it has a __main__ guard (it did not always, and the day it did not, an
-# import deleted all 26 published icons before the importer's first line ran).
+# Reuse the real normaliser, guards and all: several candidates carry nested
+# transforms. Importing it is safe only because it has a __main__ guard.
 _spec = importlib.util.spec_from_file_location(
     "normalise_glass_icons", ROOT / "scripts" / "normalise_glass_icons.py")
 nrm = importlib.util.module_from_spec(_spec)
@@ -45,20 +30,10 @@ _spec.loader.exec_module(nrm)
 
 
 def main():
-    # LOOK BEFORE DELETING -- issue #537. This emptied DST before it knew SRC
-    # held anything, which is the shape that cost the published icon set twice
-    # in two days next door. The guard is nrm's, deliberately: one
-    # implementation of the rule, called by both, rather than a check written
-    # out twice and kept in step by hand.
-    #
-    # LOWER SEVERITY HERE, AND THAT IS NOT THE SAME AS SAFE. Unlike the
-    # normaliser's gitignored inbox, this SRC is `_design_sources/`, which is
-    # TRACKED -- so it is very unlikely to be empty, and the failure this
-    # prevents is a rename or a move rather than an ordinary day. That makes it
-    # rarer, not different: the drawer would empty silently, and
-    # _data/dev_glass_candidates.yml would be rewritten to agree with the empty
-    # directory, so the listing and the drawer would still match each other and
-    # nothing would look wrong.
+    # Look before deleting (#537): refuse to empty DST unless SRC holds
+    # something. A moved or renamed SRC would otherwise empty the drawer and
+    # rewrite the listing to agree with it, and nothing would look wrong. The
+    # guard is nrm's, so the rule has one implementation.
     sources = sorted(SRC.glob("*.svg"))
     nrm.refuse_if_no_input(
         sources, src=SRC, dst=DST, doing="build candidates from",
@@ -88,22 +63,6 @@ def main():
             continue
         (DST / f"{stem}.svg").write_text(svg, encoding="utf-8")
         written.append(stem)
-
-    # THIS USED TO RECOVER THE SUPERSEDED DOUBLE FROM GIT, and no longer needs
-    # to. When Helen's redraw arrived it was copied over the previous drawing,
-    # so for one commit the only surviving copy of the older one was in
-    # history, and this script dug it out with `git show`. That worked and was
-    # the wrong shape: the drawer's whole job is comparing a new drawing
-    # against the one it replaces, and a comparison that depends on archaeology
-    # breaks as soon as anyone squashes, rebases or clones shallowly.
-    #
-    # Both drawings are real files now -- glass-old-fashioned-double.svg and
-    # glass-old-fashioned-double-2.svg -- so they are picked up by the loop
-    # above like everything else, and there is no special case here at all.
-    #
-    # THE RULE THIS LEAVES BEHIND: when a drawing is superseded, give the new
-    # one a numeric suffix; never save it over the old one. _design_sources/ is
-    # the record of what was tried, and a record you can overwrite is not one.
 
     header = [
         "# GENERATED by scripts/build_glass_candidates.py -- do not hand-edit.",

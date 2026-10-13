@@ -6,10 +6,9 @@ permalink: /
   The site root forwards to food/ (#204): nobody arrives here on purpose.
   Hand-rolled, because no redirect plugin is installed: a meta-refresh with no
   delay, a canonical link, and a visible link for a browser that ignores the
-  refresh. No `layout:` on purpose: a redirect should show as little as
-  possible. The target goes through `relative_url` because the baseurl is not
-  the same on every build, and a literal `/food/` would be silently wrong on
-  one of them.
+  refresh. No `layout:` on purpose. The target goes through `relative_url`
+  because the baseurl is not the same on every build, and a literal `/food/`
+  would be silently wrong on one of them.
 {% endcomment -%}
 {%- assign redirect_url = "/food/" | relative_url -%}
 <!DOCTYPE html>

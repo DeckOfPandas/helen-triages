@@ -1,7 +1,9 @@
 """Seamless black-on-black leopard tiles as SVG data URIs.
 
-REPRODUCES NO NUMBER -- the GENERATOR that `model_instructions/LEOPARD.md` §2
-documents and says can rebuild any of Helen's twenty combinations. Ships nothing.
+An earlier generator: `model_instructions/LEOPARD.md` §3 names it, and nothing
+ships from it. `scripts/leopard_splodge.py` draws the live print.
+
+    python3 scripts/leopard_tile.py [--uri]    the tile's size, or its data URI
 
 A rosette is 3-5 thick arc fragments around an ellipse, with a smaller
 off-centre blob inside. Rosettes are placed by rejection sampling with a

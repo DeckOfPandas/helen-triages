@@ -1,41 +1,26 @@
 """What "If you liked this, how about …" would offer on a RECIPE page, and how
-thin it gets. Food's twin of scripts/related_drinks.py -- #1005, 2026-09-14.
+thin it gets. Food's twin of scripts/related_drinks.py.
 
-REPRODUCES "every recipe's third pick shares at least 1" in
-`tests/test_rendered_pages.py` and `_layouts/recipe.html`.
-
-THE FEATURE is three related recipes at the foot of every recipe page, chosen
-in Liquid by `_layouts/recipe.html`. The score is:
-
-    shared tags  +  shared main_ingredients
-
--- the drinks rule ported directly, at Helen's word ("Yes"). TWO THINGS ON TOP
-OF IT, hers as well. "Prioritise (star*mood)": a candidate that shares this
-recipe's STAR INGREDIENT and at least one MOOD tag outranks every candidate that
-does not, whatever the counts say. And a TIE is broken by shared ingredients,
-larder staples last -- "where just one tag is shared, do you think it would be
-better to pick matched ingredients (in larder order)?" -- so within a score the
-candidate sharing more NON-pantry main ingredients comes first, then the one
-sharing more pantry staples (_data/food/pantry.yml), then A-Z. Measured before
-it was chosen (DECISIONS §13): weighting ingredients above tags changed 49 of
-69 rows and put chocolate ice cream beside cauliflower cheese via "whole milk";
-the tie-break changed 37, nearly all the cases she meant. Nothing else -- no
-per-field multiplier -- for the reason the drinks version gives: every knob one
-could add is a claim about what makes two recipes alike, and nobody has made it.
-
-WHY THIS SCRIPT EXISTS: the template only offers a candidate scoring above
-zero (or prioritised), so a recipe sharing no tag and no main ingredient with
-anything would quietly render a row of two, or a heading over nothing, on its
-own page and nowhere else. `test_every_published_recipe_page_offers_three_other_published_recipes`
-turns that into a red build; this is where to look when it fires.
-
-    python3 scripts/related_recipes.py                 # the distribution, and the tail
+    python3 scripts/related_recipes.py                     # the distribution, and the tail
     python3 scripts/related_recipes.py roast-beef-fillet   # one recipe's picks, with why
 
-It reads `_food_recipes/` directly, so it needs no `jekyll build` first, and
-it applies the publication gate itself (`awaiting_fix: false` AND
-`proofread: true`), because the row a reader sees is built from the published
-set. Re-run it after a promotion batch or a taxonomy edit that moves tags.
+The related recipes at the foot of a recipe page are chosen in Liquid by
+`_layouts/recipe.html` (#1005, DECISIONS §13). This is that choice in Python
+over `_food_recipes/`, read directly, so it needs no build; it also reads
+`_data/food/taxonomy.yml` and `_data/food/pantry.yml`, and writes nothing.
+
+  score     shared tags + shared main_ingredients, with no per-field weight.
+  priority  a candidate sharing this recipe's star ingredient and at least one
+            mood tag outranks every candidate that does not.
+  ties      more shared non-pantry main ingredients first, then more shared
+            pantry staples, then A-Z.
+
+The template offers only a candidate that scores above zero or is prioritised,
+so a recipe unlike everything else would render a short row on its own page.
+`test_every_published_recipe_page_offers_three_other_published_recipes` turns
+that red; this shows which recipe and why. Re-run it after a promotion batch
+or a taxonomy edit that moves tags. A recipe counts as published on
+`awaiting_fix: false` and `proofread: true`.
 """
 import os
 import sys

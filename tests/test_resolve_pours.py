@@ -1,15 +1,9 @@
 """`scripts/resolve_pours.py` -- what the dictionaries settle, and what they do not.
 
-WHY THIS MODULE EXISTS RATHER THAN A CHECK OVER THE DRAFTS. Run against the
-collection today the script resolves NOTHING: all six untyped pours are Tier 3,
-because not one of them names a bottle `bottles.yml` declares. That is the
-script working, and it exercises none of it -- the same hole
-`test_qq_followed_by_the_sources_words_is_still_a_qq` was written to fill, and
-for the same reason (CI has no drafts clone at all).
-
-So the tiers are pinned directly, against the REAL dictionaries and with the
-words a source would actually print. A synthetic vocabulary would prove the
-algorithm and nothing about whether the algorithm fits this repo's data.
+The tiers are pinned directly rather than by a check over the drafts, which CI
+does not have. They run against the real dictionaries with the words a source
+prints: a synthetic vocabulary would prove the algorithm and nothing about
+whether it fits this repo's data.
 """
 import importlib.util
 import pathlib
@@ -36,11 +30,9 @@ def tables():
 # =============================================================================
 
 def test_a_declared_bottle_resolves_to_its_generic(tables):
-    """Helen, 2026-09-21: "If the source says 'Gosling's' then the correct
-    thing for Claude to do is give 'moderately aged rum, character: blackstrap'."
-
-    The generic and the suggestion are a dictionary read. The CHARACTER is not
-    -- see the next test.
+    """A source's name for a declared bottle resolves to that bottle's generic,
+    with the bottle's canonical name as the suggestion. The character is not a
+    dictionary read: see the next test.
     """
     got = rp.resolve("Gosling's", *tables)
     assert got, "`Gosling's` is a declared alias and must resolve"
@@ -53,15 +45,11 @@ def test_a_declared_bottle_resolves_to_its_generic(tables):
 
 
 def test_a_bottles_character_is_a_proposal_and_never_an_answer(tables):
-    """`bottles.yml` has no character column, and says so.
+    """The script may offer a bottle's character as `character_claude` and never
+    write `character` itself (#314).
 
-    Its note against Gosling's Black Seal: the bottle is "reached for FOR its
-    blackstrap, which is a `character` on the recipe and never a generic --
-    #314, and the reason this file has no character column". And Helen,
-    2026-09-14: "We don't name characters on bottles. We name characters on
-    recipe lines ... having a character is only in a context."
-
-    So the script may offer `blackstrap` and may never assert it.
+    A character belongs to a recipe line, not to a bottle, which is why
+    `bottles.yml` has no character column.
     """
     got = rp.resolve("Gosling's Black Seal", *tables)
     assert got["character_claude"] == ["blackstrap"]
@@ -72,10 +60,8 @@ def test_a_bottles_character_is_a_proposal_and_never_an_answer(tables):
 
 
 def test_a_bottle_helen_does_not_buy_never_resolves(tables):
-    """`not_reached_for` is excluded from the index on purpose.
-
-    `away-colour` names Ron del Barrilito, which Helen ruled she does not buy
-    on 2026-09-05. Resolving onto it would propose a drink she cannot make.
+    """`not_reached_for` is excluded from the index on purpose: resolving onto
+    a bottle Helen does not buy would propose a drink she cannot make.
     """
     assert rp.resolve("Ron del Barrilito Three Stars", *tables) is None
 
@@ -103,11 +89,8 @@ def test_an_exact_vocabulary_match_resolves(words, expected, tables):
 
 
 def test_a_generic_helen_reserved_never_resolves(tables):
-    """`hers_to_apply` is excluded, which is the rule it exists for.
-
-    MANUAL 9.3.1: those styles are "Helen's to apply and never to be typed into
-    from a source's own words". A resolver that typed one would be doing the
-    precise thing the list forbids.
+    """`hers_to_apply` generics are excluded: those styles are Helen's to apply
+    and are never typed in from a source's own words.
     """
     assert rp.resolve("caramel-forward Jamaican rum", *tables) is None
 
@@ -115,9 +98,8 @@ def test_a_generic_helen_reserved_never_resolves(tables):
 # =============================================================================
 # TIER 2, THE THIRD DICTIONARY -- a source's wording Helen has ruled on
 # =============================================================================
-# `_data/cocktails/source_wordings.yml`, 2026-10-07. Seventy-three Difford's
-# drinks arrived with 79 untyped pours and the two dictionaries above settled
-# none of them. Helen answered them and agreed to keep the answers.
+# `_data/cocktails/source_wordings.yml`: Helen's answers to source wordings
+# that the two dictionaries above do not settle.
 
 @pytest.mark.parametrize("words,expected", [
     # As Difford's prints them, and as an ingest trims them.
@@ -148,12 +130,10 @@ def test_a_wording_helen_ruled_on_resolves(words, expected, tables):
 
 
 def test_every_wording_lands_on_a_generic_the_vocabulary_declares(tables):
-    """The file is only as good as its values, and a typo in one would type
-    a pour with a generic no drink may carry.
+    """A typo in a value would type a pour with a generic no drink may carry.
 
-    AND NEVER A RESERVED ONE. `hers_to_apply` is excluded from
-    `declared_generics()`, so a wording that pointed at a style Helen applies
-    herself fails here too -- which is the right answer, not a side effect.
+    `hers_to_apply` is excluded from `declared_generics()`, so a wording that
+    points at a style Helen applies herself fails here too, on purpose.
     """
     _, generics = tables
     declared = set(generics.values())
@@ -174,12 +154,11 @@ def test_every_wording_lands_on_a_generic_the_vocabulary_declares(tables):
 
 
 def test_no_wording_shadows_a_dictionary_that_already_answers(tables):
-    """A key that is ALREADY a bottle or a generic can never be reached.
+    """A key that is already a bottle or a generic can never be reached.
 
-    The resolver reads the two dictionaries first, so such an entry is dead --
-    and worse, it reads as though the file were doing work. If a wording here
-    becomes a declared generic or a bottle's alias later, delete it from the
-    file in the same commit; this is what says so.
+    The resolver reads the two dictionaries first, so such an entry is dead
+    while reading as though it did work. When a wording becomes a declared
+    generic or a bottle's alias, delete it from the file in the same commit.
     """
     bottles, generics = tables
     shadowed = sorted(key for key in rp.source_wordings()
@@ -218,36 +197,21 @@ def test_two_wordings_do_not_fold_to_one_key_with_two_answers():
     "tequila",            # blanco, reposado or añejo -- the source did not say
     "agave nectar",       # near-miss for `agave syrup`, and a near-miss is a guess
     "Planteray Three Star",   # a real bottle this repo has not declared
-    # THREE THE 2026-10-07 DIFFORD'S BATCH MET AND DELIBERATELY LEFT OUT OF
-    # source_wordings.yml, each for a reason that file's header gives:
+    # Deliberately left out of source_wordings.yml:
     "Cherry (brandy) liqueur",   # ruled drink by drink, "one by one" -- not a rule
     "Cuban rum",                 # an ingest's own word for Havana Club 3, not a source's
     "port",                      # tawny or ruby? the source's BOTTLE says, the word does not
-    # `Cruzan Single Barrel` WAS HERE AND CAME OFF 2026-09-26, because the
-    # reason it was here was answered. Its comment read "the same" -- a real
-    # bottle this repo has not declared -- and d81d235 declared it, as
-    # `moderately aged rum`, on Helen's #1108 answer. So it resolves at Tier 1
-    # now, correctly, and the entry had become a claim the data contradicts.
-    #
-    # IT TURNED `main` RED AND THAT IS A DEPLOY OUTAGE, not a red build: the
-    # suite gates the deploy, so every merge after it shipped nothing. The two
-    # halves landed in one commit -- the bottle in `_data/`, the list here
-    # untouched -- and nothing in that commit's own review connected them.
-    #
-    # THE TELL, FOR NEXT TIME: this list is the one place in the suite that
-    # asserts a bottle is NOT known, so it is the one place that a declaration
-    # can falsify. Declaring a bottle means checking here. Its sibling stays:
-    # `Planteray Three Star` really is still undeclared.
+    # This list asserts that a bottle is NOT known, so declaring a bottle in
+    # `bottles.yml` can falsify an entry here and turn `main` red (#1108).
+    # Declaring a bottle means checking this list in the same commit.
 ])
 def test_words_nobody_can_resolve_are_left_alone(words, tables):
-    """Helen, 2026-09-21: "if a recipe gives 'blackstrap' Claude shouldn't
-    suggest anything."
+    """Words the dictionaries do not answer resolve to nothing and keep their `QQ`.
 
-    THE MATCHING IS EXACT SO THAT THIS LIST IS POSSIBLE. Every entry here is a
-    phrase a source really prints, and every one is a phrase a model could
-    produce a confident wrong answer for -- `blackstrap rum` most of all,
-    because the repo DOES know a blackstrap bottle and the inference from one to
-    the other is a single plausible step. An exact read cannot take that step.
+    The matching is exact so that this list is possible. Every entry is a
+    phrase a source prints and a model could answer confidently and wrongly:
+    `blackstrap rum` most of all, one plausible step from a bottle the repo
+    does know. An exact read cannot take that step.
     """
     assert rp.resolve(words, *tables) is None, (
         f"{words!r} must fall to Tier 3 and keep its `QQ`"
@@ -315,12 +279,9 @@ def test_apply_writes_the_resolution(tmp_path, tables, monkeypatch):
 
 def test_what_apply_writes_passes_the_suite_that_judges_it(tmp_path, tables,
                                                            monkeypatch):
-    """The output is checked by the real schema, not by this module's opinion.
-
-    A writer whose output its own suite refuses is the shape this repo keeps
-    finding: a rule written down in one place and enforced in another. So the
-    file this script produces is run through the two guards that judge a
-    proposal, with the real vocabulary behind them.
+    """The file the script writes is run through the two guards in
+    test_cocktails.py that judge a proposal, with the real vocabulary behind
+    them, so the writer and the suite cannot disagree about the schema.
     """
     import yaml
     from test_cocktails import (CLAUDE_PROPOSALS, INGREDIENT_KEYS, _is_qq,

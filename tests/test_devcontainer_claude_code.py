@@ -9,8 +9,7 @@ wrong quietly, and each has a test:
     text for the build to interpolate.
   * The Dockerfile, `run.sh` and the label have to agree on one argument name.
     If they drift, the build still succeeds -- on the default, from cache --
-    and the image silently stops following releases, which is exactly the state
-    this replaced.
+    and the image silently stops following releases.
 
 Nothing here touches the network or Docker: the lookup's parser is driven with
 bytes, and the wiring is read off the committed files.

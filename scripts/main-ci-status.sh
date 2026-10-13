@@ -1,42 +1,27 @@
 #!/bin/sh
 # Is `main` green, i.e. is the site actually deploying? Prints the last few
-# runs and one verdict line. Takes no arguments at all.
-#
-# WHY THIS EXISTS (2026-09-22). MANUAL §10: a red `main` is a DEPLOY OUTAGE,
-# not a red build. The suite gates the deploy, so one merge that turns it red
-# stops every LATER merge from going live too, and the only signal is an
-# Actions email. That happened for three days, 2026-09-12 to 2026-09-15, with
-# about twenty merges shipping nothing (DECISIONS §12).
-#
-# THE INSTRUCTION TO CHECK EXISTED AND NOBODY RAN IT, WHICH IS THE POINT OF
-# THIS FILE. The manual's original form was a one-line `gh-read.sh ... --jq
-# '.workflow_runs[] | {head_branch, conclusion}'`, and the brackets and pipe in
-# that expression make Claude Code read the argument as a path computed at run
-# time and ask Helen -- the exact friction CLAUDE.md's wrapper rule exists to
-# remove. A check that costs an interruption is a check that does not happen.
-# (It also spent seven days on an unmerged branch, so no session could have run
-# it anyway; both halves of that are in DECISIONS §12.)
+# runs and one verdict line. A red `main` is a deploy outage, not a red build:
+# the suite gates the deploy, so one merge that turns it red stops every later
+# merge going live too, silently. MANUAL §10, DECISIONS §12.
 #
 # USAGE:
 #   sh scripts/main-ci-status.sh
 #
 # Reads one GitHub endpoint and writes nothing, anywhere. It takes no
-# arguments, so there is no path, repo or option for a caller to influence --
+# arguments, so there is no path, repo or option for a caller to influence:
 # the endpoint, the branch and the count are fixed in this file. Exits 0 when
-# the latest run on `main` succeeded, 1 when it did not, and 2 on a refusal,
-# so a caller can branch on it without parsing the text.
+# the latest run on `main` succeeded, 1 when it did not, and 2 on a refusal.
 #
-# "DID NOT" COVERS THREE DIFFERENT THINGS, and the verdict line says which:
-# still running, CANCELLED (that merge is not deployed, nothing is broken), and
-# red (the deploy outage this file was written for). `branch=main` in the URL
-# also matches a fork's pull request from a branch called `main`; the parser
-# keeps those out of the verdict. scripts/main_ci_status.py has both stories.
+# "Did not" covers three things, and the verdict line says which: still
+# running, cancelled (that merge is not deployed, nothing is broken), and red.
+# `branch=main` in the URL also matches a fork's pull request from a branch
+# called `main`; scripts/main_ci_status.py keeps those out of the verdict.
 #
-# The repo is public, so no credential is sent: `gh-read.sh` is not used here
-# precisely because this must work as a plain unauthenticated read.
+# The repo is public, so no credential is sent; gh-read.sh is not used, so
+# this works as a plain unauthenticated read.
 #
-# AGENT_WRAPPER_DRY_RUN=1 prints the command it would run and exits, for
-# tests/test_agent_wrappers.py.
+# AGENT_WRAPPER_DRY_RUN=1 prints the command instead of running it, one
+# argument per line, for tests/test_agent_wrappers.py.
 set -eu
 
 refuse() {
@@ -57,7 +42,6 @@ if [ -n "${AGENT_WRAPPER_DRY_RUN:-}" ]; then
   exit 0
 fi
 
-# The parsing lives in a committed python file rather than a jq expression on
-# this line, for the reason in the header: a bracketed jq argument is what made
-# the original check prompt.
+# The parsing lives in a committed python file, not a jq expression on this
+# line: a bracketed jq argument given to a wrapper prompts.
 "$@" | python3 scripts/main_ci_status.py

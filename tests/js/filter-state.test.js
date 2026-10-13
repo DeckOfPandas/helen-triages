@@ -1,14 +1,7 @@
-// =============================================================================
-// Tests for assets/js/filter-state.js — the index's filter query-string
-// grammar (GitHub issue #40) and its filter STATE SHAPE (issue #52, step
-// one). No DOM required.
+// Tests for assets/js/filter-state.js: the index's filter query-string grammar
+// (#40) and its filter state shape (#52). No DOM required.
 //
-// Run from the repo root, with the local Node runtime:
-//
-//   .node-runtime/node/bin/node --test
-//
-// See tests/js/ingredient-search.test.js for why not the system node.
-// =============================================================================
+// Run from the repo root: .node-runtime/node/bin/node --test
 'use strict';
 
 const test = require('node:test');
@@ -27,9 +20,8 @@ test('a leading ? is optional', () => {
 });
 
 // --- the + trap ---------------------------------------------------------------
-// Jekyll's url_encode is CGI.escape, which spells a space as `+`, and
-// decodeURIComponent does not undo that. Six real taxonomy values contain a
-// space, and they are among the first things anyone will click.
+// Jekyll's url_encode spells a space as `+`, and decodeURIComponent does not
+// undo that. Real taxonomy values contain a space.
 
 test('+ decodes to a space -- Jekyll url_encode spells a space that way', () => {
   assert.deepStrictEqual(FS.parseQuery('?star=oily+fish').star, ['oily fish']);
@@ -72,8 +64,7 @@ test('a bare - names nothing and is dropped', () => {
 });
 
 // --- tolerance ----------------------------------------------------------------
-// Same policy cook-timer.js applies to ?protein=beef: a bad query string is
-// not worth an error on a page that works fine without it.
+// A bad query string is not worth an error on a page that works without it.
 
 test('an empty string parses to empty, with every known kind still present', () => {
   assert.deepStrictEqual(FS.parseQuery(''), { star: [], tag: [], mood: [], ing: [] });
@@ -114,11 +105,8 @@ test('arity is the caller\'s business -- two stars both come back', () => {
 });
 
 // --- the name query, #1024 -----------------------------------------------------
-// `?q=` arrives from the search box (the header's on a local build since
-// #1210; a recipe or drink page's furniture line before that).
-// It is NOT a kind: it is one string, whole, and a title may carry a comma, so
-// it stays out of parseQuery's return shape (which every test above reads as
-// exactly three keys) and has a reader of its own.
+// `?q=` is not a kind: it is one string, whole, and a title may carry a comma,
+// so it stays out of parseQuery's return shape and has a reader of its own.
 
 test('parseName reads ?q= whole, with the same decoding as the kinds', () => {
   assert.strictEqual(FS.parseName('?q=negroni'), 'negroni');
@@ -140,10 +128,9 @@ test('parseName does not leak into parseQuery', () => {
 });
 
 // --- ?shortlist=, #1093 ---------------------------------------------------------
-// Two meanings in one parameter: `1` is this browser's own list (#994, #1011),
-// anything else is a list of slugs someone sent. The literal
-// `indexOf('shortlist=1')` both indexes used could not tell `1` from a slug
-// that begins with it, which is why this is a parser now.
+// Two meanings in one parameter: `1` is this browser's own list, anything else
+// is a list of slugs someone sent. A slug may begin with `1`, so the value is
+// parsed, never substring-matched.
 
 test('parseShortlist: ?shortlist=1 is the own list, with no slugs', () => {
   assert.deepStrictEqual(FS.parseShortlist('?shortlist=1'), { own: true, slugs: [] });
@@ -206,27 +193,15 @@ test('toQuery is deliberately absent until something writes the URL back', () =>
   assert.strictEqual(FS.toQuery, undefined);
 });
 
-// =============================================================================
-// THE STATE SHAPE — GitHub issue #52, step one
-// =============================================================================
-//
-// The bug these exist to end happened three times in two days, always the same
-// shape: filters.js's clearAllFilters() emptied N pieces of state and the
-// clear-all button's visibility predicate checked N-1, so the button hid while
-// it still had work to do. nameQuery was missed; then isSearching was missed;
-// before that two rival copies of the predicate disagreed with each other.
-// Every one was found by eye, on the page.
-//
-// THE CASES BELOW ARE GENERATED FROM FS.FIELDS, NOT LISTED BY HAND. A
-// hand-written list of six cases has precisely the omission problem it is
-// meant to catch: the day someone adds a seventh field, the hand-written list
-// is quietly one short again and passes. Generated, a new field is covered by
-// the same line that declares it.
+// --- the state shape, #52 ------------------------------------------------------
+// Clear-all empties every field, so the clear button's visibility predicate
+// must read every field too; one it misses hides the button while it still has
+// work to do. The cases are generated from FS.FIELDS, never listed by hand: a
+// hand-written list goes one short, and still passes, when a field is added.
 
-// A non-empty value for a field, derived from that field's OWN empty value, so
-// this helper needs nothing per-field written down either. A field whose empty
-// value is of a kind not handled here throws loudly rather than being skipped
-// — a skipped field is the whole bug.
+// A non-empty value derived from the field's own empty value, so nothing is
+// written down per field. An unhandled kind throws rather than being skipped:
+// a skipped field is the bug.
 function aNonEmptyValueLike(emptyValue, field) {
   if (emptyValue && typeof emptyValue.size === 'number') return new Set(['something']);
   if (emptyValue === '') return 'something';
@@ -256,9 +231,7 @@ test('a cleared state has nothing to clear', () => {
   assert.strictEqual(FS.hasNarrowingFilter(FS.emptyState()), false);
 });
 
-// --- the load-bearing one -----------------------------------------------------
-// One generated case per field. This is the test that would have caught all
-// three of the real bugs at once, and caught them before the page did.
+// --- one generated case per field ---------------------------------------------
 
 FS.FIELDS.forEach((field) => {
   test(`with only "${field}" set, there is something to clear`, () => {
@@ -288,21 +261,13 @@ test('NARROWING_FIELDS is a subset of FIELDS -- no filter exists outside the sha
   });
 });
 
-// --- hasNarrowingFilter is a DIFFERENT question, and must stay different -----
-// Issue #248: collapsing it into hasAnythingToClear would trade a documented
-// difference for a silent behaviour change at whichever call site lost its own
-// answer. It feeds suppressList only.
+// --- hasNarrowingFilter is a different question from hasAnythingToClear ------
+// Collapsing the two silently changes behaviour at whichever call site loses
+// its own answer (#248).
 
 test('hasNarrowingFilter INCLUDES includedIngredients -- issue #1092 made it a real filter', () => {
-  // It used to be `ingredient`, a lone string EXCLUDED here on purpose:
-  // renderResultsPool() nulled it on every keystroke, so while the box was
-  // being typed into it was always empty and counting it towards
-  // hasNarrowingFilter would have been a no-op dressed up as a rule. Multi-
-  // select changed the question: a chosen entry now SURVIVES the next
-  // keystroke (it takes an explicit remove, same as excludedIngredients
-  // beside it), so it is a real filter and belongs in NARROWING_FIELDS --
-  // where the generated sweep two tests up already covers it, this one just
-  // says why the answer flipped.
+  // A chosen entry survives the next keystroke and takes an explicit remove,
+  // so it is a real filter.
   const state = stateWithOnly('includedIngredients');
   assert.strictEqual(FS.hasNarrowingFilter(state), true);
   assert.strictEqual(FS.hasAnythingToClear(state), true);
@@ -319,9 +284,6 @@ test('hasNarrowingFilter INCLUDES nameQuery -- a title search keeps the list on 
 });
 
 test('hasNarrowingFilter INCLUDES tags and star', () => {
-  // `meta` was here until 2026-09-06, when the META FILTERS block came off the
-  // index and the field went with it -- see filter-state.js's own note where
-  // its predicate used to be.
   ['tags', 'star'].forEach((field) => {
     assert.strictEqual(FS.hasNarrowingFilter(stateWithOnly(field)), true, field);
   });
@@ -359,24 +321,12 @@ test('emptyState hands out FRESH collections, never one shared Set', () => {
   });
 });
 
-// =============================================================================
-// THE EXCLUSION RULE — GitHub issue #52's actual goal
-// =============================================================================
-//
-// Helen's user story: "I have invited someone for dinner and they hate peas, so
-// I want to see all recipes that do NOT contain peas as an ingredient."
-//
-// The fixture below is not invented. All three entries are really in the
-// collection's derived ingredient index, which is exactly why this rule is
-// membership rather than containment: `pea` sits inside `peanut butter` and
-// inside `pearl barley`, and a "contains" rule would hand someone who dislikes
-// peas a list with the peanut butter cookies and the pearl barley casserole
-// removed from it for no reason they could see.
-//
-// Excluding is not including turned around, either. main_ingredients is a
-// deliberately partial hint — fine to include ON, unsafe to exclude BY — so
-// these entries come from the FULL derived list (every ingredient_groups item,
-// incidentals included), which is what data-all-ingredients carries.
+// --- the exclusion rule, #52 ---------------------------------------------------
+// Membership, not containment: `pea` sits inside `peanut butter` and inside
+// `pearl barley`, and a "contains" rule removes both for someone who only
+// excluded peas. Exclusion reads the full derived ingredient list
+// (data-all-ingredients): main_ingredients is a partial hint, fine to include
+// on and unsafe to exclude by.
 
 const PEAS_ROW = ['chicken', 'mushrooms', 'peas'];
 const PEANUT_ROW = ['peanut butter', 'plain flour', 'caster sugar'];
@@ -439,8 +389,8 @@ test('an "(all)" value matches family-wise, using the matcher the caller passes'
 });
 
 test('with no matcher supplied, an "(all)" value falls back to exact membership', () => {
-  // Deliberate: no vocabulary means no umbrella. It must never quietly
-  // degrade into a substring rule, which is the one thing this must not be.
+  // No vocabulary means no umbrella; it must never degrade into a substring
+  // rule.
   assert.strictEqual(FS.excludesRow(PEAS_ROW, new Set(['chicken (all)'])), false);
 });
 
@@ -475,19 +425,12 @@ test('a missing or undefined state is answered, not thrown at', () => {
   assert.strictEqual(FS.hasAnythingToClear({}), false);
 });
 
-// =============================================================================
-// serialise / deserialise — GitHub issue #387
-// =============================================================================
-// The index remembers its list in sessionStorage so that going BACK restores
-// what you left. These two are why that is not just JSON.stringify.
+// --- serialise / deserialise, #387 ---------------------------------------------
+// The index keeps its list in sessionStorage so that going back restores it.
 
 test('serialise turns Sets into arrays, because JSON silently will not', () => {
-  // JSON.stringify(new Set(['a'])) is "{}" -- not an error, not an empty array,
-  // just nothing. Two of the fields are Sets, so a state put through raw JSON
-  // comes back with its tags and its exclusions quietly emptied. That is the
-  // bug this function exists to prevent, and it is worth stating in a test
-  // because the naive version LOOKS like it works. (It was three Sets until
-  // 2026-09-06 and the third was `meta`.)
+  // JSON.stringify(new Set(['a'])) is "{}": no error, so a state put through
+  // raw JSON comes back with its Set fields quietly emptied.
   assert.strictEqual(JSON.stringify(new Set(['soup'])), '{}');
 
   const state = FS.emptyState();
@@ -517,10 +460,7 @@ test('a full state survives a round trip through JSON', () => {
 });
 
 test('every field in FIELD_SPEC round-trips, including any added later', () => {
-  // Generated from FIELDS rather than listed, so a field added to FIELD_SPEC is
-  // covered without anyone remembering to come here. MANUAL 12 warns that a
-  // sweep like this proves the predicate and not the table -- true, and the
-  // table is the thing filter-state.js owns, so here it is the right end.
+  // Generated from FIELDS, so an added field is covered without an edit here.
   const empty = FS.emptyState();
   const back = FS.deserialise(FS.serialise(empty));
   FS.FIELDS.forEach((f) => {
@@ -533,9 +473,8 @@ test('every field in FIELD_SPEC round-trips, including any added later', () => {
 });
 
 test('a malformed record falls back to empty rather than throwing', () => {
-  // Stored state is untrusted: a version behind, hand-edited, or left over from
-  // a build where a field meant something else. One unfiltered page is a much
-  // better outcome than a wrong-looking index with no way to tell why.
+  // Stored state is untrusted: a version behind, or hand-edited. An unfiltered
+  // page beats a wrong-looking index with no way to tell why.
   [null, undefined, 'nonsense', 42, [], {}, { tags: 'soup', star: 7 }].forEach((bad) => {
     const back = FS.deserialise(bad);
     assert.strictEqual(FS.hasAnythingToClear(back), false, `${JSON.stringify(bad)} restored as set`);
@@ -547,26 +486,14 @@ test('a Set field given a non-array is ignored, not coerced', () => {
   assert.strictEqual(back.tags.size, 0);
 });
 
-// =============================================================================
-// ONE MECHANISM, TWO TABLES — GitHub issue #579
-// =============================================================================
-// The cocktail index held five loose variables (chosenMoods, chosenChaos,
-// wantName, include, exclude) and six hand-written showClear() calls, which is
-// the shape food's filter state had before issue #52 — and issue #541 asks for
-// a clear-all button on that page, "very much like food site". Clear-all is the
-// exact feature whose visibility predicate drifted from its clearing three
-// times in two days here.
-//
-// So the mechanism is parameterised rather than copied, and every generated
-// case above is re-run below against every declared table. SPECS is derived
-// from the module's own exports, so a table added to filter-state.js is covered
-// by the line that declares it and there is no list of specs to keep in step.
+// --- one mechanism, two tables, #579 -------------------------------------------
+// The generated cases run against every declared field table. SPECS is derived
+// from the module's own exports, so a table added to filter-state.js is
+// covered by the line that declares it.
 
-// Detected by SHAPE, not by name. `/_FIELDS$/` was the obvious spelling and it
-// swept up NARROWING_FIELDS, which is a list of names rather than a table — so
-// the generated cases ran over array indices and every one of them failed. A
-// spec is a mapping whose every value declares an empty() factory; nothing else
-// in this module's exports looks like that.
+// Detected by shape, not by name: `/_FIELDS$/` also matches NARROWING_FIELDS,
+// which is a list of names. A spec is a mapping whose every value declares an
+// empty() factory.
 const isFieldSpec = (v) =>
   !!v && typeof v === 'object' && !Array.isArray(v) &&
   Object.keys(v).length > 0 &&
@@ -633,8 +560,6 @@ SPECS.forEach(([name, spec]) => {
   });
 
   test(`${name}: a full state survives serialise -> deserialise, Sets included`, () => {
-    // JSON.stringify(new Set()) is `{}` — not an error, not an empty array,
-    // just silently nothing. That is why serialise() exists at all.
     const dirty = S.emptyState();
     S.FIELDS.forEach((f) => { dirty[f] = aNonEmptyValueLike(dirty[f], `${name}.${f}`); });
     const back = S.deserialise(JSON.parse(JSON.stringify(S.serialise(dirty))));
@@ -651,9 +576,8 @@ SPECS.forEach(([name, spec]) => {
 });
 
 // --- what the cocktail table must actually hold ------------------------------
-// Named rather than generated, because these are claims about the DESIGN of
-// that index rather than about the mechanism: a field quietly leaving this
-// table would take a whole filter off the clear-all button, silently.
+// Named rather than generated: a field leaving this table takes a whole filter
+// off the clear-all button, silently.
 
 test("the cocktail table covers all five of the index's named questions", () => {
   const S = FS.create(FS.COCKTAIL_FIELDS);
@@ -664,9 +588,8 @@ test("the cocktail table covers all five of the index's named questions", () => 
 });
 
 test('a half-typed cocktail search is clearable but does not narrow', () => {
-  // isSearching's siblings — issue #274 on the food side, declared here rather
-  // than rediscovered. Typing "gi" into HAS TO HAVE and picking nothing leaves
-  // a pool of chips with no other way to dismiss them but deleting the text.
+  // Typing into HAS TO HAVE and picking nothing leaves a pool of chips that
+  // only clear-all or deleting the text dismisses (#274 on the food side).
   const S = FS.create(FS.COCKTAIL_FIELDS);
   ['isIncludeSearching', 'isExcludeSearching'].forEach((f) => {
     const state = S.emptyState();
@@ -677,13 +600,9 @@ test('a half-typed cocktail search is clearable but does not narrow', () => {
 });
 
 // --- is this row one you asked for? — issue #506 ------------------------------
-// The 40 lines that used to sit inside filters.js's update(), where the only
-// way to ask them a question was to open a browser and type. They are
-// FilterState.rowMatchesFilters now, and these are the questions.
-//
 // The row shape is what filters.js reads off each <li>: tags, star,
 // titleFolded, isDraft, ingredients. `titleFolded` is pre-folded by the caller
-// because state.nameQuery is stored folded -- see the function's own comment.
+// because state.nameQuery is stored folded.
 
 const ROW = (over) => Object.assign({
   tags: ['soup', 'make-ahead'],
@@ -695,10 +614,8 @@ const ROW = (over) => Object.assign({
 
 const EMPTY = () => FS.emptyState();
 
-// The real matcher lives in ingredient-search.js and needs a vocabulary. These
-// cases are about the ROW rules, so the umbrella is stubbed to something with
-// no opinions -- exact membership, which is what a family button falls back to
-// anyway when nothing is passed.
+// The real matcher needs a vocabulary. These cases are about the row rules, so
+// the umbrella is stubbed to exact membership.
 const EXACT = (list, key) => list.indexOf(key) !== -1;
 
 test('an empty state keeps every row', () => {
@@ -740,15 +657,8 @@ test('the name query is a substring of the FOLDED title, both sides folded', () 
 });
 
 test('a draft row is not filtered on any more, in either direction', () => {
-  // THE REPLACEMENT FOR A TEST THAT WENT, rather than a deletion. Until
-  // 2026-09-06 this asserted that `meta: draft` kept drafts and dropped the
-  // rest; Helen removed the META FILTERS block ("it was useful when I was still
-  // ingesting recipes I know, but it's not now I've done most of that") and the
-  // field went with it.
-  //
-  // What is worth pinning now is the OTHER half of the old test, which has not
-  // changed and is easy to break by accident: `isDraft` is still on the row --
-  // it renders the `draft` badge -- and no filter may quietly start reading it.
+  // `isDraft` is on the row because it renders the `draft` badge; no filter
+  // may read it. The food index has no META FILTERS block (DECISIONS).
   assert.strictEqual(FS.rowMatchesFilters(ROW({ isDraft: true }), EMPTY(), EXACT), true);
   assert.strictEqual(FS.rowMatchesFilters(ROW({ isDraft: false }), EMPTY(), EXACT), true);
 });
@@ -764,19 +674,15 @@ test('the ingredient key drops its (all) suffix before it is matched', () => {
 });
 
 test('with no matcher, an ingredient filter selects nothing rather than everything', () => {
-  // The opposite direction from excludesRow's own no-matcher case, and both
-  // fail where it shows: an empty list is visibly wrong, where a silently
-  // unenforced EXCLUSION would hand back the thing you ruled out.
+  // Fails where it shows: an empty list is visibly wrong.
   const state = EMPTY();
   state.includedIngredients.add('lamb');
   assert.strictEqual(FS.rowMatchesFilters(ROW(), state, undefined), false);
 });
 
 // --- HAS TO HAVE is AND across its chosen entries -- GitHub issue #1092 -------
-// A second (or third) pick used to REPLACE state.ingredient's one value; now
-// it joins a Set, and a row must satisfy every member, the same shape
-// excludesRow's caller already has for LEAVE OUT (OR, the opposite
-// direction) and cocktail-search.js's own `include` cupboard.
+// Each pick joins a Set and a row must satisfy every member; LEAVE OUT is the
+// opposite direction, OR.
 
 test('two chosen ingredients are AND -- a row must have both, not either', () => {
   const state = EMPTY();
@@ -803,9 +709,8 @@ test('an empty set of chosen ingredients filters nothing, same as excludedIngred
 });
 
 test('the row rules are ALL of them, and each one alone can drop a row', () => {
-  // A sweep, so a rule quietly deleted from the predicate is a failure rather
-  // than a smaller function. Generated from the four fields rather than
-  // hand-listed, which is the omission problem this module exists to remove.
+  // A sweep, so a rule deleted from the predicate is a failure rather than a
+  // smaller function.
   const cases = [
     ['tags', (s) => { s.tags = new Set(['nonexistent']); }],
     ['star', (s) => { s.star = 'beef'; }],
@@ -823,18 +728,15 @@ test('the row rules are ALL of them, and each one alone can drop a row', () => {
 });
 
 test('a row missing every field is not a crash', () => {
-  // Defensive because the caller reads a live DOM: a row whose data attributes
-  // are all absent arrives as empty strings and empty arrays, and the answer
-  // wanted there is "nothing is filtering it out", not an exception.
+  // The caller reads a live DOM: a row with no data attributes must come back
+  // unfiltered, not as an exception.
   assert.strictEqual(FS.rowMatchesFilters({}, EMPTY(), EXACT), true);
   assert.strictEqual(FS.rowMatchesFilters(undefined, undefined, EXACT), true);
 });
 
 // --- did we get here by going back? — #387, shared with cocktails by #595 -----
-// The one browser fact both restores rest on. It is here rather than in either
-// index because the alternative was the same six lines twice, and because
-// `performance` can be injected -- so the question can be asked without a
-// browser, which is the whole reason the food side's version was unreachable.
+// The one browser fact both indexes' restores rest on. `performance` is
+// injected, so the question can be asked without a browser.
 
 test('a back/forward navigation is recognised', () => {
   const perf = { getEntriesByType: () => [{ type: 'back_forward' }] };
@@ -853,9 +755,8 @@ test('every other kind of arrival is a fresh visit', () => {
 });
 
 test('no Navigation Timing at all is a fresh visit, not a crash', () => {
-  // The index runs this at startup; an exception here would take the whole
-  // page's filtering with it, and the honest fallback is the list you would
-  // have had before the feature existed.
+  // The index runs this at startup; an exception here takes the whole page's
+  // filtering with it.
   assert.strictEqual(FS.arrivedByGoingBack({ getEntriesByType: () => [] }), false);
   assert.strictEqual(FS.arrivedByGoingBack({}), false);
   assert.strictEqual(FS.arrivedByGoingBack(null), false);
@@ -873,9 +774,8 @@ test('the two tables are genuinely different -- this is not one index twice', ()
 });
 
 // --- the cocktails half of the grammar ---------------------------------------
-// `mood` joined KINDS on 2026-09-05, when a drink page's chips became links to
-// a pre-filtered index. The grammar is one thing for both sites; each index
-// reads only the keys it has buttons for.
+// The grammar is one thing for both sites; each index reads only the keys it
+// has buttons for.
 
 test('a mood parses like any other kind', () => {
   assert.deepStrictEqual(FS.parseQuery('?mood=sharp'),
@@ -883,8 +783,8 @@ test('a mood parses like any other kind', () => {
 });
 
 test("a two-word mood survives Jekyll's url_encode, which spells a space as +", () => {
-  // Every one of these is a real mood in _data/cocktails/taxonomy.yml, and the
-  // `+` is what `url_encode` emits -- see _layouts/cocktail.html.
+  // Both are real moods in _data/cocktails/taxonomy.yml; `url_encode` in
+  // _layouts/cocktail.html emits the `+`.
   assert.deepStrictEqual(FS.parseQuery('?mood=sunny+terrace').mood, ['sunny terrace']);
   assert.deepStrictEqual(FS.parseQuery('?mood=no+juicing').mood, ['no juicing']);
 });

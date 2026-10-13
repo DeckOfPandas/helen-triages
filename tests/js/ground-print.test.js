@@ -1,13 +1,10 @@
-// =============================================================================
-// Tests for assets/js/ground-print.js — the two pure pieces of the script that
+// Tests for assets/js/ground-print.js: the pure pieces of the script that
 // draws cocktails' leopard once on the device and keeps it (#733). The drawing
-// itself needs a canvas and IndexedDB and is looked at in a browser; what can
-// go quietly wrong without either is here.
+// itself needs a canvas and IndexedDB and is looked at in a browser.
 //
 // Run from the repo root, with the local Node runtime:
 //
 //   .node-runtime/node/bin/node --test tests/js/*.test.js
-// =============================================================================
 'use strict';
 
 const test = require('node:test');
@@ -46,7 +43,7 @@ test('two sites on one origin do not share a picture', () => {
 
 test('a strength of 1.5 is one full pass and one at half', () => {
   // A canvas can only draw an image fainter than it is, so "stronger" is more
-  // passes. This is the number Helen chose for the fur.
+  // passes.
   assert.deepStrictEqual(GP.passes(1.5), [1, 0.5]);
   assert.deepStrictEqual(GP.passes(1), [1]);
   assert.deepStrictEqual(GP.passes(0.5), [0.5]);

@@ -5,28 +5,17 @@
     python3 scripts/ingest_preflight.py <path> [...]    # explicit files
     python3 scripts/ingest_preflight.py --all           # both whole collections
 
-RUN IT THROUGH `/ingest`, which is the procedure; this file is only the engine.
+The engine behind `/ingest` (MANUAL §11.0.3). With no argument it takes the
+files each drafts clone's branch changed against that clone's `main`. It reads
+the recipe files and `_data/cocktails/`, and never writes:
+`scripts/tidy_drafts.py` is the fixer. Mechanical things get fixed there;
+judgements get reported here, grouped by decision, so each kind of gap is one
+line Helen reads once.
 
-WHY IT EXISTS. The 2026-08-31 Death & Co ingest brought Helen vocabulary gaps in
-a TRICKLE -- bottles at one moment, generics at another, garnishes at a third --
-so she was interrupted three times for what was really one sitting. A gap found
-while transcribing drink four is not urgent; it is one line in a list she reads
-once. Batching them is the whole point.
-
-IT NEVER WRITES ANYTHING. `scripts/tidy_drafts.py` is the fixer and its boundary
-is the same one: mechanical things get fixed, judgements get reported.
-
-EVERY RULE IS IMPORTED FROM THE TEST SUITE, NEVER RE-TYPED. `tidy_drafts.py`
-established that, and the reason is sharper for a REPORTER than for a fixer: a
-report carrying its own copy of the vocabulary will eventually call a declared
-value undeclared, or stay silent when it should not, and either way Helen stops
-trusting the list. If an import here breaks because a test constant moved, that
-is the mechanism working.
-
-IT DOES NOT DUPLICATE THE SUITE. Run `pytest` for what is already enforced; a
-second opinion that disagrees with the tests is worse than no opinion. This
-looks only for what is VALID and still wants a human -- an undeclared word, a
-near-duplicate phrasing, a silence in the source.
+Every rule is imported from the test suite, never re-typed: a report with its
+own copy of the vocabulary drifts from the tests. It does not repeat what
+`pytest` already enforces. It looks only for what is valid and still wants a
+human: an undeclared word, a near-duplicate phrasing, a silence in the source.
 """
 from __future__ import annotations
 
@@ -53,10 +42,9 @@ FOOD = ROOT / "_food_drafts"
 COCKTAILS = ROOT / "_cocktail_drafts"
 
 # How close a new method step must be to a canonical one before it is called a
-# near-miss rather than a new instruction. 0.80 was picked by running it over
-# the whole collection: it catches "Stir all THE ingredients with ice" against
-# "Stir all ingredients with ice" and does not pair two genuinely different
-# muddles. Lower it and every strain looks like every other strain.
+# near-miss rather than a new instruction. At 0.80 "Stir all the ingredients
+# with ice" pairs with "Stir all ingredients with ice" and two genuinely
+# different muddles do not; lower, and every strain looks like every other.
 NEAR_MISS = 0.80
 
 
@@ -110,12 +98,8 @@ def _site_of(path):
 
 
 class Report:
-    """Grouped by DECISION, never by file.
-
-    Helen rules on a CLASS -- "all cane syrups are 2:1" -- far more cheaply than
-    on twelve separate files, and a per-file report makes her derive the class
-    herself, twelve times.
-    """
+    """Grouped by decision, never by file: Helen rules on a class far more
+    cheaply than on twelve separate files."""
 
     def __init__(self):
         self.groups = collections.OrderedDict()
@@ -157,9 +141,7 @@ def _us_units_in(text, ignored):
     return (words - ignored) & US_UNITS
 
 
-# =============================================================================
-# Cocktails
-# =============================================================================
+# --- Cocktails ---------------------------------------------------------------
 
 def check_cocktail(path, fm, rep, ctx):
     slug = path.stem
@@ -232,14 +214,11 @@ def check_cocktail(path, fm, rep, ctx):
                         "punch steps carried ounces after the 2026-09-01 conversion had\n"
                         "already fixed every `amount:` in the collection.")
         if s in ctx["canonical_steps"] or s in ctx["proposed_steps"]:
-            # A step already on the left of a methods.yml proposal is TRACKED,
-            # not undecided. Re-reporting it makes an ingest report look like a
-            # backlog and buries the handful of things that are genuinely new --
-            # which is the whole failure this script exists to fix.
+            # A step already on the left of a methods.yml proposal is tracked,
+            # not undecided: re-reporting it buries what is genuinely new.
             continue
         if any(rx.match(s) for rx in ctx["shape_patterns"]):
-            # A filled `shapes:` sentence ("Shake all ingredients other than
-            # the cola with ice.") is canonical too -- 2026-09-10.
+            # A filled `shapes:` sentence is canonical too.
             continue
         close = difflib.get_close_matches(s, ctx["canonical_steps"], n=1, cutoff=NEAR_MISS)
         if close:
@@ -268,9 +247,7 @@ def check_cocktail(path, fm, rep, ctx):
                     "looks. Worth doing in the same sitting.")
 
 
-# =============================================================================
-# Food
-# =============================================================================
+# --- Food --------------------------------------------------------------------
 
 QUALIFIERS = {
     "sugar": r"(caster|granulated|icing|demerara|muscovado|brown|palm|coconut|vanilla|golden|jaggery)",
@@ -347,17 +324,9 @@ def check_food(path, fm, rep, ctx):
                     why="Left QQ deliberately -- `Estimated N mins` is banned outright\n"
                         "(MANUAL 5). Fill in from the source, or from cooking it.")
 
-    # A BLANK `star_ingredient` IS NOT REPORTED, and the playtest is why. It
-    # fired on 118 drafts -- about a third, which is the rate MANUAL §7
-    # documents as CORRECT ("~a quarter are legitimately blank"). §12 uses this
-    # exact field as its worked example of a false finding: "be suspicious of
-    # your own findings before reporting them -- check whether what you found is
-    # a documented convention (a blank star_ingredient is correct for a plain
-    # sponge)". A report that cries wolf on a third of the corpus teaches Helen
-    # to skim it, which costs more than the check could ever buy.
-    #
-    # Proposing a star for a NEW recipe is still tier-2 work and belongs in the
-    # ingest doc -- it is just not a defect to flag on an existing file.
+    # A blank `star_ingredient` is not reported: it is correct for many
+    # recipes, and a report that fires on a large share of the corpus gets
+    # skimmed.
 
 
 def main():

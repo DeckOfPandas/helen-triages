@@ -1,8 +1,6 @@
 // =============================================================================
 // THE SHORTLIST — #546, the drinks side
 // =============================================================================
-// Three controls:
-//
 //   .btn-shortlist          marks one drink, on the drink page
 //   .btn-shortlist--card    the same control in a card's top-right corner
 //   .btn-shortlist-only     shows only what is marked, in the row under the count
@@ -114,14 +112,10 @@
 // ON A CARD — the mark alone, in the top-right corner
 // =============================================================================
 // It shares the ship mark's right edge, $card-pad-x, so the card has a second
-// fixed anchor in the same column.
-//
-// No word here. The tape runs almost to the card's right edge, so anything in
-// this corner is paid for out of the title, and a word costs several times
-// what the mark does. The button carries an `aria-label` naming the drink.
-//
-// Fixed width is a requirement: `+` and `✓` are drawn in a box of the same
-// declared width, so the anchor does not move when the mark is pressed.
+// fixed anchor in the same column. No word: the tape runs almost to the card's
+// right edge, so this corner is paid for out of the title; the button's
+// `aria-label` names the drink. `+` and `✓` are drawn in a box of one declared
+// width, so the anchor does not move when the mark is pressed.
 
 // The mark's size, named because two rules depend on it: the button below,
 // and the title's reservation further down, which is computed from it (#962).
@@ -153,17 +147,12 @@ $card-shortlist-size: 1.15rem;
   // would sit the glyph off-centre in its own hit area.
   &::before { margin-right: 0; }
 
-  // A bigger target that costs the layout nothing (#823). An absolutely
+  // A bigger target that costs the layout nothing (#823): an absolutely
   // positioned ::after extends the clickable region without entering layout,
   // so the reservation, the tape's width and card-name-fit.js's measurement
-  // are untouched. It reaches only into what is already empty: the card's
-  // padding above and to the right, the gap the reservation keeps clear of
-  // the tape on the left, and a little below.
-  //
-  // It takes the corner from the card link on purpose: a click there
-  // shortlists instead of opening the drink.
-  //
-  // `content: ''` and no background: it must never be visible.
+  // are untouched. It reaches only into what is already empty, and takes the
+  // corner from the card link on purpose: a click there shortlists instead of
+  // opening the drink. `content: ''` and no background: never visible.
   &::after {
     content: '';
     position: absolute;
@@ -175,40 +164,25 @@ $card-shortlist-size: 1.15rem;
 }
 
 // --- What the corner costs the title -----------------------------------------
-// The tape bleeds right by $card-tape-bleed-right into the card's padding, so
-// its right edge is closer to the border than the button's. Without this
-// reservation the longest names run under the button.
-//
-// The bleed is added, not subtracted: the reservation covers the mark's box,
-// the hit area's padding on the side facing the tape, the gap, and the bleed.
-// Built from the same tokens the collision is made of, so moving one moves
-// this.
-//
-// Scoped to `.drink-cards`, because only a card in a list has the button; the
-// universe pick wears `.drink-card-name` too and must not reserve room. On the
-// name, not the body: the ingredient line keeps the full width.
-//
-// There must be only this one `padding-right`. card-name-fit.js measures the
-// tape word's `clientWidth`, which is the box this leaves, so a name that no
-// longer fits steps down or wraps by its rule. The tagline mark (#1292) adds
-// to this calc through `--card-tagline-reserve`, which is 0 wherever there is
-// hover, rather than restating the rule.
+// The tape bleeds right by $card-tape-bleed-right, so without this reservation
+// the longest names run under the button. It covers the mark's box, the hit
+// area's padding facing the tape, the gap, and the bleed (added, not
+// subtracted). Scoped to `.drink-cards`: the universe pick wears
+// `.drink-card-name` too and has no button. There must be only this one
+// `padding-right`: card-name-fit.js measures the box it leaves, and the
+// tagline mark (#1292) adds to it through `--card-tagline-reserve`.
 .drink-cards .drink-card-name {
   padding-right: calc(0.85 * #{$card-shortlist-size} + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right} + var(--card-tagline-reserve, 0px));
 }
 
 // --- the tagline mark, left of the button, where there is no hover -----------
-// #1292. Pointing at a card shows its tagline (_cards.scss); a phone or a
-// tablet has nothing to point with, so it gets a `?`. It is the `+` again, one
-// step left: the same size, box, padding and top anchor, grey off and wicked
-// woowoo on. The step is one button's box and its padding on both sides.
+// #1292. A phone or a tablet cannot point at a card, so it gets a `?`: the `+`
+// again, one step left, the step being one button's box and its padding on
+// both sides. Only under `(hover: none)`, and `hidden` until card-tagline.js
+// wires it, so a page with no script has no dead control.
 //
-// Only under `(hover: none)`, and `hidden` until card-tagline.js wires it, so
-// a page with no script has no dead control.
-//
-// The title pays for it through `--card-tagline-reserve`, above 400px only:
-// below that the glass is a band across the top with both marks in it, and the
-// name has its own row beneath.
+// The title pays through `--card-tagline-reserve`, above 400px only: below
+// that both marks are in the glass band and the name has its own row beneath.
 $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs});
 
 .btn-card-tagline { display: none; }
@@ -263,9 +237,7 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
 // THE SHOPPING LIST — what a shortlist adds up to
 // =============================================================================
 // The last thing on the index, shown only while the shortlisted-only filter is
-// on (see cocktails/index.html).
-//
-// Amount first, name second, with a fixed column for the amount: a shopping
+// on (see cocktails/index.html). Amount first in a fixed column: a shopping
 // list is read down its left edge for "how much". 7rem holds
 // `12 drops + 6 dashes` at this size; anything longer pushes the name along
 // rather than wrapping under it.

@@ -19,7 +19,7 @@ const [url, clickSelector, cropSelector, out, width] = process.argv.slice(2);
   const el = await page.$(cropSelector);
   if (!el) { console.log('no element for', cropSelector); process.exit(1); }
   await el.screenshot({ path: out });
-  // THE BOX, IN CSS PX FROM THE PAGE'S TOP-LEFT, as crop.js prints it.
+  // The box, in CSS px from the page's top-left, as crop.js prints it.
   const box = await el.evaluate((node) => {
     const r = node.getBoundingClientRect();
     const f = (n) => Math.round(n * 10) / 10;

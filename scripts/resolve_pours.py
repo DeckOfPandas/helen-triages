@@ -6,62 +6,36 @@ nothing else.
     python3 scripts/resolve_pours.py --apply         # write the resolutions
     python3 scripts/resolve_pours.py --only rum-cow  # one drink
 
-WHY THIS EXISTS. Of 77 `QQ` notes across both drafts collections, 42 -- 55% --
-ask Helen either "which category is this?" or "which bottle is this?". Both are
-dictionary reads when the source names something the repo declares, and both
-were being done BY HAND, from recall, one drink at a time. The batch of
-2026-09-20 resolved nine bottles that way (Gosling's, Smith & Cross, Suze,
-Fernet Branca, Angostura, Cointreau, Hayman's London Dry, Monin Pure Cane
-Sugar, El Dorado 5 Year Old). Nine correct answers looked up by a model that
-could equally have produced nine confident wrong ones.
+It reports by default, so the resolutions can be read before they are written.
+It reads every `.md` under `_cocktail_drafts/` (a README.md aside) and, from
+`_data/cocktails/`, `bottles.yml`, `ingredients.yml` and
+`source_wordings.yml`. With `--apply` it replaces the resolved lines of each
+draft as text. Re-derive moods afterwards:
+`python3 scripts/derive_cocktail_moods.py --write`.
 
-HELEN'S RULE, 2026-09-21, IS THE WHOLE SPECIFICATION:
+It looks only at an ingredient whose `generic` is still
+`"QQ <the source's words>"`, and there are three outcomes (DECISIONS §9):
 
-    "If the source says 'Gosling's' then the correct thing for Claude to do is
-     give 'moderately aged rum, character: blackstrap'. But if a recipe gives
-     'blackstrap' Claude shouldn't suggest anything."
-
-So there are exactly three outcomes for a pour whose `generic` is still a QQ:
-
-  TIER 1  the source's words name a DECLARED BOTTLE
-          -> write `generic` and `suggestion` from bottles.yml. A dictionary
-             read; no judgement; the QQ goes.
-  TIER 2  the source's words ARE a declared generic, exactly
-          -> write `generic`. Also a dictionary read.
+  TIER 1  the source's words name a declared bottle, by name or alias
+          -> write `generic` and `suggestion` from bottles.yml.
+  TIER 2  the source's words are a declared generic, exactly, or a wording
+          Helen has ruled on in source_wordings.yml
+          -> write `generic`.
   TIER 3  anything else
-          -> leave `generic: "QQ <the source's words>"` exactly as it is.
+          -> leave the line exactly as it is. It is Helen's.
 
-AND, SINCE 2026-10-07, A THIRD DICTIONARY THAT TIER 2 READS:
-`_data/cocktails/source_wordings.yml`. Seventy-three Difford's drinks arrived
-with 79 untyped pours and this script settled none, because Difford's never
-writes a category the way this collection does -- "Rosso vermouth" for `sweet
-vermouth`, "Light white rum (charcoal-filtered 1-4 years old)" for `lightly
-aged and filtered rum`. Helen answered them an afternoon at a time and then
-agreed to keep the answers ("Agree to the mapping"). So:
+The rules:
 
-  TIER 2  ...or the source's words are a WORDING HELEN HAS RULED ON
-          -> write the generic she gave it. Still a dictionary read, still
-             exact: the file holds her rulings and nothing an ingest inferred,
-             which is what keeps "will not guess" true below.
-
-AND THE ONE INFERENCE IT WILL MAKE, ONLY AS A PROPOSAL. `bottles.yml` has no
-character column, deliberately -- its own note against Gosling's Black Seal says
-the bottle is "reached for FOR its blackstrap, which is a `character` on the
-recipe and never a generic". So resolving a bottle gives a generic and a
-suggestion and NO character, and Helen's 2026-09-14 ruling says why: "We don't
-name characters on bottles. We name characters on recipe lines ... having a
-character is only in a context." Where a resolved bottle has a character
-recorded in `bottle_characters` below, this writes `character_claude` -- a
-PROPOSAL, beside the pour, for her to accept or reject. Never `character`.
-
-WHAT IT WILL NEVER DO. It will not match loosely, stem, fuzzy-match or guess.
-Every lookup is an exact read of a folded string against a declared name or
-alias. "blackstrap rum" names no bottle and is not a declared generic, so it is
-Tier 3 and this script leaves it alone -- which is the case Helen raised, and
-the reason the matching is exact rather than clever.
-
-REPORTS BY DEFAULT, exactly as scripts/tidy_drafts.py does, so the resolutions
-can be read before they are written.
+  - Every lookup is an exact read of a folded string against a declared name
+    or alias. It never matches loosely, stems, fuzzy-matches or guesses:
+    "blackstrap rum" names no bottle and is not a declared generic, so it is
+    Tier 3.
+  - A bottle on `not_reached_for` is never resolved onto, and a generic in
+    `hers_to_apply` is never written.
+  - A character is only ever proposed. bottles.yml records none, because a
+    character belongs to a recipe line and not to a bottle. Where a resolved
+    bottle is listed in BOTTLE_CHARACTERS this writes `character_claude` and a
+    `QQ` note beside it, for Helen to accept or delete. Never `character`.
 """
 from __future__ import annotations
 
@@ -82,10 +56,10 @@ FRONT_MATTER = re.compile(r"\A(---\s*\n)(.*?\n)(---\s*\n)", re.S)
 # A pour's `generic` line, quoted, at the indent an ingredient entry uses.
 GENERIC_LINE = re.compile(r'^(?P<indent>\s*)generic:\s*"QQ (?P<words>.+)"\s*$')
 
-# The characters a BOTTLE is reached for, which bottles.yml deliberately does
-# not record. Proposals only -- see the module docstring. Keep this short: a
-# character is a property of a RECIPE's use of a bottle, so an entry here is
-# only ever "this is usually why", never "this is what it is".
+# The characters a bottle is reached for, which bottles.yml deliberately does
+# not record. Proposals only. Keep this short: a character belongs to a
+# recipe's use of a bottle, so an entry is "this is usually why", never "this
+# is what it is".
 BOTTLE_CHARACTERS = {
     "gosling's black seal": ["blackstrap"],
 }
@@ -103,12 +77,11 @@ def _data(name: str) -> dict:
 
 
 def bottle_index() -> dict:
-    """Every declared bottle NAME and ALIAS -> (canonical name, its generic).
+    """Every declared bottle name and alias -> (canonical name, its generic).
 
-    `not_reached_for` is deliberately absent. Those are bottles Helen has ruled
-    she does not buy, so resolving a pour onto one would be proposing a drink
-    she cannot make -- Ron del Barrilito Three Stars is the live case, named by
-    `away-colour` and sitting on that list.
+    `not_reached_for` is deliberately absent: those are bottles Helen has
+    ruled she does not buy, so resolving onto one would propose a drink she
+    cannot make.
     """
     out = {}
     for name, entry in (_data("bottles.yml").get("bottles") or {}).items():
@@ -141,9 +114,8 @@ def declared_generics() -> dict:
 def source_wordings() -> dict:
     """Folded source wording -> the generic Helen ruled it is.
 
-    `_data/cocktails/source_wordings.yml`. Her rulings only -- that file's
-    header says what may and may not go in it, and tests/test_resolve_pours.py
-    holds every value to the declared vocabulary.
+    `_data/cocktails/source_wordings.yml` holds her rulings only, and
+    tests/test_resolve_pours.py holds every value to the declared vocabulary.
     """
     path = DATA / "source_wordings.yml"
     if not path.exists():
@@ -156,9 +128,8 @@ def resolve(words: str, bottles: dict, generics: dict,
             wordings: dict | None = None) -> dict | None:
     """Tier 1, Tier 2, or None for Tier 3. Exact reads only.
 
-    `wordings` is `source_wordings()`; it is read from the data file when a
-    caller does not pass it, so the two-table call the tests have always made
-    still sees the third dictionary.
+    `wordings` is `source_wordings()`, read from the data file when a caller
+    does not pass it.
     """
     key = fold(words)
     if key in bottles:
@@ -181,9 +152,8 @@ def resolve(words: str, bottles: dict, generics: dict,
 def rewrite(text: str, found: list) -> str:
     """Replace each resolved `generic:` line, and the `suggestion:` under it.
 
-    TEXTUAL, NOT A YAML ROUND TRIP -- the same reason scripts/needs_helen.py
-    edits its one line by hand: a round trip loses comment placement and key
-    order, and a drafts file is something Helen reads.
+    Textual, not a YAML round trip: a round trip loses comment placement and
+    key order, and a drafts file is something Helen reads.
     """
     lines = text.split("\n")
     for hit in sorted(found, key=lambda h: -h["line"]):
@@ -193,11 +163,10 @@ def rewrite(text: str, found: list) -> str:
         if hit.get("character_claude"):
             joined = ", ".join(f'"{c}"' for c in hit["character_claude"])
             block.append(f"{indent}character_claude: [{joined}]")
-            # THE PROPOSAL NEEDS AN OPEN QUESTION TO SIT BESIDE. Tier 1 answers
-            # the generic outright, so no QQ survives there -- and a `_claude`
-            # key on a pour with nothing open is refused by
-            # `test_a_claude_proposal_only_sits_beside_an_open_question`.
-            # The question this pour still has is the character, so it says so.
+            # The proposal needs an open question beside it: a `_claude` key
+            # with nothing open is refused by
+            # `test_a_claude_proposal_only_sits_beside_an_open_question`, and
+            # Tier 1 leaves no QQ. So the note asks about the character.
             words = ", ".join(hit["character_claude"])
             block.append(
                 f'{indent}note: "QQ - {hit["suggestion"][0]} is usually '

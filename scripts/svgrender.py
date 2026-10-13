@@ -1,28 +1,16 @@
-"""A minimal SVG rasteriser for the glass icons, so artwork can be MEASURED.
+"""A minimal SVG rasteriser for the glass icons, so artwork can be measured.
 
-There is no cairosvg, rsvg-convert, ImageMagick or Inkscape available here, and
-drawing an icon blind is how you ship a tiki mug with gaps in its lines. This
-handles exactly the subset the glass icons use -- absolute M/L/C/Z plus the
-h/v/A shorthands -- flattens curves to polylines, and rasterises either as
-round-capped strokes (`render`) or as nonzero-winding fills (`render_filled`).
+A library, not a command: the glass scripts and the suite import it. There is
+no cairosvg, rsvg-convert, ImageMagick or Inkscape in the container.
 
-WHY THIS IS IN scripts/ RATHER THAN tmp/ (#498). It started as a throwaway to
-answer "does this look like a tiki mug", but it has since been the only way to
-answer three separate questions that reasoning got WRONG:
+It handles the subset the glass icons use: M, L, H, V, C, S, A and Z path
+commands, absolute or relative, and `translate`, `matrix` and `scale`
+transforms on nested groups and on paths. Curves are flattened to polylines
+and rasterised as round-capped strokes (`render`) or nonzero-winding fills
+(`render_filled`). No styling, no gradients, no text.
 
-  - #472: which icons actually read darker, and why. Eyeballing said "the
-    filled one"; measuring said the filled one AND a 46-path stroked one.
-  - the double old-fashioned's size, where the viewBox numbers pointed the
-    opposite way to the truth (#503).
-  - the tiki mug centrelines, via scripts/trace_centrelines.py, which cannot
-    work without a rasteriser.
-
-It is not a general SVG renderer and is not trying to be: no styling, no
-transforms beyond a single translate, no gradients, no text. It is enough to
-turn these particular files into pixels that can be counted, which is the whole
-job. Anything it cannot parse it should fail loudly on rather than silently
-render wrong -- a quietly-empty raster would read as "no ink", which every
-caller would interpret as a pass.
+Anything it cannot parse must fail loudly, never render wrong: an empty raster
+reads as "no ink", which every caller would take for a pass.
 """
 import math
 import pathlib
@@ -233,11 +221,10 @@ def render(paths, viewbox, height_px=420, stroke=1.6, ss=3, translate=(0, 0)):
 
 
 def render_filled(paths, viewbox, height_px=420, ss=3, translate=(0, 0)):
-    """Scanline fill, nonzero winding -- for LOOKING at fill-based artwork.
+    """Scanline fill, nonzero winding, for looking at fill-based artwork.
 
-    The tiki mug's source is filled ink, so stroking its paths shows the
-    outline of the drawing rather than the drawing. This renders what the
-    artwork actually is.
+    Stroking the paths of a filled drawing shows the outline of the ink, not
+    the drawing.
     """
     vx, vy, vw, vh = viewbox
     scale = height_px / vh
@@ -292,8 +279,7 @@ def render_filled(paths, viewbox, height_px=420, ss=3, translate=(0, 0)):
 
 
 def render_file_filled(svg_path, out_png, height_px=420):
-    # Through parse_icon_text, not its own regexes -- this had a fourth copy of
-    # the one-translate parse that #599 found wrong on four icons.
+    # Through parse_icon_text, which applies the full transform stack (#599).
     paths, vb, translate, _ = parse_icon_text(
         pathlib.Path(svg_path).read_text(), str(svg_path))
     W, H, g = render_filled(paths, vb, height_px, translate=translate)
@@ -318,30 +304,8 @@ def write_png(path, W, H, gray):
 def parse_icon(svg_path):
     """(paths, viewbox, translate, is_filled) for one glass icon file.
 
-    Factored out because five callers had each grown their own copy of these
-    three regexes -- the audits behind #472, the tracer, and the viewBox-margin
-    guard. Copies of a parser drift, and a parser that drifts from the files it
-    reads fails by returning PLAUSIBLE numbers rather than by erroring.
-
-    The <g transform="..."> matters and is easy to forget: the normaliser leaves
-    Inkscape's group offset in place rather than baking it into the path data,
-    so an icon parsed without it rasterises to an empty or half-empty canvas --
-    which counts as "no ink" rather than as a failure.
-
-    THE TRANSFORM IS A STACK, NOT AN ATTRIBUTE, and reading it as one attribute
-    was wrong for four of the 26 icons. This function used to pull the FIRST
-    `translate(...)` out with a regex and hand it back for callers to add on.
-    Four drawings nest a second group inside the first -- coupe, goblet,
-    old-fashioned-double and nick-and-nora each carry a
-    `<g transform="matrix(...)">` holding the bowl -- and that matrix was
-    silently dropped, so every measurement taken through here read their bowls
-    at the wrong size and place.
-
-    IT FAILED IN THE DIRECTION THAT LOOKS FINE. The bowl still landed somewhere
-    inside the canvas, so `test_no_glass_artwork_has_a_slack_viewbox` measured a
-    healthy 97.5% fill for the coupe while 11.8 units of its rim sat outside the
-    viewBox entirely, and `fit_viewbox` then clamped the canvas onto geometry it
-    had mis-read. See issue #599.
+    The one parser every caller shares: a copy that drifts from the files it
+    reads returns plausible numbers instead of erroring. See parse_icon_text.
     """
     return parse_icon_text(pathlib.Path(svg_path).read_text(), svg_path)
 
@@ -426,20 +390,18 @@ def _as_path_data(polylines):
 
 
 def parse_icon_text(text, label='<svg>'):
-    """As parse_icon, but for SVG text that is not on disk yet -- which is what
+    """As parse_icon, but for SVG text that is not on disk yet, which is what
     scripts/normalise_glass_icons.py needs to fit a canvas to output it has
-    just built and not yet written.
+    just built.
 
-    THE PATHS COME BACK ALREADY PLACED, and `translate` is therefore always
-    (0, 0). Every ancestor transform is composed and baked into the geometry
-    here, so a caller cannot forget to apply one and cannot apply only the
-    outermost -- which is exactly the bug this replaces. The returned `d`
-    strings are flattened polylines rather than the file's own curves: the
-    callers are a rasteriser and a bounding box, both of which flatten anyway,
-    and `fit_viewbox` never writes path data back.
+    The paths come back already placed: every ancestor transform is composed
+    and baked into the geometry, so a caller cannot forget one or apply only
+    the outermost (#599). A dropped nested matrix still lands the ink inside
+    the canvas, so the measurement looks healthy and is wrong. The returned
+    `d` strings are flattened polylines, not the file's own curves.
 
-    `translate` is still returned so the four existing call sites keep working
-    unchanged; passing it on to render() adds nothing, which is correct now.
+    `translate` is always (0, 0), and is returned so that call sites which
+    pass it on to render() keep working.
     """
     box = re.search(r'viewBox="([^"]+)"', text)
     if not box:
@@ -457,34 +419,15 @@ def parse_icon_text(text, label='<svg>'):
 
 
 def ink_bbox_units(paths, viewbox, translate=(0, 0), probe_px=None):
-    """(x0, y0, x1, y1) of the VISIBLE ink, in the viewBox's own units.
+    """(x0, y0, x1, y1) of all the ink, in the viewBox's own units.
 
-    Two traps here, and the naive implementation falls into one or the other.
+    Not a raster: a pixel grid depends on the viewBox, which is the thing
+    being computed, so feeding the result back in moves it. Flattened paths
+    have no grid to land on.
 
-    NOT A RASTER. Finding ink pixels works, but the answer depends on where the
-    pixel grid falls, which depends on the viewBox, which is the thing being
-    computed -- so feeding the result back in moves it. Measured over eight
-    successive fits, the canvas oscillated across a ~0.1-unit band instead of
-    settling. Flattening the paths is exact and has no grid to land on.
-
-    IT USED TO CLIP TO THE VIEWBOX AND NO LONGER DOES -- issue #599. The
-    argument for clipping was that some drawings extend outside their own
-    canvas, that the excess "has never been visible on the site", and that
-    fitting to it would reveal drawing nobody has seen. Both halves of that
-    turned out to be wrong:
-
-    - It IS visible. `.drink-card-glass svg` sets `overflow: visible` (added so
-      a stroke sitting on the viewBox edge is not sheared, §9.11), and a root
-      <svg> only clips because the UA stylesheet says so. Turning that off drew
-      the excess on every card, which is what made the coupe sit high in its
-      panel.
-    - The numbers behind it were mis-measured. They came from a parser that
-      dropped nested <g transform> groups (see parse_icon_text), so the figures
-      quoted for the goblet and the coupe described geometry in the wrong place.
-
-    So this measures ALL the ink, which is what a browser now paints. That is
-    also strictly more idempotent than clipping was: the answer does not depend
-    on the viewBox at all, so it cannot move when the viewBox does.
+    Not clipped to the viewBox (#599): `overflow: visible` on a card paints
+    ink outside the frame, so that ink is measured too. The answer does not
+    depend on the viewBox at all, so a second fit finds it unchanged.
     """
     tx, ty = translate
     xs, ys = [], []
@@ -501,31 +444,18 @@ def ink_bbox_units(paths, viewbox, translate=(0, 0), probe_px=None):
 def fit_viewbox(text, margin=1.4, label='<svg>'):
     """SVG text with its viewBox tightened to the artwork plus `margin` units.
 
-    THE ARTWORK DOES NOT MOVE. Path data and the <g transform> are untouched;
-    only the frame changes. So this can reframe a drawing but never distort one.
+    Returns (text, old height, new height). The artwork does not move: path
+    data and <g transform> are untouched and only the frame changes.
 
-    MARGIN IS IN USER UNITS, NOT A PERCENTAGE. These icons use
+    The margin is in user units, not a percentage. The icons use
     `vector-effect: non-scaling-stroke`, so the stroke is a fixed number of
-    SCREEN pixels and therefore spans MORE viewBox units the smaller the icon
-    renders. A percentage margin would shrink exactly when the stroke needs it
-    most -- on a card -- and clip the rim. 1.2 is the set's own typical margin.
+    screen pixels and spans more viewBox units the smaller the icon renders;
+    a percentage margin would shrink on a card, where the stroke needs it
+    most, and clip the rim.
 
-    IT GROWS AS WELL AS SHRINKS, SINCE #599, and the clamp it replaces was a
-    consequence of the clip that ink_bbox_units no longer applies. The old
-    reasoning was that padding an ink box which touches the clip edge pushes the
-    canvas out, admitting a sliver of previously-hidden artwork, enlarging the
-    box, pushing it out again -- unbounded creep, one margin per regeneration.
-    That is real, and it is a property of measuring CLIPPED ink: the input moved
-    when the frame moved. Measuring all the ink has no such feedback, because
-    the bounding box does not depend on the viewBox at all, so one pass lands on
-    the answer and a second finds it unchanged. `test_fitting_a_canvas_never_
-    moves_the_artwork` asserts exactly that.
-
-    What the clamp actually bought was a promise -- "fitting removes empty
-    space, it never reveals drawing nobody has seen" -- that the site had
-    already broken. `overflow: visible` on a card means the excess was on
-    screen; the canvas was simply lying about where the drawing was. Growing the
-    box to contain it is what makes `heights_mm` true again.
+    The frame grows as well as shrinks (#599), so it contains ink that sat
+    outside the old canvas. One pass lands on the answer;
+    `test_fitting_a_canvas_never_moves_the_artwork` asserts it.
     """
     paths, viewbox, translate, _ = parse_icon_text(text, label)
     x0, y0, x1, y1 = ink_bbox_units(paths, viewbox, translate)

@@ -77,11 +77,9 @@
     // curated synonym family matches on containment of any of its words
     // (`cheese` has to reach comté); anything else matches when every word of
     // the key prefixes some word of the entry. Prefix, not containment, or
-    // `salt` matches unsalted butter and `ice` matches rice (#619); a family
-    // that containment used to reach (`nuts` -> walnuts) is declared in the
-    // vocabulary's `synonyms`. Both directions ask this one function: include
-    // of `main_ingredients`, and the exclude "(all)" umbrella through
-    // filter-state.js's excludesRow.
+    // `salt` matches unsalted butter (#619); a family only containment reaches
+    // (`nuts` -> walnuts) is declared in the vocabulary's `synonyms`. Include
+    // and the exclude "(all)" umbrella both ask this one function.
     function entriesMatchKey(list, key) {
       var synonyms = getSynonymWords(key);
       if (synonyms) {

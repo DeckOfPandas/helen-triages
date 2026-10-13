@@ -51,14 +51,12 @@ article.recipe .method-short {
 }
 
 // --- Links in the article ----------------------------------------------------
-// One link style for the whole page. It re-declares :hover because the shared
-// a:hover (shared/_base.scss, $color-mood-root) would otherwise win on hover.
-// Weight 600 rather than an underline is what marks a link as interactive.
-//
-// The :not() list is load-bearing. This rule is (0,2,1) and each excluded
-// class has its own (0,1,0) rule that it would repaint: the taxonomy badges
-// are links (#40), and so are two of the page's action controls (#1058).
-// .btn-pdf sits outside the article today (#1210); it stays in the list so a
+// One link style for the whole page; weight 600, not an underline, marks a
+// link. It re-declares :hover because the shared a:hover (shared/_base.scss,
+// $color-mood-root) would otherwise win. The :not() list is load-bearing:
+// this rule is (0,2,1) and would repaint each excluded class's own (0,1,0)
+// rule: the taxonomy badges are links (#40), and so are two action controls
+// (#1058). .btn-pdf sits outside the article (#1210) and stays listed so a
 // control that moves back in is still excluded.
 article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   color: $color-recipe-link;
@@ -74,9 +72,7 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 // rule belongs in shared/_chrome.scss, which both sites load (#374).
 
 // --- Title -------------------------------------------------------------------
-// Left-aligned, so a title that wraps keeps one left edge and reads as one
-// block.
-//
+// Left-aligned, so a title that wraps keeps one left edge.
 // Two `align-items` declarations on purpose; do not delete the first. A
 // browser that cannot parse `last baseline` drops that line and keeps
 // `flex-end`. `last baseline` aligns a neighbour to the lettering of the
@@ -273,10 +269,8 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 }
 
 // --- A button that looks like a body link ------------------------------------
-// For a <button> that acts on this page and must be indistinguishable from
-// `article.recipe a`. A body link has no font-size of its own, so this names
-// the article's token to match it exactly.
-//
+// For a <button> that must be indistinguishable from `article.recipe a`. A
+// body link has no font-size of its own, so this names the article's token.
 // The three resets (letter-spacing, -webkit-text-stroke, text-shadow) are
 // load-bearing: .btn-method-toggle sits inside .recipe-section-heading, which
 // sets all three, and all three inherit. Without them the button wears the

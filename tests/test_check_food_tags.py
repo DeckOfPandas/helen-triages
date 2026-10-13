@@ -14,7 +14,6 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import check_food_tags as checker  # noqa: E402
 
-# Suite marker, so `pytest -m food` can run this half alone.
 pytestmark = pytest.mark.food
 
 

@@ -1,7 +1,7 @@
-"""House style: time words, typography, spelling.
+"""House style for food recipes: time words, typography, spelling, accents and
+the closed lists of ingredient qualifiers. Run: pytest tests/test_style.py
 
-The rule that catches the most is the split convention agreed 2026-07-25:
-tighter for metadata than for prose.
+Time words are tighter in metadata than in prose:
 
     prep_time / cook_time  ->  mins, hrs
     prose                  ->  mins, hours, seconds
@@ -16,10 +16,9 @@ import re
 import pytest
 
 from conftest import where, checkable_raw, checkable_prose
-# The corpus-agnostic half of this file's rules — see the long note above them
-# in conftest.py (issue #670). They live there so the cocktails suite can reach
-# them without importing the food suite; every assert and every message below
-# is unchanged, and so is every test id.
+# The corpus-agnostic rules live in conftest so the cocktails suite reaches them
+# without importing the food suite (#670). Other modules import several of
+# these names from HERE, so the imports below are also this module's exports.
 from conftest import (
     ALL_DRAFTS, ALL_MAGIC_BAG, ALL_RECIPES, ISO_DATE, NUMBER_RANGE,
     SHARED_TYPOGRAPHY, SPELLINGS, accent_problems, accented_words,
@@ -27,16 +26,11 @@ from conftest import (
     number_range_hits, spelling_problems,
 )
 
-# Re-exported under the names three other consumers already import from this
-# module: tests/test_prose_pages.py, tests/test_magic_bag.py and
-# scripts/build_ingest_vocab.py. Kept as aliases rather than repointed at their
-# new home so that #670 changes no file it did not have to.
+# Aliases: tests/test_prose_pages.py and scripts/build_ingest_vocab.py import
+# these names from this module.
 _accented_words = accented_words
 _accent_problems = accent_problems
 
-# Suite marker, so `pytest -m food` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.food
 
 TIME_FIELDS = ("prep_time", "cook_time")
@@ -46,10 +40,10 @@ IDIOM = re.compile(r"(?<![0-9])\s*(minutes?|hours?|seconds?)\b", re.I)
 
 
 def test_no_estimated_timings(recipe):
-    """`Estimated N mins` values were invented by an earlier Claude.
+    """No published time says `Estimated N mins`.
 
-    They are fine in _food_drafts/ but must never reach _food_recipes/ — an estimate that
-    survives to publication is indistinguishable from a measured time.
+    An estimate is a drafting aid: fine in _food_drafts/, but once published it
+    is indistinguishable from a measured time.
     """
     offenders = {f: recipe.fm[f] for f in TIME_FIELDS
                  if isinstance(recipe.fm.get(f), str)
@@ -66,19 +60,11 @@ QQ = re.compile(r"\bQQ\b")
 
 
 def test_no_qq_placeholder(recipe):
-    """`QQ` is Helen's own placeholder for "not decided/written yet" — see
-    MANUAL.md §4 and §12. Fine anywhere in `_food_drafts/`, and never to
-    be treated as an error there. But a `QQ` surviving into `_food_recipes/`
-    means the recipe isn't actually finished, whatever field it's hiding in
-    (a tagline link target, a cook_time, an ingredient amount, or an
-    un-rewritten method step from ingest — `QQ - rewrite: ...`) — the same
-    "drafting aid, not a published value" logic as `test_no_estimated_timings`
-    above, generalised to the one marker Helen actually uses for "not yet".
+    """No `QQ` survives into `_food_recipes/`, in any field.
 
-    A second marker, `PLACEHOLDER`, briefly existed alongside this one
-    (found 2026-08-09 in roast-beef-fillet.md's method) and was retired
-    2026-08-10 at Helen's direction: one marker for everything, not two —
-    see MANUAL.md §4's ingest paragraph. Don't reintroduce it.
+    `QQ` is Helen's placeholder for "not decided or written yet": never an
+    error in `_food_drafts/`, but a published recipe carrying one is not
+    finished. It is the only draft marker; never add a second (MANUAL §10.1).
     """
     hits = QQ.findall(recipe.raw)
     assert not hits, (
@@ -124,17 +110,10 @@ def test_prose_abbreviates_minutes_only(recipe):
 
 
 # --- method-step notes read as sentences, unlike ingredient notes -----------
-# GitHub issue #174, open, picked up 2026-08-12. The opposite convention from
-# test_ingredient_notes_are_lowercase_fragments (test_taxonomy.py) on purpose -- an
-# ingredient note is a fragment ("swap for cider vinegar plus a pinch of
-# sugar"), a method-step note is an aside in full sentence form ("Don't
-# skip the salt, it's part of the chemical process."), and the two were
-# never meant to share a style. 18 real violations across 13 recipes found
-# 2026-08-12, none via a bulk YAML tool (see CLAUDE.md on not round-tripping
-# YAML) -- fixed one note string at a time, capital first letter and a
-# trailing full stop, no wording changed. Scoped to `method`/`method_groups`
-# step notes only -- an ingredient item's own `note:` field is deliberately
-# NOT checked here, it already has its own test and its own opposite rule.
+# #174. A note on a `method`/`method_groups` step is an aside in sentence form:
+# capital first letter, trailing full stop. The opposite of an ingredient
+# item's `note:`, which is a lowercase fragment with no full stop and has its
+# own test (test_ingredient_notes_are_lowercase_fragments, test_taxonomy.py).
 def test_method_step_notes_are_sentences(recipe):
     bad = []
     for step in recipe.fm.get("method") or []:
@@ -155,45 +134,16 @@ def test_method_step_notes_are_sentences(recipe):
 
 
 # --- notes are sentences -----------------------------------------------------
-# #711, Helen 2026-09-06. The rule and its two helpers live in conftest so the
-# cocktails suite holds a drink to the same one; see the block there for why
-# leading punctuation is skipped and why a QQ note is never checked.
-#
-# THE EXCEPTIONS ARE DECLARED, NOT TOLERATED, and each carries its reason --
-# the shape `unresolved_suggestions` uses in bottles.yml, and for the same
-# argument: a known failure with a reason attached lets this test bite on the
-# NEXT one instead of being switched off. The staleness test below stops the
-# block outliving the problems.
+# #711. The rule and its helpers live in conftest so the cocktails suite holds
+# a drink to the same one. An exception is declared here with its reason, so
+# the test still bites on the next note; the staleness test below stops an
+# entry outliving its note.
 NOTE_EXCEPTIONS = {
-    # A DELIBERATE CONTINUATION, not a missing capital. The note finishes a
-    # thought the recipe started, and the ellipsis is doing that work; giving it
-    # a capital would break the join it exists to make.
+    # A continuation, not a missing capital: the ellipsis joins the note to
+    # the sentence above it.
     "...goat's cheese and cherry tomato.":
         "leading ellipsis: the note continues the sentence above it",
 }
-
-# `GF_TIP` WAS HERE AND IS GONE, 2026-09-10 (#800), AND ITS COMMENT WAS WRONG IN
-# BOTH ITS FACTS -- worth recording, because the wrong premise is what kept the
-# exemption alive for a month.
-#
-# It said FOURTEEN drafts opened with the rubric. It was eight. And it treated
-# "gf" as an abbreviation whose capitalisation Helen had yet to rule on, which
-# assumed gluten-free. **`gf` is Good Food, the magazine.** Six of the eight
-# named it in `source:` outright ("Adapted from Good Food, June 2024"), and not
-# one of the tips was about gluten -- they were the magazine's standing tip box,
-# transcribed verbatim: a nutrition note, a freezing instruction, a substitution,
-# how to make vanilla sugar. One even names the magazine inside the tip.
-#
-# SO THE QUESTION THE EXEMPTION WAS HOLDING OPEN DID NOT EXIST, and the third
-# answer it offered -- "Gluten-free tip:" -- would have put a false claim about
-# allergens on a recipe page. Helen, asked what it meant: "I actually have no
-# idea what this means... Good Food tip, the magazine source I use a lot?"
-#
-# Her ruling: drop the label. Each note is now a plain sentence like every other
-# note, and `source:` carries the attribution it always did. The rubric varied
-# (`gf tips:`, `gf tip on stock cubes:`, `gf tip - vanilla sugar:`), so no
-# capitalisation rule could have covered it anyway -- with the label gone there
-# is no varying prefix left to have a house form for.
 
 
 def _note_exempt(text: str) -> bool:
@@ -203,11 +153,8 @@ def _note_exempt(text: str) -> bool:
 def test_notes_are_sentences(recipe):
     """A note starts with a capital and ends with a full stop -- #711.
 
-    THE SIBLING OF `test_method_step_notes_are_sentences` ABOVE, which has held
-    method-step notes to this since long before #711 while the recipe's own
-    `notes:` list and its per-ingredient `note:` were unchecked. Helen, asked
-    how she wanted this done: "I'd prefer you add tests for this then fix them
-    for me!!!!"
+    Covers what `notes_of` returns, which for a recipe is its `notes:` list.
+    Method-step notes have `test_method_step_notes_are_sentences` above.
     """
     problems = [
         f"{where_note}: {text!r} ({', '.join(note_problems(text))})"
@@ -223,19 +170,12 @@ def test_notes_are_sentences(recipe):
 def test_no_note_exception_is_stale():
     """A declared exception must still name a note that exists.
 
-    THE SAME ROT `test_unresolved_suggestions_has_no_stale_entries` CATCHES in
-    bottles.yml: an exemption that outlives its note reads as an outstanding
-    problem while also quietly exempting that exact string for whoever writes it
-    next. Deleting the line is how one gets retired.
+    An exemption that outlives its note quietly exempts that exact string for
+    whoever writes it next.
 
-    WHAT ITS GREEN MEANS IN CI, where `_food_drafts/` does not exist: the sweep
-    covers recipes and the magic bag only, so an exemption naming a DRAFT's note
-    would look stale and fail. That is a real risk and is accepted rather than
-    skipped, because the one declared entry names a PUBLISHED recipe, which CI
-    has -- so in CI this is honest coverage of every exemption that currently
-    exists. If a draft-only exemption is ever added, this test becomes the thing
-    that fails in CI for the wrong reason, and the fix is to make the exemption
-    name a recipe or to move this to SKIPS_WITHOUT_DRAFTS.
+    In CI `_food_drafts/` is absent, so ALL_DRAFTS is empty and an exemption
+    naming a draft-only note fails there as stale. Make such an exemption name
+    a published recipe, or move this test to SKIPS_WITHOUT_DRAFTS.
     """
     live = set()
     for entry in ALL_RECIPES + ALL_DRAFTS + ALL_MAGIC_BAG:
@@ -251,9 +191,7 @@ def test_no_note_exception_is_stale():
 TYPOGRAPHY = [
     ("slash fractions", r"(?<![\d/])(1/2|1/4|3/4|1/3|2/3|1/8|3/8|5/8|7/8)(?![\d/])",
      "use Unicode fractions: ½ ¼ ¾ ⅓ ⅔ ⅛ ⅜ ⅝ ⅞"),
-    # `double hyphen` and `ASCII arrow`, in that order and with the same
-    # messages, spliced in from conftest so the cocktails suite enforces the
-    # same two without a second copy. The three around them are food's own.
+    # Shared with the cocktails suite; the entries around it are food's own.
     *SHARED_TYPOGRAPHY,
     ("wikilink", r"\[\[[^\]]+\]\]",
      "cross-recipe links are markdown, relative: [display text](../slug/)"),
@@ -264,55 +202,19 @@ TYPOGRAPHY = [
 ]
 
 # --- en dashes in number ranges ----------------------------------------------
-# Issue #413, Helen 2026-08-21. Ranges on this site are written `48–50°C`,
-# `3–4 mins`, `1.6–1.8 kg` -- en dash, and correctly so almost everywhere --
-# but nothing enforced it, so a hyphenated range passed. Fourteen were found
-# across thirteen recipes, several sitting one line from a correct one:
-# roast-beef-fillet had `1½–2 mins` and `52–54°C` right beside two `170-180°C`.
-#
-# ISO DATES ARE BLANKED FIRST, not excluded by a cleverer pattern. `2026-08-12`
-# is three number pairs joined by hyphens and matches a range rule perfectly;
-# it accounted for all 24 "violations" in the first measurement of the data
-# files. Blanking is legible where a lookaround doing the same job would not be.
-#
-# WHY A DIGIT ON BOTH SIDES AND NOTHING CLEVERER. It deliberately does not fire
-# on `1-inch balls`, `criss-cross`, `half- or quarter-cylinder` or any other
-# ordinary hyphen -- only on `<number>-<number>`, which on this site is always a
-# range. Scoped that narrowly, it found no false positives at all across 82
-# recipes, both reference pages and the reference data.
-#
-# BOTH PATTERNS, AND THE `findall` OVER THEM, MOVED TO conftest ON 2026-09-03
-# (#670) so that a drink is held to the same rule. They are imported back into
-# this module's namespace at the top of the file, because tests/test_magic_bag.py
-# and tests/test_prose_pages.py both import them FROM HERE by name.
+# #413. The rule is `number_range_hits` in conftest: a digit on both sides of a
+# hyphen, with ISO dates blanked first because `2026-08-12` matches a range
+# pattern exactly. `1-inch`, `criss-cross` and other ordinary hyphens do not
+# fire.
 
 
 def test_number_ranges_use_en_dashes(recipe):
-    """`3–4 mins`, not `3-4 mins`.
+    """`3–4 mins`, not `3-4 mins` -- #413.
 
-    Checked over the whole file rather than .prose, on Helen's ruling about
-    cauliflower-cheese's `cook_time: "20-25 mins"`: "These still render to the
-    user, so correct to en dash please." The test is scoped by what a reader
-    sees, not by whether a field is prose -- and a metadata time, an ingredient
-    amount and a method step all reach the page.
-
-    AND IT STOPS AT A `QQ` LINE, like every other whole-file style rule here.
-    It did not until 2026-08-29: this read `recipe.raw` while its neighbours
-    read `checkable_raw`. #413 (this rule) and #426 (the QQ exemption) landed on
-    the same day and the exemption reached test_typography and not this.
-
-    INVISIBLE ON RECIPES, WHICH IS WHY IT SURVIVED: `test_no_qq_placeholder`
-    forbids the marker in _food_recipes/, so the two readings are identical
-    there -- 0 hits either way. The difference is entirely in the drafts, and it
-    is not small: 130 hits across 58 files counting QQ lines, 44 across 36
-    ignoring them. 22 of those files fail ONLY on source wording awaiting a
-    rewrite, and MANUAL §5 names this exact case -- "correcting its degree
-    sign or its dash tidies text about to be deleted, by editing someone else's
-    words". Measured before changing anything, not assumed.
-
-    (test_magic_bag.py's copy keeps reading `raw`, and correctly: a magic-bag
-    dish is Helen's own from memory with no source to await a rewrite, so there
-    is no QQ text there to protect.)
+    Scoped by what a reader sees, so it reads the whole file, not .prose: a
+    metadata time, an ingredient amount and a method step all reach the page.
+    It reads `checkable_raw`, so it stops at a `QQ` line (#426): a draft's
+    source wording awaiting a rewrite is not corrected.
     """
     hits = number_range_hits(checkable_raw(recipe))
     assert not hits, (
@@ -338,11 +240,9 @@ def test_no_ampersand_in_title(recipe, taxonomy):
     itself spelled with an ampersand ("Ben & Jerry's"), where swapping in
     'and' would misspell the name rather than restyle it.
 
-    _data/food/taxonomy.yml's ampersand_proper_nouns is the curated
-    allow-list, same pattern as proper_nouns: declared by exact phrase, not
-    guessed at, so a lazy stylistic '&' still fails and a new brand name
-    needs an explicit entry rather than silently passing. `short_name` used
-    to be checked here too; retired 2026-08-12, GitHub issue #169.
+    _data/food/taxonomy.yml's ampersand_proper_nouns is the allow-list,
+    declared by exact phrase, so a stylistic '&' still fails and a new brand
+    name needs an explicit entry.
     """
     allowed = taxonomy.get("ampersand_proper_nouns") or []
     value = str(recipe.fm.get("title", ""))
@@ -357,11 +257,6 @@ def test_no_ampersand_in_title(recipe, taxonomy):
         f"'and' -- if this is a real brand/proper name, add the exact "
         f"phrase to ampersand_proper_nouns in _data/food/taxonomy.yml."
     )
-
-
-# SPELLINGS MOVED TO conftest ON 2026-09-03 (#670) and is imported back at the
-# top of this file — tests/test_magic_bag.py and tests/test_prose_pages.py both
-# import it from here by name. A misspelling is a misspelling on a drink too.
 
 
 def test_spellings(recipe):
@@ -380,29 +275,17 @@ def test_temperatures_use_degree_c(recipe):
 
 
 # --- butter, sugar, flour: closed list of qualifiers ------------------------
-# GitHub issue #74's main_ingredients spot-check (2026-08-10) turned this
-# into a real closed-list rule, not just "isn't bare" -- Helen: outside an
-# incidental use (melted butter for greasing a tin), butter is always
-# "salted butter" or "unsalted butter", full stop, and sugar/flour each have
-# their own short list of allowed names. See MANUAL.md for the
-# reasoning behind each list.
+# #74. Each is a closed list of allowed names, not merely "isn't bare":
+# "caster sugar" and "muscovado sugar" are qualified and still wrong.
 #
-# Supersedes two narrower tests: the old test_flour_and_sugar_specify_type
-# only caught a totally bare name ("caster sugar" passed it fine, since it
-# isn't bare), and the old brown-sugar-only test had a real gap -- it only
-# fired when the name contained the word "brown", so bare "muscovado sugar"
-# or "light muscovado sugar" (missing "brown" entirely) slipped through
-# unnoticed. Found by running this same check against real data
-# (sticky-marmalade-ham.md, a draft) before writing the replacement.
-#
-# Checked as a whole-word phrase anywhere in the name, not just a prefix or
-# suffix -- real data has qualifiers wrapped in all directions: "melted
-# salted butter", "knob of salted butter, optional", "~2 tbsp dark brown
-# muscovado sugar", "dusting as preferred: icing sugar, cocoa powder...".
-# A plain substring check would be too loose (e.g. "salted" inside
-# "unsalted"), but \b...\b isn't fooled by that -- there's no word boundary
-# between "un" and "salted" in "unsalted".
+# An allowed name is matched as a whole-word phrase anywhere in the item, since
+# qualifiers wrap in all directions ("melted salted butter", "~2 tbsp dark
+# brown muscovado sugar"). `\b` matters: a substring check would find "salted"
+# inside "unsalted".
 _QUALIFIED_BUTTER = {"salted butter", "unsalted butter"}
+# A line that is butter for the tin and nothing else. "plus extra" means the
+# line is an ingredient of the dish too, so it does not match.
+_ONLY_FOR_GREASING = re.compile(r"^(?!.*\bplus\b).*,\s*(?:extra,\s*)?(?:for greasing|to grease)\b", re.I)
 _QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour"}
 _QUALIFIED_SUGAR = {
     "golden caster sugar", "golden granulated sugar", "white caster sugar",
@@ -411,9 +294,8 @@ _QUALIFIED_SUGAR = {
     "demerara sugar", "icing sugar", "coconut palm sugar", "palm sugar",
 }
 
-# Ingredients that merely contain the word but aren't the ingredient itself
-# -- a butter bean isn't butter, sugar snap peas aren't sugar. Out of scope
-# entirely, not something that needs a qualifier.
+# Ingredients that contain the word but are not the ingredient: a butter bean
+# is not butter. Out of scope, not in need of a qualifier.
 _COMPOUND_EXCLUDE = {
     "butter": re.compile(
         r"\b(butter beans?|peanut butter|almond butter|cashew butter"
@@ -443,12 +325,10 @@ def _unqualified(recipe, word: str, allowed: set[str]) -> list[str]:
                 continue
             if exclude and exclude.search(name):
                 continue
-            # The word-presence gate above stays narrow (cut at the first
-            # comma OR paren) so it doesn't fire on the word turning up in
-            # some unrelated later clause. But a qualifier can legitimately
-            # sit in a trailing parenthetical -- "milk (any kind)" -- not
-            # just before the word itself, so the allowed-phrase check gets
-            # a wider scope: cut at the first comma only, keeping any paren.
+            # The word-presence gate above cuts at the first comma OR paren,
+            # so the word in a later clause does not fire. The allowed-phrase
+            # check cuts at the first comma only: a qualifier may sit in a
+            # trailing parenthetical, as in "milk (any kind)".
             qualify_scope = v.split(",", 1)[0].strip()
             if not allowed_pattern.search(qualify_scope):
                 bad.append(f"{field} {v!r}")
@@ -456,10 +336,12 @@ def _unqualified(recipe, word: str, allowed: set[str]) -> list[str]:
 
 
 def test_butter_specifies_salted_or_unsalted(recipe):
-    """GitHub issues #74/#140. Only two names allowed, full stop -- not a
-    style preference, salted-vs-unsalted actually changes the recipe.
+    """#74, #140. Butter is "salted butter" or "unsalted butter" and nothing
+    else: the choice changes the recipe. Butter only for greasing is exempt;
+    "plus extra for greasing" is not, because that line is also in the dish.
     """
-    bad = _unqualified(recipe, "butter", _QUALIFIED_BUTTER)
+    bad = [b for b in _unqualified(recipe, "butter", _QUALIFIED_BUTTER)
+           if not _ONLY_FOR_GREASING.search(b)]
     assert not bad, (
         f"{where(recipe)} has unqualified butter: {bad!r}. "
         f"Allowed: salted butter, unsalted butter."
@@ -476,12 +358,10 @@ def test_flour_specifies_type(recipe):
 
 
 def test_sugar_specifies_type(recipe):
-    """GitHub issues #74/#79. Bare "sugar", "caster sugar" (needs "golden"),
-    "brown sugar" (needs light/dark and soft/muscovado) etc. all leave the
-    cook guessing. "white caster sugar" is deliberately its own allowed name,
-    distinct from "golden caster sugar" -- lemon-meringue-pie.md uses it
-    specifically for the meringue, where a whiter sugar keeps the meringue
-    from picking up a cream tint golden caster sugar would give it.
+    """#74, #79. Bare "sugar", "caster sugar" (needs "golden" or "white") and
+    "brown sugar" (needs light/dark and soft/muscovado) leave the cook
+    guessing. "white caster sugar" is its own allowed name on purpose: a
+    meringue made with golden caster sugar picks up a cream tint.
     """
     bad = _unqualified(recipe, "sugar", _QUALIFIED_SUGAR)
     assert not bad, (
@@ -491,13 +371,9 @@ def test_sugar_specifies_type(recipe):
 
 
 # --- mustard, soy sauce, ginger, mixed/five-spice powder ---------------------
-# GitHub issues #143/#142/#136/#137 -- same closed-list pattern and the same
-# _unqualified() helper as butter/sugar/flour above, just different words and
-# allowed sets. Mustard needed no data fixes at all when this was written --
-# every real instance already used one of the six allowed names. "mustard
-# oil" added later (indian-mutton-raan-roast.md) -- a real, distinct
-# ingredient (a cooking oil pressed from mustard seeds, common in Indian/
-# Bengali cooking), not a variant of condiment mustard.
+# #143, #142, #136, #137. The same closed-list pattern as butter, sugar and
+# flour. "mustard oil" is a distinct ingredient, a cooking oil pressed from
+# mustard seeds, not a kind of condiment mustard.
 _QUALIFIED_MUSTARD = {
     "english mustard", "english mustard powder", "dijon mustard",
     "french mustard", "wholegrain mustard", "whole mustard seeds",
@@ -526,18 +402,12 @@ def test_soy_sauce_specifies_dark_or_light(recipe):
 
 
 def test_soy_sauce_as_tamari_alternative_specifies_dark_or_light(recipe):
-    """GitHub issue #142 follow-up, 2026-08-18. `_unqualified()` truncates
-    each value at the first comma or paren before checking whether the
-    target word is even present, so a soy sauce alternative tucked after
-    tamari -- "tamari (or low-sodium soy sauce)", "tamari or soy sauce" --
-    was invisible to test_soy_sauce_specifies_dark_or_light: the truncated
-    name was just "tamari", which never mentions soy sauce at all. Real
-    miss, caught 2026-08-18 when "tamari (or low-sodium soy sauce)" was
-    edited down to "tamari or soy sauce" in teriyaki-sauce.md -- removing
-    the parenthetical incidentally exposed it to the *other* test, but the
-    parenthetical form would have shipped unqualified regardless. Scans the
-    whole string instead of truncating, and fires only where tamari is the
-    ingredient being given a soy sauce alternative.
+    """A soy sauce offered as an alternative to tamari says dark or light -- #142.
+
+    `_unqualified()` cuts each value at the first comma or paren, so "tamari
+    (or low-sodium soy sauce)" reaches test_soy_sauce_specifies_dark_or_light
+    as "tamari" and passes. This scans the whole string, and fires only on an
+    item that names tamari.
     """
     bad = []
     for field, values in (
@@ -558,10 +428,9 @@ def test_soy_sauce_as_tamari_alternative_specifies_dark_or_light(recipe):
 
 
 def test_ginger_specifies_fresh_ground_or_paste(recipe):
-    """GitHub issue #136. Checked in both fields, not just main_ingredients
-    -- Helen's call: the ingredient list needs the literal word too, not
-    just a prep description ("grated ginger" -> "grated fresh ginger"),
-    since a prep word alone doesn't say which kind was used.
+    """#136. Checked in the ingredient list as well as main_ingredients: a
+    prep word alone ("grated ginger") does not say which kind was used, so
+    the literal word is required ("grated fresh ginger").
     """
     bad = _unqualified(recipe, "ginger", _QUALIFIED_GINGER)
     assert not bad, (
@@ -571,9 +440,7 @@ def test_ginger_specifies_fresh_ground_or_paste(recipe):
 
 
 def test_mixed_spice_and_five_spice_say_powder(recipe):
-    """GitHub issue #137. Sold and used as a powder -- the ingredient name
-    should say so, not just "mixed spice" / "five-spice".
-    """
+    """#137. Sold and used as a powder, so the ingredient name says so."""
     bad = _unqualified(recipe, "mixed spice", {"mixed spice powder"})
     bad += _unqualified(recipe, "five-spice", {"five-spice powder"})
     assert not bad, (
@@ -583,9 +450,7 @@ def test_mixed_spice_and_five_spice_say_powder(recipe):
 
 
 # --- nutmeg, cinnamon, cloves, vanilla ---------------------------------------
-# GitHub issue #151. Same closed-list pattern again. "cloves" excludes garlic
-# cloves via _COMPOUND_EXCLUDE -- a completely unrelated ingredient that
-# happens to share the word, same shape of problem as butter beans earlier.
+# #151. "cloves" excludes garlic cloves via _COMPOUND_EXCLUDE.
 _QUALIFIED_NUTMEG = {"whole nutmeg", "ground nutmeg"}
 _QUALIFIED_CINNAMON = {"cinnamon stick", "cinnamon sticks", "ground cinnamon"}
 _QUALIFIED_CLOVES = {"whole cloves", "ground cloves"}
@@ -608,14 +473,8 @@ def test_nutmeg_cinnamon_cloves_vanilla_specify_type(recipe):
 
 
 # --- cardamom -----------------------------------------------------------------
-# Prompted by garam-masala-powder.md: main_ingredients said "black cardamom"
-# while the ingredient list said "black cardamom pods" -- a mismatch
-# invisible to every other test, since cardamom wasn't tracked at all.
-# Helen's rule: always green or black, always pods/powder/seeds. Singular
-# forms included alongside the plurals -- indian-mutton-raan-roast.md
-# genuinely uses a single "black cardamom pod" (amount: 1), and forcing
-# that to the plural would just be bad grammar for the sake of a shorter
-# allowed list.
+# Always green or black, always pods, powder or seeds. The singular forms are
+# allowed because a recipe can call for one pod.
 _QUALIFIED_CARDAMOM = {
     "green cardamom pod", "green cardamom pods", "green cardamom powder",
     "green cardamom seed", "green cardamom seeds",
@@ -634,11 +493,7 @@ def test_cardamom_specifies_type(recipe):
 
 
 # --- vinegar ------------------------------------------------------------------
-# GitHub issue #150. Needed zero data fixes for bare "vinegar" -- every real
-# instance already named a type. Only real change was consolidating "rice
-# wine vinegar" into "rice vinegar" (both named the same product; picked one).
-# White wine and malt vinegar are in the allowed list pre-emptively -- common
-# UK types, just not used by any current recipe.
+# #150. "rice vinegar" is the one name for rice wine vinegar.
 _QUALIFIED_VINEGAR = {
     "apple cider vinegar", "balsamic vinegar", "red wine vinegar",
     "rice vinegar", "sherry vinegar", "white wine vinegar", "malt vinegar",
@@ -655,17 +510,10 @@ def test_vinegar_specifies_type(recipe):
 
 
 # --- garlic: form, not the amount/item split ---------------------------------
-# GitHub issue #171, open, picked up 2026-08-12. Deliberately NOT the shared
-# _unqualified() helper (item text only): garlic's count unit is "clove" --
-# "amount: 3 cloves, item: garlic, minced" is a complete, standard
-# description the same way "amount: 1 stick, item: celery" is elsewhere on
-# the site, and treating that as unqualified would be the same mistake as
-# moving a genuine counting unit into item text. Checked amount+item
-# together for the ingredient list; main_ingredients has no amount to pair
-# with, so the qualifier has to be in the string itself there, same as every
-# other closed-list rule. slow-cooker-confit-duck-legs.md's "fresh garlic"
-# with no amount at all was the one real gap (fixed 2026-08-12, "garlic
-# cloves") -- "fresh" doesn't say whether you're buying a bulb or a jar.
+# #171. Not the shared _unqualified() helper, which reads item text only:
+# garlic's counting unit is "clove", so `amount: 3 cloves, item: garlic,
+# minced` is complete. The ingredient list is checked as amount plus item;
+# main_ingredients has no amount, so the form must be in the string itself.
 _QUALIFIED_GARLIC_FORM = re.compile(
     r"\bcloves?\b|\bhead\b|\bpaste\b|\bpur[ée]e\b|\bpowder\b|\bgranulated\b|\bwild garlic\b", re.I,
 )
@@ -697,9 +545,7 @@ def test_garlic_specifies_form(recipe):
 
 
 # --- loomi: colour, since black and white/yellow are different products ----
-# GitHub issue #173, open, picked up 2026-08-12. Only one current user
-# (vietnamese-spiced-braised-venison-haunch.md, "yellow loomi") and it
-# already qualifies -- this is a regression guard, not a fix.
+# #173.
 _QUALIFIED_LOOMI = {"black loomi", "white loomi", "yellow loomi"}
 
 
@@ -712,19 +558,10 @@ def test_loomi_specifies_colour(recipe):
 
 
 # --- milk: type -- deliberately a standing checklist -------------------------
-# GitHub issue #167, picked up 2026-08-12. Deliberately a standing
-# checklist, not a guard expected to be green -- confirming which milk each
-# original recipe actually specified (whole vs semi-skimmed, almost
-# certainly whole for a bake, but not safe to assume) needs the source, not
-# a default. Don't bulk-convert to "whole milk" blind.
-#
-# "milk (any kind)" added 2026-08-12, Helen's explicit call: some recipes
-# genuinely don't care which milk goes in, and that's a real answer to
-# "confirm from the source", not a dodge of the rule -- it says something
-# was actually checked, the same way a specific type does. Only recognised
-# as a trailing parenthetical, e.g. "milk (any kind), to glaze" -- see
-# _unqualified's qualify_scope for why a parenthetical needs separate
-# handling from a leading qualifier word like "whole".
+# #167. A checklist, not a guard expected to be green: which milk a recipe
+# specified is confirmed from its source, never defaulted to "whole milk".
+# "milk (any kind)" is a real answer, for a recipe that does not care; it is
+# recognised only as a trailing parenthetical (see _unqualified).
 _QUALIFIED_MILK = {
     "whole milk", "semi-skimmed milk", "skimmed milk", "buttermilk",
     "oat milk", "almond milk", "soya milk", "coconut milk", "evaporated milk",
@@ -733,13 +570,11 @@ _QUALIFIED_MILK = {
 
 
 def test_milk_specifies_type(recipe):
-    """main_ingredients is vocabulary, not the place the actual
-    qualification lives -- if any ingredient line already states "milk
-    (any kind)", a bare "milk" in main_ingredients is describing that same
-    already-answered choice, not a second unconfirmed one, so it's exempt
-    too. Ingredient-line "milk (any kind)" itself is still required to
-    match _QUALIFIED_MILK's own "any kind" entry -- this exemption only
-    ever removes a main_ingredients hit, never an ingredient one.
+    """Milk names its type, or says "(any kind)" -- #167.
+
+    If an ingredient line states "milk (any kind)", a bare "milk" in
+    main_ingredients describes that same answered choice and is exempt. The
+    exemption only removes a main_ingredients hit, never an ingredient one.
     """
     bad = _unqualified(recipe, "milk", _QUALIFIED_MILK)
     if any(re.search(r"\bmilk\s*\(any kind\)", item, re.I) for item in recipe.ingredient_items):
@@ -752,15 +587,10 @@ def test_milk_specifies_type(recipe):
 
 
 # --- chocolate: type, plus a cacao percentage on the recipe page only -------
-# GitHub issue #139. Helen: dark-family chocolate needs a cacao percentage on
-# the recipe page's own ingredient list so a cook knows what to buy -- dark
-# 70%, very dark 90%, unsweetened 100% -- but main_ingredients stays a plain
-# type name with no percentage, the same vocabulary-vs-presentation split as
-# everywhere else main_ingredients appears. Milk and white chocolate never
-# get a percentage -- the distinction that matters for them isn't cacao
-# content. Chip/shaving forms need a type word ("dark chocolate chips") but
-# no percentage -- they're a mix-in or garnish, not the recipe's defining
-# chocolate.
+# #139. Dark-family chocolate carries a cacao percentage on the recipe's
+# ingredient list, so a cook knows what to buy; main_ingredients stays a plain
+# type name. Milk and white chocolate never take a percentage. Chips and
+# shavings need a type word but no percentage.
 _CHOCOLATE_PERCENT = {
     "dark chocolate": "70",
     "very dark chocolate": "90",
@@ -770,15 +600,12 @@ _CHOCOLATE_NO_PERCENT = {"milk chocolate", "white chocolate"}
 _ALL_CHOCOLATE_TYPES = set(_CHOCOLATE_PERCENT) | _CHOCOLATE_NO_PERCENT
 _CHOCOLATE_FORM_EXEMPT = re.compile(r"\b(chips|shavings)\b", re.I)
 
-# A prepared/branded product, not a bar of chocolate to type -- exempt
-# entirely, same treatment as peanut butter/butter beans earlier.
+# A prepared product, not a bar of chocolate to type: exempt entirely.
 _CHOCOLATE_COMPOUND_EXCLUDE = re.compile(r"\bchocolate (syrup|beans)\b", re.I)
 
 
 def test_chocolate_specifies_type(recipe):
-    """GitHub issue #139. Every chocolate mention, in either field, names
-    one of the five allowed types.
-    """
+    """#139. Every chocolate mention, in either field, names an allowed type."""
     allowed_pattern = re.compile(
         "|".join(rf"\b{re.escape(t)}\b" for t in _ALL_CHOCOLATE_TYPES), re.I,
     )
@@ -803,9 +630,9 @@ def test_chocolate_specifies_type(recipe):
 
 
 def test_chocolate_main_ingredients_has_no_percentage(recipe):
-    """GitHub issue #139. main_ingredients names the type only -- "dark
-    chocolate", never "dark chocolate, 70% cacao". The percentage belongs on
-    the recipe page's own ingredient list, not the index-page pill.
+    """#139. main_ingredients names the type only: "dark chocolate", never
+    "dark chocolate, 70% cacao". The percentage belongs on the recipe page's
+    ingredient list, not the index-page pill.
     """
     bad = []
     for v in (recipe.fm.get("main_ingredients") or []):
@@ -821,14 +648,10 @@ def test_chocolate_main_ingredients_has_no_percentage(recipe):
 
 
 def test_chocolate_percentage_matches_type(recipe):
-    """GitHub issue #139. On the recipe page's own ingredient list (not
-    main_ingredients), dark/very dark/unsweetened chocolate must carry the
-    percentage that identifies which of the three it is -- 70/90/100. Chip
-    and shaving forms are exempt (type word only, per Helen's call). A
-    missing or mismatched percentage is exactly the kind of thing that looks
-    fine at a glance: bens-chocolate-ice-cream.md said "very dark chocolate,
-    100% cacao" for real, until this was caught and fixed 2026-08-10 --
-    100% is unsweetened, not very dark.
+    """#139. On the ingredient list, dark, very dark and unsweetened chocolate
+    carry the percentage that identifies which it is: 70, 90, 100. A
+    mismatch looks fine at a glance ("very dark chocolate, 100% cacao" is
+    unsweetened). Chips and shavings are exempt.
     """
     bad = []
     for item in recipe.ingredient_items:
@@ -837,10 +660,9 @@ def test_chocolate_percentage_matches_type(recipe):
             continue
         if _CHOCOLATE_COMPOUND_EXCLUDE.search(name) or _CHOCOLATE_FORM_EXEMPT.search(item):
             continue
-        # Longest phrase first and stop at the first match -- "very dark
-        # chocolate" also contains "dark chocolate" as a substring, so
-        # checking every entry would test a "very dark" item against plain
-        # dark's 70% too and wrongly flag a correct "..., 90% cacao".
+        # Longest phrase first, stopping at the first match: "very dark
+        # chocolate" contains "dark chocolate", so checking every entry
+        # would hold a correct 90% item to plain dark's 70%.
         for choc_type in sorted(_CHOCOLATE_PERCENT, key=len, reverse=True):
             if re.search(rf"\b{re.escape(choc_type)}\b", name, re.I):
                 pct = _CHOCOLATE_PERCENT[choc_type]
@@ -854,10 +676,8 @@ def test_chocolate_percentage_matches_type(recipe):
 
 
 # --- eggs: size, count agreement, weight for bakes ---------------------------
-# GitHub issues #144/#145/#147, closed 2026-08-10/11 with no test -- caught in
-# the 2026-08-12 issue audit. Yolks/whites are a different noun from "egg" and
-# excluded throughout; the count-agreement and size rules are specifically
-# about whole eggs.
+# #144, #145, #147. The rules are about whole eggs: yolks and whites are
+# excluded throughout.
 _EGG_SIZE_RE = re.compile(r"\b(small|medium|large|extra large)\b", re.I)
 
 
@@ -874,14 +694,9 @@ def _whole_egg_items(recipe):
 
 
 def test_egg_size_is_stated(recipe):
-    """GitHub issues #144/#145. Every whole-egg ingredient states a UK size
-    (small/medium/large/extra large) in its `amount:` field -- not buried in
-    `item:`, which is where courgette-orange-cake-cream-cheese-frosting.md
-    had it ("large eggs, lightly beaten" with amount: "3") until this was
-    caught and moved, 2026-08-12. Fixing that file also surfaced a real,
-    separate bug: main_ingredients had "self-raising flour\"" with a stray
-    literal quote baked into the string (a missing opening quote had let
-    YAML swallow it as plain text) -- fixed in the same pass.
+    """#144, #145. Every whole-egg ingredient states a UK size
+    (small/medium/large/extra large) in its `amount:` field, not in `item:`
+    ("large eggs, lightly beaten" with amount: "3" fails).
     """
     bad = []
     for item in _whole_egg_items(recipe):
@@ -896,9 +711,8 @@ def test_egg_size_is_stated(recipe):
 
 
 def test_main_ingredients_egg_count_agrees(recipe):
-    """GitHub issue #147. main_ingredients says "egg" for a single egg,
-    "eggs" for more than one -- checked against the actual total count in
-    the ingredient list, not guessed.
+    """#147. main_ingredients says "egg" for a single egg and "eggs" for more
+    than one, checked against the total count in the ingredient list.
     """
     main = [str(m) for m in (recipe.fm.get("main_ingredients") or [])]
     egg_entries = [m for m in main if re.search(r"\begg", m, re.I)
@@ -922,24 +736,17 @@ def test_main_ingredients_egg_count_agrees(recipe):
 
 
 # --- size belongs with the count, not prefixed onto the item ----------------
-# GitHub issue #149, closed 2026-08-10 with no test -- caught in the 2026-08-12
-# audit, five real violations found (apples, lemons x2, garlic, butter pats,
-# not just the issue's own carrot example -- the underlying rule generalises
-# past literal vegetables to anything counted). Scoped to a bare numeric
-# count specifically: a weight-based amount ("400 g large open mushrooms")
-# reads fine keeping the size as a descriptive adjective, and a "small
-# bunch"/"small handful" idiom with no numeric amount at all is the amount,
-# not a count carrying a stray adjective -- neither of those is this bug.
+# #149. Scoped to a bare numeric count. A weight ("400 g large open
+# mushrooms") keeps its size as an adjective, and "small bunch" with no number
+# is itself the amount. scripts/tidy_drafts.py imports the pattern from here.
 _LEADING_SIZE_WORD = re.compile(r"^(small|medium|large|extra large|baby)\s+", re.I)
 
 
 def test_size_word_is_with_the_count_not_the_item(recipe):
     """"2 large cooking apples" as amount: "2", item: "large cooking apples"
-    means the highlighter only picks up "2" -- the size sits unstyled in the
-    item text with no error anywhere, the same "quantity embedded in item
-    text" trap MANUAL.md §4 already documents for a leading `~` or a
-    "zest and juice of 1 lime" pattern. Bare numeric counts only -- see
-    module comment above for what's deliberately excluded.
+    means the highlighter only picks up "2": the size sits unstyled in the
+    item text with no error anywhere (#149). Bare numeric counts only; see
+    the comment above for what is excluded.
     """
     bad = []
     for group in recipe.fm.get("ingredient_groups") or []:
@@ -959,15 +766,9 @@ def test_size_word_is_with_the_count_not_the_item(recipe):
 
 
 # --- homemade pastry needs salt ----------------------------------------------
-# GitHub issue #135, closed 2026-08-10 with no test -- caught in the 2026-08-12
-# audit. Already true of every current homemade-pastry recipe (asparagus-
-# gruyere-quiche, lemon-meringue-pie, sweet-shortcrust-pastry-mince-pies), so
-# this is a real regression guard, not a checklist. Detected via an
-# ingredient GROUP named for pastry/dough/choux specifically -- not "has
-# flour and butter", which a cake batter also has, and not "the word pastry
-# appears anywhere", which beef-wellington.md trips just by buying 500g of
-# it ready-made (has_flour is False for that group: nothing is rubbed
-# together, there's nothing here for salt to season).
+# #135. Detected by an ingredient GROUP named for pastry, dough or choux: not
+# "has flour and butter", which a cake batter also has, and not the word
+# pastry anywhere, which a recipe buying it ready-made would trip.
 _PASTRY_GROUP_NAME = re.compile(r"\b(pastry|dough|choux)\b", re.I)
 
 
@@ -991,12 +792,8 @@ def test_homemade_pastry_has_salt(recipe):
 
 
 # --- unsalted butter needs salt somewhere, or an explicit note --------------
-# GitHub issue #138, closed 2026-08-10 with no test -- caught in the 2026-08-12
-# audit. "Included in a method step" doesn't require the literal word "salt"
-# if the method is a single catch-all step that already covers every
-# ingredient by name (gluten-free-crumble-topping.md: "Blend everything
-# together" -- salt is one of the things being blended) -- checked for real
-# against that file specifically, not assumed safe.
+# #138. The method need not say "salt" where a catch-all step covers every
+# ingredient ("Blend everything together").
 _SALT_WORD = re.compile(r"(?<!un)salt", re.I)
 _CATCH_ALL_METHOD = re.compile(r"\beverything\b|\ball\b", re.I)
 
@@ -1023,28 +820,18 @@ def test_unsalted_butter_has_salt_or_a_note(recipe):
 
 
 # --- accents ----------------------------------------------------------------
-# `_accented_words` and `_accent_problems` MOVED TO conftest ON 2026-09-03
-# (#670), where the cocktails suite can reach them, and are aliased back to
-# their old names at the top of this file. WHICH FIELDS to look in is the half
-# that does not travel: `_accent_check_fields` below is food's own answer, and a
-# drink's is different (no main_ingredients, and a bottle name is reproduced as
-# the bottle spells it -- INGEST_ONE_COCKTAIL §7).
+# The word list and the matcher are shared from conftest (#670). Which fields
+# to look in is food's own: `_accent_check_fields` below.
 
 
 def _accent_check_fields(recipe) -> list[tuple[str, str]]:
-    """Every field an accent might need to appear in, beyond recipe.prose.
+    """Every field an accent might need to appear in: recipe.prose plus the
+    title, main_ingredients, star_ingredient, ingredient item names and body
+    content (#46, #48, #82).
 
-    GitHub issues #46/#48/#82: "glace cherries" (an ingredient item name AND
-    a main_ingredients entry), "Creme Brulee" (a title), "cafe" (found in
-    henrys-quick-bulletproof-hollandaise-sauce.md's free-text body content,
-    the long-form write-up added after MANUAL's "exactly one file uses this"
-    note was written) -- none of these are in .prose, which was built for the
-    typography/time-word tests and only ever covered front-matter running
-    text, not names or body content. title/main_ingredients/star_ingredient/
-    ingredient item names/body content all get the same treatment as prose
-    does; slugs, filenames and `source:` still don't -- see
-    test_accents_in_prose's docstring for why. `short_name` used to be
-    checked here too; retired 2026-08-12, GitHub issue #169.
+    .prose covers front-matter running text only, not names or body content.
+    Slugs, filenames and `source:` are left out; test_accents_in_prose's
+    docstring says why.
     """
     out = list(recipe.prose)
     if recipe.fm.get("title"):
@@ -1067,17 +854,14 @@ def test_accents_in_prose(recipe):
     detection, because no detector can tell a missing accent from a word that
     never had one.
 
-    Scope is title/main_ingredients/star_ingredient/ingredient item
-    names plus everything in .prose (tagline, method, notes, ingredient
-    notes) -- never slugs or filenames, which must stay ASCII, and never
-    `source:`, where a citation is reproduced as the publication spells it.
+    Scope is `_accent_check_fields` -- never slugs or filenames, which must
+    stay ASCII, and never `source:`, where a citation is reproduced as the
+    publication spells it.
     """
     words = _accented_words()
-    # An `if not words: return` here (which is what this was until
-    # 2026-08-14) means an empty or mis-keyed accented_words.yml silences this
-    # check across every recipe in the collection, reporting green. The file
-    # missing entirely is a different thing and _accented_words() already
-    # skips on it; an empty map is a broken spec, not an absent one.
+    # Asserted, not `if not words: return`: an empty or mis-keyed
+    # accented_words.yml would silence this check on every recipe and report
+    # green.
     assert words, (
         "_data/accented_words.yml has no `words:` map, so there is nothing to "
         "check any recipe against. That file IS this test's specification -- "
@@ -1095,14 +879,11 @@ def test_accents_in_prose(recipe):
 def test_accents_in_drafts():
     """Same rule as test_accents_in_prose, for _food_drafts/.
 
-    Same reasoning as test_no_main_ingredient_spelling_collisions in
-    test_taxonomy.py: a draft carries its spelling forward when it's
-    promoted to _food_recipes/, so it's worth catching before that happens
-    rather than after.
+    A draft carries its spelling forward when it is promoted.
 
-    SKIPS WITHOUT THE DRAFTS (#378). This reads _food_drafts/ and nothing else,
-    so in CI -- where that private repo is absent -- it would scan an empty list
-    and report a confident green having looked at nothing at all.
+    Skips without the drafts (#378): this reads _food_drafts/ and nothing
+    else, so in CI, where that private repo is absent, ALL_DRAFTS is empty and
+    it would report green having looked at nothing.
     """
     from conftest import ALL_DRAFTS, DRAFTS_PRESENT, NO_DRAFTS_REASON
     if not DRAFTS_PRESENT:
@@ -1146,16 +927,12 @@ def _size_problems(fields: list[tuple[str, str]]) -> list[str]:
 
 
 def test_pan_and_ingredient_sizes_use_digits(recipe):
-    """GitHub issue #95: "7-inch" not "seven-inch", same for an ingredient
-    size like "4-cm piece of ginger". Unlike time words ("ten minutes of
-    glory" is fine, per this file's own docstring), a size describing a
-    physical dimension is a measurement, not prose, and reads the same way
-    every other measurement on this site already does -- digits.
+    """#95. "7-inch", not "seven-inch"; "4-cm piece of ginger". A physical
+    dimension is a measurement, not prose, so it takes digits (unlike "ten
+    minutes of glory").
 
-    Same field set as the accent checks (title/main_ingredients/
-    star_ingredient/ingredient item names, plus prose): a size can appear as
-    an ingredient's own name ("4-cm piece of ginger") just as easily as in
-    a method step ("a 7-inch tin").
+    Same field set as the accent checks: a size can be in an ingredient's
+    name as easily as in a method step.
     """
     problems = _size_problems(_accent_check_fields(recipe))
     assert not problems, (
@@ -1166,8 +943,8 @@ def test_pan_and_ingredient_sizes_use_digits(recipe):
 
 def test_pan_and_ingredient_sizes_use_digits_in_drafts():
     """Same rule as test_pan_and_ingredient_sizes_use_digits, for
-    _food_drafts/ -- same reasoning as test_accents_in_drafts, including its
-    note on skipping when the private drafts are absent (#378).
+    _food_drafts/. Skips when the private drafts are absent (#378), for the
+    reason test_accents_in_drafts gives.
     """
     from conftest import ALL_DRAFTS, DRAFTS_PRESENT, NO_DRAFTS_REASON
     if not DRAFTS_PRESENT:
@@ -1184,28 +961,12 @@ def test_pan_and_ingredient_sizes_use_digits_in_drafts():
 
 
 # --- oven temperature: fan required ------------------------------------------
-# GitHub issue #146. House style has been fan-only for a while
-# (MANUAL.md §5: "always fan oven only, never conventional or gas
-# mark"), but the word "fan" isn't actually written next to every existing
-# temperature yet. Helen's explicit call: don't assume the numbers already
-# there are confirmed fan figures just because house style says they should
-# be -- leave this test failing on every one that's missing the word, and
-# she'll confirm each against its original source recipe and add "fan" by
-# hand as she gets to it, rather than have the test silently pass on
-# unverified numbers. This is deliberately a checklist, not a guard that's
-# expected to be green.
+# #146. House style is fan oven only (MANUAL §5).
 _OVEN_WORD_RE = re.compile(r"\b(?:bake|roast|blast|oven)\w*\b", re.I)
 _OVEN_TEMP_RE = re.compile(r"\d{2,3}(?:[–-]\d{2,3})?\s*°C(\s*fan)?\b", re.I)
-# The phrasings that mark a °C figure as an INTERNAL temperature rather than an
-# oven setting, so the fan rule below doesn't demand "fan" on a thermometer
-# reading. Meat has no fan setting.
-#
-# "out at" / "take it out at" joined the list on 2026-08-14, when the reference
-# work standardised on that wording -- Helen: "I don't love the word pull...
-# mostly because it's American". The temperature charts, the timings page and
-# _layouts/recipe.html all say "out at" now, so a recipe writing the same figure
-# into a method step says it too, and this test has to know the site's own
-# vocabulary or it flags correct copy.
+# The phrasings that mark a °C figure as an INTERNAL temperature, so the fan
+# rule does not demand "fan" on a thermometer reading. "out at" is the site's
+# own wording for it (never "pull at"), so it has to be on this list.
 _INTERNAL_TEMP_RE = re.compile(
     r"(?:(?:internal|thigh|breast|core|centre|center)\s+temp(?:erature)?\s+of"
     r"|(?:take\s+(?:it|them)\s+)?out\s+at"
@@ -1216,35 +977,19 @@ _INTERNAL_TEMP_RE = re.compile(
 
 
 def test_oven_temperature_says_fan(recipe):
-    """GitHub issue #146. A °C figure only counts as an oven temperature when
-    its step also mentions baking/roasting/blasting/the oven -- deliberately
-    excludes stovetop and tempering readings (chocolate-ganache.md's
-    cooling-stage figures, chocolate-mousse.md's "still warm" check) and
-    internal-doneness checks (teriyaki-salmon.md's "internal temperature of
-    57°C"), none of which are an oven setting "fan" does or doesn't apply to.
+    """#146. An oven temperature says "fan".
 
-    Known gap, not a false pass: gordons-christmas-five-spice-roast-goose.md
-    has a "Calculate the cooking time: 10 mins at 240°C, then reduce to
-    190°C..." step that restates the same figures as the actual method step
-    below it, without an oven word of its own -- this test won't catch that
-    one, so check it by hand when you get to this recipe.
+    A °C figure counts as an oven temperature only when its step also
+    mentions baking, roasting, blasting or the oven: stovetop, tempering and
+    internal-doneness readings have no fan setting. Blind spot: a step that
+    restates oven figures with no oven word of its own is not checked.
     """
     bad = []
     for step in recipe.method_steps:
-        # MARKDOWN LINKS ARE UNWRAPPED FIRST, and that is load-bearing rather
-        # than tidiness. _INTERNAL_TEMP_RE recognises an internal temperature by
-        # the words immediately before the figure ("reads", "out at", "internal
-        # temperature of"), so anything inserted between the phrase and the
-        # number blinds it -- and since issue #260 the site links temperatures
-        # in method steps, which puts a literal "[" in exactly that gap.
-        #
-        # "reads [74–75°C](#doneness)" therefore read as an OVEN temperature
-        # missing its "fan", on a step whose own link says it is a thermometer
-        # reading. Unwrapping to "reads 74–75°C" restores the adjacency the
-        # regex is looking for. It also stops this depending on where an author
-        # happens to open the bracket: "[internal temperature of 90–95°C](...)"
-        # passed only because the "[" landed before the phrase rather than
-        # inside it, which is luck, not a rule anyone could follow.
+        # Markdown links are unwrapped first. _INTERNAL_TEMP_RE reads the words
+        # immediately before the figure, and a linked temperature (#260) puts a
+        # "[" in that gap: "reads [74–75°C](#doneness)" would otherwise count
+        # as an oven temperature missing its "fan".
         step = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", step)
         if not _OVEN_WORD_RE.search(step):
             continue
@@ -1263,15 +1008,10 @@ def test_oven_temperature_says_fan(recipe):
 def test_no_recipe_says_cooking_temperatures(recipe):
     """"internal temperatures chart", never "cooking temperatures". Issue #352.
 
-    Helen worked out why in #338: "It's not cooking temperatures, it's internal
-    temperatures." The chart measures the inside of the meat; the old phrase
-    named the oven instead, which is a different number and the wrong one to
-    check doneness against.
-
-    A copy rule rather than a data one, so nothing else would catch a
-    reintroduction -- the page builds, the anchor resolves, and the link works.
-    It would simply be wrong, quietly, on the recipes where being wrong matters
-    most: the ones with a meat temperature to check.
+    The chart measures the inside of the meat; "cooking temperatures" names
+    the oven, a different number and the wrong one to check doneness against
+    (#338). A copy rule, so nothing else catches it: the page builds and the
+    link works.
     """
     body = recipe.path.read_text(encoding="utf-8")
     assert "cooking temperature" not in body.lower(), (
@@ -1285,16 +1025,12 @@ def test_no_recipe_says_cooking_temperatures(recipe):
 def test_ingredient_group_names_do_not_repeat_for_the(recipe):
     """The layout supplies "For the ...", so a group must not supply it too.
 
-    Issue #329. `_layouts/recipe.html` renders `For the {{ group.name }}:`,
-    so a group named "for the sauce" becomes "For the for the sauce:". The
-    failure is pure duplication and only visible on a rendered page with more
-    than one ingredient group -- a single-group recipe prints no heading at
-    all, so the mistake can sit in the data indefinitely without showing.
+    #329. A group named "for the sauce" renders as "For the for the sauce:",
+    and only on a page with more than one ingredient group: a single-group
+    recipe prints no heading, so the mistake can sit unseen.
 
-    A group named `variation: ...` is the deliberate exception and skips the
-    prefix entirely, because "For the ..." promises the reader something they
-    have to make. See #342: caramel's second group is the condensed milk for
-    Millionaire's shortbread, which most people making caramel never touch.
+    A group named `variation: ...` skips the prefix on purpose (#342): "For
+    the ..." promises something the reader has to make.
     """
     groups = recipe.fm.get("ingredient_groups") or []
     bad = [g.get("name") for g in groups

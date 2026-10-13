@@ -1,89 +1,26 @@
-# =============================================================================
-# WHAT A DRINK COSTS, APPROXIMATELY. Spec: this file. Prices checked 2026-09-05.
-# =============================================================================
-# HELEN IS CATERING FOR FAMILY, NOT RUNNING A BAR, and that one sentence decides
-# most of what is NOT here. Asked on 2026-09-05 which of dashes, garnishes,
-# muddled fruit and ice/salt/sugar should count, she answered: "None of these
-# come into the estimated cost." So the rule is mechanical and lives in
-# `excluded_units` below -- a pour counts only if its amount is a VOLUME.
-# 585 of the collection's 685 pours are; 99 are dashes, drops, leaves, cubes,
-# pinches and rinses, and they are free.
+# What a drink costs, approximately (#547, DECISIONS §9.3.5). Shown on local
+# builds only, behind `site.show_costs`.
 #
-# NARROWED ON 2026-09-06 (#748), BUILT 2026-09-24: "Price whole fruit and
-# weighed solids." A solid that IS the drink -- the pear and four apricots the
-# Bellini consists of, the palm sugar the Caipirinha is muddled on -- is not a
-# garnish. So the rule now reads: a pour counts if its unit is a VOLUME, or a
-# COUNT of a fruit priced in `fruit_prices`, or a WEIGHT priced in
-# `weight_prices`; a dash, a leaf, a garnish and ice never count, and a count
-# or weight with no row stays free, as it always was. The two blocks are the
-# whole of the change; `excluded_units` is untouched.
+# A pour counts if its amount is a volume, a count of a fruit in
+# `fruit_prices`, or a weight in `weight_prices`. Dashes, garnishes and ice
+# never count; `(top)` does, through `top_up_ml`.
 #
-# THE ONE EXCEPTION SHE ASKED FOR IS `to top`. It is a counted unit, so the rule
-# above would drop it -- but a splash of champagne is the DEAREST thing in the
-# seven glasses that take one, which is noise in no sense at all. Helen,
-# 2026-09-05: "We can calculate top volumes, well, slightly, can't we -- I'd
-# like that to be captured actually so it can be added into the shopping list
-# feature." So `top_up_ml` below is a declared RANGE, and it does double duty:
-# it prices the champagne AND it is what lets shopping-list.js report a volume.
-# Both halves are live as of 2026-09-08 (#746): three topped sodas read
-# "300–450 ml" on the list, where they read "to top (x3)" before. See its own
-# note.
+# A pour that names a bottle takes that bottle's price. Otherwise its generic
+# is a range across the bottles declared under it (narrowed by
+# `default_bottles`) and any row in `generics:`.
 #
-# IT IS THE ONE BLOCK IN THIS FILE THAT IS NOT A PRICE, and so the one that is
-# emitted to the deployed site: cocktails/index.html sends it UNGATED while
-# everything else here rides behind `site.show_costs`. A volume is not a price,
-# and "300–450 ml of soda water" is what the live shopping list should say too.
-#
-# WHY A SEPARATE FILE FROM bottles.yml. A price is a different KIND of fact from
-# everything in that file. `generic`, `aliases` and the appellation rulings are
-# invariant -- Appleton 12 is a moderately-aged Jamaican for as long as the
-# bottle exists. A price is true on a day, in a shop, and goes stale on its own
-# without anybody editing anything. Putting it beside the rulings would date the
-# rulings by association and would bury 130 numbers in 933 lines of prose that
-# must not be disturbed to reprice a bottle. `checked:` is this file's honesty,
-# and it is the field to distrust first when a total looks wrong.
-#
-# TWO LAYERS, AND A POUR TAKES THE FIRST THAT ANSWERS.
-#   1. the pour NAMES A BOTTLE -> that bottle's price. 247 of 685 pours.
-#   2. it names a generic only -> `generics:` below. 438 of 685.
-# Layer 2 is not a nicety: the four most-poured things in the collection are
-# lime juice (58 pours), lemon juice (34), cane sugar syrup 2:1 (32) and
-# pineapple juice (15), and not one of them will ever be a bottle.
-#
-# THE PAGE SHOWS A RANGE, and the range is not decoration. Helen chose it over a
-# single figure on 2026-09-05, and it falls out of the data rather than being
-# invented: a generic with several bottles under it spans them. `London dry gin`
-# is Beefeater at GBP 18 and Rutte at GBP 26, and a Martini made with either is
-# the same drink. A pour that names its bottle is a point, so a drink that names
-# every bottle prints one figure -- which is correct, not a bug.
-#
-# (That example named Anchor Junipiero at GBP 38 as the top until 2026-09-05,
-# when Helen removed the bottle. Two things then narrowed the same category on
-# the same day: losing Junipiero, and her `default_bottles` ruling settling gin
-# on Tanqueray, which now decides it outright. Left corrected rather than
-# rewritten, because the POINT the example makes is unchanged.)
-#
-# CONFIDENCE IS PER ROW AND IT MEANS SOMETHING:
-#   high    a UK retail price read off a search result on 2026-09-05.
-#   medium  within about 20% for this category; fine for an approximation.
-#   low     a genuine guess. OVERWRITE THESE FIRST.
-# Master of Malt is the source Helen prefers and it returns HTTP 429 to every
-# automated request, so the high rows come from The Whisky Exchange, Tesco,
-# Trolley and PriceRunner instead. She is filling the rest in from MoM by hand,
-# which is why the sizes are already correct and only `gbp` needs her.
-#
-# PROMOTIONS ARE DELIBERATELY IGNORED. Appleton Signature was GBP 27 shelf and
-# GBP 20 on a Clubcard the day this was written. The shelf price is the one that
-# is true in a fortnight.
-# =============================================================================
+# `confidence` per row: high is a shelf price read on the `checked` date or
+# Helen's own figure; medium is within about 20% for the category; low is a
+# guess, and the first to overwrite. Shelf prices, never promotions.
 
-# The day the `high` rows were read. Everything here decays from this date.
+# The day the prices were read. A test fails once it is two years old (#749);
+# the fix is re-reading the prices, never moving the date alone.
 checked: "2026-09-05"
 
-# A pour counts only if its unit is a volume. These are the units that mean
-# "counted or weighed", straight out of ingredients.yml's `non_volumetric`, and
-# a pour measured in one of them contributes NOTHING. Helen's ruling, above.
-# `to top` is the exception and is handled by `top_up_ml`, not here.
+# Units that are counted or weighed: a pour in one adds no volume. Each must
+# be a unit ingredients.yml declares. `(top)` is deliberately absent: it
+# costs, through `top_up_ml`. The strength and volume arithmetic read this
+# list too.
 excluded_units:
   - dash
   - dashes
@@ -101,29 +38,15 @@ excluded_units:
   - g
   - half
   - whole
-  # `(rinse)` WAS `to rinse` UNTIL 2026-09-26, when Helen bracketed the
-  # unspecified amounts on #1217. `(top)` is deliberately still absent from
-  # this list, exactly as `to top` was: it is the one excluded-looking unit
-  # that DOES cost, through `top_up_ml` below, and the block header above says
-  # why. `(splash)` and `(float)` are absent for a different reason -- neither
-  # has a declared volume range yet, so neither reaches the arithmetic at all.
   - (rinse)
-  # `(sprinkle)` joined 2026-09-26 with the Milliners Punch. Excluded for the
-  # reason a dash and a leaf are: no volume, so no arithmetic. The cinnamon is
-  # a real pour she will buy, and it shows on the shopping list as a count --
-  # what it cannot do is add millilitres to a total. `(garnish)` joined with it
-  # and left on 2026-10-01 (#1256): the shell rum is a measured 25 ml now.
   - (sprinkle)
 
-# --- what a bottle costs and how big it is -----------------------------------
-# `size_ml` IS AS LOAD-BEARING AS `gbp` AND IS EASIER TO GET WRONG. A price
-# without a size is not a price: Angostura at GBP 11.75 is dear or cheap
-# depending entirely on the 200 ml, and the bitters are the only rows here where
-# the bottle is not 70cl. Vermouth and sherry are 75cl, Carpano is a litre,
-# Lustau Don Nuno is 50cl, Acacia honey is a 340 g jar. Every one of those is a
-# real difference and every one of them was checked.
+# --- what a bottle costs and how big it is ---
+# One row per bottle bottles.yml declares, under the same key. `size_ml`
+# matters as much as `gbp`: the bitters, vermouths, sherries, Carpano and the
+# honey jar are not 70cl.
 bottles:
-  # --- rum: Jamaican -----------------------------------------------------
+  # --- rum: Jamaican ---
   "Appleton Estate Signature":
     size_ml: 700
     gbp: 26
@@ -156,7 +79,7 @@ bottles:
     size_ml: 700
     gbp: 30
     confidence: high
-  # --- rum: Demerara -----------------------------------------------------
+  # --- rum: Demerara ---
   "El Dorado 3 Year Old":
     size_ml: 700
     gbp: 22
@@ -181,7 +104,7 @@ bottles:
     size_ml: 700
     gbp: 26
     confidence: medium
-  # --- rum: moderately aged ----------------------------------------------
+  # --- rum: moderately aged ---
   "Pusser's Blue Label":
     size_ml: 700
     gbp: 27
@@ -206,14 +129,12 @@ bottles:
     size_ml: 700
     gbp: 28
     confidence: medium
-  # A GUESS OF 2026-09-25 (#1108) THAT HELEN TICKED AS RIGHT on #1351,
-  # 2026-10-10. Not a shop figure and not one she typed, hence `medium`.
   "Cruzan Single Barrel":
     size_ml: 700
     gbp: 36
     confidence: medium
     basis: "a guess Helen ticked as right on #1351, 2026-10-10; not shop-checked"
-  # --- rum: light, blended and flavoured ---------------------------------
+  # --- rum: light, blended and flavoured ---
   "Havana Club 3 year old":
     size_ml: 700
     gbp: 21.5
@@ -222,8 +143,7 @@ bottles:
     size_ml: 700
     gbp: 22
     confidence: medium
-  # A GUESS OF 2026-09-25 (#1108) THAT HELEN TICKED AS RIGHT on #1351,
-  # 2026-10-10. Not a pricing input for the category (`default_bottles`).
+  # Not a pricing input for its category (`default_bottles`).
   "Pedro Mandinga Panama silver rum":
     size_ml: 700
     gbp: 30
@@ -237,9 +157,7 @@ bottles:
     size_ml: 700
     gbp: 30
     confidence: medium
-  # In the house since 2026-09-06, #782, and HELEN'S OWN FIGURE: 52, against the
-  # 40 I guessed from UK listings the same morning. Overproof Pusser's is scarce
-  # here and the guess was 23% under.
+  # Helen's figure.
   "Pusser's 151":
     size_ml: 700
     gbp: 52
@@ -252,13 +170,12 @@ bottles:
     size_ml: 700
     gbp: 16
     confidence: medium
-  # --- cane juice: agricole, clairin, cachaca, arrack --------------------
+  # --- cane juice: agricole, cachaça, arrack ---
   "Clément Rhum Agricole Blanc":
     size_ml: 700
     gbp: 32
     confidence: medium
-  # NEW 2026-09-14 (#1012). Helen's figure, £46. The size was not given and is
-  # taken as 70cl, which is what every other agricole blanc here is sold in.
+  # Helen's figure (#1012); 70cl assumed.
   "Clément Rhum Agricole Canne Bleue":
     size_ml: 700
     gbp: 46
@@ -303,8 +220,7 @@ bottles:
     size_ml: 700
     gbp: 24
     confidence: medium
-  # HELEN'S FIGURE, 2026-10-10 (#1351): "Barbancourt 5 Star: £42". It replaces a
-  # GBP 38 placeholder. 70cl, as its sibling.
+  # Helen's figure (#1351).
   "Barbancourt 5 Star":
     size_ml: 700
     gbp: 42
@@ -321,22 +237,16 @@ bottles:
     size_ml: 700
     gbp: 16
     confidence: medium
-  # RENAMED 2026-09-14 (#796) from `Van Osten Botanik Arrack` -- see bottles.yml.
   "Batavia Arrack van Oosten":
     size_ml: 700
     gbp: 40
     confidence: high
-  # In the house since 2026-09-06, #782. HELEN'S OWN FIGURE, twice: 37 on
-  # 2026-09-06 against the 28 I guessed, then "Ceylon Arrack: £35 (default
-  # coconut flower arrack)" on 2026-09-14 (#747), which is the figure here and
-  # the reason the bottle is now the category's default in `default_bottles`.
-  # The key turned out to be the label after all (#796, 2026-09-14); what
-  # changed that day was its generic, `coconut-flower arrack`.
+  # Helen's figure (#747); the category's default in `default_bottles`.
   "Ceylon Arrack":
     size_ml: 700
     gbp: 35
     confidence: high
-  # --- gin ---------------------------------------------------------------
+  # --- gin ---
   "Beefeater":
     size_ml: 700
     gbp: 18
@@ -365,7 +275,7 @@ bottles:
     size_ml: 700
     gbp: 24
     confidence: medium
-  # --- whisky ------------------------------------------------------------
+  # --- whisky ---
   "Elijah Craig 12":
     size_ml: 700
     gbp: 38
@@ -382,9 +292,8 @@ bottles:
     size_ml: 700
     gbp: 26
     confidence: high
-  # HELEN'S FIGURE, 2026-10-10 (#1351): "Bonded rye can default to Rittenhouse
-  # 50%, £36 for 70 cl". The same bottle as the `bonded rye` row below, so the
-  # one figure is written in both places. It was GBP 34, `medium`.
+  # Helen's figure (#1351). The `bonded rye` row in `generics:` is this
+  # bottle: change the two together.
   "Rittenhouse 100":
     size_ml: 700
     gbp: 36
@@ -397,13 +306,11 @@ bottles:
     size_ml: 700
     gbp: 34
     confidence: medium
-  # RENAMED 2026-09-14 (#1012) from `Ardbeg XO` -- the bottle was always An Oa.
-  # The price is the one Helen gave under the old name, for the same bottle.
   "Ardbeg An Oa":
     size_ml: 700
     gbp: 54
     confidence: high
-  # --- agave -------------------------------------------------------------
+  # --- agave ---
   "Patrón Silver":
     size_ml: 700
     gbp: 45
@@ -412,11 +319,7 @@ bottles:
     size_ml: 700
     gbp: 26
     confidence: medium
-  # THE THREE HELEN NAMED ON 2026-09-05 so her Rooster/Patrón rule could be
-  # written for reposado and añejo as well as blanco. She supplied the names
-  # that day and the PRICES on 2026-09-14 (#747): "Rooster Reposado: £26 /
-  # Rooster Anejo: £36". The guessed 28 and 32 were within 12%, which is what
-  # `medium` promised.
+  # Helen's figures for the two aged Roosters (#747).
   "Rooster Rojo Tequila Reposado":
     size_ml: 700
     gbp: 26
@@ -437,15 +340,13 @@ bottles:
     size_ml: 700
     gbp: 42
     confidence: high
-  # --- brandy ------------------------------------------------------------
+  # --- brandy ---
   "Courvoisier":
     size_ml: 700
     gbp: 28
     confidence: high
-  # BOTH PIERRE FERRANDS ARE £53, HELEN'S OWN FIGURE, 2026-09-14 (#745): "different
-  # bottles, but both £53 and both 40 % ABV". The Ambré was £45 at `medium`
-  # until then. 70cl assumed for both, the size every cognac here uses. The
-  # 1840 is not a `default_bottles` input -- her cognac rule names the Ambré.
+  # Both Pierre Ferrands are Helen's figure (#745), 70cl assumed. Only the
+  # Ambré is a `default_bottles` input.
   "Pierre Ferrand Ambré":
     size_ml: 700
     gbp: 53
@@ -462,7 +363,7 @@ bottles:
     size_ml: 700
     gbp: 35
     confidence: high
-  # --- vodka -------------------------------------------------------------
+  # --- vodka ---
   "Ketel One":
     size_ml: 700
     gbp: 24
@@ -471,28 +372,22 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: high
-  # HELEN'S OWN FIGURE, 2026-09-09: "Ciroc Pineapple Flavoured Vodka", GBP 31.
-  # 700 ml assumed -- the size she did not state and the one every other row
-  # here uses. My generic guess was GBP 20-26, about 20% under.
+  # Helen's figure; 70cl assumed.
   "Ciroc Pineapple Flavoured Vodka":
     size_ml: 700
     gbp: 31
     confidence: high
-  # HELEN'S OWN FIGURE, 2026-10-07: "Absolut Citron at £25 for 70 cl."
+  # Helen's figure.
   "Absolut Citron":
     size_ml: 700
     gbp: 25
     confidence: high
-  # NEW 2026-09-09 with the bottle. 75cl, like every other vermouth here and
-  # unlike the 70cl default -- the header calls that out as the thing easiest
-  # to get wrong. MINE, NOT HERS: `medium` means "within about 20% for the
-  # category", and the two Dolins she already owns are not priced here to
-  # anchor it. Overwrite when she next reads Master of Malt.
+  # A vermouth, so 75cl. An estimate for the category, not Helen's figure.
   "Dolin Rouge":
     size_ml: 750
     gbp: 15
     confidence: medium
-  # --- orange liqueurs and triple sec ------------------------------------
+  # --- orange liqueurs and triple sec ---
   "Cointreau":
     size_ml: 700
     gbp: 24
@@ -517,7 +412,7 @@ bottles:
     size_ml: 700
     gbp: 18
     confidence: medium
-  # --- other liqueurs and amari ------------------------------------------
+  # --- other liqueurs and amari ---
   "Disaronno":
     size_ml: 700
     gbp: 20
@@ -558,10 +453,7 @@ bottles:
     size_ml: 700
     gbp: 18
     confidence: medium
-  # NEW 2026-09-09 with the bottle. Priced from its siblings above rather than
-  # from a shop: Briottet's crèmes sit together on a shelf and the Pêche and
-  # d'Abricot are both GBP 18. `medium` means exactly that -- within about 20%
-  # for the category. Hers to correct.
+  # Priced from its Briottet siblings above, not from a shop.
   "Briottet Crème de Cerise":
     size_ml: 700
     gbp: 18
@@ -592,7 +484,6 @@ bottles:
     size_ml: 700
     gbp: 28
     confidence: medium
-  # RENAMED 2026-09-14 (#1012) from `Gabriel Boudier Gingembre`.
   "Gabriel Boudier Liqueur de Gingembre":
     size_ml: 700
     gbp: 20
@@ -602,11 +493,7 @@ bottles:
     size_ml: 700
     gbp: 26
     confidence: high
-  # BOTTLES NAMED 2026-09-14 (#1012) for two categories that had none, at the
-  # figures the category rows in `generics:` had carried -- and PRICED BY HELEN
-  # the same evening (#747): "Briottet Sapin: £40", "La Tomato: £24". The
-  # category rows are gone: with a bottle under each, a price there would be a
-  # second answer to the same question.
+  # Helen's figures for these two (#747).
   "Briottet Liqueur de Sapin":
     size_ml: 700
     gbp: 40
@@ -615,12 +502,7 @@ bottles:
     size_ml: 700
     gbp: 24
     confidence: high
-  # HELEN'S OWN FIGURE, 2026-09-26: "18% ABV, £22", pricing Clément Mahina
-  # Coconut Rhum Liqueur so the White Negroni Piña Colada could promote.
-  # 700 ml ASSUMED -- the size she did not state, and the one nearly every row
-  # here uses; the Ciroc above was entered on exactly the same assumption and
-  # says so. The placeholder category range this replaces was GBP 30-45 per
-  # litre, so the guess was about right and is now a fact.
+  # Helen's figure; 70cl assumed.
   "Clément Mahina Coconut Rhum Liqueur":
     size_ml: 700
     gbp: 22
@@ -661,13 +543,12 @@ bottles:
     size_ml: 700
     gbp: 24
     confidence: high
-  # --- fortified and aromatised -- NOTE THE SIZES, none of these is 70cl ---
+  # --- fortified and aromatised: none of these is 70cl ---
   "Lillet Blanc":
     size_ml: 750
     gbp: 18
     confidence: high
-  # HELEN'S FIGURE, 2026-10-10 (#1351): "Cocchi Americano: £26". It replaces a
-  # GBP 22 placeholder. 75cl.
+  # Helen's figure (#1351).
   "Cocchi Americano":
     size_ml: 750
     gbp: 26
@@ -708,7 +589,7 @@ bottles:
     size_ml: 500
     gbp: 15
     confidence: medium
-  # --- absinthe ----------------------------------------------------------
+  # --- absinthe ---
   "Vieux Pontarlier":
     size_ml: 700
     gbp: 48
@@ -717,9 +598,9 @@ bottles:
     size_ml: 700
     gbp: 38
     confidence: medium
-  # --- bitters -- SMALL BOTTLES. A dash is free under Helen's rule, so these
-  # prices are carried for completeness and for the shopping list, not because
-  # any drink's total depends on them ---
+  # --- bitters: small bottles ---
+  # A dash is free, so no drink's total depends on these; they are here
+  # because every declared bottle has a row.
   "Angostura":
     size_ml: 200
     gbp: 11.75
@@ -753,7 +634,7 @@ bottles:
     size_ml: 100
     gbp: 18
     confidence: high
-  # --- syrups and cordials -----------------------------------------------
+  # --- syrups and cordials ---
   "Monin Pure Cane Sugar":
     size_ml: 700
     gbp: 7
@@ -778,7 +659,7 @@ bottles:
     size_ml: 500
     gbp: 4
     confidence: medium
-  # --- pantry ------------------------------------------------------------
+  # --- pantry ---
   "Acacia honey":
     size_ml: 340
     gbp: 6
@@ -788,50 +669,20 @@ bottles:
     gbp: 4
     confidence: medium
 
-# --- fresh fruit, priced per fruit and NOT per litre --------------------------
-# THIS BLOCK EXISTS SO THAT #546 IS NOT RETYPED. `juice_yields:` in
-# ingredients.yml already carries Helen's own figures -- "Lemons give about 30-45
-# ml of juice. Limes 20-30 ml. Medium oranges about 60-80 ml. Grapefruit 180-240
-# ml" -- and cocktail-index.js already hands them to the shopping list. A
-# per-litre price for lime juice would be a SECOND place those yields are
-# implied, and the two would drift the first time she revised one.
-#
-# So a juice costs `price of one fruit / what one fruit yields`, and the range
-# falls out of the two ranges honestly: the cheap end is the cheapest fruit
-# giving its best yield, the dear end the dearest fruit giving its worst. Limes
-# come out GBP 6.00-15.00 a litre, which is a wide span and a true one.
-#
-# LIME IS THE MOST-POURED INGREDIENT IN THE WHOLE COLLECTION -- 58 pours, 1473
-# ml -- so this block moves the numbers more than any bottle does.
-# Prices read 2026-09-05: Tesco loose limes GBP 0.23, Aldi GBP 0.18, lemons from
-# GBP 0.22. The top of each range allows for a bad week and for organic.
-#
-# AND SINCE 2026-09-24 IT PRICES THE FRUIT ITSELF, COUNTED -- #748, Helen's
-# ruling of 2026-09-06: "Price whole fruit and weighed solids." A pour written
-# `1 whole`, `4 whole`, `1.5 each`, `9 each`, `5 cubes` or `half` of a generic
-# with a row here costs that many times the row (half a lime is half a lime's
-# price). A counted pour of anything WITHOUT a row here stays a flourish and is
-# free, exactly as before: a dozen sugar cubes in a punch is still about 7p and
-# still does not spoil a total. The rule the plugin applies is therefore: a pour
-# counts if its unit is a volume, OR a count of a fruit priced here, OR a
-# weight priced in `weight_prices:` below -- and a dash, a leaf, a garnish and
-# ice never count.
-#
-# THE KEY IS THE GENERIC EXACTLY AS A DRINK WRITES IT. For the four citrus
-# fruits that is also what `juice_yields` names, which is how a squeezed juice
-# finds its fruit; the rest are only ever counted.
-#
-# A `basis` says what the figure is PER, where a row is not simply "one fruit":
-# blackberries and raspberries are sold by the punnet and poured by the berry,
-# cucumber is poured by the wheel and pineapple by the cube, so those rows are
-# a punnet or a fruit divided by how many pieces it gives. Those are the rows
-# to overwrite first; the derivation is shown so it can be argued with.
+# --- fresh fruit, priced per piece and not per litre ---
+# A squeezed juice costs the fruit's price divided by its yield, and the
+# yields live only in `juice_yields` in ingredients.yml (#546): a per-litre
+# juice price here would be a second place they are implied.
+# A counted pour (`1 whole`, `9 each`, `5 cubes`, `half`) of a generic with a
+# row here costs that many times the row (#748). The key is the generic
+# exactly as a drink writes it. A `basis` says what the figure is per, where a
+# row is not simply one fruit.
 fruit_prices:
   lime:       { gbp_min: 0.18, gbp_max: 0.30, confidence: high }
   lemon:      { gbp_min: 0.22, gbp_max: 0.35, confidence: high }
   orange:     { gbp_min: 0.35, gbp_max: 0.55, confidence: medium }
   grapefruit: { gbp_min: 0.80, gbp_max: 1.20, confidence: medium }
-  # --- counted whole, #748 (estimates, 2026-09-24; UK supermarket loose/pack) --
+  # --- counted whole (#748): estimates ---
   pear:           { gbp_min: 0.40, gbp_max: 0.70, confidence: medium }
   passion fruit:  { gbp_min: 0.40, gbp_max: 0.70, confidence: medium }
   dried apricots: { gbp_min: 0.08, gbp_max: 0.15, basis: "GBP 2-3 / 250 g bag of about 30", confidence: medium }
@@ -839,290 +690,136 @@ fruit_prices:
   raspberries:    { gbp_min: 0.05, gbp_max: 0.10, basis: "GBP 2-3 / 150 g punnet of about 30-40 berries", confidence: medium }
   cucumber:       { gbp_min: 0.03, gbp_max: 0.05, basis: "per wheel: GBP 0.60-0.90 a cucumber, about 20 wheels", confidence: low }
   pineapple:      { gbp_min: 0.03, gbp_max: 0.05, basis: "per cube: GBP 1.00-1.50 a pineapple, about 30-40 cubes", confidence: low }
-  # NEW 2026-10-04 (#1302), for Peach Me, which muddles one of each. They were
-  # written as a bare `1` until Helen confirmed the counts, and a bare number is
-  # not a counted pour, so nothing asked for a price. ESTIMATES, not her figures:
-  # the slice is the `orange` row above divided by eight; the cherry runs from a
-  # supermarket cocktail cherry to a Luxardo one.
+  # Estimates (#1302): the slice is the `orange` row divided by eight.
   orange slice:      { gbp_min: 0.04, gbp_max: 0.07, basis: "per slice: GBP 0.35-0.55 an orange, about 8 slices", confidence: low }
   maraschino cherry: { gbp_min: 0.05, gbp_max: 0.25, basis: "per cherry: GBP 2 / jar of about 40 to GBP 10-12 / 400 g Luxardo jar of about 50", confidence: low }
 
-# --- weighed solids, priced per kilogram ---------------------------------------
-# THE OTHER HALF OF HELEN'S 2026-09-06 RULING (#748): "Price whole fruit and
-# weighed solids." A pour written `N g` of a generic with a row here costs
-# N/1000 of the row; a weight with no row here is a flourish and free, as every
-# `g` pour was until 2026-09-24. `g` STAYS IN `excluded_units` because that list
-# is what the strength and volume arithmetic read, and a spoon of sugar is still
-# not a millilitre of anything.
+# --- weighed solids, priced per kilogram ---
+# A pour written `N g` of a generic with a row here costs N/1000 of the row
+# (#748). `g` stays in `excluded_units`, which the strength and volume
+# arithmetic read. `basis` names the shop price the figure derives from.
 #
 # Sugar by weight costs nothing (#1371). Its rows are zero, not absent: a
 # weighed generic with no row makes the drink withhold its whole figure.
-#
-# `gbp_per_kg`, unrounded ranges, and a `basis` naming the shop price so the
-# derived figure can be checked against the shelf rather than trusted.
 weight_prices:
   honey:               { gbp_per_kg_min: 9.00, gbp_per_kg_max: 18.00, basis: "GBP 3-6 / 340 g jar (supermarket clear honey to Acacia)", confidence: medium }
   golden caster sugar: { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   palm sugar:          { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
 
-# --- how much a `to top` actually pours ---------------------------------------
-# HELEN ASKED FOR THIS DIRECTLY, 2026-09-05: "We can calculate top volumes,
-# well, slightly, can't we -- I'd like that to be captured actually so it can be
-# added into the shopping list feature."
-#
-# IT IS A RANGE BECAUSE TOPPING IS NOT MEASURING. You pour until the glass looks
-# right, and the glass differs -- a flute takes less than a collins. A single
-# figure here would be the same false precision `juice_yields` refuses, so this
-# follows that file's shape deliberately.
-#
-# WHY IT OVERRIDES THE `excluded_units` RULE. `to top` is a non-volumetric unit,
-# so the family-not-a-bar rule would drop it -- and it is the only excluded unit
-# where that would be wrong. Seven drinks top with champagne or prosecco, and in
-# those seven the topper is the DEAREST thing in the glass. Airmail, Bali Hai,
-# Drunken Skull, Green Flash, Julien Sorel, Arrack Christmas Punch and Anita's
-# Attitude Adjuster all depend on this block for a total worth reading.
-#
-# THE OTHER CONSUMER IS shopping-list.js, which is the half Helen asked for.
-# Today it reports an unquantified pour as "to top (x3)" and says so in its own
-# header -- "multiplying by the scaler multiplies the drinks, which is the only
-# honest reading" -- because nothing had told it a volume. This tells it one, and
-# it is a DECLARED range rather than a conversion the file invented, which is
-# the distinction that header was protecting.
+# --- how much a `(top)` pours ---
+# A declared range, because topping is not measuring (DECISIONS §9.3.5). It
+# prices the topper, which is the dearest thing in a champagne-topped glass,
+# and gives the shopping list a volume. The one block here that is not a
+# price: cocktails/index.html emits it ungated, to the deployed site too.
+# Every `(top)` pour's generic needs a row
+# (test_top_up_volumes_cover_every_to_top_pour).
 top_up_ml:
   champagne:  { ml_min: 75,  ml_max: 100 }
   prosecco:   { ml_min: 75,  ml_max: 100 }
   soda water: { ml_min: 100, ml_max: 150 }
 
-# --- which bottles a category is PRICED from ----------------------------------
-# HELEN'S DEFAULTS, given 2026-09-05, with an explicit instruction about where
-# they may and may not go: "Don't name these on the recipes, but you can note
-# them as inputs to the default prices."
-#
-# SO THIS IS A PRICING FACT AND NOT A SUGGESTION, and the distinction is the
-# whole reason the block exists rather than 40 new `suggestion:` lines across
-# the drinks. A `suggestion` is a claim about THIS DRINK -- it says the recipe
-# wants this bottle -- and #441 settled that the reason belongs to the recipe.
-# "Gin means Tanqueray unless I say otherwise" is not a fact about any one
-# drink; it is a fact about her shelf, and putting it on 5 recipes would say
-# something she has just declined to say, five times.
-#
-# WHAT IT CHANGES. Without it, a generic is priced across EVERY bottle declared
-# under it, which spans bottles she would not actually pour: `London dry gin`
-# ran GBP 18-38, Beefeater to Anchor Junipiero, for a category she says is
-# Tanqueray. (Junipiero left the collection hours later, so that span is now
-# GBP 18-26 -- but the block is what DECIDES the category, not the accident of
-# which bottles remain.) With it, the range is the bottles named here alone --
-# so a default of one bottle gives a point price, which is the honest output
-# when she has told us there is one answer.
-#
-# A CATEGORY NOT LISTED HERE IS UNCHANGED and still spans all its bottles. That
-# is the right default for a category she has not ruled on: breadth is an
-# admission of not knowing, and it should stay until she narrows it.
-#
-# TWO OF HER RULINGS CANNOT BE WRITTEN HERE YET -- see the note under
-# `reposado tequila` below. Every name in this block must be a bottle
-# bottles.yml declares, and `test_default_bottles_are_declared_and_priced`
-# holds that; adding a bottle to her dictionary on inference is not this
-# file's business.
+# --- which bottles a category is priced from ---
+# Helen's defaults: pricing inputs, never named on a recipe (DECISIONS
+# §9.3.5). A generic listed here is priced from these bottles alone, so one
+# bottle gives a point price; an unlisted generic spans every bottle declared
+# under it. A default also supplies the strength where the category's bottles
+# have no mode (#1016). Each name must be a priced bottle that bottles.yml
+# declares under that generic.
+# test_default_bottles_are_declared_priced_and_in_the_right_category
 default_bottles:
-  # "London dry gin let's say the default is tanqueray, and going forward if I
-  # want to commit to something else I'll name it." The other five gins stay
-  # declared in bottles.yml -- she owns them -- they are simply not what an
-  # unqualified `London dry gin` costs.
+  # The other gins stay declared; they are not what an unqualified `London dry
+  # gin` costs.
   London dry gin: ["Tanqueray"]
 
-  # "orgeat is always Monin". Already the only orgeat declared, so this changes
-  # no number today. It is written down anyway because "always" is a RULING and
-  # the next orgeat added to bottles.yml would silently widen five drinks
-  # without it.
+  # Orgeat and mezcal each have one answer, on Helen's ruling. Recorded so
+  # that the next bottle declared under either does not widen the range.
   orgeat: ["Monin Orgeat"]
 
-  # "Mezcal is always Del Maguey Vida unless I discover I need to downgrade!!!!"
-  # Same case as orgeat: sole bottle today, ruling recorded for tomorrow.
   mezcal: ["Del Maguey Vida"]
 
-  # "Bianco tequila is Rooster when it doesn't matter loads, Patron Silver if it
-  # really does." A two-bottle default is a REAL range rather than an
-  # uncertainty: both ends are bottles she pours, chosen by how much the drink
-  # cares. Tapatio drops out of the pricing set and stays in the dictionary.
+  # A two-bottle default is a real range: Rooster when it matters little,
+  # Patrón when it matters. Reposado and añejo below follow the same rule.
   blanco tequila: ["Rooster Rojo Bianco", "Patrón Silver"]
 
-  # "Cognac is Pierre Ferrand Ambre when it matters more, Hine/Corvoisier/
-  # Hennessey when less (not that they're really less expensive, just harsher)."
-  # Courvoisier is the only one of that trio bottles.yml declares, so it carries
-  # the cheap end. HER PARENTHESIS IS WORTH KEEPING: the cheap end here is not
-  # cheaper by much, and the range narrows rather than widens because of it.
-  # Pierre Ferrand 1840 is unmentioned and so is not a pricing input.
+  # Pierre Ferrand 1840 is declared and is not a pricing input.
   cognac: ["Courvoisier", "Pierre Ferrand Ambré"]
 
-  # "Lightly aged and filtered rum will be one of Havana 3 or El Dorado 3 99% of
-  # the time." Flor de Caña Extra Dry is the 1% and stays declared. The two are
-  # within 50p of each other, so this is nearly a point price -- which is what
-  # "99% of the time" ought to produce.
+  # The other bottles under this generic stay declared and are not inputs.
   lightly aged and filtered rum: ["Havana Club 3 year old", "El Dorado 3 Year Old"]
 
-  # "Same for Reposado and Anejo actually" -- the other two thirds of the
-  # tequila rule, unwritable on 2026-09-05 morning because three of the four
-  # bottles were undeclared. Helen supplied them ("all need diacritics") and
-  # they are in bottles.yml now, so the rule reads the same shape as the
-  # blanco above: Rooster for when it does not matter, Patrón for when it does.
   reposado tequila: ["Rooster Rojo Tequila Reposado", "Patrón Reposado"]
   añejo tequila: ["Rooster Rojo Tequila Añejo", "Patrón Añejo"]
 
-  # --- the no-mode categories, 2026-09-14 (#1016) ------------------------------
-  # WHY THESE SEVEN, AND WHY NOW. #1016 made an unbottled pour's STRENGTH the
-  # mode of the bottles declared under its generic ("more meaningful than mean
-  # or median"). Measured that day, seven categories had no mode at all -- every
-  # bottle a different strength -- so the rule had no answer for them. Asked
-  # what should happen, Helen chose "name a default bottle" over the highest,
-  # the mean or the median, and named each one in the same sitting.
-  #
-  # A DEFAULT HERE SETS THE PRICE TOO, and she was told so before choosing: an
-  # unbottled bourbon pour now costs a Woodford's rather than the four-bourbon
-  # range. That is the rule this block has always had; these are simply the
-  # first defaults that arrived for the strength's sake rather than the price's.
-  #
-  # test_every_bottled_generic_resolves_to_one_strength is what makes the next
-  # one arrive the same way: a new bottle that leaves a category with no mode
-  # and no default fails the build, naming the category.
+  # --- named for the strength's sake (#1016) ---
+  # Each of these categories has bottles with no modal strength.
+  # test_every_bottled_generic_resolves_to_one_strength fails a category with
+  # neither a mode nor a default.
   bourbon: ["Woodford's Reserve"]
   absinthe: ["Vieux Pontarlier"]
   cachaça: ["Sagatiba"]
   amontillado sherry: ["Lustau Amontillado"]
-  # "Gabriel Boudier Liqueur de Gingembre (18%)" over King's Ginger (41%).
   ginger liqueur: ["Gabriel Boudier Liqueur de Gingembre"]
   maraschino liqueur: ["Luxardo Maraschino"]
-  # "If cherry liqueur then Briottet, if cherry brandy then Cherry Heering." The
-  # answer split one category into two (bottles.yml): each now has exactly one
-  # bottle, so neither default changes a number today. Both are recorded
-  # because "if cherry liqueur then Briottet" is a RULING, and the next cherry
-  # liqueur added would otherwise silently become a two-bottle mode question --
-  # the orgeat argument above.
+  # One bottle each for the two cherry generics; recorded so the next cherry
+  # bottle does not open a mode question.
   cherry liqueur: ["Briottet Crème de Cerise"]
   cherry brandy: ["Cherry Heering"]
 
-  # "Ceylon Arrack: £35 (default coconut flower arrack)" -- Helen, 2026-09-14
-  # (#747). The only bottle under the category today, so this changes no
-  # number; recorded because "default" is a ruling, as orgeat's is above.
   coconut-flower arrack: ["Ceylon Arrack"]
 
-  # THE SAME TEST, 2026-10-07: declaring Barbancourt 5 Star left this category
-  # two bottles at 43 and two at 45. Shown the four and asked which is the
-  # default, Helen answered with the strength rather than a bottle: "45%." So
-  # BOTH 45s are named -- a two-bottle default, like the tequilas above -- and
-  # an unbottled pour is 45% and priced across the pair. The two Barbancourts
-  # stay declared and are what a drink gets by naming one.
+  # Helen's default is a strength, 45%, so both 45% bottles are named. The
+  # Barbancourts stay declared.
   rhum agricole vieux: ["La Favorite L'Authentique Ambré", "Rhum JM Ambré"]
 
-# --- generics with no bottle behind them --------------------------------------
-# 438 of 685 pours name a generic and no bottle, and this is what prices them.
-# A generic that DOES have bottles is deliberately absent: its range is computed
-# from those bottles, so writing a figure here too would be a second truth.
-#
-# THREE KINDS OF ROW, AND HELEN DREW THE LINE HERSELF on 2026-09-05: "Campari is
-# just Campari, as is chartreuse. They have prices."
-#
-#   ONE PRODUCT   The generic names a single thing that has one price. min ==
-#                 max, and that is not a missing range -- there is nothing to
-#                 range over. Campari, both Chartreuses, Aperol, Cynar,
-#                 Jagermeister, Becherovka, Grand Marnier.
-#   A CATEGORY    Genuinely several bottles wide, none of them declared yet.
-#                 champagne, sloe gin, pisco. The range is the span.
-#   MADE, NOT BOUGHT  A syrup you cook. Priced from what goes into it, with the
-#                 arithmetic shown in `basis` so it can be argued with.
-#
-# `gbp_per_litre`, NOT a bottle price, because half of these are not sold in
-# bottles at all -- a syrup is made, an espresso is pulled, a tea is brewed.
-# One unit across all three kinds is what lets the code stay simple.
+# --- generics priced without a bottle ---
+# `gbp_per_litre`, because half of these are not sold in bottles. A generic
+# that has bottles is normally absent: its range is computed from those
+# bottles. A row beside priced bottles is unioned with them, so it must carry
+# a `basis` saying what it is.
+# test_a_generic_priced_both_ways_is_deliberate_and_declared
+# Three kinds of row: one product (min == max), a category (the range is the
+# span of what you might buy), and made-not-bought (the sum is in `basis`).
 generics:
 
-  # --- one product, one price (min == max) ------------------------------------
-  # GBP per litre = bottle price / bottle size. `basis` shows the shop price so
-  # Helen can check that rather than the derived figure.
+  # --- one product, one price (min == max) ---
+  # `basis` shows the shop price; GBP per litre is that price over the size.
   Campari:            { gbp_per_litre_min: 29.89, gbp_per_litre_max: 29.89, basis: "GBP 20.92 / 70cl", confidence: high }
   Aperol:             { gbp_per_litre_min: 21.51, gbp_per_litre_max: 21.51, basis: "GBP 15.06 / 70cl", confidence: high }
   Chartreuse Verte:   { gbp_per_litre_min: 68.21, gbp_per_litre_max: 68.21, basis: "GBP 47.75 / 70cl", confidence: high }
   Chartreuse Jaune:   { gbp_per_litre_min: 64.29, gbp_per_litre_max: 64.29, basis: "GBP 45 / 70cl", confidence: medium }
   Grand Marnier:      { gbp_per_litre_min: 40.00, gbp_per_litre_max: 40.00, basis: "GBP 28 / 70cl", confidence: medium }
-  # A GENERIC SINCE 2026-10-04 (#1108); it was a bottle under `clairin` until
-  # then, at this same GBP 42 / 70cl.
+  # A generic, not a bottle: each clairin is its own (#1108).
   Clairin Communal:   { gbp_per_litre_min: 60.00, gbp_per_litre_max: 60.00, basis: "GBP 42 / 70cl", confidence: high }
   Cynar:              { gbp_per_litre_min: 28.57, gbp_per_litre_max: 28.57, basis: "GBP 20 / 70cl", confidence: medium }
   Jägermeister:       { gbp_per_litre_min: 28.57, gbp_per_litre_max: 28.57, basis: "GBP 20 / 70cl", confidence: medium }
   Becherovka:         { gbp_per_litre_min: 31.43, gbp_per_litre_max: 31.43, basis: "GBP 22 / 70cl", confidence: medium }
   Amaro Nonino:       { gbp_per_litre_min: 60.00, gbp_per_litre_max: 60.00, basis: "GBP 42 / 70cl", confidence: medium }
-  # HELEN'S OWN PRICE, 2026-09-07: "Amaro Ciociano is GBP 36" -- so 51.43 a
-  # litre, up from a guessed 42.86, and `low` becomes `high`. It was one of
-  # the few `low` rows left in the file.
+  # Helen's figure.
   Amaro Ciociaro:     { gbp_per_litre_min: 51.43, gbp_per_litre_max: 51.43, basis: "GBP 36 / 70cl", confidence: high }
-  # `liqueur de sapin` and `tomato liqueur` MOVED TO BOTTLES 2026-09-14 (#1012):
-  # Briottet Liqueur de Sapin and La Tomato Liqueur, above, at the same prices.
-  # HELEN'S OWN FIGURE, 2026-09-14 (#747): "Carlshamns Flaggpunsch: £21
-  # (default)". Still a category row rather than a bottle, because bottles.yml
-  # declares no Carlshamns and a bottle nobody pours is a different decision;
-  # the basis names the bottle so the row can become one when she wants it.
+  # Helen's figure (#747). A category row with the bottle in its basis:
+  # bottles.yml declares no Carlshamns.
   Swedish flaggpunsch: { gbp_per_litre_min: 30.00, gbp_per_litre_max: 30.00, basis: "Carlshamns Flaggpunsch, GBP 21 / 70cl", confidence: high }
   Plymouth gin:       { gbp_per_litre_min: 37.14, gbp_per_litre_max: 37.14, basis: "GBP 26 / 70cl", confidence: medium }
-  # `coconut-flower arrack` HAD A ROW HERE UNTIL 2026-09-24 (GBP 28 / 75cl,
-  # low). It is gone: the Ceylon Arrack bottle prices the category and is its
-  # default since Helen's "(default coconut flower arrack)" on 2026-09-14
-  # (#747), so a figure here would be a second answer -- see the block header.
   lime cordial:       { gbp_per_litre_min: 7.14,  gbp_per_litre_max: 7.14,  basis: "Rose's, GBP 5 / 70cl", confidence: medium }
   coconut cream:      { gbp_per_litre_min: 5.00,  gbp_per_litre_max: 7.50,  basis: "GBP 2-3 / 400ml tin", confidence: medium }
-  # HELEN'S OWN FIGURE, 2026-09-26: "18% ABV, £22" for Clément Mahina Coconut
-  # Rhum Liqueur, declared in bottles.yml the same day. The category keeps a
-  # row rather than handing everything to the bottle -- the `pineapple vodka`
-  # shape rather than the `liqueur de sapin` one -- because ingredients.yml
-  # still has Helen reviewing whether `coconut rhum` is the right generic, and
-  # a category she may yet rename is not the moment to empty its row.
-  # The placeholder this replaces guessed GBP 30-45 and was close.
+  # The same figure as its one bottle, Clément Mahina.
   coconut rhum:       { gbp_per_litre_min: 31.43, gbp_per_litre_max: 31.43, basis: "GBP 22 / 70cl", confidence: high }
-  # HELEN'S OWN FIGURE, 2026-09-14 (#1014): "Use £4.50/litre for both sites."
-  # Only this site prices anything -- food's shopping list counts and does not
-  # cost (_plugins/food_shopping.rb) -- so this is the one place it can go.
-  # The Grasshopper (#984) is the first drink to pour cream by volume.
+  # Helen's figure (#1014).
   cream:              { gbp_per_litre_min: 4.50,  gbp_per_litre_max: 4.50,  basis: "GBP 4.50 / litre", confidence: high }
 
-  # --- a real category: the range is the span of what you might buy ------------
-  # `overproof Demerara rum, lightly aged` JOINED THIS BLOCK ON 2026-09-05,
-  # when El Dorado 151 went to bottles.yml's `not_reached_for` -- Helen: "I don't own it, I just
-  # wanted to, but it looks like it's hard to get." It was the only bottle in
-  # the category, so the category lost its price with it, and two drinks still
-  # pour it (pic-a-de-crop-punch's 360 ml, zombie-intoxica's 15 ml).
-  #
-  # PRICING A CATEGORY SHE CANNOT CURRENTLY BUY IS THE CONSISTENT ANSWER, not a
-  # contradiction. 78 of the 154 categories in use have no bottle behind them
-  # and every one of them is priced here; champagne two lines down is no more
-  # "on the shelf" than this is. The fallback answers "what would a litre of
-  # this cost", which has an answer whether or not a bottle is open. The RANGE
-  # is wide and deliberately so: scarcity is exactly what she ran into.
+  # --- a real category: the range is the span of what you might buy ---
+  # Pusser's 151 is declared under this generic, so the plugin unions this row
+  # with that bottle.
   overproof Demerara rum, lightly aged: { gbp_per_litre_min: 57.14, gbp_per_litre_max: 85.71, basis: "GBP 40-60 / 70cl, scarce in the UK", confidence: low }
-  # `tawny port` JOINED FOR THE SAME REASON, hours later. Ottoman 10 Year Tawny
-  # was the only one declared and Helen removed it -- "the three Lows I skipped,
-  # let's remove them from the collection please" -- leaving Port Authority's
-  # 22.5 ml with nothing to price it from. A 10-year tawny is not scarce the way
-  # an overproof Demerara is, so this range is ordinary rather than punitive.
+  # No bottle is declared (bottles.yml `not_reached_for`), so this row is the
+  # whole price.
   tawny port:         { gbp_per_litre_min: 20.00, gbp_per_litre_max: 40.00, basis: "GBP 15-30 / 75cl", confidence: low }
-  # HELEN'S FIGURE, 2026-10-10 (#1351): "Ruby port can default to Taylor's Fine,
-  # 20%, £17 for 75 cl". A category row with the bottle in its basis, the
-  # Swedish flaggpunsch shape: bottles.yml declares no Taylor's.
+  # Helen's figure (#1351), the flaggpunsch shape: the bottle is in the basis
+  # and is not declared.
   ruby port:          { gbp_per_litre_min: 22.67, gbp_per_litre_max: 22.67, basis: "Taylor's Fine Ruby, GBP 17 / 75cl", confidence: high }
-  # HELEN'S OWN FIGURE, 2026-09-05: "Let's say champage is GBP 20 -- I buy
-  # crates of Heidsieck Blue Top on sale at Christmas!!!!!" A POINT PRICE, not a
-  # range, because she buys ONE THING at ONE PRICE rather than shopping the
-  # category -- which is the same reason Campari is a point price, arrived at
-  # from the opposite direction.
-  #
-  # IT REPLACES MY GBP 22-40 GUESS, the single widest source of spread left in
-  # the collection: six of the ten widest-ranging drinks -- Bali Hai, Green
-  # Flash, Airmail, Drunken Skull, Julien Sorel, Arrack Christmas Punch -- were
-  # wide ONLY because of this row.
-  #
-  # HEIDSIECK BLUE TOP IS NOT DECLARED AS A BOTTLE, deliberately. She named it as
-  # the reason for the number rather than as a suggestion, and `champagne` is a
-  # category she buys one of on offer, not a bottle she reaches for by name. If
-  # it should be a bottle that is a two-line change, and this comment is where
-  # the question was left.
+  # Helen's figure, and a point: she buys one thing at one price. Heidsieck
+  # Blue Top is the reason for the number and is deliberately not a declared
+  # bottle.
   champagne:          { gbp_per_litre_min: 26.67, gbp_per_litre_max: 26.67, basis: "Heidsieck Blue Top, GBP 20 / 75cl", confidence: high }
   prosecco:           { gbp_per_litre_min: 10.67, gbp_per_litre_max: 18.67, basis: "GBP 8-14 / 75cl", confidence: medium }
   red wine:           { gbp_per_litre_min: 9.33,  gbp_per_litre_max: 16.00, basis: "GBP 7-12 / 75cl", confidence: medium }
@@ -1133,89 +830,43 @@ generics:
   apple brandy:       { gbp_per_litre_min: 40.00, gbp_per_litre_max: 57.14, basis: "GBP 28-40 / 70cl", confidence: medium }
   navy strength gin:  { gbp_per_litre_min: 42.86, gbp_per_litre_max: 57.14, basis: "GBP 30-40 / 70cl", confidence: medium }
   apple schnapps:     { gbp_per_litre_min: 22.86, gbp_per_litre_max: 31.43, basis: "GBP 16-22 / 70cl", confidence: low }
-  # NEW 2026-09-14 (#1013). HELEN'S OWN FIGURE, "£12"; 70cl assumed, the size
-  # every schnapps row here uses. A point price rather than a range, the
-  # pineapple-vodka case: she named the thing she buys.
+  # Helen's figure (#1013); 70cl assumed.
   peach schnapps:     { gbp_per_litre_min: 17.14, gbp_per_litre_max: 17.14, basis: "GBP 12 / 70cl", confidence: high }
   crème de cassis:    { gbp_per_litre_min: 22.86, gbp_per_litre_max: 34.29, basis: "GBP 16-24 / 70cl", confidence: medium }
-  # THE DIFFORD'S BATCH OF 2026-10-07, PRICED BY HELEN ON 2026-10-10 (#1351).
-  # Five placeholders stood here. For four she named the bottle a pour
-  # defaults to -- "Black raspberry liqueur can default to Chambord, 16.5%,
-  # £25 for 70 cl", "Myrtille can default to Briottet, 18%, £23 for 70 cl",
-  # "Kummel can default to Mentzendorff, 38%, £28 for 50 cl", "Sake can default
-  # to Akashi-Tai Daiginjo Genshu, 17%, £42 for 72 cl" -- so each is a POINT
-  # price with the bottle in its basis, the Swedish flaggpunsch shape:
-  # bottles.yml declares none of them, and declaring a bottle is her call.
-  # THE KÜMMEL IS A 50cl BOTTLE AND THE SAKE 72cl; the per-litre is from those.
+  # Four of Helen's figures (#1351), each a point price with its undeclared
+  # bottle in the basis. The kümmel is a 50cl bottle and the sake 72cl.
   black raspberry liqueur: { gbp_per_litre_min: 35.71, gbp_per_litre_max: 35.71, basis: "Chambord, GBP 25 / 70cl", confidence: high }
   crème de myrtille:  { gbp_per_litre_min: 32.86, gbp_per_litre_max: 32.86, basis: "Briottet Crème de Myrtille, GBP 23 / 70cl", confidence: high }
   kümmel:             { gbp_per_litre_min: 56.00, gbp_per_litre_max: 56.00, basis: "Mentzendorff Kümmel, GBP 28 / 50cl", confidence: high }
   sake:               { gbp_per_litre_min: 58.33, gbp_per_litre_max: 58.33, basis: "Akashi-Tai Daiginjo Genshu, GBP 42 / 72cl", confidence: high }
-  # The fifth she ticked as right without naming a bottle, so the range
-  # stays and is no longer a placeholder.
   tsipouro:           { gbp_per_litre_min: 30.00, gbp_per_litre_max: 50.00, basis: "GBP 21-35 / 70cl, a range Helen ticked as right on #1351, 2026-10-10; not shop-checked", confidence: medium }
-  # NEW 2026-10-04 (#838), when Helen split `crème de cacao` by colour. The
-  # white is priced from Briottet Crème de Cacao Blanc (GBP 17 / 70cl); the
-  # brown has no bottle declared. The range starts at that bottle's price and
-  # is a guess above it, NOT a figure Helen gave -- hence `low`.
+  # No bottle declared; a guess upward from the white's bottle price (#838).
   brown crème de cacao: { gbp_per_litre_min: 24.29, gbp_per_litre_max: 34.29, basis: "GBP 17-24 / 70cl, from the white's price; not checked", confidence: low }
-  # HELEN'S OWN FIGURE, 2026-09-09: "I have Ciroc, GBP 31, 37.5%." My guess was
-  # GBP 20-26, so the range was about 20% under. 70cl assumed -- the size she
-  # did not state and the one every other row here uses.
+  # The same figure as its one bottle, Ciroc.
   pineapple vodka:    { gbp_per_litre_min: 44.29, gbp_per_litre_max: 44.29, basis: "GBP 31 / 70cl", confidence: high }
   aguardiente:        { gbp_per_litre_min: 25.71, gbp_per_litre_max: 37.14, basis: "GBP 18-26 / 70cl", confidence: low }
   kirschwasser:       { gbp_per_litre_min: 42.86, gbp_per_litre_max: 62.86, basis: "GBP 30-44 / 70cl", confidence: low }
-  # NEW 2026-09-18, with Gunmetal Blue's first pour of the generic. Helen ruled
-  # the drink is peach brandy and dropped its Briottet suggestion -- "that's
-  # what I had at the time" -- so the pour has no bottle behind it and this row
-  # is the only thing that can price it.
-  #
-  # `low`, AND THE RANGE IS SAT BETWEEN ITS TWO DECLARED SIBLINGS rather than
-  # read off a shelf: apple brandy is GBP 28-40 and kirschwasser GBP 30-44, and
-  # a peach brandy is scarcer in the UK than either, so the top is a little
-  # above both. NOT CHECKED IN A SHOP -- that is exactly what `low` says here,
-  # and it is the row to correct first if Helen ever buys one.
   peach brandy:       { gbp_per_litre_min: 40.00, gbp_per_litre_max: 60.00, basis: "GBP 28-42 / 70cl, sat between apple brandy and kirschwasser, not shop-checked", confidence: low }
 
-  # --- made, not bought -------------------------------------------------------
-  # THE ARITHMETIC IS IN `basis` ON PURPOSE. A syrup's price is the only kind
-  # here that can be checked without a shop: sugar at about GBP 1/kg dissolves
-  # into roughly 1.6 litres at 1:1 and 2.2 at 2:1, so a litre of 2:1 costs about
-  # 90p. If that looks wrong the sum is right there to correct.
+  # --- made, not bought ---
+  # The arithmetic is in `basis`, so the figure can be checked without a shop.
   cane sugar syrup 1:1: { gbp_per_litre_min: 0.60, gbp_per_litre_max: 1.00, basis: "1kg sugar @ GBP 1 + 1L water -> ~1.6L", confidence: medium }
+  # Also bought, as Monin Pure Cane Sugar: the plugin spans both.
   cane sugar syrup 2:1: { gbp_per_litre_min: 0.90, gbp_per_litre_max: 1.40, basis: "2kg sugar @ GBP 1 + 1L water -> ~2.2L", confidence: medium }
-  # THE `2:1` IN THE BASIS WAS ALREADY HERE before the generic said it --
-  # this row priced demerara at 2:1 while the generic carried no ratio at
-  # all, which is how #594 found the gap. Helen ruled 2:1 on 2026-09-06 and
-  # the costing needed no change, only the name.
   demerara sugar syrup 2:1: { gbp_per_litre_min: 1.50, gbp_per_litre_max: 2.20, basis: "demerara @ GBP 1.80/kg, 2:1", confidence: medium }
-  # Turbinado is a raw cane sugar and sits between white and demerara on the
-  # shelf; priced against demerara because that is the nearer neighbour.
+  # Priced against demerara, its nearer neighbour on the shelf.
   turbinado sugar syrup 2:1: { gbp_per_litre_min: 1.50, gbp_per_litre_max: 2.30, basis: "turbinado @ GBP 1.90/kg, 2:1", confidence: medium }
-  # 1:1 IS THE CHEAPER OF THE TWO, because the ratio is honey:water and so 2:1
-  # carries more honey. 2:1 is two thirds honey; 1:1 is one half. Honey is all
-  # of the cost and water is none of it, so 1:1 is priced at three quarters of
-  # 2:1 exactly: 13.00 -> 9.75 and 18.00 -> 13.50.
-  #
-  # Arrived 2026-09-07 with chartreuse-daiquiri, the first drink to use 1:1 --
-  # its own note says "Honey water is equal parts honey and water", which is
-  # what settled its ratio when the other four went to 2:1 on Helen's word.
+  # The ratio is honey:water and honey is all of the cost, so 1:1 is three
+  # quarters of 2:1.
   honey water 1:1:    { gbp_per_litre_min: 9.75, gbp_per_litre_max: 13.50, basis: "honey @ GBP 17.60/kg, 1:1", confidence: medium }
   honey water 2:1:    { gbp_per_litre_min: 13.00, gbp_per_litre_max: 18.00, basis: "honey @ GBP 17.60/kg, 2:1", confidence: medium }
-  # NEW 2026-10-07 with the generic. The same honey price carried to the third
-  # ratio by the two rows above, not a fresh figure.
   honey water 3:1:    { gbp_per_litre_min: 14.60, gbp_per_litre_max: 20.25, basis: "honey @ GBP 17.60/kg, 3:1", confidence: medium }
-  # HELEN'S FIGURE, 2026-10-10 (#1351): "Monin Pineapple Syrup is £10 for 70 cl",
-  # "Monin Hazelnut Syrup is £10 for 70 cl" (Cyrano, Electro Batida). Category
-  # rows with the bottle in the basis; neither Monin is declared in bottles.yml.
+  # Helen's figures for these two (#1351); neither Monin is declared in
+  # bottles.yml.
   pineapple syrup:    { gbp_per_litre_min: 14.29, gbp_per_litre_max: 14.29, basis: "Monin Pineapple Syrup, GBP 10 / 70cl", confidence: high }
   hazelnut syrup:     { gbp_per_litre_min: 14.29, gbp_per_litre_max: 14.29, basis: "Monin Hazelnut Syrup, GBP 10 / 70cl", confidence: high }
-  # NEW 2026-09-25 (#1108), Helen's generic for Fanny Chu's Piña Colada: three
-  # parts Coco Lopez to one part coconut milk. NOT priced off `coconut cream`
-  # above -- Coco Lopez is sweetened cream of coconut, a different tin -- and
-  # neither tin price is shop-checked, which is what `low` says. The sum: Coco
-  # Lopez GBP 3-4 / 425 ml (7.05-9.40/L) x 3, coconut milk GBP 1-1.60 / 400 ml
-  # (2.50-4.00/L) x 1, over 4 -> GBP 5.90-8.05/L. Overwrite when she prices it.
+  # Not priced off `coconut cream`: Coco Lopez is sweetened cream of coconut,
+  # a different tin.
   "Coco mix": { gbp_per_litre_min: 5.90, gbp_per_litre_max: 8.05, basis: "(3 x Coco Lopez @ GBP 7.05-9.40/L + 1 x coconut milk @ GBP 2.50-4.00/L) / 4, tin prices guessed", confidence: low }
   agave syrup:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 3.50 / 350g", confidence: medium }
   vanilla syrup:      { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
@@ -1225,69 +876,36 @@ generics:
   fruit purée:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 4-7 / 500ml", confidence: low }
   egg white:          { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 12.00, basis: "GBP 0.30 per egg, ~30ml white", confidence: medium }
 
-  # --- bought, and barely worth counting, but counted anyway ------------------
-  # These are here so that a total never silently omits something. Under a
-  # pound a litre they change nothing, and that is the point of checking.
+  # --- bought, and barely worth counting ---
+  # Here so that a total never silently omits one.
   soda water:         { gbp_per_litre_min: 0.35, gbp_per_litre_max: 1.20, basis: "GBP 0.25-0.85 / 75cl", confidence: medium }
   cola:               { gbp_per_litre_min: 1.20, gbp_per_litre_max: 2.00, basis: "supermarket", confidence: medium }
-  # TWO PLACEHOLDERS, 2026-09-20, added so that typing a pour does not fail
-  # the price test -- NOT SHOP-CHECKED, and Helen has not seen these figures.
-  # `ginger beer` came in with the Moscow Mule and Dark 'n' Stormy, `milk` with
-  # Rum Cow. HELEN'S FIGURE, 2026-10-10 (#1351): "Ginger beer: £2 / 500 ml",
-  # "Milk: £1.50 / l". Point prices, replacing two supermarket-range guesses.
+  # Helen's figures for ginger beer and milk (#1351).
   ginger beer:        { gbp_per_litre_min: 4.00, gbp_per_litre_max: 4.00, basis: "GBP 2 / 500 ml", confidence: high }
   milk:               { gbp_per_litre_min: 1.50, gbp_per_litre_max: 1.50, basis: "GBP 1.50 / litre", confidence: high }
   pineapple juice:    { gbp_per_litre_min: 1.20, gbp_per_litre_max: 2.00, basis: "carton", confidence: medium }
   apple juice:        { gbp_per_litre_min: 1.00, gbp_per_litre_max: 1.80, basis: "carton", confidence: medium }
-  # HELEN'S FIGURE, 2026-10-10 (#1351): "Cranberry juice drink: £2 / l" (Woo Woo,
-  # Mexico City).
+  # Helen's figure (#1351).
   cranberry juice drink: { gbp_per_litre_min: 2.00, gbp_per_litre_max: 2.00, basis: "GBP 2 / litre", confidence: high }
   cider vinegar:      { gbp_per_litre_min: 3.00, gbp_per_litre_max: 6.00, basis: "supermarket", confidence: medium }
-  # HELEN'S FIGURE, 2026-10-10 (#1351): "Coconut water: £4.50 / l" (Electro
-  # Batida, Dead Parrot Colada) and "Natural yoghurt: £4 / kg" (Ramos Greek
-  # Fizz). THE YOGHURT IS SOLD BY WEIGHT AND POURED BY VOLUME: a kilo is taken
-  # as a litre, which is within a few per cent for yoghurt.
+  # Helen's figures for coconut water and yoghurt (#1351).
   coconut water:      { gbp_per_litre_min: 4.50, gbp_per_litre_max: 4.50, basis: "GBP 4.50 / litre", confidence: high }
-  # Birch water (Eccentrica Daiquiri) she ticked as right without a figure, so
-  # the range stays and is no longer a placeholder.
   birch water:        { gbp_per_litre_min: 5.00, gbp_per_litre_max: 12.00, basis: "a small-bottle shelf range Helen ticked as right on #1351, 2026-10-10; not shop-checked", confidence: medium }
   natural yoghurt:    { gbp_per_litre_min: 4.00, gbp_per_litre_max: 4.00, basis: "GBP 4 / kg, a kilo taken as a litre", confidence: high }
 
-  # --- TWO MORE FROM THE DIFFORD'S BATCH, PRICED BY HELEN 2026-10-10 (#1351) ---
-  # `Japanese whisky` was declared ahead of any drink (#1186) and so had no
-  # price; Geisha Martini's whisky is what made the price test ask. "Japanese
-  # whisky can default to Suntory Toki Blended, 43%, £30 for 70 cl." A point
-  # price with the bottle in its basis; declaring the bottle would win over
-  # the row.
-  # (`americano` and `lemon vodka` each had a row here for an hour, until Helen
-  # named a bottle for each -- Cocchi Americano, Absolut Citron -- and a
-  # category with a bottle is priced from the bottle.)
+  # Helen's figure (#1351); the bottle is in the basis and is not declared.
   Japanese whisky:    { gbp_per_litre_min: 42.86, gbp_per_litre_max: 42.86, basis: "Suntory Toki, GBP 30 / 70cl", confidence: high }
-  # Autumn Leaves pours `bonded rye` with no bottle named. "Bonded rye can
-  # default to Rittenhouse 50%, £36 for 70 cl." Rittenhouse 100 IS declared,
-  # under `rye`, and carries the same GBP 36 in `bottles:` above.
+  # Rittenhouse 100, which is declared under `rye`: the same figure as its row
+  # in `bottles:`.
   bonded rye:         { gbp_per_litre_min: 51.43, gbp_per_litre_max: 51.43, basis: "Rittenhouse 100, GBP 36 / 70cl", confidence: high }
 
-  # --- free -------------------------------------------------------------------
-  # `water` is already kept off cards and out of the shopping list by
-  # ingredients.yml's `not_on_cards`. It is declared here too so that a reader
-  # of THIS file does not have to wonder whether it was forgotten.
+  # --- free ---
+  # Declared so that nobody wonders whether it was forgotten;
+  # ingredients.yml's `not_on_cards` keeps it off the cards.
   water:              { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "tap", confidence: high }
 
-  # THE SUGARS ARE ZERO ON PURPOSE, AND ZERO IS NOT THE SAME AS ABSENT. Helen
-  # excluded sugar from the estimate outright (2026-09-05), and almost every
-  # sugar pour is already gone because it is weighed or counted -- `75 g`,
-  # `12 cubes`. Zombie Intoxica is the one that gets through: `5 ml` of
-  # `raw sugar` or `molasses sugar`, a spoon measure of a dry solid, which is a
-  # volume and so passes the `excluded_units` gate.
-  #
-  # Left undeclared it was the collection's ONLY unpriced pour, and an unpriced
-  # pour is indistinguishable from a vocabulary the file has not caught up with
-  # -- which is the thing `test_every_priceable_pour_has_a_price` exists to
-  # catch. Declaring it zero says "counted, and it costs nothing", so the test
-  # can demand a price for everything without that one drink forcing an
-  # exception into the test itself. Sixteen cubes of sugar is about 7p; the
-  # rounding on any drink here is wider than that.
+  # Zero, not absent: a spoon of sugar is a volume, and an unpriced volume
+  # fails test_every_priceable_pour_has_a_price.
   raw sugar:          { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   molasses sugar:     { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   white sugar:        { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
@@ -1295,23 +913,16 @@ generics:
   palm sugar:         { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   sugar cube:         { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   salt:               { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
-  # 2026-09-28, with the Milliners Punch, and zero for the same reason as salt:
-  # Helen's 2026-09-05 ruling that a seasoning is not a cost. A sprinkle of
-  # cinnamon over a lit lime shell is pennies, and the rounding on any drink
-  # here is wider than that.
   ground cinnamon:    { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
 
-  # --- squeezed, so priced from `fruit_prices` and `juice_yields` -------------
-  # NO FIGURE HERE ON PURPOSE. `from_fruit` names the entry in `juice_yields:`
-  # to divide the fruit price by; see the `fruit_prices` note above for why the
-  # yields are not restated.
+  # --- squeezed: priced from `fruit_prices` and `juice_yields` ---
+  # `from_fruit` names the `juice_yields` entry to divide the fruit price by.
   lime juice:         { from_fruit: lime juice }
   lemon juice:        { from_fruit: lemon juice }
   orange juice:       { from_fruit: orange juice }
   blood orange juice: { from_fruit: blood orange juice }
   grapefruit juice:   { from_fruit: grapefruit juice }
-  # Priced off the same fruit: a ruby grapefruit is not dearer than a white one
-  # and the yield is identical. The generic is separate because the FLAVOUR
-  # differs, not the cost.
+  # Priced off the same fruit as plain grapefruit; the generic is separate for
+  # flavour, not cost.
   ruby grapefruit juice: { from_fruit: grapefruit juice }
   pink grapefruit juice: { from_fruit: grapefruit juice }

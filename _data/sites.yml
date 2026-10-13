@@ -1,26 +1,18 @@
-# Site identity: what distinguishes one site in the mono-repo from the other.
-# Selected by `site_key`, which _config.yml's `defaults:` sets per collection
-# and per page directory. Only what differs between the sites belongs here: a
-# key says where you are. What the chrome is belongs in _data/chrome.yml (#374).
-#
-# Keys:
-#   title        <title>, og:site_name, the footer, and the second half of the
-#                wordmark's accessible name
+# Site identity: only what differs between the two sites, selected by
+# `site_key`, which _config.yml's `defaults:` sets per collection and per page
+# directory. What the chrome is belongs in _data/chrome.yml (#374).
+#   title        <title>, og:site_name, the footer, the wordmark's accessible name
 #   word         the bracketed word on the taped strip: [ FOOD ]
 #   description  fallback meta description for pages with no tagline
 #   css          basename under assets/css/: `food` means assets/css/food.scss
 #   home         where this site's own nav link goes, relative to baseurl
-#   icon         basename (no .svg) of an _includes/icons/ partial: the site's
-#                mark. Not drawn in the header nav (#1007);
+#   icon         basename (no .svg) of an _includes/icons/ partial. Not drawn in
+#                the header nav (#1007), but
 #                test_site_nav_links_resolve_to_real_pages still asks for it.
-#   social_image this site's link-preview card (og:image), a PNG under
-#                assets/img/social/ rendered by scripts/render_social_images.py
-#   reference_links
-#                this site's reference pages, a footer column under its word.
-#                A site with none gets no column. An entry may carry
-#                `local_only: true`, which drops it from any build without
-#                `show_local_reference_links`; set and clear it together with
-#                the page's own `published: false`.
+#   social_image og:image, a PNG under assets/img/social/ rendered by
+#                scripts/render_social_images.py
+#   reference_links  footer column of reference pages. `local_only: true` drops
+#                an entry from any build without `show_local_reference_links`.
 
 food:
   title: Helen Triages Food

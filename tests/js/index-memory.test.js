@@ -1,28 +1,18 @@
-// =============================================================================
-// Tests for HTF.indexMemory in assets/js/assets.js — the sessionStorage record
-// that returns you to the list you were reading when you go BACK from a recipe
-// or a drink. GitHub issues #387 (the feature) and #686 (one copy, not two).
-//
-// Run from the repo root, with the local Node runtime:
+// Tests for HTF.indexMemory in assets/js/assets.js: the sessionStorage record
+// that returns you to the list you were reading when you go back from a recipe
+// or a drink (#387, #686).
 //
 //   .node-runtime/node/bin/node --test tests/js/*.test.js
 //
-// See tests/js/ingredient-search.test.js for why not the system node, and
-// tests/js/stub-dom.js for why this file loads assets.js through a fake page
-// rather than requiring it.
+// tests/js/stub-dom.js says why assets.js is loaded through a fake page.
 //
-// WHY THIS FILE EXISTS. The failure modes here are all invisible ones. A
-// browser in private mode throws on setItem; site data blocked can make even
-// the read throw; a record left by an older version of the page parses fine
-// and is the wrong shape. Every one of those must end as "carry on as a fresh
-// list", and none of them can be produced by clicking around in the browser
-// you happen to have open — which is exactly why the swallowing was worth
-// having in one place with a stub storage pointed at it.
+// The failures here are invisible ones: private mode throws on setItem,
+// blocked site data can make the read throw, and a record from an older page
+// parses fine in the wrong shape. Each must end as a fresh list.
 //
-// WHAT IS NOT TESTED HERE, because it is deliberately not in this module: the
-// decision to restore AT ALL. That is FilterState.arrivedByGoingBack(), asked
-// at each index's own call site and covered by tests/js/filter-state.test.js.
-// =============================================================================
+// Not tested here: the decision to restore at all. That is
+// FilterState.arrivedByGoingBack(), asked at each index's call site and
+// covered by tests/js/filter-state.test.js.
 'use strict';
 
 const test = require('node:test');
@@ -50,11 +40,9 @@ function withStorage(sessionStorage) {
 
 /** Bring an object back across the vm boundary before comparing it.
  *
- * The stub page is a separate realm with its own intrinsics, so an object
- * JSON.parse built INSIDE it has that realm's Object.prototype and
- * deepStrictEqual refuses it -- same structure, different prototype. Re-parsing
- * here is the smallest honest fix: it compares the DATA, which is the only
- * thing this module promises, and keeps the strict comparison everywhere else.
+ * The stub page is a separate realm, so an object JSON.parse built inside it
+ * has that realm's Object.prototype and deepStrictEqual refuses it. Re-parsing
+ * here compares the data, which is all this module promises.
  */
 function plain(value) {
   return value === null ? null : JSON.parse(JSON.stringify(value));
@@ -74,8 +62,7 @@ test('a record saved under a key comes back from that key', () => {
 });
 
 test('the two indexes do not read each other: a key is a key', () => {
-  // The whole reason the key is a parameter. Both pages are the same origin,
-  // so one sessionStorage holds both records.
+  // Both pages are the same origin, so one sessionStorage holds both records.
   const { HTF } = withStorage(workingStorage());
   HTF.indexMemory.save('htf-index-memory-v1', { order: ['a'] });
   HTF.indexMemory.save('htf-drinks-memory-v1', { order: ['b'] });
@@ -111,9 +98,9 @@ test('storage that throws on READ: null, and nothing escapes', () => {
 });
 
 test('storage that throws on WRITE — private mode — does not break the page', () => {
-  // The real one: Safari private browsing has thrown QuotaExceededError on
-  // setItem for years. saveIndexMemory runs on pagehide, so an escaping throw
-  // would fire while the reader is on their way to a recipe.
+  // Safari private browsing throws QuotaExceededError on setItem. The index
+  // saves on pagehide, so an escaping throw would fire while the reader is on
+  // their way to a recipe.
   const { HTF } = withStorage({
     getItem: () => null,
     setItem: () => { throw new Error('QuotaExceededError'); }
@@ -132,9 +119,9 @@ test('no sessionStorage in the context at all: still null, still no throw', () =
 });
 
 test('what lands in storage is JSON, so the record survives a page load', () => {
-  // Not a formality: setItem coerces whatever it is given with String(), so
-  // storing the object itself would put "[object Object]" in the store and
-  // lose everything, silently, until someone went back.
+  // setItem coerces whatever it is given with String(), so storing the object
+  // itself would put "[object Object]" in the store and lose everything,
+  // silently, until someone went back.
   const { HTF, storage } = withStorage(workingStorage());
   HTF.indexMemory.save(KEY, { order: ['a'], scrollY: 10 });
   assert.deepStrictEqual(JSON.parse(storage.read(KEY)), { order: ['a'], scrollY: 10 });

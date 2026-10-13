@@ -1,29 +1,15 @@
-// =============================================================================
-// The two card measurement passes, running inside the real index — issue #1107.
+// The two card measurement passes, running inside the real index (#1107).
 //
 //   node --test tests/js/*.test.js
 //
-// WHAT THIS ADDS THAT THE TWO UNIT TESTS DO NOT. `card-name-fit.test.js` and
-// `card-line-budget.test.js` run each script against a DOM built for it, which
-// proves the arithmetic. Neither proves the script survives the page: #828
-// built `index-harness.js` so a startup crash fails the suite, named the class
-// of bug it wanted caught -- "a pass measuring a hidden card and getting zero,
-// a pass throwing and taking the rest of the page with it" -- and then did not
-// load either pass, so neither half of that sentence was exercised.
+// `card-name-fit.test.js` and `card-line-budget.test.js` run each script
+// against a DOM built for it, which proves the arithmetic. This proves each
+// survives the page: it loads in `index-harness.js` without throwing and
+// leaves alone what it cannot measure.
 //
-// THE SECOND HALF WAS NOT HYPOTHETICAL. card-line-budget.js writes
-// `card.style.setProperty('--ship-w', …)`. The stub DOM's `style` was a plain
-// object with no such method, so the first thing that happened when this file
-// was written was a TypeError that took the whole pass down -- on the harness,
-// not on the page, but it is the same shape as the real bug and nothing else
-// would have found it.
-//
-// NO PIXELS ARE ASSERTED HERE. The stub has no line breaking, no font metrics
-// and no box model, so a rendered width would be a number the test invented.
-// What is asserted is what each pass DECIDES from boxes the test supplies:
-// round height over line-height, compare a chip's right edge against the
-// ship's left, leave an unmeasurable element alone.
-// =============================================================================
+// No pixels are asserted. The stub has no line breaking, no font metrics and
+// no box model, so a rendered width would be a number the test invented. What
+// is asserted is what each pass decides from boxes the test supplies.
 'use strict';
 
 const test = require('node:test');
@@ -31,7 +17,7 @@ const assert = require('node:assert');
 
 const { boot, SCRIPTS, LAYOUT_SCRIPTS } = require('./index-harness.js');
 
-// The stylesheet's real numbers, which the harness also uses as its defaults:
+// The stylesheet's numbers, which the harness also uses as its defaults:
 // `_cards.scss` sets the ingredient line at 0.82rem with line-height 1.5, so
 // 13.12px of type on a 19.68px line at a 16px root.
 const LINE = 19.68;
@@ -62,8 +48,7 @@ test('both card passes load in the index harness, in the layout order', () => {
   }
   // Both hang their re-run hook off the namespace; cocktail-index.js calls
   // them on every apply(), guarded, so a missing hook fails silently on the
-  // real page. That guard is why the tag for card-line-budget.js could go
-  // missing for two days (#846) without anything going red.
+  // real page (#846).
   assert.strictEqual(typeof r.sandbox.HTF.fitCardNames, 'function',
     'card-name-fit.js did not register HTF.fitCardNames');
   assert.strictEqual(typeof r.sandbox.HTF.cardLineBudget, 'function',
@@ -71,10 +56,9 @@ test('both card passes load in the index harness, in the layout order', () => {
 });
 
 test('a card with nothing to measure is left alone rather than crashing', () => {
-  // Every other test in this repo boots the harness with cards that stub no
-  // boxes at all. That is the honest model of an element the browser has not
-  // laid out, and both passes must return quietly from it -- which is also
-  // what keeps those other tests green now that these two scripts load.
+  // A card that stubs no boxes is the model of an element the browser has not
+  // laid out, and both passes must return quietly from it. Every other test
+  // that boots the harness relies on that.
   const r = boot({ drinks: [plain(), plain({ name: 'b', url: '/b/' })] });
   const cards = r.doc.querySelectorAll('.drink-card');
 
@@ -115,9 +99,8 @@ test('three rendered ingredient lines cap the chips, two do not', () => {
 });
 
 test('the class comes off again when the card is re-measured narrower', () => {
-  // The reset-then-measure order, which is the bug card-name-fit.js's step 1
-  // exists to prevent and which this pass copies. Without it a card that once
-  // had three lines keeps the cap for ever, even at a width where it has two.
+  // Reset, then measure. Without the reset a card that once had three lines
+  // keeps the cap for ever, even at a width where it has two.
   const r = boot({
     drinks: [plain({ ingredients_box: { width: 200, height: LINE * 3 } })]
   });
@@ -134,11 +117,9 @@ test('the class comes off again when the card is re-measured narrower', () => {
 });
 
 // --- the ship collision, with a matched chip ---------------------------------
-//
-// #1100 made a MATCHED card chip an inverted block carrying its separator in a
-// margin (#1099), which moves the chip's box -- and this pass is the thing
-// most likely to notice, because it compares that box against the ship's left
-// edge. So the collision cases below use a matched chip.
+// A matched chip is an inverted block carrying its separator in a margin
+// (#1099, #1100), which moves the box this pass compares against the ship's
+// left edge. So the collision cases below use a matched chip.
 
 test('a matched chip reaching the ship on its row clears the ship', () => {
   const r = boot({
@@ -188,9 +169,9 @@ test('a chip on a row above the ship is not in the way', () => {
 });
 
 test('a hidden card is not measured, and keeps no collision class', () => {
-  // The index paginates by setting `card.hidden`, not by removing cards, and a
-  // hidden element measures zero. A pass that reads that zero as "no ship
-  // drawn" is right; one that reads it as a decision is the #1115 bug.
+  // The index paginates by setting `card.hidden`, and a hidden element
+  // measures zero. Reading that zero as "no ship drawn" is right; reading it
+  // as a decision is the #1115 bug.
   const r = boot({
     drinks: [plain({
       moods: ['sharp', 'no juicing'],
@@ -243,8 +224,8 @@ test('a name one short word over steps down; the step is kept if it reaches', ()
 });
 
 test('a step that does not actually reach is undone and the name wraps', () => {
-  // The prediction is a linear model and type is not quite linear. Same
-  // over-by as above, but the stepped lettering still measures 104 -- so the
+  // The prediction is a linear model and type is not quite linear. The same
+  // overflow as above, but the stepped lettering still measures 104, so the
   // name wraps rather than sitting smaller and ellipsising anyway.
   const r = boot({
     drinks: [plain({ name_box: { width: 100, height: 20, clientWidth: 100,
@@ -272,12 +253,10 @@ test('a name far too long goes straight to two lines', () => {
 });
 
 test('a hidden card\'s name is left in its no-JS state entirely', () => {
-  // #1115: the cocktails index paginates by `card.hidden`, a hidden element
-  // measures zero in both directions, and `0 > 0 + 1` reads as "it fits" -- so
-  // every name on page two was classified as fitting at load, however long.
-  // Returning BEFORE --fitted is the point: that class releases the ellipsis
-  // clip, and releasing it on a measurement that could not happen leaves a
-  // name running off its tape.
+  // #1115: a hidden element measures zero in both directions, and `0 > 0 + 1`
+  // reads as "it fits". Returning before --fitted is the point: that class
+  // releases the ellipsis clip, and releasing it on a measurement that could
+  // not happen leaves a name running off its tape.
   const r = boot({
     drinks: [plain({ name_box: { width: 100, height: 20, clientWidth: 100,
                                  contentWidth: 400 } })]
@@ -300,11 +279,9 @@ test('a hidden card\'s name is left in its no-JS state entirely', () => {
 });
 
 test('the name pass runs before the budget pass, as the layout loads them', () => {
-  // card-line-budget.js's header: the name decides how much room the
-  // ingredients get, and the ingredients decide how much the chips get.
-  // Running the budget first is not a crash -- it is a budget computed against
-  // a name that had not been fitted yet, which is the kind of wrong a harness
-  // in the wrong order would report as fine.
+  // The name decides how much room the ingredients get, and the ingredients
+  // how much the chips get. The budget run first does not crash; it is
+  // computed against a name that has not been fitted.
   assert.deepStrictEqual(LAYOUT_SCRIPTS,
     ['card-name-fit.js', 'card-line-budget.js']);
   assert.ok(SCRIPTS.indexOf('card-name-fit.js')

@@ -1,22 +1,11 @@
-// =============================================================================
-// THE STUB-DOM HARNESS — running a browser-only script under `node --test`.
-// =============================================================================
-// Not a test file (no `.test.js`), so `node --test tests/js/*.test.js` does not
-// try to run it.
+// The stub-page harness: running a browser-only script under `node --test`.
+// Not a test file (no `.test.js`), so the runner does not try to run it.
 //
-// WHY THIS EXISTS. Every other module in tests/js/ is a pure one that ends with
-// a `module.exports` tail and is simply `require`d. `assets/js/assets.js` is
-// not that shape and should not become it: it is the FIRST script every page
-// loads, it reads two <meta> tags at parse time, and it attaches to
-// `window.HTF` rather than exporting. Requiring it from Node throws on
-// `window` before it defines anything.
-//
-// So the page is stubbed instead, which is MANUAL §10.2's diagnostic trick
-// written down once rather than re-derived: build a fake `window`/`document`,
-// `vm.runInContext` the real source file into it, and read what it attached.
-// The script under test is the shipped one, byte for byte — nothing here
-// re-implements it.
-// =============================================================================
+// `assets/js/assets.js` is the first script every page loads; it reads two
+// <meta> tags at parse time and attaches to `window.HTF` rather than
+// exporting, so requiring it from Node throws on `window`. The page is stubbed
+// instead (MANUAL §10.2): build a fake `window`/`document`, `vm.runInContext`
+// the shipped source into it, and read what it attached.
 'use strict';
 
 const fs = require('node:fs');
@@ -27,12 +16,8 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..');
 
 /**
  * A minimal page: enough `document` for a script to read its two meta tags,
- * and a `console` that keeps warnings out of the test output while still
- * recording them, so a test can assert one happened.
- *
- * `window` IS the sandbox, as it is in a browser, so a script may reach a
- * global either bare (`sessionStorage.getItem`) or through `window`
- * (`window.scrollY`) and get the same object both ways.
+ * and a `console` that records warnings instead of printing them. `window` is
+ * the sandbox, as in a browser, so a bare global and `window.x` are one object.
  *
  * @param {Object} [metas] - meta tag name -> content, e.g. {'base-url': '/x/'}
  * @returns {Object} the contextified sandbox
@@ -63,11 +48,9 @@ function makePage(metas) {
 }
 
 /**
- * Run repo scripts into a stub page, IN THE ORDER THE BUILT PAGE LOADS THEM,
- * and hand back the page. Read that order from the built site rather than from
- * a layout — a layout's own scripts land inside `{{ content }}` and are not
- * where the file suggests (§10.2, and the bug that taught it).
- *
+ * Run repo scripts into a stub page, in the order the built page loads them.
+ * Read that order from the built site, not a layout: a layout's own scripts
+ * land inside `{{ content }}`, not where the file suggests (MANUAL §10.2).
  * @param {string[]} relPaths - repo-root-relative, e.g. ['assets/js/assets.js']
  * @param {Object} [page] - an existing page from makePage(), or a fresh one
  * @returns {Object} the page, with whatever the scripts attached to it

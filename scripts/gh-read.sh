@@ -1,32 +1,9 @@
 #!/bin/sh
-# Read the GitHub REST API as DeckOfPandas-agentic-claude: GET only, the three repos only.
-#
-# WHY THIS EXISTS (2026-09-11). Helen: "Please work out how to run sh commands in
-# a way that can be statically analysed, so things remain safe without
-# harrassing me for permissions all the time." Reads that no named `gh`
-# subcommand covers (an issue's comments as JSON, a filtered PR list, a private
-# repo's file) went through `sh scripts/gh-agent.sh api ...`, and that can never
-# be allow-listed: `api` is also the door to every write the token can make --
-# PATCH a PR body, and PUT .../pulls/N/merge, which IS a merge, on a token that
-# since 2026-09-09 has nothing but a written rule between it and merging. So
-# every read prompted. This wrapper cannot write, so it can be allow-listed, and
-# `.claude/settings.json` allows `sh scripts/gh-read.sh *`.
-#
-# WHAT MAKES IT READ-ONLY. It builds the `gh` command itself and accepts nothing
-# it does not understand: an endpoint, `--jq <expr>`, `--paginate`. Everything
-# else -- `-X`, `--method`, `-f`/`-F` (either one switches gh to POST on its
-# own), `--input`, `-H`, `--hostname` -- is refused before gh runs, and
-# `--method GET` is always passed explicitly.
-#
-# THE THREE REPOS ONLY. CLAUDE.md: never act on any other repository. The
-# endpoint must start `repos/DeckOfPandas/<one of the three>`, and may not
-# contain `..`.
-#
-# AND NO `env` IN A --jq EXPRESSION. Measured 2026-09-11: gh's built-in jq can
-# read the process environment (`env | length` printed 38), and gh-agent.sh
-# hands gh the token through that environment. A jq expression that names
-# `env` or `$ENV` is refused here; `guard-token-expansion.py` refuses the same
-# thing on any other gh call.
+# Read the GitHub REST API as DeckOfPandas-agentic-claude: GET only, the three
+# repos only. It cannot write, which is why `.claude/settings.json` can allow
+# `sh scripts/gh-read.sh *`; `gh-agent.sh api` cannot be allow-listed, because
+# `api` is also the door to every write the token can make, a merge included.
+# DECISIONS §11.
 #
 # USAGE (quote the endpoint whenever it carries a query string):
 #   sh scripts/gh-read.sh <endpoint> [--fields a,b.c | --each a,b.c | --jq <expr>] [--paginate]
@@ -35,26 +12,37 @@
 #   sh scripts/gh-read.sh 'repos/DeckOfPandas/helen-triages/pulls?state=all&per_page=40' --each number,state,title
 #   sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/issues/944 --jq .body
 #
-# PREFER --fields AND --each TO --jq, SINCE 2026-09-15. Measured that day with
-# Helen reporting which calls asked her: `--jq .state` ran unasked, and
-# `--jq '[.state, .merged_at] | @tsv'` asked ("sh names a path that is computed
-# at run time") -- Claude Code reads a script's arguments as possible paths, and
-# a bracket or a pipe makes one look computed, quotes or not. So this script
-# builds that expression itself from plain field names: `--fields a,b` is
-# `[.a, .b] | @tsv` on one object, `--each a,b` is `.[] | [.a, .b] | @tsv` on
-# a list. guard-unanalyzable-bash.py refuses a quoted `[`, `]` or `|` given to
-# any `sh scripts/` wrapper, so a bracketed --jq no longer reaches Helen at all.
+# ACCEPTS an endpoint, at most one of --fields, --each and --jq, and
+# --paginate. It builds the `gh` command itself and always passes
+# `--method GET`.
 #
-# A WRITE IS NOT THIS SCRIPT'S JOB. scripts/gh-write.sh makes the three routine
-# writes (a PR, a PR body, a comment); anything else goes through gh-agent.sh
-# and asks, on purpose.
+# REFUSES, before gh runs:
+#   * any other argument. `-X`, `--method`, `--input`, `-H` and `--hostname`
+#     change the method, the body or the host, and `-f`/`-F` each switch gh to
+#     POST on their own.
+#   * an endpoint not under `repos/DeckOfPandas/<one of the three>`, or
+#     containing `..`: the token never acts on another repository.
+#   * a jq expression, or a field list, containing `env` in any case: gh's jq
+#     can read the process environment, where gh-agent.sh puts the token.
+#     guard-token-expansion.py refuses the same on any other gh call.
+#   * a --fields or --each value that is not plain names: letters, digits and
+#     `_`, with `.` inside a name's path and `,` between fields.
 #
-# AGENT_WRAPPER_DRY_RUN=1 prints the command it would run, one argument per
-# line, and exits -- for tests/test_agent_wrappers.py, which proves the
-# refusals and the accepted shapes without touching the network.
+# PREFER --fields AND --each TO --jq. Claude Code reads a script's arguments as
+# possible paths, and a bracket or a pipe makes one look computed, quotes or
+# not, so guard-unanalyzable-bash.py refuses a quoted `[`, `]` or `|` given to
+# any `sh scripts/` wrapper. This script builds the expression itself:
+# `--fields a,b` is `[.a, .b] | @tsv` on one object, `--each a,b` is
+# `.[] | [.a, .b] | @tsv` on a list.
 #
-# Invoked via `sh` so it needs no execute bit, and it calls gh-agent.sh rather
-# than naming the credential itself, so the token's name stays in one file.
+# A write goes through scripts/gh-write.sh (a PR, a PR body, a comment);
+# anything else goes through gh-agent.sh and asks, on purpose.
+#
+# AGENT_WRAPPER_DRY_RUN=1 prints the command instead of running it, one
+# argument per line, for tests/test_agent_wrappers.py.
+#
+# Invoked via `sh` so it needs no execute bit. It calls gh-agent.sh rather than
+# naming the credential, so the token's name stays in one file.
 set -eu
 
 refuse() {

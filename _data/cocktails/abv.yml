@@ -1,135 +1,18 @@
-# =============================================================================
-# HOW STRONG A BOTTLE IS. Spec: #297. Filled 2026-09-06.
-# =============================================================================
-# Helen, 2026-09-06: "I want the number of units in a drink, not the ABV of the
-# drink, i.e. water etc don't matter." That sentence decides the whole shape of
-# this file. A UK unit is 10 ml of pure alcohol, so a pour contributes
-# `ml x abv / 1000` units and a pour of something at 0% contributes nothing --
-# which is why dilution, juice and syrup need no arithmetic at all. They are
-# still DECLARED here, at `abv: 0`, and that is the point of the
-# `non_alcoholic` block below.
+# How strong a bottle is, for a drink's UK units (#297): a pour contributes
+# ml x abv / 1000. Read by _plugins/cocktail_units.rb. Apart from costs.yml
+# because a price goes stale and a strength does not.
 #
-# WHY A SEPARATE FILE FROM costs.yml, WHICH THIS OTHERWISE MIRRORS. A price is
-# true on a day, in a shop, and goes stale on its own -- costs.yml says so at
-# length and carries a `checked:` date as its honesty. A strength does not decay
-# that way: Tanqueray has been 43.1% for decades. The two files answer different
-# questions about the same bottles and would date each other if merged.
+# A pour that names a bottle takes that bottle's figure. A pour that names a
+# generic only is marked approximate and takes the generic's row in
+# `generics:`, or, where the generic has bottles, Helen's `default_bottles`
+# entry in costs.yml, else the MODE of its bottles' strengths (#1016). A
+# generic with bottles has no row of its own
+# (test_no_generic_gets_its_strength_from_two_places).
 #
-# WHY NOT IN bottles.yml, WHICH PREDICTED THIS. That file's header says "#297
-# (ABV) sits on the same invariant side" as `generic` and the appellations, and
-# it is right -- Appleton 12 is 43% in every drink that pours it, exactly as it
-# is a moderately-aged Jamaican in every drink that pours it. The disagreement
-# is only about WHERE, and it is the argument costs.yml already won: 127 numbers
-# buried in 933 lines of prose rulings cannot be reread or corrected without
-# disturbing prose that must not be disturbed. The invariance claim is accepted;
-# the interleaving is declined.
-#
-# TWO LAYERS, AND A POUR TAKES THE FIRST THAT ANSWERS. Identical to costs.rb.
-#   1. the pour NAMES A BOTTLE -> that bottle's abv. An exact figure.
-#   2. it names a generic only -> derived, and the drink is marked approximate.
-# A GENERIC WITH BOTTLES UNDER IT IS DELIBERATELY ABSENT from `generics:` below,
-# for the reason costs.yml gives: a figure written here as well would be a
-# second truth about the same category. It derives instead, and the rule is:
-#
-#   HELEN'S `default_bottles` RULING DECIDES IT WHEN SHE HAS GIVEN ONE.
-#   "London dry gin let's say the default is tanqueray" makes an unqualified gin
-#   pour 43.1%, which is a REAL number off a real bottle rather than an average
-#   of six gins she would not have poured. (A default of TWO bottles -- blanco
-#   tequila -- is her "real range" and is averaged, as before.)
-#
-#   ABSENT A RULING, THE MODE, SINCE 2026-09-14 -- #1016, Helen: "if a bottle
-#   isn't stated for a cocktail recipe, assume the MODE ABV of bottles we've
-#   declared. This will be more meaningful than mean or median." It was the mean
-#   until then. The mode is a strength a real bottle on her shelf actually has;
-#   the mean was often none of them (rhum agricole blanc averaged 45.25% across
-#   bottles that are all 40, 42 or 50).
-#
-#   A CATEGORY WITH NO MODE GETS A DEFAULT BOTTLE, NOT A FALLBACK. Asked what
-#   to do where no strength repeats -- seven categories, bourbon among them --
-#   she chose "name a default bottle" over the highest, the mean or the median,
-#   and named all seven the same day (costs.yml `default_bottles`). So a
-#   no-mode category with no default is a TEST FAILURE
-#   (test_every_bottled_generic_resolves_to_one_strength), not a silent guess:
-#   the day a new bottle breaks a tie, the build says so and names the
-#   category. The plugin still falls back to the mean so a page never breaks,
-#   and that fallback is what the test exists to keep from ever being read.
-#
-# WHY A SINGLE FIGURE HERE WHEN COST PRINTS A RANGE. Helen's call, 2026-09-06,
-# asked directly: "one figure, marked approximate when it's a fallback." Cost
-# ranges because two bottles under one category are genuinely two prices and she
-# will pay one of them. Strength ranges far less -- most categories here span a
-# point or two, not the 2x that separates Beefeater from a premium gin -- so a
-# range would be decoration where cost's is information.
-#
-# CONFIDENCE IS PER ROW AND MEANS WHAT costs.yml MADE IT MEAN:
-#   high    printed on every bottle of it and stable for years. Read off the
-#           label or too well known to be worth doubting.
-#   medium  right for this bottle within about a point. Fine for a unit count.
-#   low     a genuine guess. OVERWRITE THESE FIRST.
-# A row that needs HELEN specifically -- not a better source, her bottle --
-# also carries `qq:` saying why, and every one is something no source settles:
-# a rhum bottled at three strengths, a bottle whose name matches no product I
-# could place, a category whose range spans 20 points.
-#
-#   THE WORKLIST IS `python3 scripts/abv_worklist.py`, NOT `grep -n 'qq:'`,
-#   since the unit count went public (#1001, 2026-09-14). The grep lists the
-#   rows; the script replays the units plugin's own resolution over the
-#   PUBLISHED drinks and says which of them change a number somebody can see.
-#   Many do not: both Bob's bitters are only ever poured in dashes, and a dash
-#   never reaches the arithmetic (see the bitters block below). They are flagged
-#   anyway, because the day one of them is poured in millilitres is not the day
-#   to discover the strength was a guess.
-#
-#   NO COUNT IN THIS COMMENT, AND THAT IS THE RULE. This said "There are
-#   ELEVEN" from the web pass until 2026-09-14, five days after Flaggpunsch was
-#   promoted to a checked figure (the note recording it is a few blocks down)
-#   and nobody moved the number -- and one session copied the stale figure into
-#   four more files before anyone counted. A count in a comment is a second copy
-#   of something the file already knows, and it goes stale the first time
-#   anybody edits the thing it counts. Which rows reach a published drink is not
-#   even a constant: the Caribbean Sazerac pours a bare `rhum agricole blanc`,
-#   which averages every bottle under that category, so proofreading that one
-#   drink changes the answer. Run the script.
-#
-# IT WAS SEVENTEEN UNTIL THE WEB PASS, 2026-09-06. Helen's instruction was
-# "knowledge first, web only for the doubtful ones", and the web half settled
-# six -- three of them by CORRECTING a figure rather than confirming it, which
-# is the argument for having done it:
-#
-#   Suze                            15 -> 20    the UK bottle is 20; Europe is 15
-#   Clairin Communal              53.5 -> 43    `Communal` is the four-village
-#                                               BLEND, not a single clairin
-#   Gabriel Boudier Creme de Menthe 18 -> 21
-#   Rhum JM Blanc                     50        confirmed (the 55 is a second
-#                                               product, not this one)
-#   Opihr                             40        confirmed
-#   Amaro Ciociaro                    30        confirmed
-#
-# TWO SPELLING FAULTS SURFACED WITH THEM, and BOTH ARE NOW BEING FIXED under
-# #701 rather than left as a note here. The reason this block once said "not
-# fixed here" still holds and is worth keeping: correcting a name in THIS file
-# alone would make it disagree with bottles.yml, and
-# `test_every_declared_bottle_has_an_abv` checks both directions. So each was
-# renamed everywhere at once, not here first.
-#
-#   `Ophir` -> `Opihr`      DONE 2026-09-07. A BOTTLE, so bottles.yml keeps the
-#                           old spelling as an alias and nothing can fail to
-#                           resolve (Helen's La Favorite rule, 2026-09-06).
-#   `Amaro Ciociano` -> `Amaro Ciociaro`
-#                           DONE 2026-09-07. A GENERIC, and generics have no
-#                           alias mechanism, so it went through one merge with
-#                           BOTH spellings declared -- the drink lives in the
-#                           other repo and the two cannot land in one commit.
-#
-# NO WEB SOURCE WAS USED FOR THE `high` ROWS, and that is a difference from
-# costs.yml worth stating plainly. These are from knowledge, not from a search
-# result on a dated day. `high` here means "this is Cointreau, it is 40%", not
-# "a shop said so on 2026-09-06".
-#
-# PROOF SYSTEMS ARE A TRAP AND TWO ROWS BELOW WOULD BE WRONG WITHOUT THE NOTE.
-# Rittenhouse 100 is 100 US proof, which is 50% -- not 57%. Wood's 100 is 100
-# BRITISH proof, which IS 57%. Two bottles, both called 100, eleven points apart.
-# =============================================================================
+# confidence: high = on every label and stable for years; medium = right
+# within about a point; low = a guess, overwrite first, and it carries a `qq:`
+# saying what Helen has to check. `python3 scripts/abv_worklist.py` lists the
+# guesses a published drink can show.
 
 # The day these were filled in. Unlike costs.yml's `checked`, this does not
 # decay on its own -- it is here so that a reformulation (Campari has dropped
@@ -148,7 +31,7 @@ bottles:
   "Appleton Estate 12 Rare Casks":    { abv: 43,   confidence: high }
   "Blackwell":                        { abv: 40,   confidence: high }
   "Myers":                            { abv: 40,   confidence: high }
-  # Navy strength, and the reason the Mai Tai lands where it does.
+  # Navy strength.
   "Smith & Cross":                    { abv: 57,   confidence: high }
   "Wray & Nephew":                    { abv: 63,   confidence: high }
   "Rum Fire":                         { abv: 63,   confidence: high }
@@ -159,8 +42,7 @@ bottles:
   "El Dorado 8 Year Old":         { abv: 40,   confidence: high }
   "El Dorado 12 Year Old":        { abv: 40,   confidence: high }
   "Skipper's":                        { abv: 40,   confidence: medium }
-  # 100 BRITISH proof, not US -- see the note in the header. This one really is
-  # 57% and is the strongest thing in the Demerara block by a distance.
+  # 100 BRITISH proof, which is 57%. Rittenhouse 100 is US proof: 50%.
   "Wood's":                           { abv: 57,   confidence: high }
 
   # --- rum: moderately aged ----------------------------------------------
@@ -170,41 +52,24 @@ bottles:
   "Havana Club 7 year old":           { abv: 40,   confidence: high }
   "Planteray 5 Year Old Barbados":             { abv: 40,   confidence: medium }
   "Chairman's Reserve":               { abv: 40,   confidence: high }
-  # Named by Helen 2026-09-25 (#1108) for Away Colour. 40 is the published
-  # strength of the Single Barrel; the category's mode stays 40 with it.
   "Cruzan Single Barrel":             { abv: 40,   confidence: high }
 
   # --- rum: light, blended and flavoured ---------------------------------
   "Havana Club 3 year old":           { abv: 40,   confidence: high }
   "Flor de Caña Extra Dry":           { abv: 40,   confidence: medium }
-  # Named by Helen 2026-09-25 (#1108) for Fanny Chu's Piña Colada, no strength
-  # given. The 40 was a guess; she ticked it as right on #1351, 2026-10-10.
+  # Helen confirmed the 40 (#1351).
   "Pedro Mandinga Panama silver rum": { abv: 40,   confidence: medium }
   "Planteray 3 Stars":                { abv: 41.2, confidence: medium }
   "Planteray O.F.T.D.":               { abv: 69,   confidence: high }
-  # In the house since 2026-09-06, #782, and CONFIRMED BY HELEN off the bottle
-  # the same day. 75.5% is the published strength and has been for decades --
-  # the "151" is the US proof, which is the figure.
+  # 75.5% is the published strength; "151" is the US proof.
   "Pusser's 151":                     { abv: 75.5, confidence: high }
   "Planteray Stiggins' Fancy":        { abv: 40,   confidence: high }
   "Malibu":                           { abv: 21,   confidence: high }
 
   # --- rhum agricole and clairin -----------------------------------------
-  # THE STRENGTH IS PART OF THE NAME on two of these, which is why Damoiseau
-  # appears three times in bottles.yml. A 40 and a 50 of the same rhum are ten
-  # points and a quarter of a unit apart in a 60 ml pour.
-  # BOTH CLÉMENTS AND THE DAMOISEAU PURE CANE ARE HELEN'S OWN FIGURES, off the
-  # shelf, 2026-09-14 (#1012): "Clement Rhum Agricole Canne Bleue is 50 %.
-  # Clement Rhum Agricole Blanc is 40%". The two Cléments answer the `qq:` that
-  # asked which Clément was on the shelf -- both are -- and the Canne Bleue
-  # joined bottles.yml and costs.yml the same day.
-  #
-  # THE PURE CANE IS 50, AND IT WAS 40 FOR AN HOUR. Her issue comment said
-  # "Damoiseau Rhum Agricole Blanc Pure Cane is 40%", which matched the old
-  # guess, and she corrected it the same afternoon on seeing it go past:
-  # "Damoiseau Rhum Agricole Blanc Pure Cane is 50%, just saw 40% scroll past
-  # and wanted to correct in case I mistyped." The Mai Tai names this bottle,
-  # so its unit figure moved with the correction.
+  # The strength is part of the name on two of these, which is why Damoiseau
+  # appears three times. Both Cléments and the Damoiseau Pure Cane are Helen's
+  # figures off the shelf (#1012).
   "Clément Rhum Agricole Blanc":      { abv: 40,   confidence: high }
   "Clément Rhum Agricole Canne Bleue": { abv: 50,  confidence: high }
   "Damoiseau Rhum Agricole Blanc 40°": { abv: 40,  confidence: high }
@@ -213,52 +78,24 @@ bottles:
   "La Favorite Rhum Agricole Blanc": { abv: 50,   confidence: medium }
   "La Favorite Cœur de Canne":       { abv: 50,   confidence: medium }
   "La Favorite L'Authentique Ambré": { abv: 45,   confidence: medium }
-  # 50 CONFIRMED. JM does bottle a 55 as well, but the product simply called
-  # `Rhum Agricole Blanc` is the 50 -- rested six months and reduced with Mt
-  # Pelee spring water before bottling. (#702's question about the bare alias
-  # `JM` is untouched by this: that is about WHICH BOTTLE a drink means, not
-  # about how strong either of them is.)
+  # The product called `Rhum Agricole Blanc` is the 50; JM also bottles a 55.
   "Rhum JM Blanc":                    { abv: 50,   confidence: high }
   "Rhum JM Ambré":                    { abv: 45,   confidence: medium }
   "Trois Rivières Cuvée de l'Océan":  { abv: 42,   confidence: high }
   "Barbancourt 3 Star":               { abv: 43,   confidence: high }
-  # Named by Helen 2026-10-07 without a strength. 43 is the 3 Star's figure
-  # carried across; she ticked it as right on #1351, 2026-10-10.
+  # The 3 Star's figure carried across; Helen confirmed it (#1351).
   "Barbancourt 5 Star":               { abv: 43,   confidence: medium }
-  # 43, NOT 53.5, AND THE WORD `COMMUNAL` IS THE WHOLE POINT. A single-village
-  # clairin -- Sajous, Vaval, Casimir -- really does run into the fifties and
-  # move batch to batch, which is where the old guess came from. `Communal` is
-  # the BLEND of four of them, deliberately made approachable, and it is bottled
-  # at a flat 43%. Ten points, on a spirit poured neat.
-  # MOVED TO `generics:` BELOW ON 2026-10-04 (#1108), when each clairin became
-  # a generic of its own and this stopped being a bottle. The figure is the same.
   "Rhum Clément Créole Shrubb":       { abv: 40,   confidence: high }
-  # HELEN'S OWN FIGURE, 2026-09-26: "18% ABV, £22". The bottle the `coconut
-  # rhum` generic was declared for on 2026-09-20 and which had no entry
-  # anywhere until she named its strength. Its category row left `generics:`
-  # below in the same commit -- a bottle's figure wins.
+  # Helen's figure. The bottle under `coconut rhum`, so that generic has no
+  # row below.
   "Clément Mahina Coconut Rhum Liqueur": { abv: 18, confidence: high }
 
   # --- cachaça and arrack ------------------------------------------------
   "Sagatiba":                         { abv: 38,   confidence: medium }
   "Leblon":                           { abv: 40,   confidence: high }
   "Velho Barreiro":                   { abv: 39,   confidence: medium }
-  # RENAMED 2026-09-14 (#796), from `Van Osten Botanik Arrack` -- Helen: "the
-  # bottle I own is 'Batavia Arrack van Oosten' (note misspelling on current
-  # site)". The old spelling survives as an alias in bottles.yml, so nothing
-  # typed the old way stops resolving. The strength is the bottle's, unchanged.
   "Batavia Arrack van Oosten":        { abv: 42,   confidence: medium }
-  # THE FIGURE MOVED HERE FROM `generics:` on 2026-09-06, because #782 put a
-  # bottle under what was then `Ceylon arrack` -- `coconut-flower arrack` since
-  # #796, 2026-09-14 -- and a generic may not be strengthed in two places
-  # (test_no_generic_gets_its_strength_from_two_places).
-  #
-  # AND IT CHANGED IN THE MOVE. The generic row said 33, which was the bottom of
-  # the 33-to-40 range the category spans and carried a `qq:` asking which end
-  # this bottle sat at. Helen answered the same day: 40. The row is hers now,
-  # not a guess, even though the KEY is still the category -- she chose to enter
-  # the bottle as the words in the issue rather than have a brand guessed onto
-  # her shelf, and the strength is a fact about the actual bottle regardless.
+  # Helen's figure for her own bottle, keyed by the words she entered it under.
   "Ceylon Arrack":                    { abv: 40,   confidence: high }
 
   # --- whisky ------------------------------------------------------------
@@ -270,9 +107,7 @@ bottles:
   "Woodford's Reserve":               { abv: 43.2, confidence: high }
   "Jack Daniels":                     { abv: 40,   confidence: high }
   "Bulleit Bourbon":                  { abv: 45,   confidence: high }
-  # "Ardbeg XO should be 'Ardbeg An Oa', ABV 46.6 %." -- Helen, 2026-09-14
-  # (#1012). There is no Ardbeg XO, which is what the `qq:` here said; the
-  # bottle was a mis-transcription of An Oa. `Ardbeg XO` is its alias.
+  # Helen's figure (#1012). `Ardbeg XO` is its alias in bottles.yml.
   "Ardbeg An Oa":                     { abv: 46.6, confidence: high }
 
   # --- gin ---------------------------------------------------------------
@@ -282,9 +117,6 @@ bottles:
   "Hayman's Old Tom":                 { abv: 41.4, confidence: high }
   "Rutte":                            { abv: 43,   confidence: medium }
   "Portobello Road":                  { abv: 42,   confidence: high }
-  # 40 CONFIRMED for Opihr Oriental Spiced. The spelling was wrong in
-  # bottles.yml when this row was written and the note here said so; #701 fixed
-  # it on 2026-09-07 and this row followed the rename.
   "Opihr":                            { abv: 40,   confidence: high }
 
   # --- agave -------------------------------------------------------------
@@ -298,9 +130,7 @@ bottles:
 
   # --- brandy ------------------------------------------------------------
   "Courvoisier":                      { abv: 40,   confidence: high }
-  # "Pierre Ferrand Ambré and Pierre Ferrand 1840 are different bottles, but
-  # both £53 and both 40 % ABV." -- Helen, 2026-09-14 (#745). The 1840 was
-  # collapsed into the Ambré from 2026-09-05 until then.
+  # Two different bottles at one strength (#745).
   "Pierre Ferrand Ambré":             { abv: 40,   confidence: high }
   "Pierre Ferrand 1840":              { abv: 40,   confidence: high }
   "Avallen":                          { abv: 40,   confidence: high }
@@ -309,12 +139,8 @@ bottles:
   # --- vodka -------------------------------------------------------------
   "Ketel One":                        { abv: 40,   confidence: high }
   "Absolut Vanilla":                  { abv: 38,   confidence: high }
-  # Helen, 2026-09-09, naming the product so it could be declared: "Ciroc
-  # Pineapple Flavoured Vodka", 37.5%. Same figure the `pineapple vodka`
-  # generic carried, which is now deleted in favour of this row.
   "Ciroc Pineapple Flavoured Vodka":  { abv: 37.5, confidence: high }
-  # HELEN'S OWN FIGURE, 2026-10-07: "Lemon vodka: 40% abv, default is Absolut
-  # Citron".
+  # Helen's figure.
   "Absolut Citron":                   { abv: 40,   confidence: high }
 
   # --- absinthe ----------------------------------------------------------
@@ -324,30 +150,21 @@ bottles:
   # --- vermouth, sherry, port, aromatised wine ---------------------------
   "Dolin Dry":                        { abv: 17.5, confidence: high }
   "Dolin Blanc":                      { abv: 16,   confidence: high }
-  # NEW 2026-09-09 with the bottle. `high` where its PRICE is only `medium`,
-  # and the two confidences mean different things: Dolin Rouge is 16% on every
-  # bottle and has been for years, which is exactly what `high` means in this
-  # file (see the header -- "printed on every bottle of it and stable for
-  # years"), while what a shop charges for it this month is a guess.
   "Dolin Rouge":                      { abv: 16,   confidence: high }
   "Carpano Antica Formula":           { abv: 16.5, confidence: high }
   "Martini Rosso":                    { abv: 15,   confidence: high }
   "Cocchi Vermouth di Torino":        { abv: 16,   confidence: high }
   "Punt e Mes":                       { abv: 16,   confidence: high }
   "Lillet Blanc":                     { abv: 17,   confidence: high }
-  # Named by Helen 2026-10-07 for Picotin and North Sea Oil, no strength given.
-  # 16.5 is what the bottle usually says; she ticked it as right on #1351,
-  # 2026-10-10.
+  # Helen confirmed the 16.5 (#1351).
   "Cocchi Americano":                 { abv: 16.5, confidence: medium }
   "Lustau Amontillado":               { abv: 18.5, confidence: medium }
   "Barbadillo Principe":              { abv: 19,   confidence: medium }
   "Lustau Don Nuño Oloroso":          { abv: 20,   confidence: medium }
 
   # --- orange liqueurs ---------------------------------------------------
-  # THE SPREAD HERE IS REAL AND IT IS THE WIDEST IN THE FILE. Cointreau and
-  # Ferrand Dry are 40; the Briottet and Boudier curaçaos are 25. A 20 ml pour
-  # is 0.8 units or 0.5 depending only on which bottle, which is why the
-  # `triple sec` / `orange Curaçao` distinction earns its keep here.
+  # The widest spread in the file: Cointreau and Ferrand Dry are 40, the
+  # Briottet and Boudier curaçaos 25, so which bottle a pour names matters.
   "Cointreau":                        { abv: 40,   confidence: high }
   "L'Original Combier Triple Sec":    { abv: 40,   confidence: high }
   "Pierre Ferrand Dry Curaçao":       { abv: 40,   confidence: high }
@@ -362,38 +179,24 @@ bottles:
   "Bitter Truth Pimento Dram":        { abv: 22,   confidence: high }
   "Roots Mastiha":                    { abv: 30,   confidence: high }
   "Disaronno":                        { abv: 28,   confidence: high }
-  # A `cherry brandy` since 2026-09-14 (#1012 follow-up), not a `cherry
-  # liqueur`: "Cherry Heering is a cherry brandy, Briottet Cerise is a cherry
-  # liqueur." The generic moved in bottles.yml; the strength is unchanged.
   "Cherry Heering":                   { abv: 24,   confidence: high }
   "Kahlua":                           { abv: 16,   confidence: high }
   "Passoa":                           { abv: 17,   confidence: high }
   "King's Ginger":                    { abv: 41,   confidence: high }
-  # RENAMED AND SETTLED 2026-09-14 (#1012) -- Helen: "'Gabriel Boudier Liqueur
-  # de Gingembre' is 18 % -- and please update the name string." The guess
-  # was 20; the old name `Gabriel Boudier Gingembre` is its alias.
+  # Helen's figure (#1012).
   "Gabriel Boudier Liqueur de Gingembre": { abv: 18, confidence: high }
   # Helen's figure.
   "Briottet Liqueur de Gingembre":    { abv: 18,   confidence: high }
-  # BOTTLES WHERE THERE WERE ONLY CATEGORIES, 2026-09-14 (#1012). Each was a
-  # `generics:` row with a `qq:` because the file could not tell which bottle
-  # the drink meant; Helen named the one on her shelf. "Briottet Liqueur de
-  # Sapin is 40 %", and "'La Tomato Liqueur' is 25 %, and this is the only
-  # tomato liqueur I have (shocker)". With a bottle declared under each, the
-  # category rows are gone from `generics:` below -- a generic may not be
-  # strengthed in two places.
+  # Helen's figures (#1012). Each is the bottle under its generic, so neither
+  # generic has a row below.
   "Briottet Liqueur de Sapin":        { abv: 40,   confidence: high }
   "La Tomato Liqueur":                { abv: 25,   confidence: high }
   "Briottet Crème de Pêche":          { abv: 18,   confidence: medium }
-  # NEW 2026-09-09 with the bottle. 18 from its siblings, not from a label --
-  # Briottet's crèmes run 16 to 25 and the fruit ones cluster at 18, so this is
-  # `medium` like the rest of them rather than the `high` a read label earns.
+  # 18 from its Briottet siblings, not from a label.
   "Briottet Crème de Cerise":         { abv: 18,   confidence: medium }
   "Briottet Crème d'Abricot":         { abv: 18,   confidence: medium }
   "Briottet Crème de Cacao Blanc":    { abv: 25,   confidence: medium }
   "Briottet Crème de Menthe Blanche": { abv: 21,   confidence: medium }
-  # 21, matching the Briottet blanche above it -- the crème de menthe category
-  # is tighter than the guess of 18 assumed.
   "Gabriel Boudier Crème de Menthe":  { abv: 21,   confidence: high }
   "Briottet Crème de Violette":       { abv: 16,   confidence: medium }
   # Helen's figure (#1351).
@@ -402,10 +205,7 @@ bottles:
 
   # --- amari and bitter aperitivi ----------------------------------------
   "Fernet Branca":                    { abv: 39,   confidence: high }
-  # 20, NOT 15, AND THE UK IS WHY. Suze is 15% across the rest of Europe and
-  # 20% in Britain -- it was relaunched here at the higher strength, which is
-  # the liqueur's own older figure. This file had 15 from general knowledge and
-  # the web pass corrected it: a third of a unit on every 25 ml pour.
+  # Suze, below, is 20 in the UK and 15 across the rest of Europe.
   "Giffard Crème de Mûre":            { abv: 16,   confidence: high }
   "Suze":                             { abv: 20,   confidence: high }
   "Liquore Strega":                   { abv: 40,   confidence: high }
@@ -413,23 +213,11 @@ bottles:
   "Galliano L'Autentico":             { abv: 42.3, confidence: high }
 
   # --- cocktail bitters --------------------------------------------------
-  # NONE OF THESE COUNT TOWARD A UNIT TOTAL, AND SINCE 2026-09-14 THAT IS A
-  # RULE ABOUT BITTERS, NOT ABOUT DASHES. Helen, #1012: "Don't include bitters
-  # in our ABV calculations." Until then they dropped out only because a dash
-  # is a non-volumetric unit -- six dashes of Angostura is about 0.02 units --
-  # and a bitters poured in millilitres would have counted. cocktail_units.rb
-  # now skips any pour whose generic is in ingredients.yml's `bitters:` list,
-  # whatever its amount. Measured the day it landed: no drink, live or draft,
-  # poured a bitters by volume, so no figure moved.
-  #
-  # They are declared anyway, so that the completeness test can require EVERY
-  # declared bottle to carry a figure without an exception list, which is the
-  # kind of exception that rots.
-  #
-  # THE THREE `low` ROWS LOST THEIR `qq:` THE SAME DAY. A question for Helen's
-  # shelf is only worth asking about a figure that can reach a number, and by
-  # her own ruling these never can. They stay `low` because they are still
-  # guesses -- if bitters ever count again, overwrite these first.
+  # No bitters counts toward a unit total (#1012): cocktail_units.rb skips any
+  # pour whose generic is in ingredients.yml's `bitters:` list. They are
+  # declared anyway, so that every declared bottle carries a figure with no
+  # exception list. The `low` rows are guesses and need no `qq:`, because they
+  # reach no number.
   "Angostura":                        { abv: 44.7, confidence: high }
   "Angostura orange bitters":         { abv: 28,   confidence: low }
   "Peychaud's":                       { abv: 35,   confidence: high }
@@ -440,10 +228,8 @@ bottles:
   "Bob's Peppermint Bitters":         { abv: 38,   confidence: low }
 
   # --- not alcohol at all ------------------------------------------------
-  # DECLARED, NOT OMITTED, and the difference is the whole safety property of
-  # this file: a missing key is a test failure, `abv: 0` is a statement. If a
-  # syrup could simply be absent then so could a gin, and the gin would total
-  # as water without anything going red.
+  # Declared, not omitted: a missing key is a test failure and `abv: 0` is a
+  # statement. If a syrup could be absent, so could a gin.
   "Monin Pure Cane Sugar":            { abv: 0,    confidence: high }
   "Monin Cinnamon":                   { abv: 0,    confidence: high }
   "Monin Gingembre":                  { abv: 0,    confidence: high }
@@ -454,20 +240,11 @@ bottles:
   "Biona unsweetened":                { abv: 0,    confidence: high }
 
 # --- generics with no bottle behind them -------------------------------------
-# Generics poured without any bottle declared under them. A generic that DOES
-# have bottles is deliberately absent -- it derives, and a figure here as well
-# would be a second truth. See the header. (This said "54 generics" until
-# 2026-09-14, and was wrong by then; the header's rule about counts in comments
-# applies here too.)
-#
-# THESE ARE CATEGORY FIGURES AND EVERY DRINK THAT USES ONE IS MARKED
-# APPROXIMATE. That is Helen's ruling of 2026-09-06 working as intended: the
-# page says `approx` rather than pretending a category has one strength.
+# Category figures: a drink that pours one is marked approximate. A generic
+# that has bottles is absent on purpose and derives from them.
 generics:
 
   # --- one product, one strength -----------------------------------------
-  # Helen drew this line for prices -- "Campari is just Campari, as is
-  # chartreuse. They have prices" -- and it holds identically for strength.
   Campari:            { abv: 25,   confidence: high }
   Aperol:             { abv: 11,   confidence: high }
   Chartreuse Verte:   { abv: 55,   confidence: high }
@@ -477,12 +254,9 @@ generics:
   Becherovka:         { abv: 38,   confidence: high }
   Grand Marnier:      { abv: 40,   confidence: high }
   Amaro Nonino:       { abv: 35,   confidence: high }
-  # 30 CONFIRMED for Paolucci Amaro Ciociaro, bottled at 30% since 1873.
   Amaro Ciociaro:     { abv: 30,   confidence: high }
-  # A GENERIC SINCE 2026-10-04 (#1108); it was a bottle under `clairin` until
-  # then, at this same 43 (see the note where it stood, above). The other three
-  # clairins are declared and unpoured, and get a figure when a drink pours one:
-  # the single-village ones run into the fifties and move batch to batch.
+  # The blend of four clairins, bottled at a flat 43. The single-village
+  # clairins run into the fifties and get a row when a drink pours one.
   Clairin Communal:   { abv: 43,   confidence: high }
 
   # --- genuinely a category, no bottle declared yet ----------------------
@@ -491,121 +265,48 @@ generics:
   sloe gin:               { abv: 26,   confidence: medium }
   pisco:                  { abv: 40,   confidence: medium }
   aquavit:                { abv: 40,   confidence: medium }
-  # 40, Helen, 2026-09-14 (#1012). The guess was 29, the Colombian anise
-  # style; the Bali Hai's pour was first typed "full-strength clear fruit
-  # brandy" and is paired with kirschwasser, which is the pomace style.
+  # Helen's figure (#1012): the pomace style, not the Colombian anise one.
   aguardiente:            { abv: 40,   confidence: high }
   apple brandy:           { abv: 40,   confidence: medium }
   kirschwasser:           { abv: 40,   confidence: medium }
-  # NEW 2026-09-18, arriving with Gunmetal Blue, which is the generic's first
-  # pour. 35 is the figure `ingredients.yml` already carried when the generic
-  # was coined on 2026-08-29 ("Distilled peach wine, ~35%, clear or aged"), so
-  # this is not a fresh guess -- it is the number that was written down at the
-  # time being read by the layer that needs it. `medium`, the same as its two
-  # siblings above: a category figure, no label read.
-  #
-  # DELIBERATELY BELOW THE 40 THE OTHER FRUIT DISTILLATES CARRY. A peach brandy
-  # is distilled peach WINE and runs lower than a pomace or apple spirit; the
-  # whole reason this generic exists is that `crème de pêche` at 18-20 was
-  # standing in for it, and splitting the difference at 40 would repeat that
-  # mistake in the other direction.
+  # Distilled peach wine, so below the 40 of the other fruit distillates.
   peach brandy:           { abv: 35,   confidence: medium }
-  # 20, CONFIRMED by Helen 2026-09-14 (#1012): "Apple schnapps: 20% (the 40%
-  # is the brandies)." The `qq:` said the category spans 15 to 40; the top of
-  # that range was the apple brandies, which are their own generic above.
+  # Helen's figure (#1012). The 40% apple spirits are `apple brandy` above.
   apple schnapps:         { abv: 20,   confidence: high }
-  # NEW 2026-09-14 (#1013), Helen: "Add 'peach schnapps' as a generic let's
-  # say ABV 18%." `medium` because "let's say" is a working figure rather than
-  # a label read -- but it is hers, so it is not a guess for an agent to
-  # overwrite. Peach Me is its only pour today.
+  # Helen's working figure (#1013): not a guess for an agent to overwrite.
   peach schnapps:         { abv: 18,   confidence: medium }
   crème de cassis:        { abv: 20,   confidence: medium }
-  # FIVE PLACEHOLDERS, 2026-10-07, with their generics -- the Difford's batch.
-  # No bottle is declared for any of them and none is a label Helen has read:
-  # each is the figure the category is usually bottled at, `low`, with the
-  # question. Declaring the bottle she pours replaces the row.
-  # HELEN'S FIGURES, 2026-10-10 (#1351), each with the bottle a pour defaults
-  # to: Chambord 16.5, Briottet myrtille 18 (it was a guessed 16), Mentzendorff
-  # kümmel 38, Akashi-Tai Daiginjo Genshu 17 (it was a guessed 16). The
-  # tsipouro's 42 she ticked as right without naming a bottle.
+  # Helen's figures (#1351); the tsipouro's she confirmed without a bottle.
   # `crème de myrtille` has no row here: its declared bottle carries the figure.
   black raspberry liqueur: { abv: 16.5, confidence: high }
   kümmel:                 { abv: 38,   confidence: high }
   sake:                   { abv: 17,   confidence: high }
   tsipouro:               { abv: 42,   confidence: medium }
-  # NEW 2026-10-04 (#838), when Helen split `crème de cacao` by colour. The
-  # white derives from Briottet Crème de Cacao Blanc above; the brown has no
-  # bottle declared, and Brandy Alexander is its only pour. 25 is that same
-  # bottle's figure carried across, a category figure and NOT one Helen gave.
+  # The Briottet Crème de Cacao Blanc figure carried across; not Helen's.
   brown crème de cacao:   { abv: 25,   confidence: medium }
-  # `coconut rhum` LEFT THIS BLOCK 2026-09-26, and it is the `liqueur de sapin`
-  # move exactly: the category gained a bottle, and a bottle's figure wins.
-  # Helen named it that day -- "18% ABV, £22" -- so Clément Mahina Coconut Rhum
-  # Liqueur is declared in bottles.yml and carries 18 in `bottles:` above.
-  # The placeholder that stood here from 2026-09-20 guessed 18 and was right,
-  # but it was a guess and said so in a `qq:`.
-  # test_no_generic_gets_its_strength_from_two_places is what requires the
-  # deletion rather than the update, and it is right to: two rows is two
-  # answers, and the one nobody edits is the one that rots.
-  # `liqueur de sapin` and `tomato liqueur` LEFT THIS BLOCK 2026-09-14: each
-  # gained a bottle (Briottet Liqueur de Sapin, La Tomato Liqueur -- see
-  # `other liqueurs` above), and a bottle's figure wins.
-  # Helen confirmed 26 on 2026-09-09, reading this block: "Swedish Flaggpunsch
-  # is correct." Guess promoted to a checked figure.
+  # Helen confirmed the 26.
   Swedish flaggpunsch:    { abv: 26,   confidence: high }
-  # TWO ROWS CAME OUT OF THIS BLOCK ON 2026-09-09, both because the category
-  # gained a bottle and a bottle's figure wins:
-  #   `overproof Demerara rum, lightly aged` -- Pusser's 151 was retyped into
-  #     it (Helen: "It's 100% Guyanese"), and the bottle is 75.5%, not the 57
-  #     this row guessed. The 57 was the WRONG NUMBER as well as a shadowed
-  #     one, so leaving it would have under-counted both drinks that pour it.
-  #   `pineapple vodka` -- Ciroc Pineapple Flavoured Vodka was declared, at the
-  #     same 37.5 this row already carried.
-  # `test_no_generic_gets_its_strength_from_two_places` is what enforces this;
-  # deleting the first row also closes #831, since it was the twelve-character
-  # overhang breaking this block's alignment.
   tawny port:             { abv: 20,   confidence: high }
-  # NEW 2026-10-07 with the generic (Roman Punch, a 5 ml float). The tawny's
-  # figure carried across -- a ruby is bottled in the same 19-20 band -- and
-  # `medium`: a category figure, no label read.
-  # Helen, 2026-10-10 (#1351): "Ruby port can default to Taylor's Fine, 20%".
+  # Helen's figure (#1351).
   ruby port:              { abv: 20,   confidence: high }
-  # A PLACEHOLDER, 2026-10-07, the Difford's batch. `Japanese whisky` was
-  # declared ahead of a drink and had no figure; Geisha Martini (2.5 ml) is
-  # its first pour. A GUESS, `low`, with the question -- not a label Helen has
-  # read.
-  # ANSWERED 2026-10-10 (#1351): "Japanese whisky can default to Suntory Toki
-  # Blended, 43%". The guess stood; it is hers now.
+  # Helen's figure (#1351).
   Japanese whisky:        { abv: 43,   confidence: high }
-  # `americano` AND `lemon vodka` EACH HAD A ROW HERE FOR AN HOUR and lost it
-  # the same day, when Helen named a bottle for each (Cocchi Americano, Absolut
-  # Citron -- both in `bottles:` above). A bottle's figure wins, and
-  # test_no_generic_gets_its_strength_from_two_places requires the deletion.
-  # NEW 2026-10-07, for Autumn Leaves -- the first pour of this generic with no
-  # bottle beside it. NOT A GUESS: bottled-in-bond is 100 proof by definition,
-  # and the drink's Difford's source says so in the line itself, "Straight rye
-  # whiskey (100 proof /50% alc./vol.)".
+  # Bottled-in-bond is 100 US proof by definition.
   bonded rye:             { abv: 50,   confidence: high }
 
   # --- wine and sparkling -------------------------------------------------
-  # THE TWO SPARKLING ROWS ARE ALSO `to top` POURS, so they reach the total
-  # through top_up_ml's declared range in costs.yml and never as a measured
-  # volume. See cocktail_units.rb.
+  # The two sparkling rows are also `to top` pours: those reach the total
+  # through costs.yml `top_up_ml`, never as a measured volume.
   champagne:          { abv: 12,   confidence: high }
   prosecco:           { abv: 11,   confidence: high }
   red wine:           { abv: 13,   confidence: medium }
-  # "12.5% is fine" -- Helen, 2026-09-14, asked. `medium` like red wine above:
-  # a category figure, confirmed, not a label read.
+  # Helen confirmed the 12.5.
   white wine:         { abv: 12.5, confidence: medium }
 
 # --- poured, and contributes nothing ------------------------------------------
-# EVERY ONE OF THESE IS A DELIBERATE ZERO, not a gap. Helen: "water etc don't
-# matter." They are listed rather than defaulted so that a new ingredient with
-# no strength recorded fails a test instead of quietly diluting a total.
-#
-# NOTE WHAT IS *NOT* HERE. `falernum` is 11% and is an easy one to assume is a
-# syrup because it sits beside the syrups in every recipe that uses it -- it
-# derives from Velvet Falernum above. `grenadine` and `orgeat` really are 0.
+# Each is a deliberate zero. Listed rather than defaulted, so a new ingredient
+# with no strength recorded fails a test instead of diluting a total.
+# `falernum` is NOT here: it is 11% and derives from Velvet Falernum above.
 non_alcoholic:
   - lime juice
   - lemon juice
@@ -631,9 +332,7 @@ non_alcoholic:
   - raw sugar
   - molasses sugar
   - soda water
-  # Ginger beer is non-alcoholic (2026-09-20). A brewed one can carry a trace,
-  # which is not what this list is asking: it is a soft drink for the strength
-  # test, like cola beside it.
+  # A soft drink for this purpose, like cola; a brewed one's trace is ignored.
   - ginger beer
   - coconut water
   - birch water
@@ -644,15 +343,8 @@ non_alcoholic:
   - black tea
   - espresso
   - coconut cream
-  # Coco Lopez and coconut milk, 3:1 -- Helen's generic for Fanny Chu's Piña
-  # Colada, 2026-09-25 (#1108). Two tins, neither with any alcohol in it.
   - "Coco mix"
-  # "Cream is non-alcoholic." -- Helen, 2026-09-14 (#1014). The generic was
-  # declared long before anything poured it by volume; the Grasshopper (#984)
-  # is the first, and it failed the strength test until this line.
   - cream
-  # Milk is non-alcoholic (2026-09-20, Rum Cow -- the first drink to pour it by
-  # volume once it was typed).
   - milk
   - fruit purée
   - egg white

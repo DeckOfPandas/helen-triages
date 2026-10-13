@@ -1,12 +1,11 @@
 """The browser harness has one Playwright version, wherever it is installed.
 
-Since 2026-09-15 Playwright is pinned twice: in .devcontainer/Dockerfile, which
-bakes it into the image under /opt/playwright, and in scripts/browser/install.sh,
-which installs it into tmp/browser/ outside the image. Helen asked for the
-image copy ("shall I pre-install Playwright (and its dependencies) into this
-Docker image?") so fresh worktrees stop downloading a browser. Two pins drift
-silently -- a screenshot taken on one version and compared with one taken on
-the other is not the same measurement -- so this file refuses the drift.
+Playwright's version is written in .devcontainer/Dockerfile, which bakes it
+into the image under /opt/playwright, in scripts/browser/install.sh, which
+installs it into tmp/browser/ outside the image, and in requirements-test.txt
+for the Python binding. Pins drift silently, and a screenshot taken on one
+version compared with one taken on another is not the same measurement, so
+this file refuses the drift.
 """
 from __future__ import annotations
 
@@ -52,24 +51,13 @@ def _pip_pin() -> str:
 
 
 def test_the_python_binding_and_the_npm_harness_are_the_same_playwright():
-    """THE THIRD PIN, added 2026-09-28, and the reason the version moved.
+    """The pip binding (#1200) and the npm harness pin one exact version, so
+    they resolve one Chromium revision and the image carries one browser.
 
-    requirements-test.txt gained `playwright` for #1200's headless smoke test.
-    It was first pinned at 1.47.0 to sit beside the npm 1.47.2 in the image --
-    and PyPI HAS NO 1.47.2 (checked against the index that day: 1.47.0, then
-    1.48.0). So the two lines could not be made to agree, each resolved a
-    different Chromium revision, and the image carried two browsers for no
-    reason anybody chose.
-
-    Moving both to 1.63.0, which exists on npm and PyPI alike, collapses that
-    into one number and one browser. This test is what stops them drifting
-    apart again -- and it is why `playwright` sits in dependabot.yml's ignore
-    list, since a bot can only ever move one of the four places the number
-    lives (here, both Dockerfile lines, and install.sh).
-
-    Read as an EXACT match, not a major or minor one: a screenshot taken on one
-    build and compared with one taken on another is not the same measurement,
-    which is the same argument the sibling test above makes for the npm pair.
+    npm and PyPI do not publish the same patch releases, so pick a version
+    both have. `playwright` is in dependabot.yml's ignore list because a bot
+    moves only one of the places the number lives: requirements-test.txt,
+    both Dockerfile lines, and install.sh.
     """
     assert _pip_pin() == _dockerfile_pin(), (
         f"requirements-test.txt pins playwright {_pip_pin()} and the image's "

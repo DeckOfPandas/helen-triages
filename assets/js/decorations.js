@@ -170,19 +170,13 @@
   }
 
   // --- Tag shapes ------------------------------------------------------------
-  // The torn-tape background behind a pill or a filter button, on both sites'
-  // index pages (#1219).
-  //
+  // The torn-tape background behind a pill or a filter button (#1219).
   // Assigned by a hash of the tag's own text, never randomly or by position:
-  // the same tag must wear the same shape in the filter section and in the
-  // list.
-  //
-  // The pool is the originals without their mirror images, because a row that
-  // mixes both disagrees about which end is torn. Shape 4 keeps its flip (it
-  // is torn at both ends) and shape 8 is out as too diagonal. Shape 9's
-  // diagonal spans its full width and turns near-vertical on a narrow pill, so
-  // it is excluded for short text only. The unused files stay in
-  // assets/img/chrome/tag-shapes/.
+  // a tag must wear the same shape in the filter section and in the list.
+  // The pool leaves out mirror images, because a row mixing both disagrees
+  // about which end is torn; shape 4 keeps its flip (torn at both ends).
+  // Shape 8 is out as too diagonal, and shape 9 for short text only: its
+  // diagonal turns near-vertical on a narrow pill.
   function tagShapes() {
     var slots = document.querySelectorAll('.tag-shape');
     if (!slots.length) return;

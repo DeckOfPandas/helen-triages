@@ -1,73 +1,27 @@
-# =============================================================================
-# COOKING METHODS — oven temperatures, timings and coverings, as DATA.
-# =============================================================================
-# THIS FILE IS THE SOURCE OF TRUTH, EDITED BY HAND. It is no longer generated
-# from the page. food/reference/cooking-methods.html used to RENDER FROM this
-# file, via _includes/food/method_table.html -- the page is the consumer, not
-# the source. To add a new protein or method, edit this file directly.
+# Cooking methods: oven settings, timings and coverings. Edited by hand, and
+# the source of truth: food/reference/cooking-methods-and-timings.html renders
+# from it. scripts/build_cooking_methods.py and build_cooking_methods_prose.py
+# are one-off migration tools pinned to an old commit; running either
+# overwrites the hand edits here. The sourcing notes for these figures are in
+# food/reference/cooking-methods-prose-archive.html (#400). DECISIONS §14.
 #
-# scripts/build_cooking_methods.py and scripts/build_cooking_methods_prose.py
-# are MIGRATION TOOLS, not generators to re-run. They did the original
-# transcription and are pinned to commit 8bdbd27, the last version of the page
-# that still held the tables -- running either against the current working
-# tree finds no tables left to parse and would emit an empty data file, which
-# in turn blanks the page it feeds. That has already happened once. Leave
-# those scripts alone; edit this file instead.
-#
-# The figures themselves were transcribed by machine, not retyped, when this
-# file was first built, so nothing was re-researched and nothing changed value
-# in the move from page to data. Correction history has been dropped from the
-# notes (Helen, 2026-08-13: "keep safety and sources, drop correction
-# history") -- that was scaffolding for a fact-check pass that is finished.
-#
-# `shape` IS THE FIELD THAT MATTERS, and it exists because a timing is not
-# always a formula. 52 of the 66 rows are `rate` and a calculator can just
-# multiply; the rest are one of five other things, and a calculator that
-# averaged them into a confident serving time would be worse than none:
-#
+# `shape` says what kind of thing a timing is, so the calculator never
+# averages one it cannot multiply:
 #   rate         rate_min/rate_max minutes per kg, plus optional flat_add
-#   total        a fixed time that does NOT scale with weight
+#   total        a fixed time that does not scale with weight
 #   staged       two rates in sequence (simmer, then roast)
 #   by_doneness  a different rate per doneness level
 #   relative     defined against another row; no figure of its own
-#   disputed     sources genuinely disagree; refuse rather than average
-#   unparsed     prose, no formula recoverable
-#
-# Steak, fish and shellfish are absent on purpose: their tables carry cuts and
-# recommended methods, with no timings in them at all.
-#
-# internal_temp_ref points into internal_temperatures.yml, so a schedule can
-# finish on a thermometer figure rather than on a clock.
-#
-# `groups` USED TO LIVE HERE AND IS GONE, 2026-08-21, issue #400. It held the
-# page furniture from before the migration: each table's subtitle, its column
-# names, and two ordered lists of the prose that sat before and after it. The
-# rebuilt page never rendered any of it, so for eight days it was 35 paragraphs
-# of invisible text making up 30% of the 58 KB JSON blob this file is
-# serialised into and shipped to every visitor's browser.
-#
-# IT WAS NOT DELETED, IT WAS MOVED. Fourteen of those paragraphs are sourcing
-# notes recording where each timing figure came from -- Delia Smith, Waitrose,
-# Gressingham, the American Lamb Board -- which is original research that
-# exists nowhere else, and #400's description of this as dead data was right
-# about the rendering and wrong about the content. It now lives in
-# food/reference/cooking-methods-prose-archive.html, committed but not built,
-# complete and verbatim including the 14 outbound links buried inside those
-# notes. Read it there before assuming any timing here is unsourced.
+#   disputed     sources disagree; refuse, never average
 
-# "(whole)" ON THE FOUR BIRDS, 2026-10-09 -- Helen: "Update the chicken line
-# in the dropdown to 'chicken (whole)', and the same for duck and goose", then
-# "Turkey should get (whole) too." Every method under the four is a whole-bird
-# method. The label is also the heading the calculator writes over the methods.
-#
-# `oven` IS A LIST OF SHORT STAGE LINES, 2026-10-10, one per oven setting in
-# the order they happen: "220°C fan for 20 min", then "180°C fan for the
-# rest". It was one sentence per method ("Start 220°C fan for 15–20 min,
-# drop to 180°C fan"), and Helen asked for the figures unburied: "hardly any
-# extra text, instructions not buried." A one-setting method is a one-line
-# list. A relative row says what it follows ("As the plain method") and what
-# it adds ("Rub on for last 20–30 min"). The calculator writes each line on a
-# line of its own; test_every_oven_temperature_says_fan reads them joined.
+# Steak, fish and shellfish are absent on purpose: they carry no timings.
+# `internal_temp_ref` is a dot-path into internal_temperatures.yml, so a
+# schedule can finish on a thermometer figure. `label` is the dropdown line
+# and the heading the calculator writes over the methods. `oven` is a list of
+# short stage lines, one per oven setting in the order they happen ("220°C fan
+# for 20 min", then "180°C fan for the rest"); a relative row says what it
+# follows and what it adds. test_every_oven_temperature_says_fan reads the
+# lines joined.
 chicken:
   label: Chicken (whole)
   internal_temp_ref: poultry.chicken

@@ -2,31 +2,23 @@
 """Rank recipes by how much their ingredient order seems to disagree with
 the order the method actually calls for them (GitHub issue #68).
 
-REPRODUCES NO NUMBER -- a DISCOVERY aid. `tests/test_taxonomy.py` cites the
-word-collision false positives it found as why no item-level order test exists.
-
-WHAT THIS IS: a DISCOVERY aid for finding recipes worth a human read, not
-a source of truth. Two rounds of trying to make this fully automated
-(a real test, or an auto-fix) surfaced genuine word-collision bugs --
-"chicken breast" and "chicken stock" both match on "chicken", so the
-matcher attributes the wrong method step to the wrong ingredient;
-"onion" inside a flavourings item's own description ("onion powder")
-collides with an unrelated onion ingredient earlier in the list. Matching
-free-form ingredient names against free-form method prose is inherently
-this fuzzy. See the commit that added test_ingredient_group_order_matches_
-title in tests/test_taxonomy.py (GROUP-level ordering, a much safer
-suffix-match against the title) for why that test exists instead of an
-item-level one.
-
-HOW TO USE IT: run it, read the ranked output, then for each candidate
-worth a look, open the actual recipe file and read the actual method
-text yourself before touching anything. Never move an ingredient because
-this script said so -- only because you (or a human reading the method)
-confirmed it. Many high-ranked "inversions" turn out to be one real fix
-plus several word-collision artefacts once you actually read the recipe.
-
     python3 scripts/find_ingredient_order_candidates.py
     python3 scripts/find_ingredient_order_candidates.py --limit 30
+    python3 scripts/find_ingredient_order_candidates.py --recipes-dir _food_drafts
+
+A discovery aid for finding recipes worth a human read, not a source of
+truth. It reads `_food_recipes/` (or `--recipes-dir`) and writes nothing.
+
+Matching free-form ingredient names against free-form method prose is fuzzy:
+"chicken breast" and "chicken stock" both match on "chicken", and "onion"
+inside "onion powder" collides with an unrelated onion earlier in the list.
+That is why the suite tests only group-level order
+(`test_ingredient_group_order_matches_title` in tests/test_taxonomy.py) and
+there is no item-level test or auto-fix.
+
+So read the ranked output, open each candidate and read its method before
+touching anything. Never move an ingredient because this script said so: a
+high-ranked recipe is often one real fix plus several word collisions.
 """
 from __future__ import annotations
 

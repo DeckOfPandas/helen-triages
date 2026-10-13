@@ -1,29 +1,15 @@
-// =============================================================================
-// A DOM small enough to hand-read, big enough to START the index scripts.
-// Issue #633. Not a test file — `node --test` only discovers *.test.js.
-// =============================================================================
-// WHY THIS EXISTS. On 2026-08-31 cocktail-index.js read a name off the wrong
-// object, calling undefined threw, and the ENTIRE TAIL of the file stopped
-// running: the back/forward restore, `apply()` at startup, and the `pagehide`
-// listener. Every JS test stayed green, because all of them ask a pure module a
-// question and the fault was in the WIRING between two.
+// A DOM small enough to hand-read, big enough to start the index scripts
+// (#633). Not a test file: `node --test` only discovers *.test.js.
 //
-// WHY NOT jsdom. There is no package.json in this repo and no node_modules; the
-// JS suite runs on `node:test` and `node:assert` and nothing else, which is the
-// same no-bundler, no-dependency position the browser code takes. Adding a
-// dependency to run four tests would be a bigger change to this project than
-// the thing being tested.
+// It exists so a fault in the wiring between two modules, which no pure-module
+// test can see, stops the suite. Not jsdom: the repo has no package.json and
+// the JS suite runs on `node:test` and `node:assert` alone.
 //
-// WHAT IT IS NOT. Not a rendering engine, not a layout engine, not a
-// standards-compliant DOM. It answers exactly the 25 calls the index scripts
-// make (surveyed, not guessed) and throws loudly on anything else it is asked
-// for, so a script reaching for a new API fails HERE with a clear message
-// rather than silently getting undefined — which is the failure mode the whole
-// issue is about.
+// Not a rendering engine, a layout engine or a standards-compliant DOM: it
+// answers only the calls the index scripts make.
 //
-// THE SELECTOR ENGINE IS THE ONE FIDDLY PART and is deliberately tiny: tag,
-// `.class`, `#id`, `[attr]`, `[attr='value']`, descendant space and `>` child.
-// That is every selector these files use, listed in the test that consumes it.
+// The selector engine is deliberately tiny: tag, `.class`, `#id`, `[attr]`,
+// `[attr='value']`, descendant space and `>` child.
 'use strict';
 
 let nextId = 1;
@@ -76,39 +62,25 @@ class Element {
     this._text = '';
     this.hidden = false;
     this.value = '';
-    // A plain bag. Nothing here computes style, and nothing needs it to: the
-    // index scripts only ever WRITE to it (`visibility`, `display`), and a test
-    // that wants to know what they wrote reads it back.
-    //
-    // IT GREW THREE METHODS ON 2026-09-20 (#1107) and stayed a plain bag. A
-    // CUSTOM PROPERTY CANNOT BE SET ANY OTHER WAY: card-line-budget.js writes
-    // `card.style.setProperty('--ship-w', …)`, and against a bare object that
-    // is a TypeError that takes the whole pass down -- which is precisely the
-    // "a pass throwing and taking the rest of the page with it" failure #828
-    // named and nothing exercised. They are non-enumerable so that a test
-    // reading `Object.keys(el.style)` still sees only what was written.
+    // A plain bag: nothing here computes style. The index scripts only write
+    // to it, and a test reads back what they wrote (see makeStyle).
     this.style = makeStyle();
     this.classList = new ClassList(this);
 
     // --- measurement ------------------------------------------------------
-    // #1107. A test sets `el.__box` to the rect this element should report and
-    // `el.__contentWidth` to the width a Range over its contents should give.
-    // NOTHING HERE COMPUTES LAYOUT and nothing should: the stub has no line
-    // breaking, no font metrics and no box model, so a pixel result would be a
-    // number this file invented. What the card passes actually DO with a
-    // measurement -- round height over line-height, compare a chip's right
-    // edge against the ship's left -- is arithmetic, and arithmetic over
-    // stubbed boxes is a real test of a real decision.
+    // A test sets `el.__box` to the rect this element should report and
+    // `el.__contentWidth` to the width a Range over its contents should give
+    // (#1107). Nothing here computes layout, and nothing should: the stub has
+    // no line breaking, font metrics or box model, so a computed pixel would
+    // be a number this file invented.
     this.__box = null;
     this.__contentWidth = 0;
   }
 
   /** True unless this element or an ancestor is `hidden`.
    *
-   * The index paginates by setting `card.hidden` rather than by removing the
-   * card, and a hidden element measures ZERO in both directions in a real
-   * browser -- which is the whole of #1115. Modelling that here is what lets a
-   * test assert that card-name-fit.js leaves a paginated-away name alone.
+   * The index paginates by setting `card.hidden`, and a hidden element
+   * measures zero in both directions in a real browser (#1115).
    */
   get __rendered() {
     for (let node = this; node; node = node.parentNode) {
@@ -190,10 +162,8 @@ class Element {
     this._text = String(v);
   }
 
-  // innerHTML is WRITE-ONLY here, and setting it CLEARS rather than parses.
-  // Every use in these scripts is `el.innerHTML = ''` to empty a pool, or a
-  // build-up of markup that the test then does not inspect. Parsing HTML is a
-  // different project; pretending to would be worse than not having it.
+  // Setting innerHTML clears rather than parses: the scripts use it to empty
+  // a pool, or to build markup no test inspects.
   get innerHTML() { return this._html || ''; }
   set innerHTML(v) {
     this._html = String(v);
@@ -222,10 +192,8 @@ class Element {
     (this.listeners[type] = this.listeners[type] || []).push(fn);
   }
 
-  // `el.click()` -- results-bar.js, 2026-09-26. The bar's own `× clear all`
-  // forwards to the index's top button by calling its click(), the DOM method
-  // rather than a custom event, so that the index script's listener runs
-  // exactly as a real click would run it. A click is a dispatched click.
+  // results-bar.js forwards its clear-all to the index's button by calling
+  // click(), so a click is a dispatched click.
   click() { this.dispatch('click'); }
 
   // Fire a listener as the browser would, for the tests that need to click.
@@ -254,14 +222,10 @@ class Element {
     return null;
   }
 
-  // scrollIntoView -- #1057/#1059, 2026-09-15. Recorded rather than a no-op:
-  // filters.js and cocktail-index.js both feature-test
-  // `typeof el.scrollIntoView === 'function'` before calling it, so leaving
-  // this off entirely would make every arrival-scroll test pass by never
-  // running the code it means to exercise. `this._scrollCalls` is read back
-  // by the tests below rather than a return value, matching how the rest of
-  // this stub hands a test something to inspect (`style`, `dataset`) instead
-  // of instrumenting a spy framework this repo does not depend on.
+  // Recorded, never absent (#1057, #1059): filters.js and cocktail-index.js
+  // feature-test `typeof el.scrollIntoView === 'function'` before calling it,
+  // so without this every arrival-scroll test would pass by never running the
+  // code. Tests read `_scrollCalls` back.
   scrollIntoView(opts) {
     this._scrollCalls = this._scrollCalls || [];
     this._scrollCalls.push(opts);
@@ -331,14 +295,9 @@ function selectorMatches(el, c) {
   return true;
 }
 
-// Split a selector into compounds and `>` combinators, WITHOUT splitting on a
-// space inside brackets.
-//
-// A plain `.split(/\s+/)` looked fine and was wrong for exactly one real
-// selector: `[data-mood='no juicing']`. Half the moods on this site are two
-// words -- `sunny terrace`, `no juicing`, `i want to faff` -- so the naive
-// version silently found nothing for most of them, which is a stub lying about
-// the page rather than failing.
+// Split a selector into compounds and `>` combinators, without splitting on a
+// space inside brackets: `[data-mood='no juicing']` is one compound, and a
+// plain `.split(/\s+/)` silently finds nothing for every two-word mood.
 function splitCombinators(selector) {
   const parts = [];
   let buf = '';
@@ -417,12 +376,10 @@ function createDocument() {
   doc.readyState = 'complete';
   doc.documentElement = doc;
 
-  /* #1107. card-name-fit.js measures the LETTERING rather than the element --
-     a Range over the contents, because the drink page's title sits in an
-     element at `display: contents` which generates no box of its own. The stub
-     answers from the element's `__contentWidth`, which is the number the test
-     set, and reports zero for anything not laid out so that the hidden-card
-     path is reachable. */
+  /* card-name-fit.js measures the lettering with a Range over the contents
+     (#1107). The stub answers from the element's `__contentWidth`, and
+     reports zero for anything not laid out so the hidden-card path is
+     reachable. */
   doc.createRange = () => {
     let node = null;
     return {
@@ -437,8 +394,7 @@ function createDocument() {
   return doc;
 }
 
-// A localStorage that behaves, plus the two ways it misbehaves in real life:
-// see assets.js's own note about a browser set to block site data.
+// A localStorage that behaves.
 function createStorage(initial) {
   const map = new Map(Object.entries(initial || {}));
   return {

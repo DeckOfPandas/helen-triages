@@ -1,164 +1,57 @@
-# =============================================================================
-# INGREDIENT SEARCH VOCABULARY
-#
-# Everything filters.js needs to know about ingredient WORDS. Lifted out of the
-# JavaScript so that changing how search behaves is a YAML edit, not a code edit.
-#
-# index.html emits this as JSON in a <script type="application/json"> block and
-# filters.js reads it at startup. No build tooling, no bundler — plain Jekyll.
-# =============================================================================
+# Everything the ingredient pickers know about ingredient words. food/index.html
+# emits this file as JSON for the index scripts, so changing how search behaves
+# is an edit here and no code. The pipeline is in assets/js/ingredient-search.js
+# (`normaliseEntry`, then `applyAlias`): trailing phrase, leading quantity,
+# measure phrase, modifier, alias.
+# The exclude picker's vocabulary is derived from raw `item:` text. For it,
+# over-stripping silently merges two ingredients and hides recipes the cook
+# never meant to exclude, while under-stripping is only a visible duplicate:
+# when unsure, leave an entry alone. DECISIONS §8.
 
 search:
   # A query must be at least this long before "(all)" family buttons appear.
-  #
-  # THIS NUMBER LIVES HERE AND NOWHERE ELSE. It used to be a bare `>= 3` inside
-  # filters.js with no definition behind it, which meant every rewrite of that
-  # file re-derived it from scratch and landed on 2 — the intuitive default for
-  # a substring search. It was not a bug, it was an absence of a definition.
-  #
-  # Two shows too much: with a two-character query, nearly every ingredient
-  # matches something and the family buttons become noise rather than a
-  # shortcut. Three is where the suggestions start being useful.
+  # Defined here and nowhere else. At two characters nearly every ingredient
+  # matches and the family buttons are noise.
   family_button_min_chars: 3
 
-# -----------------------------------------------------------------------------
-# Modifiers — leading words the search UI strips before matching, so
-# "chopped pistachios" and "pistachios" are treated as the one ingredient.
-#
-# Recipe files are NOT touched — main_ingredients keeps the word, because
-# it's an accurate instruction there. This list only governs how the search
-# box matches and labels things.
-#
-# Deliberately short, and deliberately NOT a general "strip adjectives" list.
-# A word belongs here only if it describes a preparation state with no
-# product distinction riding on it. Checked against every multi-word
-# main_ingredients entry in the collection before being added — words that
-# looked like candidates but were rejected because they mark a genuinely
-# different product: "smoked" (smoked haddock vs haddock), "roasted"
-# (roasted red peppers), "whole" (whole milk vs milk — note "ground" and
-# "dried" have no such collision: nothing else in the collection is just
-# "almonds"/"ginger"/"pasta"/"porcini" with a different qualifier, so
-# stripping them loses no distinction the way stripping "whole" or "smoked"
-# would).
-#
-# Those rejections still stand AS BLANKET STRIPS, which is the only thing
-# this list can do: a word here fires on every entry that starts with it,
-# sight unseen, now and for every recipe added later. "smoked", "roasted" and
-# "toasted" are nonetheless collapsed for three SPECIFIC entries — see
-# `aliases` below, and Helen's reasoning there for why avoidance asks a
-# different question of them than searching does. A named phrase can be judged
-# one at a time; a word on this list cannot be judged at all.
+# Leading words stripped before matching and labelling, so "chopped
+# pistachios" and "pistachios" are one ingredient. Recipe files keep the word.
+# A word here fires on every entry that starts with it, in every later recipe
+# too, so it belongs only if no cook would treat the two forms as different
+# when deciding what to leave out. Deliberately absent, each marking a
+# different product: smoked, roasted, toasted, whole, baby, all-butter,
+# wholemeal, wholewheat. One phrase that needs collapsing is an alias instead.
 modifiers:
   - chopped
   - crispy
   - ground
   - dried
   - leftover
-  # GitHub issue #366. Three more preparation states, each checked against this
-  # list's own test: does stripping it merge two things a cook would treat as
-  # DIFFERENT when deciding what to leave out?
-  #
-  #   boneless / skinless — a butchery state, not a different ingredient. Someone
-  #     excluding chicken thighs means all chicken thighs. These were also the
-  #     worst offenders in the picker: "boneless" and "skinless" were being
-  #     offered as ingredients IN THEIR OWN RIGHT, alongside "boneless chicken
-  #     thighs", "boneless pork shoulder", "boneless skinless salmon fillets" and
-  #     "skinless chicken breasts" — five candidates where there are two
-  #     ingredients. There is already an alias for the single phrase "boneless
-  #     skinless chicken breast", which is the same fix applied one string at a
-  #     time; as modifiers they cover every combination without another entry.
-  #   ready-rolled — exactly like "chopped": a state the shop sold it in.
-  #
-  # NOT added, and deliberately: "free-range", "all-butter", "wholemeal",
-  # "wholewheat", "fresh". Each is a real product distinction someone might
-  # actually be choosing between, and the header above is explicit that
-  # over-stripping silently merges two ingredients and hides recipes the cook
-  # never meant to exclude. "gressingham" below stands as the one breed/brand
-  # exception, at Helen's explicit call, and it says in terms that it is not a
-  # precedent.
+  # A butchery state, or the state the shop sold it in (#366).
   - boneless
   - skinless
   - ready-rolled
-  # SIZE WORDS, added after Helen typed "carr" and got TEN candidates for one
-  # vegetable: carrot, carrots, baby carrots, large carrot, large carrots,
-  # medium carrot, medium-sized carrots, rainbow carrots, small carrots, and
-  # "parsley or carrot tops". Typing "lar" was worse -- thirty-odd entries, all
-  # of them "large something", and a `large (all)` family button offering to
-  # exclude everything big.
-  #
-  # These pass the test cleanly: nothing in the collection is distinguished from
-  # anything else by being large, and nobody excluding carrots means only the
-  # small ones. Size is the clearest case there is of a word that describes the
-  # instance rather than the ingredient.
-  #
-  # Safe on the MATCHING side as well as the display side, which is the thing to
-  # check before adding any modifier: filters.js puts each row's own entries
-  # through buildMasterList too (not just the master list), so "large carrots"
-  # collapses to "carrots" on both sides and excluding "carrots" still hides the
-  # row. A modifier that stripped in the picker but not in the matcher would
-  # silently stop hiding recipes, which is the worst failure this filter has.
-  #
-  # NOT added: "baby". "baby corn" and "corn" are genuinely different products
-  # on a shelf and in a stir-fry, which is the same reason "whole" and "smoked"
-  # were rejected above.
+  # Size describes the instance, not the ingredient.
   - large
   - medium
   - medium-sized
   - small
-  # `fresh`, `free-range` and `organic`, added on a consistency argument that
-  # overturns the "NOT added" note above -- and the note was wrong, not the
-  # rule. `dried` has been a modifier since this list was written, so "dried
-  # basil" already collapses into "basil" while "fresh basil" sat beside it as a
-  # separate thing to exclude. Stripping one half of a pair and not the other is
-  # not a conservative choice, it is an arbitrary one.
-  #
-  # Put through the same test: would a cook treat these as different when
-  # deciding what to LEAVE OUT? Nobody excluding basil means only the dried,
-  # nobody excluding eggs means only the caged ones, nobody excluding beef stock
-  # means only the non-organic. These qualify the shopping, not the ingredient.
-  #
-  # 21 candidates had a bare twin under `fresh` alone; free-range and organic
-  # had 2 each.
+  # These qualify the shopping, not the ingredient. `dried` is stripped, so
+  # its twin `fresh` is too.
   - fresh
   - free-range
   - organic
 
-  # "gressingham" is a different KIND of exception to the rest of this list —
-  # it's a breed/brand qualifier, not a preparation state, so it doesn't pass
-  # the "no product distinction" test the others do. It's here anyway, at
-  # Helen's explicit call: "duck leg" and "Gressingham duck legs" aren't
-  # meaningfully distinct results for a decision-support search, even though
-  # they're genuinely different products on a shelf. Not a precedent for
-  # stripping other brand names without asking first.
+  # A breed name, not a preparation state: the one exception, and not a
+  # precedent for stripping other brand names without asking Helen.
   - gressingham
 
-# -----------------------------------------------------------------------------
-# Quantity units — the unit words that may follow a leading NUMBER in an
-# `item:` string, and are dropped with it. GitHub issue #273.
-#
-# The exclude filter's vocabulary is DERIVED from `item:` free text rather
-# than from the curated main_ingredients, so it inherits every way a recipe
-# happened to be written. Five recipes put the amount in `item:` instead of
-# `amount:` — "1 tsp salt", "150 g gruyère", "4–5.5 kg fresh goose" — and the
-# picker duly offered the quantity as if it were the ingredient's name. The
-# recipes are the real bug and are being reported separately; this makes the
-# picker survive them, because it will happen again.
-#
-# THE RULE IS DELIBERATELY NARROW, and narrower than it could be. Only a
-# leading token made ENTIRELY of digits, vulgar fractions and the characters
-# that join them (". / - – —") is treated as a quantity, and only the unit
-# words listed here are dropped after it. That means "3-bone rib of beef" and
-# "70% dark chocolate" keep their first word: both tokens carry a letter or a
-# percent sign, so neither is a bare number, and neither gets touched. Both
-# are under-strips, and that is the intended trade — for an EXCLUDE filter,
-# under-stripping is visible and annoying while over-stripping silently
-# merges two ingredients and hides recipes the cook never meant to exclude.
-#
-# Multi-word units are listed as their own single words ("fl", "oz"): the
-# strip drops every consecutive unit word after a number, so "3 fl oz" goes
-# in one pass without needing a phrase form. No unit here is also an
-# ingredient name anywhere in the collection — checked before adding, the
-# same way `modifiers` and `never_family` were.
+# Unit words dropped along with a leading number, for an `item:` that carries
+# its own amount ("150 g gruyère", #273). Only a leading token made entirely
+# of digits, fractions and their joining characters counts as a number, so
+# "3-bone rib of beef" and "70% dark chocolate" keep their first word.
+# Multi-word units are listed as single words ("fl", "oz"): every consecutive
+# unit word goes. No unit here may also be an ingredient's name.
 quantity_units:
   - g
   - kg
@@ -172,24 +65,12 @@ quantity_units:
   - oz
   - lb
 
-# -----------------------------------------------------------------------------
-# Measure phrases — whole leading phrases meaning "some of", stripped so the
-# entry is the ingredient. GitHub issue #273.
-#
-# "a few sprigs of fresh thyme" is fresh thyme; "a good pinch of salt" is
-# salt. Seven derived entries were being offered as a portion size rather
-# than as a food.
-#
-# WHOLE PHRASES, NOT WORDS, and that is the whole point. A general rule —
-# strip anything before an "of" — would take "bicarbonate of soda" down to
-# "soda" and "cream of tartar" to "tartar", inventing merges the cook never
-# asked for. Each phrase here is matched literally at the front of the entry,
-# including its leading "a" and trailing "of", so it can only ever fire on
-# text that was actually written that way. Add to it by finding the real
-# entry that needs it, not by imagining phrases that might appear.
-#
-# Longest match wins, so a phrase that contains a shorter one still strips in
-# full. Never strips the entire entry: something always survives.
+# Leading phrases meaning "some of", stripped so the entry is the ingredient:
+# "a few sprigs of fresh thyme" is fresh thyme (#273, #281). Whole phrases
+# matched literally at the front, never a general "strip before of" rule:
+# "bicarbonate of" and "cream of" are deliberately absent, because stripping
+# them leaves "soda" and "tartar". Longest match wins, and an entry is never
+# stripped to nothing. Add a phrase only for a real entry that needs it.
 measure_phrases:
   - a few handfuls of
   - a few sprigs of
@@ -197,18 +78,6 @@ measure_phrases:
   - a good pinch of
   - a large handful of
   - a pat of
-
-# GitHub issue #281, 2026-08-16. The six above came from main_ingredients,
-# where a stray portion word is rare. These came from reading all 1421 DERIVED
-# entries -- the exclude picker's vocabulary, built from raw `item:` lines
-# written for a cook rather than for a filter -- and every one below has at
-# least one real entry behind it. Counts where they matter: "handful of" 20,
-# "pinch of" 14, "small bunch of" 10, "small handful of" 9.
-#
-# THE TRAPS ARE THE POINT. "bicarbonate of" (2 entries) and "cream of" (1) are
-# deliberately ABSENT: they end in "of" and lead an entry, and stripping them
-# would hand back "soda" and "tartar" -- the exact merge the section header
-# above warns about. Read the real list before adding to this one.
   - a bunch of
   - a handful of
   - a knob of
@@ -255,14 +124,10 @@ measure_phrases:
   - tins of
   - white ends of
 
-# The same habit without the "of": a container standing in for a quantity.
-# "can chickpeas" is chickpeas; "rashers smoked streaky bacon" is bacon. 44
-# derived entries read this way.
-#
-# SAFE BECAUSE stripMeasurePhrase MATCHES `phrase + ' '`: "can " cannot fire on
-# "cannellini beans", and bare "cloves" (the spice) is untouched because there
-# is no trailing space to match -- only "cloves garlic" strips. That trailing
-# space is load-bearing; a word-list version of this would destroy both.
+  # A container standing in for a quantity, with no "of": "can chickpeas".
+  # Safe only because the strip matches the phrase plus a trailing space:
+  # "can" cannot fire on "cannellini beans", and bare "cloves" (the spice) is
+  # untouched.
   - balls
   - big sprigs
   - bunch
@@ -279,19 +144,9 @@ measure_phrases:
   - rashers
   - slice
 
-# A second pass over what survived the first (issue #281, same day). Mostly
-# the singular or "of"-less twin of a phrase already above -- "sprigs thyme"
-# beside "sprigs of thyme", "small bunch basil" beside "small bunch of basil".
-#
-# "a little" AND "a little extra" CARRY THEIR LEADING "a" FOR A REASON, and it
-# is the same trap as bicarbonate of soda: the collection contains "little gem
-# lettuce", "little gem lettuces" and "large little gem lettuce". A bare
-# "little" would strip all three down to "gem lettuce", inventing a vegetable.
-# The "a" is what makes the phrase mean "a small amount of" rather than an
-# adjective attached to the name.
-#
-# "a few tbsp" sits beside "a few" so the longest-match rule can take the whole
-# thing: "a few" alone would leave "tbsp chopped roasted pistachios".
+  # "a little" carries its leading "a" so that "little gem lettuce" is not
+  # stripped to "gem lettuce". "a few tbsp" sits beside "a few" so the longest
+  # match takes the whole thing.
   - a few
   - a few tbsp
   - a little
@@ -304,91 +159,31 @@ measure_phrases:
   - sprigs
   - tin
 
-# -----------------------------------------------------------------------------
-# Trailing phrases — instructions to the cook that got written into `item:`
-# after the ingredient, stripped from the END. GitHub issue #273.
-#
-# "herbs to taste" is herbs; "sriracha to serve" is sriracha. These are not
-# part of any ingredient's name — they say when or how much, which is a
-# method note that happens to have landed in the item string.
-#
-# Mirrors `measure_phrases` at the other end of the entry, and is a separate
-# list for the same reason `modifiers` and `stopwords` are separate: the
-# position is the rule. A word list stripped from anywhere would catch the
-# "to" in a name; these four phrases can only fire where they actually mean
-# what they say.
-#
-# "to glaze" has no live example in _food_recipes/ today — it is here at
-# Helen's call alongside the three that do, because the four are one habit
-# and a picker that handles three of them is a trap for the fourth.
+# Instructions written into `item:` after the ingredient, stripped from the
+# end: "sriracha to serve" is sriracha (#273). Whole phrases at the end only;
+# a word list would catch the "to" inside a name. Also handed to the recipe
+# page's scaler (`data-trailing` in _layouts/recipe.html).
 trailing_phrases:
   - to taste
   - to serve
   - to glaze
   - to garnish
 
-# -----------------------------------------------------------------------------
-# Stopwords — connector words that never count as a match target, wherever
-# they fall in an entry. "chicken thighs and drumsticks" contains "and", so
-# typing "a" matched it; "pork or turkey mince" contains "or", so typing "o"
-# matched that and "leg of lamb" too. Neither is a real ingredient word.
-#
-# The first example is collapsed to "chicken" by `aliases` below and no longer
-# exists as an entry — the rule it illustrates does, for every compound
-# `aliases` doesn't name ("pork or turkey mince" and "leg of lamb" are both
-# still live) and for every one written into a recipe tomorrow. Aliases name
-# phrases one at a time; this list is what handles the ones nobody has looked
-# at yet.
-#
-# Different from `modifiers`: modifiers are stripped from the FRONT and
-# change the canonical entry ("chopped pistachios" becomes "pistachios"
-# everywhere, including the button label). Stopwords are invisible to
-# MATCHING ONLY, wherever they sit in the phrase — the display text keeps
-# "and"/"or"/"of" exactly as written, because dropping them would leave a
-# broken sentence ("chicken thighs drumsticks"), not a cleaner ingredient
-# name.
-#
-# Checked against every multi-word main_ingredients entry: these four are
-# the only connector words that actually appear as their own word anywhere
-# in the collection.
+# Connector words that never count as a match target, wherever they fall, so
+# typing "o" does not match "pork or turkey mince" or "leg of lamb". Invisible
+# to matching only: the label keeps them as written.
 stopwords:
   - and
   - or
   - of
   - with
 
-# -----------------------------------------------------------------------------
-# Never-family words — first words that head 2+ entries but should never earn
-# an "(all)" button, because the entries sharing them aren't a real family.
-#
-# Different from `modifiers` above: these words are NOT stripped. "red onion"
-# stays "red onion" — "red" is a genuine, meaningful variety, the same way
-# "smoked" and "whole" are (see the modifiers comment). The problem isn't the
-# word, it's treating everything that happens to start with it as one group:
-# "red (all)" would lump together red wine, red onion and red Thai curry
-# paste, which have nothing in common but the word "red". Nobody searching
-# thinks "what can I cook with some kind of red".
-#
-# Every word here was checked against the real data first. Most head at
-# least two main_ingredients entries that are otherwise unrelated foods,
-# purely coincidentally sharing a colour or variety word, and are never
-# themselves a standalone ingredient — "cherry" and "oyster" don't qualify
-# on that test (bare "cherries" and oyster as a shellfish are real
-# ingredients), so they get their own handling in `family_exceptions` below
-# instead.
-#
-# "tomato" and "fennel" are exceptions to the "never standalone" test — both
-# ARE real ingredients — but earn a place here anyway: once "tomato ketchup"
-# is correctly excluded (see family_exceptions), the only other tomato
-# member is "tomato purée", and once "fennel seed"/"fennel seeds" correctly
-# collapse into one entry (see `singulars`), the only other fennel member is
-# "fennel seed" itself. A purée and a spice are both background
-# flavour-builders used by the tablespoon or teaspoon, not something you'd
-# reach for the way you'd reach for a tomato or a fennel bulb. A two-member
-# family whose members don't actually substitute for each other isn't a
-# useful "(all)" any more than a coincidental one is — the real test
-# throughout this list is "would a user think of these as some kind of the
-# same thing", and word-sharing is only the most common way to fail it.
+# First words that head two or more entries but never earn an "(all)" button,
+# because the entries sharing them are not a family: "red (all)" would lump
+# red wine with red onion. The word is not stripped. The test is whether a
+# user would think of the members as kinds of the same thing: `tomato` and
+# `fennel` are real ingredients, and are here because their only other
+# members are a purée and a spice.
 never_family:
   - mixed
   - red
@@ -411,183 +206,34 @@ never_family:
   - tomato
   - fennel
 
-# -----------------------------------------------------------------------------
-# Family exceptions — specific entries excluded from counting towards their
-# own head word's family, because they aren't really a kind of that word at
-# all, just a coincidental compound name. "cherry tomatoes" isn't a cherry;
-# "oyster mushrooms" aren't related to oysters, they're named for their shape.
-#
-# Different from `never_family`: the WORD still heads a family if a genuine
-# member justifies one. Here, neither word does — "cherry" and "oyster" both
-# lose their (all) button entirely, because once the impostor is excluded,
-# nothing legitimate is left to group (bare "cherries" and "oyster sauce"
-# are the only real members, one each). ("tomato ketchup" isn't listed here
-# any more — "tomato" moved to never_family outright, once its only other
-# member, "tomato purée", turned out not to be a good enough reason to keep
-# the family either.)
-#
-# These entries still show up as normal individual search results — this
-# only stops them being swept into an (all) button under a word they don't
-# actually belong to.
+# Entries that do not count towards their head word's family because they are
+# not a kind of it: cherry tomatoes are not cherries. They still appear as
+# ordinary search results.
 family_exceptions:
   - cherry tomatoes
   - oyster mushrooms
 
-# -----------------------------------------------------------------------------
-# Aliases — whole-phrase entry on the left, what it becomes on the right.
-# THREE FORMS, ONE MECHANISM:
-#
-#   a NAME        five-spice powder: five-spice
-#                 A RENAME. The entry collapses into that one, and only the
-#                 right-hand form ever appears as a search result.
-#
-#   a LIST        beef or venison stock: [beef stock, venison stock]
-#                 A SPLIT. One written item naming two foods becomes both,
-#                 so each can be picked on its own.
-#
-#   an EMPTY LIST flavouring or fruit: []
-#                 A DROP, for an entry that names no food at all and so can
-#                 never be a useful thing to search for or avoid.
-#
-# A single name and a one-item list mean the same thing; the bare name is
-# kept because it reads better and because it is what was already here.
-#
-# Different from `singulars`: singulars normalises one WORD for MATCHING only
-# ("chicken legs" still displays as "chicken legs", it just also matches
-# "chicken leg"). This collapses, splits or drops whole master-list entries —
-# the same "duck leg"/"Gressingham duck legs" call already made for
-# `modifiers`' "gressingham" entry, just phrased for a whole phrase instead
-# of a leading word.
-#
-# "five-spice" (five-spice-crispy-duck-legs.md) and "five-spice powder"
-# (gordons-christmas-five-spice-roast-goose.md) are the one product, written
-# two ways across two recipes — five-spice-powder.md, the ingredient's own
-# page, is titled "Five-Spice Powder". Typing "five" used to surface three things:
-# "five-spice", "five-spice powder", and a "five (all)" umbrella over just
-# those two — Helen: collapse the two into one, and don't add a family
-# button for a "family" that's actually one ingredient spelled two ways.
-# Collapsing them to a single master-list entry does both at once: with
-# only one entry left, "five (all)" no longer has 2+ members to group.
-#
-# Not a general "strip trailing powder" rule — "cocoa powder" stays as
-# written: most "powder" entries mark a real product difference (chilli
-# powder vs. chilli), so this only ever collapses phrases explicitly listed
-# here.
-#
-# THAT IS THE PROPERTY THE WHOLE LIST RESTS ON, and it is why the thirty-four
-# entries added below for GitHub issue #273 are named one at a time instead of
-# derived by a rule. The exclude picker's vocabulary is built from `item:`
-# free text rather than from curated main_ingredients, so it inherits every
-# way a recipe happened to be written: items naming two foods at once ("beef
-# or venison stock"), items naming none ("seasoning and flavourings — see
-# note"), and preparation states the leading-word `modifiers` strip can't
-# reach ("boneless skinless chicken breast"). A general "split on and/or" rule
-# would coin an entry called "whatever you prefer" and would halve any name
-# with a connector inside it; a general prep-stripper would have to be trusted
-# never to reach "apple cider vinegar". A named phrase cannot reach anything
-# it does not name — which matters most for an EXCLUDE filter, where
-# under-stripping is visible and annoying while over-stripping silently merges
-# two ingredients and hides recipes the cook never meant to exclude.
-#
-# SMOKED, ROASTED AND TOASTED ARE IN THE LIST, and Helen's reasoning settles
-# the category rather than the three entries it names: "No one is going to
-# dislike sesame oil but not toasted sesame oil, and this isn't an allergen
-# avoider tool." The distinction those words mark is real when you are
-# SEARCHING — smoked haddock is a different thing to buy, which is exactly why
-# `modifiers` still refuses to strip them for everyone — but this vocabulary
-# serves AVOIDANCE, where the only question is "does this dish contain the
-# thing I don't like", and both forms answer yes. Named phrase by phrase here
-# rather than added to `modifiers`, because a modifier fires on every entry
-# beginning with the word, everywhere, while a named phrase reaches only
-# itself: "smoked haddock" and "dry roasted peanuts" are not keys and come
-# through exactly as written.
-#
-# FOUR OF THE #273 KEYS ALSO OCCUR IN main_ingredients, so the include picker
-# — which goes through the same buildMasterList — sees them too: "roasted
-# peanuts" becomes peanuts, "smoked mackerel fillets" becomes mackerel,
-# "chicken thighs and drumsticks" becomes chicken, "cooked chestnuts" becomes
-# chestnuts, in the include list as well as the exclude one. Recorded rather
-# than quietly accepted: the ruling above was made about avoidance, and
-# whether the same merge is right for the include picker is a separate
-# question nobody has been asked. If the answer turns out to be no, the fix is
-# to run this list over the derived vocabulary only.
-#
-# KEYS ARE THE POST-STRIP FORM — what an entry looks like once the quantity,
-# measure-phrase, trailing-phrase and modifier strips have run, because that
-# is the form applyAlias() is handed. "chopped almonds or whatever you prefer"
-# is keyed as "almonds or whatever you prefer"; "sorrel or more to taste" as
-# "sorrel or more". Every key below was checked against the real derived
-# vocabulary of a build — a key matching nothing would sit here inert while
-# looking like it was doing something.
-#
-# APPLIES TO BOTH SIDES. The picker's vocabulary and each recipe row's own
-# entries go through the one buildMasterList, so a row that lists "beef or
-# venison stock" carries beef stock and venison stock too — and exclusion,
-# being set membership, only works because both sides were rewritten.
-# -----------------------------------------------------------------------------
+# Whole-entry rewrites, keyed on the post-strip form `applyAlias` is handed:
+#   five-spice powder: five-spice                        a rename
+#   beef or venison stock: [beef stock, venison stock]   a split
+#   flavouring or fruit: []                              a drop: no food named
+# An alias resolves one hop: never point at a key that is itself aliased
+# (test_no_food_alias_points_at_another_alias, #1175). Each phrase is named,
+# never derived by a rule such as "split on or". A descriptor that does not
+# change what the thing is collapses; a different product keeps its entry.
 aliases:
   five-spice powder: five-spice
-  # NOTHING FOR cornflour/beansprouts HERE, AND IT WAS TRIED -- #619, 2026-09-06.
-  # Both were cases where the old mid-word matching did something useful by
-  # accident: `corn flour` reached "cornflour" (6 recipes) and `bean sprouts`
-  # reached "beansprouts" (1), purely because containment does not care about a
-  # space. Prefix matching loses them, so an alias collapsing each pair looked
-  # like the obvious repair.
-  #
-  # IT MAKES IT WORSE, MEASURED RATHER THAN REASONED. An alias rewrites the
-  # PICKER's vocabulary (buildMasterList: 718 chips down to 682) but a row is
-  # matched against `data-ingredients`, which food/index.html writes as RAW
-  # `main_ingredients` and which no alias ever touches. So the two chips collapse
-  # into one that then matches only half the recipes it names -- and the
-  # "cornflour" chip that used to reach the other half is gone. Two honest chips
-  # beat one that quietly under-matches.
-  #
-  # The real fix is one spelling in the data. Raised as its own issue.
-  # GitHub issue #366 — "not collapsing over synonyms". Helen sent three
-  # screenshots of the exclude picker; every entry below was a duplicate visible
-  # in one of them. Typing "past" offered FOUR ways to say vanilla paste and
-  # THREE ways to say puff pastry; typing "ss" offered five for lemongrass.
-  #
-  # Aliases rather than new `modifiers`, because each of these is a phrase, and a
-  # modifier is a WORD applied everywhere. "bean" is the clearest case: stripping
-  # it globally would collapse "vanilla bean paste" correctly and butter beans,
-  # broad beans and black beans catastrophically. The phrase is safe where the
-  # word is not.
-  #
-  # A LIST VALUE SPLITS A COMPOUND into its real ingredients, which is the
-  # existing convention here ("beef or venison stock"). Recipes written as "X or
-  # Y" are the underlying problem and are worth fixing in the data eventually,
-  # but the picker has to survive them because they will keep being written.
+  # No alias joins cornflour to "corn flour" or beansprouts to "bean sprouts"
+  # (#619). An alias rewrites the picker's entries, but the include side
+  # matches a row on its raw `main_ingredients`, so the merged chip would
+  # match only half the recipes it names. On the exclude side each row's own
+  # entries go through this list too, so a merge there is safe.
   vanilla bean paste: vanilla paste
   vanilla bean paste or extract: [vanilla paste, vanilla extract]
   vanilla extract or paste: [vanilla extract, vanilla paste]
-  # AN EMPTY LIST DROPS AN ENTRY, and these two need dropping rather than
-  # renaming. "boneless" and "skinless" appear in the derived vocabulary as
-  # ingredients in their own right, because the upstream split breaks
-  # "boneless, skinless chicken thighs" at the comma and leaves the adjectives
-  # standing alone. Adding them to `modifiers` fixes the compound forms
-  # ("boneless chicken thighs" -> "chicken thighs") but cannot help here: a
-  # modifier is stripped FROM something, and there is nothing left to strip it
-  # from. Nobody excludes "boneless".
-  # PLURALS THAT WERE BEING OFFERED ALONGSIDE THEIR OWN SINGULAR. Helen typed
-  # "carr" and got "carrot" AND "carrots" as separate things to exclude, which
-  # is the same ingredient twice. 36 pairs were doing this: onion/onions,
-  # egg/eggs, potato/potatoes, lemon/lemons and so on.
-  #
-  # ALIASES RATHER THAN THE `singulars` MAP BELOW, which looks like the obvious
-  # home and is not. `singulars` is consulted per WORD during matching, so it
-  # already makes "carrots" and "carrot" match the same rows -- which is why
-  # this was never a correctness bug, only a duplicated candidate. It is not
-  # applied when the master list is BUILT, so it cannot merge two entries. An
-  # alias is a whole-entry rewrite, which is exactly the operation needed.
-  #
-  # Singular wins, so the label reads as the ingredient rather than as a
-  # shopping quantity. Both forms still match either way.
-  #
-  # Generated by listing every candidate whose singular was ALSO a candidate,
-  # rather than by imagining plurals -- the same discipline the measure_phrases
-  # header asks for. A pair only appears here because both halves were really
-  # on screen.
+  # Plurals offered beside their own singular. `singulars` cannot do this: it
+  # normalises a word for matching and does not merge two entries. Singular
+  # wins, so the label reads as the ingredient.
   apples: apple
   aubergines: aubergine
   banana shallots: banana shallot
@@ -624,63 +270,32 @@ aliases:
   sweet potatoes: sweet potato
   thyme sprigs: thyme sprig
   tomatoes: tomato
-  # TWO MORE, FOUND BY #1289 AND RULED BY HELEN, 2026-10-04: "Plum. Almonds."
-  # Both pairs were on screen in the picker and in the header search box.
-  # `plums` follows the list above. ALMOND GOES THE OTHER WAY, on purpose: the
-  # plural is what 23 recipes write and what "ground almonds" and "flaked
-  # almonds" already read as, so the one recipe saying "almond" joins them.
+  # `almond` goes the other way on purpose: the plural is what most recipes
+  # write, and what "ground almonds" and "flaked almonds" already read as.
   plums: plum
   almond: almonds
-  # "baby" IS NOT A MODIFIER and these are not an argument that it should be.
-  # Baby corn and corn are different things on a shelf and in a stir-fry, so the
-  # word cannot be stripped sight unseen -- but baby carrots ARE carrots to
-  # anyone deciding what to leave out. This is the case the modifiers header
-  # describes: "a named phrase can be judged one at a time; a word on this list
-  # cannot be judged at all". Judged, one at a time, and baby corn keeps its own
-  # entry.
+  # "baby" is not a modifier (baby corn is not corn), so these are judged one
+  # phrase at a time.
   baby carrots: carrot
   baby spinach: spinach
   baby pak choi: pak choi
   rainbow carrots: carrot
+  # Adjectives left standing alone by the upstream comma split. A modifier is
+  # stripped from something; here nothing is left, so the entry is dropped.
   boneless: []
   skinless: []
-  # Same orphan case, from a recipe whose `item:` reduced to a bare size word.
-  # Nobody excludes "large".
   large: []
-  # THE LAST FOUR COMPOUNDS THAT REACH THE LIVE SITE. Helen asked where "butter
-  # and apricot jam" had come from; the answer turned out to be worth measuring
-  # rather than guessing at, because the shape of the problem changes completely
-  # depending on which build you look at:
-  #
-  #   local (drafts visible)   1501 candidates, 177 "X and/or Y" compounds
-  #   PRODUCTION                383 candidates,  28 compounds, 6 unaliased
-  #
-  # The picker is fed the DERIVED `item:` free text, and drafts are 253 files of
-  # less-polished prose that no reader ever sees. So the alarming pile is almost
-  # entirely local noise, and the real, live list is small enough to name one at
-  # a time -- which is why there is no general "split on and/or" rule here. Such
-  # a rule would have to handle "caster or granulated sugar" (splitting to
-  # "caster" invents an ingredient) and would be reasoning about 177 strings to
-  # fix 4. Same argument the `measure_phrases` header makes against a general
-  # "strip anything before an of" rule.
-  #
-  # Two of the six needed nothing: "chopped almonds or whatever you prefer"
-  # already resolves through `chopped` + an existing alias, and "sorrel or more
-  # to taste" through a trailing phrase. Checked by running them through the
-  # matcher, not by reading the file.
+  # Compounds, named one at a time.
   herb sprigs like thyme or rosemary: [thyme, rosemary]
   plenty of salt and pepper: [salt, pepper]
   seasonings and flavourings like chicken stock cubes: chicken stock
   tamari or dark soy sauce: [tamari, dark soy sauce]
-  # Draft-only, so it never reaches the live picker -- aliased anyway because it
-  # is one line and the draft will be published one day.
   butter and apricot jam: [butter, apricot jam]
   ready-rolled puff pastry: puff pastry
   all-butter puff pastry sheets: puff pastry
   filo pastry sheets: filo pastry
   lasagne sheets: lasagne
-  # Keyed on the post-modifier form: `small` is a modifier now, so the raw
-  # "small pasta shells" is already "pasta shells" by the time aliases run.
+  # Keyed on the post-modifier form: `small` is stripped before aliases run.
   pasta shells: pasta
   casarecce or similar pasta: pasta
   tamarind concentrate or paste: [tamarind concentrate, tamarind paste]
@@ -700,11 +315,9 @@ aliases:
   naturally brewed soy sauce: soy sauce
   kale or cabbage or a mixture: [kale, cabbage]
   natural/organic vegetable or chicken stock cube: [vegetable stock, chicken stock]
-  # The yoghurts collapse to one because the fat level and the culture are not
-  # what anyone is excluding — "no yoghurt" is the decision being made. Left
-  # deliberately as `natural yoghurt` rather than bare `yoghurt`, because the
-  # collection also has sweetened and flavoured yoghurts that ARE a different
-  # answer to "what do I not want".
+  # Fat level and culture are not what anyone excludes. The target is `natural
+  # yoghurt`, not bare `yoghurt`: sweetened and flavoured yoghurts are a
+  # different answer.
   full-fat natural bio yoghurt: natural yoghurt
   full-fat natural yoghurt: natural yoghurt
   low-fat natural yoghurt: natural yoghurt
@@ -712,7 +325,7 @@ aliases:
   thick natural yoghurt: natural yoghurt
   unsweetened natural yoghurt: natural yoghurt
   gel- or paste-based colouring if wanted: food colouring
-  # GitHub issue #273 — the derived vocabulary's compounds and prep states.
+  # Compounds and prep states from the derived vocabulary (#273).
   almonds or whatever you prefer: almonds
   barley or brown rice miso: miso
   beef or venison stock: [beef stock, venison stock]
@@ -748,13 +361,9 @@ aliases:
   vegetable stock powder or 1 organic vegetable stock cube: vegetable stock
   woody herb sprigs such as thyme or rosemary: [thyme, rosemary]
 
-  # GitHub issue #281, 2026-08-16 -- the derived vocabulary, read end to end.
-  #
-  # COMPOUNDS, split only where BOTH halves are already a known ingredient
-  # somewhere in the collection. Helen's call, and the conservative half of a
-  # real choice: a blind split on " or " turns "a little red or purple food
-  # colouring" into "red", inventing an ingredient nobody wrote. 94 compounds
-  # are deliberately left whole for that reason and listed in the issue.
+  # Compounds split only where both halves are already a known ingredient
+  # somewhere in the collection (#281): a blind split on " or " makes "red"
+  # out of "red or purple food colouring".
   butter or olive oil: [butter, olive oil]
   chicken or vegetable stock: [chicken, vegetable stock]
   clotted cream or crème fraîche: [clotted cream, crème fraîche]
@@ -782,10 +391,7 @@ aliases:
   sugar or honey: [sugar, honey]
   sunflower oil or butter: [sunflower oil, butter]
   toasted sesame oil or vegetable oil: [sesame oil, vegetable oil]
-  # Targets `vanilla paste`, not `vanilla bean paste`: the latter is itself an
-  # alias source now (#366), and pointing one alias at another alias's KEY left
-  # a stray "vanilla bean paste" candidate beside the collapsed one. Aliases
-  # are applied once, not chased.
+  # Targets `vanilla paste`, not `vanilla bean paste`, which is itself a key.
   vanilla bean paste or vanilla extract: [vanilla paste, vanilla extract]
   vanilla or almond extract: [vanilla, almond extract]
   whipped cream or crème fraîche: [whipped cream, crème fraîche]
@@ -793,12 +399,9 @@ aliases:
   white wine or stock: [white wine, stock]
   white wine vinegar or cider vinegar: [white wine vinegar, cider vinegar]
 
-  # CITRUS BY WAY OF ITS JUICE OR ZEST. Helen's call: excluding "lemon" should
-  # hide a recipe that uses only its juice, because someone avoiding lemon
-  # means the flavour, not the fruit's physical body. Written out one entry at
-  # a time rather than as a "juice of" measure phrase, because measure phrases
-  # strip AFTER the quantity strip has already run -- "juice of 2 lemons" would
-  # be left as "2 lemons", which is worse than leaving it alone.
+  # Citrus by its juice or zest: excluding "lemon" hides a recipe that uses
+  # only the juice. Named entry by entry because the measure-phrase strip runs
+  # after the quantity strip, so a "juice of" phrase would leave "2 lemons".
   finely grated zest 1 orange: orange
   finely grated zest and juice of ½ lime: lime
   finely grated zest of 1 lemon: lemon
@@ -812,18 +415,13 @@ aliases:
   zest of 2 lemons: lemon
   zest of ½ orange: orange
 
-  # Quantities the strip cannot reach, for the same ordering reason: a leading
-  # "about" blocks stripLeadingQuantity, and by the time a measure phrase could
-  # remove it the quantity strip has been and gone. Three entries, so they are
-  # named rather than given a mechanism.
+  # A leading "about" blocks the quantity strip, so these are named.
   about 2 tbsp vegetable oil: vegetable oil
   about 200 g raw king prawns: king prawns
   about 75 g seaweed: seaweed
 
-  # A clove of garlic is garlic. Ten spellings of the same thing, none of which
-  # a cook excluding garlic would want to hunt for separately. The spice
-  # "cloves" is NOT in this list and stays its own entry -- see the note on the
-  # trailing space in measure_phrases.
+  # A clove of garlic is garlic. The spice "cloves" is not here and keeps its
+  # own entry.
   cloves garlic: garlic
   crushed garlic clove: garlic
   fresh garlic cloves: garlic
@@ -835,18 +433,7 @@ aliases:
   small garlic clove: garlic
   small garlic cloves: garlic
 
-  # ---------------------------------------------------------------------------
-  # THE PUBLISHED COLLECTION, read end to end (issue #281, 2026-08-16).
-  #
-  # Scope is Helen's call: the entries below are the ones that actually SHIP.
-  # Measuring the local build conflates 254 drafts and the unrewritten recipes
-  # into the same list -- 218 bad entries there against 28 here -- and a draft's
-  # `item:` lines get rewritten before publishing, so cleaning them now is work
-  # done twice. Revisit as drafts are proofread.
-  # ---------------------------------------------------------------------------
-
-  # AN INSTRUCTION THAT LANDED IN `item:`. Not part of any ingredient's name --
-  # it says when, how much, or what to do with it.
+  # An instruction that landed in `item:`: when, how much, or what to do.
   double cream with salt: [double cream, salt]
   "dusting as preferred: icing sugar": icing sugar
   extra demerara sugar to coat: demerara sugar
@@ -857,37 +444,16 @@ aliases:
   flavourings to taste like onion powder: onion powder
   seasoning including mushroom ketchup: mushroom ketchup
 
-  # TWO INGREDIENTS IN ONE LINE, joined by the method rather than by "or".
-  # Helen's call: both halves count, because a recipe whose only milk is on the
-  # far side of a "dissolved in" still contains milk, and someone excluding
-  # dairy needs it to register.
+  # Two ingredients joined by the method, not by "or". Both halves count: a
+  # recipe whose only milk is behind a "dissolved in" still contains milk.
   bicarbonate of soda dissolved in 3 fl oz milk: [bicarbonate of soda, milk]
   cornstarch dissolved in 3 tbsp water: [cornstarch, water]
   water mixed with 3 tsp cornstarch: [water, cornstarch]
   whole milk mixed with 90ml water: [whole milk, water]
   fresh chives and/or parsley: [fresh chives, parsley]
 
-  # PREP AND CUT, removed on the rule Helen set in issue #273 for toasted
-  # sesame oil: a descriptor that does not change WHAT THE THING IS should not
-  # split it into two pickable entries. Nobody dislikes thick-cut short ribs
-  # while happily eating thin-cut ones, and this is not an allergen tool.
-  #
-  # The sugars are deliberately NOT here. "dark brown muscovado" and "light
-  # brown soft" read like prep to a word counter but are distinct products a
-  # baker chooses between, so they keep their own entries.
-  #
-  # AN ALIAS RESOLVES ONE HOP, SO POINT IT AT THE FINAL ANSWER -- 2026-09-21.
-  # `applyAlias` in assets/js/ingredient-search.js returns `aliasMap[key]`
-  # without re-resolving, and three entries here pointed at another alias KEY:
-  # `spring onions in thin strips` -> `spring onions` -> `spring onion`, the
-  # same for `thick-cut beef short ribs` and for `onions` inside `shallots or
-  # onions`. The first hop landed on the plural and stopped, so the index grew
-  # a SECOND button for an ingredient the singulars block below exists to
-  # collapse -- `citrus-soy-salmon-sticky-rice` did it to itself, its `item:`
-  # giving `spring onions` and its `main_ingredients` giving `spring onion`.
-  # Measured against the real matcher, not inferred. Never alias to a key that
-  # is itself aliased; write the target the chain ends at.
-  # tests/test_site_config.py refuses the next one (#1175).
+  # Prep and cut that do not change what the thing is. The brown sugars are
+  # deliberately not here: they are distinct products a baker chooses between.
   extra virgin olive oil: olive oil
   freshly ground black peppercorns: black peppercorns
   freshly ground szechuan peppercorns: szechuan peppercorns
@@ -897,29 +463,16 @@ aliases:
   unsalted butter straight from the fridge: unsalted butter
   bart bouquet garni bags: bouquet garni
 
-# -----------------------------------------------------------------------------
-# Display names — the entry on the left (a master-list/alias TARGET, after
-# collapsing) shows as the text on the right, for the button label only.
-#
-# Kept separate from `aliases` on purpose: matching still runs against the
-# left-hand key ("five-spice"), because that's the literal text that has to
-# overlap with what's actually in main_ingredients for at least one recipe
-# ("five-spice" in five-spice-crispy-duck-legs.md). "Chinese five-spice
-# powder" appears in neither recipe's main_ingredients verbatim — using it
-# as the match key itself would match zero recipes. This only swaps the
-# label shown on the button and pre-filled into the search box once
-# selected; what gets matched against recipes never changes.
-# -----------------------------------------------------------------------------
+# Button label only: the entry on the left (an alias target) shows as the text
+# on the right. Matching still runs against the left-hand key, which is the
+# text a recipe's `main_ingredients` actually holds.
 display_names:
   five-spice: Chinese five-spice powder
 
-# -----------------------------------------------------------------------------
-# Singulars — plural form on the left, the form to match on, on the right.
-#
-# Used to normalise ingredient words before comparison, so that "chicken legs"
-# and "chicken leg" collapse to the same entry rather than both appearing.
-# Only irregular or non-obvious plurals need listing.
-# -----------------------------------------------------------------------------
+# Plural word on the left, the form to match on, on the right. Normalises one
+# word for matching, so "chicken legs" and "chicken leg" are one entry. Also
+# handed to the recipe page's scaler (`data-singulars` in
+# _layouts/recipe.html).
 singulars:
   anchovies: anchovy
   apples: apple
@@ -951,22 +504,11 @@ singulars:
   thighs: thigh
   tomatoes: tomato
 
-# -----------------------------------------------------------------------------
-# Synonyms — the collapse behaviour.
-#
-# When a query exactly matches a key, any ingredient containing any of the
-# listed words counts as a match, and the key earns a forced "(all)" button.
-# This is what makes searching "cheese" return Cheshire, cheddar and mozzarella.
-#
-# The key should always appear in its own list, so that a literal match still
-# works.
-#
-# DO NOT add unaccented variants here. `comte` and `gruyere` used to be listed
-# as accent workarounds, which had the unwanted effect of making those queries
-# return the ENTIRE cheese family rather than the one cheese. filters.js now
-# strips diacritics when matching, so the accented spelling is the only entry
-# needed and typing without accents still works.
-# -----------------------------------------------------------------------------
+# When a query exactly matches a key, any ingredient containing any listed
+# word matches and the key earns a forced "(all)" button: "cheese" returns
+# Cheshire, cheddar and mozzarella. The key always appears in its own list.
+# Never add an unaccented variant: matching strips diacritics, and a variant
+# here makes that query return the whole family and not the one cheese.
 synonyms:
   pasta:
     - pasta
@@ -1011,8 +553,8 @@ synonyms:
     - mascarpone
     - cream cheese
     - cottage cheese
-    # Named cheeses that no longer carry the word "cheese" in main_ingredients,
-    # so they need listing explicitly to stay findable under a "cheese" search.
+    # Named cheeses whose entries do not carry the word "cheese", listed so a
+    # "cheese" search still finds them.
     - cheshire
     - lancashire
     - comté
@@ -1022,28 +564,9 @@ synonyms:
     - stock
     - broth
 
-  # ADDED 2026-09-06 WITH #619, and it is the price of that fix rather than a
-  # new idea. When HAS TO HAVE stopped matching mid-word, `nuts` stopped
-  # reaching walnuts, hazelnuts and peanuts -- 17 of the 136 pairs the switch
-  # dropped, and the only ones among them anybody would miss.
-  #
-  # IT ALSO FIXES WHAT CONTAINMENT WAS GETTING WRONG, which is why this is a
-  # gain and not a patch. Measured over the real vocabulary: `nuts` reached 12
-  # entries and MISSED almonds, ground almonds, flaked almonds, pistachios,
-  # chopped pistachios, pecans and cashews -- because none of those spellings
-  # contains the letters "nuts". A family reaches all of them.
-  #
-  # WHAT IS DELIBERATELY ABSENT, and each was in the data waiting to be caught
-  # by a lazier list. The bare word `nut` would take butternut squash, nutmeg,
-  # whole nutmeg and groundnut oil, so no entry here is `nut` alone.
-  # `chestnuts` is PLURAL for the same reason: `chestnut` would take chestnut
-  # mushrooms, which are a mushroom.
-  #
-  # COCONUT IS NOT HERE ON PURPOSE. Coconut cream, coconut milk, desiccated
-  # coconut and coconut palm sugar are four entries that would arrive with it,
-  # and nobody looking for nuts wants a Pina Colada. It is also the one that
-  # matters if this list is ever read as an allergy filter, which it is not --
-  # `never_family` and the exclude side are where that question lives.
+  # No entry is bare `nut`, which would take butternut squash, nutmeg and
+  # groundnut oil, and `chestnuts` is plural so it does not take chestnut
+  # mushrooms. Coconut is deliberately absent. Not an allergy filter (#619).
   nuts:
     - nuts
     - almond
@@ -1057,12 +580,9 @@ synonyms:
     - chestnuts
     - pine nut
 
-  # GitHub issue #59: flour is always the TRAILING word in this corpus
-  # ("plain flour", "self-raising flour") — never the first — so it can
-  # never form a family the structural, first-word-only way. Cornflour is
-  # deliberately excluded: a different product (cornstarch), not a wheat
-  # flour, the same call already made for "cherry tomatoes" not counting
-  # towards "cherry".
+  # Flour is always the trailing word ("plain flour"), so it never forms a
+  # family by first word (#59). Cornflour is deliberately excluded: a
+  # different product.
   flour:
     - flour
     - plain flour

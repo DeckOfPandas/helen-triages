@@ -1,35 +1,16 @@
-// =============================================================================
-// Tests for what the index scripts ASK OF filter-state.js — issue #633.
+// What the index scripts ask of filter-state.js (#633).
 //
 // Run from tests/js with `node --test`.
 //
-// WHAT WENT WRONG, AND WHY EVERY EXISTING TEST STAYED GREEN. On 2026-08-31
-// cocktail-index.js read `FilterState.arrivedByGoingBack` — which is on the
-// filter-state MODULE and not on the binding `create(SPEC)` returns. That is
-// `undefined`, calling undefined throws, and so THE ENTIRE TAIL OF THE FILE
-// STOPPED RUNNING: the back/forward restore, `apply()` at startup (the index
-// stopped applying its own filters and its shuffle), and the `pagehide`
-// listener that saves the list.
-//
-// Every JS test stayed green, and that is the point of #633 rather than a
-// detail of that bug. All of them ask a pure module a question and get a
-// correct answer; the fault was in the WIRING BETWEEN two modules, which is the
-// one place a suite of pure-function tests cannot look.
-//
-// THE TRAP IS THAT ONE NAME MEANS TWO OBJECTS:
+// One name means two objects:
 //
 //   filters.js          var FilterState = HTF.filterState;              the MODULE
 //   cocktail-index.js   var FilterState = HTF.filterState.create(...);  a BINDING
 //
-// Same variable, same-looking property access, two different surfaces. Nothing
-// but this notices.
-//
-// THIS IS NOT ALL OF #633 AND DOES NOT CLAIM TO BE. The issue asks for the
-// index scripts to be RUN, which needs a DOM these scripts can start against;
-// that is a real piece of work and is still open. This covers the specific
-// class of fault that issue was raised from, statically, for the price of a
-// file — and it would have failed on the 2026-08-31 revision.
-// =============================================================================
+// The two have different surfaces. A property read off the wrong one is
+// `undefined`, calling it throws, and the rest of the file stops running
+// while every pure-module test stays green. This checks it statically; the
+// two index-startup tests run the scripts.
 'use strict';
 
 const test = require('node:test');
@@ -44,10 +25,8 @@ function source(name) {
   return fs.readFileSync(path.join(JS_DIR, name), 'utf8');
 }
 
-// Strip comments before scanning for property access. Both files discuss
-// `FilterState.arrivedByGoingBack` in prose — cocktail-index.js's own comment is
-// the record of the bug — and a scanner that read those would report the fault
-// as still present for ever.
+// Comments are stripped before scanning for property access: a name that
+// appears only in prose would otherwise be reported as a fault for ever.
 function code(text) {
   return text
     .replace(/\/\*[\s\S]*?\*\//g, ' ')
@@ -76,7 +55,7 @@ const SCRIPTS = [
 ];
 
 test('filter-state exposes a module and a binding, and they differ', () => {
-  // If these ever became the same object the trap would be gone -- and so would
+  // If these ever became the same object the trap would be gone, and so would
   // the reason for every test below. Asserting it makes that a decision.
   const binding = FS_MODULE.create(FS_MODULE.COCKTAIL_FIELDS);
   assert.ok(FS_MODULE.arrivedByGoingBack, 'the module lost arrivedByGoingBack');
@@ -132,10 +111,8 @@ for (const { file, spec } of SCRIPTS) {
 }
 
 test('the scanner ignores property names that only appear in comments', () => {
-  // cocktail-index.js's own comment names `FilterState.arrivedByGoingBack` as
-  // the thing that broke. If this scanner read comments it would report that
-  // bug as permanently present, the test would be permanently red, and the
-  // first thing anybody did would be to delete it.
+  // If the scanner read comments, a property named only in prose would keep
+  // the test red for ever.
   const withComment = `
     /* FilterState.arrivedByGoingBack is undefined -- see #633. */
     var FilterState = HTF.filterState.create(SPEC);
@@ -157,9 +134,8 @@ test('the scanner can tell a binding from the module', () => {
 });
 
 test('the guard fires on the 2026-08-31 source, not just passes on today\'s', () => {
-  // The bug as it was written: FilterState is a create() binding, and
-  // arrivedByGoingBack is read off it. Reconstructed rather than checked out,
-  // so this test needs no git history to stay meaningful.
+  // FilterState is a create() binding, and arrivedByGoingBack is read off it.
+  // Reconstructed here, so the test needs no git history.
   const broken = `
     var FilterState = HTF.filterState.create(HTF.filterState.COCKTAIL_FIELDS);
     var state = FilterState.emptyState();
