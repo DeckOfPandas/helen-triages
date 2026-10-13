@@ -84,7 +84,7 @@ paragraph is the only enforcement there is.
 - Closing an issue is a real action on a shared, outward-facing thing: **say which issues you are about to close and why before doing it**, unless Helen has just told you to close them. That applies to a trailer too -- name them before pushing, while the message can still be rewritten.
 
 ## Writing -- replace, never append
-Helen: *"Through this whole project I have begged to delete and replace rather than just append!"* Nothing below has a hook yet, so these paragraphs are the enforcement.
+Helen: *"Through this whole project I have begged to delete and replace rather than just append!"* `tests/test_comment_rule.py` holds a comment's length and its dates, as a ratchet over what predates the rule; for everything else below, these paragraphs are the enforcement.
 - **A code comment states a constraint the code cannot show**: what must stay true, and what breaks if it does not. Present tense. **No dates, no quotations, no "used to", no account of how it was found.** One pointer (`#N`, `MANUAL §n` or `DECISIONS §n`) is enough. At most eight lines a block, fifteen for a file header.
 - **When code changes, REWRITE its comment. Never add a dated paragraph under the old one.** Delete the comment when its code goes. Before a comment names a file, a test, a function or a count, check it exists; never write a count a command can print.
 - **The story goes in the commit message**: what was tried, what broke, the measurements. Git keeps it; the file does not need to.
