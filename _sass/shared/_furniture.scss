@@ -40,12 +40,11 @@
 // --- The search box -----------------------------------------------------------
 // The index's own box (type mixin, hairline and placeholder from
 // shared/_rule.scss); its place in the header's grid is shared/_layout.scss's.
-// `letter-spacing: normal` resets the 0.5em `.site-header` carries for the
-// wordmark. `position: relative` anchors the dropdown.
-//
-// The glass is on the right simply by DOM order, and the input is
-// right-aligned so a word grows leftwards from the glass and a long one
-// scrolls its beginning off the left (#1099).
+// `letter-spacing: normal` resets the tracking `.site-header` carries for the
+// wordmark. `position: relative` anchors the dropdown. The glass is on the
+// right by DOM order, and the input is right-aligned so a word grows
+// leftwards from the glass and a long one scrolls its beginning off the left
+// (#1099).
 .page-search {
   position: relative;
   margin: 0;
@@ -137,10 +136,9 @@ $page-search-quiet: 45%;
 // Hangs from the box's right edge, under the glass (#1050). The box is on the
 // header's right edge at every width, so the panel's left edge is the one
 // that has to stay on screen: `max-width` against the viewport does that, and
-// the options ellipsise so the panel keeps one row per result.
-//
-// The group headings take each site's section hues, which only a site's
-// stylesheet may name: food/_search.scss and cocktails/_filters.scss colour
+// the options ellipsise so the panel keeps one row per result. The group
+// headings take each site's section hues, which only a site's stylesheet may
+// name: food/_search.scss and cocktails/_filters.scss colour
 // `.page-search-group--<kind>`.
 .page-search-results {
   position: absolute;
@@ -228,7 +226,6 @@ $page-search-quiet: 45%;
 // --- The shortlist pair: [ + SHORTLIST ]  SEE SHORTLIST (N) ------------------
 // The button marks this page; the link goes to the list it is marked on.
 // Every action on the page wears the same Courier caps (Helen's ruling).
-//
 // The button is the one bordered thing on its line, in the pill the index
 // draws for `.btn-shortlist-only`. Its type, colours, mark and states stay
 // the per-site rule's; this adds the box, whose border follows

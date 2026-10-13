@@ -4,7 +4,6 @@
 //
 // Loaded as a plain <script> after ingredient-search.js (attaching to
 // window.HTF), and via require() in tests/js/cocktail-search.test.js.
-//
 // Shares only `fold`, `getWords` and `orderByBand` with food. Food's matcher
 // strips cook's prose, which this curated vocabulary has none of; food derives
 // families from a shared head word, which cannot work here ("aged Demerara rum"
@@ -288,11 +287,9 @@
 
     // Returns chips, { value, terms }: `value` is what the button says and
     // what is stored as a filter; `terms` is everything that finds it.
-    //
     // Takes one group per ingredient (its `data-ing`), not one per card: a
     // suggestion is a bottle for the generic written beside it, and only the
     // per-ingredient attribute keeps that pairing.
-    //
     // A bottle is not offered as a chip when its category is. It stays a
     // hidden term of the category, so typing "velvet" still reaches `falernum`.
     function buildPool(ingredientGroups) {

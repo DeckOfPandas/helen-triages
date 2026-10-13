@@ -51,10 +51,9 @@ window.HTF = window.HTF || {};
    * URL for a file in the shared chrome's artwork set (header and footer):
    * chromeAsset('/tape/tape-3.svg') -> '<base>/assets/img/chrome/tape/tape-3.svg'
    * Never null: chrome renders on every page, including one with no site.
-   * A helper of its own, not a call to the generic asset() above, so that
-   * test_artwork_fetches_go_through_site_asset can ban every image path built
-   * through that one with no exception. That test greps source text, comments
-   * included, so do not spell the banned call out literally here.
+   * Not a call to the generic asset() above:
+   * test_artwork_fetches_go_through_site_asset bans every image path built
+   * through that one and greps comments too, so do not spell the call out here.
    */
   HTF.chromeAsset = function (path) {
     return HTF.base + '/assets/img/chrome' + path;
@@ -195,16 +194,13 @@ window.HTF = window.HTF || {};
   };
 
   // --- The shortlist ---------------------------------------------------------
-  // Recipes and drinks marked to come back to, held in this browser and
-  // nowhere else (#546).
+  // Recipes and drinks marked to come back to, held in this browser only (#546).
   // - localStorage, not sessionStorage: the list must outlive the tab.
-  // - One store per site, keyed by HTF.site; both sites share one origin. A
-  //   page with no site key gets no store.
+  // - One store per site, keyed by HTF.site: both sites share one origin.
   // - An entry is a collection URL (`page.url` in Liquid, NOT `relative_url`):
   //   a baseurl prefix would empty every stored list the day baseurl changed.
   // - The in-memory copy is the source of truth, not a cache: when setItem
-  //   throws, the control still responds and the list works until the page
-  //   closes.
+  //   throws, the list still works until the page closes.
   var shortlist = (function () {
     var KEY_PREFIX = 'htf-shortlist-';
     var GLASSES_PREFIX = 'htf-shortlist-glasses-';
@@ -509,7 +505,6 @@ window.HTF = window.HTF || {};
       /**
        * Which live keys a list of slugs names. Reads nothing and writes
        * nothing: opening a shared link shows the list and saves none of it.
-       *
        * @param {string[]} slugs - as parsed from the URL, in link order
        * @param {string[]} liveKeys - every `data-shortlist-key` on the page
        * @returns {{keys:string[], unmatched:string[]}} `keys` in link order,

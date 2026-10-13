@@ -50,33 +50,23 @@
   }
 
   // --- The chips are packed, not just wrapped (#1308) ------------------------
-  // Of every order the chips could take, keep the ones that (1) show the most
-  // chips inside the row cap, (2) in the fewest rows, (3) with the row on the
-  // ship's line stopping short of the ship, and of those (4) fill the first
-  // row as full as it will go, then the second, and so on. Ties are settled
-  // alphabetically: the search walks the chips in alphabetical order and keeps
-  // the FIRST best answer.
-  //
-  // Rows are laid out greedily, as `flex-wrap` will draw them, with one
-  // exception (#1331): a row may be ended before a chip that would have
-  // fitted, where the ship's row needs it. `breaks` names the chip that ends
-  // such a row and the margin that closes the row off after it.
-  //
-  // A chip matching a filter stays at the front (#757): `pinned` leading chips
-  // keep their place and only the rest are arranged.
-  //
-  //   adv[i]      the width chip i takes with another chip after it (its dot)
-  //   lastAdv[i]  its width as the very last chip, which draws no dot
-  //   pinned      how many leading chips keep their place
-  //   o.W         the width of a row
-  //   o.lastW     how far the row on the ship's line may run
-  //   o.cap       how many rows the stylesheet shows
-  //
-  // Returns { order, visible, breaks } -- indices into `adv`, and for each row
-  // ended early a [chip, margin] pair -- or null when no order keeps the
-  // ship's row short enough.
+  // Of every order the chips could take, packChips keeps the one that (1) shows
+  // the most chips inside the row cap, (2) in the fewest rows, (3) with the
+  // ship's row stopping short of the ship, then (4) fills each row in turn as
+  // full as it will go. It walks the chips alphabetically and keeps the FIRST
+  // best answer, so ties fall alphabetically.
+  // Rows are greedy, as `flex-wrap` draws them, except that a row may be ended
+  // before a chip that would have fitted, where the ship's row needs it (#1331).
   var FITS = 0.02;   // layout is in 1/64px; this is rounding, not slack
 
+  // adv[i] is chip i's width with a chip after it (its dot); lastAdv[i] its
+  // width as the very last chip, which draws no dot. The first `pinned` chips
+  // keep their place: a chip matching a filter stays at the front (#757).
+  // o.W is a row's width, o.lastW how far the ship's row may run, o.cap how
+  // many rows the stylesheet shows.
+  // Returns { order, visible, breaks }: indices into `adv`, and per row ended
+  // early a [chip, margin] pair closing it off after that chip; null when no
+  // order keeps the ship's row short enough.
   function packChips(adv, lastAdv, pinned, o) {
     var n = adv.length;
     var ALL = Math.pow(2, n) - 1;

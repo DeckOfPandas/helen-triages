@@ -2,8 +2,6 @@
 // that returns you to the list you were reading when you go back from a recipe
 // or a drink (#387, #686).
 //
-// Run from the repo root, with the local Node runtime:
-//
 //   .node-runtime/node/bin/node --test tests/js/*.test.js
 //
 // tests/js/stub-dom.js says why assets.js is loaded through a fake page.

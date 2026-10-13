@@ -40,19 +40,13 @@
   .cocktail-scale-batch { display: none; }
 
   // --- colour: dark on light (#1086) ------------------------------------------
-  // shared/_print.scss makes html and body transparent so paper stays white,
-  // and names no colour. This site's palette is inverted for the screen (#469),
-  // so every explicit colour on a drink page was solved against black and
-  // prints as pale grey or a washed-out tint on white.
+  // This site's palette is solved against black (#469) and shared/_print.scss
+  // names no colour, so print has a second palette, scoped to `.cocktail`. The
+  // two inks are food's, already solved for paper. Each accent is its screen
+  // hue darkened by the smallest step that clears 4.5:1 on white: re-solve it
+  // if a hue moves (`scripts/palette_measure.py --contrast <fg> <bg>`).
   //
-  // So print has a second palette, scoped to `.cocktail`. The two inks are
-  // food's own, which are already solved for paper. Each accent is its screen
-  // hue darkened by the smallest step that clears 4.5:1 on white: the step is a
-  // property of the hue, so re-solve it if a hue moves
-  // (`scripts/palette_measure.py --contrast <fg> <bg>`).
-  //
-  // The name tape is deliberately untouched: it paints its own black band with
-  // light lettering and is artwork (MANUAL §9.13).
+  // The name tape is untouched: it paints its own black band (MANUAL §9.13).
   $print-ink:        #211f20;  // = food's $color-text
   $print-ink-quiet:  #4f4e4a;  // = food's $color-clear-text
   $print-mood:        darken($color-banging-bellini, 22%);

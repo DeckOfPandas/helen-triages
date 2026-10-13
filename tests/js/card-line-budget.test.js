@@ -11,9 +11,8 @@
 // lines can measure as 2.98, which floors to two and drops the rule on a card
 // that visibly has three.
 //
-// The DOM is stubbed, as tests/js/cocktail-scale.test.js stubs one: the shipped
-// source runs byte for byte inside a fake `window`, and the stub carries only
-// what the script touches.
+// The DOM is stubbed: the shipped source runs byte for byte inside a fake
+// `window`, and the stub carries only what the script touches.
 'use strict';
 
 const test = require('node:test');

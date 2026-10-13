@@ -403,11 +403,9 @@ test('#757: the chips are moved in the DOM, not merely reordered visually', () =
 // --- arriving at the shortlist by URL, #994 ----------------------------------
 // The index turns the view on through the same `enterShortlistView()` the
 // `shortlisted (N)` button calls, so the two doors lead to one state (#918,
-// MANUAL 8.9).
-//
-// The shortlist is empty in this harness: HTF.shortlist keys its storage on
-// `HTF.site`, from a meta tag the stub page does not carry, so the store is a
-// no-op. The view being on and narrowed to nothing is what these assert; the
+// MANUAL 8.9). The shortlist is empty in this harness: HTF.shortlist keys its
+// storage on `HTF.site`, from a meta tag the stub page does not carry, so the
+// store is a no-op. These assert the view is on and narrowed to nothing; the
 // store belongs to shortlist.test.js and shortlist-view.test.js.
 
 function shortlistViewIsOn(r) {

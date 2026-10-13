@@ -254,32 +254,14 @@
     return words.join(' ');
   }
 
-  /**
-   * Total up a shortlist of recipes, grouped by aisle.
-   *
-   * @param {Array} entries - one per ingredient of every shortlisted recipe:
-   *        { amount: string, name: string, aisle: string, scale: number,
-   *          recipe?: string, parts?: string[], fruit?: string,
-   *          count?: string, pointer?: boolean }
-   *        `scale` is portions wanted over portions the recipe makes; absent
-   *        or not a positive number means x1, which is also what a recipe with
-   *        no resolved portion count gets. `recipe` says which lines share a
-   *        recipe, and the last four are _plugins/food_shopping.rb's marks --
-   *        see `reunite` above.
+  /** Total up a shortlist of recipes, grouped by aisle.
+   * @param {Array} entries - { amount, name, aisle, scale, recipe? } per ingredient, plus the marks `reunite` reads
    * @param {Object} [options]
-   * @param {Array} [options.wholeMeasures] - half-step measures, bought in
-   *        whole ones: `half_step_measures` and `half_step_counts`.
-   * @param {Array} [options.quarterMeasures] - quarter-step measures, bought
-   *        in whole ones too: `quarter_step_measures`.
-   * @param {Array} [options.countNouns] - nouns bought by count, whose row
-   *        label may be made plural or singular: `count_nouns` in scaling.yml.
-   * @param {Array} [options.aisles] - [{key, label}] in the order they should
-   *        appear. An aisle with nothing in it is not returned; an entry whose
-   *        aisle is not in the list falls to the last one.
-   * @returns {Array} [{ key, label, items: [{ label, text, aside, totals,
-   *        unquantified }] }] -- `aside` is "1¼ in the recipes" where the
-   *        amount was rounded up to a whole one, and '' otherwise
-   */
+   * @param {Array} [options.wholeMeasures] - `half_step_measures` and `half_step_counts`, bought in whole ones
+   * @param {Array} [options.quarterMeasures] - `quarter_step_measures`, bought in whole ones too
+   * @param {Array} [options.countNouns] - `count_nouns` in scaling.yml: a row label may change number
+   * @param {Array} [options.aisles] - [{key, label}] in display order; an unknown aisle falls to the last
+   * @returns {Array} [{ key, label, items: [{ label, text, aside, totals, unquantified }] }] */
   function build(entries, options) {
     var opts = options || {};
     var aisles = opts.aisles && opts.aisles.length

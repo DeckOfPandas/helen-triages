@@ -17,20 +17,19 @@
     margin: 15mm 14mm;
   }
 
-  // Browsers strip backgrounds when printing, and the mark under every
-  // heading is a `linear-gradient` background (shared/_rule.scss), so
-  // `print-color-adjust: exact` is what keeps the paper version looking like
-  // the site (Helen's ruling). It is inherited, so declaring it at the root
-  // reaches every mark, wash and chart bar. The -webkit- form is for Safari.
-  //
-  // No page background: $color-bg is a tint, and flooding every sheet with
-  // it is a lot of ink for a decorative ground (Helen's ruling). It has to
-  // be `transparent`, stated: shared/_base.scss's `body { background }` is
-  // still in the cascade under @media print. Both html and body, because a
-  // body background propagates to the canvas.
   html,
   body {
+    // No page background: $color-bg is a tint, and flooding every sheet with
+    // it is a lot of ink for a decorative ground (Helen's ruling). It has to
+    // be `transparent`, stated: shared/_base.scss's `body { background }` is
+    // still in the cascade under @media print. Both html and body, because a
+    // body background propagates to the canvas.
     background: transparent;
+    // Browsers strip backgrounds when printing, and the mark under every
+    // heading is a `linear-gradient` background (shared/_rule.scss), so this
+    // is what keeps the paper version looking like the site (Helen's ruling).
+    // It is inherited, so declaring it at the root reaches every mark, wash
+    // and chart bar. The -webkit- form is for Safari.
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }

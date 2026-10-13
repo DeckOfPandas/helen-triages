@@ -70,15 +70,13 @@
 }
 
 // --- The search-for-anything dropdown's headings, in this site's hues ---------
-// #1050, #1136. The dropdown itself is shared/_furniture.scss; food's part is
-// which colour each kind of result wears: its section's own hue, as a FILL
-// with this site's near-black lettering, like an active chip. The names group
-// takes I KNOW WHAT I WANT's hue.
-//
-// The root hues, not the `-bright` ones: a `-bright` is its root darkened to
-// read as text on the panel, a mid-tone on which neither `$color-text` nor the
-// paper colour reaches 4.5:1. On the roots `$color-text` clears it. The cost
-// is that the yellow and wasabi blocks have faint edges on this paper.
+// The dropdown itself is shared/_furniture.scss (#1050, #1136); food's part is
+// which colour each kind of result wears: its section's own hue as a fill
+// under $color-text, like an active chip. The names group takes I KNOW WHAT
+// I WANT's hue. The root hues, not the `-bright` ones: a `-bright` is a
+// mid-tone on which neither `$color-text` nor the paper colour reaches
+// 4.5:1, and on the roots `$color-text` clears it. The cost is that the
+// yellow and wasabi blocks have faint edges on this paper.
 .page-search-group-label { color: $color-text; }
 
 .page-search-group--name           .page-search-group-label { background: $color-name-search-root; }

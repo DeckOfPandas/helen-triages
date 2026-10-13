@@ -1,9 +1,8 @@
 // =============================================================================
 // COCKTAILS — THE LEOPARD. Black-on-black print on the page ground (#733).
 // =============================================================================
-// model_instructions/LEOPARD.md says what is live, how the tiles are generated,
-// how the print reaches the screen and what must not happen to it. Read it
-// before changing a value here.
+// Read model_instructions/LEOPARD.md before changing a value here: what is
+// live, how the tiles are generated and what must not happen to the print.
 //
 // This partial only declares the print. assets/js/ground-print.js reads the
 // declarations, draws both SVGs once into a picture on the device, and hands it

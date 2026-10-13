@@ -2,21 +2,17 @@
    sites (#1005, #1011, #1210) ──
    A recipe page puts this on the INGREDIENTS heading's line; a drink page on
    the read it / make it toggle's line, in `.cocktail-controls`. One include,
-   so the two cannot drift. Print and pdf are not here: they are on the
-   furniture line (page-print.html). DECISIONS §13 (#1210).
-
-   The shortlist button is a pill, drawn in shared/_furniture.scss as the
-   index's `.btn-shortlist-only` shape. The link beside it is deliberately not
-   made to look like it: one changes this page, the other goes to a different
-   one. Plain quiet caps, words first, count in brackets, no arrow.
-
+   so the two cannot drift. Print and pdf are on the furniture line
+   (page-print.html). DECISIONS §13 (#1210).
+   The button is a pill, drawn in shared/_furniture.scss. The link beside it
+   is deliberately not made to look like it: one changes this page, the other
+   goes to a different one.
    Both ship `hidden` and shortlist.js reveals them; the link stays hidden
    while the count is zero. The shortlist key is `page.url`, not
    `relative_url`: the same key the index row or card for this page emits. The
    link's count is the store's (`data-shortlist-total`), not
    `[data-shortlist-count]`, which counts marked controls on this page. The
-   link is `?shortlist=1` on this site's index, the shortlist view (MANUAL
-   8.9), and ends in `#results` (#1057) so the index scrolls to the list. {% endcomment %}
+   link ends in `#results` (#1057) so the index scrolls to the list. {% endcomment %}
 {% assign actions_site = site.data.sites[page.site_key] %}
 <div class="page-actions">
   <button type="button"

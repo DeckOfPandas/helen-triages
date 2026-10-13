@@ -1,24 +1,18 @@
 // ground-print.js
 // The page ground's print, drawn once on the device and kept (#733;
-// model_instructions/LEOPARD.md). The SVG print is too costly to repaint as a
-// CSS background while scrolling, and the site ships no images, so the SVG is
-// drawn once into a canvas and the stylesheet uses that picture. The picture
-// is kept in IndexedDB, so only the first visit after the artwork changes
-// pays for the drawing.
-//
+// model_instructions/LEOPARD.md). The SVG is too costly to repaint as a CSS
+// background while scrolling, so it is drawn once into a canvas and kept in
+// IndexedDB: only the first visit after the artwork changes pays for it.
 // Site-agnostic (MANUAL §3): a stylesheet opts in by declaring
 // `--ground-print` on :root. What it reads, from _sass/<site>/_leopard.scss:
-//
 //   --ground-print           the print's file under the site's own artwork
 //   --ground-nap             an optional texture laid under it
 //   --ground-print-ground    the colour to draw both on
 //   --ground-print-version   changes when either file does
 //   --ground-print-strength  how strongly to draw the print; 1 if unset
 //   --ground-nap-strength    the same for the nap
-//
 // What it sets: `--ground-picture`, a url() for the body's background-image.
-// Every path fails quiet into the plain ground, which is also what a browser
-// with scripts off shows.
+// Every path fails quiet into the plain ground.
 
 (function (root) {
   'use strict';

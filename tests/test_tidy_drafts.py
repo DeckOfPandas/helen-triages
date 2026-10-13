@@ -27,14 +27,13 @@ SCRIPT = ROOT / "scripts" / "tidy_drafts.py"
 
 
 # ---- One drink: every fault the pass fixes, and the same faults off limits ----
-# Six to fix, on four lines: the unquoted `tagline:`
-# (test_drink_scalar_fields_are_quoted), `--` in the tagline and an ingredient
-# note (test_drink_typography), and `2-3` in the tagline, that note and a
-# note's text (test_drink_number_ranges_use_en_dashes). The same `--` and `2-3`
-# sit in an `amount`, a `QQ` generic, a `suggestion` and a `QQ` note, where the
-# pass does not go. Keys are in page order (#1213), so the `order` rule has
-# nothing to do and every count below is the prose faults alone; that rule's
-# fixture is `ORDER_BEFORE`.
+# To fix: the unquoted `tagline:` (test_drink_scalar_fields_are_quoted), `--`
+# in the tagline and an ingredient note (test_drink_typography), and `2-3` in
+# the tagline, that note and a note's text
+# (test_drink_number_ranges_use_en_dashes). The same `--` and `2-3` sit in an
+# `amount`, a `QQ` generic, a `suggestion` and a `QQ` note, where the pass does
+# not go. Keys are in page order (#1213), so the `order` rule has nothing to
+# do and every count below is the prose faults alone; see `ORDER_BEFORE`.
 BEFORE = '''---
 title: "Test Drink"
 tagline: Sharp -- and bright, 2-3 dashes of it

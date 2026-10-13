@@ -162,11 +162,9 @@ _WELL_FORMED_TARGET = re.compile(r"^[a-z0-9-]+/?$")
 # `](../../reference/<slug>/)`. ANY_RELATIVE_LINK strips the leading `../`.
 # It has to be relative: front matter is never Liquid-templated (MANUAL §4),
 # and a root-relative `/food/reference/...` drops the baseurl and 404s in
-# production while working on localhost.
-#
-# Narrow on purpose: only `reference/`, a slug and a trailing slash, with an
-# optional `?protein=` and no other query (#243). An unknown protein is
-# ignored silently by the timings page, so a typo there shows no error.
+# production while working on localhost. Narrow on purpose: only `reference/`,
+# a slug, a trailing slash and an optional `?protein=` (#243). The timings
+# page ignores an unknown protein silently, so a typo there shows no error.
 _REFERENCE_TARGET = re.compile(r"^\.\./reference/[a-z0-9-]+/(\?protein=[a-z-]+)?$")
 
 

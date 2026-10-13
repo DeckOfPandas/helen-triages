@@ -1,45 +1,18 @@
-# =============================================================================
-# GLASS SURVEY -- what each glass type measures on the market (#1238)
-# =============================================================================
-# One row per DISTINCT product, researched 2026-09-28 by fetching makers' and
-# retailers' own pages. `glasses.yml` carries the statistics (n, min, median,
-# mean, max) GENERATED from this file by scripts/glass_survey_stats.py; fix a
-# figure here, never there.
+# Glass survey: what each glass type measures on the market (#1238).
+# One row per distinct product; the same product at two retailers counts once.
+# A row belongs to a type only where the maker or retailer names it as that
+# type. scripts/glass_survey_stats.py generates the statistics in glasses.yml
+# from this file: fix a figure here, never there.
 #
-# THE RULE FOR A ROW: the maker or retailer itself names the product as that
-# type. Nothing was classified by looks, and the same product sold by two
-# retailers counts once. `stated` is the page's own wording; `capacity_ml` is
-# that converted (US fl oz x 29.574, UK fl oz x 28.413, ml as given) and
-# `height_mm` is overall height (inches x 25.4), null where the page gives
-# none. Nothing is estimated.
+#   stated          the page's own wording; nothing is estimated
+#   capacity_ml     that, converted (US fl oz x 29.574, UK fl oz x 28.413)
+#   height_mm       overall height (inches x 25.4); null where none is given
+#   capacity_basis  `brimful` (a to-the-brim figure), `nominal` (a serving or
+#                   filling line: not counted), `documented` (a fruit vessel's
+#                   volume from a reference source), `unstated` otherwise
+#   exclude         "<why>": the row is recorded and not counted
 #
-# capacity_basis: `brimful` where the page gives a to-the-brim figure,
-# `nominal` where it gives a pour or a filling line (NOT counted as a
-# capacity -- a design pour is not what the glass holds), `documented` for a
-# fruit vessel's volume from a reference source, `unstated` otherwise. Most
-# rows are `unstated`: WebstaurantStore, the one retailer that reliably lists
-# heights, carries a site-wide line that its capacities are "an approximate
-# maximum capacity based off of an industry standard size", which is not a
-# measurement of the product.
-#
-# A ROW WITH NEITHER FIGURE IS A SEARCH THAT CAME BACK EMPTY, and it is kept on
-# purpose: "no bar source states what a hollowed pineapple holds" is a finding,
-# and its note says what was looked for.
-#
-# exclude: "<why>" -- recorded and NOT counted. The naming rule admits a few
-# products that plainly are not the shape the icon draws; they stay here with
-# the reason, so the judgement is visible and reversible.
-#
-# `mule-mug` IS NOT AN ICON. The `mule mug` spelling draws the plain mug, and
-# rightly (the drawing cannot say "copper"), but a copper mule mug holds about
-# a third more than a tea mug at the same height, so it is surveyed on its own.
-# `survey_only_types` in glasses.yml declares it.
-#
-# THE TWO FRUIT VESSELS ARE THIN. No bar or recipe source states what a real
-# hollowed pineapple holds; the pineapple rows with figures are manufactured
-# pineapple vessels, each marked so in its note. The coconut has one
-# documented fruit figure (a drinking coconut's water) and a few coconut cups.
-# =============================================================================
+# A row with neither figure is a search that came back empty, kept on purpose.
 
 survey:
 - glass: absinthe

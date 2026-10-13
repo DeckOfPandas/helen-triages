@@ -213,19 +213,14 @@ family_exceptions:
   - cherry tomatoes
   - oyster mushrooms
 
-# Whole-entry rewrites: the entry on the left becomes what is on the right.
-#   a name         five-spice powder: five-spice            a rename
-#   a list         beef or venison stock: [beef stock, venison stock]   a split
-#   an empty list  flavouring or fruit: []                  a drop: no food named
-#
-# A key is the post-strip form, which is what `applyAlias` is handed. An alias
-# resolves one hop: never point at a key that is itself aliased
+# Whole-entry rewrites, keyed on the post-strip form `applyAlias` is handed:
+#   five-spice powder: five-spice                        a rename
+#   beef or venison stock: [beef stock, venison stock]   a split
+#   flavouring or fruit: []                              a drop: no food named
+# An alias resolves one hop: never point at a key that is itself aliased
 # (test_no_food_alias_points_at_another_alias, #1175). Each phrase is named,
-# never derived by a rule: a general "split on or" coins an ingredient called
-# "whatever you prefer", while a named phrase reaches only itself. The list
-# serves avoidance, so a descriptor that does not change what the thing is
-# collapses ("toasted sesame oil"), and a different product keeps its entry
-# ("smoked haddock", "cocoa powder", the brown sugars).
+# never derived by a rule such as "split on or". A descriptor that does not
+# change what the thing is collapses; a different product keeps its entry.
 aliases:
   five-spice powder: five-spice
   # No alias joins cornflour to "corn flour" or beansprouts to "bean sprouts"

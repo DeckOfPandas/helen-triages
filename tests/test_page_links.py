@@ -220,11 +220,9 @@ ASSIGN_LITERAL = re.compile(
 # instead. A new untraceable href that is not listed fails
 # test_no_link_shape_is_silently_unresolved. Remove an entry when its shape
 # leaves the templates: a stale one trusts whatever emits that shape next.
-#
 # `<x>_site.home` and `link.url` are values out of _data/sites.yml, which
 # test_site_nav_links_resolve_to_real_pages checks against the published pages.
-# A document's `.url` is computed by Jekyll from its own permalink, so it is
-# correct by construction.
+# A document's `.url` is computed by Jekyll from its own permalink.
 TRUSTED_DYNAMIC = (
     re.compile(r"^\{\{\s*this_site\.home\s*\|\s*default:\s*'/'\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*nav_site\.home\s*\|\s*relative_url\s*\}\}$"),
@@ -450,15 +448,11 @@ def test_site_nav_links_resolve_to_real_pages():
             )
 
         # The footer reference block. A site with no links is fine; a listed
-        # link has to go somewhere real.
-        #
-        # `local_only: true` inverts the check, it does not skip it (#529).
-        # Such a link points at a `published: false` page, and the template
-        # drops it unless `show_local_reference_links` is set, which only
-        # _config_local.yml does. The two flags must agree: a local-only link
-        # points at a page in UNPUBLISHED_PAGES, an ordinary one at a page in
-        # PAGES. Otherwise production links a 404, or a page that now exists
-        # goes unlinked.
+        # link has to go somewhere real. `local_only: true` inverts the check,
+        # it does not skip it (#529): the template drops such a link unless
+        # `show_local_reference_links` is set, so it must point at a page in
+        # UNPUBLISHED_PAGES, and an ordinary one at a page in PAGES. Otherwise
+        # production links a 404, or a page that now exists goes unlinked.
         for entry in site.get("reference_links") or []:
             entry = entry or {}
             url = entry.get("url")

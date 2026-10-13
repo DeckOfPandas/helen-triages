@@ -12,9 +12,6 @@
 //   - Unknown parameters are ignored.
 //   - `+` decodes to a space: Jekyll's `url_encode` writes a space as `+` and
 //     decodeURIComponent does not undo that.
-//
-// The state: the field list exists once, in a spec table, and the empty state
-// and "is anything set" are both computed by iterating it.
 // =============================================================================
 (function (root) {
   'use strict';
@@ -174,8 +171,7 @@
   //   chaos      string|null; `open` is a lit state that applies no filter
   //              (#478) and is still clearable
   //   include    Set of pool entries, AND between them
-  //   exclude    Set of pool entries, matched exactly or through a declared
-  //              family -- see cocktail-search.js
+  //   exclude    Set of pool entries, exact or through a declared family
   //   nameQuery  I KNOW WHAT I WANT, folded and lowercased by the wiring
   var COCKTAIL_FIELD_SPEC = {
     moods: { empty: function () { return new Set(); }, narrows: true },

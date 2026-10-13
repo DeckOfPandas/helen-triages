@@ -61,13 +61,11 @@
   // --- The ingredient highlighter has to survive the printer -------------
   // The highlight is how an ingredient list is scanned for amounts, so it
   // must print. Every highlighters/*.svg draws its blob through
-  // `filter="url(#ink-tex)"`, an feTurbulence chain, and print rasterisers
-  // that fail on the filter drop the whole blob. A CSS `filter` beats the
-  // presentation attribute, so this prints the same shape flat, with no
-  // change to the assets.
-  //
-  // Greyscale is not handled here: if the yellow prints too faint on a mono
-  // printer, the fix is a print-only tint on .ingredient-amount-number.
+  // `filter="url(#ink-tex)"`, and print rasterisers that fail on the filter
+  // drop the whole blob. A CSS `filter` beats the presentation attribute, so
+  // this prints the same shape flat. Greyscale is not handled here: if the
+  // yellow prints too faint on a mono printer, the fix is a print-only tint
+  // on .ingredient-amount-number.
   .highlighter-slot svg,
   .highlighter-slot path {
     filter: none;

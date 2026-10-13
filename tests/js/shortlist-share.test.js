@@ -1,7 +1,5 @@
 // Tests for the store half of the share link (#1093).
 //
-// Run from the repo root:
-//
 //   node --test tests/js/*.test.js
 //
 // `?shortlist=negroni,aviation` opens an index showing those drinks without

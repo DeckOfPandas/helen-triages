@@ -177,16 +177,13 @@ def _bad_publisher(source, kind):
 
 
 # --- a book names its author, in one shape or the other ----------------------
-#
 #     Adapted from Feed Your Soul, Wagamama        title, then author
 #     Adapted from Delia Smith's Book of Cakes     author possessively, then title
-#
 # The heuristic fails towards accepting, on purpose: a title that merely
 # contains a possessive ("The Baker's Year") satisfies it without naming an
-# author. A false alarm would push someone to mangle correct prose.
-#
-# There is no exception list (DECISIONS §4, #406). If a book seems to have no
-# author, check first that it is a book, then ask Helen.
+# author. A false alarm would push someone to mangle correct prose. There is
+# no exception list (DECISIONS §4, #406): if a book seems to have no author,
+# check first that it is a book, then ask Helen.
 COMMA_AUTHOR = re.compile(r",\s*\S")
 POSSESSIVE_AUTHOR = re.compile(r"\b\w[\w&.\-]*(?:\s+[\w&.\-]+)*'s\s+\S")
 

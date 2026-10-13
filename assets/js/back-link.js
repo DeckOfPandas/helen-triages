@@ -15,11 +15,6 @@
   'use strict';
 
   /**
-   * Should the arrow go back through history rather than follow its href?
-   *
-   * Everything it needs is passed in, so a test can pose a situation a browser
-   * would otherwise have to be driven into.
-   *
    * @param {object} ctx
    * @param {string} ctx.referrer      document.referrer ('' when absent)
    * @param {string} ctx.linkHref      the arrow's resolved absolute URL

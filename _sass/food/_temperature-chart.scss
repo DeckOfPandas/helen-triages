@@ -43,14 +43,12 @@ $tc-threshold-height: 1.35rem;
 
 // --- The plot area -----------------------------------------------------------
 // A row is two grid rows: the label and the figure share the first, and the
-// track takes the whole of the second (#1327).
-//
-// The track must span every column. .tc-unsafe is drawn on .tc-plot and the
-// bars on .tc-track, and the two share an origin and a width only because
-// nothing sits to the left of the track. tests/test_reference_data.py pins it.
-//
-// The label column is `max-content` and the figure takes the rest: the other
-// way round, a long figure squeezes the label to nothing and prints over it.
+// track takes the whole of the second (#1327). The track must span every
+// column: .tc-unsafe is drawn on .tc-plot and the bars on .tc-track, and the
+// two share an origin and a width only because nothing sits to the left of
+// the track (tests/test_reference_data.py pins it). The label column is
+// `max-content` and the figure takes the rest: the other way round, a long
+// figure squeezes the label to nothing and prints over it.
 .tc-row {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
@@ -160,15 +158,13 @@ $tc-gridlines: ();
 }
 
 // --- The food-safety threshold ----------------------------------------------
-// A hatched zone plus a labelled line. Everything to the left of the line is
-// below the cited safety figure for that protein. Hatched rather than tinted
-// so it survives greyscale and forced-colors.
-//
-// The percentage is of .tc-plot, and it is correct only while .tc-track has
-// the same left edge and width (see .tc-row). If a column ever sits to the
-// left of the track, this must be measured from the track instead, or the
-// line draws to the left of the temperature it claims and understates the
-// hazard.
+// A hatched zone plus a labelled line: everything left of the line is below
+// the cited safety figure for that protein. Hatched rather than tinted so it
+// survives greyscale and forced-colors. The percentage is of .tc-plot, and
+// is correct only while .tc-track has the same left edge and width (see
+// .tc-row). If a column ever sits to the left of the track, measure from the
+// track instead, or the line draws to the left of the temperature it claims
+// and understates the hazard.
 .tc-unsafe {
   position: absolute;
   top: $tc-threshold-height;

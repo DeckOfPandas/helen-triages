@@ -97,11 +97,10 @@ $ref-col-card:    minmax(6rem, 9rem);
   // last line only (#920): these headings are sentences and wrap.
   //
   // `> span`, not `span`. last-line-rule.js rebuilds the heading as
-  // `.rule-split > .rule-lines + .rule-last`, and a descendant selector
-  // matches those inner spans too, handing the full mark back to the lines
-  // the mixin has just unmarked. The script's TARGETS lists
+  // `.rule-split > .rule-lines + .rule-last`, and a descendant selector would
+  // hand the full mark back to those inner spans. The script's TARGETS lists
   // `.ref-section-heading span`; it runs before any split exists, so it only
-  // ever matches the outer one.
+  // matches the outer one.
   > span {
     display: inline;
     @include overlapping-rule-double-last-line($color-electric-absinthe, $color-ultra-violette);
@@ -219,12 +218,10 @@ $ref-col-card:    minmax(6rem, 9rem);
 // =============================================================================
 // CHARACTERS AND RETIRED WORDS
 // =============================================================================
-// One per line with a mark in the gutter, the about page's list idiom (#920).
-// Re-drawn rather than shared: that page's classes are in _sass/food/, which
-// this site does not import.
-//
-// The mark is $color-clear-text, not a hue: this page's one colour means
-// "bottle" (see the header).
+// One per line with a mark in the gutter, the about page's list idiom (#920),
+// re-drawn because that page's classes are in _sass/food/, which this site
+// does not import. The mark is $color-clear-text, not a hue: this page's one
+// colour means "bottle" (see the header).
 $ref-list-gutter: 1.3rem;
 
 @mixin ref-marked-list($mark) {
@@ -307,15 +304,11 @@ $ref-list-gutter: 1.3rem;
 // =============================================================================
 // THE GLASSES PAGE — #295, cocktails/reference/glasses.html
 // =============================================================================
-// Every glass on one shelf, at relative scale: a heading, a row of drawings,
-// and three short lines under each.
-//
-// The stage is what makes it a shelf. Every item reserves the same height, the
-// tallest glass's, and stands its drawing on the bottom of it, so every glass
-// in a row shares one baseline and every name starts on one line. The drawing
-// is `--glass-ratio` of that height, set per item by the template. A drawing
-// is never width-capped: a capped glass is drawn shorter than it is, and
-// scale is what this page is for.
+// Every glass on one shelf, at relative scale. Every item reserves the tallest
+// glass's height and stands its drawing on the bottom of it, so a row shares
+// one baseline and every name starts on one line. The drawing is
+// `--glass-ratio` of that height, set per item by the template, and is never
+// width-capped: a capped glass is drawn shorter than it is.
 $glass-shelf-height: 11rem;
 
 // `.ref-section-heading` supplies the mark. Only the space above changes: it

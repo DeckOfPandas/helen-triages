@@ -2,11 +2,11 @@
 ratchet: a comment block is at most eight lines (fifteen at the head of a
 file), and a comment carries no date.
 
-Whole-line comments only; a Python docstring is not read. A shell script's
-header is its manual and has no limit. `KNOWN_LONG` and `KNOWN_DATED` hold the
-blocks and dated lines that predate the rule, as a count per file. A count may
-fall and never rise: shorten the comment, or put the story in the commit
-message. Lower a count when a file improves; delete its line at zero.
+Whole-line comments only. Not read: a Python docstring, a JSDoc `@param` or
+`@returns` line, and a shell script's header, which is its manual.
+`KNOWN_LONG` and `KNOWN_DATED` are the exceptions, as a count per file, each
+with its reason. A count never rises: shorten the comment, or put the story
+in the commit message.
 """
 import re
 import subprocess
@@ -27,89 +27,14 @@ DATE = re.compile(r"\b20\d\d-\d\d-\d\d\b")
 BLOCK_LINES, HEADER_LINES = 8, 15
 
 KNOWN_LONG = {
-    "_data/cocktails/glass_survey.yml": 1,
-    "_data/cocktails/ingredients.yml": 1,
-    "_data/food/ingredient_words.yml": 1,
-    "_data/sites.yml": 1,
-    "_dev/card-glasses.html": 1,
-    "_dev/emboss.html": 1,
-    "_dev/glasses.html": 2,
-    "_dev/no-verdict.html": 1,
-    "_includes/back-to-index.html": 1,
-    "_includes/food/temp_row.html": 1,
-    "_includes/page-actions.html": 1,
-    "_includes/page-search.html": 1,
-    "_layouts/cocktail.html": 1,
-    "_layouts/default.html": 2,
-    "_layouts/recipe.html": 2,
-    "_sass/cocktails/_cards.scss": 6,
-    "_sass/cocktails/_filters.scss": 4,
-    "_sass/cocktails/_leopard.scss": 1,
-    "_sass/cocktails/_palette.scss": 2,
-    "_sass/cocktails/_print.scss": 1,
-    "_sass/cocktails/_reference.scss": 3,
-    "_sass/cocktails/_rule.scss": 1,
-    "_sass/cocktails/_shortlist.scss": 6,
-    "_sass/cocktails/_universe.scss": 3,
-    "_sass/food/_badges.scss": 2,
-    "_sass/food/_category-labels.scss": 1,
-    "_sass/food/_palette.scss": 2,
-    "_sass/food/_print.scss": 1,
-    "_sass/food/_recipe-annotations.scss": 1,
-    "_sass/food/_recipe-header.scss": 3,
-    "_sass/food/_recipe-list.scss": 1,
-    "_sass/food/_recipe-notes-body.scss": 4,
-    "_sass/food/_rule.scss": 1,
-    "_sass/food/_search.scss": 1,
-    "_sass/food/_shortlist.scss": 3,
-    "_sass/food/_temperature-chart.scss": 2,
-    "_sass/shared/_furniture.scss": 3,
-    "_sass/shared/_layout.scss": 2,
-    "_sass/shared/_print.scss": 1,
-    "_sass/shared/_results-bar.scss": 2,
-    "_sass/shared/_rule.scss": 2,
-    "assets/css/longform-demo.scss": 1,
-    "assets/js/assets.js": 3,
-    "assets/js/back-link.js": 1,
-    "assets/js/card-line-budget.js": 1,
-    "assets/js/cocktail-search.js": 2,
-    "assets/js/cook-schedule.js": 1,
-    "assets/js/decorations.js": 1,
-    "assets/js/filter-state.js": 2,
-    "assets/js/food-scale.js": 4,
-    "assets/js/food-shopping-list.js": 1,
-    "assets/js/ground-print.js": 1,
-    "assets/js/ingredient-search.js": 1,
-    "assets/js/last-line-rule.js": 2,
-    "assets/js/page-search.js": 3,
-    "assets/js/scale.js": 6,
-    "assets/js/shopping-list.js": 2,
-    "assets/js/shortlist.js": 1,
-    "assets/js/universe.js": 1,
-    "cocktails/index.html": 7,
-    "cocktails/reference/glasses.html": 1,
-    "cocktails/reference/rum-categories.html": 1,
-    "food/index.html": 3,
-    "food/reference/cooking-methods-and-timings.html": 1,
-    "index.html": 1,
+    # Not a comment: a string the script writes out as a YAML header.
     "scripts/build_cooking_methods_prose.py": 1,
-    "scripts/food_yield.rb": 1,
-    "tests/js/card-line-budget.test.js": 1,
-    "tests/js/card-name-fit.test.js": 1,
-    "tests/js/cocktail-index-startup.test.js": 1,
-    "tests/js/index-memory.test.js": 1,
-    "tests/js/shortlist-share.test.js": 1,
-    "tests/js/stub-dom.js": 2,
-    "tests/test_cocktails.py": 2,
-    "tests/test_page_links.py": 2,
-    "tests/test_source_attribution.py": 1,
-    "tests/test_taxonomy.py": 1,
-    "tests/test_tidy_drafts.py": 1,
 }
 
 KNOWN_DATED = {
-    "_data/cocktails/glass_survey.yml": 1,
+    # Not a comment: a line of a block scalar that opens with an issue number.
     "_data/cocktails/ingredients.yml": 1,
+    # The three below quote a date as an example of the text their code reads.
     "scripts/build_decisions_index.py": 2,
     "tests/conftest.py": 1,
     "tests/test_style.py": 1,
@@ -128,7 +53,8 @@ def _comment_lines(path, lines):
         for n, line in enumerate(lines, 1):
             s = line.strip()
             if inside:
-                yield n, s
+                if not s.startswith("* @"):
+                    yield n, s
                 inside = "*/" not in s
             elif s.startswith("//"):
                 yield n, s

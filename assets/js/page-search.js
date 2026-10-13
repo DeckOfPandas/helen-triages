@@ -6,14 +6,12 @@
 // _includes/page-search.html renders the box, under the `show_header_search`
 // gate, as a plain GET form to this site's index carrying `q=`, which works
 // with no JavaScript; this file upgrades it. Per site, never across sites.
-//
 // It searches a JSON file the build writes (food/search.json,
 // cocktails/search.json), fetched on first focus. The JSON comes from the
 // gated collections, so the dropdown only offers a page that is live.
 //
 // Matching is prefix only, whole words only (#1052): every word typed must
-// prefix a whole word of the candidate. No substring fallback. Names are
-// listed first, then the tag groups.
+// prefix a whole word of the candidate. No substring fallback.
 // =============================================================================
 
 (function (root) {
@@ -111,19 +109,13 @@
     return encodeURIComponent(String(value));
   }
 
-  /**
-   * Build a searcher over one site's search.json.
-   *
+  /** Build a searcher over one site's search.json.
    * @param {object} data                the parsed JSON
    * @param {string} data.home           this site's index, already relative_url'd
    * @param {string} data.items_label    what the first group is called
-   * @param {Array}  data.groups         the vocabulary groups, in the index's
-   *                                     order: {kind, label, param, field,
-   *                                     values?}
+   * @param {Array}  data.groups         in the index's order: {kind, label, param, field, values?}
    * @param {Array}  data.items          {t, u, ...fields}
-   * @param {object} [ingredientSearch]  ingredient-search.js's api, for a group
-   *                                     that carries a `vocabulary`; defaults
-   *                                     to HTF.ingredientSearch when loaded
+   * @param {object} [ingredientSearch]  ingredient-search.js's api, for a group with a `vocabulary`
    */
   function create(data, ingredientSearch) {
     var d = data || {};
@@ -134,17 +126,13 @@
     });
 
     // Every group's vocabulary, counted. A declared list (`values`) keeps its
-    // own order; a group without one is built from what the items carry,
-    // alphabetically. A word with no item is dropped: a result leading to an
-    // empty index is a promise the page cannot keep.
-    //
-    // A group with a `vocabulary` is read through the index's own picker
-    // (#1289), because `?ing=` hands the word to that picker: each value goes
-    // through buildMasterList, values sharing an entryKey are one word, and
-    // the label is the entry the picker's pool would show. `id` is what a word
-    // is counted and merged on; `key` stays the folded label, because the
-    // highlight indexes into the label. With no vocabulary, or the picker's
-    // module not loaded, every value is its own word.
+    // own order; a group without one is alphabetical. A word with no item is
+    // dropped: a result leading to an empty index is a promise the page cannot
+    // keep. A group with a `vocabulary` is read through the index's own picker
+    // (#1289), because `?ing=` hands the word to that picker: values sharing
+    // an entryKey are one word, labelled as the picker's pool would show it.
+    // `id` is what a word is counted and merged on; `key` stays the folded
+    // label, because the highlight indexes into the label.
     var groups = (d.groups || []).map(function (g) {
       var picker = (g.vocabulary && pickerApi) ? pickerApi.create(g.vocabulary) : null;
 

@@ -833,11 +833,9 @@ other:
   - "cola"
   - "coconut cream"
   # A made mix: Coco Lopez (sweetened cream of coconut) loosened with coconut
-  # milk, three to one. Not `coconut cream`, the unsweetened tin. The name is
-  # the ingredient alone; how it is made, and what stands in for it, is a note
-  # on the drink. DECISIONS §9.3.1.
-  #
-  # THE LINE TO REUSE, every time a drink asks for it, word for word:
+  # milk, three to one. Not `coconut cream`, the unsweetened tin. How it is
+  # made is a note on the drink (DECISIONS §9.3.1), and every drink that asks
+  # for it reuses this line word for word:
   #     - amount: "<n> ml"
   #       generic: "Coco mix"
   #       note: "3:1 Coco Lopez to coconut milk."

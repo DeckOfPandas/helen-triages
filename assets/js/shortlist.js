@@ -4,8 +4,7 @@
 // page; this is the wiring and knows nothing about storage.
 //
 // - Every control, on either site, is `.btn-shortlist` carrying
-//   `data-shortlist-key`. A new placement is markup and a stylesheet rule,
-//   and nothing here.
+//   `data-shortlist-key`: a new placement is markup and a stylesheet rule.
 // - The controls ship `hidden` and this reveals them: the markup assumes
 //   JavaScript did not run, and a control that silently fails is worse than
 //   no control.

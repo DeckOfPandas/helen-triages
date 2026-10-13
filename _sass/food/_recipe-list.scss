@@ -121,22 +121,20 @@ $recipe-title-line-height: 1.3;
 // --- IF YOU LIKED THIS, HOW ABOUT … on a recipe page (#1005) ------------------
 // Related recipes at the foot of _layouts/recipe.html, drawn as this file's
 // rows: the list carries `.recipe-list`, so every rule above applies.
-//
-// `.recipe-list` starts `visibility: hidden` and a recipe page never loads the
-// script that lifts it; same specificity, later in the file, so this wins.
-//
-// `article.recipe a:not(...)` (_recipe-header.scss) gives every link in a
-// recipe the body-link colour and weight; the three-class selector below
-// outranks it.
 .recipe-related-section {
   margin-bottom: $spacing-section-gap;
 }
 
+// `.recipe-list` starts `visibility: hidden` and a recipe page never loads the
+// script that lifts it; same specificity, later in the file, so this wins.
 .recipe-related {
   visibility: visible;
   margin-bottom: 0;
 }
 
+// `article.recipe a:not(...)` (_recipe-header.scss) gives every link in a
+// recipe the body-link colour and weight; this three-class selector outranks
+// it.
 article.recipe .recipe-related .recipe-title-link {
   color: $color-text;
   font-weight: 700;

@@ -148,35 +148,14 @@ layout: default
     </ul>
   {% endfor %}
 
-  {% comment %} The scaler (#1005). On a `serves:` recipe the box holds people, starts at
-     `page.portions`, and amounts are multiplied by wanted over made, with the
-     shopping list's parser (assets/js/food-scale.js). `page.portions` is
-     _plugins/food_shopping.rb's, from `serves:` or `serves_estimate:` (#815);
-     the `~` marks an estimate, and a recipe with no count gets no control.
-     `hidden` until assets/js/recipe-scale.js reveals it. Amounts with no number,
-     or ingredients with no amount, cannot scale and are named in the note below,
-     which recipe-scale.js builds.
-
-     `data-half-step-measures` is _data/food/scaling.yml's `half_step_measures`
-     (#1125); `data-trailing` and `data-singulars` are ingredient_words.yml's
-     `trailing_phrases` and `singulars`. All data: adding a measure is a line of
-     YAML.
-
-     On a `makes:` recipe the box counts the thing made, never portions (#1286).
-     `page.made` is the build's reading of the `makes:` line
-     (_plugins/food_yield.rb); the box starts at its figure, the lower number of
-     a range, and the whole reading goes to the script as JSON in `data-made`
-     (food-scale.js `yieldMode`). Plus and minus move in whole recipes, so a
-     typed number goes to the nearest whole recipe. One step below one recipe, x½,
-     only where the build says so (`data-half-recipe`,
-     _plugins/food_half_recipe.rb); without the mark, minus at one recipe does
-     nothing.
-
-     Same classes as the portions control, so the script, the stylesheet and the
-     tests find one control; `--made` only widens the box. A `makes:` line with
-     no count has no `page.made` and falls through to the portions control, which
-     then steps in whole recipes too (`data-whole-recipes`). MANUAL 8.2.
-  {% endcomment %}
+  {% comment %} The scaler (#1005, MANUAL 8.2): two branches, the same classes, so the
+     script, the stylesheet and the tests find one control. With `page.made`
+     (_plugins/food_yield.rb's reading of `makes:`) the box counts the thing
+     made, never portions (#1286), in whole recipes, with x½ only under
+     `data-half-recipe` (_plugins/food_half_recipe.rb). Otherwise it holds
+     people, from `page.portions` (_plugins/food_shopping.rb, #815): `~` marks an
+     estimate, and no count means no control. `hidden` until recipe-scale.js
+     reveals it. The `data-*` word lists are _data/food YAML, never literals. {% endcomment %}
   {% if page.made and page.ingredient_groups.size > 0 %}
     <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="make fewer">&minus;</button>
@@ -338,27 +317,14 @@ layout: default
   </div>
   {% endif %}
 
-  {% comment %} ── If you liked this, how about … (#1005) ──
-     Three related recipes. The score is shared tags plus shared main
-     ingredients. A candidate sharing this recipe's star ingredient and at least
-     one mood tag outranks every one that does not; the score decides within each
-     half. Ties go to more shared non-larder ingredients, then more shared larder
-     staples (_data/food/pantry.yml), then title. No other weighting:
-     DECISIONS §13.
-
-     The sort is a string sort: each candidate is one
-     `prio~rank~real~larder~title~url` string (`prio` 0 for a star-and-mood
-     match, `rank = 999 - score`, `real` and `larder` each 99 minus the count),
-     sorted ascending. scripts/related_recipes.py is the same rule in Python;
-     re-run it after a promotion batch or a taxonomy edit that moves tags.
-     Lowercased on both sides, star included.
-
-     The rows are the index's own rows, written out rather than included because
-     the index row carries data attributes this page has no use for; the
-     stylesheet is the shared half, and the pantry ordering is copied from
-     food/index.html. `site.food_recipes` is already the published set:
-     _plugins/publish_gate.rb removes a held-back recipe at :post_read. The
-     heading is Helen's final wording (#1088). {% endcomment %}
+  {% comment %} ── If you liked this, how about … (#1005; heading final, #1088) ──
+     Score = shared tags + shared main ingredients; a candidate sharing the star
+     ingredient and a mood tag outranks every one that does not. Ties: more shared
+     non-larder ingredients, then larder staples (_data/food/pantry.yml), then
+     title. No other weighting: DECISIONS §13. Each candidate is one
+     `prio~rank~real~larder~title~url` string, sorted as text;
+     scripts/related_recipes.py is the same rule in Python. `site.food_recipes`
+     is already the published set (_plugins/publish_gate.rb). {% endcomment %}
   {% assign _mood_tags = site.data.food.taxonomy.tags.mood %}
   {% assign _pantry = site.data.food.pantry %}
   {% capture _my_ings %}|{% for _ing in page.main_ingredients %}{{ _ing | downcase }}|{% endfor %}{% endcapture %}

@@ -152,16 +152,12 @@ permalink: /food/
 
 {% comment %} Reuses the filter-heading treatment (punched label and stroke) with no
    colour rule underneath: it is not a filter category, so it borrows none of
-   their hues. The count is the server-rendered resting value; filters.js keeps
-   it live. {% endcomment %}
+   their hues. {% endcomment %}
 {% comment %} `id="results"` is where a search result lands (#1050): every filtered link
    the search dropdown offers ends in `#results`, and filters.js scrolls here
-   again once the list is revealed. The same id is on the drinks index, so
-   page-search.js knows one word for both sites. {% endcomment %}
-{% comment %} The number and the word are two spans: the digits take the label face
-   (`.results-count-number`, _sass/shared/_results-bar.scss) and the word stays
-   bare (MANUAL 13.7). filters.js paints both; `#recipe-count` still reads as
-   one sentence. The Liquid is the resting value for the first render. {% endcomment %}
+   again once the list is revealed. The drinks index carries the same id. {% endcomment %}
+{% comment %} Number and word are two spans (MANUAL 13.7): the digits take the label
+   face (`.results-count-number`). filters.js paints both after the first render. {% endcomment %}
 <div class="results-heading" id="results">
   <span class="category-label"><span class="category-label-text" id="recipe-count"><span class="results-count-number" id="recipe-count-n">{{ _rendered_recipes.size }}</span> <span id="recipe-count-word">survivor{% unless _rendered_recipes.size == 1 %}s{% endunless %}</span></span></span>
 
@@ -241,15 +237,12 @@ permalink: /food/
 
       {% comment %} `is_draft` is a badge, not a filter: it writes no row attribute and no
          control reads it. {% endcomment %}
-      {% comment %} The derived ingredient index (#52): every ingredient_groups item on this
-         recipe, not main_ingredients, which is a deliberately partial hint: fine to
-         include on, dangerous to exclude by. Incidentals count: no
-         `unless item.incidental` here, on purpose. The name is taken up to the first
-         comma or open bracket, lowercased, and deduplicated within the row.
-         Separated by `|`, not commas, because item text is free text full of commas.
-         The leading and trailing `|` make the value self-delimiting, so filters.js's
-         split is exact and a substring probe cannot half-match an entry.
-      {% endcomment %}
+      {% comment %} The derived ingredient index (#52): every ingredient_groups item, not
+         main_ingredients, a partial hint that is dangerous to exclude by.
+         Incidentals count: no `unless item.incidental` here, on purpose. The name
+         runs to the first comma or open bracket, lowercased, deduplicated.
+         `|`-separated, since item text is full of commas, with a leading and
+         trailing `|` so a substring probe cannot half-match an entry. {% endcomment %}
       {% assign _all_ing = "|" %}
       {% for _group in recipe.ingredient_groups %}
         {% for _item in _group.items %}
@@ -450,22 +443,14 @@ permalink: /food/
   </button>
 </details>
 
-{% comment %} What each recipe is made of, and how many it feeds (#801). Every recipe, not
-   the shortlisted ones: the shortlist lives in this browser's localStorage and
-   the build cannot know it. _plugins/food_shopping.rb has already computed
-   `shopping`, `portions` and `portions_estimated`; this copies them out. The
-   row gate above is repeated here, magic-bag exemption included, or a draft's
-   ingredients ride into a production build.
-
-   Keys: `p` portions, `e` estimated, `y` the recipe's own words for its yield,
-   `k` which key those words came from, `i` the ingredients (`a` amount, `n`
-   name, `s` shelf). `k` exists because `serves` and `makes` are exclusive and
-   `y` takes whichever is there; it also tells the panel whether the box can
-   count people. A `makes:` recipe also carries `w` (the box counts batches),
-   `h` (half a batch is offered) and `m` (what one batch makes), the figures
-   the recipe page's scaler reads (#1297). An ingredient may carry `pt` (parts
-   of a fruit), `f`/`c` (fruit and count) and `x` (a line that only points at
-   another). Each value goes through `jsonify`, never hand-quoted. {% endcomment %}
+{% comment %} What each recipe is made of, and how many it feeds (#801). Every recipe:
+   the shortlist lives in localStorage and the build cannot know it.
+   _plugins/food_shopping.rb computed `shopping`, `portions` and
+   `portions_estimated`; this copies them out. The row gate above is repeated
+   here, magic-bag exemption included, or a draft's ingredients ride into a
+   production build. `k` says which of `serves` and `makes` `y` came from;
+   `w`, `h` and `m` are a `makes:` recipe's batch figures (#1297). Each value
+   goes through `jsonify`, never hand-quoted. {% endcomment %}
 <script type="application/json" id="recipe-ingredients">
 {
 {%- assign _first_recipe = true -%}

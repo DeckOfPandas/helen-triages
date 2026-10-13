@@ -22,18 +22,14 @@ permalink: /food/reference/cooking-methods-and-timings/
 
     <p class="ct-strapline">Cooking methods and timings for proteins, by weight.</p>
 
-    {% comment %} No <hr> here: a section heading, with its air above and the double rule
-       under its lettering (.section-heading-text--reference), is already the
-       boundary. The heading below is the selected protein, filled by cook-timer.js
-       and updated when the dropdown changes; it is empty in the served HTML
-       because the protein list comes from the JSON above. Same treatment as the
-       temperature charts' sections, so the two pages read as one reference layer.
-    {% endcomment %}
-    {% comment %} The "what" selector sits above the heading it changes (#253), and the weight
-       directly under it, so the two inputs are one form. The weight is outside
-       #ct-calculator but is put away with it: cook-timer.js hides this one field
-       when the dropdown says fish, which is not cooked by weight. The dropdown
-       itself is never hidden, because it is how you get back. {% endcomment %}
+    {% comment %} No <hr> here: a section heading, with the double rule under its
+       lettering (.section-heading-text--reference), is already the boundary. The
+       heading below is the selected protein, filled by cook-timer.js; it is empty
+       in the served HTML because the protein list comes from the JSON above. {% endcomment %}
+    {% comment %} The "what" selector sits above the heading it changes (#253), the
+       weight directly under it. The weight is outside #ct-calculator, and
+       cook-timer.js hides that one field for fish, which is not cooked by
+       weight. The dropdown is never hidden: it is how you get back. {% endcomment %}
     <div class="ct-inputs">
       <div class="ct-form">
         <label class="ct-field">

@@ -14,11 +14,10 @@
 // Only the number takes the label face; the word beside it stays plain body
 // text (MANUAL §13.7). $font-label is for numbers the reader acts on
 // (§13.10.1), and the count is the number the panel above exists to move.
-// Tabular figures so 9 -> 10 does not shove the word beside it.
-//
-// Each index resets its own count element to body text (food's
-// `.results-heading .category-label`, cocktails' `.drink-count`); this is a
-// child of that element, so there is no specificity fight.
+// Tabular figures so 9 -> 10 does not shove the word beside it. Each index
+// resets its own count element to body text (food's `.results-heading
+// .category-label`, cocktails' `.drink-count`); this is a child of that
+// element, so there is no specificity fight.
 .results-count-number {
   font-family: $font-label;
   font-weight: 600;
@@ -28,19 +27,17 @@
 }
 
 // --- 2. The bar --------------------------------------------------------------
+// What a site's list rule reads for its `scroll-margin-top`: a page turn that
+// scrolls the list's top into view leaves `#results` just above the viewport,
+// which is when the bar appears, so the first row has to land below the bar.
+$results-bar-height: 2.75rem;
+
 // One line fixed to the top of the viewport once the count line (`#results`)
 // has scrolled off above it. A mirror, never a second computation:
 // assets/js/results-bar.js copies the count's text and the top clear-all's
 // visibility, and its button clicks that one. It ships `hidden` and the
 // script reveals it only while the heading is above the viewport, so it
 // cannot sit over the header or the filter panel.
-//
-// $results-bar-height is what a site's list rule reads for its
-// `scroll-margin-top`: a page turn that scrolls the list's top into view
-// leaves `#results` just above the viewport, which is when the bar appears,
-// so the first row has to land below the bar.
-$results-bar-height: 2.75rem;
-
 .results-bar {
   position: fixed;
   top: 0;

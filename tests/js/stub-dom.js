@@ -16,12 +16,8 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..');
 
 /**
  * A minimal page: enough `document` for a script to read its two meta tags,
- * and a `console` that keeps warnings out of the test output while still
- * recording them, so a test can assert one happened.
- *
- * `window` IS the sandbox, as it is in a browser, so a script may reach a
- * global either bare (`sessionStorage.getItem`) or through `window`
- * (`window.scrollY`) and get the same object both ways.
+ * and a `console` that records warnings instead of printing them. `window` is
+ * the sandbox, as in a browser, so a bare global and `window.x` are one object.
  *
  * @param {Object} [metas] - meta tag name -> content, e.g. {'base-url': '/x/'}
  * @returns {Object} the contextified sandbox
@@ -52,11 +48,9 @@ function makePage(metas) {
 }
 
 /**
- * Run repo scripts into a stub page, in the order the built page loads them,
- * and hand back the page. Read that order from the built site, not from a
- * layout: a layout's own scripts land inside `{{ content }}` and are not
- * where the file suggests (MANUAL §10.2).
- *
+ * Run repo scripts into a stub page, in the order the built page loads them.
+ * Read that order from the built site, not a layout: a layout's own scripts
+ * land inside `{{ content }}`, not where the file suggests (MANUAL §10.2).
  * @param {string[]} relPaths - repo-root-relative, e.g. ['assets/js/assets.js']
  * @param {Object} [page] - an existing page from makePage(), or a fresh one
  * @returns {Object} the page, with whatever the scripts attached to it

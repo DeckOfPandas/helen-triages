@@ -29,14 +29,12 @@ const SOURCE = path.resolve(__dirname, '..', '..',
 const STEP = 0.86;
 
 /**
- * One `.drink-card-name` whose lettering is `contentWidth` px inside a
- * `boxWidth` px box.
+ * One `.drink-card-name`: lettering `contentWidth` px in a `boxWidth` px box.
  *
  * @param {number} contentWidth what a Range over the word reports
  * @param {number} boxWidth     the word element's clientWidth
- * @param {object} [opts]       `laidOut: false` for a paginated-away card,
- *                              `stepped` for the width once the type has
- *                              actually shrunk (defaults to the linear model)
+ * @param {object} [opts]       `laidOut: false` for a paginated-away card;
+ *                              `stepped`, the width once the type has shrunk
  */
 function name(contentWidth, boxWidth, opts) {
   opts = opts || {};

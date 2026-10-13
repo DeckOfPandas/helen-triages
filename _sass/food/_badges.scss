@@ -90,15 +90,11 @@
   }
 
   // Three rungs, and the badges rest on the quietest so a row's title is
-  // read first:
-  //
-  //     rest      a hint of the hue in the tape (14%), grey text
-  //     matched   a 35% mix, set in _active-filter-states.scss
-  //     hover     the lightened full-strength hue, below
-  //
-  // mix() with $color-border, not opacity: a transparent hue over the page
-  // only lightens it, where a mix desaturates it. Only the badge's own hover
-  // lights it, never the row's.
+  // read first: rest is a hint of the hue in the tape with grey text, matched
+  // a stronger mix (_active-filter-states.scss), hover the lightened
+  // full-strength hue below. mix() with $color-border, not opacity: a
+  // transparent hue over the page only lightens it, where a mix desaturates
+  // it. Only the badge's own hover lights it, never the row's.
   &-star {
     color: $color-clear-text;
     .tag-shape { color: mix($color-star-root, $color-border, 14%); }
@@ -118,12 +114,10 @@
 // --- Badge hover (#40) -------------------------------------------------------
 // The loudest of the three rungs. No new colour: each is the category's own
 // hue, which the index's colour code requires (MANUAL §13.5).
-//
-// Each selector leads with `a`, and the `color` line is not redundant.
+// Each selector leads with `a`, and the `color` line is not redundant:
 // shared/_base.scss's `a:hover` sets $color-mood-root and out-specifies a bare
 // `.badge-star`, so without both a STAR or PRACTICALITIES badge would turn
-// MOOD's colour on hover. `a.badge-star:hover` wins on specificity, not on
-// import order.
+// MOOD's colour on hover.
 a.badge-star:hover {
   color: $color-star-active;
   .tag-shape { color: mix($color-star-root, $color-white, 82%); }

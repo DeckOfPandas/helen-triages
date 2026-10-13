@@ -149,14 +149,12 @@ $card-glass-scale: 10.4rem;
 
 // --- the whole card is the link (#971) ---------------------------------------
 // The name's anchor is stretched over the card by a pseudo-element: one link,
-// no nested interactive content, no click handler.
-//
-// Sized in vmax, not `inset: 0`: the anchor's nearest positioned ancestors are
-// `.drink-card-tape-word` and `.drink-card-tape`, which must stay positioned
-// for the tape artwork, so `inset: 0` would cover only the word. The overlay is
-// drawn far too big and `.drink-card`'s `overflow: hidden` clips it, and its
-// hit area, to the card. It also needs `.drink-card-name--fitted` (below) to
-// release the tape word's own clip.
+// no nested interactive content, no click handler. Sized in vmax, not
+// `inset: 0`: its nearest positioned ancestors are the tape and the tape word,
+// which must stay positioned for the artwork, so `inset: 0` would cover only
+// the word. `.drink-card`'s `overflow: hidden` clips the overlay and its hit
+// area to the card. `.drink-card-name--fitted` (below) releases the tape
+// word's own clip.
 .drink-card .drink-card-tape-word a::after {
   content: '';
   position: absolute;
@@ -225,10 +223,9 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 }
 
 // --- a name that does not fit: shrink it, or wrap it -------------------------
-// assets/js/card-name-fit.js measures and adds one of two classes. A name over
-// by about one short word takes one step down; a name over by more wraps to a
-// two-line tape. Nothing is cut. Without the script nothing gets either class
-// and the base rule's ellipsis stays.
+// assets/js/card-name-fit.js measures and adds one of two classes: a name over
+// by about one short word takes one step down, a longer one wraps to a two-line
+// tape. Without the script neither is set and the base rule's ellipsis stays.
 //
 // One step only: a ladder would put titles at several sizes down one column.
 // It moves through font-size, not a transform, so the tape's `em` padding and
@@ -344,14 +341,13 @@ $card-name-step: 0.86;
 .drink-card-sep { color: mix($color-text, $color-surface, 25%); }
 
 // --- the tagline takes the card (#1292) --------------------------------------
-// There is no tagline on a resting card. Pointing at a card, the ingredient
-// line and the mood chips step out and the tagline has their room; the name,
-// the glass, the ship mark and the `+` do not move.
+// A resting card has no tagline. Pointing at one, the ingredient line and the
+// mood chips step out and the tagline has their room; nothing else moves.
 //
 // The tagline's first baseline is the ingredient line's first baseline. Two
-// faces at two sizes do not share a baseline by sharing a margin, so this one
-// is derived: re-run scripts/card_tagline_baseline.py if either rule's size,
-// line height or face moves.
+// faces at two sizes do not share one by sharing a margin, so this is derived:
+// re-run scripts/card_tagline_baseline.py if either rule's size, line height
+// or face moves.
 $card-tagline-top: 0.584rem;
 
 .drink-card-tagline {
@@ -477,13 +473,10 @@ $card-tagline-top: 0.584rem;
 }
 
 // --- the foot ----------------------------------------------------------------
-// The chips and the ship mark share the foot, bottom-aligned, so the foot is
-// only as tall as the chips and the chips' last row sits on the ship's line.
-//
-// The ship is out of flow (#760), absolutely positioned at the foot's bottom
-// right, so the chips get the full width on every row. Nothing reserves space
-// for it, so the last row can run underneath: the ship masks it with the card's
-// background, and card-line-budget.js orders the chips so that row stops short.
+// The chips and the ship mark share the foot, bottom-aligned. The ship is out
+// of flow (#760) at the foot's bottom right, so the chips get the full width on
+// every row; it masks a row running under it with the card's background, and
+// card-line-budget.js orders the chips so that row stops short.
 //
 // The last resort, for a card no order can free: the script adds this class and
 // `--ship-w`, and the chips are padded clear of the ship on every row.
@@ -688,10 +681,9 @@ $card-tagline-top: 0.584rem;
 }
 
 // On a card: top left, over the glass column, which takes nothing from the
-// title. Above 720px it clears every drawing. From 401px to 720px a card is as
-// tall as its content and the rim can sit behind the badge, so
-// `background-color: inherit` gives it the card's own field, hover wash
-// included. Brighter than the base badge, still no hue.
+// title. From 401px to 720px a card is as tall as its content and the rim can
+// sit behind the badge, so `background-color: inherit` gives it the card's own
+// field, hover wash included. Brighter than the base badge, still no hue.
 //
 // `z-index` with the controls, or the card's link overlay paints over it;
 // `pointer-events: none` because it is a label and that patch still opens the
@@ -786,10 +778,9 @@ $card-tagline-top: 0.584rem;
 // one budget. A wrapped name takes a line from the ingredients and a row from
 // the chips; three rendered lines of ingredients take a row from the chips.
 //
-// `.drink-card-name--wrap` is card-name-fit.js's, and the name, the ingredient
-// line and the foot are siblings, so `~` reaches both. CSS cannot ask how many
-// lines a clamped element rendered, so card-line-budget.js sets
-// `.drink-card--ingredients-3`.
+// `.drink-card-name--wrap` is card-name-fit.js's and `~` reaches its siblings.
+// CSS cannot ask how many lines a clamped element rendered, so
+// card-line-budget.js sets `.drink-card--ingredients-3`.
 .drink-card-name--wrap ~ .drink-card-ingredients {
   -webkit-line-clamp: 2;
 }

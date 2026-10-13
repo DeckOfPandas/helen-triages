@@ -163,11 +163,9 @@
   }
 
   // A search section's results pool is empty on load, and a flex `gap` applies
-  // between items whatever their size, so an empty pool would still buy a gap.
-  // The gap is zeroed and put on the pool itself, only when it has content.
-  // `:not(:empty)` rather than `display: none`, because the pool is an
-  // aria-live region and should stay in the tree.
-  //
+  // between items whatever their size, so the gap is zeroed and put on the
+  // pool itself, only when it has content. `:not(:empty)` rather than
+  // `display: none`: the pool is an aria-live region and stays in the tree.
   // This is the only place the pool's top margin may be set (#589): a second,
   // unconditional declaration makes the empty pool taller than a full one.
   // test_an_empty_search_results_pool_reserves_no_space guards it.

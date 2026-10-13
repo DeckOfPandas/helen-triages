@@ -144,13 +144,11 @@ REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves", "snippet"}
 
 # `suggestion` is written even when empty, as `suggestion: []`. `as` says how
 # an ingredient is used and `card_order` names a card tier outright (#754);
-# `_plugins/cocktail_card_ingredients.rb` reads both.
-#
-# The three `_claude` keys hold a proposal beside a `QQ <the source's words>`
-# in the field itself, for Helen to collapse by ruling. A declared bottle needs
-# none (write `generic` and `suggestion` outright), and a bare category word
-# nobody can resolve gets the QQ alone. A character is always an inference
-# about this recipe: `bottles.yml` has no character column (#314).
+# `_plugins/cocktail_card_ingredients.rb` reads both. The three `_claude` keys
+# hold a proposal beside a `QQ <the source's words>` in the field itself, for
+# Helen to collapse by ruling. A declared bottle needs none, and a bare
+# category word nobody can resolve gets the QQ alone. A character is always an
+# inference about this recipe: `bottles.yml` has no character column (#314).
 INGREDIENT_KEYS = {
     "generic", "amount", "suggestion", "note", "character", "optional",
     "as", "card_order",
@@ -1145,11 +1143,10 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # last touched at or before it is exempt from the proofread flip (#367). The
 # test sees this repo's history only, so a promotion of drinks she has already
 # read looks like an agent edit and needs a move too (#624).
-# Moving it is Helen's grant, never a way to turn a red test green:
-#   1. run the test with the old value; it must name only the granted files;
-#   2. move it in a commit of its own, quoting her grant (DECISIONS §4.0);
-#   3. a grant covers that commit and nothing after it.
-# Grants made on parallel branches need the merge commit behind both.
+# Moving it is Helen's grant, never a way to turn a red test green: run the
+# test with the old value, which must name only the granted files, then move
+# it in a commit of its own quoting her grant (DECISIONS §4.0). A grant covers
+# that commit and nothing after; parallel grants need the merge behind both.
 COCKTAIL_BASELINE_COMMIT = "49822c36"   # has `e5d693ab` behind it: #1375's fourteen, #1378's thirteen, Cynar Toronto
 
 

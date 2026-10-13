@@ -56,15 +56,11 @@ $emboss-cocktails-vars-emitted: false !default;
 // =============================================================================
 // @mixin heading-rule($colour) — the one-bar mark under the index's headings
 // =============================================================================
-// One bar in the section's own colour (`$color-heading-*`). Here rather than in
-// _filters.scss because this file is imported before every cocktails partial
-// that could want it.
-//
-// The geometry is the top bar of `overlapping-rule-double`, so this bar sits
-// where the upper bar of food's double mark sits. It is not
-// `overlapping-rule-single`, which paints the thin lower bar's geometry at
-// $rule-front-opacity. It names the shared $rule-* variables rather than
-// restating them, so if the mark moves on food it moves here.
+// One bar in the section's own colour (`$color-heading-*`). Here because this
+// file is imported before every cocktails partial that could want it. The
+// geometry is the top bar of `overlapping-rule-double`, not
+// `overlapping-rule-single`'s thin lower bar, and it names the shared $rule-*
+// variables, so if the mark moves on food it moves here.
 @mixin heading-rule($colour) {
   display: inline;
   box-decoration-break: clone;

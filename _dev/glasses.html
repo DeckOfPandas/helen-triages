@@ -8,17 +8,13 @@ excerpt_separator: ""
 ---
 
 {% comment %} Glasses swatch: internal reference, never published.
-
    `site_key: cocktails` is load-bearing: default.html picks the stylesheet
    through it, and without one there is no `.glass-icon-line` rule, so every
    path falls back to the SVG default fill and the set renders as silhouettes.
-   Check an icon on the page the browser serves, never in a renderer that
-   applies the stroke itself.
-
    Never published is a config fact: the `dev` collection is `output: false`
-   in _config.yml and true only in _config_local.yml (#276). Every number on
-   the page is counted live from site.cocktail_drafts, and every viewBox is
-   read from the SVG. {% endcomment %}
+   in _config.yml and true only in _config_local.yml (#276). Every number is
+   counted live from site.cocktail_drafts; every viewBox is read from the SVG.
+   {% endcomment %}
 
 {% assign icon_map = site.data.cocktails.glasses.icons %}
 {% assign all_icons = site.data.cocktails.glasses.all_icons %}
@@ -213,14 +209,11 @@ excerpt_separator: ""
   </p>
 
   {% comment %} ── 5. The double old-fashioned, and every candidate ──
-     The double row is at true relative height: an icon renders at the height
-     `heights_mm` gives its viewBox, so a drawing with empty margin inside its
-     viewBox renders smaller. The candidates below it are every drawing in
-     _design_sources/cocktails/glasses/, normalised into
-     _includes/icons/glass-candidates/ by scripts/build_glass_candidates.py.
-     They are viewing copies for this page only: not published icons, not in
-     `all_icons`, and in a sibling directory so the icon-set tests cannot see
-     them. {% endcomment %}
+     The candidates are every drawing in _design_sources/cocktails/glasses/,
+     normalised into _includes/icons/glass-candidates/ by
+     scripts/build_glass_candidates.py. They are viewing copies for this page
+     only: not published icons, not in `all_icons`, and in a sibling directory
+     so the icon-set tests cannot see them. {% endcomment %}
 
   <h2>5. The double old-fashioned &mdash; at the size the site draws it</h2>
   <p class="dev-note">

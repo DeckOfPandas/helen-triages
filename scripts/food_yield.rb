@@ -1,28 +1,20 @@
 # frozen_string_literal: true
 
-# Ask the build's two yield readers a question, without building the site.
+# Ask the build's two yield readers a question without building the site, which
+# is the only other way to ask them. tests/test_food_yield.py runs this (#1286).
+# Reads files in this repository (plus the one JSON file named), writes nothing.
 #
 #   ruby scripts/food_yield.rb "4–6 waffles, depending on your waffle iron" "950 ml"
 #
-# Prints one JSON object: each argument as a key, and what
-# _plugins/food_yield.rb makes of it as the value (null where the line does not
-# open with a count of something named, which keeps the portions box).
+# Prints one JSON object: each argument, and what _plugins/food_yield.rb makes
+# of it under the vocabulary in _data/food/scaling.yml (null where the line
+# does not open with a count of something named).
 #
 #   ruby scripts/food_yield.rb --half tmp/recipes.json
 #
-# Reads a JSON list of {"key", "makes", "serves", "serves_estimate",
-# "ingredient_groups"} and prints, per key, the reading of `makes:` and
-# _plugins/food_half_recipe.rb's verdict on whether the recipe is offered a
-# half step: {"made": ..., "half": {"ok": true/false, "why": "..."}}. The
-# same three steps _plugins/food_shopping.rb takes for a real recipe.
-#
-# The vocabulary is the real one, _data/food/scaling.yml.
-#
-# Both readers are a Jekyll plugin's helpers, and the only other way to ask
-# them anything is a full build. tests/test_food_yield.py runs this (#1286).
-#
-# It reads files in this repository (plus the one JSON file named) and writes
-# nothing.
+# Takes a JSON list of {"key", "makes", "serves", "serves_estimate",
+# "ingredient_groups"} and prints per key {"made": ..., "half": {"ok": ...,
+# "why": "..."}}: _plugins/food_half_recipe.rb's verdict on a half step.
 
 require "json"
 require "yaml"

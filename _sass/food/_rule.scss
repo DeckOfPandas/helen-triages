@@ -5,8 +5,7 @@
 // _sass/shared/_rule.scss. What is left here is food's re-point of the label
 // tier's stroke: small punched labels (SERVES/PREP/COOK and its kin, under
 // 1rem) take the softer $color-label-stroke, not the shared default of
-// $color-text. The display and heading tiers use the shared defaults.
-// model_instructions/LETTERING.md describes the tiers.
+// $color-text. model_instructions/LETTERING.md describes the tiers.
 //
 // It lives here because $color-label-stroke is food's own and not a
 // palette-contract variable, so shared/ may not name it. It must be imported
