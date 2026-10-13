@@ -105,24 +105,13 @@ article.recipe .recipe-body-content.about-page {
 
   // --- The footnote ----------------------------------------------------------
   // Sits at the a) b) level, not in the gutter: a footnote is subordinate to
-  // the item that called it, which is b). Same indent and mark treatment as
-  // .about-enum-sub > li, with the text one size down.
+  // the item that called it, which is b). Its asterisk is a character in the
+  // markup, in the text's own face and colour, one size down, and it starts
+  // on the a) b) text's left edge. DECISIONS §13.
   .about-footnote {
-    position: relative;
     padding-left: 1.7rem;            // = .about-enum-sub > li, so the columns match
     margin: $space-sm 0 0 0;
     font-size: $font-size-body-sm;
-
-    &::before {
-      content: "*";
-      position: absolute;
-      left: 0;
-      top: 0;
-      font-family: $font-headings;
-      font-weight: 700;
-      font-size: $font-size-body-sm;   // the a) b) marks' size, not the gutter's
-      color: $about-mark-colour;
-    }
   }
 
   // --- Variable names in prose -----------------------------------------------

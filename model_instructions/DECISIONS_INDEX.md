@@ -750,11 +750,10 @@ argument and the rules each field is read by.
 - undated · §13 · #902 #915 · Undated, #902 / #915 — the footer's two licence sentences stack on narrower screens and sit close under the copyright line.
 - undated · §13 · #1005 · Undated, #1005 — the related recipes on a food recipe page are the index's own rows.
 - 2026-08-14 · §13 · the short-method toggle and its print "In short:" section are not deployed: short_method_enabled: false in _config.yml.
-- 2026-09-04 · §13 · the about page's footnote sits inside point 2, aligned with the sub-list it annotates.
 - 2026-08-04 · §13 · #54 · the ingredient amount's highlight and lettering cover the unit as well as the number.
 - 2026-08-14 · §13 · #86 · a printed page looks like the site: the marks keep their colours, the page ground is not printed, and badges are the one thing taken off a recipe.
 - 2026-09-02 · §13 · the about page's <hr> is the footer's 1px dashed hairline, not an empty heading mark.
-- 2026-09-04 · §13 · the about page's footnote sits at the a) b) sub-list level, inside the point that calls it, not in the page gutter.
+- 2026-10-13 · §13 · the about page's footnote is a normal asterisk footnote below point 2b, inside the point that calls it and not in the page gutter.
 - 2026-09-04 · §13 · #546 · the shortlist control is grey when off and the site's hot colour when on: wicked woowoo on cocktails, hot magenta on food.
 - 2026-09-16 · §13 · #1119 · the back arrow and the header's door use one arrow graphic.
 - undated · §13 · Undated — a method step may hold a real bullet list.
