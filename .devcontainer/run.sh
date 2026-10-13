@@ -94,7 +94,7 @@ CLAUDE_CODE_LABEL=com.deckofpandas.claude-code-version
 
 IMAGE_CLAUDE_CODE="$(docker image inspect --format "{{ index .Config.Labels \"$CLAUDE_CODE_LABEL\" }}" "$IMAGE" 2>/dev/null || true)"
 [ "$IMAGE_CLAUDE_CODE" = "<no value>" ] && IMAGE_CLAUDE_CODE=""
-CLAUDE_CODE_VERSION="$(python3 .devcontainer/claude_code_latest.py || true)"
+CLAUDE_CODE_VERSION="${PIN_CLAUDE_CODE:-$(python3 .devcontainer/claude_code_latest.py || true)}"
 [ -z "$CLAUDE_CODE_VERSION" ] && CLAUDE_CODE_VERSION="${IMAGE_CLAUDE_CODE:-latest}"
 
 if [ "$IMAGE_STAMP" != "$BUILD_INPUTS_HASH" ] || [ "$IMAGE_CLAUDE_CODE" != "$CLAUDE_CODE_VERSION" ]; then
