@@ -65,14 +65,14 @@ site_key: food
       <li>I want to cook something that I already know how to make, but scrolling through a list of files isn't inspiring.</li>
       <li>I want to browse recipes I haven't tried yet without first having to
         <ul class="about-enum-sub">
-          <li>locate a magazine/email/screenshot/bookmark or open tab, or</li>
+          <li>locate a magazine, email, screenshot, bookmark, open tab or whatever, or</li>
           <li>scroll through pages of boring nonsense about somebody's favourite sauté pan*, or the blow-by-blow of a recent seaside trip that inexplicably precedes a recipe for beans on toast.</li>
         </ul>
         {% comment %} The footnote lives inside point 2, under the a) b) list
-           it annotates, and takes that list's indent and mark size rather than
-           the page gutter's: on the gutter it reads as a third point.
-           {% endcomment %}
-        <p class="about-footnote">Or artisanally hand-crafted Japanese ice tools. Use your imagination for other cocktail-related nouns and verbs.</p>
+           it annotates and on that list's text indent: on the page gutter it
+           reads as a third point. Its asterisk is a character in the text,
+           not a drawn mark. DECISIONS §13. {% endcomment %}
+        <p class="about-footnote">* Or artisanally hand-crafted Japanese ice tools. Etc.</p>
       </li>
     </ol>
 
@@ -107,7 +107,12 @@ site_key: food
       <li>by how badly you want to set something on fire.</li>
     </ul>
 
-    <p>Filter however you like. Honestly, I don't care — this site is not for you.</p>
+    {% comment %} Bold, and deliberately no rule above it. The emphasis pairs
+       this line with "The only goal of this site..." so the two bold statements
+       bracket the filter section -- what the site is for, then who it is not
+       for. A rule as well separated it from the lists it is withdrawing.
+       2026-10-13. {% endcomment %}
+    <p><strong>Filter however you like. Honestly, I don't care — this site is not for you.</strong></p>
 
     <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--about-faq">FAQ</span></h2>
 
@@ -127,32 +132,48 @@ site_key: food
     </div>
 
     <div class="about-faq-item">
-      <h3>Can I see your to-try recipes?</h3>
-      <p>No. They only build locally, from a private repository each for food and drink. I also don't want to break copyright or disrespect authors. But more importantly — and please hear me when I say this — I don't want to put effort into rewriting a load of recipes I haven't tested because many will turn out to be terrible.</p>
+      <h3>Can I see your to-try food recipes?</h3>
+      <p>No. They only build locally, from a private repository. I don't want to break copyright or disrespect authors. But more importantly — and please hear me when I say this — I don't want to put effort into rewriting a load of untested recipes, many of which will turn out to be terrible.</p>
+    </div>
+
+    <div class="about-faq-item">
+      <h3>Can I see your to-try cocktail recipes?</h3>
+      <p>Sort of. Some of the cocktails marked ??? are ones I haven't made yet. They're on the site anyway, because cocktail drafts are &gt;99% fact (uncopyrightable) and &lt;1% prose (very copyrightable), meaning they take almost no time to tidy compared with food drafts.</p>
     </div>
 
     <div class="about-faq-item">
       <h3>Why do cocktails have ratings but food doesn't?</h3>
-      <p>All my food recipes are excellent. Cocktail ratings are Helen-facing. All my cocktail recipes are shippable, but differently robust to things like bottle selection, ice pedantry, and being distracted while making them. An El Presidente is famously unforgiving about vermouth. Ask me how I know. But I've since found my vermouth, so chaos is contained, and my El Presidente is in my top bracket. Future-Helen can decide whether she wants a sure thing or YOLO.</p>
+      <p>All my food recipes are excellent. My cocktail recipes, while also mostly excellent, are differently robust to things like bottle selection, ice pedantry, and being distracted while making them. An El Presidente is famously unforgiving about vermouth. Ask me how I know.</p>
+      {% comment %} The two names are the buttons' own words on the cocktails
+         index, set in <code> so they read as the controls. {% endcomment %}
+      <p>The <code>no chaos please</code> filter gives me a reliably good drink. The <code>chaos only</code> filter gives me an unreliably good drink. Future-Helen can decide whether she wants a sure thing or YOLO.</p>
     </div>
 
-    {% comment %} The three names are the cocktails palette's own variables,
-       shortened for prose: _sass/cocktails/_palette.scss spells them
-       $color-wicked-woowoo and so on. Set in <code> so they read as
-       names rather than as words that happen to start with a dollar. {% endcomment %}
+    {% comment %} The four names are the two palettes' own variables,
+       shortened for prose: _sass/food/_palette.scss spells the first
+       $color-dazzling-dragonfruit, _sass/cocktails/_palette.scss the rest
+       $color-wicked-woowoo and so on. The first two are one colour, which
+       is the joke. Set in <code> so they read as names rather than as
+       words that happen to start with a dollar. "peony-posy" below is
+       prose, not a variable -- deliberately not in <code>. {% endcomment %}
     <div class="about-faq-item">
       <h3>Why is the cocktail site dark?</h3>
-      <p>I was running out of ways to use <code>$wicked-woowoo</code> (#FF00C8) on white, and <code>$electric-absinthe</code> and <code>$ultra-violette</code> look far better on black. But truthfully, the moment I realised I could include black-on-black leopard print, my lifetime-favourite texture, the decision made itself.</p>
+      <p>I was running out of ways to use <code>$dazzling-dragonfruit</code> (#FF00C8) on white, so when it turned out to also look fantastic on black I rebranded it as <code>$wicked-woowoo</code> (#FF00C8). And its new friends <code>$electric-absinthe</code> and <code>$ultra-violette</code> look banging there too. And don't even get me started on the peony-posy deliciousness of the filters, which wouldn't have worked on white at all.</p>
+      <p>But, truthfully, the moment I realised I could include black-on-black leopard print, my lifetime-favourite texture, the decision made itself.</p>
     </div>
 
     <div class="about-faq-item">
       <h3>Did you write any of this code yourself directly?</h3>
-      <p>Absolutely not. Not one single line, for better or worse, mostly better. This is an experiment in agentic engineering. My main architecture concern is to keep parallel Claudes from trampling each other's work when I can't be bothered to supervise them. I could have written most of the code myself the old-fashioned way...eventually. But I certainly wouldn't have north of 18,000 tests were I left to my own devices. Every time I find myself about to edit some YAML, I request new tests instead. Obviously TDD has always been great, but I'm feeling particularly fond of it now that neither writing the test nor satisfying it is my problem.</p>
+      <p>Absolutely not. Not one single line, for better or worse, mostly better.</p>
+      <p>This is an experiment in agentic engineering. I could have written most of the code myself the old-fashioned way...eventually. But I certainly wouldn't have north of 20,000 tests. Or a decision log that mostly quotes me saying silly things.</p>
+      <p>Every time I find myself about to edit some YAML, I revisit my life choices and request new tests instead. While TDD has always been great, I'm feeling particularly fond of it now that neither writing the test nor satisfying it is my problem.</p><p>Running Claudes-in-Claudes pleases me greatly in a philosophical sense (#TurtlesAllTheWayDown). But, being practical, Claudes-in-Claudes trampling other Claudes-in-Claudes is still easier for a Claude (in a Claude?) to untangle than whatever mess I'd create myself.</p>
     </div>
 
     <div class="about-faq-item">
-      <h3>Can you share the prompts or scripts or workflows you used to ingest and clean your recipe data?</h3>
-      <p>No. I didn't log any of this, or even really think it through — welcome to the future: it looks Claude-y. See <a href="https://github.com/DeckOfPandas/helen-triages/tree/main/_data">the repository</a> for the data models if you care. I don't have Repeatable Analysis Pipelines. I do have Claude Code, a comprehensive herd of tests that fail loudly rather than admit broken code or poor formatting, and slightly too much time on my hands at the moment (but still not enough to write YAML).</p>
+      <h3>Can you share the prompts or scripts or workflows you used to ingest, clean and generally wrangle your recipe data?</h3>
+      <p>Not really. There are some manuals, decision logs, and Claude-to-Claude advice in <a href="https://github.com/DeckOfPandas/helen-triages/tree/main/model_instructions"><code>model_instructions/</code></a>. But ingestion and cleaning were mainly done interactively because, incredibly, that turned out to be quicker given I was "designing" — a word that flatters me — my data model into the void.</p>
+      <p>Welcome to the future: it looks Claude-y. I don't have Repeatable Analysis Pipelines. I do have opinionated dictionaries (none of which I wrote myself), an outrageous number of tests (none of which I wrote myself), and a happy co-worker to do all the boring heavy lifting I would otherwise mangle every time I changed my mind about something. I also have slightly too much time on my hands at the moment — but still not enough to write YAML.</p>
+      <p>See <a href="https://github.com/DeckOfPandas/helen-triages">the repository</a> for all the data machinery if you're not already asleep.</p>
     </div>
 
     <div class="about-faq-item">
