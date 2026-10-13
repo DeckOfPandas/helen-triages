@@ -1,10 +1,7 @@
 """Architecture regression tests.
 
-These do not test recipes. They test that the structure we built stays built —
-that the single sources of truth stay single, and that values which now have a
-home do not silently sprout copies elsewhere.
-
-Everything here exists because it went wrong at least once.
+These do not test recipes. They test that the single sources of truth stay
+single, and that a value with a home does not sprout a copy elsewhere.
 """
 from __future__ import annotations
 
@@ -16,14 +13,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-# One comment-stripper for the whole suite, not a second copy. Its own comment
-# carries the reasoning that matters -- comments go, STRING LITERALS STAY,
-# because a string is exactly how a name gets read.
+# One comment-stripper for the whole suite: comments go, string literals stay.
 from test_front_matter import _strip_comments
 
-# Suite marker, so `pytest -m shared` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.shared
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -55,15 +47,12 @@ def test_family_button_min_chars_is_three():
 
 
 def test_filters_js_holds_no_literal_threshold():
-    """The regression guard, and the point of the whole exercise.
+    """Neither filters.js nor ingredient-search.js compares `query.length`
+    against a literal.
 
-    For months this value lived as a bare `query.length >= 3` in filters.js with
-    nothing defining it, so every rewrite of that file re-derived it from
-    scratch and landed on 2. It now lives in _data/food/ingredient_words.yml, read
-    into FAMILY_BUTTON_MIN_CHARS in assets/js/ingredient-search.js (the
-    matching algorithm moved there so it could be tested directly with
-    Node — see tests/js/ingredient-search.test.js — filters.js is DOM wiring
-    only now). If a literal ever reappears in either file, this fails.
+    The threshold lives in _data/food/ingredient_words.yml and is read into
+    FAMILY_BUTTON_MIN_CHARS in assets/js/ingredient-search.js. A bare literal
+    has nothing defining it, so a rewrite of the file re-derives it wrongly.
     """
     js = read("assets", "js", "filters.js")
     search_js = read("assets", "js", "ingredient-search.js")
@@ -113,16 +102,9 @@ def test_no_food_alias_points_at_another_alias():
     """An alias must name where the chain ENDS, because nothing follows it.
 
     `applyAlias` in assets/js/ingredient-search.js returns `aliasMap[key]`
-    without resolving the result again. So `spring onions in thin strips ->
-    spring onions` stopped at the plural, although `spring onions -> spring
-    onion` was two lines away, and the index grew a second button for one
-    ingredient. Three entries did it on 2026-09-21 (#1175), and
-    `citrus-soy-salmon-sticky-rice` did it to itself: its `item:` gave `spring
-    onions` and its `main_ingredients` gave `spring onion`.
-
-    They were fixed in the data and the rule was left as a comment above the
-    list. A comment is read by whoever is already looking; the next chain is
-    added by somebody who is not.
+    without resolving the result again, so an alias whose target is itself
+    aliased stops one hop short and the index grows a second button for one
+    ingredient (#1175).
     """
     path = DATA / "ingredient_words.yml"
     aliases = yaml.safe_load(path.read_text(encoding="utf-8")).get("aliases") or {}
@@ -142,11 +124,10 @@ def test_no_food_alias_points_at_another_alias():
 
 
 def test_the_alias_chain_check_sees_a_chain():
-    """The check above passes on today's data, so prove it can fail.
+    """The check above passes on real data, so prove it can fail.
 
-    The three shapes are the three it has to tell apart: a chain through a
-    bare name, a chain through a list, and a spelling that only matches a key
-    once it is folded the way the matcher folds it.
+    Three shapes: a chain through a bare name, a chain through a list, and a
+    spelling that only matches a key once folded the way the matcher folds it.
     """
     assert _alias_chains({"onions": "onion", "shallots or onions": ["shallots", "onions"]})
     assert _alias_chains({"spring onions": "spring onion",
@@ -167,8 +148,8 @@ def test_vocabulary_is_emitted_to_the_page():
         "empty singulars and synonyms — ingredient search still works, but "
         '"cheese" stops returning cheddar and the collapse behaviour is lost.'
     )
-    # Match the <script src> tag specifically — the word "filters.js" also
-    # appears in a comment above the block, which would give a false failure.
+    # The <script src> tag specifically: the template's comments also say
+    # "filters.js".
     tag = re.search(r"<script src=[^>]*filters\.js", html)
     assert tag, "food/index.html no longer loads js/filters.js at all."
     assert html.index('id="ingredient-vocabulary"') < tag.start(), (
@@ -180,10 +161,8 @@ def test_vocabulary_is_emitted_to_the_page():
 def test_ingredient_search_js_loads_before_filters_js():
     """filters.js calls HTF.ingredientSearch at startup -- it must already exist.
 
-    Same shape as assets.js needing to load before everything else: the
-    matching algorithm lives in ingredient-search.js (see
-    model_instructions/DEV_JOBS_v22.md §3.4), and filters.js wires it up
-    with `HTF.ingredientSearch.create(...)` in its very first few lines.
+    The matching algorithm lives in ingredient-search.js, and filters.js wires
+    it up with `HTF.ingredientSearch.create(...)` as it starts.
     """
     html = read("food", "index.html")
     search_tag = re.search(r"<script src=[^>]*ingredient-search\.js", html)
@@ -197,18 +176,8 @@ def test_ingredient_search_js_loads_before_filters_js():
 
 
 def test_list_view_js_loads_before_filters_js():
-    """filters.js calls HTF.listView at startup (shuffleRecipeList, update's
-    pagination) -- it must already exist, same trap as ingredient-search.js.
-
-    THE FILE WAS `recipe-list.js` AND THE KEY WAS `HTF.recipeList` UNTIL
-    2026-09-20 (#759). It is three pure helpers the food index happened to need
-    first, and #694 put it on the cocktails index too; both names recorded
-    where it was born rather than what it does. The PATTERN below is what
-    matters here, not the name -- it is
-    matched against the real template, so a tag renamed without this test
-    renamed fails loudly rather than silently passing on a regex that matches
-    nothing. `.recipe-list`, the CSS class on food's `<ul>`, is untouched and
-    really is a list of recipes.
+    """filters.js calls HTF.listView at startup -- it must already exist, the
+    same trap as ingredient-search.js (#759).
     """
     html = read("food", "index.html")
     list_view_tag = re.search(r"<script src=[^>]*list-view\.js", html)
@@ -224,15 +193,10 @@ def test_list_view_js_loads_before_filters_js():
 def test_filter_state_js_loads_before_filters_js():
     """filters.js reads HTF.filterState at startup -- it must already exist.
 
-    Same trap as ingredient-search.js and list-view.js above, and worth
-    stating again because of how it fails rather than because the shape is
-    new. GitHub issue #40 made every taxonomy badge a link into
-    `/food/?star=…&tag=…`, and filters.js applies that query string in its
-    last few lines via HTF.filterState.parseQuery. Loaded the wrong way round,
-    the call throws once and the whole DOMContentLoaded handler dies with it:
-    no shuffle, no filter buttons, and `.recipe-list` never has its
-    `visibility: hidden` lifted -- a blank page, with the only evidence in a
-    console nobody has open.
+    filters.js applies the badge links' query string through
+    HTF.filterState.parseQuery (#40). Loaded the wrong way round, the call
+    throws and the whole DOMContentLoaded handler dies with it: `.recipe-list`
+    never has its `visibility: hidden` lifted, so the index is blank.
     """
     html = read("food", "index.html")
     filter_state_tag = re.search(r"<script src=[^>]*filter-state\.js", html)
@@ -248,12 +212,9 @@ def test_filter_state_js_loads_before_filters_js():
 def test_cook_schedule_js_loads_before_cook_timer_js():
     """cook-timer.js reads HTF.cookSchedule at startup -- it must already exist.
 
-    Third of the same trap as ingredient-search.js and list-view.js above:
-    the arithmetic (resolving a method to minutes, the backwards-from-the-plate
-    clock maths, the rounding) lives in assets/js/cook-schedule.js, and
-    cook-timer.js grabs it into `CS` in its first few lines. Loaded the wrong
-    way round the timings page throws once, silently, and shows nothing but an
-    empty table -- there is no visible error to notice.
+    The arithmetic lives in assets/js/cook-schedule.js and cook-timer.js grabs
+    it as it starts. Loaded the wrong way round the timings page throws once
+    and shows an empty table, with no visible error.
     """
     html = read("food", "reference", "cooking-methods-and-timings.html")
     schedule_tag = re.search(r"<script src=[^>]*cook-schedule\.js", html)
@@ -273,17 +234,11 @@ def test_cook_schedule_js_loads_before_cook_timer_js():
 def test_the_scaler_scripts_load_in_dependency_order():
     """scale.js reads HTF.shoppingList, and cocktail-scale.js reads HTF.scale.
 
-    The same trap as cook-schedule.js before cook-timer.js above, one page
-    along: GitHub issue #545's scaler is three files in a chain -- the amount
-    parser (shopping-list.js, shared with the index's shopping list), the
-    arithmetic (scale.js), and the wiring (cocktail-scale.js). Each grabs the
-    one before it off `HTF` as it parses. Loaded the wrong way round the drink
-    page throws once, silently, and the control simply never appears -- there is
-    no visible error to notice, and the page still reads correctly at x1, which
-    is what would let it ship.
-
-    Read from the LAYOUT rather than from a built page, because that is where
-    these three tags live -- a drink page has no scripts of its own.
+    The drink scaler (#545) is a chain: the amount parser (shopping-list.js),
+    the arithmetic (scale.js) and the wiring (cocktail-scale.js), each grabbing
+    the one before it off `HTF` as it parses. Out of order, the drink page
+    throws once and the control never appears, while the page still reads
+    correctly at x1. The tags live in the layout, so that is what is read.
     """
     html = read("_layouts", "cocktail.html")
     order = ["shopping-list.js", "scale.js", "cocktail-scale.js"]
@@ -304,26 +259,13 @@ def test_the_scaler_scripts_load_in_dependency_order():
 
 
 def test_the_search_box_searches_for_anything_on_a_local_build():
-    """#1050. The search box -- on the back arrow's line as Helen first
-    specified it, in the header on a local build since #1210 -- and the
-    plumbing it needs to be more than a name search.
-
-    THE ORDER IN THE MARKUP IS THE LAYOUT: the input is BEFORE the glass
-    (#1056 moved the glass to the right end, reversing #1050's own layout),
-    so it sits at the right and never moves as the text grows rightwards
-    from the box's left edge. The dropdown element is rendered empty and
-    hidden so the no-script page is the page minus the script; the form
-    names the JSON it searches; both page layouts load page-search.js after
-    back-link.js; and the two JSON pages exist, one per site, out of the
-    sitemap. `search_placeholder` is gone from sites.yml: the words are the
-    same on both sites now, so the key stopped saying where you are.
+    """The header search box (#1050) is local-only, and has the plumbing it
+    needs: _includes/page-search.html renders nothing unless
+    `show_header_search` is set, which only _config_local.yml may declare
+    (#1210). The markup order is the layout: input, then glass, then the
+    dropdown, rendered hidden. The include loads page-search.js itself, and
+    each site has a search.json kept out of the sitemap.
     """
-    # IN THE HEADER, LOCAL BUILDS ONLY, SINCE #1210 (2026-09-30). The box left
-    # _includes/back-to-index.html for _includes/page-search.html, which
-    # _layouts/default.html includes under the door to the other site and
-    # which renders nothing unless `show_header_search` is set -- a key only
-    # _config_local.yml may declare, Helen's "to show on the local site only".
-    # The markup checks below are the same ones; only the file moved.
     include = read("_includes", "page-search.html")
     # The include's Liquid comment discusses the markup at length; only the
     # markup after it is asserted on.
@@ -374,10 +316,8 @@ def test_the_search_box_searches_for_anything_on_a_local_build():
     )
     assert "icons/search.svg" in body, "the glass is _includes/icons/search.svg."
 
-    # THE SCRIPT SHIPS WITH THE BOX, since 2026-10-01: page-search.html loads
-    # page-search.js after the form, inside the same gate, so every page that
-    # has the box has the dropdown and no deployed page loads a script for a
-    # box it does not have. It was a page-layout script from #1050 to #1210.
+    # The script ships with the box, inside the same gate, so no deployed page
+    # loads a script for a box it does not have.
     assert body.find("page-search.js") > body.find('class="page-search"'), (
         "_includes/page-search.html must load page-search.js AFTER the form "
         "it wires (the script binds on run, not on DOMContentLoaded)."
@@ -401,10 +341,8 @@ def test_the_search_box_searches_for_anything_on_a_local_build():
             f"{site}/search.json is not a page and must stay out of the sitemap."
         )
 
-    # A filtered result lands on the list, not the panel above it (Helen,
-    # 2026-09-15): the dropdown's links end in `#results`, and both indexes
-    # must carry that id on the line above their list, or the fragment lands
-    # nowhere and the page opens at the top as if nothing had been asked.
+    # The dropdown's links end in `#results`, and both indexes must carry that
+    # id on the line above their list, or the page opens at the top.
     js = (JS_DIR / "page-search.js").read_text(encoding="utf-8")
     assert "var RESULTS_FRAGMENT = '#results';" in js
     for page in ("food", "cocktails"):
@@ -423,12 +361,10 @@ def test_the_search_box_searches_for_anything_on_a_local_build():
 
 
 def test_the_recipe_scaler_scripts_load_in_dependency_order():
-    """#1005. Four scripts on the recipe page, each read at parse time by the
-    one after it: shopping-list.js (the one amount parser), food-shopping-
-    list.js (food's formatting on top of it), food-scale.js (one amount at a
-    factor, built on both), recipe-scale.js (the wiring). Loaded the wrong
-    way round the page throws once, silently, and the portions box never
-    appears -- the same failure the drink page's three-script test guards.
+    """#1005. The recipe page's scaler scripts are each read at parse time by
+    the one after it: shopping-list.js, food-shopping-list.js, food-scale.js,
+    recipe-scale.js. Out of order the page throws once, silently, and the
+    portions box never appears.
     """
     html = read("_layouts", "recipe.html")
     order = ["shopping-list.js", "food-shopping-list.js", "food-scale.js",
@@ -446,22 +382,17 @@ def test_the_recipe_scaler_scripts_load_in_dependency_order():
 
 
 def test_the_recipe_scaler_is_handed_the_half_step_measures():
-    """#1125. A handful scales in half steps, and WHICH words do is data.
+    """#1125. Which by-eye measures scale in steps is data, and it reaches the
+    page by one route.
 
-    `half_step_measures` in _data/food/scaling.yml reaches the page by one
-    route: _layouts/recipe.html joins it onto the scaler control as
-    `data-half-step-measures`, and recipe-scale.js reads that attribute.
-    Break either end and nothing errors -- food-scale.js treats a missing
-    list as an empty one -- so "1 handful" quietly goes back to scaling to
-    "1.17 handfuls", which is the bug the issue was raised for.
-    `trailing_phrases` travels the same way for the name on the "(Not scaled:
-    ...)" line.
+    _layouts/recipe.html joins the step lists in _data/food/scaling.yml onto
+    the scaler control as data attributes, and recipe-scale.js reads them.
+    Break either end and nothing errors -- food-scale.js treats a missing list
+    as an empty one -- so "1 handful" quietly scales to "1.17 handfuls".
     """
     scaling = yaml.safe_load(read("_data", "food", "scaling.yml"))
     measures = scaling.get("half_step_measures")
-    # `handful` was the word this list was made for and left it on 2026-10-10
-    # for the quarter-step list: "Recipe page handfuls and sprigs in 1/4 too
-    # please." It must be on exactly one of them, or 1.17 handfuls is back.
+    # `handful` is a quarter-step measure, and must be on exactly one list.
     assert measures and "pinch" in measures, (
         "_data/food/scaling.yml has no `half_step_measures` list naming `pinch`."
     )
@@ -490,9 +421,7 @@ def test_the_recipe_scaler_is_handed_the_half_step_measures():
         f"'2 large' scales (#1005), and 240 amounts are written that way."
     )
 
-    # Drops, twists, lots and pats step in halves too since 2026-10-10 ("please
-    # round to the nearest 1/2"), from their own list -- see the test below for
-    # why they are not simply in `half_step_measures`.
+    # `half_step_counts` step in halves too, from their own list.
     html = read("_layouts", "recipe.html")
     wiring = {
         "data-half-step-measures": "site.data.food.scaling.half_step_measures | "
@@ -517,13 +446,11 @@ def test_the_recipe_scaler_is_handed_the_half_step_measures():
 def test_the_food_shopping_scripts_load_in_dependency_order():
     """food-shopping-list.js reads HTF.shoppingList, and filters.js reads both.
 
-    The same trap as the drink scaler's three above, on the other index. #801's
-    shopping list is a chain: the amount parser (shopping-list.js, shared with
-    the drinks), the food arithmetic (food-shopping-list.js), and the wiring
-    (filters.js). food-shopping-list.js pulls six helpers off HTF.shoppingList
-    at module scope, so loading it first throws while it parses -- and that
-    throw kills filters.js's whole startup with it, which is a blank index and
-    not just a missing panel. The failure filter-state.js's own test describes.
+    The shopping list (#801) is a chain: the amount parser (shopping-list.js),
+    the food arithmetic (food-shopping-list.js) and the wiring (filters.js).
+    food-shopping-list.js reads HTF.shoppingList at module scope, so loading
+    it first throws as it parses and kills filters.js's whole startup: a blank
+    index, not just a missing panel.
     """
     html = read("food", "index.html")
     order = ["shopping-list.js", "food-shopping-list.js", "filters.js"]
@@ -548,21 +475,11 @@ def test_the_food_shopping_scripts_load_in_dependency_order():
 def test_the_results_bar_loads_after_the_index_script_on_both_indexes():
     """results-bar.js mirrors what the index script paints, so it loads after it.
 
-    Helen, 2026-09-26, from the "N survivors" candidates page: both treatments,
-    the mono number and the sticky bar, on both indexes. The bar is a MIRROR of
-    the count spans and of the top `× clear all` -- never a second count -- and
-    it wires itself on DOMContentLoaded, after the index script's own handler
-    (filters.js) or its immediate run (cocktail-index.js). Listeners fire in
-    registration order, so the tag has to come after the index script's on
-    each page, or the bar looks for buttons that do not exist yet and finds
-    nothing to mirror.
-
-    Three more facts the same ruling depends on, held here because nothing
-    else sees them: the bar's markup ships `hidden`, so a page without
-    JavaScript is unchanged; the digits carry the shared class on both indexes,
-    so the two counts cannot drift in face; and both stylesheets import the one
-    partial that styles that class, or one site's digits are plain text with a
-    class that means nothing.
+    The bar mirrors the count spans and the top `× clear all`, and wires
+    itself on DOMContentLoaded. Listeners fire in registration order, so its
+    tag comes after the index script's or it finds nothing to mirror. Also
+    pinned: the bar ships `hidden`, the digits carry the shared class on both
+    indexes, and both stylesheets import the partial that styles it.
     """
     for page, index_script in (("food", "filters.js"),
                                ("cocktails", "cocktail-index.js")):
@@ -595,19 +512,10 @@ def test_the_results_bar_loads_after_the_index_script_on_both_indexes():
 def test_the_card_measurement_passes_are_loaded_in_order():
     """card-name-fit.js, then card-line-budget.js, both from the shared layout.
 
-    THE SECOND TAG WAS MISSING FOR TWO DAYS AND NOTHING NOTICED -- 2026-09-08
-    to 2026-09-10. #846 deleted chip-rows.js and its tag from
-    _layouts/default.html, and the comment that replaced them described
-    card-line-budget.js's tag without keeping it. cocktail-index.js guards its
-    call with `if (HTF.cardLineBudget)`, so the #776 budget pass simply never
-    ran and every JS test stayed green: the pure tests run the file directly and
-    never ask whether a page loads it. Found when the pass gained the
-    ship-collision check and marked nothing on a page where seven cards
-    collided.
-
-    The ORDER matters too: the name pass decides how much room the ingredients
-    get, and the budget pass reads the rendered ingredient line, so the budget
-    must run second (its own header says so).
+    cocktail-index.js guards its call with `if (HTF.cardLineBudget)`, so a
+    missing tag means the budget pass (#776) silently never runs while every
+    JS test stays green. The budget pass reads the ingredient line the name
+    pass has just sized, so it loads second.
     """
     html = read("_layouts", "default.html")
     order = ["card-name-fit.js", "card-line-budget.js"]
@@ -628,20 +536,12 @@ def test_the_card_measurement_passes_are_loaded_in_order():
 
 
 def test_a_drink_cards_tagline_is_a_reveal_and_never_shown_at_rest():
-    """#1292: the tagline is on a card's markup again, and hidden until asked for.
+    """#1292: a card's tagline is a reveal, in the markup and hidden at rest.
 
-    #512 took the tagline off the index card, and Helen confirmed it on
-    2026-10-04 with the spare room measured: "no taglines back on the index
-    cards." What she chose instead is a REVEAL -- pointing at a card, or
-    pressing its `?` where there is no hover. So three things have to stay
-    true together, and each fails quietly on its own:
-
-    - the line's base rule is `display: none`, or every card shows it at rest
-      and #512 is undone without anyone deciding to;
-    - both card templates emit it through the one include, or the index card
-      and a drink page's related card stop being the same card (#991);
-    - the shared layout loads card-tagline.js, or the `?` ships `hidden` and
-      stays hidden, and a phone has no way to see a tagline at all.
+    Three things fail quietly on their own: the line's base rule is
+    `display: none`, or every card shows it at rest (#512); both card
+    templates emit it through the one include (#991); and the shared layout
+    loads card-tagline.js, or the `?` stays hidden where there is no hover.
     """
     scss = read("_sass", "cocktails", "_cards.scss")
     base = re.search(r"^\.drink-card-tagline \{(.*?)^\}", scss, re.S | re.M)
@@ -674,10 +574,9 @@ def test_a_drink_cards_tagline_is_a_reveal_and_never_shown_at_rest():
 def test_the_shopping_list_reads_the_aisles_from_the_data_file():
     """The aisle headings are emitted from _data/food/aisles.yml, not written out.
 
-    Same contract `#ingredient-vocabulary` has with ingredient_words.yml: adding
-    an aisle is a YAML edit and must never need this template touched. The
-    keyword table deliberately does NOT go to the page -- the matching happens
-    in _plugins/food_shopping.rb -- so this checks the one half that does.
+    Adding an aisle is a YAML edit and must never need the template touched.
+    The keyword table stays off the page: the matching happens at build time
+    in _plugins/food_shopping.rb.
     """
     html = read("food", "index.html")
     assert 'id="recipe-aisles"' in html, (
@@ -689,8 +588,7 @@ def test_the_shopping_list_reads_the_aisles_from_the_data_file():
         "`order`. A hand-written copy in the template is a second list to keep "
         "in step, which is the thing this contract exists to prevent."
     )
-    # Comments stripped first: the template's own prose explains what it is
-    # NOT emitting, and an unstripped search finds the explanation.
+    # Comments stripped first: the template's prose names what it does not emit.
     assert "aisles.keywords" not in _strip_comments(html, ".html"), (
         "food/index.html looks like it is emitting the aisle KEYWORD table. "
         "That belongs at build time in _plugins/food_shopping.rb -- one "
@@ -701,10 +599,8 @@ def test_the_shopping_list_reads_the_aisles_from_the_data_file():
 def test_filters_js_holds_no_aisle_vocabulary():
     """No aisle name is written into the JavaScript.
 
-    The same guard test_filters_js_holds_no_ingredient_vocabulary makes about
-    ingredient words, for the same reason: the moment a heading is spelled in
-    two places, renaming one renames half the page. filters.js reads the list
-    off the page and passes it straight through.
+    A heading spelled in two places means renaming one renames half the page.
+    filters.js reads the list off the page and passes it straight through.
     """
     aisles = yaml.safe_load((DATA / "aisles.yml").read_text(encoding="utf-8"))
     source = _strip_comments(
@@ -722,9 +618,8 @@ def test_filters_js_holds_no_aisle_vocabulary():
 def test_cook_timer_js_holds_no_schedule_arithmetic():
     """The maths lives in cook-schedule.js, where tests/js can reach it.
 
-    cook-timer.js is DOM wiring. If a rate multiplication or a minutes-from-
-    midnight calculation reappears here it is, by construction, untested again --
-    which is the state GitHub issue #221 existed to end.
+    cook-timer.js is DOM wiring. A rate multiplication or a minutes-from-
+    midnight calculation written there is untested by construction (#221).
     """
     js = read("assets", "js", "cook-timer.js")
     for fragment in ("rate_min", "* 1440", "+= 1440", "Math.round(mins / 5)"):
@@ -738,23 +633,11 @@ def test_cook_timer_js_holds_no_schedule_arithmetic():
 def test_filters_js_holds_no_loose_filter_state_variables():
     """The filter state lives in filter-state.js, where tests/js can reach it.
 
-    Same spirit as test_cook_timer_js_holds_no_schedule_arithmetic above, and
-    for a sharper reason. GitHub issue #52, step one: filters.js used to hold
-    its filter state as six loose variables inside 900 lines of DOM wiring, and
-    three times in two days the same bug shipped -- clearAllFilters() emptied
-    N of them while the clear-all button's visibility predicate checked N-1, so
-    the button hid while it still had work to do. Each was found by eye.
-
-    The state is now ONE object whose fields, cleared value and both "is
-    anything set" answers are all derived by iterating FIELD_SPEC in
-    assets/js/filter-state.js, covered by the generated per-field cases in
-    tests/js/filter-state.test.js. If a loose variable reappears here it is, by
-    construction, outside that enumeration again -- and the generated test
-    cannot see it, because it generates from FIELDS.
-
-    Declarations only. The names are still perfectly good English and may well
-    appear in prose in a comment; what must not come back is filters.js owning
-    the value.
+    The state is one object whose fields, cleared value and "is anything set"
+    answers are all derived from FIELD_SPEC in assets/js/filter-state.js. A
+    loose variable in filters.js is outside that enumeration, so clearing and
+    the clear-all button's predicate can disagree about it (#52). Declarations
+    only: the names may still appear in prose.
     """
     js = read("assets", "js", "filters.js")
     for name in (
@@ -786,12 +669,9 @@ def test_filters_js_holds_no_loose_filter_state_variables():
 def _derivation_block(html: str) -> str:
     """The Liquid that builds `_all_ing` in food/index.html, on its own.
 
-    Grabbing the block rather than the whole file matters for the incidental
-    check below: the word "incidental" is free to appear anywhere else in the
-    template, and only its appearance INSIDE this loop would change what the
-    index contains. {% comment %} blocks come out for the same reason one step
-    down: the loop's own comment has to be able to say the word "incidental" in
-    order to explain why the code never says it.
+    The block alone, with its {% comment %} blocks removed, because the
+    incidental check below searches it for a word the rest of the template,
+    and the loop's own comment, are free to use.
     """
     start = html.find('{% assign _all_ing = "|" %}')
     assert start != -1, (
@@ -805,16 +685,12 @@ def _derivation_block(html: str) -> str:
 
 
 def test_index_emits_the_derived_ingredient_index():
-    """GitHub issue #52: "they hate peas, show me everything without peas".
+    """Each index row carries its complete ingredient list, derived from
+    ingredient_groups and joined on `|` (#52).
 
-    Answering that needs each row's COMPLETE ingredient list, not
-    main_ingredients. main_ingredients is a deliberately partial hint — fine to
-    include ON, dangerous to exclude BY. Nine recipes list an olive oil in
-    ingredient_groups and not one of them names it in main_ingredients, so an
-    exclusion answered from main_ingredients would hand back nine recipes
-    containing the thing the cook is avoiding; coriander is 3 against 8,
-    mushrooms 3 against 4. Hence a second, derived attribute rather than a
-    reuse of the first.
+    The exclude filter reads it. main_ingredients is a deliberately partial
+    hint: an exclusion answered from it hands back recipes containing the
+    thing the cook is avoiding.
     """
     html = read("food", "index.html")
     assert "data-all-ingredients=" in html, (
@@ -832,12 +708,8 @@ def test_index_emits_the_derived_ingredient_index():
         "precisely what makes an exclusion filter lie."
     )
 
-    # The separator, and why it is not the comma data-ingredients uses. That
-    # attribute joins main_ingredients, a curated vocabulary the taxonomy tests
-    # already keep comma-free. These values are arbitrary `item:` free text
-    # where the comma is the commonest character there is, and it is kept out of
-    # the value only by the truncation in the same expression — a separator
-    # whose safety depends on another rule staying exactly as it is.
+    # Not the comma data-ingredients uses: these values are free `item:` text,
+    # where a comma is common and nothing validates it away.
     assert re.search(r'data-all-ingredients="\{\{\s*_all_ing', html), (
         "data-all-ingredients is no longer emitting the `_all_ing` accumulator."
     )
@@ -854,14 +726,10 @@ def test_index_emits_the_derived_ingredient_index():
 def test_the_derived_ingredient_index_counts_incidental_items():
     """`incidental: true` items are IN the index, deliberately.
 
-    The flag hides an item from main_ingredients and from the recipe page's own
-    Ingredients section, which is right for "what is this dish made of" — but
-    "we didn't itemise the frying oil" is not an answer to someone avoiding it.
-    Helen's call, GitHub issue #52.
-
-    Two halves, because either alone can go quiet: the template must not filter
-    the flag out, and the collection must still contain an example for that to
-    mean anything.
+    The flag hides an item from main_ingredients and from the recipe page's
+    Ingredients section, but someone avoiding the frying oil still needs it
+    excluded (#52). Two halves: the template must not filter the flag out, and
+    the collection must still contain an example.
     """
     from conftest import ALL_RECIPES
 
@@ -890,10 +758,9 @@ def test_the_derived_ingredient_index_counts_incidental_items():
         "deliberately — do not leave it passing over an empty list."
     )
 
-    # The Liquid's own rule, mirrored: name up to the first comma or open
-    # bracket, lowercased. A PARALLEL implementation, not a render of the real
-    # template (same caveat as _sink_pantry above) — it guards the rule, not the
-    # template's fidelity to it.
+    # The Liquid's rule, mirrored: name up to the first comma or open bracket,
+    # lowercased. A parallel implementation, not a render of the template: it
+    # guards the rule, not the template's fidelity to it.
     for slug, item_text in with_incidentals:
         name = re.split(r"[,(]", item_text)[0].strip().lower()
         assert name, (
@@ -907,23 +774,11 @@ def test_the_derived_ingredient_index_counts_incidental_items():
 def test_recipe_badges_are_links_carrying_their_own_filter_value():
     """GitHub issue #40. Every taxonomy badge is an <a> with data-tag/data-star.
 
-    Three separate things all rest on this one line of markup, and none of
-    them fails loudly if it regresses to a <span>:
-
-      1. KEYBOARD REACH. A <span> with a click handler is invisible to the tab
-         key and to a screen reader's link list. An <a href> is focusable and
-         announced for free, with no roles or tabindex to remember.
-      2. THE HANDLER'S INPUT. filters.js reads `badge.dataset.tag` /
-         `badge.dataset.star` -- both to route a click and to decide which
-         badges get `.badge--matched`. It used to match on the badge's TEXT,
-         which could not tell a mood badge from a star one.
-      3. THE FALLBACK. The href is what makes middle-click, open-in-new-tab
-         and copy-link-address work, and it is the entire mechanism on a
-         recipe page, where no script intercepts anything.
-
-    Asserted against the template rather than the built site so it holds
-    without a build, and covers both include sites at once -- food/index.html
-    and _layouts/recipe.html share this one partial.
+    A <span> fails quietly three ways: it is unreachable by keyboard;
+    filters.js routes a click and paints `.badge--matched` from the data
+    attribute; and the href is the whole mechanism on a recipe page, where no
+    script intercepts. The href's fragment names the filter section that
+    holds the badge (#1059).
     """
     html = read("_includes", "recipe_badges.html")
 
@@ -946,11 +801,9 @@ def test_recipe_badges_are_links_carrying_their_own_filter_value():
             f"attribute. Without it a badge is a caption again."
         )
 
-    # The query grammar's own shape, at the one place it is written into a URL.
-    # url_encode specifically: it is Ruby's CGI.escape, so it spells a space as
-    # `+`, and assets/js/filter-state.js's parseQuery is written to undo that.
-    # Swapping it for a filter that emits %20 would work; swapping it for no
-    # filter at all would break `oily fish` and five other real values.
+    # url_encode spells a space as `+`, which parseQuery in
+    # assets/js/filter-state.js undoes. No filter at all breaks every taxonomy
+    # value containing a space.
     assert "url_encode" in html, (
         "_includes/recipe_badges.html builds a badge href without url_encode. "
         "Six taxonomy values contain a space (oily fish, root veg, carbs "
@@ -965,12 +818,8 @@ def test_recipe_badges_are_links_carrying_their_own_filter_value():
             f"KIND -- and filters.js only knows how to read that one."
         )
 
-    # #1059, 2026-09-15: a badge's href must land on the filter SECTION that
-    # holds it, not the top of the index. The star badge always names one
-    # fixed section; a tag badge's section depends on which group.name loop
-    # iteration produced it, so its fragment is built from that same variable
-    # rather than a literal -- see the loop just below this function's own
-    # test for the section ids that fragment has to resolve against.
+    # The star badge names one fixed section; a tag badge's section depends
+    # on its group, so its fragment is built from `group.name` (#1059).
     assert "#filter-star" in html, (
         '_includes/recipe_badges.html\'s star badge no longer ends its href '
         'in "#filter-star" -- #1059. Clicking the badge on a recipe page must '
@@ -986,17 +835,12 @@ def test_recipe_badges_are_links_carrying_their_own_filter_value():
 
 
 def test_filter_sections_carry_the_id_their_badges_and_chips_link_to():
-    """#1059, 2026-09-15: "clicking a chip at the top of a recipe should snap
-    the index page to that filter group." A chip's href ends in a fragment
-    (test_recipe_badges_are_links_carrying_their_own_filter_value and
-    _layouts/cocktail.html's mood chips, checked below); this is the other
-    half -- the section the fragment names must actually carry that id.
+    """#1059: the filter section a chip's or badge's fragment names carries
+    that id, or the link lands at the top of the index.
 
-    Asserted against the templates rather than a build, like every other test
-    in this file that can be: food/index.html passes each filter_group.html
-    call a `section_id`, which _includes/filter_group.html turns into the
-    wrapper's `id`; cocktails' MOOD and HASSLE sections write the literal id
-    directly, since they are not built through that shared include.
+    food/index.html passes each filter_group.html call a `section_id`, which
+    the include turns into the wrapper's `id`; cocktails' MOOD and HASSLE
+    sections write the literal id.
     """
     filter_group = read("_includes", "filter_group.html")
     assert 'id="{{ include.section_id }}"' in filter_group, (
@@ -1048,10 +892,8 @@ def test_filter_sections_carry_the_id_their_badges_and_chips_link_to():
 
 
 def test_the_see_shortlist_link_lands_on_the_results_list():
-    """#1057, 2026-09-15: "clicking 'see shortlist' should snap to the section
-    of the page where the shortlisted recipes start" -- the same landing a
-    search-dropdown result already gets (#1050), the count line both indexes
-    carry id="results" on, not the top of the index.
+    """#1057: "see shortlist" lands on the count line both indexes carry
+    id="results" on, not the top of the index.
     """
     page_actions = read("_includes", "page-actions.html")
     assert re.search(r'href="[^"]*\?shortlist=1#results"', page_actions), (
@@ -1100,10 +942,8 @@ def test_no_inline_highlighter_fill(relpath):
 
 @pytest.mark.parametrize("relpath", ["_data/colors.yml", "_data/recipe_sections.yml"])
 def test_deleted_data_files_stay_deleted(relpath):
-    """Both were removed in July 2026 and should not come back.
-
-    colors.yml duplicated the palette; recipe_sections.yml was entirely dead —
-    assigned in recipe.html and never used.
+    """Neither file comes back: colors.yml would be a second copy of the
+    palette, and nothing reads recipe_sections.yml.
     """
     assert not (ROOT / relpath).exists(), (
         f"{relpath} has reappeared. Colour belongs in _sass/food/_palette.scss only; "
@@ -1112,41 +952,12 @@ def test_deleted_data_files_stay_deleted(relpath):
 
 
 def test_palette_is_the_only_place_hex_colours_are_written():
-    """No script writes a colour down. The palette is the only source.
+    """No script under assets/js/ writes a hex colour; the palette is the only source.
 
-    This used to assert that assets/js/colours.js called getPropertyValue — it
-    read food's --colour-* custom properties off :root so JS-injected SVG could
-    be recoloured without a second copy of the palette. The 2026-07-31 recipe
-    redesign removed the last decoration that needed a colour in JavaScript, so
-    colours.js and the :root block both went, and that assertion had nothing
-    left to read.
-
-    Checking every script for a hex literal is what the old test was reaching
-    for anyway, and it is stronger: it covers files colours.js never did, and it
-    keeps biting now that the bridge it guarded no longer exists. If a script
-    ever needs a colour again, the answer is a CSS custom property read at
-    runtime, not a literal here.
-
-    COMMENTS ARE STRIPPED FIRST -- BOTH KINDS, as of 2026-08-16. This used to
-    strip only `//` (`line.split("//")[0]`), which is every comment in most of
-    these scripts and almost none of the comments in cook-timer.js, where the
-    prose is written in `/* */` blocks. So `issue #244` in a block comment was
-    reported as a three-digit colour, and the same false positive was waiting
-    for every three- and six-digit issue number anyone might cite that way:
-    #139, #204, #221, #227, #241 are all live references in this codebase and
-    all read as hex.
-
-    That is not a cosmetic complaint. A check that cries wolf on correct code
-    gets switched off, or -- worse here -- gets worked around by writing the
-    reference wrongly, and the guard ends up shaping the prose instead of
-    guarding the palette. Same reasoning test_notes_are_not_damaged in
-    tests/test_reference_data.py gives for keeping its own checks exact rather
-    than heuristic, and it applies to the code this suite reads as much as to
-    the data.
-
-    _strip_js_comments (defined below, with the SVG guards) is line-preserving
-    for exactly this test's sake: the failure names `file:lineno`, so blanking a
-    block comment must leave its newlines behind.
+    A script that needs a colour reads a CSS custom property at runtime. Both
+    comment kinds are stripped first, or `issue #244` in a block comment reads
+    as a three-digit colour. `_strip_js_comments` keeps line breaks because the
+    failure names `file:lineno`.
     """
     js_files = sorted((ROOT / "assets" / "js").glob("*.js"))
     assert js_files, "No scripts found — this test would pass while checking nothing."
@@ -1171,9 +982,8 @@ def test_palette_is_the_only_place_hex_colours_are_written():
 def test_pantry_entries_are_actually_used():
     """Every pantry staple should appear somewhere in the collection.
 
-    An entry that matches nothing is either a typo or a leftover, and either way
-    it is dead weight in a list whose whole job is to be short and deliberate.
-    Matching is exact and lowercase, exactly as index.html does it.
+    An entry that matches nothing is a typo or a leftover. Matching is exact
+    and lowercase, as food/index.html does it. Skips when ALL_DRAFTS is empty.
     """
     from conftest import ALL_RECIPES, ALL_DRAFTS
     path = DATA / "pantry.yml"
@@ -1181,25 +991,10 @@ def test_pantry_entries_are_actually_used():
         pytest.skip("_data/food/pantry.yml does not exist yet")
     pantry = yaml.safe_load(path.read_text(encoding="utf-8")) or []
 
-    # THIS TEST NEEDS THE DRAFTS, AND CI DOES NOT HAVE THEM. `_food_drafts/` is
-    # a separate PRIVATE repository, gitignored here, so a CI checkout contains
-    # the 82 published recipes and none of the 253 drafts.
-    #
-    # That is not a detail: 15 of the 36 pantry entries -- butter, olive oil,
-    # flour, sugar, garlic, water, sea salt among them -- are used ONLY by
-    # drafts. Run against published recipes alone, this test reports them as
-    # dead weight and fails, which is exactly what happened on the first CI run
-    # to gate a deploy (2026-08-18). Every entry was verified used at that
-    # point; none was a typo and none was aspirational. The data was right and
-    # the corpus was incomplete.
-    #
-    # So it skips rather than lying in either direction -- a pass would claim a
-    # check that did not happen, and a failure would blame correct data for the
-    # absence of a private repository. Conditioned on the DRAFTS being missing
-    # rather than on CI, so it runs anywhere the full collection exists and
-    # starts working in CI for free if the drafts ever become visible there.
-    #
-    # test_pantry_entries_are_well_formed below is what CI can still check.
+    # Some pantry entries are used only by drafts, and `_food_drafts/` is a
+    # private repo a CI checkout lacks. Without ALL_DRAFTS this would fail on
+    # correct data, so it skips; test_pantry_entries_are_well_formed is what
+    # CI can still check.
     if not ALL_DRAFTS:
         pytest.skip(
             "_food_drafts/ is absent (private, gitignored repo), so the "
@@ -1231,17 +1026,9 @@ def test_pantry_entries_are_actually_used():
 def test_pantry_entries_are_well_formed():
     """What CI can check about pantry.yml without the private drafts repo.
 
-    test_pantry_entries_are_actually_used above needs the full collection and
-    skips without it, which would otherwise leave this file completely
-    unguarded on the only machine that gates the deploy. These three properties
-    need no corpus at all, and each has real consequences in food/index.html,
-    which does a raw `contains` against this list:
-
-      - a DUPLICATE is silent -- the list still works, it is just wrong twice,
-        and the second copy will survive an edit that removes the first;
-      - SURROUNDING WHITESPACE never matches, because the comparison is against
-        a stripped ingredient string, so the entry is dead on arrival;
-      - an EMPTY entry matches nothing and reads as an editing accident.
+    food/index.html does a raw `contains` against this list, so a duplicate
+    survives an edit that removes the first copy, and an entry with
+    surrounding whitespace, or an empty one, never matches anything.
     """
     path = DATA / "pantry.yml"
     if not path.exists():
@@ -1274,11 +1061,9 @@ def test_pantry_entries_are_well_formed():
 
 
 def test_pantry_list_is_lowercase():
-    """The match in food/index.html is `ing | downcase` against a raw `contains`
-    check on this list -- an uppercase entry here would silently never match
-    anything (Liquid does not lowercase the pantry side), the exact "test that
-    cannot fail and not notice" failure mode MANUAL.md §12 warns about:
-    green, no error, just an entry that's dead weight forever.
+    """food/index.html matches `ing | downcase` against this list with a raw
+    `contains`, and Liquid does not lowercase the pantry side, so an uppercase
+    entry silently never matches anything.
     """
     path = DATA / "pantry.yml"
     if not path.exists():
@@ -1294,14 +1079,12 @@ def test_pantry_list_is_lowercase():
 
 
 def _sink_pantry(main_ingredients, pantry):
-    """Python mirror of food/index.html's ordering Liquid (issue #107/#74):
+    """Python mirror of food/index.html's ordering Liquid (#74, #107):
     non-pantry ingredients first, pantry staples sunk to the end, authored
     order preserved within each half. Exact, lowercase match.
 
-    This is a *parallel* implementation, not a render of the real template --
-    it cannot catch food/index.html drifting from this rule, only regressions
-    in the rule itself. If the Liquid there changes, update this to match, or
-    this test will pass green while checking something the page no longer does.
+    A parallel implementation, not a render of the template: if the Liquid
+    changes, change this to match, or its test checks a rule the page has left.
     """
     lead = [i for i in main_ingredients if str(i).lower() not in pantry]
     tail = [i for i in main_ingredients if str(i).lower() in pantry]
@@ -1309,10 +1092,9 @@ def _sink_pantry(main_ingredients, pantry):
 
 
 def test_main_ingredients_sink_pantry_to_the_end():
-    """GitHub issue #74/#107: main_ingredients render in "larder order" on the
-    index page -- distinctive ingredients first, pantry staples trailing, so
-    the eye meets what makes the dish itself before the things every kitchen
-    already has. Checks the rule against known cases, not just that it runs.
+    """#74, #107: main_ingredients render in larder order on the index --
+    distinctive ingredients first, pantry staples trailing. Checks the rule
+    against known cases.
     """
     pantry = {"onion", "butter", "salt", "garlic"}
 
@@ -1321,7 +1103,7 @@ def test_main_ingredients_sink_pantry_to_the_end():
         "chicken", "lemon", "onion", "butter",
     ]
 
-    # Exact match only -- a variety naming itself is not demoted (§6/pantry.yml).
+    # Exact match only -- a variety naming itself is not demoted (MANUAL §6).
     assert _sink_pantry(["red onions", "onion"], pantry) == ["red onions", "onion"]
 
     # Case-insensitive: `ing | downcase` in the template.
@@ -1342,11 +1124,10 @@ JS_DIR = ROOT / "assets" / "js"
 
 
 def test_base_url_is_derived_in_exactly_one_place():
-    """The base URL used to be copy-pasted four times, and the copies drifted.
+    """Only assets.js reads the base-url meta tag.
 
-    Every decorative asset URL is built from this value, and the value changes
-    when `baseurl` changes — so a second copy is a second chance to be subtly
-    wrong on the day you deploy.
+    Every decorative asset URL is built from this value, and it changes when
+    `baseurl` does, so a second reader is a second chance to be wrong on deploy.
     """
     pattern = re.compile(r"""meta\[name=["']base-url["']\]""")
     offenders = []
@@ -1371,22 +1152,13 @@ def test_base_url_is_derived_in_exactly_one_place():
 def test_assets_js_loads_before_any_other_script():
     """assets.js defines window.HTF, which every other script calls at parse time.
 
-    It has to load first, and "end of <body>" is NOT first here. A page
-    layout's own scripts are emitted inside `{{ content }}`, which default.html
-    renders into <main> — ABOVE its own closing scripts. So recipe.html's
-    section-rule.js (now heading-underline.js, renamed when the redesign cut
-    four of its five jobs) ran before assets.js and threw
-    `Cannot read properties of undefined (reading 'makeShuffledPicker')` on its
-    first line, silently removing the section rules, the ingredient bullets and
-    the section-heading doodles. They were missing for weeks.
-
-    The fix is assets.js at the end of <head>, above `{{ content }}`. It reads
-    only the two meta tags above it and touches no body element at parse time.
+    "End of <body>" is not first: a page layout's own scripts are emitted
+    inside `{{ content }}`, above default.html's closing scripts, and would
+    run before it and throw. So assets.js sits in <head>, above
+    `{{ content }}`.
     """
-    # Strip Liquid comments FIRST. The comment above assets.js explains the
-    # rule by quoting `{{ content }}`, and a naive find() locates that mention
-    # rather than the real render — which is the same read-a-comment-as-code
-    # mistake this file's other guards were bitten by.
+    # Liquid comments stripped first: the layout's own comment quotes
+    # `{{ content }}`, and find() would locate that mention.
     html = re.sub(r"\{%-?\s*comment\s*-?%\}.*?\{%-?\s*endcomment\s*-?%\}", "",
                   read("_layouts", "default.html"), flags=re.S)
 
@@ -1419,15 +1191,9 @@ IMG_DIR = ROOT / "assets" / "img"
 def _strip_js_comments(text: str) -> str:
     """Blank // and /* */ comments so a guard cannot match its own explanation.
 
-    LINE NUMBERS SURVIVE, and that is the whole reason this replaces the comment
-    rather than deleting it: every caller reports `file:lineno`, and a block
-    comment removed outright takes its newlines with it, so every line number
-    after the first `/* */` in the file comes out short by however many lines
-    that comment ran to. A guard that names the wrong line is worse than one
-    that names none. Each stripped block leaves exactly the newlines it held.
-
-    Trailing `//` is stripped as well as a whole-line one -- a hex literal in an
-    end-of-line comment is a comment, wherever it sits on the line.
+    Each stripped block leaves exactly the newlines it held, because callers
+    report `file:lineno`. A trailing `//` comment is stripped as well as a
+    whole-line one.
     """
     text = re.sub(r"/\*.*?\*/", lambda m: "\n" * m.group(0).count("\n"),
                   text, flags=re.S)
@@ -1435,25 +1201,16 @@ def _strip_js_comments(text: str) -> str:
 
 
 def test_svg_injection_does_not_assume_a_space_after_the_svg_tag():
-    """`'<svg '` with a trailing space is a trap, and it cost weeks.
+    """No script's replace() searches for the literal `'<svg '` with a
+    trailing space.
 
-    decorations.js rewrites each decorative SVG as it injects it — stripping the
-    mm dimensions and adding `position:absolute` so the wash sits BEHIND its
-    label. Every one of those rewrites matched the literal `'<svg '`.
-
-    Inkscape puts each attribute on its own line, so all 100 files under
-    backgrounds-headers/ open with `<svg\\n   width="…mm"`. Not one replace
-    matched. String.replace returns the input unchanged when it does not match,
-    so there was no error anywhere — the wash simply rendered at its natural
-    14mm × 4mm, inline, to the left of the label text.
-
-    Match `<svg` plus whitespace instead. Comments are stripped first, because
-    the comment in decorations.js explaining this rule quotes the bad literal.
+    Inkscape puts each attribute on its own line, so its files open with
+    `<svg\\n`. String.replace returns its input unchanged when nothing matches,
+    so the artwork renders at its natural size with no error. Match `<svg`
+    plus whitespace. Comments are stripped first: they may quote the literal.
     """
-    # Only the SEARCH argument of a replace, never the replacement. The
-    # replacement legitimately contains `<svg ` — it is what gets written back
-    # — so a bare search for the literal flags every correct call as a fault.
-    # First version of this test did exactly that and failed on the fix.
+    # Only the search argument of a replace: the replacement legitimately
+    # contains `<svg `.
     search_arg = re.compile(
         r"""\.replace\(\s*(?:(['"])<svg |/[^/\n]*<svg )"""
     )
@@ -1472,11 +1229,10 @@ def test_svg_injection_does_not_assume_a_space_after_the_svg_tag():
 
 
 def test_every_shipped_svg_is_matched_by_the_injection_pattern():
-    """The other half: assets must be matchable, not just the code tolerant.
+    """Every SVG under assets/img/ opens with a tag the injection can match.
 
-    Guards the actual files rather than the regex, so dropping in artwork
-    exported by something with yet another convention fails here — loudly, once
-    — instead of rendering wrong on a page nobody reloads for a fortnight.
+    Guards the files rather than the regex, so artwork exported with another
+    convention fails here instead of rendering at the wrong size.
     """
     pattern = re.compile(r"<svg(?=[\s>])")
     svgs = sorted(IMG_DIR.rglob("*.svg"))
@@ -1495,29 +1251,10 @@ def test_every_shipped_svg_is_matched_by_the_injection_pattern():
 def test_every_shipped_svg_actually_parses():
     """An SVG is XML, and a browser that cannot parse it renders NOTHING.
 
-    GitHub issue #241, and it is a good demonstration of why "the file looks
-    right" is not the same as "the file works". The favicon was changed to a
-    black H on the brand magenta, and the fill values were correct -- but the
-    comment explaining the choice used ` -- ` as a dash, the way a commit
-    message here does. A double hyphen is illegal inside an XML comment, so
-    the whole document failed to parse, every browser silently kept showing
-    the previously cached icon, and the change appeared simply not to have
-    happened. It was diagnosed only when Helen opened the .svg directly and
-    got a parser error page.
-
-    Nothing else could have caught it. The build does not parse SVGs, and
-    test_every_shipped_svg_is_matched_by_the_injection_pattern above reads
-    each file as TEXT, looking for an opening tag -- which a malformed file
-    still has.
-
-    HOUSE STYLE POINT worth keeping with the test: prose in this repo uses an
-    em dash (MANUAL §5). The ASCII `--` exception is for COMMIT MESSAGES
-    specifically. Inside an SVG comment it is not merely off-style, it is a
-    parse error.
-
-    Covers _includes/icons/ as well as assets/img/: those partials are
-    inlined straight into the page by default.html, so a malformed one takes
-    the surrounding markup with it rather than just failing to draw.
+    The usual cause is `--` inside an XML comment, which is illegal: the whole
+    document fails to parse and the browser keeps showing its cached copy
+    (#241). The build does not parse SVGs. Covers _includes/icons/ too: those
+    are inlined into the page, so a malformed one damages the markup round it.
     """
     import xml.dom.minidom
 
@@ -1545,13 +1282,11 @@ def test_every_shipped_svg_actually_parses():
 
 
 def test_site_key_is_derived_in_exactly_one_place():
-    """Same discipline as the base URL, for the same reason.
+    """Only assets.js reads the site-key meta tag.
 
-    Food and cocktails keep separate artwork under assets/img/<site>/, so every
-    decorative fetch needs the site key. It is emitted once by default.html and
-    read once by assets.js, which exposes HTF.site and HTF.siteAsset(). A second
-    reader is a second thing to forget when a third site appears — and unlike
-    the base URL, a wrong site key fails only on the site nobody was looking at.
+    Each site keeps its artwork under assets/img/<site>/, so every decorative
+    fetch needs the key; assets.js exposes it as HTF.site and HTF.siteAsset().
+    A wrong key in a second reader fails only on the site nobody is looking at.
     """
     pattern = re.compile(r"""meta\[name=["']site-key["']\]""")
     offenders = []
@@ -1570,22 +1305,10 @@ def test_site_key_is_derived_in_exactly_one_place():
 def test_artwork_fetches_go_through_site_asset():
     """No script may hardcode which site's artwork it is loading.
 
-    `HTF.asset('/assets/img/…')` reaches into a specific site's set from code
-    that should not know which site it is on — it is how tape-food-N.svg came to
-    be named in decorations.js. Artwork goes through HTF.siteAsset(), which
-    builds the path from the page's site key.
-
-    assets/img/favicon.svg is the one genuinely shared image referenced from a
-    TEMPLATE, so it needs no exception here.
-
-    THE SHARED CHROME IS NOT AN EXCEPTION EITHER, and that is deliberate. The
-    header and footer artwork (assets/img/chrome/) belongs to no site, so it
-    genuinely cannot go through siteAsset -- but it does not get to reach for
-    HTF.asset either, because then this rule would have to allow
-    `HTF.asset('/assets/img/…')` in general and would stop catching the thing it
-    exists for. It goes through a third helper, HTF.chromeAsset, whose name
-    states the claim it is making. A script that wants a site's artwork and
-    reaches for chromeAsset is wrong in a way a reader can see.
+    Artwork goes through HTF.siteAsset(), which builds the path from the
+    page's site key; `HTF.asset('/assets/img/…')` reaches into one site's set.
+    The shared header and footer artwork is no exception: it goes through
+    HTF.chromeAsset, so this rule never has to allow HTF.asset for images.
     """
     pattern = re.compile(r"""HTF\.asset\(\s*['"]/assets/img/""")
     offenders = []
@@ -1604,10 +1327,8 @@ def test_artwork_fetches_go_through_site_asset():
 def test_no_silently_swallowed_fetch_errors():
     """An empty catch on an asset fetch is worse than no catch.
 
-    All five decorative SVG fetches used to end in `.catch(function() {})`, so a
-    wrong baseurl produced a site with no decoration and a completely clean
-    console. Fetching now goes through HTF.fetchSvg, which warns with the URL
-    and names the likely cause.
+    With `.catch(function() {})` a wrong baseurl gives a site with no
+    decoration and a clean console. HTF.fetchSvg warns with the URL.
     """
     empty_catch = re.compile(r"\.catch\(\s*function\s*\(\s*\)\s*\{\s*\}\s*\)")
     offenders = []
@@ -1645,9 +1366,8 @@ def test_svg_fetching_goes_through_the_shared_helper():
 def test_gemfile_does_not_pin_jekyll_backwards():
     """The `github-pages` gem would silently downgrade Jekyll 4.3 to 3.9.
 
-    It is only needed for GitHub Pages' classic branch-based build. Deployment
-    here runs `bundle exec jekyll build` in an Actions workflow, so the version
-    in the Gemfile is the one actually used.
+    Deployment runs `bundle exec jekyll build` in an Actions workflow, so the
+    version in the Gemfile is the one used.
     """
     lines = read("Gemfile").splitlines()
     active = [l for l in lines if l.strip() and not l.strip().startswith("#")]
@@ -1677,13 +1397,10 @@ def test_gitignore_covers_build_output():
 def test_every_drafts_collection_is_gitignored():
     """Unpublished drafts must not reach a public repo.
 
-    .gitignore matches by directory NAME, so renaming a drafts collection
-    silently stops ignoring it — no error, no warning, just 221 unpublished
-    recipes newly stageable. That is exactly what happened when `_drafts/`
-    became `_food_drafts/` in the mono-repo migration.
-
-    Derived from _config.yml rather than hardcoded, so a drafts collection added
-    later is covered the day it is declared.
+    .gitignore matches by directory name, so renaming a drafts collection
+    silently stops ignoring it and the drafts become stageable. The names are
+    derived from _config.yml, so a collection added later is covered. Git is
+    asked too: a pattern ending in `/` does not ignore a symlink (#235).
     """
     config = yaml.safe_load(read("_config.yml"))
     drafts = [name for name in (config.get("collections") or {}) if "draft" in name]
@@ -1692,10 +1409,7 @@ def test_every_drafts_collection_is_gitignored():
         "removed, delete this test; otherwise the collection name has changed "
         "shape and this check is no longer finding it."
     )
-    # Active patterns only. A substring match over the whole file would count a
-    # commented-out `# _food_drafts/` as coverage — and the explanatory comment
-    # directly above the entries names them, so a naive check passes even with
-    # every pattern deleted.
+    # Active patterns only: .gitignore's own comments name the directories.
     active = {line.strip() for line in read(".gitignore").splitlines()
               if line.strip() and not line.strip().startswith("#")}
     missing = [f"_{name}/" for name in drafts if f"_{name}/" not in active]
@@ -1706,16 +1420,10 @@ def test_every_drafts_collection_is_gitignored():
         f"source markdown being committed."
     )
 
-    # AND ASK GIT, not just the file. Everything above checks that a PATTERN is
-    # written; it cannot tell you whether the PATH is ignored, and the two came
-    # apart on 2026-08-27. `_cocktail_drafts/` matches a directory, and a
-    # symlink to a directory is not one as far as git is concerned -- so a
-    # worktree with the drafts linked in from the main checkout had them sitting
-    # untracked and stageable, with this test green, which is issue #235's shape
-    # arriving through the ignore rule instead of the build config.
-    #
-    # Only checks what is actually on disk: a clean public checkout has neither
-    # directory, and `check-ignore` on an absent path proves nothing either way.
+    # A written pattern is not an ignored path: `_cocktail_drafts/` matches a
+    # directory, and git does not treat a symlink to one as a directory. Only
+    # paths on disk are asked about; `check-ignore` on an absent path proves
+    # nothing.
     for name in drafts:
         path = ROOT / f"_{name}"
         if not (path.exists() or path.is_symlink()):
@@ -1734,20 +1442,12 @@ def test_every_drafts_collection_is_gitignored():
 
 
 def test_every_glass_icon_named_in_the_data_exists():
-    """_data/cocktails/glasses.yml maps a drink's `glass:` to an SVG partial,
-    and _layouts/cocktail.html inlines it with `{% include %}`.
+    """Every icon _data/cocktails/glasses.yml names exists under
+    _includes/icons/glasses/.
 
-    THE TWO FAILURE MODES ARE OPPOSITE AND ONLY ONE IS LOUD. A glass with no
-    entry in the map renders no icon, silently and correctly -- that is the
-    designed absent-means-nothing path, and it is the NORMAL case today, since
-    `coupe` is the commonest glass in the collection and has no artwork yet. But
-    an entry naming a file that is not there is a Jekyll build failure on every
-    drink using that glass, which is a bad way to find out you typed
-    `nick-and-nora` as `nick-and-norah`.
-
-    So the map is checked against the directory rather than the template being
-    made defensive: Liquid has no file-exists test, and adding one would mean
-    the layout silently swallowing a real mistake in the data.
+    A glass with no entry renders no icon, by design. An entry naming a file
+    that is not there fails the Jekyll build on every drink using that glass:
+    `{% include %}` has no file-exists test.
     """
     path = ROOT / "_data" / "cocktails" / "glasses.yml"
     if not path.exists():
@@ -1803,17 +1503,12 @@ def _png_size(path: Path) -> tuple[int, int]:
 
 
 def test_every_link_preview_image_exists_at_the_size_the_layout_claims():
-    """The og:image cards: one per site in sites.yml, one repo-level in
+    """The og:image cards (#1086): one per site in sites.yml, one in
     _config.yml for the site-neutral pages, all rendered by
-    scripts/render_social_images.py (design review 2026-09-15, #1086).
+    scripts/render_social_images.py.
 
-    Three things can rot independently: a site can name a card that was never
-    rendered (a preview with a broken picture, which is worse than none); the
-    layout's og:image:width/height can drift from what the script writes
-    (Facebook and WhatsApp size the card off those numbers and crop to them);
-    and the script's own constants can move without the layout following.
-    So this reads the PNG headers and holds every one to the numbers the
-    layout states, and holds the layout's numbers to the script's.
+    Every named card exists, its PNG header matches the og:image:width/height
+    the layout states, and the layout's numbers match the script's constants.
     """
     sites = yaml.safe_load(read("_data", "sites.yml"))
     config = yaml.safe_load(read("_config.yml"))
@@ -1855,8 +1550,6 @@ def test_every_link_preview_image_exists_at_the_size_the_layout_claims():
 
 
 # --- accessibility of the interactive layer ----------------------------------
-# The decorative layer is already sound: every ornamental SVG carries
-# aria-hidden. These guard the controls, which is where the gaps were.
 
 def test_search_inputs_have_a_label():
     """A <span> beside an input is not a label.
@@ -1874,15 +1567,12 @@ def test_search_inputs_have_a_label():
 
 
 def test_the_recipe_title_gap_names_the_furniture_includes_own_wrapper():
-    """The 1rem under the back arrow is a sibling selector, and it went stale.
+    """The gap under the back arrow is a sibling selector naming the include's
+    outermost element.
 
-    `_sass/food/_recipe-header.scss` closes the gap between the arrow and a
-    recipe's title with `.<wrapper> + .recipe .recipe-title`. #1024 wrapped the
-    arrow in `.page-furniture` on 2026-09-14 and the rule still said
-    `.back-to-index +`, which then matched nothing: every recipe title sat 3rem
-    under the arrow, against the drink page's 1rem, for a day, with nothing red.
-    Found by measuring in #1093's spacing review. So this asks the include what
-    its outermost element is called and holds the rule to that name.
+    `_sass/food/_recipe-header.scss` closes the gap with
+    `.<wrapper> + .recipe .recipe-title`. Rename or re-wrap the include and
+    the rule matches nothing, silently, and the title drops (#1024, #1093).
     """
     include = read("_includes", "back-to-index.html")
     wrapper = re.search(r'^<(\w+) class="([\w-]+)"', _strip_comments(include, ".html"), re.M)
@@ -1896,7 +1586,7 @@ def test_the_recipe_title_gap_names_the_furniture_includes_own_wrapper():
 
 
 def test_clear_controls_are_buttons():
-    """They were <span>s with click handlers: not focusable, not announced."""
+    """A <span> with a click handler is not focusable and not announced."""
     html = read("food", "index.html") + read("_includes", "filter_group.html")
     offenders = re.findall(r'<span[^>]*class="[^"]*btn-clear-inline', html)
     assert not offenders, (
@@ -1909,8 +1599,8 @@ def test_clear_controls_are_buttons():
 def test_filter_buttons_announce_their_state():
     """The filter buttons are toggles, so they need aria-pressed.
 
-    filters.js syncs the value from the .active class inside update(), in one
-    place rather than at each of the fifteen toggle sites.
+    filters.js syncs the value from the .active class in one place,
+    syncAriaPressed, rather than at each toggle site.
     """
     assert 'aria-pressed="false"' in read("_includes", "filter_group.html"), (
         "Filter buttons in filter_group.html have no aria-pressed attribute. "
@@ -1934,7 +1624,7 @@ def test_search_results_are_announced():
 
 
 def test_index_has_a_heading():
-    """Every recipe page has an h1. The index had none of any level."""
+    """The food index has an h1, like every recipe page."""
     html = read("food", "index.html")
     assert re.search(r"<h1[^>]*>", html), (
         "food/index.html has no <h1>. The logo is the visible title, so a "
@@ -1947,11 +1637,9 @@ def test_index_has_a_heading():
 # --- one word per concept ----------------------------------------------------
 
 def test_the_method_is_called_method_everywhere():
-    """It used to be `instructions` in CSS, `method` in the data, and
-    `method-full` in JS — one concept, two words, three places.
-
-    `recipe.html` also carried a `page.method | default: page.instructions`
-    fallback to a front matter field that no file has used since June.
+    """The word `instructions` appears in no code line of the recipe layout or
+    method-toggle.js: the data field is `method`, so the class and the JS say
+    `method` too.
     """
     offenders = []
     for relpath in ("_layouts/recipe.html", "_sass/food/_recipe.scss", "assets/js/method-toggle.js"):
@@ -1960,7 +1648,7 @@ def test_the_method_is_called_method_everywhere():
             continue
         for line in path.read_text(encoding="utf-8").splitlines():
             stripped = line.strip()
-            # comments may mention the old name to explain the history
+            # A comment may use the word.
             if stripped.startswith(("//", "/*", "*", "#", "{%- comment", "{% comment")):
                 continue
             if "instructions" in line:
@@ -1973,12 +1661,12 @@ def test_the_method_is_called_method_everywhere():
 
 
 def test_no_recipe_uses_the_retired_instructions_field():
-    """The template fallback is gone, so a file using it would render no method.
+    """The template has no fallback to `instructions:`, so a file using it
+    renders no method.
 
-    PARTIAL IN CI, KNOWINGLY (#378). Reads drafts as well as recipes, and a CI
-    checkout has no drafts -- so there it means "no published recipe uses it".
-    Deliberately not skipped: the published half is the half that ships, and
-    losing it to report honestly about the other half would be a bad trade.
+    Partial in CI, knowingly (#378): it reads ALL_DRAFTS as well as recipes,
+    and a CI checkout has no drafts. Not skipped there, because the published
+    half is the half that ships.
     """
     from conftest import ALL_RECIPES, ALL_DRAFTS
     assert ALL_RECIPES, (
@@ -1994,7 +1682,8 @@ def test_no_recipe_uses_the_retired_instructions_field():
 
 
 def test_no_orphaned_data_file_references():
-    """_data/index_tags_sections.yml was renamed to filter_sections.yml."""
+    """No template reads `index_tags_sections`: Jekyll resolves a missing data
+    file to nil silently, so the symptom is empty filter groups."""
     offenders = []
     for path in list((ROOT / "_layouts").glob("*.html")) + \
                 list((ROOT / "_includes").glob("*.html")) + \
@@ -2016,31 +1705,16 @@ SASS_DIR = ROOT / "_sass"
 def sass_files() -> list[Path]:
     """Every partial, at any depth under _sass/.
 
-    rglob, NOT glob. The partials used to sit flat in _sass/ and the three
-    structural tests below globbed "*.scss"; the mono-repo split moved every one
-    of them into _sass/shared/, _sass/food/ and _sass/cocktails/ (there used
-    also to be a _sass/root/, for the landing page's own styles — deleted by
-    GitHub issue #204 along with the landing page itself), which would have
-    left that pattern matching an empty set. The tests would have gone on
-    PASSING while checking nothing at all.
-
-    That is not hypothetical. The same failure had already happened once in this
-    file: JS_DIR pointed at _sass's sibling `js/` after the scripts moved to
-    `assets/js/`, and three guards silently passed over an empty directory until
-    it was noticed. A test that cannot fail is worse than no test, because it
-    reads as coverage.
-
-    test_sass_files_are_actually_found below asserts this returns something.
+    rglob, not glob: the partials live in subdirectories, and a flat glob
+    matches an empty set, so the structural tests pass while checking nothing.
+    test_sass_files_are_actually_found asserts this returns something.
     """
     return sorted(SASS_DIR.rglob("*.scss"))
 
 
 def test_sass_files_are_actually_found():
-    """The guard on the guards — see sass_files() above.
-
-    If a future reorganisation moves the partials somewhere this does not reach,
-    this fails loudly instead of the three structural tests quietly passing on
-    an empty list.
+    """sass_files() finds the partials. If they move somewhere it does not
+    reach, this fails instead of the structural tests passing on an empty list.
     """
     found = sass_files()
     assert len(found) >= 5, (
@@ -2054,35 +1728,11 @@ def test_sass_files_are_actually_found():
 def _top_level_blocks(text: str):
     """Yield (selector, [declared properties]) for every un-nested rule.
 
-    "Un-nested" rather than "zero-indent" since 2026-08-14: a rule sitting
-    inside an at-rule counts too, and carries that at-rule in its key --
-    `@media print .recipe-badges`, not `.recipe-badges`.
-
-    ELEMENT SELECTORS COUNT TOO, also 2026-08-14. The pattern used to require
-    a leading `.#%&`, so `body`, `a`, `main` and `h1, h2, h3` -- every bare
-    element rule in shared/_base.scss and shared/_layout.scss -- were simply
-    not seen. That was invisible until a test built on this helper needed to
-    ask "does anything paint the page ground", got back nothing, and passed
-    while checking nothing at all.
-
-    THIS USED TO SEE NOTHING INSIDE AN @media BLOCK, and that mattered the
-    moment the site got its first one. The old version matched a selector
-    only at zero indent, so every rule the print stylesheet declares
-    (_sass/shared/_print.scss and _sass/food/_print.scss, GitHub issue #86)
-    was invisible to test_no_selector_declares_the_same_property_twice below
-    while it went on reporting green -- the exact "test that cannot fail and
-    not notice" shape MANUAL.md §12 warns about, arriving with a
-    feature rather than with a file move.
-
-    THE AT-RULE HAS TO STAY IN THE KEY, not be folded away. A print rule and
-    the screen rule it overrides declare the same property for the same
-    selector deliberately -- that is what an override IS -- so keying both as
-    `.recipe-badges` would report every correct print rule as a clash. Only
-    two print rules fighting each other, or two screen rules, are a bug.
-
-    Line-oriented, like the version it replaces: it assumes this codebase's
-    own formatting, one opening brace at the end of its line and a closing
-    brace on a line of its own.
+    A rule inside an at-rule counts, and carries the at-rule in its key
+    (`@media print .recipe-badges`): a print rule overriding a screen rule
+    declares the same property on purpose and must not read as a clash.
+    Element selectors (`body`, `h1, h2`) count too. Line-oriented: it assumes
+    one opening brace at the end of its line and a closing brace on its own.
     """
     depth = 0
     at_rule = None          # the @media/@supports we are inside, if any
@@ -2129,13 +1779,8 @@ def _top_level_blocks(text: str):
 
 # --- the shared/forked SCSS boundary -----------------------------------------
 
-# Every variable the shared partials -- _base.scss, _layout.scss and
-# _footer.scss -- use but do not define. Each site palette owes all of them.
-#
-# `color-accent` is the tenth, added with issue #374 when the footer's
-# interactive rules moved out of _sass/food/ and into shared/. It is each site's
-# one "this is interactive / branded" colour: food's magenta, and a placeholder
-# on cocktails until that palette is argued from real drinks.
+# Variables the shared partials use but do not define. Each site palette owes
+# all of them (#374).
 SHARED_PALETTE_CONTRACT = [
     "color-accent",
     "color-bg", "color-border", "color-clear-text", "color-mood-root",
@@ -2143,25 +1788,17 @@ SHARED_PALETTE_CONTRACT = [
     "font-body", "font-headings",
 ]
 
-# Directories holding a _palette.scss: the two sites. There used to be a
-# third, "root", for the landing page — which belonged to neither site but
-# rendered the same shared chrome and so needed the same nine variables. The
-# landing page and its palette were deleted by GitHub issue #204 in favour of
-# a bare redirect from the root to food/, which needs no palette at all.
+# Directories holding a _palette.scss: the two sites.
 PALETTE_OWNERS = ["food", "cocktails"]
 
 
 @pytest.mark.parametrize("owner", PALETTE_OWNERS)
 def test_every_palette_satisfies_the_shared_contract(owner):
-    """A shared partial names palette variables it does not define.
+    """Every palette declares each variable the shared partials name.
 
-    That is what makes it shareable — but it means a palette that omits one
-    fails at BUILD time, with an "Undefined variable" pointing at a line in
-    _sass/shared/, not at the palette that actually forgot it. Worse, it only
-    breaks the site whose palette is short, so food can be perfectly fine while
-    cocktails will not compile.
-
-    Checked here so the failure names the file and the variable instead.
+    A palette that omits one fails at build time with an "Undefined variable"
+    pointing into _sass/shared/, and only on the site whose palette is short.
+    Checked here so the failure names the file and the variable.
     """
     path = SASS_DIR / owner / "_palette.scss"
     assert path.exists(), (
@@ -2185,30 +1822,13 @@ SHARED_FONT_STACKS = ["font-headings", "font-body"]
 
 @pytest.mark.parametrize("variable", SHARED_FONT_STACKS)
 def test_the_two_palettes_declare_the_SAME_font_stack(variable):
-    """Typography is the family resemblance between the two sites.
+    """Both palettes declare the same `$font-headings` and `$font-body` (#686).
 
-    Both palettes' own comments say so and ask that any change here be made as
-    a DECISION rather than by drift — and until GitHub issue #686 nothing
-    checked it. The two files' `$font-headings` and `$font-body` lines were
-    byte-identical because somebody had been careful, which is not a guarantee:
-    a third face added to one stack, or a fallback dropped from it, would leave
-    food and cocktails setting the same text in different type and neither site
-    would look wrong on its own screen.
-
-    NOT MOVED INTO shared/, deliberately. `SHARED_PALETTE_CONTRACT` above
-    requires every palette to DECLARE all ten variables by name, which is what
-    makes the shared partials shareable and what makes a missing one fail with
-    the palette's name on it rather than a shared file's. Hoisting these two
-    would carve the first exception into that rule, and cocktails' own
-    `$font-label` comment (2026-09-02) is the argument against: borrowing the
-    survivor of someone else's argument is not the same as having made one, so
-    each site keeps the line and the chance to diverge from it on purpose.
-    Equality is the cheaper guarantee — it costs one assert and holds the
-    resemblance without taking the decision away from either site.
-
-    IF THIS FAILS AND THE DIFFERENCE IS INTENDED: the fix is to delete the
-    variable from SHARED_FONT_STACKS with a note saying which site diverged and
-    why, not to edit one palette back to match the other.
+    Typography is the family resemblance between the sites; a stack that
+    drifts on one leaves neither looking wrong on its own screen. Compared
+    for equality rather than hoisted into shared/, so every palette still
+    declares each variable in SHARED_PALETTE_CONTRACT by name. An intended
+    divergence takes the variable out of SHARED_FONT_STACKS with the reason.
     """
     pattern = rf"^\${re.escape(variable)}\s*:\s*(.+?);"
     declared = {}
@@ -2220,9 +1840,7 @@ def test_the_two_palettes_declare_the_SAME_font_stack(variable):
             f"test_every_palette_satisfies_the_shared_contract should have "
             f"caught first — the build fails without it."
         )
-        # Whitespace normalised: the two files align their values in a column,
-        # so `$font-body:     "Selawik"` and `$font-body: "Selawik"` are the
-        # same decision spelled differently and this test is not about spacing.
+        # Whitespace normalised: the two files align their values in a column.
         declared[owner] = re.sub(r"\s+", " ", match.group(1).strip())
 
     values = set(declared.values())
@@ -2239,10 +1857,8 @@ def test_the_two_palettes_declare_the_SAME_font_stack(variable):
 def test_shared_scss_never_imports_a_site_partial():
     """The dependency arrow points one way: sites import shared, never back.
 
-    A shared partial reaching into _sass/food/ would compile perfectly well on
-    the food stylesheet and fail on the cocktails one, which is the most
-    annoying possible version of this bug — it looks fine everywhere you tend
-    to look.
+    A shared partial reaching into _sass/food/ compiles on the food stylesheet
+    and fails on the cocktails one.
     """
     offenders = []
     for path in sorted((SASS_DIR / "shared").glob("*.scss")):
@@ -2260,11 +1876,9 @@ def test_shared_scss_never_imports_a_site_partial():
 
 
 def test_shared_scss_names_no_site():
-    """No selector or variable in shared/ may name one site.
+    """No selector or variable in shared/ names one site: both render it.
 
-    `.site-logo-food` lived in the layout that both sites now render. The word
-    in the brackets comes from _data/sites.yml, so the class cannot assume it —
-    it is `.site-logo-word`. Comments are exempt: they explain the history.
+    Comments are exempt.
     """
     offenders = []
     for path in sorted((SASS_DIR / "shared").glob("*.scss")):
@@ -2281,16 +1895,11 @@ def test_shared_scss_names_no_site():
 
 
 def test_no_selector_declares_the_same_property_twice():
-    """A selector may legitimately appear more than once.
+    """No selector declares the same property in two separate blocks.
 
-    `_layout.scss` groups by concern — the clip-path SHAPES for .btn-star sit
-    with the badges, its appearance sits with the buttons. That is a deliberate
-    structure and merging the blocks would flatten it.
-
-    What is never safe is the same PROPERTY declared for the same selector in
-    two blocks, because then the later one silently wins and editing the earlier
-    one appears to do nothing. That is the actual hazard, so that is what this
-    tests — not mere repetition.
+    A selector may appear more than once, since a partial groups by concern.
+    A repeated property is the hazard: the later block wins and editing the
+    earlier one appears to do nothing.
     """
     from collections import defaultdict
     problems = []
@@ -2314,35 +1923,11 @@ def test_no_selector_declares_the_same_property_twice():
 # --- the print stylesheet keeps pointing at real markup ----------------------
 
 def test_a_print_partial_declares_nothing_outside_media_print():
-    """A rule in a `_print.scss` that forgets `@media print` styles the SCREEN.
+    """Every top-level block in a `_print.scss` is an `@media print` (#538).
 
-    GitHub issue #538. `_sass/cocktails/_print.scss` was added for #482, to make
-    a drink page print its full editorial state rather than whichever state the
-    `make it` toggle happened to be left in. Its rules were written without the
-    wrapper, so they compiled to top level:
-
-        .cocktail.is-making .cocktail-tagline { display: revert; }
-        .btn-make { display: none; }
-
-    On screen that would have PERMANENTLY BROKEN THE TOGGLE IT EXISTS TO
-    OVERRIDE -- `make it` would stop hiding anything, and the button itself
-    would be invisible. The build succeeded, the site rendered, and nothing in
-    the suite noticed. It was caught by reading _site/assets/css/cocktails.css
-    and seeing the rules sitting after the `@media print` block rather than
-    inside it.
-
-    THE TWO HALVES ARE BOTH SILENT AND ONLY ONE WAS COVERED.
-    test_print_rules_target_classes_that_exist below is "a print rule that
-    matches nothing"; this is "a print rule that matches everything, all the
-    time". Neither is visible in review and neither has a console.
-
-    The file being NAMED `_print.scss` is a strong enough declaration of intent
-    to assert against, which is what makes this checkable at all -- there is no
-    way to tell a stray print rule from an ordinary one in a general partial.
-
-    Scoped to top-level BLOCKS on purpose. A print partial may legitimately
-    hold variables, an `@import`, or comments; what it may not hold is a rule
-    that emits declarations to every medium.
+    A rule that forgets the wrapper compiles to top level and styles the
+    screen, with a clean build. Only blocks are checked: a print partial may
+    hold variables, an `@import` or comments.
     """
     partials = [p for p in sass_files() if p.name.startswith("_print")]
     assert partials, (
@@ -2359,8 +1944,8 @@ def test_a_print_partial_declares_nothing_outside_media_print():
             if depth == 0 and "{" in code:
                 head = code.split("{")[0].strip()
                 if not (head.startswith("@media") and "print" in head):
-                    # All three are called _print.scss, so the parent directory
-                    # is the half that says which one.
+                    # Every print partial is called _print.scss, so the parent
+                    # directory is the half that says which one.
                     offenders.append(f"{path.parent.name}/{path.name}:{i} {head}")
             depth += code.count("{") - code.count("}")
 
@@ -2393,23 +1978,12 @@ def _print_block_classes() -> list[tuple[str, str]]:
 
 
 def test_print_rules_target_classes_that_exist():
-    """GitHub issue #86. Every class the print stylesheet styles is emitted by
-    some template.
+    """Every class the print stylesheet styles is emitted by a template or
+    named by a script (#86).
 
-    THE FAILURE THIS PREVENTS IS INVISIBLE BY CONSTRUCTION. Rename a class and
-    the screen rule that follows it goes wrong in front of you; the print rule
-    that did not follow it goes wrong on paper, which nobody looks at in
-    review, and which has no console, no layout shift and no error. A printout
-    that quietly regains the site header, or loses its page breaks, would
-    survive indefinitely.
-
-    Derived from both sides -- the classes come from whatever is currently
-    inside an `@media print` block, the markup from whatever the templates
-    currently emit -- so a print rule added tomorrow is covered tomorrow,
-    without this test being edited.
-
-    Not the reverse direction: a class with no print rule is the normal case,
-    since most of the page needs no different treatment on paper.
+    A print rule that did not follow a rename goes wrong on paper only, with
+    no error. Both sides are derived, so a new print rule is covered without
+    editing this test. A class with no print rule is the normal case.
     """
     named = _print_block_classes()
     assert named, (
@@ -2428,16 +2002,9 @@ def test_print_rules_target_classes_that_exist():
     )
     markup = "\n".join(p.read_text(encoding="utf-8") for p in html_files if p.exists())
 
-    # A CLASS THE SCRIPTS ADD IS STILL A CLASS THAT EXISTS. `is-making` is put
-    # on the drink page by assets/js/cocktail-make.js, never by a template, and
-    # the print rule that reverses it (#482) is exactly as vulnerable to a
-    # rename as any other -- more so, because nothing type-checks a string in a
-    # classList call either. Searching the scripts as well keeps the guard's
-    # promise ("the class this styles exists somewhere") true, rather than
-    # exempting the case that needed it.
-    #
-    # Matched as a quoted string, which is how classList.add/toggle/remove and
-    # every template literal in this codebase name one.
+    # A class a script adds counts: `is-making` comes from
+    # assets/js/cocktail-make.js, never a template (#482). Matched as a quoted
+    # string, which is how a classList call names one.
     scripts = "\n".join(
         s.read_text(encoding="utf-8") for s in sorted(ROOT.glob("assets/js/*.js")))
 
@@ -2460,22 +2027,12 @@ def test_print_rules_target_classes_that_exist():
 
 
 def test_print_neutralises_the_screen_page_background():
-    """Whatever paints the page ground for the screen must be overridden in
-    print, not merely left unmentioned there.
+    """Whatever paints the page ground for the screen is overridden in print.
 
-    THIS IS THE BUG IT CAME FROM, and it is worth stating plainly because the
-    mistake is so easy to repeat. Asked to stop printing a page-wide tint, I
-    deleted the print stylesheet's own `background: $color-bg` line -- and
-    nothing changed, because shared/_base.scss sets `body { background:
-    $color-bg }` for the screen and that rule is still in the cascade inside
-    @media print. Removing an override is not the same as overriding.
-    $color-bg is a tint rather than white, so the symptom was every sheet
-    flooded with ink, and the only thing that caught it was Helen looking at
-    another print preview.
-
-    Derived from the stylesheets rather than hardcoded: if a future partial
-    starts painting the ground somewhere else, this asks for that to be
-    answered in print too.
+    A screen `body { background }` is still in the cascade inside
+    `@media print`, so a print stylesheet that leaves the background
+    unmentioned prints the tint over every sheet. Derived from the
+    stylesheets, so a new partial painting the ground is asked the same.
     """
     paints_ground = []
     print_override = False
@@ -2491,10 +2048,8 @@ def test_print_neutralises_the_screen_page_background():
             else:
                 paints_ground.append(f"{path.name}: `{selector}`")
 
-    # NOT `if not paints_ground: return`. That was the first version, and it
-    # is how this test passed while checking nothing -- see the docstring.
-    # If one day genuinely nothing paints a ground, that is a real change to
-    # know about, not a reason to fall silent.
+    # Asserted, not an early return: with nothing found this would pass while
+    # checking nothing.
     assert paints_ground, (
         "Nothing in _sass/ paints a background on html or body, so this test "
         "has nothing to check. Either the shared base stopped setting the page "
@@ -2511,27 +2066,16 @@ def test_print_neutralises_the_screen_page_background():
 
 
 def test_list_sections_are_conditioned_on_size_not_truthiness():
-    """An empty array is TRUTHY in Liquid, so a section guarded by a bare
-    truth test renders its heading with nothing underneath it.
+    """A list section in the recipe layout is gated on `.size`, never on bare
+    truthiness.
 
-    Only nil and false are falsy. `notes: []` therefore drew the NOTES
-    heading and an empty grid on 49 drafts, unnoticed until Helen looked at
-    one while checking the print layout -- and the pages it affects are
-    exactly the ones nobody scrutinises, because a draft looking unfinished
-    is not a surprise.
-
-    Nothing else can catch this: the data is valid, the template is valid,
-    the build is clean, and the only symptom is a heading over blank space
-    on whichever files happen to hold an empty list today.
-
-    Scoped to the fields that are lists and that gate a whole section --
-    `.size > 0` is the fix, `.size > 1` and `.size == 1` are fine too since
-    they are already asking about length rather than existence.
+    An empty array is truthy in Liquid, so `notes: []` renders the heading
+    over nothing, with valid data and a clean build. Any `.size` comparison
+    is fine.
     """
     layout = read("_layouts", "recipe.html")
-    # The comment blocks in this layout describe the bad pattern in prose
-    # rather than quoting it, precisely because Liquid parses tag delimiters
-    # inside a comment -- so there is nothing here to strip first.
+    # Not stripped of comments first: the layout's comments describe the bad
+    # pattern in prose, because Liquid parses tags inside a comment.
     bare = re.findall(
         r"\{%-?\s*if\s+page\.(notes|ingredient_groups|method_short|tags|main_ingredients)"
         r"\s*(?:%\}|-%\})",
@@ -2546,21 +2090,12 @@ def test_list_sections_are_conditioned_on_size_not_truthiness():
 
 
 def test_pdf_link_points_where_the_pdfs_are_written():
-    """GitHub issue #86. The "pdf" link on a recipe page and the file
-    scripts/generate_pdfs.py writes have to agree on one directory, and
-    nothing at either end would notice if they stopped.
+    """The pdf link on a page and the file scripts/generate_pdfs.py writes
+    agree on one directory (#86).
 
-    Almost everything else about this feature fails loudly: no browser, a
-    crashed render, a build with no recipe pages in it all exit the workflow
-    non-zero. This one does not. Change the collection's permalink and the
-    script keeps working perfectly -- it globs whatever the build produced --
-    while every link in the markup goes on pointing at the old path. The
-    result is a deploy that succeeds, a site that looks right, and a link that
-    404s on every recipe.
-
-    So all three are read from where they actually live rather than restated
-    here: the permalink from _config.yml, the link from the layout, and the
-    write path from the script.
+    A changed permalink leaves the script working and every link a 404, on a
+    green deploy. The permalink, the link and the write path are each read
+    from where they live.
     """
     config = yaml.safe_load(read("_config.yml"))
     permalink = ((config.get("collections") or {}).get("food_recipes") or {}).get("permalink")
@@ -2572,17 +2107,10 @@ def test_pdf_link_points_where_the_pdfs_are_written():
     # "/food/recipes/:path/" -> "/food/recipes/"
     expected = permalink.split(":")[0]
 
-    # THE LINK IS BUILT FROM `page.url` SINCE #1005 (2026-09-14): the page's
-    # own URL with its trailing slash swapped for `.pdf`. That is where the
-    # script writes each file -- beside the page's output directory -- for
-    # whatever permalink a collection has, so the link cannot point at a
-    # different directory from the page it is on. IN _includes/page-print.html
-    # SINCE #1210 (2026-09-30), which back-to-index.html renders only when a
-    # layout passes `actions=true` -- the two page layouts do; the magic-bag
-    # page, which has no PDF beside it, does not. What is left to check is
-    # that the include still builds it that way, that both page layouts ask
-    # for it, and that the script renders every collection whose pages carry
-    # it (below).
+    # The link is the page's own URL with its trailing slash swapped for
+    # `.pdf` (#1005), built in _includes/page-print.html, which
+    # back-to-index.html renders only under `actions=true` (#1210). The
+    # magic-bag page has no PDF beside it, so its layout must not ask.
     include = read("_includes", "page-print.html")
     assert re.search(
         r"page\.url\s*\|\s*append:\s*'\.pdf'\s*\|\s*replace:\s*'/\.pdf',\s*'\.pdf'",
@@ -2611,9 +2139,7 @@ def test_pdf_link_points_where_the_pdfs_are_written():
         "link would be #86's permanent 404."
     )
 
-    # BOTH COLLECTIONS SINCE #1005 (2026-09-14): the script walks one tuple of
-    # directories and this reads that tuple rather than a literal glob, so a
-    # third collection is one entry there and one permalink here.
+    # Read from the script's tuple of directories, not a literal glob (#1005).
     script = read("scripts", "generate_pdfs.py")
     dirs = re.search(r'for collection in \(([^)]*)\):', script)
     assert dirs, (
@@ -2653,28 +2179,11 @@ def test_spacing_tokens_are_not_used_for_type():
 
 
 def test_no_element_can_force_horizontal_scroll():
-    """A fixed width wider than a phone viewport, with nothing clamping it.
+    """No fixed `width` above 320px without a max-width, min() or clamp().
 
-    Horizontal scroll is the most visible mobile failure there is, and one
-    unclamped element is enough to cause it.
-
-    THIS CHECKS ELEMENTS, AND OVERFLOW IS A PROPERTY OF THE ROW -- issue #468,
-    and the limit is stated here rather than left for the next reader to
-    discover. On 2026-08-23 the footer overflowed a phone with every element in
-    it under this threshold: `.site-footer-top` was `1fr auto 1fr`, a `1fr`
-    track will not shrink below min-content, and the row's floor was
-    "temperatures" (~120px) plus the hearts' flat 240px plus 2rem of gaps --
-    about 392px against a ~360px viewport. Three sub-320px tracks side by side
-    overflow a phone perfectly well. `test_a_multi_track_row_can_become_one`
-    below is the half this one cannot see.
-
-    This docstring also used to claim "the site has no media queries and does
-    not need any". It has had one in food/_recipe-list.scss for a long time,
-    shared/_layout.scss added a second on 2026-08-23, and food/_search.scss a
-    third with issue #586. Four counting print.
-
-    A `width: Npx` above 320 is fine as long as a max-width, min() or clamp()
-    sits with it.
+    One unclamped element is enough to scroll a phone sideways. This checks
+    elements only; overflow is also a property of the row, which
+    `test_a_multi_track_row_can_become_one` covers (#468).
     """
     offenders = []
     for path in sass_files():
@@ -2695,41 +2204,10 @@ def test_no_element_can_force_horizontal_scroll():
     )
 
 
-# A multi-track grid that never collapses is a BET that its content stays
-# narrow, and nothing static can settle that bet: the floor of a `1fr` track is
-# its content's min-content width, which depends on a font, a string and a
-# browser. So the rule is about the collapse, not about the arithmetic.
-#
-# These rows are declared exceptions, each with the claim it is making.
-# The list only shrinks: giving one of them a narrow-screen variant means
-# deleting its entry, and an entry for a row that HAS one fails too, so it
-# cannot rot into a list of things that were fixed years ago.
-#
-# `.tc-row` AND `.tc-axis` LEFT THIS LIST ON 2026-09-10 (#903): the label sat
-# above the bar on a phone from then -- exactly the redesign their entries said
-# it would take, done once the charts were finally looked at on one. The two
-# rows shared one `@media` block in _sass/food/_temperature-chart.scss, so they
-# moved together, which was the point of the second entry.
-#
-# `.tc-row` IS BACK ON 2026-10-08 (#1327), and `.tc-axis` is not: the axis is
-# one column now, and the row is label-and-figure on one line at EVERY width,
-# Helen's choice from the candidates page, so there is no narrow variant to
-# have. Its entry below makes the claim the old one could not: the figure
-# wraps.
-#
-# `.cocktail-head-words` LEFT IT ON 2026-09-15 (#1086), and it left by losing
-# the second track rather than by gaining a variant. The entry claimed
-# "`minmax(0, 1fr) auto` -- the words and, in the second track, the shortlist
-# button alone (#979)"; #1005 moved every action into the controls row under
-# the head, so the row has been one `minmax(0, 1fr)` track since, and this
-# test only ever asks about rows of two or more.
-#
-# `.page-actions` LEFT IT ON 2026-09-30 (#1210), and like `.cocktail-head-words`
-# it left by ceasing to be a grid rather than by gaining a variant: the two-by-
-# two of four controls (#1182) is a flex row of two -- the shortlist pill and
-# its see-shortlist link -- with print and pdf on the furniture line. The
-# entry's claim ("about 205px, well inside a 312px phone column") was measured
-# and true; the shape it described is simply gone.
+# A multi-track grid that never collapses is a bet that its content stays
+# narrow: the floor of a `1fr` track is its content's min-content width, which
+# nothing static can compute. Each row here is a declared exception with the
+# claim it makes. An entry for a row that has a narrow variant fails the test.
 MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
     ".recipe-pagination": (
         "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "
@@ -2845,28 +2323,11 @@ def _grid_declarations():
 def test_a_multi_track_row_can_become_one():
     """Every grid row of 2+ tracks collapses on a narrow screen, or says why not.
 
-    Issue #468. `test_no_element_can_force_horizontal_scroll` above asks whether
-    any single element is too wide. The footer overflowed a phone on 2026-08-23
-    with every element in it under that threshold, because OVERFLOW IS A
-    PROPERTY OF THE ROW: `1fr auto 1fr` gave "temperatures" (~120px min-content),
-    the hearts (a flat 240px) and 2rem of gaps a floor of about 392px against a
-    ~360px viewport. Three sub-320px tracks side by side overflow a phone
-    perfectly well.
-
-    WHY THIS CHECKS FOR A COLLAPSE RATHER THAN DOING THE ARITHMETIC. The
-    arithmetic cannot be done here and it is worth being plain about that: a
-    `1fr` track will not shrink below its content's min-content width, and
-    min-content depends on a font, a string and a browser. Summing the declared
-    lengths would have given the real footer bug a floor of 272px and passed it.
-    So the honest static claim is not "this row fits" but "this row is a bet
-    that its content is narrow, and it never gets to stop betting".
-
-    The fix that actually worked was a collapse to one column, which is what
-    this asks for, and it is what .drink-searches, .search-pair and
-    .site-footer-top all now do.
-
-    `repeat(auto-fit, …)` and `repeat(auto-fill, …)` are exempt by construction:
-    they collapse on their own.
+    Issue #468. Overflow is a property of the row: tracks that each pass
+    `test_no_element_can_force_horizontal_scroll` can overflow side by side.
+    A collapse is asked for, not arithmetic, because a `1fr` track's floor is
+    its content's min-content width. `repeat(auto-fit, …)` and
+    `repeat(auto-fill, …)` collapse on their own and are exempt.
     """
     declarations = _grid_declarations()
     assert declarations, (
@@ -2921,32 +2382,10 @@ def test_a_multi_track_row_can_become_one():
 def test_no_decoration_slot_is_orphaned():
     """Every empty aria-hidden slot in a template is filled by some script.
 
-    A decoration slot is an empty `<span class="…-slot" aria-hidden="true">`
-    that exists only for JavaScript to inject an SVG into. If the injection is
-    deleted and the slot is not, the slot stays in the markup forever, drawing
-    nothing, looking load-bearing to whoever reads the template next. That is
-    exactly how `--annotation-gutter: 200px` became a declaration nobody dared
-    remove — see DEV_JOBS_v23.md §4.
-
-    It nearly happened again in the 2026-07-31 recipe-page redesign, which cut
-    four of the five decorations `section-rule.js` drew (the section rules, the
-    violet asterisk bullets, the pink section-heading doodles and the meta-label
-    underlines) and left six `.section-heading-sparkle` spans, four
-    `.meta-label-underline` spans and every `.ingredient-bullet` in the layout
-    to be removed by hand.
-
-    Derived, not listed: the slots come from the markup and the injectors from
-    the scripts, so a new slot is covered the day it is written.
-
-    The reverse direction — a script querying a slot no template emits — is NOT
-    checked here, because several classes filters.js queries are ones it creates
-    itself and no template ever contains. `decorations.js` used to carry a
-    `doodles()` function in exactly that shape, querying `data-index-doodle`
-    for a slot no template had emitted in as long as git remembered — GitHub
-    issue #228 deleted it (and the function was already the only thing in the
-    file referencing that attribute, so nothing else needed to change). Recorded
-    here as history rather than as a live caveat, since there is no longer any
-    dead code of this kind for this test's coverage gap to be hiding.
+    A slot whose injector was deleted stays in the markup drawing nothing and
+    looking load-bearing. Slots come from the markup and injectors from the
+    scripts, so a new slot is covered. The reverse is not checked: scripts
+    query classes they create themselves.
     """
     html_files = (
         sorted(ROOT.glob("_layouts/*.html"))
@@ -2961,9 +2400,9 @@ def test_no_decoration_slot_is_orphaned():
     assert js_files, "No scripts found — this test would pass while checking nothing."
     js_blob = "\n".join(p.read_text(encoding="utf-8") for p in js_files)
 
-    # An empty span/div carrying a class and aria-hidden="true" is this repo's
-    # decoration-slot idiom. `[^>]*` spans newlines, so a slot whose attributes
-    # are split across lines (.tape-bg) is still matched.
+    # An empty span/div with a class and aria-hidden="true" is the
+    # decoration-slot idiom. `[^>]*` spans newlines, so attributes split
+    # across lines still match.
     slot_pattern = re.compile(
         r'<(span|div)\s+class="([^"]*)"[^>]*aria-hidden="true"[^>]*>\s*</\1>'
     )
@@ -2992,22 +2431,11 @@ def test_no_decoration_slot_is_orphaned():
     )
 
 
-# =============================================================================
-# THE PUBLICATION GATE — GitHub issues #331 and #667
-# =============================================================================
-# A page publishes only on `meta.awaiting_fix: false` AND `meta.proofread:
-# true`: no known open problem, and Helen has read what is now in the file.
-# Anything else is held back. The mechanism is _plugins/publish_gate.rb, which
-# removes the document at :post_read so it gets no URL and no sitemap entry.
-#
-# The file was `hide_awaiting_fix.rb` until 2026-09-02, when `proofread` became
-# the second leg (#667) and the name stopped describing the whole rule.
-#
-# EVERY FAILURE MODE OF THIS GATE FAILS OPEN. Delete the plugin, flip one config
-# key, or switch the workflow to a build that ignores plugins, and flagged pages
-# publish -- with no error, no warning, and a green build. The page you have
-# explicitly marked as wrong is the one that goes live. That asymmetry is why
-# these are asserted rather than trusted.
+# --- the publication gate (#331, #667) ---------------------------------------
+# A page publishes only with `meta.awaiting_fix: false` and `meta.proofread:
+# true`; _plugins/publish_gate.rb removes anything else at :post_read. Every
+# way of breaking the gate fails open with a green build: a deleted plugin, a
+# flipped config key, a build that ignores plugins. DECISIONS §4.0.
 
 PLUGIN = ROOT / "_plugins" / "publish_gate.rb"
 
@@ -3027,9 +2455,7 @@ def test_awaiting_fix_plugin_exists_and_checks_the_flag():
             f"reading a different field or hooking a different phase, and it "
             f"fails open either way."
         )
-    # The two legs must both be COMPARED, not merely mentioned in a comment.
-    # A gate that reads `proofread` only in its header is the failure this file
-    # exists to make loud.
+    # Both legs must be compared, not merely mentioned in a comment.
     for needle in ('meta["awaiting_fix"] == false', 'meta["proofread"] == true'):
         assert needle in src, (
             f"{PLUGIN.name} no longer contains `{needle}`. The gate publishes "
@@ -3060,13 +2486,10 @@ def test_production_config_hides_awaiting_fix_and_local_shows_it():
 
 
 def test_deploy_workflow_still_runs_a_plugin_capable_build():
-    """`bundle exec jekyll build`, not the github-pages gem's safe mode.
+    """`bundle exec jekyll build`, never a Pages-native safe-mode build.
 
-    THIS IS THE QUIETEST WAY THE GATE COULD DIE. Jekyll's safe mode -- what a
-    Pages-native build uses -- ignores _plugins/ entirely. It does not warn and
-    it does not fail; the plugin simply never runs, and every flagged recipe
-    publishes. Nothing else in this suite would notice, because the repository
-    would be unchanged and correct.
+    Safe mode ignores _plugins/ without warning, so the gate never runs and
+    every flagged recipe publishes from an unchanged, correct repository.
     """
     wf = ROOT / ".github" / "workflows" / "build-and-deploy.yml"
     assert wf.is_file(), f"{wf.relative_to(ROOT)} is missing."
@@ -3097,19 +2520,10 @@ _STATUS_FUNCTIONS = ("always()", "failure()", "cancelled()")
 def _why_a_red_suite_could_deploy(jobs) -> str | None:
     """None if `deploy` can only run after `test` succeeded; else the reason.
 
-    THE INVARIANT, NOT ONE SPELLING OF IT -- #1271. This used to assert that
-    `build` declares `needs: test`, which was the only shape the workflow had
-    ever had. That shape makes every merge wait for the suite and THEN for the
-    build and the PDFs; running the two side by side with `deploy` needing
-    both is the same guarantee about two minutes sooner, and the old assertion
-    would have refused it.
-
-    What actually has to hold is two things. `test` is among the jobs `deploy`
-    needs, directly or through another job. And no job on the way from `deploy`
-    back to `test` has an `if` that calls a status function: a job with `needs`
-    is skipped when a needed job fails ONLY while its `if` leaves the implicit
-    success() in place, so `if: always()` on `deploy` (or on a `build` that
-    stands between it and `test`) deploys a red suite with `needs` intact.
+    #1271. `test` must be among the jobs `deploy` needs, directly or through
+    another job, and no job on that route may have an `if` calling a status
+    function: that replaces the implicit success(), so the job runs after a
+    failed need.
     """
     if "deploy" not in jobs:
         return "The deploy workflow has no `deploy` job, so this gate is unread."
@@ -3156,9 +2570,9 @@ def test_the_deploy_gate_check_refuses_every_way_round_it():
 
     pr = "github.event_name != 'pull_request'"
     ok = [
-        # the shape until #1271: build waits for test, deploy waits for build
+        # build waits for test, deploy waits for build
         {"test": job(), "build": job("test", pr), "deploy": job("build", pr)},
-        # #1271: side by side, and deploy waits for both
+        # side by side, and deploy waits for both (#1271)
         {"test": job(), "build": job(cond=pr), "deploy": job(["test", "build"], pr)},
     ]
     broken = [
@@ -3179,27 +2593,13 @@ def test_the_deploy_gate_check_refuses_every_way_round_it():
 
 
 def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
-    """CI must run the suite, and refuse to build if it is red. Issue #369.
+    """CI runs the suite and cannot deploy while it is red (#369).
 
-    UNTIL 2026-08-18 IT DID NOT. The workflow checked out, built, rendered PDFs
-    and deployed, with no test step anywhere -- so every guard in this
-    repository protected a local run and nothing else. A push to `main` shipped
-    whatever was on `main` however red the suite was, including the
-    `awaiting_fix` publish gate (#331) whose entire job is to stop a flagged
-    recipe going live.
-
-    Four things are asserted, because dropping any one of them restores that
-    state quietly:
-
-      - a `test` job exists at all;
-      - `deploy` cannot run unless `test` succeeded -- see
-        `_why_a_red_suite_could_deploy`, which states the invariant rather than
-        one spelling of it (#1271);
-      - `fetch-depth: 0`, because actions/checkout is shallow by default and
-        #367's history-reading test would then examine nothing;
-      - the JS suite is invoked with a GLOB. `node --test tests/js/` treats the
-        directory as one test file and reports "tests 1, fail 1" -- it does not
-        run the 144 tests inside. Checked, not assumed.
+    Pinned: a `test` job exists; `deploy` cannot run unless it succeeded
+    (`_why_a_red_suite_could_deploy`); `fetch-depth: 0`, or #367's
+    history-reading test examines nothing in a shallow clone; and the JS suite
+    is invoked with a glob, because `node --test tests/js/` treats the
+    directory as one test file.
     """
     wf = ROOT / ".github" / "workflows" / "build-and-deploy.yml"
     src = wf.read_text(encoding="utf-8")
@@ -3231,28 +2631,14 @@ def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
     )
 
 
-# =============================================================================
-# THE SHARED CHROME'S OWN ARTWORK — GitHub issue #374
-# =============================================================================
+# --- the shared chrome's own artwork (#374) -----------------------------------
 
 def test_tape_count_matches_the_tape_directory():
-    """_data/chrome.yml's tape_count is what decorations.js picks from.
+    """_data/chrome.yml's tape_count equals the files in assets/img/chrome/tape/.
 
-    A browser cannot list a directory, so the number of tape SVGs has to be
-    written down somewhere and can therefore disagree with the files. Both
-    directions fail silently, which is why this is asserted rather than trusted:
-
-      - COUNT TOO HIGH and tape() rolls a number with no file behind it. The
-        wordmark renders with no tape at all, roughly one page load in N, with a
-        console warning nobody is watching for -- an intermittent missing
-        decoration is close to the hardest kind of bug to be told about.
-      - COUNT TOO LOW and the extra files are simply never dealt. Nothing breaks,
-        nothing warns, and the artwork you added does not appear.
-
-    This used to be `tape_count` in _data/sites.yml, once per site, pointing at
-    a directory per site holding byte-identical files -- so the same number had
-    to be right in two places against two directories. It is one number against
-    one directory now.
+    A browser cannot list a directory, so decorations.js picks from 1 to the
+    count. Too high, and some page loads render no tape; too low, and the
+    extra files are never dealt. Neither errors.
     """
     chrome = yaml.safe_load((ROOT / "_data" / "chrome.yml").read_text(encoding="utf-8")) or {}
     declared = chrome.get("tape_count")
@@ -3263,9 +2649,8 @@ def test_tape_count_matches_the_tape_directory():
     )
 
     tape_dir = ROOT / "assets" / "img" / "chrome" / "tape"
-    # Sorted by the NUMBER, not the name: past nine files a lexical sort puts
-    # tape-10 before tape-2 and reports a perfectly gapless run as broken.
-    # Found the day the set went from seven to fifteen (2026-09-11, #644).
+    # Sorted by the number, not the name: a lexical sort puts tape-10 before
+    # tape-2 and reports a gapless run as broken.
     actual = sorted(tape_dir.glob("tape-*.svg"),
                     key=lambda p: int(p.stem.split("-", 1)[1]))
     assert len(actual) == declared, (
@@ -3277,10 +2662,8 @@ def test_tape_count_matches_the_tape_directory():
         f"shipped set was chosen."
     )
 
-    # Named tape-1 .. tape-N with no gaps, because that is what decorations.js
-    # assumes when it rolls a random number in that range. Seven files named
-    # tape-1, tape-2 and tape-4..tape-8 would satisfy the count above and still
-    # 404 one load in seven.
+    # Named tape-1 .. tape-N with no gaps: decorations.js rolls a number in
+    # that range, so a gap satisfies the count above and is an intermittent 404.
     expected = [f"tape-{n}.svg" for n in range(1, declared + 1)]
     assert [p.name for p in actual] == expected, (
         f"assets/img/chrome/tape/ is not a gapless tape-1..tape-{declared} run: "
@@ -3291,24 +2674,11 @@ def test_tape_count_matches_the_tape_directory():
 
 
 def test_no_site_holds_a_copy_of_the_chrome_artwork():
-    """The header and footer artwork exists in exactly one place.
+    """The header and footer artwork exists in exactly one place (#374).
 
-    assets/img/food/tape/ and assets/img/cocktails/tape/ held the same seven
-    files, kept in step by hand, and had already drifted once for five days
-    (issue #223). They are one directory now, assets/img/chrome/. This fails if
-    a per-site copy comes back -- which is what "cocktails should have its own
-    tape one day" looks like on the way in, and is a decision to take
-    deliberately (it means a second header) rather than by adding a folder.
-
-    BY FILENAME, NOT BY DIRECTORY NAME, and the distinction earned itself
-    immediately: the first draft of this test banned any site directory called
-    `hearts`, and caught assets/img/food/hearts/, which holds seven
-    doodle-heart-path*.svg files that are not chrome at all. They are leftovers
-    -- b547aa7 deleted the swatch pages that were their last consumer and left
-    the artwork -- so the directory-name version was flagging dead files as a
-    drift risk while a copy under any other name would have walked past it.
-    What actually matters is a SECOND FILE WITH THE SAME NAME, because that is
-    the thing two directories can disagree about.
+    Fails if a site's image directory holds a file named the same as one in
+    assets/img/chrome/. By filename, not directory name: a second file with
+    the same name is what two directories can disagree about.
     """
     chrome_dir = ROOT / "assets" / "img" / "chrome"
     chrome_names = {p.name for p in chrome_dir.rglob("*.svg")}
@@ -3335,16 +2705,12 @@ def test_no_site_holds_a_copy_of_the_chrome_artwork():
 
 
 def test_both_indexes_filter_chips_wear_the_shared_tape():
-    """#1219: one chip on both sites, and three places it can silently come apart.
+    """Both indexes' filter chips wear the shared tape (#1219).
 
-    Helen, 2026-10-11, from the control-layer candidates page: "cocktail chips,
-    and tape on both sites!" The tape is a `.tag-shape` slot in the markup,
-    filled by decorations.js's tagShapes() from one set of artwork. Each of
-    these fails without a console message: a chip with no slot is a bare word;
-    a chip class missing from tagShapes()'s host list is skipped (the bug its
-    own comment records for `.ingredient-pill`); and a shape missing from the
-    shared folder is a slot that stays empty -- on cocktails, behind a chosen
-    chip whose word is the page's own dark ground.
+    The tape is a `.tag-shape` slot filled by decorations.js's tagShapes().
+    Three things fail without a console message: a chip with no slot, a chip
+    class missing from tagShapes()'s host list, and a shape with no file in
+    the shared folder.
     """
     cocktails = (ROOT / "cocktails" / "index.html").read_text(encoding="utf-8")
     chips = re.findall(r'<button type="button" class="btn-(?:chaos|mood)"[^>]*>(.*?)</button>', cocktails)
@@ -3378,23 +2744,15 @@ def test_both_indexes_filter_chips_wear_the_shared_tape():
             f"assets/css/{entry} does not import the tape slot.")
 
 
-# =============================================================================
-# THE COCKTAIL INDEX — GitHub issue #579
-# =============================================================================
-# Every guard protecting the food index's shape was scoped to `filters.js` by
-# name, so none of them reached cocktails, and cocktail-index.js drifted into
-# 428 lines that re-derived three things food had deliberately extracted. Two of
-# the three were wrong. These are the same guards, aimed at the other page.
-
+# --- the cocktail index (#579) ------------------------------------------------
+# The food index's guards are scoped to `filters.js` by name and do not reach
+# cocktails. These are the same guards, aimed at the other page.
 
 def _strip_js_comments(js: str) -> str:
     """Source with comments removed.
 
-    Not fastidiousness: test_both_ingredient_pickers_mark_their_word_matches
-    records the case where a guard counted a token in the raw source, the
-    comment explaining the bug named that token twice, and deleting the real
-    code left the count unchanged and the test green. A guard defeated by the
-    prose explaining the bug it guards against.
+    A guard that counts a token in raw source is defeated by a comment naming
+    that token.
     """
     return re.sub(r"//.*$", " ", re.sub(r"/\*.*?\*/", " ", js, flags=re.S), flags=re.M)
 
@@ -3402,20 +2760,9 @@ def _strip_js_comments(js: str) -> str:
 def test_cocktail_index_js_holds_no_loose_filter_state_variables():
     """The drinks index's filter state lives in filter-state.js, like food's.
 
-    Issue #579, and the reason it is worth a guard rather than a tidy-up: issue
-    #541 asks for a clear-all button on this page, "very much like food site".
-    Clear-all is the exact feature that shipped broken three times in two days
-    on the food side -- clearAllFilters() emptied N pieces of state while the
-    button's visibility predicate checked N-1, so the button hid while it still
-    had work to do. Each was found by eye, on the page.
-
-    cocktail-index.js held `chosenMoods`, `chosenChaos`, `wantName`, `include`
-    and `exclude` as loose variables and painted six clear links by hand. That
-    is the shape food's state had BEFORE issue #52. Building #541 on it would
-    have been that bug's own conditions, reassembled.
-
-    Declarations only. The names are ordinary English and may appear in a
-    comment; what must not come back is this file owning the value.
+    Issue #579. Loose state variables let clear-all empty one set of fields
+    while its visibility predicate checks another (#52). Declarations only:
+    the names are ordinary English and may appear elsewhere.
     """
     js = _strip_js_comments(read("assets", "js", "cocktail-index.js"))
     for name in ("chosenMoods", "chosenChaos", "wantName", "include", "exclude", "vocabulary"):
@@ -3436,25 +2783,12 @@ def test_cocktail_index_js_holds_no_loose_filter_state_variables():
 
 
 def test_the_cocktail_index_never_matches_an_ingredient_by_substring():
-    """Fuzzy to FIND, exact to FILTER -- and the wiring must not do its own thing.
+    """Fuzzy to find, exact to filter: the wiring calls cocktail-search.js's rules.
 
-    Both matching directions used to be a raw substring test against the whole
-    concatenated data-ingredients attribute, which is precisely what
-    filter-state.js's excludesRow() exists to forbid on the food side
-    ("excluding peas would silently lose the peanut butter cookies and the pearl
-    barley casserole"). Measured over the 114 drinks, 26 of the 240 pool terms
-    over-matched: `gin` hid twelve drinks whose only gin-shaped ingredient was
-    ginger, `water` hid thirteen whose only water was honey water, and
-    `apple juice` matched fifteen drinks that have PINEapple juice.
-
-    Worse, a substring probe over the joined attribute could match across the
-    `|` between two ingredients, so nothing on the card corresponded to what had
-    matched.
-
-    So the rules live in cocktail-search.js, where Node can ask them a question,
-    and this file may only call them. Checked as "the wiring does not roll its
-    own", not as "the string `indexOf` never appears" -- it legitimately does,
-    on lists of chips and DOM children.
+    A substring test over the joined data-ingredients attribute cannot tell
+    `gin` from `ginger` and can match across the `|` between two ingredients.
+    Checked as "the wiring does not roll its own", not as "`indexOf` never
+    appears": it legitimately does, on lists of chips and DOM children.
     """
     js = _strip_js_comments(read("assets", "js", "cocktail-index.js"))
 
@@ -3478,12 +2812,10 @@ def test_the_cocktail_index_never_matches_an_ingredient_by_substring():
 
 
 def test_the_cocktail_search_thresholds_are_not_hardcoded():
-    """The two numbers live in the vocabulary, not in the algorithm.
+    """The search thresholds live in the vocabulary, not in the algorithm.
 
-    Same rule food's `family_button_min_chars` follows, and for the same reason:
-    how much typing earns a pool of candidates is a question about this
-    vocabulary, not about the code that reads it. #549 point 4 is exactly that
-    question, and the answer should be a one-line edit to a YAML file.
+    How much typing earns a pool of candidates is a question about the
+    vocabulary, so the answer is a one-line edit to a YAML file (#549).
     """
     path = ROOT / "_data" / "cocktails" / "ingredients.yml"
     vocab = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -3516,13 +2848,8 @@ def test_the_cocktail_search_thresholds_are_not_hardcoded():
 
 
 def test_the_cocktail_vocabulary_is_emitted_to_the_page():
-    """cocktail-search.js can only read the families if the template emits them.
-
-    `family_of` has existed in _data/cocktails/ingredients.yml since #322, its
-    header says it is for "the ingredient search's `(all)` buttons ... and
-    exclusion", and it was read by NOTHING until #579 -- 68 declared
-    memberships across 10 families, sitting unused while #549 point 1 asked for
-    the mechanism they are.
+    """cocktail-search.js can only read the families and the bottles if the
+    template emits them, ahead of its script tag (#579).
     """
     html = read("cocktails", "index.html")
     assert 'id="drink-vocabulary"' in html, (
@@ -3558,13 +2885,11 @@ def test_the_cocktail_vocabulary_is_emitted_to_the_page():
 
 
 def test_the_cocktail_index_scripts_load_in_dependency_order():
-    """Four scripts, and every one of them is read at STARTUP, not on first use.
+    """The drinks index's scripts load in dependency order.
 
-    So a page that loads them out of order fails immediately rather than on the
-    first keystroke -- which is the better failure, and the reason food has
-    three tests of exactly this shape. cocktail-index.js reads
-    HTF.cocktailSearch and HTF.filterState as it runs; cocktail-search.js reads
-    HTF.ingredientSearch as it loads.
+    Each reads its dependency at startup, not on first use: cocktail-index.js
+    reads HTF.cocktailSearch and HTF.filterState as it runs, and
+    cocktail-search.js reads HTF.ingredientSearch as it loads.
     """
     html = read("cocktails", "index.html")
     order = ["ingredient-search.js", "filter-state.js", "cocktail-search.js", "cocktail-index.js"]
@@ -3584,19 +2909,10 @@ def test_the_cocktail_index_scripts_load_in_dependency_order():
 def test_the_cocktail_card_ingredient_attribute_is_self_delimiting():
     """`data-ing` is `|`-separated, like every other ingredient attribute here.
 
-    food/index.html's data-all-ingredients chose `|` because a comma is the
-    commonest character in the values; the drink card's data-ingredients chose
-    it for the same reason. `data-ing` was SPACE-separated, which meant the one
-    attribute the highlight reads could not be split back into ingredients at
-    all -- so a card could only be matched against it by substring, which is the
-    fault this page was fixed of.
-
-    WHERE THE JOIN LIVES MOVED ON 2026-09-06. It was a `{% capture ing_search %}`
-    in the template; #567/#691 moved the whole card ingredient line into
-    _plugins/cocktail_card_ingredients.rb, so the `|` join and the downcasing are
-    now Ruby and the template only prints what it is handed. The PROPERTY is
-    unchanged and so is what depends on it, so this follows the join rather than
-    being deleted with the capture.
+    A comma is the commonest character in the values, and a space-separated
+    attribute cannot be split back into ingredients. The join and the
+    downcasing live in _plugins/cocktail_card_ingredients.rb (#567, #691);
+    the template only prints what it is handed.
     """
     html = read("cocktails", "index.html")
     tag = re.search(r'data-ing="\{\{[^"]*"', html)
@@ -3629,26 +2945,11 @@ def test_the_cocktail_card_ingredient_attribute_is_self_delimiting():
 
 # --- a binding is only asked for what it has ---------------------------------
 #
-# filter-state.js exports TWO shapes and they are not the same object:
-#
-#   HTF.filterState                     the module: parseQuery, excludesRow,
-#                                       rowMatchesFilters, arrivedByGoingBack,
-#                                       create, the two field tables...
-#   HTF.filterState.create(SPEC)        a BINDING: seven spec-bound functions
-#                                       and nothing else.
-#
-# filters.js holds the first; cocktail-index.js holds the second. Taking a name
-# off the wrong one is not a missing feature, it is `undefined`, and calling
-# undefined throws -- which on 2026-08-31 took out the whole of
-# cocktail-index.js's startup for one commit: `arrivedByGoingBack` was read off
-# the binding, so the restore never ran, apply() never ran, and the pagehide
-# listener was never registered. The index stopped shuffling as well as
-# stopped remembering, and every JS test stayed green, because each of them
-# asks a pure module a question and the fault was in the wiring between them.
-#
-# A DIFFERENT KIND OF CHECK FROM THE ONES AROUND IT, and deliberately: the JS
-# suite proves the functions are right, and this proves the call sites are
-# talking to something that has them.
+# filter-state.js exports two shapes: `HTF.filterState`, the module, and
+# `HTF.filterState.create(SPEC)`, a binding of spec-bound functions and nothing
+# else. A name taken off the wrong one is `undefined`, and calling it throws at
+# startup. The JS suite asks pure modules questions and cannot see the wiring
+# between them; this checks the call sites.
 
 
 def _js_object_keys(source: str, opener: str) -> set[str]:
@@ -3675,12 +2976,10 @@ def _js_object_keys(source: str, opener: str) -> set[str]:
 
 
 def test_a_filter_state_binding_is_only_asked_for_what_it_has():
-    """Every `X.name` on a filter-state object must be a name that object has.
+    """Every `X.name` on a filter-state object is a name that object has.
 
-    THE FIX WHEN THIS FAILS IS USUALLY ONE WORD: a spec-bound name comes off
-    the binding, a spec-free one comes off the module. Read filter-state.js's
-    two return blocks before moving anything between them -- `create()` returns
-    what depends on WHICH INDEX you are, and the module returns what does not.
+    The fix is usually one word: a spec-bound name comes off the binding
+    `create()` returns, a spec-free one off the module.
     """
     fs_source = read("assets", "js", "filter-state.js")
     module_keys = _js_object_keys(fs_source, "var api = {")
@@ -3710,14 +3009,9 @@ def test_a_filter_state_binding_is_only_asked_for_what_it_has():
             f"test is checking its names against the wrong shape. Update the "
             f"table above rather than deleting the case."
         )
-        # COMMENTS STRIPPED FIRST, and this guard needed it within a minute of
-        # being written: the paragraph in cocktail-index.js explaining the bug
-        # names `FilterState.arrivedByGoingBack` in prose, and the first version
-        # of this test failed on its own explanation. MANUAL 12's fifth
-        # instance, and the escalation it prescribes -- imported from
-        # test_front_matter rather than re-typed, so there is one stripper and
-        # its reasoning (strings are KEPT, because a string is how a name gets
-        # read) lives in one place.
+        # Comments stripped first, so a name mentioned in prose is not read as
+        # a call. `_strip_comments` keeps strings, because a string is how a
+        # name gets read (MANUAL §12).
         source = _strip_comments(raw, ".js")
         for name in sorted(set(re.findall(r"\bFilterState\.([A-Za-z_$][\w$]*)", source))):
             if name not in available:
@@ -3738,39 +3032,16 @@ def test_a_filter_state_binding_is_only_asked_for_what_it_has():
     )
 
 
-# --- duplicate YAML keys, issue #609 -----------------------------------------
+# --- duplicate YAML keys (#609) ----------------------------------------------
 #
-# A duplicate key in a YAML mapping is NOT an error. The parser keeps the last
-# one and discards the first, in silence. _data/cocktails/taxonomy.yml grew one
-# twice in a single session on 2026-08-30 and neither changed behaviour, which
-# is exactly why neither was found:
-#
-#   `moods:` held two `clear:` keys, both with identical text -- 21 key lines
-#   and 20 keys.
-#
-#   `mood_include:` held two `south-sider:` keys, one written by hand carrying
-#   Helen's own reason and one written by a script that did not know about it.
-#   The generated one won. Her reasoning was still in the file, doing nothing.
-#
-# THE SECOND IS THE SHARP ONE AND IT IS WHY THIS EXISTS: a duplicate does not
-# merely waste a line, it can silently replace a documented decision with a
-# generated placeholder. Both were found by counting `^  key:` lines against
-# len(yaml.safe_load(...)), not by reading.
-#
-# WIDER THAN THE ISSUE ASKED, on measurement rather than ambition. #609 asks for
-# _data/; front matter is the identical hole with far more surface -- 543 files
-# against 15, several hundred of them edited by script. Two `generic:` keys on
-# one drink ingredient would drop a category with nothing to show for it.
-# Measured 2026-08-31 before the guard was written: 0 duplicates across all 558.
+# A duplicate key in a YAML mapping is not an error: the parser keeps the last
+# and discards the first in silence, which can replace a documented decision
+# with a generated placeholder. Front matter is scanned as well as _data/.
 
 
 class _DuplicateKeyLoader(yaml.SafeLoader):
-    """A SafeLoader that REPORTS repeats instead of quietly resolving them.
-
-    The duplicates are collected rather than raised, so one file can report all
-    of its own -- and so the message can name the key and the line, which is the
-    only part that saves anyone any time.
-    """
+    """A SafeLoader that collects repeated keys instead of resolving them, so
+    one file reports all of its own with the key and the line."""
 
 
 def _collect_duplicates(loader, node, deep=False):
@@ -3794,8 +3065,7 @@ def _duplicate_keys(text: str):
     try:
         loader.get_single_data()
     except yaml.YAMLError:
-        # Not this test's business -- a file that does not parse at all is
-        # somebody else's failure, and reporting it twice helps nobody.
+        # A file that does not parse at all is another test's failure.
         return []
     finally:
         loader.dispose()
@@ -3830,13 +3100,11 @@ _YAML_SOURCES = _yaml_sources()
 
 
 def test_the_duplicate_key_scan_actually_has_files_to_scan():
-    """The corpus above is a glob, and a glob that goes stale scans nothing.
+    """The duplicate-key corpus is a glob, and a stale glob scans nothing.
 
-    Asserted rather than left implicit, because the parametrised test below
-    reports an empty parametrisation as a skip and a skip reads like a pass at
-    a glance. The two floors are what CI genuinely has: the data files and the
-    published recipes live in this repo. The drafts do not, so their absence is
-    expected there and is not what this is checking.
+    An empty parametrisation reports as a skip. The two floors are what CI
+    has: the data files and the published recipes. The drafts are private
+    repos, absent there.
     """
     labels = [label for label, _, _ in _YAML_SOURCES]
     assert any(l.startswith("_data/") for l in labels), (
@@ -3856,16 +3124,12 @@ def test_the_duplicate_key_scan_actually_has_files_to_scan():
     ids=[label for label, _, _ in _YAML_SOURCES],
 )
 def test_no_yaml_mapping_has_a_duplicate_key(label, text):
-    """A repeated key is silently discarded, taking whatever it said with it.
+    """No YAML mapping repeats a key: the earlier one is silently discarded.
 
-    IN CI THIS COVERS THE DATA FILES AND THE PUBLISHED COLLECTIONS ONLY. The two
-    drafts directories are private repos a CI checkout does not have, so a green
-    run there says nothing about them -- the parametrisation is simply smaller.
-    Locally it is all 558 files.
-
-    THE FIX IS ALWAYS TO DELETE ONE OF THE TWO, and which one is not a
-    formality: the pair that prompted this held Helen's reasoning in the copy
-    that lost. Read both before choosing.
+    Issue #609. In CI this covers the data files and the published collections
+    only; the drafts are private repos a CI checkout lacks. The fix is to
+    delete one of the two after reading both, since they are not always the
+    same text.
     """
     duplicates = _duplicate_keys(text)
     assert not duplicates, (
@@ -3877,37 +3141,25 @@ def test_no_yaml_mapping_has_a_duplicate_key(label, text):
     )
 
 
-# --- a YOLO button that nothing handles ---------------------------------------
+# --- a YOLO button that nothing handles (#732) --------------------------------
 #
-# #732 added a third `.btn-chaos`, and the failure mode a third one introduces is
-# specific: the button renders, it takes focus, it goes `aria-pressed="true"`
-# when you click it -- all of that is generic over `state.chaos` and needs no new
-# code -- and then nothing filters, because the one place that is NOT generic is
-# the clause in `matches()`. A misspelled or renamed `data-chaos` value gives a
-# button that looks completely alive and does nothing at all.
-#
-# NOT A JS TEST, AND THAT IS ISSUE #633. `matches()` is inside cocktail-index.js's
-# IIFE with no export, so there is nothing for `node --test` to require. Until
-# #633 gives the index scripts a way to be run, the coupling between the template
-# and the script is only checkable as source.
+# Pressing a `.btn-chaos` is generic over `state.chaos`; the clause in
+# `matches()` is not. A misspelled `data-chaos` value gives a button that
+# presses in and filters nothing. Checked as source because `matches()` is
+# inside cocktail-index.js's IIFE with no export (#633).
 
 CHAOS_NO_OP = {
-    # `open` is a STATE, NOT A FILTER, and deliberately has no clause. It used to
-    # be `yolo` (ship is not yes-or-better), which made the button for "I'll try
-    # anything" the one button guaranteed to hide all 55 of the best drinks --
-    # Helen, 2026-08-27: "'I'm open to chaos' ... includes all drinks". Being
-    # unhandled is what it is FOR, so it is named here rather than caught.
+    # `open` is a state, not a filter: "I'm open to chaos" includes every
+    # drink, so it has no clause on purpose.
     "open",
 }
 
 
 def test_every_yolo_button_value_is_handled_by_the_index_script():
-    """A `.btn-chaos` whose value `matches()` never reads is a dead control.
+    """Every `.btn-chaos` value is one `matches()` reads, or is in CHAOS_NO_OP.
 
-    THE BUTTON STILL LOOKS ALIVE, which is the whole reason this is worth a test.
-    Pressing, the `aria-pressed` sync, the clear button and the survivor count
-    are all generic over `state.chaos` already, so a value with no clause behind
-    it presses in, highlights, clears -- and filters nothing.
+    A value with no clause still presses in, highlights and clears, because
+    those are generic over `state.chaos`, and it filters nothing.
     """
     html = read("cocktails", "index.html")
     script = (ROOT / "assets" / "js" / "cocktail-index.js").read_text(encoding="utf-8")
@@ -3932,17 +3184,11 @@ def test_every_yolo_button_value_is_handled_by_the_index_script():
 
 
 def test_the_unmade_filter_reads_made_before_and_not_ship():
-    """#732's one real trap, and it is invisible for as long as it is wrong.
+    """The `unmade` filter reads `meta.made_before`, never `ship` (#732).
 
-    Every unmade drink says `ship: "who knows"` today and every made one names a
-    rung, so filtering on `ship` or on the derived `chaos` gives the SAME twenty
-    drinks and looks correct. They come apart the first time Helen makes one of
-    the twenty: `meta.made_before` flips to true and `ship` stays `who knows`
-    until she rates it, so a filter reading `ship` would go on offering her a
-    drink she has just made, as one she never has.
-
-    Nothing would fail. The list would simply be wrong, in the direction where
-    the only person who could notice is the person the list is for.
+    An unmade drink says `ship: "who knows"`, so both give the same list
+    until a drink is made and not yet rated: `made_before` flips and `ship`
+    does not. Nothing fails; the list offers a drink already made.
     """
     html = read("cocktails", "index.html")
     assert 'data-made-before="{{ drink.meta.made_before' in html, (
@@ -3961,24 +3207,15 @@ def test_the_unmade_filter_reads_made_before_and_not_ship():
     )
 
 
-# =============================================================================
-# THE LEOPARD ON THE COCKTAILS PAGE GROUND — GitHub issue #733
-# =============================================================================
+# --- the leopard on the cocktails page ground (#733) --------------------------
 
 def test_the_leopard_picture_is_laid_at_the_fur_tile_s_own_size():
-    """_leopard.scss must lay the ground picture at the size the fur SVG says it is.
+    """_leopard.scss lays the ground picture at the size the fur SVG says it is.
 
-    assets/js/ground-print.js draws the picture at the fur tile's natural size,
-    and `background-size` is written by hand in the stylesheet. If the
-    generator's tile changes size -- another column in the offset, a bigger
-    cell -- and the stylesheet does not follow, nothing fails: the browser
-    scales the picture to fit, the rosettes grow or shrink, and the seams stay
-    perfect. LEOPARD.md: a print has a real size, like fur does, and is never
-    scaled.
-
-    This deliberately does NOT regenerate the tiles and compare bytes
-    (`scripts/build_leopard.py --check` does, by hand). Ten thousand rounded
-    sines are one libm away from differing, and a red suite stops the deploy.
+    `background-size` is written by hand. If the tile changes size and the
+    stylesheet does not follow, the browser scales the print and nothing
+    fails (LEOPARD.md). The tiles are not regenerated and compared here:
+    rounded sines can differ by platform, and a red suite stops the deploy.
     """
     scss = (SASS_DIR / "cocktails" / "_leopard.scss").read_text(encoding="utf-8")
     declared = re.search(r"background-size:\s*(\d+)px (\d+)px;", scss)
@@ -3999,17 +3236,11 @@ def test_the_leopard_picture_is_laid_at_the_fur_tile_s_own_size():
 
 
 def test_the_leopard_files_the_stylesheet_declares_exist_and_are_never_loaded_by_it():
-    """The stylesheet NAMES the two SVGs for ground-print.js and must not load them itself.
+    """The stylesheet names the two SVGs for ground-print.js and never loads them.
 
-    Two ways to break the leopard that leave everything else green:
-
-      - A NAME WITH NO FILE. `--ground-print` and `--ground-nap` are strings
-        the script turns into fetches. A typo, or a renamed file, is a 404 the
-        build never makes, and the page simply has a plain ground.
-      - A `url()` TO THE SVG. That is how it first shipped, on 2026-10-06, and
-        Helen's phone and laptop juddered: an SVG background is redrawn for
-        every strip of page that scrolls into view. It is the obvious
-        "simplification" of this partial and it is the regression.
+    A name with no file is a 404 the build never makes, and the page has a
+    plain ground. A `url()` to the SVG is redrawn for every strip of page
+    that scrolls into view, which judders.
     """
     scss = _strip_comments((SASS_DIR / "cocktails" / "_leopard.scss").read_text(encoding="utf-8"), ".scss")
     img = ROOT / "assets" / "img" / "cocktails"
@@ -4034,18 +3265,12 @@ def test_the_leopard_files_the_stylesheet_declares_exist_and_are_never_loaded_by
 
 
 def test_the_leopard_version_is_the_hash_of_the_committed_files():
-    """_leopard-version.scss must be the hash of the two SVGs as committed.
+    """_leopard-version.scss is the hash of the two SVGs as committed.
 
-    A browser keeps the picture it drew under this version and redraws only
-    when the version changes. So if the artwork is regenerated and the version
-    is not, every browser that has visited keeps showing the OLD leopard,
-    indefinitely, while a fresh browser shows the new one -- the kind of bug
-    that cannot be reproduced by whoever goes looking for it.
-
-    `scripts/build_leopard.py --write` writes all three together; this catches
-    a hand edit to an SVG, or a commit that took two of the three. It hashes
-    committed bytes, so unlike regenerating the tiles it cannot differ by
-    platform.
+    A browser keeps the picture it drew under this version, so regenerated
+    artwork with a stale version leaves returning visitors on the old leopard.
+    `scripts/build_leopard.py --write` writes all three; committed bytes are
+    hashed, so the result cannot differ by platform.
     """
     import sys
     sys.path.insert(0, str(ROOT / "scripts"))
@@ -4067,16 +3292,12 @@ def test_the_leopard_version_is_the_hash_of_the_committed_files():
 
 
 def test_the_index_shopping_list_is_handed_the_by_eye_measures():
-    """#1297. The shopping list totals a handful to a WHOLE one, and which
-    words do is the same data the recipe page uses.
+    """The by-eye measures reach the index's shopping list (#1297).
 
-    Helen, 2026-10-09: "please make the shopping list only round to whole
-    numbers for handfuls and other similar units." `half_step_measures`
-    reaches the index by one route: food/index.html joins it onto the panel as
-    `data-whole-measures`, filters.js reads the attribute and hands it to
-    `build()` as `wholeMeasures`. Break any link and nothing errors -- with no
-    list, nothing is rounded -- so the list quietly prints "1.17 handfuls"
-    again, which is the figure the issue was raised about.
+    food/index.html joins `half_step_measures` and `half_step_counts` onto
+    the panel as `data-whole-measures`; filters.js reads the attribute and
+    hands it to `build()` as `wholeMeasures`. Break a link and nothing
+    errors: the list prints "1.17 handfuls".
     """
     index = read("food", "index.html")
     assert re.search(
@@ -4098,12 +3319,12 @@ def test_the_index_shopping_list_is_handed_the_by_eye_measures():
 
 
 def test_the_whole_fruit_vocabulary_is_the_shape_the_plugin_reads():
-    """#1297. `whole_fruit:` in _data/food/scaling.yml is what lets "zest of 1
-    lemon" and "juice of 1 lemon" total as one lemon.
+    """`whole_fruit:` in _data/food/scaling.yml has the shape
+    _plugins/food_shopping.rb reads (#1297).
 
-    _plugins/food_shopping.rb compiles five lists into its patterns and marks
-    nothing at all if `fruits` or `parts` is missing -- silently, the list
-    simply stops combining. So the shape is pinned here.
+    It lets "zest of 1 lemon" and "juice of 1 lemon" total as one lemon. With
+    `fruits` or `parts` missing the plugin marks nothing and the list
+    silently stops combining.
     """
     vocab = yaml.safe_load(read("_data", "food", "scaling.yml")).get("whole_fruit")
     assert isinstance(vocab, dict), "_data/food/scaling.yml has no `whole_fruit:`."
@@ -4124,19 +3345,13 @@ def test_the_whole_fruit_vocabulary_is_the_shape_the_plugin_reads():
 
 
 def test_the_index_shopping_list_is_handed_the_count_nouns():
-    """#1297, 2026-10-10: 'Can we fix the "2 lemon" thing?'
+    """`count_nouns` reaches the index's shopping list, and holds only nouns
+    with a plain plural (#1297).
 
-    A row that is one bare count takes a label agreeing with its number. A
-    form no recipe wrote is made only for a noun in `count_nouns`
-    (_data/food/scaling.yml), which reaches build() the way the by-eye
-    measures do: joined onto #shopping-list as `data-count-nouns`, read by
-    filters.js, handed over as `countNouns`. Break a link and nothing errors;
-    the list goes back to "2 lemon".
-
-    THE ENTRIES ARE PINNED BECAUSE THE PLURAL IS MADE BY RULE. Each is the
-    last word of a name, and `unitLabel` gives it an `s` (or `es` after a
-    sibilant). A word whose plural is anything else must not be here, and the
-    six below were each measured as wrong before the list existed.
+    The list is joined onto #shopping-list as `data-count-nouns`, read by
+    filters.js and handed to build() as `countNouns`; break a link and the
+    list says "2 lemon". `unitLabel` adds `s` or `es`, so a word whose plural
+    is anything else must not be listed.
     """
     nouns = yaml.safe_load(read("_data", "food", "scaling.yml")).get("count_nouns")
     assert nouns and {"lemon", "onion", "egg"} <= set(nouns), (
@@ -4177,14 +3392,13 @@ def test_the_index_shopping_list_is_handed_the_count_nouns():
 
 
 def test_the_quarter_step_measures_reach_both_scalers():
-    """#1297, Helen, 2026-10-10: "Sprigs: Let's round to 1/4 please, and
-    express in fractions not decimals."
+    """`quarter_step_measures` reaches the recipe page and the index's
+    shopping list (#1297).
 
-    `quarter_step_measures` in _data/food/scaling.yml is read in two places:
-    the recipe page (checked with the half-step list, above) and the index's
-    shopping list, where food/index.html joins it onto the panel as
-    `data-quarter-measures` and filters.js hands it to build(). Lose either
-    and that page prints "1.17 sprigs" again with nothing failing.
+    food/index.html joins it onto the panel as `data-quarter-measures` and
+    filters.js hands it to build(). Lose it and the page prints
+    "1.17 sprigs" with nothing failing. The recipe page's route is checked by
+    `test_the_recipe_scaler_is_handed_the_half_step_measures`.
     """
     scaling = yaml.safe_load(read("_data", "food", "scaling.yml"))
     quarter = scaling.get("quarter_step_measures")
@@ -4210,9 +3424,8 @@ def test_the_quarter_step_measures_reach_both_scalers():
         "recipe must go on refusing a half recipe ('Neither mince pies nor "
         "sweet cream base halve')."
     )
-    # THE JUDGE'S OWN LIST: the half-step measures plus `by_eye_also`, which
-    # holds `handful` now that it steps in quarters. A handful halves always;
-    # a sprig is a count and an odd one refuses.
+    # The judge's own list is the half-step measures plus `by_eye_also`. A
+    # handful halves always; a sprig is a count and an odd one refuses.
     also = scaling["half_recipe"].get("by_eye_also")
     assert also == ["handful"], (
         f"half_recipe.by_eye_also should be just `handful`; got {also!r}. "

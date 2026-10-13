@@ -1,58 +1,20 @@
 """The magic bag's spec: dishes Helen makes without a recipe.
 
-A magic-bag entry is NOT a recipe and this module is not test_front_matter.py
-with the hard bits removed. The two schemas answer different questions:
+A magic-bag entry is not a recipe: it answers "does this exist, and roughly
+what goes in it?", not "how do I make this?". The required set is small on
+purpose, because capturing a dish has to be nearly free. Each rule either makes
+an entry findable or stops it quietly turning into a half-recipe.
 
-    a recipe          how do I make this?
-    a magic-bag entry does this exist, and roughly what goes in it?
+Deliberately not checked (DECISIONS §4.3): no `source`, no `meta.rewritten`
+(test_no_recipe_only_keys rejects both), no completeness rule on `ingredients`,
+and none of test_style.py's ingredient-qualification rules.
 
-So the required set is small on purpose. The whole feature depends on capturing
-a dish being nearly free -- if writing one down costs more than remembering it,
-Helen won't, and the collection stays empty. Every rule below either makes an
-entry FINDABLE (which is the point) or stops it quietly turning into a
-half-recipe (which is the failure mode).
-
-WHAT THIS DELIBERATELY DOES NOT CHECK, and why each is a decision rather than an
-oversight:
-
-  - no `source`/`source_type`. These are Helen's own dishes out of her own head.
-    SOURCE_ATTRIBUTION_SPEC.md has eight shapes and none of them is "I made it
-    up", which is the correct answer here rather than a gap in the spec.
-  - no `meta.rewritten`. There is nothing to rewrite FROM. See
-    test_no_recipe_only_keys below, which actively rejects it.
-  - `meta.proofread` IS required, since 2026-09-02 (#667). This bullet said the
-    opposite for a month after the code changed; META_KEYS below is the schema
-    and has the argument.
-  - no completeness rule on `ingredients`. The list is incomplete BY DEFINITION,
-    and this module is what makes that true rather than merely stated: there is
-    nowhere to put a method and test_no_recipe_only_keys rejects one. A test
-    asserting the list were complete would contradict the collection. (A caveat
-    saying so was rendered on every page briefly on 2026-08-26 and removed at
-    Helen's ask -- she is the only reader and knows what the collection is.)
-  - no ingredient-QUALIFICATION rules (salted vs unsalted butter, dark vs light
-    soy, which sugar). test_style.py holds recipes to those and this module
-    deliberately does not, on the friction argument above: they are questions
-    for someone about to shop from a list, and nobody shops from this one.
-    conftest's `ingredient_items` DOES now see magic-bag ingredients, so the
-    day that call is reversed the rules can be pointed at this fixture without
-    any other change.
-
-THIS MODULE CAN NO LONGER TEST NOTHING -- #1201, 2026-10-04. Every test here is
-parametrised per entry, and the collection was empty from 2026-09-07, so for
-four weeks the whole file collected zero cases and reported green. Two things
-close that, and the bottom of this file holds both:
-
-  - the `magic_bag` fixture always includes one committed FIXTURE entry
-    (tests/fixtures/magic_bag/, see conftest's MAGIC_BAG_FIXTURE_PATH), so
-    every rule runs on every run;
-  - `test_each_rule_rejects_what_it_exists_to_reject` breaks that fixture one
-    way per rule and requires the rule to fail. A rule that passes a good
-    entry proves little; a rule that passes a bad one is the hole.
-
-It does NOT assert the real collection is non-empty. The dishes come out of
-Helen's head; a test that is red until she writes one would turn `main` red,
-which stops every deploy. conftest says "not evidence about the magic bag" at
-the end of a run while the collection is empty, and nothing fails.
+Every test is parametrised per entry, so an empty collection would collect
+nothing and report green (#1201). The `magic_bag` fixture therefore always
+includes the committed entry at conftest's MAGIC_BAG_FIXTURE_PATH, and
+`test_each_rule_rejects_what_it_exists_to_reject` breaks it once per rule.
+Nothing asserts the real collection is non-empty: that would hold `main` red,
+and every deploy, until Helen writes a dish.
 """
 from __future__ import annotations
 
@@ -67,37 +29,20 @@ import conftest
 from conftest import MAGIC_BAG_FIXTURE, where
 from test_style import ISO_DATE, NUMBER_RANGE, SPELLINGS, TYPOGRAPHY
 
-# Suite marker, so `pytest -m food` runs this half. test_suite_hygiene.py
-# asserts every module declares one.
 pytestmark = pytest.mark.food
 
-# WHAT AN ENTRY MUST HAVE. Four keys, and each earns its place:
-#
-#   title             it needs a name to be reminded of
-#   tagline           REQUIRED AS A KEY, allowed to be empty -- see below
-#   main_ingredients  the curated set the index filters and pills read. This is
-#                     the one that makes a dish findable, and findability is the
-#                     entire feature.
-#   ingredients       the actual jotted list. Helen's own framing: "as a minimum
-#                     I should dash off ingredients lists."
-#   meta              the publish gate, and only the publish gate.
-#
-# `tags` is NOT required, unlike on a recipe. A recipe carries tags because the
-# index's five filter categories are how you find one; a magic-bag dish is found
-# by its ingredients, and forcing a taxonomy decision at jot-down time is
-# exactly the friction that stops the note being written. Tags are allowed and
-# validated when present (test_taxonomy.py), just not demanded.
+# What an entry must have. `tagline` is required as a key and may be empty;
+# `main_ingredients` is what the index filters and pills read, so it is what
+# makes a dish findable; `ingredients` is the jotted list; `meta` is the
+# publish gate. `tags` is not required, unlike on a recipe: a dish is found by
+# its ingredients, and a taxonomy decision at jot-down time is friction. Tags
+# are still validated when present.
 REQUIRED = ["title", "tagline", "main_ingredients", "ingredients", "meta"]
 
-# KEYS THAT MEAN THIS HAS STOPPED BEING A MAGIC-BAG ENTRY.
-#
-# The realistic failure is not someone typing `source_type:` by accident. It is
-# Helen starting to write one up properly -- adding a method, then times, then
-# groups -- until the file is a recipe living in the wrong collection, rendered
-# by a layout that shows none of it. Every key here is silently ignored by
-# _layouts/magic_bag.html, so the page would look unchanged while the work
-# vanished. The failure message says "promote it" rather than "delete this",
-# because wanting to write one up is a good thing that has outgrown the shape.
+# Keys that mean this has stopped being a magic-bag entry. Each is silently
+# ignored by _layouts/magic_bag.html, so a dish written up properly here looks
+# unchanged on the page while the work vanishes. The failure says "promote
+# it", not "delete this".
 RECIPE_ONLY = {
     "method": "a magic-bag dish has no method -- that is what makes it one",
     "method_groups": "as `method`",
@@ -113,27 +58,11 @@ RECIPE_ONLY = {
     "doneness": "as `internal_temp_ref`",
 }
 
-# `meta:` IS THE PUBLISH GATE HERE AND NOTHING ELSE -- two flags, not three.
-#
-# test_front_matter.py's META_ORDER is `rewritten -> awaiting_fix -> proofread`
-# because that is the order a RECIPE moves through them. A magic-bag entry has
-# no source to rewrite from, so `rewritten` would be permanently false and
-# meaningless -- a flag that can only hold one value is the thing
-# test_front_matter.py's own `cooked_before` tombstone warns about -- and it is
-# left out.
-#
-# `proofread` JOINED ON 2026-09-02 (#667), and until that day this comment said
-# it had no meaning here either. It gained one the moment the gate started
-# asking for it: the plugin publishes only on `awaiting_fix: false` AND
-# `proofread: true`, for every gated collection, and a collection whose schema
-# forbids a key the gate requires can never publish. Helen's ruling was that
-# the magic bag must be able to publish and that the flag arrives `false` by
-# default, like everything else at ingest -- so it is required here, written
-# false on a new entry, and she flips it when she has read the built page.
-#
-# awaiting_fix stays for the reason it always had: the collection is
-# `output: true` and the gate is about what the world sees, which is as true
-# of a four-line dish as of a recipe.
+# `meta:` is the publish gate here and nothing else. The gate publishes only
+# on `awaiting_fix: false` and `proofread: true` (#667), so a schema that
+# forbade `proofread` could never publish: it is required, `false` on a new
+# entry and Helen's to flip. There is no source to rewrite from, so no
+# `rewritten`. DECISIONS §4.0.
 META_KEYS = ["awaiting_fix", "proofread"]
 
 
@@ -148,17 +77,11 @@ def test_required_field_present(magic_bag, field):
 
 
 def test_tagline_key_is_present_even_when_empty(magic_bag):
-    """The KEY is required; the VALUE may be empty.
+    """The key is required; the value may be empty.
 
-    Helen's ask, 2026-08-26: "Optional. Always add the line to file front matter
-    so I don't have to remember to add it." So the line is always there to fill
-    in or ignore, and never something to remember to add — which is the same
-    convention `method_short: [""]` already uses, where an empty string means
-    "not written" rather than "written, and blank".
-
-    This is the mechanical half of that promise. Without it the key is merely
-    conventional, and a convention is what fails on the day you are in a hurry.
-    _layouts/magic_bag.html renders nothing at all for an empty one.
+    The line is always there to fill in, never something to remember to add:
+    the convention `method_short: [""]` uses. _layouts/magic_bag.html renders
+    nothing for an empty one.
     """
     assert "tagline" in magic_bag.fm, (
         f"{where(magic_bag)} has no `tagline:` line at all. Write `tagline: \"\"` "
@@ -174,10 +97,9 @@ def test_tagline_key_is_present_even_when_empty(magic_bag):
 def test_no_recipe_only_keys(magic_bag):
     """A magic-bag entry that grows a method has become a recipe.
 
-    Every key checked here renders NOTHING in _layouts/magic_bag.html, so the
-    work would be invisible rather than broken — the page looks fine and the
-    method you just wrote is nowhere. That is the silent-failure shape this
-    repository keeps finding (MANUAL 12), so it fails loudly instead.
+    Every key checked here renders nothing in _layouts/magic_bag.html, so the
+    work is invisible rather than broken: the page looks fine and the method
+    is nowhere.
     """
     found = {k: why for k, why in RECIPE_ONLY.items() if k in magic_bag.fm}
     assert not found, (
@@ -210,9 +132,8 @@ def test_awaiting_fix_is_a_real_boolean(magic_bag):
     """`awaiting_fix: "false"` is a string, and a string is not `false`.
 
     _plugins/publish_gate.rb publishes only on an explicit boolean `false`,
-    so a quoted value holds the page back — which fails in the SAFE direction,
-    but silently, and you would be left wondering where your dish went. The
-    recipe side has the identical guard for the identical reason (#331).
+    so a quoted value holds the page back: the safe direction, but silently
+    (#331).
     """
     value = magic_bag.fm.get("meta", {}).get("awaiting_fix")
     assert isinstance(value, bool), (
@@ -226,9 +147,8 @@ def test_awaiting_fix_is_a_real_boolean(magic_bag):
 def test_ingredients_is_a_non_empty_list(magic_bag):
     """An entry with no ingredients is just a title in a list.
 
-    Helen's own minimum. The list is explicitly allowed to be INCOMPLETE — that
-    is the collection's whole premise — but "incomplete" and "absent" are
-    different things, and only one of them is a reminder of how the dish goes.
+    The list is allowed to be incomplete, which is the collection's premise,
+    but not absent.
     """
     items = magic_bag.fm.get("ingredients")
     assert isinstance(items, list) and items, (
@@ -243,13 +163,8 @@ def test_ingredients_is_a_non_empty_list(magic_bag):
 def test_ingredient_items_are_strings_or_labelled_dicts(magic_bag):
     """Bare string, or `{item, note}` with `item` present.
 
-    The same string-or-dict polymorphism `method:`, `notes:` and recipe
-    ingredient items already use, for the same reason: the quick form has to
-    stay quick. A dict WITHOUT `item` is the shape that renders as a blank line
-    — _layouts/magic_bag.html falls through to printing the raw value, and
-    Liquid stringifies a hash rather than admitting there is nothing there.
-    That is exactly the bug the index's derived-ingredient comment records on
-    indonesian-chicken-curry-gulai-ayam.md, caught here before it can happen.
+    The quick form has to stay quick. A dict without `item` renders as a
+    blank line with no error, and `amount` is not part of this schema.
     """
     for i, item in enumerate(magic_bag.fm.get("ingredients") or [], 1):
         if isinstance(item, str):
@@ -275,8 +190,7 @@ def test_ingredient_items_are_strings_or_labelled_dicts(magic_bag):
 def test_no_duplicate_ingredient_lines(magic_bag):
     """Two identical lines in a list this short is a copy-paste slip.
 
-    Cheap to catch and invisible on the page — the list is short enough that a
-    repeat reads as deliberate emphasis rather than a mistake.
+    Invisible on the page: in a list this short a repeat reads as deliberate.
     """
     names = [i if isinstance(i, str) else i.get("item") for i in
              magic_bag.fm.get("ingredients") or []]
@@ -290,10 +204,9 @@ def test_no_duplicate_ingredient_lines(magic_bag):
 def test_notes_are_labelled_dicts(magic_bag):
     """Optional, but shaped exactly as a recipe's `notes:` when present.
 
-    Same `{label, text}` contract as test_front_matter.py enforces, because the
-    two render through identical markup — a bare string falls back to a box
-    labelled with the literal word "note", which is the unlabelled state issue
-    #141 removed from published recipes.
+    The same `{label, text}` contract test_front_matter.py enforces, because
+    the two render through the same markup, where a bare string gets a box
+    labelled with the literal word "note" (#141).
     """
     for i, note in enumerate(magic_bag.fm.get("notes") or [], 1):
         assert isinstance(note, dict) and note.get("label") and note.get("text"), (
@@ -305,10 +218,8 @@ def test_notes_are_labelled_dicts(magic_bag):
 def test_main_ingredients_is_a_non_empty_list(magic_bag):
     """This is the field that makes the dish findable, so it cannot be empty.
 
-    `ingredients` is the jotted list; `main_ingredients` is the curated set the
-    index's pills and ingredient search read. They are different jobs and an
-    entry needs both — a dish nobody can find is a dish still lost in the bag,
-    which is the exact problem this collection exists to fix.
+    `ingredients` is the jotted list; `main_ingredients` is the curated set
+    the index's pills and ingredient search read. An entry needs both.
     """
     mains = magic_bag.fm.get("main_ingredients")
     assert isinstance(mains, list) and mains, (
@@ -319,12 +230,9 @@ def test_main_ingredients_is_a_non_empty_list(magic_bag):
 
 
 # --- the shared vocabulary applies unchanged ---------------------------------
-# `tags` and `star_ingredient` are OPTIONAL on a magic-bag entry (see REQUIRED
-# above) but they are not FREE-FORM. The three-layer rule is what is at stake:
+# `tags` and `star_ingredient` are optional here but not free-form:
 # _data/food/taxonomy.yml is the only place food's vocabulary is declared, and
-# an undeclared term renders nowhere at all — no badge, no filter button — with
-# no error. A dish tagged with a word nobody declared is a dish you cannot find,
-# which is the one thing this collection must never be.
+# an undeclared term renders nowhere -- no badge, no filter button, no error.
 
 
 def test_star_ingredient_is_declared(magic_bag, taxonomy):
@@ -361,9 +269,8 @@ def test_tags_are_declared(magic_bag, taxonomy):
 def test_front_matter_has_no_duplicate_keys(magic_bag):
     """Duplicate YAML keys are silent data loss: the last one wins, quietly.
 
-    The recipe side has the identical guard, and it earned it — a duplicated key
-    on indonesian-chicken-curry-gulai-ayam.md swallowed an ingredient's name
-    entirely and left a dict with an amount and nothing to call it.
+    yaml.safe_load accepts them, so this loads with a loader that refuses
+    them, as the recipe side does.
     """
     class _Strict(yaml.SafeLoader):
         pass
@@ -387,16 +294,10 @@ def test_front_matter_has_no_duplicate_keys(magic_bag):
 
 
 # --- house style reaches the magic bag ---------------------------------------
-# These entries are short, informal and dashed off, and NONE of that is a reason
-# to exempt them: they render to the same page, in the same fonts, next to the
-# recipes. MANUAL 5's scoping rule is by what a READER SEES, not by whether a
-# field feels like prose — which is exactly why the rule reached `cook_time` and
-# the prose pages. Reused from test_style.py rather than restated, so the two
-# cannot drift apart.
-#
-# The `QQ` exemption (issue #426) does NOT apply here and there is no need for
-# it. A `QQ` line is the SOURCE's wording awaiting a rewrite; a magic-bag entry
-# has no source and every word in it is already Helen's own.
+# Short and informal is no exemption: house style is scoped by what a reader
+# sees (MANUAL §5). The patterns are test_style.py's own, imported so the two
+# cannot drift. The `QQ` exemption (#426) does not apply: a `QQ` line is a
+# source's wording, and a magic-bag entry has no source.
 
 
 @pytest.mark.parametrize("name,pattern,fix",
@@ -439,14 +340,11 @@ def test_temperatures_use_degree_c(magic_bag):
     )
 
 
-# =============================================================================
-# THE SPEC CANNOT TEST NOTHING -- #1201, 2026-10-04
-# =============================================================================
-# See the module docstring for what went wrong. Everything above takes the
-# `magic_bag` argument and so runs against the committed fixture entry as well
-# as every real one. What follows proves the two things that a green run of
-# the above cannot: that each rule can FAIL, and that the run says so when the
-# real collection is empty.
+# ---- The spec cannot test nothing, #1201 ----
+# Everything above takes the `magic_bag` argument and so runs against the
+# committed fixture entry as well as every real one. What follows proves what
+# a green run of the above cannot: that each rule can fail, and that the run
+# says so when the real collection is empty.
 
 
 def _broken(fm=None, raw=None):
@@ -545,14 +443,10 @@ BREAKAGES = {
 def test_each_rule_rejects_what_it_exists_to_reject(case, taxonomy):
     """Break the fixture one way; the rule for that breakage must fail.
 
-    THIS IS THE HALF A FIXTURE ALONE CANNOT GIVE. Running every rule against
-    one well-formed entry shows the rules execute. It does not show that any of
-    them can say no -- and a rule that cannot say no is the same hole #1201
-    was raised about, one level in: green, and checking nothing.
-
-    Typography and spellings are not broken here. Their patterns are
-    test_style.py's own, imported rather than restated, and that module holds
-    the cases that prove them.
+    Running every rule against one well-formed entry shows the rules execute,
+    not that any of them can say no (#1201). Typography and spellings are not
+    broken here: their patterns are test_style.py's own, and that module
+    holds the cases that prove them.
     """
     entry, rule = BREAKAGES[case]
     with pytest.raises(AssertionError):
@@ -562,11 +456,9 @@ def test_each_rule_rejects_what_it_exists_to_reject(case, taxonomy):
 def test_the_fixture_entry_is_always_among_the_cases():
     """The fixture is parametrised in, and is not counted as a real dish.
 
-    Both halves matter. Out of the parametrisation, this module is back to
-    collecting nothing while the collection is empty. Inside ALL_MAGIC_BAG, the
-    cross-collection sweeps (test_style.py, test_taxonomy.py) and the
-    empty-collection report below would all treat a test file as one of
-    Helen's dishes.
+    Out of the parametrisation, this module collects nothing while the
+    collection is empty. Inside ALL_MAGIC_BAG, the cross-collection sweeps and
+    the empty-collection report treat a test file as one of Helen's dishes.
     """
     class _Metafunc:
         fixturenames = ["magic_bag"]
@@ -595,10 +487,8 @@ def test_the_fixture_entry_is_always_among_the_cases():
 def test_an_empty_magic_bag_is_reported_and_a_filled_one_is_not():
     """The run says when it was not evidence about a real dish, and only then.
 
-    Honest in both directions, as the drafts caveat is
-    (test_suite_hygiene.py): it must speak while the collection is empty, and
-    be silent once it is not -- a caveat printed on every run is noise, and
-    noise is ignored exactly like a failure. It never fails the run.
+    It must speak while the collection is empty and be silent once it is not:
+    a caveat printed on every run is noise. It never fails the run.
     """
     lines = []
 

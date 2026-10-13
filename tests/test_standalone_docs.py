@@ -1,49 +1,17 @@
-"""The two ingest documents written for a Claude with NO repository.
+"""The two ingest documents written for a Claude with no repository.
 
 `model_instructions/INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md` are
-handed to claude.ai when Helen finds a recipe or a drink in the wild. They have
-no access to `_data/`, so each one PRINTS the closed vocabularies as literal
-text -- 24 tags, 14 star ingredients, 42 garnishes, 23 glasses, 28 canonical
-method steps -- and carries a worked example showing the file shape.
+handed to claude.ai, which cannot read `_data/`, so each prints the closed
+vocabularies as literal text and carries a worked example of the file shape.
+That is deliberate duplication of data, and this module is what keeps the copy
+honest: without it, retiring a tag silently makes a document wrong.
 
-THAT IS THE ONLY DELIBERATE DUPLICATION OF DATA IN THIS REPOSITORY, and it is
-the same bargain `methods.yml` strikes with its own proposals map and
-`glasses.yml` with `all_icons`: copy live data only alongside the test that
-keeps the copy honest. Without this module, adding a garnish or retiring a tag
-silently makes a document wrong, and nothing looks at markdown.
-
-THE ROT IS ASYMMETRIC AND THAT IS WHY IT MATTERS. A document that omits a new
-garnish merely under-serves; a document that still lists a RETIRED tag teaches
-a shape the suite rejects, in a session that cannot run the suite, to a reader
-who has no way to know. So the drift check runs in one direction on purpose:
-everything the document prints must still be declared. It does not require the
-document to print everything declared.
-
-WHAT THESE CHECKS HAVE ALREADY CAUGHT, all in documents freshly written by the
-agent that wrote this file, none by re-reading:
-
-  - `serves: 2` and `tags: [carbs party]` unquoted in the food example. Chasing
-    it found the identical fault in MANUAL 4's own canonical schema block,
-    which had been wrong for nine days and is the most-copied twelve lines in
-    that document.
-  - The cocktail document told its reader to omit `mood:` (the key is REQUIRED)
-    and to write `glass: []` when the source names none (#491: every drink must
-    name a glass). Both were real suite failures, found only by copying the
-    example into `_cocktail_drafts/` and running pytest.
-
-They began as `tmp/check_doc_example.py` and `tmp/check_cocktail_doc.py`.
-Helen, 2026-09-02: "It sounds very much like they should form part of our
-suite." They do now, and `tmp/` is not where a guard should live.
-
-THE ASYMMETRY IS NARROWED, NOT ABANDONED, SINCE 2026-09-02. Each vocabulary now
-sits between `<!-- vocab:<name> start -->` markers and is rendered by
-`scripts/build_ingest_vocab.py` from the same loaders below;
-`test_every_vocab_block_matches_its_generator` runs that script's `--check` and
-fails if a committed block has drifted in either direction. That is a two-way
-guard applied ONLY where the duplication is mechanical. The prose around each
-block -- the "meanings you would not guess" bullets, the four garnish rules,
-the worked examples -- is judgement, is still hand-written, and is still guarded
-one way only. INGEST_INBOX_DESIGN.md §5 is the argument for the split.
+Two guards. Each vocabulary between `<!-- vocab:<name> start -->` markers is
+rendered by `scripts/build_ingest_vocab.py` and checked both ways
+(`test_every_vocab_block_matches_its_generator`). The hand-written prose and
+examples are checked one way only: everything printed must still be declared.
+A retired term left in teaches a shape the suite rejects, to a reader who
+cannot run the suite; a new term not yet printed merely under-serves.
 """
 from __future__ import annotations
 
@@ -59,18 +27,12 @@ DOCS = ROOT / "model_instructions"
 FOOD_DOC = DOCS / "INGEST_ONE_RECIPE.md"
 COCKTAIL_DOC = DOCS / "INGEST_ONE_COCKTAIL.md"
 
-# Suite marker, so `pytest -m shared` runs this. test_suite_hygiene.py asserts
-# every module declares one -- an unmarked file is silently missed by every
-# filtered run. `shared` because the pair spans both sites.
 pytestmark = pytest.mark.shared
 
 
-# =============================================================================
-# LOADERS -- every rule comes from _data/ or from the suite, never re-typed
-# =============================================================================
+# ---- Loaders: every rule comes from _data/ or from the suite, never re-typed ----
 # A checker carrying its own copy of the contract eventually passes a document
-# INTO a shape the real tests reject, while looking green the whole time. Same
-# reasoning as scripts/tidy_drafts.py's header states at length.
+# into a shape the real tests reject, while looking green the whole time.
 
 def _doc(path: Path) -> str:
     assert path.is_file(), (
@@ -90,13 +52,10 @@ def _yaml_blocks(text: str) -> list[str]:
 
 
 def _file_blocks(text: str) -> list[tuple[str, dict]]:
-    """EVERY yaml block that is a whole file, not just the worked example.
+    """Every yaml block with something to check, not just the worked example.
 
-    Each document carries two: the annotated schema in its section 2, and the
-    worked example at the end. THE FIRST ONE IS THE MORE COPIED and was not
-    checked at all until 2026-09-02 -- found because a deliberate break aimed
-    at the wrong block passed, which is the good outcome of breaking a guard
-    on purpose rather than trusting it.
+    Each document carries an annotated schema as well as the worked example,
+    and the schema is the one a reader copies first.
     """
     out = []
     for block in _yaml_blocks(text):
@@ -104,10 +63,9 @@ def _file_blocks(text: str) -> list[tuple[str, dict]]:
         fm = yaml.safe_load(body)
         if not isinstance(fm, dict):
             continue
-        # A whole file, OR a FRAGMENT illustrating one key. The cocktail
-        # document's section 3 shows a bare `ingredients:` list with no title,
-        # and it went unchecked until a deliberate break landed in it and
-        # passed -- so match on having something to check, not on being a file.
+        # A whole file, or a fragment illustrating one key (a bare
+        # `ingredients:` list with no title): match on having something to
+        # check, not on being a file.
         if "title" in fm or "ingredients" in fm or "ingredient_groups" in fm:
             out.append((block, fm))
     return out
@@ -123,20 +81,10 @@ def _example(text: str, marker: str) -> dict:
 def _flat(text: str) -> str:
     """Whitespace-normalised and with the `<!-- vocab: -->` markers removed.
 
-    THE FIRST VERSION OF THE DRIFT SCAN DID NOT NORMALISE WHITESPACE and
-    reported twelve stale vocabulary entries, every one of them a line break
-    inside a string. MANUAL 12: be suspicious of your own findings before
-    reporting them.
-
-    THE MARKERS CAME OFF FOR THE SAME REASON, 2026-09-02. The garnish scraper
-    reads `**Group:** a · b · c` up to the next `*`, and the last group in the
-    section is now followed by `<!-- vocab:garnish end -->` with no asterisk
-    between them -- so it read `5 drops of olive oil <!-- vocab:garnish end -->`
-    as a garnish string and called it undeclared. That is a false finding about
-    the SCAFFOLDING, not a weakened check: a marker carries no vocabulary, the
-    generator's own test compares the block against `_data/` character for
-    character, and every real entry is still checked here. Dropping them is the
-    same class of normalisation as dropping the hard wrap that produced them.
+    Without the first, a hard wrap inside a printed string reads as a stale
+    entry. Without the second, the garnish scraper, which reads
+    `**Group:** a · b · c` up to the next `*`, takes the end marker after the
+    last group as part of a garnish. A marker carries no vocabulary.
     """
     return re.sub(r"\s+", " ", re.sub(r"<!--.*?-->", " ", text, flags=re.S))
 
@@ -151,19 +99,17 @@ def _declared_garnishes() -> set[str]:
 def _declared_generics() -> set[str]:
     """Every generic `ingredients.yml` declares, through the suite's own loader.
 
-    IMPORTED, NOT RESTATED. `test_cocktails._declared_generics` derives the set
-    from the file's own shape and knows the two exclusions -- `NOT_GENERIC_LISTS`
-    and the `<family>_characters` suffix. A second copy here would drift from it
-    silently, and this module's whole subject is two copies of one vocabulary
-    drifting apart.
+    Imported, not restated: `test_cocktails._declared_generics` knows the
+    exclusions (`NOT_GENERIC_LISTS`, the `<family>_characters` suffix), and a
+    second copy here drifts from it silently.
     """
     from test_cocktails import _declared_generics as declared, _vocab
     return declared(_vocab())
 
 
 def _canonical_steps() -> set[str]:
-    """Every literal under `canonical:` AND every `shapes:` sentence, since
-    2026-09-10 -- the document prints both, `<X>` and all."""
+    """Every literal under `canonical:` and every `shapes:` sentence: the
+    document prints both, `<X>` and all."""
     methods = _data("methods")
     literal = {s for grp in methods["canonical"].values() for s in grp}
     shapes = {s for grp in (methods.get("shapes") or {}).values() for s in grp}
@@ -178,17 +124,14 @@ def _food_taxonomy() -> dict:
     return _data("taxonomy", site="food")
 
 
-# =============================================================================
-# BOTH DOCUMENTS
-# =============================================================================
+# ---- Both documents ----
 
 @pytest.mark.parametrize("path", [FOOD_DOC, COCKTAIL_DOC], ids=lambda p: p.name)
 def test_every_yaml_block_in_a_standalone_doc_parses(path):
     """A document whose example does not load teaches an unusable shape.
 
-    Cheapest possible check and it earns its place: these files are edited as
-    prose, so a stray indent inside a fenced block is invisible to the writer
-    and fatal to the reader, who will copy it verbatim.
+    These files are edited as prose, so a stray indent inside a fenced block
+    is invisible to the writer and copied verbatim by the reader.
     """
     blocks = _yaml_blocks(_doc(path))
     assert blocks, f"{path.name} contains no ```yaml blocks at all"
@@ -200,18 +143,12 @@ def test_every_yaml_block_in_a_standalone_doc_parses(path):
 
 
 def test_every_vocab_block_matches_its_generator():
-    """The two-way half: what the documents print IS what `_data/` declares.
+    """The two-way half: what the documents print is what `_data/` declares.
 
-    THE SAME CODE `--check` RUNS, imported rather than re-implemented, so the
-    script and the suite cannot disagree about what stale means -- the failure
-    that would matter here is a green test beside a script that says otherwise.
-
-    It fails in both directions, which the one-way checks below deliberately do
-    not: a retired garnish still printed, AND a newly declared one missing. The
-    distinction is that a marked block is mechanical duplication with a
-    generator behind it, so "the document has not caught up" is a five-second
-    fix rather than a two-repo edit -- which is the trade the one-way rule was
-    protecting the PROSE from, and prose is not what is inside these markers.
+    The same code `--check` runs, imported and not re-implemented, so the
+    script and the suite cannot disagree about what stale means. It fails in
+    both directions -- a retired garnish still printed, a new one missing --
+    because a marked block is mechanical and has a generator to catch it up.
     """
     sys.path.insert(0, str(ROOT / "scripts"))
     from build_ingest_vocab import check  # noqa: E402
@@ -229,17 +166,11 @@ def test_every_vocab_block_matches_its_generator():
     )
 
 
-# =============================================================================
-# THE FOOD DOCUMENT
-# =============================================================================
+# ---- The food document ----
 
 def test_every_recipe_block_in_the_food_doc_uses_declared_tags_and_stars():
-    """BOTH blocks -- the annotated schema and the worked example.
-
-    The schema block is the one a reader meets first and copies, and checking
-    only the example is how MANUAL §4's own canonical block sat wrong for
-    nine days with a retired tag in it.
-    """
+    """Both blocks, the annotated schema and the worked example: the schema
+    block is the one a reader meets first and copies."""
     blocks = _file_blocks(_doc(FOOD_DOC))
     assert len(blocks) >= 2, (
         f"expected the schema block AND the worked example, found "
@@ -264,12 +195,7 @@ def test_every_recipe_block_in_the_food_doc_uses_declared_tags_and_stars():
 
 
 def test_the_food_docs_example_obeys_the_schema_it_describes():
-    """The rules the document itself states, applied to its own example.
-
-    Every one of these is a rule the document spells out in prose a few
-    paragraphs above the example, which is exactly the gap MANUAL 12's
-    "you will write down a rule instead of following it" describes.
-    """
+    """The rules the document states in prose, applied to its own example."""
     fm = _example(_doc(FOOD_DOC), "Crispy Sage Butter Gnocchi")
     problems = []
 
@@ -307,12 +233,10 @@ def test_the_food_docs_example_obeys_the_schema_it_describes():
 
 
 def test_the_food_docs_example_quotes_every_scalar_and_list_member():
-    """Unquoted `serves: 2` is what this check was written for.
+    """No unquoted `serves: 2` or `tags: [carbs party]` in the worked example.
 
-    It found exactly that, plus `tags: [carbs party]`, on its first run --
-    and chasing it turned up the identical fault in MANUAL 4's canonical
-    schema block, which had been wrong for nine days. /tidy-drafts repairs
-    quoting mechanically, which is precisely why nobody had noticed.
+    /tidy-drafts repairs quoting mechanically downstream, so an unquoted
+    example is copied for a long time before anybody notices.
     """
     from test_front_matter import SCALAR_STRING_FIELDS  # noqa: E402
 
@@ -339,11 +263,10 @@ def test_the_food_docs_example_quotes_every_scalar_and_list_member():
 def test_every_tag_and_star_the_food_doc_prints_is_still_declared():
     """The drift check: the document's reference lists vs `taxonomy.yml`.
 
-    ONE DIRECTION ONLY, deliberately. A retired term left in the document is
-    the harmful case -- it teaches a value the suite rejects, to a reader who
-    cannot run the suite. A newly declared term the document has not caught up
-    with merely under-serves, and requiring the document to be exhaustive would
-    make every taxonomy addition a two-repo edit for no safety gain.
+    One direction only, deliberately. A retired term left in the document
+    teaches a value the suite rejects, to a reader who cannot run the suite.
+    A new term the document lacks merely under-serves, and requiring it would
+    make every taxonomy addition a second edit for no safety gain.
     """
     flat = _flat(_doc(FOOD_DOC))
     tax = _food_taxonomy()
@@ -377,14 +300,12 @@ def test_every_tag_and_star_the_food_doc_prints_is_still_declared():
 
 
 def test_the_food_docs_source_type_table_uses_declared_types():
-    """The citation table's first column, against the eight real types.
+    """The citation table's first column, against the declared source types.
 
-    THE LIST ABOVE THE TABLE IS GENERATED AND THE TABLE ITSELF IS NOT: its
-    other two columns are the citation's shape and an example, which are
-    judgement and prose. So the table gets the same one-way check every other
-    hand-written vocabulary in these documents gets -- what it prints must
-    still be declared. `magazine` is the near-miss, and it has been typed by
-    hand once already; test_source_attribution.py's header tells that story.
+    The list above the table is generated and the table is not: its other
+    columns are the citation's shape and an example, which are judgement. So
+    it gets the one-way check: what it prints must still be declared.
+    `magazine` is the near-miss.
     """
     from test_source_attribution import VALID_TYPES  # noqa: E402
 
@@ -403,21 +324,14 @@ def test_the_food_docs_source_type_table_uses_declared_types():
     )
 
 
-# =============================================================================
-# THE COCKTAIL DOCUMENT
-# =============================================================================
+# ---- The cocktail document ----
 
 def test_every_drink_block_in_the_cocktail_doc_obeys_the_schema_it_describes():
-    """Including the two rules whose absence made the first draft fail.
+    """Every drink block, the annotated schema as well as the worked example.
 
-    `mood` is REQUIRED and must be `[]` (it is derived by
-    scripts/derive_cocktail_moods.py, so a hand-written one is reverted next
-    run), and every drink must name a glass (#491). The document's first
-    version got both backwards and only pytest said so.
-
-    BOTH BLOCKS, not just the worked example -- the annotated schema in section
-    2 is the one a reader meets first and copies, and it went unchecked until a
-    deliberate break aimed at it passed.
+    `mood` is required and must be `[]` (scripts/derive_cocktail_moods.py
+    derives it, so a hand-written one is reverted next run), and every drink
+    names a glass (#491).
     """
     blocks = _file_blocks(_doc(COCKTAIL_DOC))
     assert len(blocks) >= 2, (
@@ -436,7 +350,7 @@ def test_every_drink_block_in_the_cocktail_doc_obeys_the_schema_it_describes():
 def _drink_problems(fm: dict) -> list[str]:
     problems = []
 
-    # A FRAGMENT has no title and is only checked for what it shows.
+    # A fragment has no title and is only checked for what it shows.
     if "title" in fm:
         if "mood" not in fm:
             problems.append("no `mood` key -- it is required even when empty")
@@ -444,39 +358,28 @@ def _drink_problems(fm: dict) -> list[str]:
             problems.append(f"mood must be [] and is derived: {fm['mood']!r}")
         if not (fm.get("glass") or []):
             problems.append("no glass -- #491, every drink names one")
-        # `who knows`, NOT `QQ`, SINCE 2026-09-05. Helen: "Should drinks I
-        # haven't made yet have ship who knows? I think that's clearer than QQ
-        # or leaving it unset, because it's a positive presence." `QQ` is no
-        # longer in the ship vocabulary at all --
-        # test_cocktails.py::test_meta_ship_is_a_rung_or_who_knows -- so a
-        # document example still writing it would teach a repo-less reader to
-        # produce a file that fails the suite on arrival.
+        # `who knows`, not `QQ`: `QQ` is not in the ship vocabulary
+        # (test_cocktails.py::test_meta_ship_is_a_rung_or_who_knows), so an
+        # example writing it teaches a file that fails the suite on arrival.
         if fm.get("meta", {}).get("ship") != "who knows":
             problems.append(
                 f'meta.ship must be "who knows": '
                 f"{fm.get('meta', {}).get('ship')!r}"
             )
-        # AND THE FIELD THAT NOW CARRIES THE ABSENCE. An ingest cannot know
-        # whether Helen has poured the drink, so it is always false on a fresh
-        # file (#722); the value gates no publication either way.
+        # An ingest cannot know whether Helen has made the drink, so
+        # `made_before` is always false on a fresh file (#722).
         if fm.get("meta", {}).get("made_before") is not False:
             problems.append(
                 f"meta.made_before must be false: "
                 f"{fm.get('meta', {}).get('made_before')!r}"
             )
-        # THE THREE GATE FLAGS JOINED THE DRINK SCHEMA ON 2026-09-02 (#668), and
-        # a drink file without them fails test_cocktails.py's meta-order guard
-        # the moment it lands. The document's examples are what a repo-less
-        # reader copies, so they carry the flags -- read from the schema's own
-        # list rather than re-typed, the same rule every block in this file
-        # follows -- and all three are False on a new file, as on a recipe.
+        # The `meta` keys and their order are the schema's own list, not
+        # re-typed; the three gate flags (#668) are all False on a new file.
         from test_cocktails import (  # noqa: E402
             META_KEYS_IN_ORDER, keys_out_of_page_order,
         )
-        # PAGE ORDER, #1213 -- "Please apply to new ingests." A repo-less
-        # reader copies these blocks, so a block out of order teaches every
-        # file it produces to arrive out of order. The predicate is the
-        # suite's own, the one the drafts test and the tidy pass ask.
+        # Page order (#1213): a block out of order teaches every file copied
+        # from it to arrive out of order. The predicate is the suite's own.
         out_of_order = keys_out_of_page_order(list(fm))
         if out_of_order:
             problems.append(
@@ -491,10 +394,9 @@ def _drink_problems(fm: dict) -> list[str]:
             if flag in meta and meta[flag] is not False:
                 problems.append(f"meta.{flag} must be False on a new drink: {meta[flag]!r}")
 
-    # A GLASS MUST BE CANONICAL, NOT MERELY DRAWABLE. `rocks` has an icon and
+    # A glass must be canonical, not merely drawable: `rocks` has an icon and
     # is still the wrong spelling -- glasses.yml's `canonical_glasses` maps it
-    # to `old fashioned`. Checking "has an icon" passed a deliberate break on
-    # 2026-09-02, which is exactly what breaking a guard on purpose is for.
+    # to `old fashioned`.
     corrections = _data("glasses")["canonical_glasses"]
     for g in fm.get("glass") or []:
         if g in corrections:
@@ -516,27 +418,10 @@ def _drink_problems(fm: dict) -> list[str]:
             problems.append(f"US unit in the example: {amount!r}")
         if re.fullmatch(r"[\d.]+", amount.strip()):
             problems.append(f"bare number with no unit: {amount!r}")
-        # A QQ, OR A GENERIC THE DOCUMENT ITSELF PRINTS. Anything else is a
-        # guess, and that is the whole rule these documents exist to enforce.
-        #
-        # IT USED TO DEMAND EXACTLY `QQ`, ON THE GROUNDS THAT A REPO-LESS
-        # SESSION CANNOT SEE THE VOCABULARY. That was true until 2026-09-21 and
-        # then stopped being: `vocab:generics` prints all 181 declared generics
-        # into the cocktail document, so an exact match is now a LOOKUP a reader
-        # of that document can do, and the document teaches them to do it. The
-        # old check would have failed the document for following its own
-        # instructions.
-        #
-        # TWO THINGS CHANGED IT, AND BOTH ARE HERE. Retiring `item` left the
-        # source's own words nowhere to go but `generic`, behind a `QQ ` -- so
-        # a bare `QQ` cannot be demanded either, or the transcription is thrown
-        # away. And printing the vocabulary made typing an exact match honest.
-        #
-        # WHAT IS STILL REFUSED IS THE GUESS IN BETWEEN: a generic that is
-        # neither a QQ nor a value the document prints. `agave nectar` beside
-        # `agave syrup`, `rye whiskey` beside `rye`, `chartreuse` for either of
-        # the two Chartreuses -- every one a real wrong guess, and every one
-        # caught here rather than in her collection.
+        # A `QQ`, a `QQ <the source's words>`, or a generic the document
+        # itself prints in `vocab:generics`, which a repo-less reader can look
+        # up. What is refused is the guess in between: `agave nectar` beside
+        # `agave syrup`, `rye whiskey` beside `rye`.
         generic = str(item.get("generic") or "").strip()
         if not (generic == "QQ" or generic.startswith("QQ ")
                 or generic in _declared_generics()):
@@ -548,10 +433,8 @@ def _drink_problems(fm: dict) -> list[str]:
 def test_every_vocabulary_the_cocktail_doc_prints_is_still_declared():
     """Garnishes, glasses and method steps, against the live `_data/`.
 
-    This is the check with the most to guard: 42 garnish strings, 23 glass
-    names and 28 canonical steps, all printed as prose. `garnish.yml` went from
-    65 distinct strings to 49 in two days, and `methods.yml` lost 15 more the
-    week after -- so this vocabulary moves, and the document cannot feel it.
+    One way only: what is printed must still be declared. This vocabulary
+    moves, and the document cannot feel it.
     """
     flat = _flat(_doc(COCKTAIL_DOC))
 
@@ -570,7 +453,7 @@ def test_every_vocabulary_the_cocktail_doc_prints_is_still_declared():
     steps = set(re.findall(r"`([A-Z][^`]*?\.)`", flat))
     assert len(steps) >= 20, f"only found {len(steps)} method steps printed"
     # A filled `shapes:` sentence in the prose ("...other than the cola with
-    # ice.") is canonical too -- 2026-09-10; the slot matches one run of text.
+    # ice.") is canonical too; the slot matches one run of text.
     shape_res = [
         re.compile("^" + re.escape(h) + r"(.+)" + re.escape(t) + "$")
         for s in _canonical_steps() if "<X>" in s
@@ -594,22 +477,13 @@ def test_every_vocabulary_the_cocktail_doc_prints_is_still_declared():
 
 
 def test_every_declared_garnish_has_exactly_one_group():
-    """Ruling D11: the document's grouping is DATA, not a map in a script.
+    """The cocktail document's garnish grouping is data: `canonical:` maps a
+    group name to a list, and every declared garnish sits in exactly one.
 
-    THE FILE ALREADY HELD THE ANSWER and the ruling's wording ("a `group:` key
-    per entry") is what it looks like from outside. `canonical:` is a mapping of
-    group name to list, so every declared garnish already sits in exactly one
-    group -- adding a per-entry key would mean turning each entry from a string
-    into a dict, which is the one change that would break
-    `_declared_garnishes()` in test_cocktails.py, in silence, for every drink.
-    INGEST_INBOX_DESIGN §5 allows the alternative outright: "a `groups:` map
-    from group name to list is acceptable". This is that map.
-
-    WHAT CHANGED IS THE CONTRACT, WHICH IS WHY THIS TEST EXISTS. garnish.yml
-    said the grouping was "for reading only" and it is now printed verbatim
-    into INGEST_ONE_COCKTAIL.md by scripts/build_ingest_vocab.py. A garnish
-    listed under two groups would print twice; a group renamed would rename a
-    heading in a document handed to a session that cannot check it.
+    scripts/build_ingest_vocab.py prints the groups verbatim into
+    INGEST_ONE_COCKTAIL.md, so a garnish under two groups prints twice. An
+    entry stays a string: a per-entry dict breaks `_declared_garnishes()` in
+    test_cocktails.py, silently, for every drink.
     """
     vocab = _data("garnish")
     groups = vocab.get("canonical") or {}
@@ -654,11 +528,9 @@ def test_every_declared_garnish_has_exactly_one_group():
 def test_the_cocktail_docs_correction_map_matches_glasses_yml():
     """The wrong-spelling table is a copy of `canonical_glasses`.
 
-    A drink writing `rocks` is corrected to `old fashioned`; the document
-    prints that table so a repo-less reader gets it right first time. If the
-    map gains an entry and the document does not, the document teaches a
-    spelling that will be silently rewritten -- which is confusing rather than
-    fatal, so this checks only that what IS printed is still true.
+    The document prints it so a repo-less reader writes `old fashioned`, not
+    `rocks`, first time. One way only: an entry the document lacks is a
+    spelling silently rewritten later, which is confusing and not fatal.
     """
     flat = _flat(_doc(COCKTAIL_DOC))
     live = _data("glasses")["canonical_glasses"]
@@ -678,17 +550,15 @@ def test_the_cocktail_docs_correction_map_matches_glasses_yml():
     )
 
 
-# =============================================================================
-# THE INSTRUCTIONS A WEB CHAT IS GIVEN
-# =============================================================================
+# ---- The instructions a web chat is given ----
 
 WEB_DOC = DOCS / "CLAUDE_WEB_INGEST.md"
 
 
 def test_the_web_instructions_still_match_the_envelope():
-    """The instruction block in CLAUDE_WEB_INGEST.md §2 restates four facts
-    about the envelope that live elsewhere. If any of them moves, the web chat
-    is taught the wrong shape and every envelope it produces is rejected.
+    """The instruction block in CLAUDE_WEB_INGEST.md §2 restates facts about
+    the envelope that live elsewhere. If any of them moves, the web chat is
+    taught the wrong shape and every envelope it produces is rejected.
     """
     text = _doc(WEB_DOC)
     block = text.split("## 2. Instructions for the web chat", 1)[1]

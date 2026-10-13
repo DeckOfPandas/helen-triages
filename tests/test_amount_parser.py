@@ -1,8 +1,7 @@
 """The Ruby amount parser, tested without a Jekyll build -- #1199.
 
 `_plugins/amount.rb` is the one reading of an `amount:` string that the costs,
-units and card generators share. Until 2026-10-04 it was a regex retyped in
-each of them, exercised only through rendered pages.
+units and card generators share.
 
 `tests/fixtures/amounts.json` is the golden file: every distinct amount in the
 published cocktail collection, plus a few shapes worth pinning, each with what
@@ -10,10 +9,9 @@ the Ruby parser reads (`number`, `unit`, `ml`) and what the browser's
 `parseAmount` reads (`js`). `tests/js/shopping-list.test.js` reads the same
 rows, so the two languages are held to one file.
 
-THE TWO PARSERS ARE NOT THE SAME GRAMMAR AND THE FILE SAYS WHERE. The JS one
-folds a plural (`dashes` -> `dash`), reads a bare `15` as a count and `half` as
-0.5; the Ruby one keeps the unit as written and reads neither. Those rows are
-in the fixture so the difference is a recorded fact, not a discovery.
+The two parsers are not the same grammar, and the fixture records where: the
+JS one folds a plural (`dashes` -> `dash`), reads a bare `15` as a count and
+`half` as 0.5; the Ruby one keeps the unit as written and reads neither.
 """
 import json
 import shutil

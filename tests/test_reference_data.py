@@ -1,25 +1,13 @@
-"""The reference data layer's own invariants.
+"""The reference data layer's invariants: _data/food/internal_temperatures.yml,
+_data/food/cooking_methods.yml and the recipes wired to them.
+Run: pytest tests/test_reference_data.py
 
-WHY THIS FILE EXISTS. _data/food/internal_temperatures.yml now holds every
-temperature TWICE: once as the display string the pages and a recipe's meta
-line print ("48–50°C"), and once as a numeric pair the temperature charts draws
-from (out_at_min: 48, out_at_max: 50).
-
-Duplicating a fact is normally the thing to avoid, and the alternative was
-considered: store numbers only and render the strings in Liquid. It was not
-taken, for two reasons. The strings carry words the numbers can't ("74–75°C in
-the thigh", "~63°C, opaque and flaking", "70°C+") so they'd need their own
-qualifier fields anyway; and deriving them would mean rewriting ~60 call sites
-across internal-temperatures.html and _layouts/recipe.html, which is a lot of
-churn to land in one go for a page that is about to be redesigned anyway.
-
-So: duplication, guarded. That is this project's own idiom -- the same reason
-test_internal_temp_ref_resolves exists, and the same reason taxonomy tags are
-checked against a declared list rather than trusted. A duplicate that a test
-proves consistent is a cache; a duplicate nothing checks is a bug waiting.
-
-IF THE DERIVED VERSION IS EVER BUILT, delete this file with it -- it is
-scaffolding for the duplication, not a rule about temperatures.
+internal_temperatures.yml holds every temperature twice: the display string the
+pages print ("48–50°C") and the numeric pair the charts draw from
+(out_at_min: 48, out_at_max: 50). The strings carry words the numbers cannot
+("74–75°C in the thigh", "70°C+"), so the duplication is kept and guarded
+here. If the strings are ever derived from the numbers, the tests of that
+agreement go with the duplication.
 """
 import html
 import pathlib
@@ -28,9 +16,9 @@ import re
 import pytest
 
 
-# Mirrors scripts/build_cooking_methods.py's own parser, deliberately reimplemented rather
-# than imported: a test that shares its parser with the thing that generated
-# the data would agree with itself no matter how wrong both were.
+# A parser of its own, never imported from a script that writes the data: a
+# test sharing its parser with the generator agrees with it however wrong both
+# are.
 _RANGE = re.compile(r"^(\d+(?:\.\d+)?)\s*(?:°C)?\s*[–-]\s*(\d+(?:\.\d+)?)")
 _SINGLE = re.compile(r"^(\d+(?:\.\d+)?)")
 
@@ -67,10 +55,9 @@ def _nodes_with_temps(data):
 def test_every_temperature_string_has_numbers(internal_temperatures):
     """A figure the charts can't draw is a figure that silently disappears.
 
-    The one legitimate exception is a field whose value is a sentence rather
-    than a measurement -- tuna's carryover is prose about how hard to sear,
-    with no number in it at all -- so the rule is "has a leading figure implies
-    has numbers", not "every key has numbers".
+    A field whose value is a sentence with no leading figure is exempt, so the
+    rule is "a leading figure implies a numeric pair", not "every key has
+    numbers".
     """
     missing = []
     for dotted, node, key in _nodes_with_temps(internal_temperatures):
@@ -86,7 +73,8 @@ def test_every_temperature_string_has_numbers(internal_temperatures):
 
 
 def test_numbers_agree_with_their_strings(internal_temperatures):
-    """The whole point of the file. Change one, this catches the other."""
+    """Each numeric pair equals the figures in the string it duplicates, so
+    neither can be edited alone."""
     wrong = []
     for dotted, node, key in _nodes_with_temps(internal_temperatures):
         if f"{key}_min" not in node:
@@ -143,8 +131,7 @@ def test_carryover_moves_the_temperature_up(internal_temperatures):
     """A rested figure below its own out_at figure would be a transcription slip.
 
     Carryover only goes one way: meat keeps cooking after it leaves the heat.
-    This is the check that would have caught a digit swap in any of the 30-odd
-    pull/rested pairs, none of which anything else verifies.
+    Nothing else verifies an out_at/rested pair against a digit swap.
     """
     wrong = []
     for path, node in _walk(internal_temperatures):
@@ -160,27 +147,11 @@ def test_carryover_moves_the_temperature_up(internal_temperatures):
 def test_every_temperature_fits_on_the_chart_axis(internal_temperatures):
     """No figure may fall outside the chart's own axis.
 
-    This is a real bug caught the hard way, not a hypothetical. The charts's axis
-    ran 40–100°C while tuna's blue rare sits at 38°C, so that bar computed a
-    NEGATIVE left offset, escaped its track and printed over the row label.
-    Helen spotted it as a spacing problem ("the bar for tuna slightly obscures
-    the word"); it was the axis silently clipping its own data.
-
-    Nothing else could catch it. CSS has no opinion about a negative percentage,
-    the page still builds, every test still passes, and the only symptom is a
-    bar in slightly the wrong place — which reads as a styling nit rather than
-    as a wrong number.
-
-    So the bounds are read from the stylesheet rather than repeated here: the
-    two files cannot disagree, and narrowing the axis to make a chart look
-    tidier fails immediately rather than quietly cropping whatever now falls
-    outside it.
+    A figure below the axis minimum gives its bar a negative left offset: it
+    escapes the track and prints over the row label. CSS accepts a negative
+    percentage and the page builds, so it reads as a styling nit. The bounds
+    are read from the stylesheet, so narrowing the axis fails here.
     """
-    # Follows the dials, which moved from assets/css/reference-demo.scss to
-    # _sass/food/_temperature-chart.scss on 2026-08-14 when the chart stopped
-    # being a demo and started drawing on recipe pages. This test caught the
-    # move itself, which is the behaviour you want from a guard that reads
-    # another file: it failed loudly rather than silently bounding nothing.
     scss = (pathlib.Path(__file__).resolve().parent.parent
             / "_sass" / "food" / "_temperature-chart.scss")
     if not scss.exists():
@@ -196,8 +167,8 @@ def test_every_temperature_fits_on_the_chart_axis(internal_temperatures):
     lo, hi = bounds["tc-min"], bounds["tc-max"]
     outside = []
     for dotted, node, key in _nodes_with_temps(internal_temperatures):
-        # Carryover is a DIFFERENCE between two temperatures, not a temperature,
-        # so it has no business being plotted on this axis and is exempt.
+        # Carryover is a difference between two temperatures, not a point on
+        # this axis.
         if key == "carryover":
             continue
         for suffix in ("_min", "_max"):
@@ -216,13 +187,9 @@ def test_every_temperature_fits_on_the_chart_axis(internal_temperatures):
 def _doneness_spectra(node, path=()):
     """Every doneness map under a protein, with the dotted path that holds it.
 
-    FINDS THEM RATHER THAN GUESSING WHERE THEY LIVE. The first version of this
-    reached for a known sub-key -- `for key in ("roasting", "tender_roast")` --
-    which works for exactly the four proteins it was written against and
-    silently finds nothing for anything else. Walking means a protein that
-    keeps its spectrum under any other name (venison.loin, venison.haunch) is
-    checked the day it is added, without anyone remembering to teach this
-    function a fifth key.
+    Found by walking, not by a list of known sub-keys: a spectrum kept under
+    any other name (venison.loin, venison.haunch) would otherwise be silently
+    missed.
     """
     if not isinstance(node, dict):
         return
@@ -241,15 +208,9 @@ def test_doneness_levels_ascend(internal_temperatures, protein):
     what every page renders — so this checks the data as published, not a
     sorted copy of it.
 
-    THE TRAP HERE IS A SILENT SKIP, not a wrong number. This test used to walk
-    to a `roasting`/`tender_roast` sub-key and `pytest.skip` when it found no
-    `doneness` map underneath. Adding "venison" to the parametrize list would
-    then have LOOKED like coverage and been none at all: venison's spectra sit
-    on `loin` and `haunch`, neither key matched, the lookup returned None, and
-    the new parametrisation would have reported itself green while checking
-    nothing — the exact shape of failure MANUAL §12 and tests/
-    test_suite_hygiene.py exist for. So there is no skip left in here: the
-    spectra are found by walking, and an empty result is a failure.
+    There is no skip in here on purpose: a protein in the parametrize list
+    with no `doneness` map under it fails, where a skip would look like
+    coverage and check nothing (MANUAL §12).
     """
     spectra = list(_doneness_spectra(internal_temperatures[protein]))
     assert spectra, (
@@ -276,19 +237,12 @@ def test_doneness_levels_ascend(internal_temperatures, protein):
         )
 
 
-# =============================================================================
-# COOKING METHODS — the calculator's data layer
-# =============================================================================
-# Generated from cooking-methods.html by scripts/build_cooking_methods.py rather than
-# retyped. These tests are what makes that generation trustworthy: a parser that
-# quietly mis-reads one row in sixty-six produces a data file that looks
-# perfectly plausible and schedules someone's dinner wrong.
+# --- cooking methods: the calculator's data layer ----------------------------
+# _data/food/cooking_methods.yml. A mis-read rate looks plausible in the data
+# file and schedules someone's dinner wrong.
 
 import pytest as _pytest  # noqa: E402  (kept local to this appended section)
 
-# Suite marker, so `pytest -m food` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.food
 
 SHAPES = {"rate", "total", "staged", "by_doneness", "relative",
@@ -416,16 +370,11 @@ def test_no_method_produces_an_absurd_time(cooking_methods):
 
 
 def test_every_oven_temperature_says_fan(cooking_methods):
-    """House style is fan-only — MANUAL §5, "°C always, FAN OVEN ONLY, never
-    conventional or gas mark".
+    """Every oven figure in the methods data says "fan" and none names a
+    conventional temperature (MANUAL §5).
 
-    The source page didn't follow it: three rows spelled out a fan/conventional
-    pair and 63 gave a bare figure with no basis at all, which is the worst of
-    the three options — a number you can't act on without guessing which oven
-    it means, and a 20°C guess either way.
-
-    Helen, on the calculator: "only one option has fan oven though, the rest say
-    nothing... so 'fan' every time." This holds that.
+    A bare figure cannot be acted on without guessing which oven it means, a
+    20°C guess either way.
     """
     import re as _re
     problems = []
@@ -433,9 +382,8 @@ def test_every_oven_temperature_says_fan(cooking_methods):
         oven = m.get("oven")
         if not oven:
             continue
-        # A LIST OF STAGE LINES SINCE 2026-10-10 ("220°C fan for 20 min",
-        # "180°C fan for the rest"), one sentence before. Joined here so the
-        # checks below read the same text either way.
+        # `oven` is a string or a list of stage lines ("220°C fan for 20 min",
+        # "180°C fan for the rest"); joined so the checks read either.
         if isinstance(oven, list):
             oven = "; ".join(oven)
         if "conventional" in oven.lower():
@@ -448,11 +396,9 @@ def test_every_oven_temperature_says_fan(cooking_methods):
 
 
 def test_oven_basis_is_recorded(cooking_methods):
-    """Whether a fan figure was STATED by the source or INFERRED by us is the
-    kind of thing that quietly becomes fact once it's been in a data file for a
-    month. 63 of the 66 are inferred, on the evidence that every bare figure
-    which could be checked against a stated pair in its own protein matched the
-    fan half — good evidence, but evidence, not a citation."""
+    """Every row with an oven temperature records `oven_basis`: whether the
+    fan figure was stated by the source or inferred. An inferred figure with
+    no record of it quietly becomes fact."""
     missing = [f"{p}/{m['id']}" for p, m in _all_methods(cooking_methods)
                if m.get("oven") and m.get("oven_basis") not in {"stated", "inferred"}]
     assert not missing, (
@@ -464,24 +410,12 @@ def test_oven_basis_is_recorded(cooking_methods):
 # --- the notes themselves ----------------------------------------------------
 
 def test_notes_are_not_damaged(cooking_methods):
-    """Correction history is stripped from notes on the way out of the page.
-    The first implementation did it with `Corrected from[^.]*\\.?` — and `[^.]*`
-    stops at the FIRST period, which in "a 1.7–2 kg bird takes ~3 hrs" is the
-    one inside the number. Two notes ended up with a fragment welded on
-    ("…rather than throughout7–2 kg bird takes ~3 hrs at this temperature)") and
-    four more had a sentence fused onto the one before it.
+    """No note carries the marks of a bad text cut: unbalanced brackets, a
+    figure welded onto a word, or a start in mid-sentence. The notes render
+    on the published page.
 
-    It mattered more than a demo bug, because these notes now render the
-    published page. The generator splits on real sentence boundaries instead;
-    this is what stops the class of bug coming back by another route.
-
-    THE CHECKS ARE EXACT, NOT HEURISTIC, and that is deliberate. A first version
-    also flagged "a lowercase word, a space, then a capital" as a fused
-    sentence — which is genuinely the shape of the bug, and is also the shape of
-    every proper noun in the middle of a sentence. It failed on "the American
-    Lamb Board's own figures". A check that cries wolf on correct data gets
-    switched off, so it is gone: unbalanced brackets, a figure welded onto a
-    word, and a note that starts mid-sentence are all unambiguous.
+    The checks are exact on purpose. "A lowercase word, then a capital" is
+    also the shape of every proper noun in mid-sentence, so it is not flagged.
     """
     import re as _re
     damaged = []
@@ -515,61 +449,23 @@ def test_every_method_has_a_short_outcome(cooking_methods):
     assert not problems, "\n  ".join(problems)
 
 
-# --- the page renders from this data now -------------------------------------
+# --- the page renders from this data -----------------------------------------
 
-# RETIRED 2026-08-19, issue #382, and retired rather than left green.
-#
-# `test_group_columns_are_all_renderable` stood here. It checked every
-# `groups[].columns` name in cooking_methods.yml against the set
-# _includes/food/method_table.html knew how to fill, because a name outside that
-# set rendered an EMPTY CELL rather than failing -- a real guard, against a real
-# silent failure.
-#
-# #382 deleted food/reference/cooking-methods.html and, with it, that include:
-# it was the only consumer. The calculator that survives reads `methods` and
-# their own fields directly and never looks at `groups` or `columns` at all, so
-# the test would have gone on asserting that column names are renderable by a
-# template that no longer exists. Green forever, guarding nothing -- MANUAL 12
-# calls that the most dangerous failure mode here precisely because the symptom
-# IS the passing test.
-#
-# Helen's call, asked directly: retire the test, leave the data. The stranded
-# `groups`/`columns` keys are recorded as an issue rather than stripped in this
-# pass, because cooking_methods.yml is GENERATED by two scripts pinned to commit
-# 8bdbd27, and hand-editing it would make the file disagree with its own
-# generator.
 def test_every_protein_points_at_the_charts(cooking_methods):
     """Each protein carries `chart_anchor`, the section of the temperature charts
-    holding its full doneness spectrum, so the "see other doneness" link has
-    somewhere to go. Not derivable from internal_temp_ref: four birds share one
-    chart section, and beef's ref points at tender_roast while the charts split
-    beef three ways. A missing anchor doesn't error — the link just isn't
-    rendered, and the page quietly dead-ends on one doneness figure."""
+    holding its full doneness spectrum. Not derivable from internal_temp_ref:
+    several birds share one chart section. A missing anchor doesn't error —
+    the link just isn't rendered, and the page dead-ends on one doneness
+    figure."""
     missing = [p for p, node in cooking_methods.items() if not node.get("chart_anchor")]
     assert not missing, f"no chart_anchor for: {missing}"
 
 
-# =============================================================================
-# THE ARCHIVE IS NOW THE DECLARATION OF RECORD. Issue #400, 2026-08-21.
-# =============================================================================
-# The three tests below used to read `groups` out of cooking_methods.yml. That
-# key held 35 paragraphs the rebuilt page never rendered, 30% of the JSON blob
-# shipped to every visitor, and it has moved -- complete and verbatim -- to
-# food/reference/cooking-methods-prose-archive.html, committed but not built.
-#
-# THEY FOLLOW THE CONTENT RATHER THAN BEING RETIRED WITH IT, and that is the
-# whole point. Two of these three went red the moment `groups` came out, which
-# is them doing their job: they are the reason it was possible to check that
-# nothing was lost. Deleting a guard because the thing it guards moved is how
-# content goes missing quietly six months later.
-#
-# The third, test_every_method_belongs_to_a_declared_group, did something worse
-# than fail: it PASSED, vacuously, because it skipped any protein with no
-# declared groups and suddenly no protein had any. A test that reports green
-# having checked nothing is the failure mode this file's own
-# test_the_data_file_is_not_empty was written about. Pointing it at the archive
-# gives it something real to compare against again, and ties the archive to the
-# live data so it cannot silently rot.
+# --- the prose archive is the declaration of record (#400) -------------------
+# The group names, sourcing prose and outbound links live in
+# food/reference/cooking-methods-prose-archive.html, committed but not built,
+# and nowhere else. The tests below hold it complete and tie it to the live
+# data. Do not delete the archive as dead (DECISIONS §14).
 from conftest import ROOT  # noqa: E402
 
 ARCHIVE = ROOT / "food" / "reference" / "cooking-methods-prose-archive.html"
@@ -585,12 +481,10 @@ def _archive():
 
 
 def _archive_group_headings():
-    """Every group heading in document order — 14 of them, 11 distinct.
+    """Every group heading in document order, as a list.
 
-    THE DUPLICATES ARE REAL AND MUST NOT BE COLLAPSED AWAY. Three group names
-    are shared by two proteins each ("Roasting cuts — ...", and the pair of ham
-    headings), so a set has 11 members while the page has 14 headings. Counting
-    the set would have silently accepted losing three whole groups.
+    Some group names are shared by two proteins, so the duplicates are real:
+    counting a set would accept the loss of a whole group.
     """
     return [html.unescape(m) for m in re.findall(r"<h3>(.*?)</h3>", _archive())]
 
@@ -599,10 +493,9 @@ def test_every_method_belongs_to_a_declared_group(cooking_methods):
     """A method whose `group` matches no group name on record is orphaned.
 
     `method.group` is read by assets/js/cook-schedule.js and is live data. The
-    names it must match were declared by the `groups` array until #400 moved it
-    to the archive, so the archive is what it is checked against now -- which
-    also means a group quietly renamed in the data breaks this test rather than
-    stranding the archive's copy of its prose under a heading nothing uses.
+    archive's headings are the declared names (#400), so a group renamed in
+    the data fails here instead of stranding its prose under a heading nothing
+    uses.
     """
     headings = _archive_group_headings()
     assert len(headings) == 14, (
@@ -619,19 +512,10 @@ def test_every_method_belongs_to_a_declared_group(cooking_methods):
 
 
 def test_prose_blocks_survived_the_move_to_the_archive():
-    """The count must not quietly shrink: 35 paragraphs, 14 of them sources.
+    """The archive's prose blocks and sources notes must not quietly shrink.
 
-    The other 21 are weight ranges, FOOD SAFETY flags, group intros and ham's
-    Caveat. Was 30 across 12 groups until 2026-08-16, when venison arrived
-    (issue #205) with two groups and five blocks: a weight range and a sources
-    note on each, plus the slow-cooked group's intro line.
-
-    THE NUMBERS ARE UNCHANGED ACROSS THE MOVE TO THE ARCHIVE, on purpose. This
-    test read cooking_methods.yml until #400 and reads the archive now; that it
-    still says 35 and 14 is the evidence that the move lost nothing, and it is
-    worth strictly more here than it was there -- in the data these paragraphs
-    were rendered by nothing, so a loss would have been invisible in every
-    other way.
+    The archive is rendered by nothing, so a lost paragraph is invisible in
+    every other way (#400). The counts are pinned in the asserts.
     """
     text = _archive()
     total = len(re.findall(r'class="archive-prose"', text))
@@ -644,9 +528,7 @@ def test_outbound_links_are_still_in_the_archive():
     """The only outbound links live INSIDE the recipe-source notes.
 
     Flattening a source note to plain text would lose them without changing a
-    single visible word of prose, which is why they get their own assertion --
-    and why the move to the archive was checked link by link rather than by
-    eye. Four domains named here; 14 anchors in total.
+    visible word of prose, so they get their own assertion.
     """
     text = _archive()
     for domain in ("waitrose.com", "jamieoliver.com", "goodto.com"):
@@ -658,18 +540,10 @@ def test_outbound_links_are_still_in_the_archive():
 
 
 def test_the_data_file_is_not_empty(cooking_methods):
-    """A floor, and it exists because the floor gave way once.
+    """A floor: the data file holds the proteins and methods it should.
 
-    scripts/build_cooking_methods.py parses cooking-methods.html AT A PINNED
-    COMMIT (the page itself was deleted by #382) — and that page
-    renders FROM this data file. Running the generator against the working copy
-    therefore made it its own consumer: it found no tables, wrote an empty data
-    file, and the page went blank. The generator is pinned to the pre-migration
-    commit now so it can't recur, but the more useful lesson is that almost
-    every test in this file passed on that empty file, vacuously, because
-    "for every method…" is trivially true of no methods.
-
-    So: assert the shape is there at all, before asserting things about it.
+    Almost every other test here is "for every method…", which is trivially
+    true of an empty file, so the shape is asserted before anything about it.
     """
     assert len(cooking_methods) == 9, (
         f"expected 9 proteins with timings, found {len(cooking_methods)}: "
@@ -690,38 +564,12 @@ def test_a_method_step_naming_an_internal_temperature_is_wired_to_the_data():
     """If a method step says "internal temperature", the recipe must have an
     internal_temp_ref, and the step must actually state a figure.
 
-    THE BUG THIS COMES FROM shipped on a published page and read, in full:
-    "braise gently for about 90 mins, looking for an internal temperature of
-    X." A literal X. Not `QQ`, which test_no_qq_placeholder would have caught
-    on sight -- just an unfilled slot in a sentence, sitting on the live site.
+    An unfinished "an internal temperature of X" publishes as written. The
+    test below sees only steps carrying a `#doneness` link, and
+    NO_TEMPERATURE_BECAUSE cannot notice a recipe contradicting it in prose.
 
-    Two separate holes let it through, and the pair is the point:
-
-      - The recipe carried no internal_temp_ref, so
-        test_temperatures_written_into_method_text_match_the_data below never
-        looked at it. That test is scoped to steps carrying a `#doneness`
-        link, deliberately -- a method step is full of oven temperatures and
-        no parser can tell those from an internal one. But that scoping means
-        a step which mentions an internal temperature and links to NOTHING is
-        invisible to it, which is exactly the state a half-finished sentence
-        is in.
-      - It was in NO_TEMPERATURE_BECAUSE, whose whole job is to record a
-        deliberate decision that a recipe needs no temperature. It said so
-        while the recipe's own method asked for one. The opt-out list is
-        honest about roasts and braises the data cannot serve; it cannot
-        notice a recipe contradicting it in prose.
-
-    So this is the inverse of the test below: that one checks a figure against
-    the data where a link declares what the figure means, and this one checks
-    that the claim exists at all.
-
-    DELIBERATELY NARROW. It fires only on the literal phrase "internal
-    temp...", which is unambiguous, rather than on any °C figure near a verb.
-    Sugar work reaches 118°C, a custard is held at 82°C and chocolate is
-    tempered at 31°C -- all real internal temperatures of a sort, none of them
-    a protein doneness this data layer holds, and a test that flagged them
-    would be a test someone switches off. Checked against the whole collection
-    when written: exactly three recipes say "internal temp" in a method step.
+    Fires only on the literal phrase "internal temp", not on any °C figure:
+    sugar work, custard and tempering figures are not protein doneness.
     """
     import re as _re
     import yaml as _yaml
@@ -740,17 +588,10 @@ def test_a_method_step_naming_an_internal_temperature_is_wired_to_the_data():
                 steps.append(step.get("step") if isinstance(step, dict) else step)
 
         for text in [s for s in steps if s]:
-            # THE CHART LINK IS A SIGNPOST, NOT A CLAIM. Issue #352 reworded
-            # every "(check [cooking temperatures](#doneness))" to "(check
-            # [internal temperatures chart](#doneness))", which put the literal
-            # phrase "internal temp..." into eight steps that state no figure
-            # and are not trying to. Left unhandled, this test fires on all of
-            # them and the obvious fix -- loosening the regex -- would blunt the
-            # guard that caught "an internal temperature of X" on a live page.
-            #
-            # So the link text is removed first and the ORIGINAL rule then runs
-            # on what remains. A step that both signposts the chart AND names a
-            # figure still gets checked, because the claim survives the strip.
+            # The chart link is a signpost, not a claim: its text contains
+            # "internal temp" (#352) on steps that state no figure. It is
+            # removed first, so a step that signposts the chart and also
+            # names a figure is still checked.
             probe = _re.sub(r"\[internal temperatures chart\]\(#doneness\)", "", text)
             if not _re.search(r"internal temp", probe, _re.I):
                 continue
@@ -781,17 +622,12 @@ def test_a_method_step_naming_an_internal_temperature_is_wired_to_the_data():
 def test_temperatures_written_into_method_text_match_the_data(internal_temperatures):
     """A figure typed into a method step has to agree with the data behind it.
 
-    Front matter is never Liquid-templated (MANUAL §4), so a temperature a
-    cook needs mid-step can only be typed by hand — which re-creates exactly the
-    duplication internal_temperatures.yml was built to end. The compromise is
-    the one this project already makes elsewhere: duplicate, and guard it.
+    Front matter is never Liquid-templated (MANUAL §4), so a temperature in a
+    step is typed by hand and duplicates the data.
 
-    SCOPED TO STEPS THAT LINK TO THE CHART. A method step is full of oven
-    temperatures ("roast at 170-180°C fan"), and no parser can tell those from
-    an internal one by looking. A step carrying `(#doneness)` has declared what
-    its number means, so that link is the marker — which also means adding the
-    link is what opts a step into being checked, rather than something separate
-    to remember.
+    Scoped to steps that link to `#doneness`: no parser can tell an oven
+    temperature from an internal one, and the link declares what the number
+    means. Adding the link is what opts a step in.
     """
     import pathlib as _p
     import re as _re
@@ -826,12 +662,10 @@ def test_temperatures_written_into_method_text_match_the_data(internal_temperatu
             text = step.get("step") if isinstance(step, dict) else str(step)
             if "#doneness" not in text:
                 continue
-            # A linked step carries BOTH kinds of temperature -- "roast at
-            # 170-180°C fan ... take it out at 52–54°C" -- so the link alone
-            # isn't enough to tell them apart. House style is the discriminator:
-            # every oven temperature on this site says "fan" (§5, enforced for
-            # the methods data by test_every_oven_temperature_says_fan), and an
-            # internal one never does. Meat has no fan setting.
+            # A linked step carries both kinds of temperature ("roast at
+            # 170–180°C fan ... take it out at 52–54°C"). House style tells
+            # them apart: an oven temperature says "fan" (MANUAL §5) and an
+            # internal one never does.
             for lo, hi in _re.findall(r"(\d+)\s*[–-]\s*(\d+)\s*°C(?!\s*fan)", text):
                 if (float(lo), float(hi)) not in allowed:
                     problems.append(
@@ -843,20 +677,13 @@ def test_temperatures_written_into_method_text_match_the_data(internal_temperatu
     assert not problems, "\n  ".join(problems)
 
 
-# The three nodes whose doneness levels include figures that do NOT clear the
-# guidance cited for them. Named explicitly rather than inferred: this is a
-# specification, not a heuristic, and it is the list that decides whether a
-# chart warns anybody.
+# The nodes whose doneness levels include figures that do not clear the
+# guidance cited for them. A specification, named explicitly: this list decides
+# whether a chart warns anybody.
 #
-# Beef, lamb, steak and venison are deliberately absent -- UK guidance treats
-# pink beef and lamb as fine, so there is no line to draw. Venison is here for
-# the same reason and not by oversight: FSA treats a whole cut of venison the
-# way it treats beef and lamb, the bacteria are on the surface and the sear
-# kills them, so a safety_min on venison.loin or venison.haunch would be a line
-# with nothing behind it -- and this test would then demand one. Tuna has a
-# safety_note about parasites and sourcing, and venison's is about mince, both
-# of which a thermometer can't confirm and a threshold on a temperature axis
-# can't express.
+# Beef, lamb, steak and venison are absent on purpose: UK guidance treats a
+# pink whole cut as fine, so there is no line to draw. Tuna's risk is parasites
+# and sourcing, which a threshold on a temperature axis cannot express.
 SAFETY_THRESHOLDS = {
     ("fish", "salmon"): 63,
     ("pork", "roasting"): 70,
@@ -867,15 +694,10 @@ SAFETY_THRESHOLDS = {
 def test_hazardous_spectra_carry_a_drawable_threshold(internal_temperatures):
     """A doneness level below the cited guidance must never render unqualified.
 
-    THIS IS A REAL FAILURE, not a hypothetical. The recipe-page chart shipped
-    without the shading on 2026-08-14, on the reasoning that the reference page
-    had room to explain it. Teriyaki salmon then offered "rare, out at 43–49°C"
-    as one of five equal options, with nothing anywhere on the page to say that
-    four of the five sit under the FSA benchmark. Helen caught it.
-
-    The threshold was a hard-coded `--t:63` in the charts page's markup, which is
-    exactly why it couldn't travel to the second chart that needed it. It is a
-    figure on the node now, so anything drawing that node draws the warning.
+    The threshold is a figure on the data node (`safety_min`, with its label
+    and summary), so every chart drawing that node draws the warning. Without
+    it a recipe page offers a level under the benchmark as one of several
+    equal options.
     """
     missing = []
     for path, expected in SAFETY_THRESHOLDS.items():
@@ -895,24 +717,17 @@ def test_hazardous_spectra_carry_a_drawable_threshold(internal_temperatures):
 
 def test_a_threshold_actually_excludes_something(internal_temperatures):
     """A threshold no level falls below is decoration, and worse, it implies the
-    page checked and found nothing wrong. Each of the three must genuinely
-    exclude at least one doneness level, and must genuinely leave at least one
-    clearing it — a line everything fails is a broken figure, not a warning.
+    page checked and found nothing wrong. Each threshold must exclude at least
+    one doneness level and leave at least one clearing it — a line everything
+    fails is a broken figure, not a warning.
     """
     def reaches(spec):
-        """The highest temperature this level actually gets to.
+        """The highest temperature this level gets to, rested or out-at.
 
-        "Clears the guidance" is a claim about the temperature the food REACHES,
-        not the one you take it out at -- salmon's well done comes out at
-        60–63°C and rests to 65, and it is the 65 that clears the 63 benchmark.
-        Comparing out-at figures instead said no salmon doneness clears it at
-        all, which is both wrong and the kind of wrong that would have had
-        someone "fix" the threshold rather than the test.
-
-        (Pork is the case where reaching isn't sufficient -- FSA's table is
-        about temperature HELD, not passed through on the way down. That is why
-        its safety_summary says so in words: a single figure can't express it,
-        and this test isn't trying to.)"""
+        "Clears the guidance" is about the temperature the food reaches, not
+        the one it comes out at: a level can come out under the benchmark and
+        rest above it. Comparing out-at figures alone understates what clears.
+        """
         return max(spec.get("rested_max") or 0, spec.get("out_at_max") or 0)
 
     problems = []
@@ -935,25 +750,12 @@ def test_a_threshold_actually_excludes_something(internal_temperatures):
 def test_the_safety_zone_shares_the_bars_coordinate_space():
     """The shaded zone must be measured against the same thing the bars are.
 
-    The zone is absolutely positioned on .tc-plot; a bar is positioned on
-    .tc-track. From 2026-08-14 a chart row was a grid — a 9.5rem label column,
-    then `1fr` — so the plot was wider than the track by the column, and the
-    same percentage meant two different places. Salmon's 63°C line drew at
-    roughly 54°C, about 100px left of the figure it was labelled with.
+    The zone is positioned on .tc-plot and a bar on .tc-track. If the track is
+    narrower than the plot, one percentage means two places and the threshold
+    line draws left of its own figure, under-stating the hazard (#1327).
 
-    That under-stated the hazard in the only direction that matters: medium and
-    medium-well sat to the right of a line they don't clear, on a chart added
-    specifically to stop a low figure reading as an unqualified option.
-
-    SINCE 2026-10-08 THE TRACK SPANS THE WHOLE ROW (#1327: the label and the
-    figure share a line above the bar, and the label column is gone), so the
-    plot and the track have one left edge and one width, and the zone's bare
-    percentage IS the bars' percentage. That is the invariant now, and it is
-    checked in the SOURCE rather than by measuring a render, because there is
-    no browser here: the track must declare `grid-column: 1 / -1`, and the
-    zone and its label must measure from 0 at 100%. If a column ever comes
-    back to the left of the track, both halves of this go red together, which
-    is the point.
+    Checked in the source: the track spans the whole row (`grid-column:
+    1 / -1`), and the zone and its label measure from the plot's edge at 100%.
     """
     scss = (pathlib.Path(__file__).resolve().parent.parent
             / "_sass" / "food" / "_temperature-chart.scss")
@@ -990,63 +792,24 @@ def test_the_safety_zone_shares_the_bars_coordinate_space():
     assert not problems, "\n  ".join(problems)
 
 
-# =============================================================================
-# DELIBERATELY NOT TESTED: cook_time against the method's own timings
-# =============================================================================
-# roast-beef-fillet said "30 mins" where its method adds up to nearer 40, and the
-# obvious response is a test that sums the times in each method and flags the
-# gap. Helen ruled it out on 2026-08-14, and the reasoning is better than the
-# test would have been: "if a recipe contains complicated meat, a nudge to the
-# temperature chart should catch most users."
-#
-# She is right that the drift is a symptom. A clock figure cannot answer "is it
-# done", so tightening it buys very little, while the ", but check cooking
-# temperatures" link in _layouts/recipe.html sends you to the thing that can.
-# The test would also be fuzzy in the worst way -- half these methods say "until
-# golden" -- so it would need an exception list longer than its own logic.
-#
-# Don't add it. If the arithmetic matters somewhere specific, fix that recipe.
+# Deliberately not tested: cook_time against the sum of the method's timings.
+# A clock figure cannot answer "is it done", and the link to the temperatures
+# chart can. Do not add that test; fix the recipe where the arithmetic matters.
 
 
-# =============================================================================
-# COVERAGE — the gap every other test in this file has
-# =============================================================================
-# Everything above validates recipes that OPTED IN. A recipe that should carry a
-# temperature and doesn't is invisible to all of it: roast turkey and roast goose
-# sat unwired for a day with 27 passing tests, because nothing was looking for
-# absence.
+# --- coverage: recipes that should carry a temperature and do not ------------
+# Everything above validates recipes that opted in. This is the inverse: a
+# published recipe about a protein the data covers needs an internal_temp_ref
+# or an entry in NO_TEMPERATURE_BECAUSE, where each opt-out carries its reason.
 #
-# So this is the inverse test. It names the proteins we hold data for, finds
-# published recipes whose main ingredients say one of them, and requires either
-# an internal_temp_ref or an entry below saying why not.
-#
-# THE OPT-OUT LIST IS THE POINT, not a way round the test. Each entry is a
-# decision with a reason attached, so "why doesn't the lamb one have a
-# temperature?" is answered in the repo rather than in someone's memory.
-# STAR INGREDIENT IS THE PRIMARY SIGNAL, because it is a declared vocabulary
-# (taxonomy.yml, guarded by its own test) rather than free text. Indian Mutton
-# Raan slipped past the first version of this test entirely: its main
-# ingredients say "mutton leg" and the word list only knew "lamb", so a
-# three-hour roast with "until done according to an in-oven probe" and no figure
-# in it passed a test written specifically to find that.
-#
-# Its star_ingredient said "lamb" all along. The collection had already made the
-# call that mutton files under lamb; the test just wasn't reading the field that
-# knew.
-#
-# Only families we actually hold data for are mapped. `game` was absent until
-# 2026-08-16 because there was no venison node to point at; issues #205 and #217
-# added one, so it joins the list and the test starts asking every game recipe
-# for a ref on its own -- which is what the note here always said would happen.
-# `shellfish` is still out for the original reason: no shellfish node exists, so
-# demanding a ref would be demanding something that doesn't exist. Add it the
-# day the data does.
+# star_ingredient is the primary signal, because it is a declared vocabulary
+# and free text is not ("mutton leg" files under lamb). Only families the data
+# holds a node for are listed: `shellfish` joins when a shellfish node exists.
 STAR_INGREDIENTS_WITH_DATA = {
     "beef", "duck", "game", "lamb", "pork", "poultry", "oily fish", "white fish",
 }
 
-# The fallback, used ONLY when a recipe declares no star ingredient at all.
-# "mutton" and "hogget" are here now for the same reason lamb was.
+# The fallback, used only when a recipe declares no star ingredient at all.
 PROTEIN_WORDS = {
     "mutton": "lamb", "hogget": "lamb",
     "chicken": "poultry", "turkey": "poultry", "goose": "poultry", "duck": "poultry",
@@ -1058,9 +821,6 @@ PROTEIN_WORDS = {
 
 NO_TEMPERATURE_BECAUSE = {
     # Not the dish. The protein is a stock, a garnish or an accompaniment.
-    # (cherry-glaze and plum-sauce-for-duck used to be listed here and no longer
-    # need to be: their star_ingredient is "fruit", and free-text "beef stock"
-    # stopped counting once the star became the primary signal.)
     "pancetta-white-bean-stew": "pancetta is cured and diced, not a cut cooked to a temperature",
     "smoked-mackerel-pate": "the mackerel arrives smoked; nothing is cooked",
     "toad-in-the-hole": "sausages; pork.roasting is loin and leg joints, "
@@ -1068,8 +828,8 @@ NO_TEMPERATURE_BECAUSE = {
                         "a thing you probe — found by the star_ingredient net, "
                         "which the free-text one had been missing",
 
-    # A cut the data doesn't cover. These are the honest gaps -- each one names a
-    # real thing missing from internal_temperatures.yml rather than a chore.
+    # A cut the data doesn't cover: each names a real gap in
+    # internal_temperatures.yml.
     "cumin-mint-lamb-skewers": "grilled shoulder chunks; lamb.roasting is joints and "
                                "lamb.slow_cooked is a whole shoulder, neither is this",
     "chicken-a-la-king": "diced breast in a sauce; no figure for pieces",
@@ -1078,38 +838,16 @@ NO_TEMPERATURE_BECAUSE = {
     "indonesian-chicken-curry-gulai-ayam": "thighs in a curry; no figure for pieces",
     "thai-green-chicken-curry": "chicken in a curry; no figure for pieces",
 
-    # A cut where the figure exists and still does not apply.
-    #
-    # youvetsi is the only entry of this third kind, and it is worth the extra
-    # words because it was WIRED TO beef.tough_cuts FIRST, on 2026-08-21, and
-    # that was defensible: the recipe said bone-in short rib, and tough_cuts is
-    # the collagen-breakdown figure (90–96°C) for exactly short rib and pot
-    # roast. Helen unwired it the same day, cooking the dish, having stopped
-    # taking the meat off the bones and braised the rib blocks whole:
-    #
-    #   "the end temperature matters even less, as it'll just fall off at the
-    #    end, being whatever temperature the pan sits at for 3 hours"
-    #
-    # THE POINT IS THE ONE THE DATA CANNOT SEE. A figure can be correct for the
-    # cut and useless in the method. Three hours in a covered casserole has no
-    # moment where anybody probes anything; the meat is done when it leaves the
-    # bone. Wiring a real temperature in would not have been WRONG, which is why
-    # nothing here caught it -- it would just have put a number on the page that
-    # no step ever asks the cook to take.
-    #
-    # The method may be rewritten around whole rib blocks once she has eaten it.
-    # If the recipe ever goes back to off-the-bone pieces, beef.tough_cuts is
-    # still the right reference and this entry should come out.
+    # A cut where the figure exists and does not apply: right about the cut and
+    # useless in the method, because no step probes anything (DECISIONS §14).
+    # If youvetsi goes back to off-the-bone pieces, wire beef.tough_cuts in
+    # and take its entry out.
     "youvetsi": "short rib blocks braised whole for 3 hrs; the meat is done when "
                 "it falls off the bone, and no step probes anything — "
                 "beef.tough_cuts is right about the cut and irrelevant to the "
                 "method",
-    # Promoted 2026-09-11 on Helen's word. The same kind as youvetsi: a whole
-    # 5–6 kg gammon, covered, at 140°C fan for about 5 hours and then glazed
-    # at 180°C for 45–50 minutes. ham.cured is right about the cut (this is a
-    # cook-before-eating gammon) and no step probes anything -- the recipe
-    # cooks it by time and reads doneness off the glaze. If she ever adds a
-    # probe step, wire ham.cured in and take this out.
+    # The same kind. If a probe step is ever added, wire ham.cured in and take
+    # this out.
     "sticky-marmalade-ham": "a whole gammon cooked covered for about 5 hrs then "
                             "glazed; done by time, and no step probes anything — "
                             "ham.cured is right about the cut and irrelevant to "
@@ -1129,11 +867,9 @@ def test_every_recipe_with_a_known_protein_has_a_temperature_or_a_reason():
         fm = _yaml.safe_load(raw.split("---")[1]) or {}
         if fm.get("internal_temp_ref") or path.stem in NO_TEMPERATURE_BECAUSE:
             continue
-        # A DECLARED STAR WINS OUTRIGHT. If the recipe says what it is about,
-        # that is the answer -- cherry-glaze is "fruit" however much duck its
-        # ingredients mention, and the venison braise is "game" however much
-        # beef stock is in it. The free-text net below is a FALLBACK for a
-        # protein-led recipe that never set one, not a second opinion.
+        # A declared star wins outright: a glaze starred "fruit" is not a
+        # duck recipe however much duck its ingredients mention. The free-text
+        # net is a fallback for a recipe with no star, not a second opinion.
         star = (fm.get("star_ingredient") or "").strip().lower()
         if star:
             hits = [star] if star in STAR_INGREDIENTS_WITH_DATA else []
@@ -1167,12 +903,9 @@ def test_the_opt_out_list_has_no_stale_entries():
 def test_chart_anchors_point_at_sections_that_exist(internal_temperatures):
     """Every chart_anchor has to match an id on the temperatures page.
 
-    A wrong one doesn't error anywhere: the recipe's "more meat temperatures"
-    link renders, resolves to a real page, and lands at the top of it. The only
-    symptom is arriving in the wrong place, which reads as a missing scroll
-    rather than a broken link — and it will happen the first time a section is
-    renamed, which has already happened twice this week (Steak -> Beef: steak,
-    Everything one scale -> All).
+    A wrong one doesn't error anywhere: the recipe's link renders, resolves to
+    a real page and lands at the top of it, which reads as a missing scroll.
+    It happens whenever a section of that page is renamed.
     """
     page = pathlib.Path("food/reference/internal-temperatures.html")
     if not page.exists():
@@ -1191,16 +924,10 @@ def test_chart_anchors_point_at_sections_that_exist(internal_temperatures):
 def test_every_figure_a_recipe_can_point_at_has_a_chart_anchor(internal_temperatures):
     """Anchors have to be PRESENT, not just valid when present.
 
-    test_chart_anchors_point_at_sections_that_exist checks the ones that are
-    there. It cannot see a node that has none — and a missing anchor doesn't
-    break anything visible: the chart still draws, the figure is still right,
-    there is simply no way out to the rest of the spectrum. Indian Mutton Raan
-    shipped like that, because an earlier pass added anchors by searching for
-    "  slow_cooked:" and matched pork's copy of the key rather than lamb's.
-
-    Any node carrying a figure is a node some recipe can name in
-    internal_temp_ref, so any node carrying a figure needs somewhere to send
-    them.
+    test_chart_anchors_point_at_sections_that_exist cannot see a node that has
+    none, and a missing anchor breaks nothing visible: the chart draws and the
+    link to the rest of the spectrum is silently omitted. Any node carrying a
+    figure can be named in a recipe's internal_temp_ref, so it needs one.
     """
     orphans = []
     for path, node in _walk(internal_temperatures):

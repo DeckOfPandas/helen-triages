@@ -1,26 +1,13 @@
-// =============================================================================
-// Tests for assets/js/back-link.js — the decision behind the back arrow on a
-// recipe or cocktail page (GitHub issue #387), no DOM required.
+// Tests for assets/js/back-link.js: the decision behind the back arrow on a
+// recipe or cocktail page (#387). No DOM required.
 //
 // Run from the repo root, with the local Node runtime:
 //
 //   .node-runtime/node/bin/node --test tests/js/*.test.js
 //
-// See tests/js/ingredient-search.test.js for why not the system node.
-//
-// WHY THIS FILE EXISTS. The first version of back-link.js checked the referrer
-// and nothing else, which is correct for the case everyone pictures and wrong
-// for the one Helen asked about within a minute of reading it: opening a recipe
-// in a NEW TAB. Those index links carry no rel="noreferrer", so the new tab's
-// referrer is the index and the check passed — while the tab's session history
-// held one entry and history.back() did nothing at all. The arrow was inert,
-// with no error and nothing on screen to explain it.
-//
-// That is invisible to every other kind of check here: the markup is right, the
-// href resolves, the class has a rule, the page builds. It is only visible if
-// you can pose "you came from the index, but this tab has no history", which is
-// exactly what a pure function lets a test do and a browser does not.
-// =============================================================================
+// The trap: a recipe opened in a new tab has the index as its referrer and one
+// entry of session history, so history.back() does nothing and the arrow is
+// inert with no error. Only a pure function lets a test pose that.
 'use strict';
 
 const test = require('node:test');
@@ -46,10 +33,8 @@ test('clicked through from the index in the same tab: go back', () => {
 });
 
 test('opened in a NEW TAB from the index: follow the link, do not call back', () => {
-  // The referrer still says "the index" and says it truthfully. The tab's
-  // history is what makes back() a no-op, so history length is the deciding
-  // fact and the referrer alone is not enough. This is the case the first
-  // version of back-link.js got wrong.
+  // The referrer still says "the index", truthfully. The tab's history is
+  // what makes back() a no-op, so history length is the deciding fact.
   assert.strictEqual(BL.shouldGoBackToIndex(ctx({ historyLength: 1 })), false);
 });
 
@@ -91,8 +76,8 @@ test('a cocktail page returns to the cocktails index', () => {
 });
 
 test('a query string on the index still counts as coming from the index', () => {
-  // Compared on pathname, so a future /food/?tag=soup does not disqualify the
-  // shortcut — and going back to it is more right, not less.
+  // Compared on pathname, so /food/?tag=soup does not disqualify the
+  // shortcut: going back to a filtered index is more right, not less.
   assert.strictEqual(
     BL.shouldGoBackToIndex(ctx({ referrer: INDEX + '?tag=soup' })),
     true

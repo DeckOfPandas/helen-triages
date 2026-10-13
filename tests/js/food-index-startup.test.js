@@ -1,32 +1,15 @@
-// =============================================================================
-// The food index actually RUNS, and its shopping list actually fills in — #801.
+// The food index runs to the end, and its shopping list fills in (#801).
 //
 //   node --test tests/js/*.test.js
-// =============================================================================
-// THE SAME ARGUMENT tests/js/cocktail-index-startup.test.js MAKES, on the other
-// index. Every other JS test in this repo asks a pure module a question and gets
-// a correct answer; the faults that have actually shipped were in the WIRING
-// between modules, which is the one place a suite of pure-function tests cannot
-// look. cocktail-index.js read a property off the wrong object once and the
-// entire tail of the file stopped running, with every test green.
 //
-// FOOD IS WORSE THAN COCKTAILS IN ONE RESPECT, which is why this exists now:
-// the whole of filters.js is inside a single `DOMContentLoaded` handler, so
-// anything that throws anywhere in it takes the rest of the file with it -- the
-// shuffle, the filter buttons, the query-string restore, and the line that
-// lifts `.recipe-list`'s `visibility: hidden`. The failure is a BLANK INDEX,
-// with the only evidence in a console nobody has open. #801 adds two scripts
-// and about a hundred lines to that handler.
+// All of filters.js is one `DOMContentLoaded` handler, so a throw anywhere in
+// it leaves `.recipe-list` at `visibility: hidden`: a blank index, with the
+// only evidence in the console. The canary is that list becoming visible, at
+// the end of the handler, so one assertion covers every line above it.
 //
-// THE CANARY IS `.recipe-list` BECOMING VISIBLE, and it is the right one for
-// the same reason cocktails picked its `pagehide` listener: it is one of the
-// last statements in the file, so anything that throws above it stops it
-// happening, and one assertion covers every line before it.
-//
-// THE SCRIPTS ARE THE REAL FILES, in the order food/index.html loads them, run
-// through `vm.runInNewContext` rather than require() -- these are not modules
-// in a browser, and the browser path is the one that breaks. Only the DOM and
-// localStorage are stand-ins.
+// The scripts are the real files, in the order food/index.html loads them,
+// run with `vm.runInContext` and not require(): in a browser they are not
+// modules. The DOM, the storage and the window are stand-ins.
 'use strict';
 
 const test = require('node:test');
@@ -41,9 +24,9 @@ const ROOT = path.join(__dirname, '..', '..');
 const JS_DIR = path.join(ROOT, 'assets', 'js');
 
 // assets.js comes from _layouts/default.html; the rest are food/index.html's
-// own tags, in its own order. test_the_food_shopping_scripts_load_in_dependency
-// _order in tests/test_site_config.py guards the last three in the template;
-// the test at the foot of this file guards that THIS list still matches it.
+// own tags, in its order. The test at the foot of this file pins this list to
+// the template; test_the_food_shopping_scripts_load_in_dependency_order in
+// tests/test_site_config.py pins the template's order.
 const SCRIPTS = [
   'assets.js',
   'ingredient-search.js',
@@ -52,27 +35,18 @@ const SCRIPTS = [
   'shopping-list.js',
   'food-shopping-list.js',
   'filters.js',
-  // 2026-09-26. The sticky results bar (tests/js/results-bar.test.js has its
-  // own fixture). It wires itself on DOMContentLoaded, AFTER filters.js's
-  // handler, and returns at once here: this sandbox has no
-  // IntersectionObserver, which is the no-bar path a real browser without the
-  // API takes.
+  // Wires itself on DOMContentLoaded, after filters.js's handler, and returns
+  // at once here: this sandbox has no IntersectionObserver, which is the path
+  // a browser without the API takes.
   'results-bar.js',
-  // #849. Nobody's dependency: it reads HTF.shortlist at run time rather than
-  // lifting helpers off another module at startup, and it subscribes to
-  // `htf:shortlist-change` rather than being called. Listed anyway because the
-  // test at the foot of this file asserts this array IS the template's script
-  // list -- which is the point of that test, and is what caught its absence.
+  // #849. Nobody's dependency; listed because the test at the foot of this
+  // file asserts this array is the template's script list.
   'shortlist-export.js'
 ];
 
-/* Two recipes and the panel, hand-built rather than sliced out of a real build:
-   a fixture you can read in one screen is what makes a failure diagnosable, and
-   the alternative drags a megabyte of markup into the repo.
-
-   `b` IS THE GUESSED ONE (`e: true`), because the tilde on a guessed serving
-   size is the only thing on the page saying a number is this repo's rather
-   than Helen's. */
+/* Hand-built, and small enough to read in one screen. `b` is the guessed one
+   (`e: true`): the tilde on a guessed serving size is the only thing on the
+   page saying a number is this repo's and not Helen's. */
 const RECIPES = {
   '/food/recipes/a/': {
     p: 4, e: false, y: '4', k: 'serves',
@@ -85,12 +59,11 @@ const RECIPES = {
     i: [{ a: '300 g', n: 'plain flour', s: 'cupboard' },
       { a: '1', n: 'onion', s: 'produce' }]
   },
-  /* THE TWO `makes:` RECIPES, WHICH COUNT BATCHES since #1297. `w` is
-     page.whole_recipes, `h` page.half_recipe, `m` page.made -- the three
-     figures the recipe page's own scaler reads (#1286). The gelato makes a
-     MEASURE and may be halved; the cookies make a COUNT and may not (an odd
-     number of eggs). Both still carry `p`, the `serves_estimate`, which the
-     batch box never reads. */
+  /* The two `makes:` recipes, which count batches (#1297). `w` is
+     page.whole_recipes, `h` page.half_recipe, `m` page.made: the figures the
+     recipe page's own scaler reads (#1286). The gelato makes a measure and may
+     be halved; the cookies make a count and may not. Both carry `p`, the
+     `serves_estimate`, which the batch box never reads. */
   '/food/recipes/gelato/': {
     p: 6, e: true, y: 'About 750 ml', k: 'makes', w: true, h: true,
     m: { kind: 'measure', base: 750, unit: 'ml', box: '750' },
@@ -122,10 +95,10 @@ const TITLES = {
   '/food/recipes/pies/': 'Mince Pies'
 };
 
-/* THREE `makes:` RECIPES WHOSE YIELD IS ONE NAMED THING, as
-   _plugins/food_yield.rb reads "one 8-inch cake", "1 jar" and "1 dozen mince
-   pies". None is offered a half: a yield has to halve to at least one of
-   itself. Passed as `options.recipes`, so the standing fixture keeps its four. */
+/* `makes:` recipes whose yield is one named thing, as _plugins/food_yield.rb
+   reads "one 8-inch cake", "1 jar" and "1 dozen mince pies". None is offered a
+   half: a yield has to halve to at least one of itself. Passed as
+   `options.recipes`, so the standing fixture is unchanged. */
 const SINGLE_THINGS = {
   '/food/recipes/cake/': {
     p: 12, e: true, y: 'one 8-inch cake', k: 'makes', w: true, h: false,
@@ -183,10 +156,9 @@ function boot(options) {
   doc.body.appendChild(el('meta', '', { name: 'base-url', content: '' }));
   doc.body.appendChild(el('meta', '', { name: 'site-key', content: 'food' }));
 
-  /* THE THREE JSON BLOCKS THE PAGE EMITS. Supplied so the scripts take their
-     REAL path rather than their graceful-degradation one -- each warns and
-     falls back to nothing when its block is missing, which would quietly test
-     a different program from the one that ships. */
+  /* The three JSON blocks the page emits. Without one, its script warns and
+     falls back to nothing, which would test a different program from the one
+     that ships. */
   json('ingredient-vocabulary', { search: { family_button_min_chars: 3 } });
   json('recipe-aisles', AISLES);
   json('recipe-ingredients', recipes);
@@ -195,24 +167,19 @@ function boot(options) {
   // is not exercised here, only the query's arrival.
   const controls = el('div', 'controls');
   controls.appendChild(el('input', '', { id: 'name-search-box', type: 'text' }));
-  // HAS TO HAVE's box and pool, so `?ing=` (#1050) has somewhere to land; as
-  // with the name box, the input handler is not exercised here, only the
-  // query's arrival.
+  // HAS TO HAVE's box and pool, so `?ing=` (#1050) has somewhere to land.
   controls.appendChild(el('input', '', { id: 'ingredient-search-box', type: 'text' }));
   controls.appendChild(el('div', 'category-buttons search-results', { id: 'ingredient-results-pool' }));
   doc.body.appendChild(controls);
 
-  // `id="results"` (#1050) and `id="filter-star"` (#1059) -- the two kinds of
-  // fragment a link on this site can end in: the count line above the list,
-  // and a filter section a badge names. Real food/index.html carries several
-  // more (`filter-mood`, `filter-practicalities`); one is enough to prove the
-  // startup block scrolls to WHATEVER `location.hash` names rather than only
-  // the literal string "results".
+  // `id="results"` (#1050) and `id="filter-star"` (#1059): the two kinds of
+  // fragment a link on this site can end in, the count line and a filter
+  // section. One section is enough to prove the startup block scrolls to
+  // whatever `location.hash` names.
   const results = el('div', 'results-heading', { id: 'results' });
-  // THE COUNT'S REAL SHAPE SINCE 2026-09-26: the number and the word in their
-  // own spans inside `#recipe-count`, so the digits can take the label face
-  // (`.results-count-number`) and the word stay bare. filters.js paints the
-  // two spans and falls back to the outer element's text when they are absent.
+  // The count's real shape: the number and the word in their own spans inside
+  // `#recipe-count`. filters.js paints the two spans and falls back to the
+  // outer element's text when they are absent.
   const countOuter = el('span', 'category-label-text', { id: 'recipe-count' });
   countOuter.appendChild(el('span', 'results-count-number', { id: 'recipe-count-n' }));
   countOuter.appendChild(doc.createTextNode(' '));
@@ -265,11 +232,9 @@ function boot(options) {
   const win = {
     document: doc,
     localStorage: createStorage(),
-    // sessionStorage too, since #387/#1057's back-navigation memory
-    // (HTF.indexMemory in assets.js) reads and writes it -- every call is
-    // wrapped in try/catch there and treats a missing sessionStorage as "carry
-    // on as a fresh load", so leaving this out would make a real back
-    // navigation untestable here without failing loudly anywhere.
+    // HTF.indexMemory in assets.js (#387, #1057) reads and writes
+    // sessionStorage and treats a missing one as a fresh load, so without this
+    // a back navigation is untestable here and nothing fails.
     sessionStorage: createStorage(),
     console: { warn() {}, error() {}, log() {} },
     setTimeout, clearTimeout,
@@ -279,11 +244,8 @@ function boot(options) {
       hash: (options && options.hash) || ''
     },
     history: { replaceState() {}, pushState() {} },
-    // `options.backForward` -- #387/#1057, 2026-09-15. FilterState.arrivedByGoingBack
-    // reads exactly this entry; a test that wants to prove the fragment scroll
-    // is SKIPPED on a genuine back navigation (rather than merely on every
-    // load, which would be the bug this generalisation could have introduced)
-    // needs to be able to say so was true.
+    // `options.backForward` (#387, #1057): FilterState.arrivedByGoingBack
+    // reads this entry, so a test can make a load a back navigation.
     performance: {
       getEntriesByType: () => (options && options.backForward
         ? [{ type: 'back_forward' }] : []),
@@ -307,12 +269,8 @@ function boot(options) {
       context, { filename: name });
   });
 
-  // A hook between the scripts loading (so win.HTF exists) and
-  // DOMContentLoaded firing (so nothing has read location/sessionStorage
-  // yet) -- #387/#1057. Its one caller today seeds a valid HTF.indexMemory
-  // record to prove the fragment scroll is skipped on a genuine restore, the
-  // same way `options.recipes` above lets a test replace the ingredients
-  // blob before anything reads it.
+  // `options.beforeStart` runs after the scripts load, so win.HTF exists, and
+  // before DOMContentLoaded, so nothing has read location or sessionStorage.
   if (options && typeof options.beforeStart === 'function') {
     options.beforeStart(win, doc);
   }
@@ -350,9 +308,8 @@ test('it still gets to the end with a shortlist to render', () => {
 });
 
 test('the count paints its number and its word into separate spans', () => {
-  // 2026-09-26: the digits take `.results-count-number` and the word stays
-  // bare, so filters.js writes the two halves separately -- and the outer
-  // element still reads "N survivors" for anything that reads the sentence.
+  // The digits take `.results-count-number` and the word stays bare; the
+  // outer element still reads "N survivors".
   const { doc } = boot();
   assert.strictEqual(doc.getElementById('recipe-count-n').textContent, '4');
   assert.strictEqual(doc.getElementById('recipe-count-word').textContent, 'survivors');
@@ -399,10 +356,8 @@ test('each recipe starts at however many it makes', () => {
 });
 
 test('the yield is on the control, never printed beside the name', () => {
-  /* Helen, 2026-09-07, with a screenshot of `7  Moules Marinière serves 4`:
-     "This screenshot makes it look like I'm asking for 28 portions of
-     mussels." A number at each end of a short line reads as one expression,
-     so the yield moved into the input rather than being dimmed further. */
+  // A number at each end of a short line reads as one expression, so the
+  // yield is on the input and never beside the name.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.toggle('/food/recipes/b/');
@@ -421,7 +376,7 @@ test('the yield is on the control, never printed beside the name', () => {
 });
 
 test('the visible row says what the number counts, then the name', () => {
-  // #1297: "4 portions of Aubergine thing". The yield is still not on the row.
+  // #1297. The number is the input; the yield is still not on the row.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/a/');
   showTheList(doc);
@@ -473,12 +428,10 @@ test('a number below one is ignored rather than emptying the list', () => {
   });
 });
 
-/* THE PER-RECIPE INPUTS ARE WRITTEN WITH innerHTML, which this stub stores as
-   a string rather than parsing into nodes -- so they cannot be found with
-   querySelector and clicked. That costs nothing here: the listener is
-   DELEGATED and reads `ev.target`, so a stand-in carrying the three things it
-   actually looks at exercises exactly the code the browser would. The markup
-   those inputs are built from is asserted above, from the same render. */
+/* The per-recipe inputs are written with innerHTML, which this stub stores as
+   a string, so they cannot be found and clicked. The listener is delegated and
+   reads `ev.target`, so a stand-in carrying the three things it looks at runs
+   the same code. */
 const typedInto = (url, value) => ({
   classList: { contains: (cls) => cls === 'shopping-list-portions' },
   dataset: { url: url },
@@ -502,10 +455,9 @@ test('one recipe can be rescaled on its own', () => {
 });
 
 test('rescaling one recipe does not replace the input being typed into', () => {
-  // The caret rule: the per-recipe list is rebuilt whole on every shortlist
-  // change, but NOT from the input handler, because replacing the node under a
-  // typing cursor loses the caret and the keystroke. cocktail-index.js carries
-  // the same split for the same reason.
+  // The per-recipe list is rebuilt whole on every shortlist change, but not
+  // from the input handler: replacing the node under a typing cursor loses
+  // the caret and the keystroke.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/a/');
   showTheList(doc);
@@ -556,16 +508,8 @@ test('an ingredient with no amount is still a line', () => {
 });
 
 // --- a `makes:` recipe counts BATCHES -- #1297 --------------------------------
-// Helen, 2026-10-09: 'The shopping list scaler could show e.g. "X batches of 18
-// Peanut Butter Cookies", allowing half-batches where that doesn't split eggs.
-// ... That stops us saying 2 cookies is a portion -- not out of principle, but
-// because that's meaningless.'
-//
-// THIS REVERSES #815 FOR `makes:` RECIPES ONLY. From 2026-09-07 every recipe
-// counted people, through its `serves_estimate:`, and the tests that stood here
-// said so ("there is one kind of number in the panel"). What she objected to
-// then was a batch box that LOOKED like a portions box; these rows say which
-// they are in words.
+// Half a batch only where the build allows it, and no portion figure: a
+// portion of 18 cookies has no meaning. `serves:` recipes still count people.
 
 const batchInput = (url, value) => ({
   classList: { contains: (cls) => cls === 'shopping-list-portions' },
@@ -596,9 +540,7 @@ test('the figure after "of" is shown only for a count above one', () => {
 });
 
 // --- a yield that is ONE named thing is counted as that thing ------------------
-// Helen, 2026-10-11: 'When the "makes" contains a word like cake, or something
-// that doesn't make a "batch", we should do the same, so "two 13x9-in
-// traybakes".' These rows read "batches of Beetroot Chocolate Cake" until then.
+// "one 8-inch cake" and "1 jar" are not batches: the row names the thing made.
 
 const rowText = (panel) => recipesHtml(panel).split('</li>')
   .map((row) => row.replace(/<[^>]*>/g, '').trim()).filter(Boolean);
@@ -611,11 +553,10 @@ test('one cake is a cake, not a batch: the row names the thing made', () => {
   showTheList(doc);
 
   assert.deepStrictEqual(rowText(panel), [
-    // THE TITLE NAMES THE THING ("Cake"), so the row is her own form: '"×
-    // 8-inch Beetroot Chocolate Cake"'. The noun is not said twice.
+    // The title names the thing ("Cake"), so the noun is not said twice.
     '× 8-inch Beetroot Chocolate Cake',
-    // A jar HOLDS the sauce, so it comes first with "of": 'please write "[2]
-    // jars of peanut sauce"'. `jar` is in the fixture's data-container-nouns.
+    // A jar holds the sauce, so it comes first with "of". `jar` is in the
+    // fixture's data-container-nouns.
     'jar of Peanut Sauce',
     // A dozen is counted in dozens; "mince pies" is already in the title.
     'dozen Mince Pies'
@@ -645,8 +586,8 @@ test('two of them take the plural, and a dozen stays a dozen', () => {
 });
 
 test('one thing that IS the dish, and is not in its name, follows the name', () => {
-  // '"[3] rainbow confetti traybakes" (made up example)'. A traybake is not a
-  // container, so there is no "of"; the noun takes the plural above one.
+  // A traybake is not a container, so there is no "of"; the noun takes the
+  // plural above one.
   const recipes = {
     '/food/recipes/cake/': {
       p: 12, e: true, y: 'one traybake', k: 'makes', w: true, h: false,
@@ -665,9 +606,8 @@ test('one thing that IS the dish, and is not in its name, follows the name', () 
 });
 
 test('the title\'s own noun goes singular before the thing made', () => {
-  // 'Can we get to "batch of 16 brownie squares", so where the thing name
-  // word in the title is plural we make it singular?' The cookies' row, where
-  // nothing follows the title, keeps its plural.
+  // A plural noun in the title goes singular when the thing made follows it.
+  // The cookies' row, where nothing follows the title, keeps its plural.
   const recipes = {
     '/food/recipes/cookies/': Object.assign({}, RECIPES['/food/recipes/cookies/'], {
       y: '16 squares',
@@ -681,9 +621,8 @@ test('the title\'s own noun goes singular before the thing made', () => {
 });
 
 test('a batch says what it is a batch OF when the title does not', () => {
-  // Helen, 2026-10-11, of `makes: "24 squares"`: 'The shopping list entry
-  // should say "batch of 24 Guinness, Beetroot and Chocolate Cake squares".'
-  // The cookies' title already says cookies; a dozen stays a dozen.
+  // `makes: "24 squares"`: the row says what the batch is of. The cookies'
+  // title already says cookies; a dozen stays a dozen.
   const recipes = {
     '/food/recipes/cake/': {
       p: 12, e: true, y: '24 squares', k: 'makes', w: true, h: false,
@@ -708,8 +647,7 @@ test('a batch says what it is a batch OF when the title does not', () => {
 });
 
 test('every recipe named in the panel is a link to it, in the row title\'s class', () => {
-  // "render the name of the recipe ... the same way we do in the recipe list
-  // row titles, just smaller of course, and make them links please."
+  // Each name is a link; the figure and the words stay outside it.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.toggle('/food/recipes/cookies/');
@@ -723,9 +661,9 @@ test('every recipe named in the panel is a link to it, in the row title\'s class
 });
 
 test('an item nobody scaled names the recipe it came from, as a link', () => {
-  // "where an item hasn't been scaled, please list its recipe name in
-  // brackets after the item so the user knows what to do." Recipe `a` lists
-  // olive oil with no amount; its flour and onions are scaled and say nothing.
+  // An unscaled item names its recipe in brackets, so the reader knows which
+  // page to look at. Recipe `a` lists olive oil with no amount; its flour and
+  // onions are scaled and say nothing.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.toggle('/food/recipes/b/');
@@ -741,7 +679,7 @@ test('an item nobody scaled names the recipe it came from, as a link', () => {
 });
 
 test('a count above one is still batches of that many', () => {
-  // The cookies are untouched by the rule above: 18 of something is a batch.
+  // 18 of something is a batch, unlike one named thing.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/cookies/');
   win.HTF.shortlist.setBatches('/food/recipes/cookies/', 2);
@@ -750,8 +688,8 @@ test('a count above one is still batches of that many', () => {
 });
 
 test('NO PORTION FIGURE IS PRINTED FOR A `makes:` RECIPE, anywhere on its row', () => {
-  // "That stops us saying 2 cookies is a portion". The estimate is still in
-  // the blob (`p: 9`) and must not reach the row, its title or its label.
+  // The estimate is still in the blob (`p: 9`) and must not reach the row,
+  // its title or its label.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/cookies/');
   win.HTF.shortlist.toggle('/food/recipes/gelato/');
@@ -803,8 +741,7 @@ test('half a batch is offered only where the build allows it', () => {
 
 test('there is no batch and a half: the spinner goes on to the next whole one', () => {
   // The box steps in halves so that it can reach ½, and so lands on 1½ on the
-  // way up from 1 and on the way down from 2. Helen: "not having half recipes
-  // in between integers, just between 0 and 1".
+  // way up from 1 and down from 2. Halves exist only between 0 and 1.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/gelato/');
   showTheList(doc);
@@ -820,9 +757,8 @@ test('there is no batch and a half: the spinner goes on to the next whole one', 
 });
 
 test('"set all to" sets the portions rows and leaves the batch rows alone', () => {
-  /* #815 made it reach every row, because the gelato's box then counted
-     people. It counts batches again, and "6 portions" of 18 cookies has no
-     answer that does not decide how many cookies a portion is. */
+  // "6 portions" of 18 cookies has no answer that does not decide how many
+  // cookies a portion is, so "set all to" leaves the batch rows alone.
   const { win, doc, panel } = boot();
   Object.keys(RECIPES).forEach((url) => win.HTF.shortlist.toggle(url));
   showTheList(doc);
@@ -841,8 +777,8 @@ test('"set all to" sets the portions rows and leaves the batch rows alone', () =
 });
 
 test('a portions number left in the store is not read as batches', () => {
-  // Every `makes:` recipe had a portions entry until #1297. A stored 6 was six
-  // people; read as batches it would shop for six times the gelato.
+  // The store may still hold a portions entry for a `makes:` recipe. A stored
+  // 6 was six people; read as batches it shops for six times the gelato.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.setPortions('/food/recipes/gelato/', 6);
   win.HTF.shortlist.toggle('/food/recipes/gelato/');
@@ -852,8 +788,8 @@ test('a portions number left in the store is not read as batches', () => {
 });
 
 test('an estimate is marked with a ~ and a stated serving size is not', () => {
-  // Helen's ruling, #815: "yes, mark an estimate on the scaler with a ~". It
-  // is the only thing saying a figure was reasoned rather than written down.
+  // #815: the tilde is the only thing saying a figure was estimated rather
+  // than written down.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/a/');   // serves: "4"
   win.HTF.shortlist.toggle('/food/recipes/b/');   // serves_estimate: 6
@@ -905,18 +841,9 @@ test('the juice and the zest of one lemon is one lemon, on the real wiring', () 
 });
 
 test('A STORED NUMBER CANNOT RESURRECT A BOX THE RECIPE CANNOT SUPPORT', () => {
-  /* Helen, 2026-09-07, with a screenshot: the gelato's box read 200 and the
-     list did not move, while the cheesecake beside it scaled to ⅝ of an egg.
-
-     THE GUARD WAS ASKING THE WRONG QUESTION. `portionsFor()` returned the
-     STORED number before it looked at the recipe, so a figure she had typed
-     earlier -- kept in localStorage, and outliving the recipe's own data --
-     made the "no portion count, no box" test pass for a recipe that had none.
-     A box was drawn, it accepted 200, and scaleFor() silently returned 1.
-
-     THE SAME BUG AS THE FIRST ONE, through a different door, which is why this
-     test asks about the STORE rather than about the render: her machine had a
-     value in it, and mine did not. */
+  /* portionsFor() must ask the recipe before the store. A number typed
+     earlier outlives the recipe's own data in localStorage; trusted, it draws
+     a box that accepts 200 and scales nothing. So this test seeds the store. */
   const { win, doc, panel } = boot({
     recipes: {
       '/food/recipes/a/': {
@@ -925,7 +852,7 @@ test('A STORED NUMBER CANNOT RESURRECT A BOX THE RECIPE CANNOT SUPPORT', () => {
       }
     }
   });
-  // What she had typed before the recipe lost (or never had) its count.
+  // A number typed before the recipe lost, or never had, its count.
   win.HTF.shortlist.setPortions('/food/recipes/a/', 200);
   win.HTF.shortlist.toggle('/food/recipes/a/');
   showTheList(doc);
@@ -938,11 +865,9 @@ test('A STORED NUMBER CANNOT RESURRECT A BOX THE RECIPE CANNOT SUPPORT', () => {
 });
 
 test('a recipe with NO portion count gets no box, and says why', () => {
-  /* Every recipe carries one since #815 and a test keeps it that way, so this
-     is what a NEW recipe looks like between being written and being given its
+  /* What a new recipe looks like between being written and being given its
      `serves_estimate:`. It contributes at x1 and says what is missing, rather
-     than offering a control that would do nothing -- the rule this feature
-     broke twice before learning it. */
+     than offering a control that does nothing. */
   const { win, doc, panel } = boot({
     recipes: {
       '/food/recipes/a/': {
@@ -963,8 +888,7 @@ test('a recipe with NO portion count gets no box, and says why', () => {
 });
 
 test('a shortlisted recipe that is no longer on the page is dropped quietly', () => {
-  // A renamed or unpublished recipe, left in localStorage. The same silence
-  // the rest of this feature gives one.
+  // A renamed or unpublished recipe, left in localStorage.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/gone/');
   win.HTF.shortlist.toggle('/food/recipes/a/');
@@ -974,13 +898,10 @@ test('a shortlisted recipe that is no longer on the page is dropped quietly', ()
 });
 
 // --- arriving at the shortlist by URL, #1011 -----------------------------------
-//
-// `?shortlist=1` is food's half of what #994 gave the drinks index: the "see
-// shortlist" action on a recipe page links here. The same three assertions
-// tests/js/cocktail-index-startup.test.js makes, for the same reason -- the
-// index must turn the VIEW on when it arrives, through the same
-// `enterShortlistView()` the `shortlisted (N)` button calls, so the two doors
-// lead to one state (#918, MANUAL 8.9).
+// `?shortlist=1` is what "see shortlist" on a recipe page links to. The index
+// turns the view on through the same `enterShortlistView()` the
+// `shortlisted (N)` button calls, so the two doors lead to one state (#918,
+// MANUAL 8.9).
 
 function shortlistViewIsOn(doc) {
   const btn = doc.getElementById('shortlist-only');
@@ -1022,12 +943,9 @@ test('#1011: a shortlisted recipe is what the link shows', () => {
 });
 
 // --- a shortlist someone sent, #1093 ------------------------------------------------
-//
-// `?shortlist=a,gelato` opens the same VIEW `?shortlist=1` does, answering "is
-// this row on it" from the link. Helen's three rulings, 2026-09-15, each with
-// its assertion: the link SHOWS the list and saves none of it; "keep these"
-// makes it yours in one tap. (The third, that the shopping list hides while
-// it shows, she reversed on 2026-10-11 -- see the test that replaced it.)
+// `?shortlist=a,gelato` opens the view `?shortlist=1` does, answering "is this
+// row on it" from the link. It shows the list and saves none of it; "keep
+// these" makes it yours.
 
 const sharedNote = (doc) => doc.querySelector('[data-shared-shortlist]');
 const visibleUrls = (list) => visibleRows(list).map((li) => li.getAttribute('data-url'));
@@ -1066,9 +984,6 @@ test('#1093: the note says how many, and names what it could not find', () => {
 });
 
 test('a sent list opens WITH its shopping list, totalled from the link', () => {
-  // Helen, 2026-10-11: "when I enter a URL for a shortlist, please show the
-  // index page with the shortlist open (i.e. with shopping list open)". It hid
-  // here from #1093 until then.
   const { win, panel } = boot({ search: '?shortlist=gelato,a' });
   assert.strictEqual(panel.hidden, false);
   assert.deepStrictEqual(rowText(panel),
@@ -1115,11 +1030,10 @@ test('#1024: ?q= fills the name box and narrows the list', () => {
   const { doc, list } = boot({ search: '?q=beetroot' });
   assert.strictEqual(doc.getElementById('name-search-box').value, 'beetroot',
     'the box should show what the reader typed on the page they came from.');
-  // THE REORDER, NOT THE VISIBLE SET. reorderForTitleSearch() runs before the
-  // highlight and puts the tier-1 match first; the highlight then rewrites
-  // the title through innerHTML, which this stub CLEARS rather than parses
-  // (dom-stub.js), so the row's title reads as '' to the filter here and
-  // nowhere else. The order is what proves the query reached the script.
+  // The order, not the visible set. The highlight rewrites the title through
+  // innerHTML, which this stub clears rather than parses (dom-stub.js), so the
+  // row's title reads as '' to the filter here. reorderForTitleSearch() runs
+  // first, and the order is what proves the query reached the script.
   assert.strictEqual(list.children[0].getAttribute('data-url'), '/food/recipes/b/',
     'the query must reach reorderForTitleSearch(), not only the box.');
 });
@@ -1142,10 +1056,8 @@ test('#1050: ?ing= fills the HAS TO HAVE box and narrows the list to that ingred
 });
 
 test('#1050: an ingredient nothing names leaves the picker in a plain search', () => {
-  // The policy every other query kind follows: a stale value must not error,
-  // and must not silently narrow the list either. Here it leaves the typed
-  // text in the box with nothing chosen -- the state the box would be in had
-  // the reader typed it -- and every row still shows.
+  // A stale value must not error and must not narrow the list: the text
+  // stays in the box with nothing chosen, and every row still shows.
   const { doc, list } = boot({ search: '?ing=quince' });
   assert.strictEqual(doc.getElementById('ingredient-search-box').value, 'quince');
   assert.strictEqual(visibleRows(list).length, Object.keys(RECIPES).length,
@@ -1153,11 +1065,9 @@ test('#1050: an ingredient nothing names leaves the picker in a plain search', (
 });
 
 // --- arriving at a fragment, #1057 and #1059 ------------------------------------
-// The search dropdown's own `#results` landing (#1050) already had no test at
-// this level; these are the first, and they cover the WIDENING rather than
-// only the original case -- any element id named by `location.hash`, not only
-// "results" -- since that generalisation is what #1057 (the see-shortlist
-// link) and #1059 (a badge's own filter-section fragment) both rely on.
+// The startup block scrolls to any element id `location.hash` names, not only
+// "results": #1057 (the see-shortlist link) and #1059 (a badge's own
+// filter-section fragment) both rely on that.
 
 test('#1050/#1057: arriving at #results scrolls the count line into view', () => {
   const { results } = boot({ hash: '#results' });
@@ -1186,12 +1096,9 @@ test('with no hash at all, nothing is scrolled', () => {
 });
 
 test('#387: a genuine back navigation restores scroll instead, and skips the fragment scroll', () => {
-  // The remembered scroll (sessionStorage) is the truer answer on a back
-  // navigation than re-jumping to whatever fragment happens to still be in
-  // the URL -- restoreIndexMemory() only fires when
-  // performance.getEntriesByType('navigation')[0].type === 'back_forward'
-  // AND a valid record is there to restore, both arranged here exactly as
-  // saveIndexMemory() would have written them on the way out.
+  // On a back navigation the remembered scroll wins over the fragment still
+  // in the URL. restoreIndexMemory() fires only for a `back_forward`
+  // navigation entry with a valid record to restore; both are arranged here.
   const { win, results } = boot({
     hash: '#results',
     backForward: true,
@@ -1215,20 +1122,9 @@ test('#387: a genuine back navigation restores scroll instead, and skips the fra
 });
 
 // --- HAS TO HAVE is AND-multi-select -- GitHub issue #1092 ---------------------
-// "HAS TO HAVE filter on food site no longer allows selecting more than one
-// chip." A second pick used to REPLACE the first (state.ingredient was a
-// single string); it now joins it, the way LEAVE OUT's own exclusions and
-// cocktails' `include` cupboard already work -- so both requirements apply
-// at once, AND, not the most recent one alone.
-//
-// Typing each of these narrows to exactly one candidate ("aubergines",
-// "olive oil" and "beetroot" are each a whole entry in MAIN_INGREDIENTS and
-// share no prefix with anything else in the fixture), so each commits the
-// moment it is typed -- no click needed, the same auto-select #1050 already
-// relies on. This is deliberately the fully-typed-unique-word path rather
-// than a click on an ambiguous pool: it is the shortest route to proving the
-// SECOND commit doesn't erase the first, which is exactly what the old
-// single-value state did.
+// A second pick joins the first, and every chosen ingredient is required.
+// Each word typed below matches exactly one entry in MAIN_INGREDIENTS, so it
+// commits as it is typed, with no click.
 
 function typeIngredient(doc, word) {
   const box = doc.getElementById('ingredient-search-box');
@@ -1250,11 +1146,8 @@ test('#1092: a second HAS TO HAVE pick joins the first instead of replacing it',
     'only survivor -- this alone cannot tell "AND both" from "replaced by the ' +
     'second", which the next assertion is for.');
 
-  // The old single-value code REPLACES "aubergines" with "beetroot" here and
-  // ends up with the one row that names beetroot (recipe b). The AND-set
-  // fixed by #1092 requires EVERY chosen ingredient, and no recipe in the
-  // fixture names both aubergines and beetroot, so the true regression case
-  // is an EMPTY list, not recipe b's survival.
+  // No fixture recipe names both aubergines and beetroot, so requiring all
+  // three leaves an empty list; a pick that replaced the others shows recipe b.
   typeIngredient(doc, 'beetroot');
   assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')), [],
     'aubergines, olive oil AND beetroot are three requirements now, and no ' +
@@ -1278,9 +1171,7 @@ test('#1092: removing one chosen ingredient leaves the others in place', () => {
   typeIngredient(doc, 'aubergines');
   typeIngredient(doc, 'olive oil');
 
-  // Clicking an already-chosen chip removes just that one -- the matrix click
-  // handler's own toggle, exercised here rather than through another
-  // typeIngredient() call so this test is about the chip, not the box.
+  // Clicking an already-chosen chip removes just that one.
   const pool = doc.getElementById('ingredient-results-pool');
   const aubergineChip = Array.from(pool.querySelectorAll('.btn-ingredient'))
     .find((b) => b.dataset.ingredient === 'aubergines');
@@ -1293,11 +1184,9 @@ test('#1092: removing one chosen ingredient leaves the others in place', () => {
     'have cleared the whole picker with it.');
 });
 
-// --- choosing from several, 2026-10-11 ------------------------------------------
-// Helen: "when a chip in the has to have or leave out search results is
-// selected, it immediately joins others at the top and the other chips
-// disappear. Please make food do the same", and "I do want to have the x on
-// the chosen has to have chip, so please add it for food."
+// --- choosing from several -----------------------------------------------------
+// A chosen chip joins the others at the top, the other candidates go, and the
+// chosen chip carries an x.
 
 test('choosing one HAS TO HAVE candidate of several clears the search and keeps only the chosen', () => {
   const { doc } = boot();
@@ -1339,10 +1228,8 @@ test('a chosen HAS TO HAVE chip carries an x, and a click on the x removes the c
 // --- the list of scripts is the template's list --------------------------------
 
 test('this harness loads what food/index.html actually loads', () => {
-  // The harness is only worth having if it runs the real program. A tag added
-  // to the template and not here means the thing under test drifts away from
-  // the thing that ships -- which is how #694 put list-view.js on the
-  // cocktails index without its harness noticing.
+  // A tag added to the template and not here means the thing under test
+  // drifts away from the thing that ships.
   const html = fs.readFileSync(path.join(ROOT, 'food', 'index.html'), 'utf8');
   const inTemplate = [...html.matchAll(/<script src="\{\{ '\/assets\/js\/([^']+)'/g)]
     .map((m) => m[1]);
@@ -1353,14 +1240,13 @@ test('this harness loads what food/index.html actually loads', () => {
     + 'food/index.html. Update SCRIPTS to match the template.');
 });
 
-// --- round two of #1297, Helen, 2026-10-10 --------------------------------------
+// --- #1297: batch rows last, and the not-scaled note ---------------------------
 
 const noteOf = (panel) => panel.querySelector('.shopping-list-note');
 
 test('#1297: the batch rows come last, under a rule, whatever order they were shortlisted in', () => {
-  // "If we group the batched recipes at the bottom of the shopping list scaler
-  // section, it's clear the portions scaler multiplies portions whereas the
-  // batches are manual."
+  // Grouped at the bottom, so it is clear that "set all to" multiplies the
+  // portions rows and the batch rows are set by hand.
   const { win, doc, panel } = boot();
   ['/food/recipes/cookies/', '/food/recipes/a/', '/food/recipes/gelato/',
     '/food/recipes/b/'].forEach((url) => win.HTF.shortlist.toggle(url));
@@ -1386,7 +1272,7 @@ test('#1297: with no portions rows above them, the batch rows have no rule', () 
 });
 
 test('#1297: what was not scaled is named under the rows, in her format', () => {
-  // "(Not scaled: salt, black pepper)" -- bracketed, comma-joined, no full stop.
+  // Bracketed, comma-joined, no full stop.
   const { win, doc, panel } = boot({
     recipes: {
       '/food/recipes/a/': {

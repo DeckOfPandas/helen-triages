@@ -1,45 +1,19 @@
 """guard-main-branch.py and guard-destructive-git.py, broken on purpose.
 
-WHY THIS FILE EXISTS. Eight hooks live in `.claude/hooks/`. Until now five had
-tests -- `guard-sed.py` and `guard-awk.py` in `test_text_tool_guards.py`,
-`guard-unanalyzable-bash.py`, `guard-token-expansion.py` and
-`session-ground-truth.py` in `test_agent_wrappers.py` -- and the two that guard
-the repository's two stated disasters had none between them. The sed and awk
-guards had six tests; the hook that stops a commit landing on `main` and the
-hook that stops uncommitted work being discarded had zero. #1198.
+A guard is proved by breaking the thing on purpose (#1198, DECISIONS §11).
+Each hook is fed the JSON the harness feeds it, on stdin, with the subprocess's
+`cwd` set to a throwaway `git init` repository. A real repository, not a mock:
+what is proved is that the hook agrees with git. The nested-repository case
+(`git -C _food_drafts ...`) is tested for both hooks, because a hook that asks
+the outer repository gives the wrong answer silently.
 
-DECISIONS §11 (2026-09-09, 2026-09-10) records the rule these tests apply: a
-guard is proved by breaking the thing on purpose. Both of these hooks have
-history that makes the point -- each shipped with a hole that was found only by
-aiming a real command at a real repository, and both holes were in the
-nested-repository case:
+`cwd` is always a throwaway repo, never this worktree. `guard-destructive-git.py`
+reads `git stash list` in the process's own directory, and the stash stack is
+shared between the primary checkout and every worktree, so a stash test run
+here would pass or fail on another session's work.
 
-  * guard-main-branch.py matched `git -C _food_drafts commit` as a commit and
-    then asked the WRONG repository which branch it was on.
-  * guard-destructive-git.py's flag pattern did not allow for a flag with a
-    value, so `git -C _food_drafts reset --hard` was never recognised at all.
-
-So the nested case is not an edge here, it is the case with form, and it is
-tested for both hooks below.
-
-HOW THESE TESTS WORK. Each hook is fed the same JSON the harness feeds it, on
-stdin, with the subprocess's `cwd` set to a throwaway `git init` repository --
-because both hooks ask git about a directory, and `guard-main-branch.py` reads
-`Path.cwd()` to find it. A real repository rather than a mock: the thing being
-proved is that the hook agrees with git, and a mock would only prove it agrees
-with the mock.
-
-`cwd` IS ALWAYS A THROWAWAY REPO, NEVER THIS WORKTREE, AND THAT IS LOAD-BEARING
-FOR THE STASH TESTS. `guard-destructive-git.py` reads `git stash list` in the
-process's own directory, and the stash stack is shared between this repo's
-primary checkout and every worktree -- another session may push or pop it while
-this suite runs. A stash test run in this worktree would therefore pass or fail
-on someone else's work. In a throwaway repo the stash list is ours alone.
-
-Deliberately NOT `git worktree add`: that would mutate this repo's worktree
-list, and an interrupted test would leave an entry only `git worktree prune`
-clears -- which is Helen's, not a test's (CLAUDE.md, normal workflow). Same
-reasoning as `test_agent_wrappers.py`'s probe repo.
+Not `git worktree add`: an interrupted test would leave an entry only
+`git worktree prune` clears, which is Helen's.
 """
 from __future__ import annotations
 
@@ -53,9 +27,8 @@ pytestmark = pytest.mark.shared
 
 HOOKS = pathlib.Path(__file__).resolve().parents[1] / ".claude" / "hooks"
 
-# A committer for the throwaway repos. Passed per-invocation with `git -c`, so
-# nothing is written to a config file anywhere -- CLAUDE.md forbids touching
-# global git config, and a test that needed it would be the wrong test.
+# A committer for the throwaway repos, passed per invocation with `git -c` so
+# nothing is written to a config file anywhere.
 IDENTITY = [
     "-c", "user.name=Guard Test",
     "-c", "user.email=guard-test@example.invalid",
@@ -115,9 +88,7 @@ def _decision(hook: str, command: str, cwd: pathlib.Path) -> str | None:
     return output["permissionDecisionReason"]
 
 
-# =============================================================================
-# guard-main-branch.py -- the hook that protects `main`
-# =============================================================================
+# ---- guard-main-branch.py: the hook that protects `main` ----
 
 COMMIT_AND_MERGE = [
     "git commit -F tmp/commit-msg.txt",
@@ -155,9 +126,8 @@ def test_main_branch_guard_allows_the_same_commands_on_a_working_branch(
 
 
 @pytest.mark.parametrize("command", [
-    # Everything else on `main` is untouched, and CLAUDE.md says so in as many
-    # words: "reading, fetching, branching, checking out, pushing an existing
-    # commit".
+    # Everything else on `main` is untouched: reading, fetching, branching,
+    # checking out, pushing an existing commit.
     "git status",
     "git log --oneline -5",
     "git diff",
@@ -167,8 +137,7 @@ def test_main_branch_guard_allows_the_same_commands_on_a_working_branch(
     "git checkout -b chore/1198-guard-tests",
     "sh scripts/git-push-agent.sh branch:branch",
     "sh scripts/git-fetch-main.sh",
-    # Writing ABOUT the verbs. Commit messages in this repository discuss them
-    # constantly -- this file's own introducing commit does.
+    # Writing about the verbs: commit messages in this repository discuss them.
     "git log --grep 'git commit on main'",
     'git add -- tmp/notes-about-git-merge.txt',
 ])
@@ -178,13 +147,12 @@ def test_main_branch_guard_leaves_everything_else_on_main_alone(tmp_path, comman
 
 
 def test_main_branch_guard_asks_the_nested_repo_not_the_outer_one(tmp_path):
-    """THE CASE WITH FORM. Four commits went onto `_cocktail_drafts`' own `main`
-    on 2026-08-17, and in 2026-09-10 the hook recognised `git -C <nested>
-    commit` as a commit and then checked the OUTER repository's branch.
+    """Outer on a working branch, nested on `main`: the answer must come from
+    the nested repository.
 
-    Outer on a working branch, nested on `main`: the answer must come from the
-    nested one. `git -C` is the only remaining way to reach a nested repo, since
-    guard-unanalyzable-bash.py refuses a leading `cd` (proved below).
+    A hook that recognises `git -C <nested> commit` as a commit and then
+    checks the outer repository's branch lets a commit onto a drafts repo's
+    own `main`.
     """
     outer = _repo(tmp_path / "outer", branch="worktree-probe")
     _repo(outer / "_food_drafts", branch="main")
@@ -203,12 +171,10 @@ def test_main_branch_guard_asks_the_nested_repo_not_the_outer_one(tmp_path):
 def test_main_branch_guard_reads_a_cd_and_a_dash_c_as_composing(tmp_path):
     """`cd a && git -C b commit` runs in `a/b`, not `a` and not `b`.
 
-    The hook's docstring says the two compose, and its own first fix for the
-    `-C` hole did not -- it resolved the `-C` path against the worktree root, so
-    this exact shape resolved to a directory that does not exist, fell back to
-    cwd, and allowed the commit. Tested at the hook even though
-    guard-unanalyzable-bash.py refuses a leading `cd` today: the two hooks are
-    independent, and this one should not depend on the other for correctness.
+    Resolving the `-C` path against the worktree root finds a directory that
+    does not exist, falls back to cwd, and allows the commit. Tested at the
+    hook even though guard-unanalyzable-bash.py refuses a leading `cd`: the
+    two hooks are independent, and this one must be correct alone.
     """
     outer = _repo(tmp_path / "outer", branch="worktree-probe")
     middle = outer / "middle"
@@ -225,15 +191,13 @@ def test_main_branch_guard_reads_a_cd_and_a_dash_c_as_composing(tmp_path):
 
 
 def test_a_leading_cd_into_a_nested_repo_is_refused_by_the_other_guard(tmp_path):
-    """The `if` gate is not a hole, and this is why it needs saying.
+    """The `if` gate is not a hole, because another guard closes it.
 
-    Both git guards are wired with `"if": "Bash(git *)"`, which is a PREFIX
-    match -- so neither of them ever sees `cd _food_drafts && git commit`. That
-    would be a hole if nothing else caught it. guard-unanalyzable-bash.py has no
-    `if`, runs on every Bash call, and refuses a leading `cd` and `&&` chaining
-    both. So the composition is closed even though neither hook closes it alone,
-    and that is worth a test rather than a comment: if the `if` gate or the
-    unanalyzable guard changes, exactly one of these two tests should go red.
+    Both git guards are wired with `"if": "Bash(git *)"`, a prefix match, so
+    neither ever sees `cd _food_drafts && git commit`.
+    guard-unanalyzable-bash.py has no `if`, runs on every Bash call, and
+    refuses the leading `cd` and the `&&`. If the gate or that guard changes,
+    this test or the wiring test goes red.
     """
     repo = _repo(tmp_path / "outer", branch="worktree-probe")
     reason = _decision(
@@ -256,9 +220,7 @@ def test_main_branch_guard_says_nothing_when_there_is_no_repository(tmp_path):
                      "git commit -F tmp/commit-msg.txt", nowhere) is None
 
 
-# =============================================================================
-# guard-destructive-git.py -- the hook that protects uncommitted work
-# =============================================================================
+# ---- guard-destructive-git.py: the hook that protects uncommitted work ----
 
 DESTRUCTIVE = [
     ("git reset --hard", "git reset --hard"),
@@ -269,13 +231,10 @@ DESTRUCTIVE = [
     ("git clean --force", "git clean -f"),
     ("git restore tracked.txt", "git restore"),
     ("git restore --staged --worktree tracked.txt", "git restore"),
-    # The bare-path form, which reads far more innocently and discards just as
-    # thoroughly. It got past the hook's first version and took a file's
-    # uncommitted work with it on 2026-08-19.
+    # The bare-path form reads more innocently and discards just as thoroughly.
     ("git checkout tracked.txt", "git checkout <path>"),
-    # The shape that got past the WRITTEN rule on 2026-08-19: a compound line
-    # with redirection and a fallback, which no prefix-matching deny pattern
-    # reaches.
+    # A compound line with redirection and a fallback, which no
+    # prefix-matching deny pattern reaches.
     ("git checkout -- tracked.txt 2>/dev/null || true", "git checkout -- <paths>"),
 ]
 
@@ -295,16 +254,16 @@ def test_destructive_guard_refuses_a_discard_over_uncommitted_work(
 def test_destructive_guard_allows_the_same_command_on_a_clean_tree(
     tmp_path, command, _label,
 ):
-    """Documented, deliberate, and the reason the hook is trusted: it is the
-    COMBINATION that is dangerous. A guard that fired on harmless invocations
-    is one you learn to route around."""
+    """Deliberate: it is the combination with a dirty tree that is dangerous.
+    A guard that fires on harmless invocations is one you learn to route
+    around."""
     repo = _repo(tmp_path / "clean")
     assert _decision("guard-destructive-git.py", command, repo) is None, command
 
 
 def test_destructive_guard_names_what_would_be_lost(tmp_path):
-    """CLAUDE.md: "names what would be lost". A refusal that does not is a
-    refusal Helen cannot act on, and she is the one being asked."""
+    """The refusal names what would be lost. One that does not is a refusal
+    Helen cannot act on, and she is the one being asked."""
     repo = _repo(tmp_path / "named")
     _dirty(repo)
     (repo / "untracked.md").write_text("new and unsaved\n", encoding="utf-8")
@@ -318,8 +277,8 @@ def test_destructive_guard_names_what_would_be_lost(tmp_path):
 
 
 @pytest.mark.parametrize("command", [
-    # `--staged` WITHOUT `--worktree` only unstages. The working tree is
-    # untouched, so there is nothing to lose and nothing to block.
+    # `--staged` without `--worktree` only unstages: the working tree is
+    # untouched, so there is nothing to lose.
     "git restore --staged tracked.txt",
     "git restore -S tracked.txt",
     # The reversible answer the refusal itself recommends.
@@ -333,8 +292,8 @@ def test_destructive_guard_names_what_would_be_lost(tmp_path):
     "git diff",
     "git add -- tracked.txt",
     "git checkout -b chore/1198-guard-tests",
-    # Writing ABOUT the commands. The CLAUDE.md entry this hook enforces names
-    # three of them, so a commit message discussing it must not be refused.
+    # Writing about the commands: a commit message or a grep that names one
+    # must not be refused.
     "git commit -F tmp/msg-about-git-reset-hard.txt",
     "git log --grep 'git reset --hard'",
     'grep -rn "git clean -fd" model_instructions/',
@@ -348,14 +307,12 @@ def test_destructive_guard_leaves_the_safe_and_the_merely_mentioned_alone(
 
 
 def test_destructive_guard_asks_the_nested_repo_not_the_outer_one(tmp_path):
-    """The 2026-09-10 hole, from the other side: `git -C <nested> reset --hard`
-    was judged by whether the OUTER tree was dirty. Outer clean, so allowed, and
-    uncommitted work in the drafts repo destroyed.
+    """Outer clean, nested dirty: `git -C <nested> reset --hard` is judged by
+    the nested tree.
 
-    The flag pattern is the part that was wrong -- it allowed a flag but not the
-    VALUE after it, so `-C ` matched and `_food_drafts` did not, and the command
-    was never recognised as a reset at all. Not judged and allowed: never looked
-    at.
+    The flag pattern must allow a flag with a value. One that matches `-C `
+    and not `_food_drafts` never recognises the command as a reset at all, so
+    it is not judged and allowed but never looked at.
     """
     outer = _repo(tmp_path / "outer")
     nested = _repo(outer / "_food_drafts")
@@ -372,12 +329,9 @@ def test_destructive_guard_asks_the_nested_repo_not_the_outer_one(tmp_path):
 
 
 def test_destructive_guard_stops_a_stash_drop_whatever_the_tree_looks_like(tmp_path):
-    """A SECOND KIND OF LOSS, and it needs its own gate. Everything else here is
-    about the working tree, so it is correctly allowed when the tree is clean.
-    `git stash drop` destroys the stash LIST, which is just as gone either way --
-    running the clean-tree check against it would have waved it through, and
-    until 2026-08-20 it did, in a hook whose own refusal message recommends
-    `git stash -u`.
+    """A second kind of loss, with its own gate. `git stash drop` destroys the
+    stash list, which is as gone on a clean tree as on a dirty one, so the
+    clean-tree check that allows everything else must not allow it.
 
     A throwaway repo, so this is our stash and not the shared stack.
     """
@@ -389,8 +343,8 @@ def test_destructive_guard_stops_a_stash_drop_whatever_the_tree_looks_like(tmp_p
 
     entries = _git(repo, "stash", "list").stdout.strip()
     assert "probe-stash" in entries, entries
-    # The tree is now CLEAN, which is exactly the condition that used to let
-    # these through.
+    # The tree is now clean: the condition under which every other command
+    # here is allowed.
     assert not _git(repo, "status", "--porcelain").stdout.strip()
 
     for command in ("git stash drop", "git stash clear", "git stash drop 'stash@{0}'"):
@@ -414,10 +368,9 @@ def test_destructive_guard_says_nothing_when_there_is_no_repository(tmp_path):
     assert _decision("guard-destructive-git.py", "git reset --hard", nowhere) is None
 
 
-# =============================================================================
-# Wiring. A hook that exists but is not wired guards nothing, and the suite
-# would not notice -- every test above runs the file directly.
-# =============================================================================
+# ---- Wiring ----
+# A hook that exists but is not wired guards nothing, and the suite would not
+# notice: every test above runs the file directly.
 
 def _pre_tool_use_hooks() -> list[dict]:
     settings = json.loads((HOOKS.parent / "settings.json").read_text(encoding="utf-8"))

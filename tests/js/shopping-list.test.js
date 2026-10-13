@@ -1,21 +1,11 @@
-// =============================================================================
-// Tests for assets/js/shopping-list.js — GitHub issue #546's shopping list.
+// Tests for assets/js/shopping-list.js, the shopping list (#546).
 //
 //   node --test tests/js/*.test.js
 //
-// A pure module with a `module.exports` tail, so it is simply required — the
-// same shape as filter-state.js and its tests, and unlike assets.js, which
-// needs the stub-dom harness.
-//
-// WHAT THESE ARE REALLY GUARDING. The module's whole job is to take a pile of
-// ingredient entries written by hand across 124 files and produce a list you
-// can shop from, and every interesting case is a MESSY-DATA case: the same
-// generic written with and without a bottle, `Woodford's` against `Woodford’s`,
-// `dash` against `dashes`, and eleven entries that are not quantities at all.
-// Those are exactly the cases that never show up while clicking around with a
-// tidy shortlist of three drinks, and exactly the ones a weekend's shopping
-// would be wrong about.
-// =============================================================================
+// A pure module with a `module.exports` tail, so it is simply required. Most
+// cases are messy-data cases: one generic written with and without a bottle,
+// straight and curly apostrophes, `dash` against `dashes`, and entries that are
+// not quantities at all. A tidy shortlist never shows them.
 'use strict';
 
 const test = require('node:test');
@@ -37,8 +27,7 @@ test('parseAmount splits a number from its unit', () => {
 });
 
 test('parseAmount returns null for the entries that are not quantities', () => {
-  // The eleven real ones in the collection, and the reason a null here is an
-  // answer rather than a failure.
+  // A null here is an answer, not a failure.
   assert.strictEqual(SL.parseAmount('(top)'), null);
   assert.strictEqual(SL.parseAmount('(rinse)'), null);
   assert.strictEqual(SL.parseAmount(''), null);
@@ -56,8 +45,7 @@ test('ml and g are never pluralised; words are, unless there is one', () => {
   assert.strictEqual(SL.unitLabel('dash', 1), 'dash');
   assert.strictEqual(SL.unitLabel('dash', 3), 'dashes');
   assert.strictEqual(SL.unitLabel('leaf', 6), 'leaves');
-  // `each` is a word with no plural, and the sibilant rule below would give it
-  // one -- `18 eaches`. Three drinks are written with it.
+  // `each` has no plural, and the sibilant rule would give it one: `18 eaches`.
   assert.strictEqual(SL.unitLabel('each', 18), 'each');
 });
 
@@ -73,8 +61,8 @@ test('the same generic across two drinks makes one line and one total', () => {
 });
 
 test('the decimals this collection is full of do not go floating-point', () => {
-  // 22.5 and 7.5 are the second and fifth most common amounts in the data, so
-  // this is the ordinary case rather than an edge one.
+  // 22.5 and 7.5 sit on the collection's 2.5 ml grid: the ordinary case, not an
+  // edge one.
   const rows = SL.build([ing('22.5 ml', 'rum'), ing('22.5 ml', 'rum'), ing('22.5 ml', 'rum')]);
   assert.strictEqual(rows[0].text, '67.5 ml');
 
@@ -103,10 +91,8 @@ test('a quantity and an unquantified entry can share a line', () => {
   assert.strictEqual(rows[0].text, '15 ml + (rinse)');
 });
 
-// --- the label rule, which is Helen's ------------------------------------------
-// Settled 2026-09-04, after she looked at the first version: "show generic
-// first, with bottle on the same line in brackets, like the recipes." The
-// generic ALWAYS leads; the bottles are always the bracketed note.
+// --- the label rule (#546) ----------------------------------------------------
+// The generic always leads; the bottles are always the bracketed note.
 
 test('the generic leads and the bottle is the note, even when unanimous', () => {
   const rows = SL.build([
@@ -118,17 +104,14 @@ test('the generic leads and the bottle is the note, even when unanimous', () => 
 });
 
 test('the long generic is used, never a shortened card name', () => {
-  // `card_names` shortens "moderately aged Jamaican rum" to "Jamaican rum" to
-  // fit a 370px card (#501). Helen: "give the long rum names, not the shortened
-  // ones we generated for cards." Nothing in this module reads that map, and
-  // this is the test that says so.
+  // `card_names` shortens "moderately aged Jamaican rum" to fit a card (#501).
+  // The list prints the long name: nothing in the module reads that map.
   const rows = SL.build([ing('30 ml', 'moderately aged Jamaican rum', 'Appleton 8')]);
   assert.strictEqual(rows[0].label, 'moderately aged Jamaican rum');
 });
 
 test('two bottles for one generic: the generic leads and both are kept', () => {
-  // The case that makes bottle-as-identity unusable — measured at 20 generics
-  // in the real collection.
+  // Why a bottle cannot be the row's identity.
   const rows = SL.build([
     ing('50 ml', 'London dry gin', 'Beefeater'),
     ing('30 ml', 'London dry gin', 'Tanqueray')
@@ -140,8 +123,8 @@ test('two bottles for one generic: the generic leads and both are kept', () => {
 });
 
 test('one bottle plus one bare entry: the generic still leads', () => {
-  // 41 generics in the collection appear both ways. The bare entry means the
-  // group is "the generic, sometimes as this bottle" — not "this bottle".
+  // The bare entry means the group is "the generic, sometimes as this bottle",
+  // not "this bottle".
   const rows = SL.build([
     ing('50 ml', 'bourbon', "Woodford's Reserve"),
     ing('30 ml', 'bourbon')
@@ -226,9 +209,7 @@ test('excluded generics are left out, and the caller supplies the list', () => {
   assert.deepStrictEqual(labels(rows), ['gin']);
 });
 
-// --- order --------------------------------------------------------------------
-// Helen, 2026-09-04: "order by descending volume required." The big pours are
-// what you shop for; two dashes of bitters is a bottle you almost certainly own.
+// --- order: largest volume first -----------------------------------------------
 
 test('rows come back largest volume first', () => {
   const rows = SL.build([
@@ -259,9 +240,8 @@ test('equal volumes fall back to the label, case-insensitively', () => {
 });
 
 // --- whole fruits -------------------------------------------------------------
-// Helen, 2026-09-04: "375 ml lemon juice (X to Y lemons)". Yields are declared
-// in _data/cocktails/ingredients.yml and passed in; only the four you squeeze
-// yourself have them.
+// Yields are declared in _data/cocktails/ingredients.yml and passed in; only a
+// juice squeezed from whole fruit has one.
 
 const YIELDS = {
   'lemon juice': { fruit: 'lemon', ml_min: 30, ml_max: 45 },
@@ -295,8 +275,8 @@ test('a range that collapses is printed once, and singular', () => {
 test('a collapsed range above one is still printed once, and plural', () => {
   const [row] = SL.build([ing('180 ml', 'grapefruit juice')], { juiceYields: YIELDS });
   assert.strictEqual(row.fruit.text, '1 grapefruit');
-  // 360 / 240 = 1.5 -> 2, and 360 / 180 = 2 -> 2. (480 does NOT collapse:
-  // it is 2 to 3, which is what this test asserted on its first run.)
+  // 360 / 240 = 1.5 -> 2, and 360 / 180 = 2 -> 2. 480 does not collapse: it is
+  // 2 to 3.
   const [two] = SL.build([ing('360 ml', 'grapefruit juice')], { juiceYields: YIELDS });
   assert.strictEqual(two.fruit.text, '2 grapefruits');
 });
@@ -326,9 +306,7 @@ test('with no yields passed at all, every total is still right', () => {
 });
 
 // --- per-drink quantities ------------------------------------------------------
-// Helen, 2026-09-04: "Per drink quantities, zomg yes please!" An entry's own
-// `glasses` wins; the global multiplier is the fallback, which is why it needed
-// no second code path.
+// An entry's own `glasses` wins; the global multiplier is the fallback.
 
 test('each entry can carry its own number of glasses', () => {
   const rows = SL.build([
@@ -363,9 +341,8 @@ test('per-drink counts scale an unquantified entry by drinks too', () => {
 });
 
 // --- declared bottle aliases ---------------------------------------------------
-// bottles.yml carries them for 77 bottles and the ingredient search already
-// reads them (#529). Case-folding cannot reach these: nothing about `ED3` says
-// `El Dorado 3` except that Helen wrote it down.
+// bottles.yml declares them (#529). Case-folding cannot reach these: nothing
+// about `ED3` says `El Dorado 3`.
 
 test('a declared alias collapses onto the canonical bottle', () => {
   const rows = SL.build([
@@ -384,10 +361,8 @@ test('each alternative of a list suggestion resolves on its own', () => {
 });
 
 test('the note names each bottle once, even when a suggestion was a list', () => {
-  // Real, on `lightly aged and filtered rum`: one drink says `Havana Club 3`,
-  // another says `El Dorado 3 or Havana Club 3`. Deduping the JOINED strings
-  // printed "Havana Club 3 / El Dorado 3 or Havana Club 3" — two bottles, one
-  // of them twice.
+  // One drink says `Havana Club 3`, another `El Dorado 3 or Havana Club 3`.
+  // Deduping the joined strings would name Havana Club 3 twice.
   const rows = SL.build([
     ing('30 ml', 'lightly aged and filtered rum', 'Havana Club 3'),
     ing('30 ml', 'lightly aged and filtered rum', ['El Dorado 3', 'Havana Club 3'])
@@ -424,11 +399,10 @@ test('no entries at all is an empty list, not a throw', () => {
   });
 });
 
-// --- #801: what the food shopping list needed the parser to learn -------------
-// Every case below is a real amount string out of _food_recipes/, and every one
-// returned null before #801 or lost part of itself on the way through. The last
-// test in this block is the important one: it is the claim that widening the
-// parser changed nothing at all for the drinks.
+// --- #801: the amounts the food recipes write ----------------------------------
+// Every case below is a real amount string out of _food_recipes/. The last test
+// in the block pins that the wider parser reads the drinks' amounts exactly as
+// before.
 
 test('vulgar fractions are numbers', () => {
   assert.deepStrictEqual(SL.parseAmount('½ tsp'), { quantity: 0.5, unit: 'tsp' });
@@ -444,14 +418,13 @@ test('a range keeps both ends', () => {
   assert.deepStrictEqual(SL.parseAmount('1–2'), { quantity: 1, unit: '', max: 2 });
   assert.deepStrictEqual(SL.parseAmount('1½–2 tsp'), { quantity: 1.5, unit: 'tsp', max: 2 });
   assert.deepStrictEqual(SL.parseAmount('¼–½ tsp'), { quantity: 0.25, unit: 'tsp', max: 0.5 });
-  // The word, as well as the dash -- thai-green-chicken-curry writes `~½ to 1`.
+  // The word, as well as the dash.
   assert.deepStrictEqual(
     SL.parseAmount('~½ to 1'), { quantity: 0.5, unit: '', max: 1, approx: true });
 });
 
 test('a hyphen inside a unit is not a range, and the unit survives', () => {
-  // classic-masala-chai's ginger, and sticky-oxtail-stew's tomatoes. A looser
-  // rule ate the hyphen and, worse, read the `400` as the top of a range.
+  // The hyphen stays in the unit, and `400` is not the top of a range.
   assert.deepStrictEqual(SL.parseAmount('2.5-cm piece'),
     { quantity: 2.5, unit: '-cm piece' });
   assert.deepStrictEqual(SL.parseAmount('2 x 400-g tins'),
@@ -475,8 +448,8 @@ test('a tilde is carried, not swallowed', () => {
 });
 
 test('an ordinary plural unit folds, and comes back for the page', () => {
-  // The ROUND TRIP is what matters: fold for the total, label for the page.
-  // `1 clove` and `3 cloves` of garlic were two lines of one bulb before this.
+  // The round trip is what matters: fold for the total, label for the page, so
+  // `1 clove` and `3 cloves` of garlic make one line.
   [['cloves', 'clove'], ['bunches', 'bunch'], ['handfuls', 'handful'],
     ['slices', 'slice'], ['inches', 'inch'], ['stalks', 'stalk'],
     ['x 400 g cans', 'x 400 g can']].forEach(function (pair) {
@@ -489,7 +462,7 @@ test('an ordinary plural unit folds, and comes back for the page', () => {
 test('a compound unit pluralises its last word, and leaves a symbol alone', () => {
   assert.strictEqual(SL.unitLabel('heaped tbsp', 2), 'heaped tbsp');
   assert.strictEqual(SL.unitLabel('large head', 2), 'large heads');
-  // Adjectives standing in for a noun have no plural: `8 mediums` was real.
+  // Adjectives standing in for a noun have no plural: never `8 mediums`.
   assert.strictEqual(SL.unitLabel('medium', 4), 'medium');
   assert.strictEqual(SL.unitLabel('small', 4), 'small');
   assert.strictEqual(SL.unitLabel('tsp', 3), 'tsp');
@@ -502,7 +475,6 @@ test('`ss` is never a plural', () => {
 });
 
 test('a bracket that restates the quantity is split off the unit', () => {
-  // chai-spice-powder and garam-masala-powder are written this way throughout.
   assert.deepStrictEqual(SL.splitParenthetical('tbsp (6 g)'),
     { unit: 'tbsp', lo: 6, hi: null, unit2: 'g' });
   assert.deepStrictEqual(SL.splitParenthetical('tbsp (9–10 g)'),
@@ -522,16 +494,15 @@ test('fractionText writes a number the way a cook would', () => {
   assert.strictEqual(SL.fractionText(1.5), '1½');
   assert.strictEqual(SL.fractionText(3 + 1 / 3), '3⅓');
   assert.strictEqual(SL.fractionText(2), '2');
-  // NOTATION, NOT ROUNDING -- Helen, 2026-09-07. 0.7 is not two thirds, and is
-  // never printed as one.
+  // Notation, not rounding: 0.7 is not two thirds, and is never printed as one.
   assert.strictEqual(SL.fractionText(0.7), '0.7');
 });
 
 test('NOTHING THE COCKTAILS COLLECTION WRITES PARSES DIFFERENTLY', () => {
-  // The claim that lets one parser serve both sites, written down so that the
-  // next widening has to prove it too. These are the shapes the 682 pours are
-  // actually in: plain decimals on the 2.5 ml grid, the counted units, the
-  // whole fruit, and the two phrases that are not quantities at all.
+  // What lets one parser serve both sites; the next widening has to keep it
+  // true. The shapes the drinks' amounts are in: plain decimals on the 2.5 ml
+  // grid, the counted units, the whole fruit, and the two phrases that are not
+  // quantities at all.
   const unchanged = {
     '45 ml': { quantity: 45, unit: 'ml' },
     '22.5 ml': { quantity: 22.5, unit: 'ml' },
@@ -557,16 +528,11 @@ test('NOTHING THE COCKTAILS COLLECTION WRITES PARSES DIFFERENTLY', () => {
   assert.strictEqual(SL.parseAmount('(rinse)'), null);
 });
 
-// --- a declared top is a volume, #746 -----------------------------------------
-// `(top) (x3)` was the honest answer while nothing had told this file how much
-// a top pours. `top_up_ml` in _data/cocktails/costs.yml now does, at Helen's
-// request -- "We can calculate top volumes, well, slightly, can't we -- I'd
-// like that to be captured actually so it can be added into the shopping list
-// feature." So this is reading a declared number, not inventing a conversion,
-// which is the same standing `juice_yields` has.
-//
-// THE REAL DECLARED VALUES, so a test failure means the behaviour moved rather
-// than the fixture.
+// --- a declared top is a volume (#746) -----------------------------------------
+// `top_up_ml` in _data/cocktails/costs.yml declares how much a top is, so this
+// reads a declared number rather than inventing a conversion, as `juice_yields`
+// does. The fixture copies the declared values, so a failure means the
+// behaviour moved rather than the fixture.
 
 const TOP_UPS = {
   champagne: { ml_min: 75, ml_max: 100 },
@@ -601,8 +567,8 @@ test('a fixed pour and a top on the same generic widen one total', () => {
 });
 
 test('a generic with no declared top keeps the count reading', () => {
-  // The honest fallback, and #746 asks for it explicitly. `tonic water` is not
-  // in `top_up_ml`, so nothing here knows how much it pours.
+  // `tonic water` is not in `top_up_ml`, so nothing here knows its volume
+  // (#746).
   const rows = SL.build([
     ing('(top)', 'tonic water'),
     ing('(top)', 'tonic water')
@@ -619,9 +585,8 @@ test('only a top phrase converts, however well declared the generic is', () => {
 });
 
 test('a topped line sorts by volume now it has one', () => {
-  // Before #746 a `(top)` line had no millilitres at all and fell into the
-  // alphabetical block below every measured pour. 300-450 ml of soda is one of
-  // the largest things on the list and now sorts like it.
+  // A top with a declared volume leaves the alphabetical block below the
+  // measured lines and sorts by its millilitres.
   const rows = SL.build([
     ing('45 ml', 'gin'),
     ing('(top)', 'soda water'),
@@ -661,15 +626,11 @@ test('an en dash, not a hyphen', () => {
   assert.ok(!rows[0].text.includes('-'), rows[0].text);
 });
 
-// --- what a line costs, #820, and what the list costs, #817 -------------------
-// GBP per litre, resolved at build time by _plugins/cocktail_costs.rb and handed
-// over as a table. This file multiplies and never resolves: every rule about
-// what a generic costs -- the union of declared bottles, `default_bottles`
-// narrowing it, a squeezed juice priced from fruit and yield -- lives in the
-// plugin, and a second copy here would be a second thing to keep in step.
-//
-// THE RATES ARE THE REAL ONES, checked against _data/cocktails/costs.yml on
-// 2026-09-08, so a failure means behaviour moved rather than a fixture drifting.
+// --- what a line costs (#820) and what the list costs (#817) -------------------
+// GBP per litre, resolved at build time by _plugins/cocktail_costs.rb and
+// handed over as a table. This file multiplies and never resolves: every rule
+// about what a generic costs lives in the plugin, and a second copy here would
+// be a second thing to keep in step.
 
 const RATES = {
   generics: {
@@ -699,8 +660,8 @@ test('a generic that spans a range prices as a range', () => {
 });
 
 test('the named bottles beat the generic when every one is priced', () => {
-  // #820: "a range where suggested bottles are a range". Two drinks naming two
-  // gins price cheapest to dearest across those two, not across the category.
+  // #820: two drinks naming two gins price cheapest to dearest across those
+  // two, not across the category.
   const rows = SL.build([
     ing('200 ml', 'London dry gin', 'Tanqueray'),
     ing('200 ml', 'London dry gin', 'Beefeater')
@@ -724,10 +685,9 @@ test('a generic with no rate carries no price, never a zero', () => {
   assert.strictEqual(rows[0].price, null);
 });
 
-// --- counted fruit and weighed solids, #748 ----------------------------------
-// Helen, 2026-09-06: "Price whole fruit and weighed solids." The plugin hands
-// over two more maps, per piece and per kilo; this file multiplies them the
-// way it multiplies the litres. The figures are costs.yml's on 2026-09-24.
+// --- counted fruit and weighed solids (#748) -----------------------------------
+// The plugin hands over two more maps, per piece and per kilo; this file
+// multiplies them the way it multiplies the litres.
 
 const SOLID_RATES = {
   generics: { 'lime juice': [6.0, 15.0] },
@@ -762,22 +722,17 @@ test('a weighed solid is priced per kilo from the weight table', () => {
 });
 
 test('a counted or weighed line with no row stays unpriced', () => {
-  // A dozen sugar cubes in a punch are still a flourish: no `fruit` row for
-  // `sugar cube`, so no price and no zero, exactly as before #748.
+  // No `fruit` row for `sugar cube`, so no price and no zero.
   const rows = SL.build([ing('12 cubes', 'sugar cube')], { rates: SOLID_RATES });
   assert.strictEqual(rows[0].price, null);
-  // "12 cubes" until #1132: the row printed "12 cubes sugar cube". The unit is
-  // still on the total; it is only the printed text that lost it.
+  // The printed text drops the unit the name repeats (#1132); the total keeps
+  // it.
   assert.strictEqual(rows[0].text, '12');
   assert.strictEqual(rows[0].totals[0].unit, 'cube');
 });
 
-// -----------------------------------------------------------------------------
-// #1132 -- "1 cube sugar cube". Helen's whole report was that line. The amount
-// and the generic are each right; printing them side by side said the word
-// twice. Every pour below is a real one, from the survey of both collections
-// on 2026-10-04 (9 of 765 pours read wrongly, and these are the shapes).
-// -----------------------------------------------------------------------------
+// --- #1132: a unit the name already says is not printed twice ------------------
+// Every amount below is a real one, out of one of the two collections.
 
 test('#1132: a unit the name already says is not printed, and the name takes its plural', () => {
   // classic-champagne-cocktail
@@ -849,7 +804,7 @@ test('#1132: a row with two totals keeps its name, and each amount its own rule'
 });
 
 test('the old rate tables, with no fruit or weight map, still price volumes only', () => {
-  // Every caller before #748 handed over {generics, bottles} and nothing else.
+  // A rate table of {generics, bottles} and nothing else is still valid.
   const rows = SL.build([ing('1 whole', 'pear'), ing('500 ml', 'lime juice')],
                         { rates: RATES });
   assert.strictEqual(byLabel(rows, 'pear').price, null);
@@ -915,10 +870,8 @@ test('moneyText collapses when the ends meet, and always shows pennies', () => {
 });
 
 // --- shelf order, #848 --------------------------------------------------------
-// Helen, 2026-09-08: "for cocktail shopping list, list items in shelf order then
-// volume", with her own nine shelves. The order is a walk round the shop, so it
-// is the OUTER sort key; the descending-volume rule she gave on 2026-09-04 is
-// unchanged and now orders within a shelf.
+// The order is a walk round the shop, so the shelf is the outer sort key;
+// descending volume orders within a shelf.
 
 const SHELVES = {
   order: ['spirits', 'fortified', 'liqueurs', 'freshly squeezed fruit juice',
@@ -981,8 +934,7 @@ test('an unfiled generic carries a null shelf, not a guess', () => {
 });
 
 test('no shelves at all leaves the 2026-09-04 volume order alone', () => {
-  // The guarantee that made this safe to land: every pre-#848 caller and test
-  // describes what it always did.
+  // Absent the option, the order is volume alone.
   const rows = SL.build([
     ing('30 ml', 'London dry gin'),
     ing('600 ml', 'soda water')
@@ -991,8 +943,7 @@ test('no shelves at all leaves the 2026-09-04 volume order alone', () => {
 });
 
 test('no topUpMl at all leaves every existing answer alone', () => {
-  // The guarantee that made this change safe to land: absent the option, this
-  // file behaves exactly as it did before #746.
+  // Absent the option, a top stays a count with no millilitres (#746).
   const rows = SL.build([
     ing('(top)', 'champagne'),
     ing('(top)', 'champagne')
@@ -1001,18 +952,13 @@ test('no topUpMl at all leaves every existing answer alone', () => {
   assert.strictEqual(rows[0].millilitres, 0);
 });
 
-// =============================================================================
-// THE GOLDEN FILE BOTH LANGUAGES READ -- #1199
-// =============================================================================
+// --- the golden file both languages read (#1199) -------------------------------
 // tests/fixtures/amounts.json holds every distinct amount a published drink
 // writes, with what `_plugins/amount.rb` reads and what `parseAmount` reads.
-// tests/test_amount_parser.py runs the Ruby side over the same rows and checks
-// that wherever both read a number it is the same number. This is the other
-// half: `parseAmount` still reads each row as the file says it does.
-//
-// The two grammars differ on purpose (this one folds `dashes` to `dash`, reads
-// a bare `15` as a count and `half` as 0.5), and the rows record that rather
-// than hide it.
+// tests/test_amount_parser.py runs the Ruby side over the same rows; this is
+// the other half. The two grammars differ on purpose (this one folds `dashes`
+// to `dash`, reads a bare `15` as a count and `half` as 0.5), and the rows
+// record that rather than hide it.
 test('parseAmount reads every amount in the shared fixture as the fixture says', () => {
   const fs = require('node:fs');
   const path = require('node:path');

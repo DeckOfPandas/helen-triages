@@ -1,31 +1,17 @@
 """Tests about the tests.
 
-One failure mode has now bitten this codebase five times, and it is the only
-one whose symptom is GREEN: a test that cannot fail, because the thing it
-scans came back empty and it treated "found nothing" as "nothing wrong".
-MANUAL.md §12 lists the first four -- a stale JS_DIR, a non-recursive
-SCSS glob, a method_groups key typo that made every prose test see zero steps,
-and a link shape no regex considered. The fifth was written on 2026-08-14 by
-someone who had just read that section, in a commit fixing a bug caused by not
-checking, and was only caught because breaking a new guard on purpose is house
-practice here.
-
-The house answer to it already exists and is used in several places:
-`assert js_files`, `assert found_any`, `assert svgs`,
-test_sass_files_are_actually_found. Assert the corpus is non-empty BEFORE
-asserting the property of it.
-
-What was missing is the sharper form of the same rule, which is what this file
-enforces:
+The failure this file guards has a green symptom: a test that cannot fail,
+because the thing it scans came back empty and it read "found nothing" as
+"nothing wrong" (MANUAL §12). The rule, which has no other enforcement:
 
     NEVER `return` EARLY BECAUSE A SCAN CAME BACK EMPTY.
     Assert it is non-empty instead, with a message saying what to do if the
     emptiness turns out to be legitimate.
 
-An early return LOOKS reasonable -- "nothing to check, so nothing to fail" --
-and it is exactly how a test stops testing without anyone noticing. An assert
-in the same place costs nothing when the corpus is healthy and is loud on the
-day it is not.
+Assert the corpus is non-empty before asserting the property of it. An early
+return looks reasonable -- "nothing to check, so nothing to fail" -- and is how
+a test stops testing unnoticed. An assert in the same place costs nothing when
+the corpus is healthy and is loud on the day it is not.
 """
 from __future__ import annotations
 
@@ -35,18 +21,14 @@ import re
 
 import pytest
 
-# Suite marker, so `pytest -m shared` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.shared
 
 TESTS_DIR = pathlib.Path(__file__).resolve().parent
 
-# A test parametrised per recipe/draft (see conftest.pytest_generate_tests) may
-# legitimately return early: "this recipe has no internal_temp_ref, nothing to
-# check HERE" is fine, because the other ~80 parametrisations still exercise
-# the predicate. The dangerous case is a whole-corpus scan, where one early
-# return silences the entire check.
+# A test parametrised per item (conftest.pytest_generate_tests) may return
+# early: "this recipe has no internal_temp_ref" is fine, because the other
+# parametrisations still exercise the predicate. The dangerous case is a
+# whole-corpus scan, where one early return silences the entire check.
 PER_ITEM_FIXTURES = {"recipe", "draft", "magic_bag"}
 
 
@@ -64,19 +46,10 @@ SUITE_MARKERS = {"food", "cocktails", "shared"}
 def test_every_test_module_declares_a_suite_marker():
     """Every tests/test_*.py sets `pytestmark = pytest.mark.<suite>`.
 
-    THE FAILURE MODE IS A SILENT OMISSION, which is this file's whole subject.
-    `pytest -m food` and `pytest -m cocktails` exist so that Helen's in-progress
-    food QA and the cocktails work do not mask each other -- a red half hides a
-    real regression in the other half. But an UNMARKED module is deselected by
-    every filtered run: it reports nothing, fails nothing, and looks exactly
-    like a module with no problems.
-
-    So the marker is not optional bookkeeping. A new test file without one is
-    invisible to the only commands anyone actually runs day to day.
-
-    Checked by reading the source rather than by asking pytest, because pytest
-    can only tell us about markers on tests it has already collected -- which is
-    the same circularity as asking a deselected test whether it ran.
+    An unmarked module is deselected by every `pytest -m food` or
+    `pytest -m cocktails` run: it reports nothing and looks like a module
+    with no problems. Checked by reading the source, because pytest only
+    knows the markers of tests it has already collected.
     """
     missing = []
     checked = 0
@@ -108,16 +81,12 @@ def test_every_test_module_declares_a_suite_marker():
 def test_no_whole_corpus_test_can_return_early():
     """A corpus-scanning test must assert its corpus is non-empty, not return.
 
-    NOT EXHAUSTIVE, and worth knowing where the edge is: this sees a bare
-    `return` in a test that is not parametrised per recipe/draft. It cannot
-    see the subtler variant, where a PER-ITEM test returns early because a
-    shared REFERENCE set is empty -- test_accents_in_prose did exactly that
-    until 2026-08-14 (`if not words: return`, which would have silenced the
-    accent rule across every recipe at once if accented_words.yml ever lost
-    its `words:` key). Both were fixed to assert; only one shape is guarded
-    automatically. If you are writing an early return of any kind in a test,
-    the question to ask is "empty because THIS item has nothing, or empty
-    because the check itself has nothing?"
+    Not exhaustive: this sees a bare `return` in a test that is not
+    parametrised per item. It cannot see a per-item test returning early
+    because a shared reference set is empty (`if not words: return`), which
+    silences the rule across every recipe at once. Before writing any early
+    return in a test, ask: empty because this item has nothing, or empty
+    because the check itself has nothing?
     """
     offenders = []
     checked = 0
@@ -145,20 +114,12 @@ def test_no_whole_corpus_test_can_return_early():
     )
 
 
-# =============================================================================
-# THE PRIVATE DRAFTS ARE NOT IN CI — GitHub issue #378
-# =============================================================================
+# --- the private drafts are not in CI (#378) ----------------------------------
 # `_food_drafts/` is a separate private repository, gitignored here, so a CI
-# checkout has the ~82 published recipes and none of the ~290 drafts. Every test
-# that reads drafts therefore examines a fraction of the collection in CI, and
-# because they are all offender-list shaped they find fewer offenders and report
-# GREEN rather than failing. Same failure mode as the rest of this file, arriving
-# by a different route: not a scan that matched nothing, but a corpus that was
-# never delivered.
-#
-# The two registries below are the point. Every draft-reading test must be in
-# one, so that "what happens to this check in CI" is a decision somebody made
-# rather than something nobody noticed.
+# checkout has the published recipes and none of the drafts. A test that reads
+# drafts finds fewer offenders there and reports green.
+# Every draft-reading test must be in one of the two registries below, so that
+# what happens to it in CI is a decision somebody made.
 
 # Reads drafts ONLY. With none present there is nothing to examine, so it skips
 # with a reason -- which shows in the run as "did not run" rather than "checked
@@ -176,18 +137,13 @@ PARTIAL_IN_CI = {
     "test_no_main_ingredient_spelling_collisions",
     "test_no_recipe_uses_the_retired_instructions_field",
     # Reads the published half from this repo's history and the draft half from
-    # _food_drafts/'s own. In CI the second half is absent, so it checks the 82
-    # recipes and none of the 314 drafts -- and the drafts are where the risk
-    # actually lives, since tidy-up passes happen there. Kept running anyway:
-    # the published half is the half that ships. See its docstring.
+    # _food_drafts/'s own. In CI it checks the recipes and none of the drafts,
+    # which is where tidy-up passes happen. See its docstring.
     "test_no_agent_commit_claims_helens_rewrite",
-    # #711's staleness guard. It sweeps recipes, drafts and the magic bag for
-    # the notes NOTE_EXCEPTIONS claims to exempt. In CI the drafts are absent,
-    # so an exemption naming a DRAFT's note would look stale and the test would
-    # fail -- except that the one declared entry names a published recipe, which
-    # CI does have. Kept running for that reason: the check is real in CI for
-    # every exemption that matters, and an entry pointing at a draft would be
-    # caught locally, where the drafts pass that created it was run.
+    # Sweeps recipes, drafts and the magic bag for the notes NOTE_EXCEPTIONS
+    # exempts (#711). In CI an exemption naming a draft's note would look stale
+    # and fail; it keeps running because the declared exemption names a
+    # published recipe.
     "test_no_note_exception_is_stale",
 }
 
@@ -198,17 +154,10 @@ def _function_source(path, node):
 
 
 def _calls_pytest_skip(node):
-    """Does this function actually call pytest.skip()?
+    """Does this function call pytest.skip()?
 
-    ASKED OF THE SYNTAX TREE, NOT OF THE TEXT, and that is the whole point. The
-    first version asked whether the word "skip" appeared in the source, and
-    every test whose DOCSTRING explains that it deliberately does not skip
-    answered yes. Two of the five classified themselves wrong on their own prose.
-
-    Fourth instance in one session of a source-scanning check being defeated by
-    the writing around the code (see the note in the test below). An AST cannot
-    be fooled by a comment, which is the reason to reach for it here rather than
-    add another exclusion to a regex.
+    Asked of the syntax tree, not the text: a test whose docstring explains
+    that it deliberately does not skip contains the word too.
     """
     for child in ast.walk(node):
         if not isinstance(child, ast.Call):
@@ -221,54 +170,27 @@ def _calls_pytest_skip(node):
 
 
 def test_every_draft_reading_test_says_what_it_does_without_drafts():
-    """A test that reads `_food_drafts/` must declare what it does in CI.
+    """A test that reads `_food_drafts/` must declare what it does in CI (#378).
 
-    Issue #378 found four checks quietly scanning a third of the collection in
-    CI and passing. Fixing those four is the small half; the large half is that
-    a FIFTH could be written tomorrow and join them silently, because nothing
-    about writing `for draft in ALL_DRAFTS` tells you the list is empty on the
-    machine that gates the deploy.
+    The list is generated from the code -- every test function whose source
+    names ALL_DRAFTS -- and each must be in SKIPS_WITHOUT_DRAFTS or
+    PARTIAL_IN_CI. A test taking the `draft` fixture is exempt: pytest reports
+    an empty parametrisation as a skip already.
 
-    So this generates the list from the code -- every test function referencing
-    ALL_DRAFTS -- and requires each to be classified. MANUAL §12's lesson from
-    the filter-state sweep, applied: when a generated test keeps missing the same
-    bug, generate the next one from the other end. The other end here is the
-    source, not a list somebody maintains.
-
-    Adding a draft-reading test means adding its name to one of the two sets
-    above, which is thirty seconds and forces the question.
-
-    PER-DRAFT TESTS ARE EXEMPT and need no entry: a test taking the `draft`
-    fixture is parametrised over ALL_DRAFTS by conftest.pytest_generate_tests,
-    and an empty parametrisation is reported by pytest as a skip already. They
-    are the 51 skips a CI-shaped run shows. Visible without help.
-
-    WHAT THIS CANNOT SEE, said plainly rather than left to be discovered: a test
-    that reaches drafts through a module-level name derived from ALL_DRAFTS
-    (test_drafts.py's `_ALL_SLUGS` is the live example) rather than naming it
-    directly. That one happens to be per-draft and so exempt anyway, but a
-    future non-parametrised consumer of such a name would slip past. Widening
-    this to follow module-level derivations is possible and was not done for a
-    single hypothetical.
+    Not seen: a test that reaches drafts through a module-level name derived
+    from ALL_DRAFTS (test_drafts.py's `_ALL_SLUGS`) rather than naming it. That
+    one is per-draft and so exempt, but a non-parametrised consumer of such a
+    name would slip past.
     """
     unclassified = []
     miscategorised = []
     found = set()
 
     for path, node in _test_functions():
-        # THIS FILE IS EXCLUDED, and the reason is funny enough to be worth
-        # recording: the first version of this test failed on ITSELF. A test
-        # about draft-reading tests necessarily writes the corpus name in its own
-        # docstring and in the line that looks for it, so it detected itself as
-        # an unclassified draft-reading test.
-        #
-        # Third time in one session that prose defeated a source-scanning check
-        # -- the destructive-git hook refused its own introducing commit, the
-        # picker guard counted a flag named in a comment, and now this. The
-        # pattern is not a coincidence: a guard's own text is where its subject's
-        # vocabulary is densest. Excluding this module is the honest fix (it
-        # reads no drafts), and the two assertions at the bottom stop that
-        # exclusion from quietly hollowing the check out.
+        # This file is excluded: a test about draft-reading tests names the
+        # corpus in its own docstring and code, and would detect itself. It
+        # reads no drafts, and the assertions on `found` and `stale` below
+        # stop the exclusion from hollowing the check out.
         if path.name == "test_suite_hygiene.py":
             continue
         source = _function_source(path, node)
@@ -315,10 +237,8 @@ def test_every_draft_reading_test_says_what_it_does_without_drafts():
         + "\n\nThe registries are only worth having if they are true."
     )
 
-    # THE SCAN ITSELF, asserted rather than trusted -- this file's whole subject.
-    # Excluding a module above is exactly the sort of edit that can turn a real
-    # check into a vacuous one, and "found nothing, so nothing was wrong" is the
-    # failure this file exists to prevent.
+    # The scan itself is asserted, not trusted: excluding a module above is
+    # the kind of edit that can turn a real check into a vacuous one.
     assert found, (
         "No draft-reading tests were found anywhere. Either they were all "
         "removed, or the scan has stopped matching -- and an empty scan passes "
@@ -334,21 +254,11 @@ def test_every_draft_reading_test_says_what_it_does_without_drafts():
     )
 
 
-# =============================================================================
-# THE AGGREGATE CAVEAT — conftest's end-of-run report, 2026-09-22
-# =============================================================================
-# The registries above work test by test. What none of them can show is how
-# much of the corpus a run never opened: a per-file test produces NO TESTS AT
-# ALL when the files are absent, so the run gets quieter rather than noisier
-# and the skip count FALLS as coverage collapses.
-#
-# Helen ruled out the obvious fix. Asked whether a test should FAIL when the
-# drafts are missing: "I don't want to run tests locally with the expectation
-# that some will fail, because a suite with failures starts to get ignored...
-# plus it's very annoying." So conftest REPORTS instead, and what is pinned
-# here is that the report is honest in both directions -- it must say so when
-# the drafts are missing, and must be silent when they are not. A caveat
-# printed on every run is noise, and noise is ignored exactly like a failure.
+# --- the aggregate caveat: conftest's end-of-run report ------------------------
+# The registries work test by test; none can show how much of the corpus a run
+# never opened. conftest reports it rather than failing (DECISIONS §11). Pinned
+# here: the report says so when the drafts are missing and is silent when they
+# are not, because a caveat printed on every run is ignored like a failure.
 
 def test_the_drafts_caveat_is_silent_when_both_clones_are_present(tmp_path):
     import conftest
@@ -404,13 +314,9 @@ def test_the_drafts_caveat_can_never_turn_a_run_red(tmp_path):
         conftest.DRAFTS_DIR, conftest.COCKTAIL_DRAFTS_DIR = original
 
 
-# =============================================================================
-# THE BROWSER SMOKE TEST -- a skip that could happen forever (#1200, 2026-09-29)
-# =============================================================================
-# test_browser_smoke.py skips whenever Chromium cannot launch, which is every
-# CI run until the workflow installs a browser. Two things keep that honest,
-# the same two the drafts have: the skip is DECIDED in one place, and the run
-# SAYS it happened. Both are pinned here.
+# --- the browser smoke test's skip (#1200) --------------------------------------
+# test_browser_smoke.py skips whenever Chromium cannot launch. Two things keep
+# that honest: the skip is decided in one place, and the run says it happened.
 
 class _Lines:
     def __init__(self):
@@ -451,13 +357,13 @@ def test_the_browser_caveat_is_silent_when_the_smoke_test_ran():
 
 
 def test_every_browser_test_goes_through_the_launch_probe():
-    """Skip on whether Chromium LAUNCHES, never on whether playwright IMPORTS.
+    """Skip on whether Chromium launches, never on whether playwright imports.
 
-    CI installs the binding and no browser, so an import skip there runs, fails
-    to launch, and gates the deploy -- the expected-to-fail arrangement Helen
-    ruled out on 2026-09-20 (DECISIONS §10). The `chromium` fixture is the one
-    probe; every test in the module must ask for it, and nothing in the suite
-    may importorskip playwright instead.
+    Where the binding is installed and no browser is, an import skip does not
+    skip: the test runs, fails to launch and gates the deploy, and no test is
+    expected to fail (DECISIONS §10). The `chromium` fixture is the one probe;
+    every test in the module asks for it, and nothing in the suite may
+    importorskip playwright.
     """
     smoke = TESTS_DIR / "test_browser_smoke.py"
     tests = [n for p, n in _test_functions() if p == smoke]

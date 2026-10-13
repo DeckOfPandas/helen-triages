@@ -1,29 +1,13 @@
 """requirements-test.txt is the single source; the Dockerfile's copy must agree.
 
-WHY THE DUPLICATION EXISTS AND IS NOT GOING AWAY. `.devcontainer/Dockerfile`
-installs the Python test dependencies by hand instead of `COPY
-requirements-test.txt`, because its build context is `.devcontainer/` itself,
-not the repo root, so the file is not reachable from the build.
+`.devcontainer/Dockerfile` repeats the pins by hand because it cannot `COPY
+requirements-test.txt`: its build context is `.devcontainer/`, not the repo
+root. The narrow context has to stay, because the image stamp (#1180) hashes
+every file in the context, and with the repo as context editing a recipe would
+rebuild the container. So the two copies are held together by this test (#1203).
 
-#1203 asked for "pin exact versions in one file and have the Dockerfile read
-it". The second half cannot be done the obvious way: widening the build context
-to the repo root would break the image stamp (#1180), which hashes every file in
-the context to decide whether to rebuild -- with the repo as context, editing a
-recipe would trigger a container rebuild. The narrow context is load-bearing.
-
-So the fix is the other shape, and this repository already has the precedent two
-blocks up in that same Dockerfile: the Playwright version is pinned there AND in
-`scripts/browser/install.sh`, and `tests/test_browser_harness.py` fails if they
-differ. A "keep in sync by hand" comment is a hope. A test is the sync.
-
-WHAT DRIFTED, MEASURED 2026-09-28. Both files said `>=`, not `==`:
-`requirements-test.txt` said `pytest>=8.0` and `PyYAML>=6.0`, and the Dockerfile
-repeated those floors. So CI installed whatever was newest on the day it ran,
-the image installed whatever was newest when it was last built, and the two
-could differ indefinitely with nothing noticing. The image in use carried pytest
-9.1.1 under a floor of 8.0, and no file anywhere recorded the version the suite
-was actually green on. A floor says "at least this works"; a pin says "this
-works", and only the second is a fact somebody measured.
+Exact pins, not floors: with `>=`, CI and the image each install whatever is
+newest on the day, and no file records the version the suite is green on.
 """
 from __future__ import annotations
 
@@ -79,8 +63,8 @@ def test_requirements_are_all_exact_pins():
 
 
 def test_the_image_installs_what_this_file_pins():
-    """THE POINT OF THE FILE. If these disagree, a green suite in the container
-    says nothing about a green suite in CI, and vice versa."""
+    """If these disagree, a green suite in the container says nothing about a
+    green suite in CI, and vice versa."""
     required = _required()
     installed = _dockerfile_pins()
 
@@ -120,18 +104,11 @@ def test_ci_installs_from_the_requirements_file_rather_than_its_own_list():
 
 
 def test_every_way_of_starting_the_container_names_one_bundle_cache():
-    """#1203: there were TWO bundle-cache volume names, so which one got used --
-    and therefore whether `bundle install` had to run from scratch -- depended on
-    how the container was started. `devcontainer.json` said
-    `helen-triages-bundle-cache`; `run.sh` said
-    `helen-triages-bundle-cache-helen-triages`.
+    """`devcontainer.json` and the README name the bundle-cache volume `run.sh`
+    assigns, and no other (#1203).
 
-    The README made it worse by claiming `devcontainer.json` is "set up to match
-    Phase 1 above (same volumes, same env)", which was not true. Aligned onto
-    `run.sh`'s name rather than the shorter one, because run.sh is the primary
-    path in the README and its volume is the populated one; the VS Code path
-    already runs `bundle install` as its `postCreateCommand`, so it refills for
-    free.
+    With two names, which cache is used, and so whether `bundle install` runs
+    from scratch, depends on how the container was started.
     """
     run_sh = (ROOT / ".devcontainer" / "run.sh").read_text(encoding="utf-8")
     declared = re.search(r"^BUNDLE_VOLUME=(\S+)", run_sh, re.M)
@@ -156,13 +133,12 @@ def test_every_way_of_starting_the_container_names_one_bundle_cache():
 
 
 def test_the_container_and_ci_agree_on_a_node_major():
-    """#1203: the container installed Node 22 while CI's setup-node said 24, so
-    the JS suite ran on two majors -- one of them in the gate that decides
-    whether the site deploys -- for weeks with no difference showing. That is
-    luck, and the version a test passed under is part of what the pass means.
+    """The container and CI run the JS suite on one Node major (#1203): the
+    version a test passed under is part of what the pass means, and CI's run
+    gates the deploy.
 
-    Read as MAJORS, because the two sources cannot express the same precision:
-    NodeSource ships a `setup_24.x` script and setup-node takes `"24"`.
+    Read as majors, because the two sources cannot express the same precision:
+    NodeSource ships a `setup_NN.x` script and setup-node takes `"NN"`.
     """
     docker = re.search(r"deb\.nodesource\.com/setup_(\d+)\.x",
                        DOCKERFILE.read_text(encoding="utf-8"))

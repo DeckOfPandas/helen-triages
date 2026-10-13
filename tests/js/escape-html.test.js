@@ -1,22 +1,14 @@
-// =============================================================================
-// Tests for HTF.escapeHtml in assets/js/assets.js — GitHub issue #686.
+// Tests for HTF.escapeHtml in assets/js/assets.js (#686).
 //
 // Run from the repo root, with the local Node runtime:
 //
 //   .node-runtime/node/bin/node --test tests/js/*.test.js
 //
-// See tests/js/ingredient-search.test.js for why not the system node, and
-// tests/js/stub-dom.js for why this file loads assets.js through a fake page
-// instead of requiring it.
+// tests/js/stub-dom.js says why assets.js is loaded through a fake page.
 //
-// WHY THIS FILE EXISTS. The function was written twice — filters.js for a
-// recipe title's matched run, cocktail-index.js for a drink name's — and both
-// copies were untested, because both were buried inside a file full of DOM
-// wiring where the only way to ask them a question was to type into a search
-// box in a browser. Escaping is exactly the kind of thing that goes wrong
-// silently: get the order wrong and `<` becomes `&amp;lt;`, which does not
-// throw, does not warn, and only shows up as literal `&lt;` on the page.
-// =============================================================================
+// Escaping goes wrong silently: get the order wrong and `<` becomes
+// `&amp;lt;`, which neither throws nor warns and shows as literal `&lt;` on
+// the page.
 'use strict';
 
 const test = require('node:test');
@@ -48,9 +40,6 @@ test('both quote characters, so the same call is safe in an attribute', () => {
 });
 
 test('the ampersand is escaped FIRST, so an escape is not escaped twice', () => {
-  // The ordering bug this function is most likely to acquire: replace `<`
-  // before `&` and this comes out as `&amp;lt;`, which renders as the literal
-  // text "&lt;" rather than as a less-than sign.
   assert.strictEqual(HTF.escapeHtml('&amp;'), '&amp;amp;');
   assert.strictEqual(HTF.escapeHtml('a & b < c'), 'a &amp; b &lt; c');
 });

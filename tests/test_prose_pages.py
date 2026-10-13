@@ -1,31 +1,17 @@
 """House typography on the pages that are NOT recipes. GitHub issue #413.
 
 tests/test_style.py's typography rules are parametrised over the recipe
-fixture, so until this file existed the about page, both index pages and the
-two reference pages had no typography coverage at all -- and the about page is
-the most-read prose on the site after the recipes themselves. #376 found
-"But more importantly -- and please hear me when I say this --" sitting three
-paragraphs from a real em dash on that page. Nothing failed, because that page
-is not a recipe.
+fixture, so without this file the about page, the index pages and the
+reference pages have no typography coverage.
 
-WHAT IS PORTED AND WHAT IS NOT. This is a porting exercise with judgement in
-it, not a copy of test_style.py. Ported: em dash, Unicode fractions, degree
-signs, house spellings, accents, and no ampersand in a title. Deliberately NOT
-ported, because they are recipe-shaped and would be wrong here:
+Ported from test_style.py: em dash, Unicode fractions, degree signs, house
+spellings, accents, and no ampersand in a title. Not ported, because they are
+recipe-shaped: `mins`/`hours` time formats (the reference tables write
+"3 hrs" and "39 min/kg" in compact cells), fan-oven wording and `Estimated N
+mins`, and markdown link shapes (these pages link with <a href>).
 
-  - `mins`/`hours` prose time formats. The reference tables write "3 hrs" and
-    "39 min/kg" in compact table cells, where the recipe convention is not the
-    house style. 17 hits, every one of them fine as written.
-  - fan-oven wording and `Estimated N mins`, which describe a recipe's own
-    metadata and have no counterpart on a prose page.
-  - markdown link shapes (wikilinks, reversed brackets). These pages link with
-    <a href>; the markdown rules have nothing to bite on.
-
-TWO SURFACES, because the pages' words do not all live in the pages. The
-reference pages render most of their prose out of _data/food/*.yml -- the
-paragraphs around each timing table, the covering instructions, the sourcing
-notes. Checking only the .html would have found 0 of the 4 real violations
-that were actually there.
+Two surfaces are checked, because the reference pages render most of their
+prose out of _data/food/*.yml and not out of the .html.
 """
 import re
 
@@ -40,14 +26,9 @@ pytestmark = pytest.mark.shared
 
 # --- what counts as a prose page ---------------------------------------------
 #
-# DISCOVERED, NOT LISTED. A hard-coded list of pages is exactly how coverage
-# stops reaching -- the page nobody adds to the list is the page nobody checks,
-# which is the whole complaint behind this issue. Anything the site publishes
-# under these roots is checked the day it appears.
-#
-# _dev/ is excluded because it is a scratch harness that never ships, and
-# _site/, _site_prod/ and tmp/ because they are build output and scratch: the
-# same words twice over, reported at a path nobody edits.
+# Discovered, not listed: the page nobody adds to a list is the page nobody
+# checks. _dev/ is excluded because it never ships; _site/, _site_prod/ and
+# tmp/ because they are the same words again at a path nobody edits.
 PAGE_ROOTS = (".", "food", "cocktails")
 SKIP_DIRS = {"_site", "_site_prod", "tmp", "_dev", "node_modules", ".git",
              "_food_recipes", "_food_drafts", "_cocktail_drafts"}
@@ -69,13 +50,10 @@ PROSE_PAGES = _prose_pages()
 
 # The reference pages' own words, which live in data rather than in the page.
 #
-# NAMED RATHER THAN GLOBBED, and this one really does have to be a list. Walking
-# every file under _data/ was tried and measured: it reports `category--star`
-# from filter_sections.yml as a missing em dash (it is a BEM class name), and 18
-# more from the rationale prose in the two taxonomy files, which documents why a
-# mood exists and renders nowhere. These two files are different in kind -- they
-# are content, every string in them is destined for a page, and walking them
-# whole produced no false positives at all.
+# Named rather than globbed, and this one has to be a list: walking all of
+# _data/ reports BEM class names (`category--star`) as missing em dashes, and
+# rationale prose that renders nowhere. Every string in these two files is
+# destined for a page.
 REFERENCE_DATA = ("food/cooking_methods.yml", "food/internal_temperatures.yml")
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---\n", re.S)
@@ -89,20 +67,13 @@ ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 
 
 def visible_text(raw: str) -> str:
-    """The words a reader actually sees, and nothing else.
+    """The words a reader sees, and nothing else.
 
-    THE FRONT MATTER IS DROPPED WHOLE, not comment-stripped. On these pages it
-    is pure configuration -- layout, permalink, site_key -- wrapped in long `#`
-    comments explaining the configuration, and those comments are written in
-    Helen's prose voice, ASCII dashes and all. Scanning them found 11 hits on
-    about.html against 2 real ones: a check that is 85% noise is a check people
-    learn to ignore. `title:` is pulled back out separately below, because it is
-    the one front matter field that reaches the reader.
-
-    Liquid and HTML comments go for the same reason. <script> and <style> go
-    because they are code -- and because cooking-methods-and-timings.html
-    serialises a 60 KB JSON blob of the data file into a <script>, which would
-    otherwise be scanned here AND again as data, reporting everything twice.
+    The front matter is dropped whole: on these pages it is configuration and
+    `#` comments with ASCII dashes, which would all be false hits. `title:`,
+    the one field that reaches the reader, is read by `page_title`. Liquid and
+    HTML comments go for the same reason; <script> and <style> are code, and a
+    reference page's <script> holds the data file again as JSON.
     """
     raw = FRONT_MATTER.sub("", raw)
     for pattern in (LIQUID_COMMENT, HTML_COMMENT, SCRIPT_OR_STYLE):
@@ -122,11 +93,6 @@ def page_title(raw: str) -> str:
 
 
 # --- the rules ---------------------------------------------------------------
-#
-# The en-dash rule is shared with test_style.py rather than restated here, so
-# the two surfaces cannot drift into disagreeing about what a range looks like.
-# Helen reviewed the recipe backlog line by line on 2026-08-21 and cleared it;
-# these pages and the reference data were already clean.
 TYPOGRAPHY = [
     ("slash fractions",
      r"(?<![\d/])(?:1/2|1/4|3/4|1/3|2/3|1/8|3/8|5/8|7/8)(?![\d/])",
@@ -167,12 +133,11 @@ def _typography_problems(text):
 
 
 def test_there_are_prose_pages_to_check():
-    """A discovery bug here reports a confident green having read nothing.
+    """A discovery bug would report green having read nothing.
 
-    PAGE_ROOTS and SKIP_DIRS between them could silently exclude everything --
-    a renamed directory, a glob that stopped matching -- and every parametrised
-    test below would then simply not exist. Pytest does not fail on an empty
-    parametrise; it says nothing at all.
+    If PAGE_ROOTS and SKIP_DIRS between them exclude everything, every
+    parametrised test below does not exist, and pytest does not fail on an
+    empty parametrise.
     """
     assert len(PROSE_PAGES) >= 6, (
         f"only found {len(PROSE_PAGES)} prose page(s): "
@@ -233,10 +198,9 @@ def _data_strings(node, path=""):
 def test_reference_data_prose_typography(name):
     """The reference pages' words mostly live in _data, so check them there.
 
-    EVERY STRING, not a list of prose-bearing keys. A key list is a guess about
-    which fields reach a reader, and it was wrong the first time it was tried:
-    `covering` (a table cell) held three of the four violations this test found
-    on its first run, and would not have been on anyone's list of prose fields.
+    Every string, not a list of prose-bearing keys: a key list is a guess
+    about which fields reach a reader, and a table cell such as `covering`
+    would not be on it.
     """
     path = ROOT / "_data" / name
     data = yaml.safe_load(path.read_text(encoding="utf-8"))

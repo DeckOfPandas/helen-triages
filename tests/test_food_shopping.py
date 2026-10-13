@@ -4,21 +4,12 @@
 people a recipe feeds is in the RECIPE, in `serves:` or, where that does not
 state a number, in `serves_estimate:`. `_plugins/food_shopping.rb` reads both.
 
-**`_data/food/servings.yml` was deleted by #815.** It held the estimates for
-the 44 published recipes for a fortnight, and was the right shape while the
-question was "can we avoid un-proofreading half the collection". Helen answered
-that directly — she would review the numbers line by line and move
-`BASELINE_COMMIT` — which removed the only reason for a second home for the
-figure. One home now, beside the words it estimates from.
-
-WHAT THESE CAN AND CANNOT CHECK. They check the FILES: that every recipe
-states how many it feeds, that an estimate is only present where it is needed,
-that the aisles are well-formed and no keyword is claimed twice. They cannot
-check the aisle MATCHING, because the matcher is Ruby and runs inside Jekyll —
-that is tests/test_rendered_pages.py's job, against the real build, which is
-the only place the two could disagree. A second implementation of the rule
-written in Python to make it testable here is exactly the drift MANUAL §11.2
-is about, and it would pass while the site was wrong.
+These check the files: every recipe states how many it feeds, an estimate is
+present only where it is needed, the aisles are well-formed and no keyword is
+claimed twice. They do not check the aisle matching, which is Ruby and runs
+inside Jekyll: tests/test_rendered_pages.py does, against the real build. A
+second matcher written in Python to test here would pass while the site was
+wrong.
 """
 from __future__ import annotations
 
@@ -28,9 +19,6 @@ from pathlib import Path
 import pytest
 import yaml
 
-# Suite marker, so `pytest -m food` can run this half alone.
-# tests/test_suite_hygiene.py asserts every module declares one --
-# an unmarked file is silently missed by every filtered run.
 pytestmark = pytest.mark.food
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -71,16 +59,11 @@ def states_people(fm: dict) -> bool:
 
 @pytest.mark.parametrize("folder", PUBLISHED_DIRS)
 def test_every_published_recipe_states_how_many_it_feeds(folder):
-    """#815. The scaler divides by this number, so every recipe needs one.
+    """The scaler divides by this number, so every recipe needs one (#815).
 
     Either `serves:` opens with a number, or `serves_estimate:` carries an
-    integer. `makes:` is never read as people however numeric it looks —
-    950 ml is not 950 portions, and "12 slices" is not necessarily twelve
-    people. That gap is the whole reason the second key exists.
-
-    Helen, #815: "clearly 750 ml of gelato doesn't feed 50. We need estimate
-    the number of people served by 750 ml, then add that to the front matter
-    somehow."
+    integer. `makes:` is never read as people however numeric it looks:
+    950 ml is not 950 portions.
     """
     missing = []
     for path in recipe_paths([folder]):
@@ -99,12 +82,10 @@ def test_every_published_recipe_states_how_many_it_feeds(folder):
 
 
 def test_every_draft_states_how_many_it_feeds():
-    """The same rule on drafts, which is the collection Helen browses locally.
+    """The same rule on drafts, which Helen browses locally: a draft with no
+    figure is a recipe the shopping list cannot scale.
 
-    Skipped where the private repo has not been cloned — CI and a fresh
-    worktree both. It is not a lesser rule there: a draft with no figure is a
-    recipe whose box the shopping list cannot draw, and Helen hit exactly that
-    with the blackberry gelato.
+    Skipped where the private repo is not cloned (CI, a fresh worktree).
     """
     folder = ROOT / "_food_drafts"
     if not folder.is_dir():
@@ -162,12 +143,11 @@ def test_no_estimate_contradicts_a_serving_size_helen_wrote(folder):
 
 
 def test_the_deleted_servings_file_stays_deleted():
-    """#815 moved the numbers into the front matter. One home, not two.
+    """The estimate has one home, the recipe's front matter (#815).
 
-    A `_data/food/servings.yml` reappearing means someone has reintroduced the
-    second home for a figure that now lives beside the words it estimates from
-    — which is how the page and the file get to disagree about how many a
-    recipe feeds.
+    A `_data/food/servings.yml` would be a second home for the figure, which
+    is how the page and the file come to disagree about how many a recipe
+    feeds.
     """
     assert not (DATA / "servings.yml").exists(), (
         "_data/food/servings.yml is back. `serves_estimate:` in the recipe is "
@@ -192,10 +172,8 @@ def test_the_aisle_order_is_a_list_of_keys_and_labels():
 def test_other_is_last_and_exists():
     """`other` is where an unmatched ingredient lands, so it has to be there.
 
-    LAST, because food-shopping-list.js sends an aisle it does not recognise to
-    the final entry -- a blob emitted by an older build, or a key removed from
-    this file. An ingredient must never silently vanish from a shopping list:
-    a line you do not see is a thing you do not buy.
+    Last, because food-shopping-list.js sends an aisle it does not recognise
+    to the final entry, so no ingredient silently vanishes from a list.
     """
     keys = [a["key"] for a in AISLES["order"]]
     assert keys[-1] == "other", (
@@ -215,11 +193,9 @@ def test_every_keyword_aisle_is_a_declared_aisle():
 def test_no_keyword_is_claimed_by_two_aisles():
     """One word, one shelf.
 
-    The matching rule is "the longest keyword wins", which has no tie-break
-    worth relying on -- so the same word under two aisles is a coin toss
-    decided by how the YAML happened to load. `garlic cloves` in produce
-    against `cloves` in spices is the RIGHT shape for this: different strings,
-    different lengths, a decidable answer.
+    The longest keyword wins and there is no tie-break, so one word under two
+    aisles is decided by how the YAML loaded. `garlic cloves` in produce
+    against `cloves` in spices is fine: different strings, different lengths.
     """
     seen: dict[str, str] = {}
     clashes = []
@@ -246,11 +222,10 @@ def test_keywords_are_lowercase_and_singular_spaced():
 def test_never_is_matched_on_the_whole_name_and_stays_short():
     """`never` drops an ingredient outright, so it is the one list that must not grow.
 
-    It is matched on the WHOLE folded name, not as a keyword -- that is what
-    keeps "water mixed with 3 tsp cornstarch" on the list while plain "water"
-    stays off it. Anything added here disappears from every shopping list with
-    no line to say so, which is why this asserts the contents rather than the
-    shape.
+    It is matched on the whole folded name, not as a keyword, which keeps
+    "water mixed with 3 tsp cornstarch" on the list while plain "water" stays
+    off. Anything added disappears from every shopping list with no line to
+    say so, so this asserts the contents and not the shape.
     """
     assert sorted(AISLES["never"]) == ["cold water", "ice", "water"], (
         "the `never` list has changed. Everything on it vanishes from every "

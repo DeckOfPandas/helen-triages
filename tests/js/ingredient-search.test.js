@@ -1,22 +1,12 @@
-// =============================================================================
-// Tests for assets/js/ingredient-search.js — the pure matching/ranking
-// algorithm behind the ingredient search box, no DOM required.
+// Tests for assets/js/ingredient-search.js: the pure matching and ranking
+// algorithm behind the ingredient search box. No DOM required.
 //
-// Run from the repo root, with the local Node runtime (see
-// model_instructions/DEV_JOBS_v22.md §3.4 for why it's not system-wide).
-// No arguments — Node's test runner auto-discovers *.test.js files from
-// the current directory; passing this file's directory explicitly does
-// NOT work the same way (tries to require() it as a module and fails):
+// Run from the repo root, with the local Node runtime and no arguments:
 //
 //   .node-runtime/node/bin/node --test
 //
-// This file uses a small, hand-built vocabulary and ingredient list rather
-// than the real site data, so each test is self-contained and readable —
-// what's being checked doesn't depend on what recipes currently exist. A
-// separate ad hoc check against the real data ran once, by hand, when this
-// module was extracted from filters.js, to confirm the extraction changed
-// nothing; these tests are the permanent record.
-// =============================================================================
+// The vocabulary and ingredient list are small and hand-built, so no test
+// depends on which recipes currently exist.
 'use strict';
 
 const test = require('node:test');
@@ -33,10 +23,8 @@ const VOCAB = {
   never_family: [],
   family_exceptions: [],
   stopwords: ['and'],
-  // GitHub issue #273 — the three strips the DERIVED vocabulary needs. Kept
-  // to the real lists' shape but not their full contents, same as every
-  // other list here: what's being checked is the algorithm, not which words
-  // happen to be in _data/food/ingredient_words.yml today.
+  // The three strips the derived vocabulary needs (#273): the real lists'
+  // shape, not their full contents.
   quantity_units: ['g', 'kg', 'ml', 'tsp', 'tbsp', 'fl', 'oz'],
   measure_phrases: ['a few sprigs of', 'a good pinch of', 'a pat of', 'a large handful of', 'a glass of'],
   trailing_phrases: ['to taste', 'to serve', 'to glaze', 'to garnish']
@@ -90,12 +78,8 @@ test('search finds a literal substring match', () => {
 
 test('search ranks a whole-string prefix match above a mid-word match', () => {
   const master = matcher().buildMasterList(RAW_INGREDIENTS);
-  // "chi" prefixes "chicken breast"/"chicken thigh"/"Chinese five spice" —
-  // real matches, should rank first. "pistachios" contains "chi" too, but
-  // buried mid-word (pis-ta-CHI-os) — the actual historical bug this rule
-  // exists to fix (see DEV_JOBS_v22.md / the "chi" screenshot). It should
-  // still be found, just ranked below the real prefix matches, never mixed
-  // in with them.
+  // "pistachios" contains "chi" mid-word (pis-ta-CHI-os): it is still found,
+  // but ranked below the real prefix matches, never mixed in with them.
   const result = matcher().search('chi', master);
   const prefixIngs = result.results.filter((r) => r.isPrefixMatch).map((r) => r.ing);
   const restIngs = result.results.filter((r) => !r.isPrefixMatch).map((r) => r.ing);
@@ -131,11 +115,8 @@ test('stopwords are never a match target, wherever they fall in the phrase', () 
 test('an irregular plural is findable by its singular form', () => {
   const master = matcher().buildMasterList(['cherries']);
   const result = matcher().search('cherry', master);
-  // "cherries" is declared in `singulars` as the plural of "cherry", but
-  // the raw text "cherries" never literally contains "cherry" as a
-  // substring — "y" becomes "ies", the ending changes rather than just
-  // extending — so matching has to consult the normalised form, not just
-  // raw text, or this returns nothing at all.
+  // "cherries" does not contain "cherry" as a substring, so matching has to
+  // consult the normalised form (`singulars`), or this returns nothing.
   const cherries = result.results.find((r) => r.ing === 'cherries');
   assert.ok(cherries, 'cherries should be found');
   assert.ok(cherries.isPrefixMatch, 'cherries should rank as a prefix match, not fall to the bottom tier');
@@ -203,51 +184,41 @@ test('display_names relabels a result without changing its match key', () => {
 test('a longer entry is never hidden behind a similar shorter one', () => {
   const master = matcher().buildMasterList(['brown sugar', 'soft brown sugar']);
   const result = matcher().search('sugar', master);
-  // There used to be a rule that suppressed "soft brown sugar" as a
-  // supposed redundant variant of "brown sugar". Checked against the real
-  // site data, every one of the 31 cases it actually fired on hid a
-  // genuinely different product — this is that case. Removed entirely
-  // rather than patched further.
+  // No rule suppresses a longer entry as a variant of a shorter one: "soft
+  // brown sugar" is a different product from "brown sugar".
   const found = result.results.map((r) => r.ing);
   assert.ok(found.includes('brown sugar'));
   assert.ok(found.includes('soft brown sugar'));
 });
 
-// =============================================================================
-// GitHub issue #273 — the derived vocabulary's three extra strips.
-//
-// The exclude picker's list is derived from `item:` free text rather than
-// from the curated main_ingredients, so it arrives carrying quantities,
-// portion phrasings and method notes. Each of the four tests below is a real
-// entry the live picker offered; the fifth is the one that matters most.
-// =============================================================================
+// --- the derived vocabulary's three extra strips, #273 -------------------------
+// The exclude picker's list is derived from `item:` free text rather than from
+// the curated main_ingredients, so it arrives carrying quantities, portion
+// phrasings and method notes.
 
 test('a leading quantity is stripped, unit and all', () => {
   const master = matcher().buildMasterList([
     '1 tsp salt', '150 g gruyère', '4–5.5 kg fresh goose',
     '¼–½ tsp sea salt', '⅛ tsp vanilla essence', '3 fl oz milk'
   ]);
-  // Every one of these is a real recipe that put its amount in `item:`
-  // instead of `amount:`. "3 fl oz" checks that a two-word unit goes in one
-  // pass rather than leaving "oz milk" behind.
+  // "3 fl oz" checks that a two-word unit goes in one pass rather than
+  // leaving "oz milk" behind.
   assert.deepStrictEqual(master.sort(), [
     'fresh goose', 'gruyère', 'milk', 'salt', 'sea salt', 'vanilla essence'
   ].sort());
 });
 
 test('a first word that only looks numeric is left alone', () => {
-  // "3-bone" and "70%" carry a letter and a percent sign respectively, so
-  // neither is a bare number and neither is a quantity. Both are
-  // under-strips, on purpose: for an EXCLUDE filter, an entry that reads
-  // oddly is visible and annoying, while a wrong merge silently hides
-  // recipes the cook never meant to exclude.
+  // "3-bone" and "70%" are not bare numbers, so neither is a quantity.
+  // Under-stripping is deliberate: for an exclude filter an odd-looking entry
+  // is visible, while a wrong merge silently hides recipes.
   const master = matcher().buildMasterList(['3-bone rib of beef', '70% dark chocolate']);
   assert.deepStrictEqual(master.sort(), ['3-bone rib of beef', '70% dark chocolate']);
 });
 
 test('a quantity strip never eats the whole entry', () => {
-  // Nothing in the collection is written this way, but an entry reduced to
-  // the empty string would be an unnamed, unpickable button.
+  // An entry reduced to the empty string would be an unnamed, unpickable
+  // button.
   assert.deepStrictEqual(matcher().buildMasterList(['500 g']), ['g']);
   assert.deepStrictEqual(matcher().buildMasterList(['200']), ['200']);
 });
@@ -272,14 +243,11 @@ test('a trailing method note is stripped from the end', () => {
 });
 
 test('none of the new strips touch an ingredient whose name genuinely contains those words', () => {
-  // THE TEST THAT MATTERS. Under-stripping is visible and annoying;
-  // over-stripping is invisible and wrong — a rule that reduces
-  // "bicarbonate of soda" to "soda", or "apple cider vinegar" to "vinegar",
-  // silently merges two ingredients and hides recipes the cook never asked
-  // to hide. Every one of these six survived a real pass over the derived
-  // vocabulary and must keep surviving: three carry an "of" that a general
-  // measure rule would strip through, and three are long compounds that a
-  // general "strip the qualifier" rule would flatten.
+  // Over-stripping is invisible and wrong: a rule that reduces "bicarbonate
+  // of soda" to "soda", or "apple cider vinegar" to "vinegar", silently merges
+  // two ingredients and hides recipes the cook never asked to hide. Some of
+  // these carry an "of" a general measure rule would strip through; the rest
+  // are compounds a general qualifier strip would flatten.
   const protectedEntries = [
     'apple cider vinegar',
     'bicarbonate of soda',
@@ -292,17 +260,10 @@ test('none of the new strips touch an ingredient whose name genuinely contains t
   assert.deepStrictEqual(master.slice().sort(), protectedEntries.slice().sort());
 });
 
-// =============================================================================
-// GitHub issue #273 — `aliases` in its list forms.
-//
-// The derived vocabulary also offered entries that name TWO ingredients at
-// once ("beef or venison stock") or none at all ("flavouring or fruit"), plus
-// preparation states the leading-word `modifiers` strip can't reach ("grated
-// parmesan"). All three are the job `aliases` already did for "five-spice
-// powder", so `aliases` took them rather than a second list being invented:
-// a NAME renames (tested above), a LIST splits, an EMPTY LIST drops. Named
-// phrases and never a rule, so nothing can fire on text nobody wrote.
-// =============================================================================
+// --- `aliases` in its list forms, #273 -----------------------------------------
+// A name renames (tested above), a list splits an entry that names two
+// ingredients, an empty list drops one that names none. Named phrases and
+// never a rule, so nothing can fire on text nobody wrote.
 
 const ALIAS_VOCAB = Object.assign({}, VOCAB, {
   aliases: {
@@ -315,10 +276,8 @@ const ALIAS_VOCAB = Object.assign({}, VOCAB, {
 
 test('an alias written as a bare name still renames, list forms or not', () => {
   const master = IS.create(ALIAS_VOCAB).buildMasterList(['grated parmesan', 'parmesan']);
-  // "grated" isn't in `modifiers` and can't be, because "grated coconut" is a
-  // different product from coconut — so this one phrase is named outright.
-  // Both spellings collapse onto the one entry, not two. The bare-name form
-  // is the original alias shape and must keep working beside the list ones.
+  // "grated" cannot be in `modifiers`, because "grated coconut" is a
+  // different product from coconut, so this one phrase is named outright.
   assert.deepStrictEqual(master, ['parmesan']);
 });
 
@@ -346,13 +305,10 @@ test('aliases match the POST-STRIP form of an entry, not the raw text', () => {
 });
 
 test('an entry `aliases` does not name is left exactly as it was', () => {
-  // THE TEST THAT MATTERS, again. The list's whole justification over a
-  // general "split on and/or" rule, or a general prep-word stripper, is that
-  // it cannot reach anything it doesn't name — so these must survive it
-  // verbatim. Three carry a connector word a general rule would cut them in
-  // half at; two are near-misses of real keys in the live list ("roasted
-  // peanuts" and "smoked mackerel fillets" ARE aliased there, "dry roasted
-  // peanuts" and "smoked haddock" are deliberately not).
+  // The list's justification over a general "split on and/or" rule or a
+  // prep-word stripper is that it cannot reach anything it does not name, so
+  // these survive verbatim: some carry a connector word, the others are
+  // near-misses of aliased phrases.
   const untouched = [
     'almonds or whatever you prefer',
     'bicarbonate of soda',
@@ -373,8 +329,6 @@ test('within the non-prefix results, a real word match ranks above a family-only
   // match — it literally contains "cheese" — but not a prefix match
   // (band 2). "feta" is included only because the curated family says
   // it's a cheese, with no textual relation to "chees" at all (band 3).
-  // Merging bands 2 and 3 is the exact mistake that let "chocolate chips"
-  // rank alongside "chicken breast" for "chi" — see the ranking test above.
   const cheeseIdx = order.indexOf('cheese');
   const creamCheeseIdx = order.indexOf('cream cheese');
   const fetaIdx = order.indexOf('feta');
@@ -384,12 +338,10 @@ test('within the non-prefix results, a real word match ranks above a family-only
 });
 
 // --- entriesMatchKey — issue #506 --------------------------------------------
-// The rule that decides whether a row answers a picked ingredient. It sat in
-// filters.js, untested, and it is asked by BOTH directions: the include filter
-// of a row's main_ingredients, and the exclude filter's "(all)" umbrella of the
-// row's derived entries, through filter-state.js's excludesRow. Two copies of
-// this is how "chicken (all)" comes to mean one thing when you filter FOR it
-// and another when you filter it OUT, which is why it is one function.
+// The rule that decides whether a row answers a picked ingredient. Both
+// directions ask it: the include filter of a row's main_ingredients, and the
+// exclude filter's "(all)" umbrella through filter-state.js's excludesRow. It
+// is one function so "chicken (all)" means the same thing both ways.
 
 test('a plain key matches an entry containing it', () => {
   assert.strictEqual(matcher().entriesMatchKey(['chicken breast', 'thyme'], 'chicken'), true);
@@ -407,8 +359,8 @@ test('EVERY word of a two-word key has to land, not just one', () => {
 });
 
 test('a curated family matches by CONTAINMENT, including members sharing no letters', () => {
-  // The whole reason synonyms exist: feta is a cheese and says so nowhere in
-  // its own name. A prefix rule cannot reach it and must not have to.
+  // Feta is a cheese and says so nowhere in its own name; a prefix rule
+  // cannot reach it.
   const m = matcher();
   assert.strictEqual(m.entriesMatchKey(['feta'], 'cheese'), true);
   assert.strictEqual(m.entriesMatchKey(['mature cheddar'], 'cheese'), true);
@@ -417,9 +369,8 @@ test('a curated family matches by CONTAINMENT, including members sharing no lett
 });
 
 test('the family rule is containment, so a family member matches mid-word too', () => {
-  // Recorded rather than admired: `cheddar` inside `cheddary crumbs` matches,
-  // where the non-family branch would want a word. It is the include/umbrella
-  // direction, where over-reaching shows you a recipe and the row says why.
+  // `cheddar` inside `cheddary crumbs` matches, where the non-family branch
+  // wants a word start. Over-reaching here shows a recipe; it hides none.
   assert.strictEqual(matcher().entriesMatchKey(['cheddary crumbs'], 'cheese'), true);
 });
 
@@ -438,15 +389,8 @@ test('an empty or missing list matches nothing, rather than throwing', () => {
 });
 
 // --- entriesMatchKey matches by PREFIX — issue #619 --------------------------
-// The rule was `ew.indexOf(kw) !== -1` (containment) until 2026-09-06, and
-// filters.js's own comment had described it as "prefixes" for as long as it
-// existed: the code and its comment disagreed the whole time. Helen found it
-// from the output — asking for `salt` handed back twelve recipes whose only
-// salt is UNsalted butter.
-//
-// These are the cases from the issue, kept as the permanent record of which
-// direction the rule runs in. Measured over the real data, the switch dropped
-// 136 (key, recipe) pairs and added none; 104 of them look like these.
+// Containment hands back, for `salt`, recipes whose only salt is UNsalted
+// butter. A key word must start an entry word.
 
 test('a key matches the START of a word, not the middle of one', () => {
   const m = matcher();
@@ -460,8 +404,7 @@ test('a key matches the START of a word, not the middle of one', () => {
 });
 
 test('the opposite of what was asked is the worst version of the same bug', () => {
-  // `salted butter` reached UNsalted butter on 12 recipes. Not merely a loose
-  // match: the entry is the negation of the key, and the row would have said so.
+  // Not merely a loose match: the entry is the negation of the key.
   assert.strictEqual(
     matcher().entriesMatchKey(['unsalted butter'], 'salted butter'), false
   );
@@ -469,7 +412,6 @@ test('the opposite of what was asked is the worst version of the same bug', () =
 
 test('the short words that made this worth fixing', () => {
   const m = matcher();
-  // 49 pairs came from `ice` alone.
   assert.strictEqual(m.entriesMatchKey(['brown rice'], 'ice'), false);
   assert.strictEqual(m.entriesMatchKey(['citrus juice'], 'ice'), false);
   assert.strictEqual(m.entriesMatchKey(['five-spice powder'], 'ice'), false);
@@ -487,9 +429,8 @@ test('the short words that made this worth fixing', () => {
 });
 
 test('a prefix still reaches a longer word, which is the point of prefix', () => {
-  // The rule is not "whole words". Typing toward something has to keep working
-  // while it is still being typed, and that is what separates this from the
-  // exclude side's set membership.
+  // The rule is not "whole words": typing toward something has to keep
+  // working while it is still being typed.
   const m = matcher();
   assert.strictEqual(m.entriesMatchKey(['chicken thighs'], 'chick'), true);
   assert.strictEqual(m.entriesMatchKey(['coriander'], 'cori'), true);

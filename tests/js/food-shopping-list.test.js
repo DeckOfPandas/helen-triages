@@ -1,24 +1,15 @@
-// =============================================================================
-// Tests for assets/js/food-shopping-list.js — GitHub issue #801.
+// Tests for assets/js/food-shopping-list.js (#801).
 //
 //   node --test tests/js/*.test.js
 //
 // A pure module, required directly, the same shape as shopping-list.js and its
 // tests. The DOM half is filters.js and is not tested here.
 //
-// WHAT THESE ARE REALLY GUARDING. Two things, and neither shows up while
-// clicking around with a tidy shortlist of three recipes:
-//
-//   THE MESSY DATA. 778 hand-written ingredient amounts across 86 files, in
-//   every shape from `½ tsp` to `2 x 400 g cans` to `1 tbsp (6 g)` to nothing
-//   at all. The fixtures below are real strings out of real recipes, named
-//   where it helps.
-//
-//   THE ARITHMETIC HELEN RULED ON. 2026-09-07: "For now, don't tidy/round
-//   beyond 1 g precision", then "I mean don't round to 10 g or 5 g, round to
-//   1g". Two thirds of 200 g is 133 g. Getting that wrong is a quiet wrong
-//   number on a page rather than an error anybody would see.
-// =============================================================================
+// Two things are pinned. The messy data: hand-written amounts in every shape
+// from `½ tsp` to `2 x 400 g cans` to `1 tbsp (6 g)` to nothing at all; the
+// fixtures are real strings out of real recipes. And the arithmetic: nothing is
+// rounded coarser than a gram, so two thirds of 200 g is 133 g. Getting that
+// wrong is a quiet wrong number on a page, not an error anybody would see.
 'use strict';
 
 const test = require('node:test');
@@ -59,8 +50,8 @@ test('aisles come back in the declared order, and empty ones do not come back', 
 
 test('an unknown aisle falls to the last one rather than vanishing', () => {
   // A blob emitted by an older build, or a key removed from aisles.yml. The
-  // ingredient still has to appear: a silently dropped line is a thing you
-  // then do not buy.
+  // ingredient still has to appear: a silently dropped line is a thing you then
+  // do not buy.
   const built = F.build([ing('1', 'kohlrabi', 'greengrocer')], opts);
   assert.deepStrictEqual(built.map((a) => a.key), ['other']);
   assert.strictEqual(built[0].items[0].label, 'kohlrabi');
@@ -81,8 +72,7 @@ test('items are alphabetical inside an aisle', () => {
 // --- scaling ------------------------------------------------------------------
 
 test('the scale multiplies, and a gram is the floor', () => {
-  // Helen's ruling, and the arithmetic behind the number she will see: four
-  // portions of a recipe that serves six.
+  // Four portions of a recipe that serves six.
   assert.strictEqual(textOf([ing('200 g', 'plain flour', 'cupboard', 2 / 3)],
     'plain flour'), '133 g');
   assert.strictEqual(textOf([ing('500 g', 'chicken', 'produce', 2)],
@@ -122,10 +112,8 @@ test('two recipes writing the same ingredient make one line', () => {
 });
 
 test('a plural and its singular are the same shopping', () => {
-  // The real pairs in the collection: onion/onions, carrot/carrots,
-  // lemon/lemons, garlic clove/garlic cloves, cinnamon stick/cinnamon sticks.
-  // Two rows here means two totals you have to add up yourself, which is the
-  // one job this panel has.
+  // Two rows here means two totals to add up by hand, which is the one job this
+  // panel has.
   const built = rows([
     ing('1', 'onion', 'produce'),
     ing('2', 'onions', 'produce')
@@ -159,9 +147,9 @@ test('units that cannot be added are kept apart, and joined with +', () => {
 });
 
 test('litres and kilograms total with millilitres and grams', () => {
-  // A litre IS a thousand millilitres, on both sides of every recipe here --
-  // which is not the conversion shopping-list.js refuses. Before this, one
-  // stock was two rows, and a twelfth of `1½ l` printed as `0.125 l`.
+  // A litre is a thousand millilitres, which is not the conversion
+  // shopping-list.js refuses: one stock is one row, and a twelfth of `1½ l`
+  // prints as `125 ml`.
   assert.strictEqual(textOf([
     ing('1½ l', 'stock', 'cupboard'),
     ing('500 ml', 'stock', 'cupboard')
@@ -212,8 +200,7 @@ test('one approximate entry makes the whole total approximate', () => {
 });
 
 test('a bracket restating the quantity scales with it', () => {
-  // chai-spice-powder's cloves. Doubling the tablespoons without the grams
-  // would print a contradiction.
+  // Doubling the tablespoons without the grams would print a contradiction.
   assert.strictEqual(textOf([ing('1 tbsp (6 g)', 'whole cloves', 'cupboard', 2)],
     'whole cloves'), '2 tbsp (12 g)');
 });
@@ -236,9 +223,8 @@ test('an unquantified entry is counted, never summed', () => {
 });
 
 test('an ingredient with no amount at all is a line with no amount', () => {
-  // Every magic-bag item (MANUAL 4.3) and 100 of the 778 recipe items. The
-  // name IS the useful half; a count appears once more than one recipe wants
-  // it.
+  // Every magic-bag item (MANUAL 4.3) and many recipe items. The name is the
+  // useful half; a count appears once more than one recipe wants it.
   const one = byLabel([ing('', 'olive oil', 'cupboard')], 'olive oil');
   assert.strictEqual(one.text, '');
   assert.strictEqual(one.label, 'olive oil');
@@ -273,16 +259,15 @@ test('no entries at all is an empty list, not a throw', () => {
 
 test('no aisle list at all still produces a list', () => {
   // The page emits _data/food/aisles.yml's own `order`; absent it, everything
-  // is still shoppable, which is the standing every other blob on that index
-  // has.
+  // is still shoppable.
   const built = F.build([ing('200 g', 'plain flour', 'cupboard')]);
   assert.strictEqual(built.length, 1);
   assert.strictEqual(built[0].items[0].label, 'plain flour');
 });
 
 test('a real weeknight, end to end', () => {
-  // Three dinners for four, one of which serves six. The shape of the thing
-  // Helen actually asked for, asserted once so a refactor has to keep it.
+  // Three dinners for four, one of which serves six, asserted once so a
+  // refactor has to keep the whole shape.
   const built = F.build([
     ing('1', 'onion', 'produce', 1),
     ing('5', 'carrots', 'produce', 2 / 3),
@@ -303,10 +288,8 @@ test('a real weeknight, end to end', () => {
     ['butter beans: 2 x 400 g cans', 'orzo: 133 g', 'stock: 1 l']);
 });
 
-// =============================================================================
-// #1297, 2026-10-09 -- by-eye measures in whole ones, one fruit from two parts,
-// and a line that only points at another.
-// =============================================================================
+// --- #1297: by-eye measures in whole ones, one fruit from two parts, and a
+// --- line that only points at another ------------------------------------------
 
 const PRODUCE = [{ key: 'produce', label: 'produce' }];
 // As food/index.html passes them: `half_step_measures` step in halves,
@@ -338,9 +321,8 @@ const eye = (amount, scale) => bought(
   [{ amount: amount, name: 'parsley', aisle: 'produce', scale: scale }], 'parsley');
 
 test('#1297: a stepped measure is bought whole, rounded UP, with what the recipes ask for beside it', () => {
-  // Helen, 2026-10-10: "I'd like the shopping list not to write 1.17 sprigs
-  // either, so please round that upwards to the next integer like this: '2
-  // handfuls fresh parsley (1 1/4 in the recipes)'."
+  // The list never writes "1.17 sprigs": it buys the next whole one and quotes
+  // the recipes' own stepped figure in the bracket.
   assert.strictEqual(eye('1 handful', 7 / 6), '2 handfuls (1¼ in the recipes)');
   assert.strictEqual(eye('1 sprig', 7 / 6), '2 sprigs (1¼ in the recipes)');
   assert.strictEqual(eye('1 bunch', 7 / 6), '2 bunches (1¼ in the recipes)');
@@ -350,8 +332,8 @@ test('#1297: a stepped measure is bought whole, rounded UP, with what the recipe
 });
 
 test('a half-step measure is quoted to the nearest half, as the recipe page steps it', () => {
-  // Helen, 2026-10-11: "Half a pinch doesn't make sense, but half a handful
-  // sort of does. Let's round pinches to the nearest 1/2."
+  // Half a handful makes sense and a quarter of a pinch does not, so a pinch is
+  // quoted to the nearest half.
   assert.strictEqual(eye('1 pinch', 7 / 6), '1 pinch');
   assert.strictEqual(eye('1 pinch', 1.5), '2 pinches (1½ in the recipes)');
   assert.strictEqual(eye('1 pinch', 1 / 3), '1 pinch (½ in the recipes)');
@@ -360,9 +342,7 @@ test('a half-step measure is quoted to the nearest half, as the recipe page step
 });
 
 test('#1297: 1.17 handfuls buys TWO -- the list does not borrow the recipe page\'s half step', () => {
-  // The first build quoted the recipe page's own figure ("1 handful") and so
-  // bought one. Helen: "1.17 handfuls should buy 2, again giving the
-  // bracketed requested number."
+  // Quoting the recipe page's own figure ("1 handful") would buy one.
   assert.strictEqual(eye('1 handful', 7 / 6), '2 handfuls (1¼ in the recipes)');
   assert.strictEqual(eye('2 handfuls', 7 / 6), '3 handfuls (2¼ in the recipes)');
 });
@@ -425,8 +405,7 @@ test('#1297: with no list of measures handed over, a handful totals as before', 
 });
 
 // --- one fruit, two parts ------------------------------------------------------
-// Helen: 'I would like to cleverly combine e.g. "zest of 1 lemon" and "juice of
-// 1 lemon" to make "1 lemon" in the shopping list.'
+// "zest of 1 lemon" and "juice of 1 lemon" in one recipe are one lemon to buy.
 
 // The literal form: the count is inside the item, and the plugin reads it out.
 const literal = (recipe, name, fruit, count, parts, scale) => ({
@@ -452,8 +431,8 @@ test('#1297: one such line alone is that many of the fruit, where it was a row w
 });
 
 test('#1297: the part that needs the most fruit decides', () => {
-  // lemon-buttermilk-pound-cake: 4 zested, then ½ and 2 large juiced ("use
-  // the ones you've zested"). It printed 4½ + 2 large.
+  // 4 zested, then ½ and 2 large juiced ("use the ones you've zested"): 4, not
+  // 4½ + 2 large.
   assert.strictEqual(line([
     house('cake', '4', 'lemons', ['zest']),
     house('cake', '½', 'lemon', ['juice']),
@@ -467,8 +446,7 @@ test('#1297: the part that needs the most fruit decides', () => {
 });
 
 test('#1297: the same part twice still adds up', () => {
-  // slow-cooked-short-rib-and-pineapple-tacos: a lime juiced, another lime
-  // juiced, and the zest and juice of half a lime.
+  // A lime juiced, another lime juiced, and the zest and juice of half a lime.
   assert.strictEqual(line([
     house('tacos', '1', 'lime', ['juice']),
     house('tacos', '1', 'lime', ['juice']),
@@ -499,7 +477,7 @@ test('#1297: the merged fruit scales with its recipe', () => {
 });
 
 test('#1297: lines that say no recipe are never merged', () => {
-  // The callers before #1297 pass no `recipe`; they get the old sum.
+  // A caller that passes no `recipe` gets the plain sum.
   assert.strictEqual(line([
     { amount: '1', name: 'lemon', aisle: 'produce', scale: 1, parts: ['zest'] },
     { amount: '1', name: 'lemon', aisle: 'produce', scale: 1, parts: ['juice'] }
@@ -519,7 +497,6 @@ test('#1297: "the rest of the oil above" adds nothing to the oil', () => {
 });
 
 test('#1297: two recipes with a pointer each no longer print a stray ×2', () => {
-  // The charred-asparagus pasta salad and the cauliflower-anchovy orzo.
   const text = line([
     oil('pasta', '85 ml'), oil('pasta', '', true),
     oil('orzo', '3 tbsp'), oil('orzo', '', true)
@@ -541,7 +518,7 @@ test('#1297: a pointer with nothing to point at stays a line', () => {
   assert.strictEqual(line([oil('pasta', '', true)], 'olive oil'), '');
 });
 
-// --- "2 lemons", not "2 lemon" -- #1297, Helen, 2026-10-10 ----------------------
+// --- "2 lemons", not "2 lemon" (#1297) ----------------------------------------
 
 const NOUNS = ['lemon', 'lime', 'apple', 'peach', 'avocado'];
 const labelOf = (entries, nouns) => {
@@ -553,7 +530,7 @@ const count = (amount, name, recipe) =>
   ({ amount: amount, name: name, aisle: 'produce', scale: 1, recipe: recipe });
 
 test('#1297: a count of more than one takes the plural, whichever spelling came first', () => {
-  // One lemon from each of two recipes printed "2 lemon".
+  // One lemon from each of two recipes must not print "2 lemon".
   assert.strictEqual(labelOf([count('1', 'lemon', 'a'), count('1', 'lemon', 'b')]), '2 lemons');
   assert.strictEqual(labelOf([count('1', 'lemon', 'a'), count('2', 'lemons', 'b')]), '3 lemons');
   assert.strictEqual(labelOf([count('1', 'sharp green apple', 'a'),
@@ -580,8 +557,8 @@ test('#1297: a form nobody wrote is made only for a noun on the list', () => {
   assert.strictEqual(labelOf([count('1', 'ripe peach', 'a'), count('1', 'ripe peach', 'b')]),
     '2 ripe peaches');
   assert.strictEqual(labelOf([count('2', 'avocado', 'a')]), '2 avocados');
-  // Real names from the collection, 2026-10-10, each of which a rule about
-  // "the last word" got wrong.
+  // Real names from the collection, each of which a rule about "the last word"
+  // gets wrong.
   [['sprigs thyme', '2 sprigs thyme'], ['goose', '2 goose'],
     ['spoons butter', '2 spoons butter'], ['skinless', '2 skinless'],
     ['star anise', '2 star anise'], ['red chilli', '2 red chilli']

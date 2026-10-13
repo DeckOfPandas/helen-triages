@@ -1,46 +1,17 @@
-// =============================================================================
-// Tests for assets/js/cook-schedule.js — the arithmetic behind the cook timer
+// Tests for assets/js/cook-schedule.js: the arithmetic behind the cook timer
 // (food/reference/cooking-methods-and-timings/), no DOM required.
 //
-// Run from the repo root, with the local Node runtime. No arguments — Node's
-// test runner auto-discovers *.test.js files from the current directory;
-// passing this file's directory explicitly does NOT work the same way:
+// Run from the repo root with no arguments. Node's test runner discovers
+// *.test.js itself; passing this file's directory does not work the same way:
 //
 //   .node-runtime/node/bin/node --test
 //
-// See tests/js/ingredient-search.test.js for why not the system node.
+// A wrong number here ruins a meal: it decides what time a joint goes into the
+// oven so that dinner is ready when you said it would be.
 //
-// WHY THIS FILE EXISTS AT ALL. This is the only place on the site where a
-// wrong number ruins a meal: it decides what time a joint goes into the oven
-// so that dinner is ready when you said it would be. Until cook-schedule.js
-// was split out of cook-timer.js, none of it was checked by anything.
-//
-// Fixtures below are hand-built, not the real _data/food/cooking_methods.yml,
-// so each test is self-contained and readable — what's being checked doesn't
-// depend on what's currently in the data file. (tests/test_reference_data.py
-// guards the data itself, including that every `relative` row can find a base.)
-// The extraction was separately proved behaviour-identical by replaying the
-// real data through a stub-DOM harness either side of it; these tests are the
-// permanent record.
-//
-// THREE TESTS ONCE PINNED BEHAVIOUR THAT WAS WRONG, and none do now. They were
-// written during a refactor whose whole point was to change nothing, so each
-// oddity found on the way was recorded here rather than quietly corrected — a
-// behaviour change hidden inside a refactor is what makes refactors dangerous.
-// All three were then fixed in their own commits, and each of those tests now
-// asserts the corrected behaviour and says when it changed:
-//
-//   hhmm    emitted a singular "min" against house style          (2026-08-15)
-//           (and prints the compact "2h5m" since 2026-10-09, Helen's ask)
-//   clock   said "the day before" however far back it wrapped     (2026-08-15)
-//   resolve dropped flat_add_max from by_doneness' upper bound    (#245)
-//
-// Kept as a list rather than deleted because the PATTERN is the useful part:
-// extracting a module is when you find out what it actually does, and the
-// discipline is to write the oddity down, ship the refactor, then fix it
-// separately. If you pin something new here, add it to this list so the next
-// person can tell a deliberate record from an accident.
-// =============================================================================
+// Fixtures are hand-built, not the real _data/food/cooking_methods.yml, so no
+// test depends on what is in the data file today. tests/test_reference_data.py
+// guards the data itself, including that every `relative` row can find a base.
 'use strict';
 
 const test = require('node:test');
@@ -59,10 +30,8 @@ const RATE_WITH_MAX = {
   rate_min: 55, rate_max: 75, flat_add: 10, flat_add_max: 15
 };
 
-// Same job as RATE_WITH_MAX above, but for the by_doneness shape (GitHub
-// issue #245): the two branches are meant to agree on the flat_add_max /
-// flat_add / 0 fallback chain, so this fixture mirrors that one rather than
-// inventing a new shape for the same check.
+// RATE_WITH_MAX on the by_doneness shape (#245): the two branches must agree on
+// the flat_add_max / flat_add / 0 fallback chain.
 const BY_DONENESS_WITH_MAX = {
   id: 'haunch', name: 'Haunch, high heat then reduce', shape: 'by_doneness', group: 'G',
   by_doneness: {
@@ -128,10 +97,9 @@ const TEMPS = {
 };
 
 // --- rounding and duration formatting ---------------------------------------
-// Helen: "let's round cooking times to the nearest 5 mins to preserve sanity."
-// The rounding is load-bearing, not cosmetic: the clock arithmetic rounds with
-// the same function, so a printed duration can never disagree with the times
-// printed either side of it.
+// Cooking times round to the nearest five minutes. The clock arithmetic rounds
+// with the same function, so a printed duration can never disagree with the
+// times printed either side of it.
 
 test('round5 rounds to the nearest five minutes, both directions', () => {
   assert.strictEqual(CS.round5(97), 95);
@@ -139,11 +107,8 @@ test('round5 rounds to the nearest five minutes, both directions', () => {
   assert.strictEqual(CS.round5(0), 0);
 });
 
-// COMPACT SINCE 2026-10-09. Helen: "Collapse timing display to e.g. '2h -
-// 3h', '4h - 4h50m', '10m - 15 m'. En dashes." These printed '45 mins',
-// '2 hrs 5 mins' and '1 hr – 2 hrs' from 2026-08-15 to then; the house's
-// "mins, never min" rule (MANUAL §5) is about the recipe pages' own time
-// lines and is not what this column is.
+// The compact form: '45m', '2h5m', and '1h – 2h' with an en dash. The house
+// style for a recipe page's time line (MANUAL §5) is not what this column is.
 
 test('hhmm: under an hour is minutes alone, with no "0h"', () => {
   assert.strictEqual(CS.hhmm(44), '45m');
@@ -193,11 +158,9 @@ test('clock wraps backwards over midnight rather than printing a negative time',
 });
 
 test('clock COUNTS the days it wraps back, rather than saying "the day before" once', () => {
-  // This was a real bug, found by the refactor that extracted this module and
-  // fixed straight after it. The loop assigned the label on every pass instead
-  // of counting, so anything more than 24 hours back was under-reported by a
-  // whole day -- and the page's own inputs reach it: 13.2 kg of brisket at the
-  // low-and-slow rate is a 29-43½ hour cook, which crosses midnight twice.
+  // The days are counted, not labelled once on every pass. The page's own
+  // inputs reach it: a big brisket at the low-and-slow rate crosses midnight
+  // twice.
   assert.strictEqual(CS.clock(-1500), '23:00 (2 days before)');
   assert.strictEqual(CS.clock(-2880), '00:00 (2 days before)');
   assert.strictEqual(CS.clock(-2881), '23:59 (3 days before)');
@@ -225,11 +188,10 @@ test('parseClock returns null — not 0, not NaN — when there is no time at al
 });
 
 // --- resolve: one branch per shape ------------------------------------------
-// _data/food/cooking_methods.yml's header documents seven shape values. Each
-// gets its own test, INCLUDING the two that refuse: a calculator that averaged
-// a disputed row into a confident serving time would be worse than one that
-// declined, so a test proving a refusal is still a refusal is worth as much as
-// one proving a number.
+// _data/food/cooking_methods.yml's header documents the shape values. Each gets
+// its own test, including the two that refuse: a calculator that averaged a
+// disputed row into a confident serving time would be worse than one that
+// declined.
 
 test('rate: minutes per kg plus the flat addition', () => {
   const r = CS.resolve(RATE, 2, 'rare', [RATE]);
@@ -285,15 +247,10 @@ test('by_doneness: an unknown level falls back to rare rather than producing NaN
 });
 
 test('by_doneness: flat_add_max applies to the upper end when the data states one', () => {
-  // GitHub issue #245. This used to add flat_add to BOTH ends and never look
-  // at flat_add_max, so an asymmetric upper bound was silently dropped — the
-  // same fixture as RATE_WITH_MAX above, on the by_doneness shape, because
-  // the two branches are meant to agree and this is the case that would have
-  // caught the divergence. Not theoretical: venison's haunch
-  // (haunch_high_heat_start_then_reduce in _data/food/cooking_methods.yml,
-  // mirrored by BY_DONENESS_WITH_MAX) is a live by_doneness row with
-  // flat_add on both its levels, and is the row most likely to gain an
-  // asymmetric flat_add_max next.
+  // #245: the upper end reads flat_add_max, as the rate branch does.
+  // BY_DONENESS_WITH_MAX mirrors venison's haunch
+  // (haunch_high_heat_start_then_reduce in _data/food/cooking_methods.yml), a
+  // live by_doneness row with a flat_add.
   const r = CS.resolve(BY_DONENESS_WITH_MAX, 1, 'rare', [BY_DONENESS_WITH_MAX]);
   assert.strictEqual(r.lo, 55 + 10);
   assert.strictEqual(r.hi, 75 + 15);
@@ -420,8 +377,8 @@ test('scheduleBack: the LONGER estimate drives the start time', () => {
 });
 
 test('scheduleBack: no range to show when the two ends round together', () => {
-  // Same five-minute rounding as the printed duration, so a card can never say
-  // "1 hr 35 mins" above two start times that differ by two minutes.
+  // The same five-minute rounding as the printed duration, so a card can never
+  // print one duration above two start times that differ by two minutes.
   const s = CS.scheduleBack(95, 97, 840, 0);
   assert.strictEqual(s.hasRange, false);
   assert.strictEqual(s.inAt, s.inAtQuicker);
@@ -443,21 +400,18 @@ test('scheduleBack: eating at 00:30 means going in the PREVIOUS DAY', () => {
 });
 
 test('scheduleBack: a cook longer than a day still returns a real number of minutes', () => {
-  // 43 hours of brisket for a 2pm Sunday lunch starts on Friday evening, and
-  // this asserts the ARITHMETIC only: -1720 minutes. Turning that into words
-  // is clock()'s job, and it used to under-report anything past 24 hours as
-  // "the day before" — fixed, and covered by clock()'s own day-counting test
-  // above rather than restated here.
+  // 43 hours of brisket for a 2pm Sunday lunch starts on Friday evening. This
+  // asserts the arithmetic only; turning the minutes into words is clock()'s
+  // job, covered by its own day-counting test.
   const s = CS.scheduleBack(43 * 60, 43 * 60, 840, 20);
   assert.strictEqual(s.inAt, 820 - 43 * 60);
 });
 
 test('scheduleBack never consults the clock, so "in the past" is not its question', () => {
-  // Nothing here knows what time it is now — deliberately. The same inputs give
-  // the same answer whenever they are asked, which is the only reason any of
-  // this is testable. A start time that has already gone is a comparison the
-  // page would have to make against a `now` it injects; today it makes none,
-  // and simply prints a time that may already have passed.
+  // Nothing here knows what time it is now, deliberately: the same inputs give
+  // the same answer whenever they are asked. A start time that has already gone
+  // is a comparison the page would have to make against a `now` it injects, and
+  // it makes none.
   const a = CS.scheduleBack(120, 120, 840, 20);
   const b = CS.scheduleBack(120, 120, 840, 20);
   assert.deepStrictEqual(a, b);
@@ -495,10 +449,9 @@ test('statedRest reads a published rest time, and null when none is published', 
 });
 
 test('restFor marks a cited figure as stated and a fallback as not', () => {
-  // The distinction is the whole point: chicken, turkey, duck and ham publish
-  // no rest time, and the page must not present a working default with the same
-  // confidence as a figure someone wrote down. The fallback is injected so that
-  // policy stays with the page.
+  // Some proteins publish no rest time, and the page must not present a working
+  // default with the same confidence as a figure someone wrote down. The
+  // fallback is injected so that policy stays with the page.
   assert.deepStrictEqual(CS.restFor(TEMPS, 'beef.tender', 20), { mins: 15, stated: true });
   assert.deepStrictEqual(CS.restFor(TEMPS, 'poultry.chicken', 20), { mins: 20, stated: false });
   assert.deepStrictEqual(CS.restFor(TEMPS, null, 20), { mins: 20, stated: false });
@@ -520,18 +473,11 @@ test('proteinOrder sorts by the label you read, not by the data file\'s key orde
   assert.deepStrictEqual(CS.proteinOrder(methods), ['beef', 'ham', 'turkey']);
 });
 
-// =============================================================================
-// EVERY DONENESS LEVEL IS REACHABLE — GitHub issue #246
-// =============================================================================
-//
-// The timings page hard-wired `doneness` to "rare" and shipped no control, so
-// the medium rates in cooking_methods.yml could not be displayed by anything:
-// real, sourced data that no reader could reach. resolve() now returns every
-// level alongside the requested one, and the page renders them all.
-//
-// These assert the WHOLE SET, not just that medium exists. A test that only
-// checked `levels.length > 0` would pass on a resolve() that returned the
-// requested level twice.
+// --- every doneness level is reachable (#246) ----------------------------------
+// resolve() returns every level alongside the requested one, and the page
+// renders them all. These assert the whole set: a test that only checked
+// `levels.length > 0` would pass on a resolve() that returned the requested
+// level twice.
 
 test('by_doneness: resolve returns every level, not only the one asked for', () => {
   const r = CS.resolve(BY_DONENESS, 2, 'rare', [BY_DONENESS]);

@@ -1,15 +1,11 @@
-// =============================================================================
-// food-scale.js — one food amount at a factor. #1005
+// food-scale.js: one food amount at a factor (#1005). Run from the repo root
+// with `node --test`.
 //
-// Run from the repo root with `node --test`.
-// =============================================================================
-// Every expectation below is a rule Helen has already given for the shopping
-// list (#801), because this module prints through the same formatter: grams
-// to the gram, spoons in cook's fractions, ranges carried at both ends, the
-// bracket scaled with its number. The only thing new is the shape -- one
-// amount in, one amount out -- and the two answers at the edges: an amount
-// with no number comes back as written and says so, and a kilogram halved
-// comes back as grams.
+// The module prints through the shopping list's formatter (#801): grams to the
+// gram, spoons in cook's fractions, ranges carried at both ends, the bracket
+// scaled with its number. Its own rules are at the edges: an amount with no
+// number comes back as written and says so, and a kilogram halved comes back as
+// grams.
 'use strict';
 
 const test = require('node:test');
@@ -64,8 +60,7 @@ test('a compound unit keeps its plural', () => {
 });
 
 test('an amount with no number comes back as written, and says so', () => {
-  // The line the note under the control is built from -- Helen: "let's add a
-  // note to bitters and handfuls".
+  // The note under the control is built from this.
   const r = scaleAmount('a few handfuls', 2);
   assert.strictEqual(r.text, 'a few handfuls');
   assert.strictEqual(r.scaled, false);
@@ -73,18 +68,11 @@ test('an amount with no number comes back as written, and says so', () => {
   assert.strictEqual(scaleAmount('', 2).text, '');
 });
 
-// -----------------------------------------------------------------------------
-// #1125 -- a measure taken by hand scales IN HALF STEPS, and the note names
-// only what genuinely did not scale. Helen: "Currently some recipes scale 1
-// handful to e.g. 1.17 handfuls, which is obvious nonsense." Then: 'If a
-// recipe calls for "a handful of parsley", three orders of that recipe should
-// call for "3 handfuls of parsley".' Then: "Handfuls can scale in half steps."
-//
-// THE LIST IS READ FROM THE REAL DATA FILE, not restated here, so a word taken
-// out of _data/food/scaling.yml fails these by name. The file is a flat YAML
-// list and node has no YAML parser; the reader below takes the `  - word`
-// lines under the one key and nothing cleverer.
-// -----------------------------------------------------------------------------
+// --- #1125: a measure taken by hand scales in steps ----------------------------
+// The step lists are read from _data/food/scaling.yml, not restated here, so a
+// word taken out of the file fails these by name. The file is a flat YAML list
+// and node has no YAML parser; the reader below takes the `  - word` lines
+// under the one key and nothing cleverer.
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -123,10 +111,8 @@ test('three orders of a handful is three handfuls -- Helen\'s own example', () =
 });
 
 test('a handful never prints a decimal -- 1.17 handfuls is "obvious nonsense"', () => {
-  // Seven portions of a recipe for six: the case in #1125. From 2026-10-04 it
-  // went to the nearest HALF and read "1 handful"; since 2026-10-10 a handful
-  // steps in quarters ("Recipe page handfuls and sprigs in 1/4 too please")
-  // and reads 1¼ -- the figure the shopping list's bracket quotes.
+  // Seven portions of a recipe for six (#1125). A handful steps in quarters, so
+  // it reads 1¼: the figure the shopping list's bracket quotes.
   const r = scaleAmount('1 handful', 7 / 6, WORDS);
   assert.strictEqual(r.text, '1¼ handfuls');
   assert.strictEqual(r.scaled, true);
@@ -148,9 +134,8 @@ test('THE ROUNDING, HANDFULS: the nearest quarter, and never less than a quarter
 });
 
 test('THE ROUNDING, PINCHES AND THE REST: the nearest half, and never less than a half', () => {
-  // Helen, 2026-10-04: "Handfuls can scale in half steps." The handful has
-  // moved on; pinch, dash, splash and knob keep the rule it left behind, and
-  // `halfStep` is still the one function that decides it.
+  // pinch, dash, splash and knob; `halfStep` is the one function that decides
+  // it.
   assert.strictEqual(at('1 pinch', 1.5, WORDS), '1½ pinches');
   assert.strictEqual(at('1 pinch', 7 / 6, WORDS), '1 pinch');
   assert.strictEqual(at('1 pinch', 4 / 3, WORDS), '1½ pinches');
@@ -164,10 +149,9 @@ test('THE ROUNDING, PINCHES AND THE REST: the nearest half, and never less than 
 });
 
 test('THE PLURAL is the site\'s existing rule: singular at exactly one, plural otherwise', () => {
-  // Not a rule invented for handfuls. A unit that is NOT on the list already
-  // prints this way through shopping-list.js's `unitLabel`, and the half-step
-  // measures match it -- so "½ handfuls" reads as "½ pats" does. If Helen
-  // wants "½ handful", the change is in `unitLabel`, for every unit at once.
+  // The plural comes from shopping-list.js's `unitLabel`, which every unit
+  // prints through, stepped or not. To print "½ handful", change `unitLabel`,
+  // for every unit at once.
   assert.strictEqual(at('1 pat', 0.5, WORDS), '½ pats');
   assert.strictEqual(at('1 pat', 1.5, WORDS), '1½ pats');
   assert.strictEqual(at('1 handful', 0.5, WORDS), '½ handfuls');
@@ -240,7 +224,6 @@ test('the measure is a whole word, so nothing else is caught by it', () => {
 // --- the measure written into the item, with no amount at all -----------------
 
 test('"a handful of fresh parsley" x3 is "3 handfuls of fresh parsley"', () => {
-  // Helen's sentence, as a test. 96 items in the two collections open this way.
   const { scaleLeadingMeasure } = foodScale;
   const r = scaleLeadingMeasure('a handful of fresh parsley', 3, WORDS);
   assert.strictEqual(r.text, '3 handfuls of fresh parsley');
@@ -289,7 +272,7 @@ test('at one, a leading measure keeps the recipe\'s own words', () => {
 });
 
 test('"a few" is not a number: Tabasco stays as written and is named', () => {
-  // Helen's other example. It must come back unscaled so the page lists it.
+  // It must come back unscaled, so the page lists it.
   const { scaleLeadingMeasure, noteName } = foodScale;
   const tabasco = 'a few dashes of Tabasco sauce to taste';
   const r = scaleLeadingMeasure(tabasco, 3, WORDS);
@@ -315,25 +298,24 @@ test('an item that does not open with a whole measure is not touched', () => {
   });
   // No list, no scaling: the caller that hands nothing over changes nothing.
   assert.strictEqual(scaleLeadingMeasure('a handful of parsley', 3).scaled, false);
-  // A pat IS a stepped measure since 2026-10-10, so one written into the item
-  // scales like a handful written there: it was left alone until then.
+  // A pat is a stepped measure, so one written into the item scales like a
+  // handful written there.
   assert.strictEqual(
     scaleLeadingMeasure('a pat of salted butter, to finish', 3, WORDS).text,
     '3 pats of salted butter, to finish');
 });
 
 test('"2 large" still scales with the list in hand', () => {
-  // Helen, #1005: "Things like '2 large' can scale, surely". scaling.yml says
-  // why a size word must never join the list; this is what would notice.
+  // scaling.yml says why a size word must never join a step list; this is what
+  // would notice (#1005).
   assert.strictEqual(scaleAmount('2 large', 2, WORDS).text, '4 large');
   assert.strictEqual(scaleAmount('4 medium', 0.5, WORDS).text, '2 medium');
   assert.strictEqual(scaleAmount('1 small', 3, WORDS).text, '3 small');
 });
 
 test('counts of things you can pick up scale -- Helen: "4 sprigs double is 8, and so on"', () => {
-  // RULED, 2026-10-04, not merely left: drop, twist and lot are absent from
-  // both step lists on her word. Sprig and bunch still double to 8 and 2; what
-  // changed for them on 2026-10-10 is the fractions, in the test below.
+  // Whole multiples. The step lists change only the fractions, which the two
+  // tests below pin.
   assert.strictEqual(scaleAmount('4 sprigs', 2, WORDS).text, '8 sprigs');
   assert.strictEqual(scaleAmount('1 bunch', 2, WORDS).text, '2 bunches');
   assert.strictEqual(scaleAmount('3–4 drops', 2, WORDS).text, '6–8 drops');
@@ -342,10 +324,8 @@ test('counts of things you can pick up scale -- Helen: "4 sprigs double is 8, an
 });
 
 test('a handful, a sprig and a bunch go to the nearest quarter, in fractions -- never 1.17', () => {
-  // Helen, 2026-10-10, shown "1.17 sprigs" and "1.17 bunches" at seven for
-  // six: "Sprigs: Let's round to 1/4 please, and express in fractions not
-  // decimals."
-  // "Recipe page handfuls and sprigs in 1/4 too please" put the handful first.
+  // Seven for six must not read "1.17 sprigs": the nearest quarter, written as
+  // a fraction.
   assert.deepStrictEqual(WORDS.quarterStep, ['handful', 'sprig', 'bunch']);
   assert.strictEqual(scaleAmount('1 sprig', 7 / 6, WORDS).text, '1¼ sprigs');
   assert.strictEqual(scaleAmount('1 bunch', 7 / 6, WORDS).text, '1¼ bunches');
@@ -371,9 +351,8 @@ test('a handful, a sprig and a bunch go to the nearest quarter, in fractions -- 
 });
 
 test('drops, twists, lots and pats step in halves -- Helen: "round to the nearest 1/2"', () => {
-  // 2026-10-10: "Drops, twists, lots etc, please round to the nearest 1/2 --
-  // these are smaller than handfuls and sprigs." It replaces "scaled linearly"
-  // (2026-10-04) for the four, `pat` among them.
+  // Smaller than handfuls and sprigs, so the nearest half rather than the
+  // nearest quarter.
   assert.deepStrictEqual(yamlList('scaling.yml', 'half_step_counts'),
     ['drop', 'twist', 'lot', 'pat']);
   assert.strictEqual(scaleAmount('5 twists', 2 / 3, WORDS).text, '3½ twists');
@@ -405,7 +384,7 @@ test('the index shopping list buys whole ones, and quotes this page\'s own figur
   assert.strictEqual(row('2 handfuls', 0.5), '1 handful');
   assert.strictEqual(row('1 small handful', 2), '2 small handfuls');
   // Seven portions of a recipe for six: 1¼ here, and the list buys two and
-  // quotes this page's figure -- the two agree since 2026-10-10.
+  // quotes this page's figure.
   assert.strictEqual(scaleAmount('1 handful', 7 / 6, WORDS).text, '1¼ handfuls');
   assert.strictEqual(row('1 handful', 7 / 6), '2 handfuls (1¼ in the recipes)');
   assert.strictEqual(row('1 handful', 1.5), '2 handfuls (1½ in the recipes)');
@@ -459,7 +438,7 @@ test('the note name drops a measure written into the item', () => {
     'fresh coriander');
   assert.strictEqual(noteName('a good pinch of salt', WORDS), 'salt');
   assert.strictEqual(noteName('pinch of salt', WORDS), 'salt');
-  // `pat` is a declared measure since 2026-10-10, so its phrase goes too.
+  // `pat` is a declared measure, so its phrase goes too.
   assert.strictEqual(noteName('a few pats of salted butter, to finish', WORDS),
     'salted butter');
   // A word that is on neither list is left alone.
@@ -494,15 +473,11 @@ test('a factor that is not a positive number leaves the amount alone', () => {
   assert.strictEqual(scaleAmount('200 g', NaN).scaled, false);
 });
 
-// -----------------------------------------------------------------------------
-// #1286 -- on a `makes:` recipe the box counts THE THING MADE. Helen: "Never
-// tell me how many cookies are in a portion!!!" and "Take the midpoint".
-//
-// THE SPECS BELOW ARE WHAT _plugins/food_yield.rb RETURNS for the real line
-// named beside each (tests/test_food_yield.py pins that half). This file is
-// the other half: what a press of plus does, and what the box and the word
-// after it say.
-// -----------------------------------------------------------------------------
+// --- #1286: on a `makes:` recipe the box counts the thing made -----------------
+// The specs below are what _plugins/food_yield.rb returns for the real line
+// named beside each (tests/test_food_yield.py pins that half). This file is the
+// other half: what a press of plus does, and what the box and the word after it
+// say.
 const { yieldMode, portionsMode } = foodScale;
 
 /** Press plus or minus `presses` times from `from`, as recipe-scale.js does. */
@@ -517,17 +492,14 @@ function reads(mode, n) {
   return mode.box(n) + ' ' + mode.word(n);
 }
 
-// "4–6 waffles, depending on your waffle iron" -- Henry's Sunday Waffles.
-// BASE 4, THE LOWER NUMBER, SINCE 2026-10-07 (Helen: "lower number please, new
-// ruling"); it was 5, the midpoint, for the three days before.
+// "4–6 waffles, depending on your waffle iron": a range reads as its lower
+// number.
 const WAFFLES = { kind: 'count', base: 4, stem: 'waffles', rest: '',
   invariable: false, singular: false, times: false, plus: false };
 
 test('#1286: the waffles step in WHOLE RECIPES -- 4 waffles, 8 waffles, 12', () => {
-  // Helen: "the buttons should still multiply the recipe in integers, just
-  // showing number of waffles. So 1x is 5 waffles, 2x is 10 waffles.
-  // Otherwise we'll need to start showing eggs in units of 1/27". (Her fives
-  // are the midpoint's; the stepping is the ruling, and it is unchanged.)
+  // The buttons multiply the recipe in integers and the box shows the count
+  // that makes; a step of one waffle would need eggs in fractions.
   const mode = yieldMode(WAFFLES);
   assert.strictEqual(mode.base, 4);
   assert.strictEqual(reads(mode, mode.base), '4 waffles');
@@ -540,9 +512,8 @@ test('#1286: the waffles step in WHOLE RECIPES -- 4 waffles, 8 waffles, 12', () 
 });
 
 test('#1286: a typed figure goes to the nearest whole recipe, and never to a part of one', () => {
-  // The box shows a derived figure, so what is typed is a request, not a
-  // value: 7 waffles is nearer two recipes than one. Helen: "not having half
-  // recipes in between integers" -- 5 or 7 waffles is never x1½.
+  // The box shows a derived figure, so what is typed is a request, not a value:
+  // 7 waffles is nearer two recipes than one, and never x1½.
   const mode = yieldMode(WAFFLES);
   assert.strictEqual(mode.clamp(7), 8);
   assert.strictEqual(mode.clamp(5), 4);
@@ -555,8 +526,8 @@ test('#1286: a typed figure goes to the nearest whole recipe, and never to a par
 });
 
 test('#1286: a figure on a half is a range of one -- "5–6", then "11", then "16–17"', () => {
-  // Helen: "Midpoints that land on a half can become a range of one."
-  // "4–7 buns" is 5.5. Nothing published is this shape; the rule is hers.
+  // A figure that lands on a half prints as a range of one. Nothing published
+  // starts on one; a halved odd count is what reaches it.
   const mode = yieldMode({ kind: 'count', base: 5.5, stem: 'buns', rest: '',
     invariable: false, singular: false, times: false, plus: false });
   assert.strictEqual(reads(mode, mode.base), '5–6 buns');
@@ -568,7 +539,6 @@ test('#1286: a figure on a half is a range of one -- "5–6", then "11", then "1
 });
 
 test('#1286: "64+" keeps its plus -- 64+ tiny macarons, 128+ tiny macarons', () => {
-  // Helen's own words, replacing her earlier '"64+" can be treated as "64"'.
   const mode = yieldMode({ kind: 'count', base: 64, stem: 'tiny macarons', rest: '',
     invariable: false, singular: false, times: false, plus: true });
   assert.strictEqual(reads(mode, mode.base), '64+ tiny macarons');
@@ -577,8 +547,8 @@ test('#1286: "64+" keeps its plus -- 64+ tiny macarons, 128+ tiny macarons', () 
 });
 
 test('#1286: "one 8-inch cake" is one; two read "2 × 8-inch cakes"', () => {
-  // Helen: "Two 8-inch cakes". A digit straight before "8-inch" is
-  // unreadable and the box is a number, so a × stands between them.
+  // A digit straight before "8-inch" is unreadable and the box is a number, so
+  // a × stands between them.
   const mode = yieldMode({ kind: 'count', base: 1, stem: '8-inch cake', rest: '',
     invariable: false, singular: true, times: true, plus: false });
   assert.strictEqual(reads(mode, mode.base), '1 × 8-inch cake');
@@ -593,7 +563,7 @@ test('#1286: "one 8-inch cake" is one; two read "2 × 8-inch cakes"', () => {
 });
 
 test('#1286: a dozen stays a dozen -- "1 dozen" doubled is "2 dozen"', () => {
-  // Helen: '"1 dozen" doubled can be "two dozen". Our scaler is integer.'
+  // "dozen" is invariable: it takes no plural at two.
   const mode = yieldMode({ kind: 'count', base: 1, stem: 'dozen mince pies', rest: '',
     invariable: true, singular: true, times: false, plus: false });
   assert.strictEqual(reads(mode, mode.base), '1 dozen mince pies');
@@ -610,7 +580,6 @@ test('#1286: a yield written with "of" carries the rest along', () => {
 });
 
 test('#1286: a volume scales by whole orders -- 950 ml, 1900 ml, 2850 ml', () => {
-  // Helen: "950 ml for one order of a recipe becomes 1900 ml for 2".
   const mode = yieldMode({ kind: 'measure', base: 950, unit: 'ml', prefix: '' });
   assert.strictEqual(reads(mode, mode.base), '950 ml');
   assert.strictEqual(reads(mode, press(mode, 950, 1)), '1900 ml');
@@ -641,8 +610,8 @@ test('#1286: a `serves:` recipe steps a portion at a time, as it always did', ()
 });
 
 test('#1286: guessed portions on a `makes:` recipe step in whole recipes -- 4, 8, 12', () => {
-  // Helen: 'if "some" is originally guessed to be 4 portions, 2x should be 8
-  // portions'. cherry-glaze: `makes: "Some"`, `serves_estimate: 4`.
+  // A `makes: "Some"` recipe with `serves_estimate: 4`: the guess doubles with
+  // the recipe.
   const mode = portionsMode(4, true);
   assert.strictEqual(mode.box(mode.base), '4');
   assert.strictEqual(press(mode, 4, 1), 8);
@@ -655,22 +624,16 @@ test('#1286: guessed portions on a `makes:` recipe step in whole recipes -- 4, 8
 });
 
 // --- the one step below a whole recipe ----------------------------------------
-// Helen: "Half a recipe would be great where the numbers aren't insane!" and
-// "not having half recipes in between integers, just between 0 and 1". The
-// BUILD decides which recipes get it (tests/test_food_yield.py); the second
-// argument here is that verdict.
+// A half is offered below one whole recipe and never between two. The build
+// decides which recipes get it (tests/test_food_yield.py); the second argument
+// here is that verdict.
 
-// A COUNT OF FIVE, which is what the waffles were while a range read as its
-// midpoint. They read 4 since 2026-10-07; these three tests are about an ODD
-// count -- the one case that halves to a range of one -- so they keep the five
-// and stop borrowing the real recipe's line for it.
+// An odd count is the one case that halves to a range of one, so these tests
+// use a count of five rather than a real recipe's line.
 const FIVE_WAFFLES = { ...WAFFLES, base: 5 };
 
 test('#1286: with the half step, a count of five goes ½, 1, 2, 3 -- "2–3", 5, 10, 15', () => {
-  // THE REAL WAFFLES ARE NOT OFFERED THIS -- Helen: "Please take the half step
-  // off the waffles. 2-3 waffles isn't enough!!!!" (the cup rule refuses
-  // them). The spec is kept because an odd count is the case that shows the
-  // range of one; the verdict passed in is what a recipe that halves gets.
+  // The verdict passed in is what a recipe that halves gets.
   const mode = yieldMode(FIVE_WAFFLES, true);
   const half = press(mode, 5, -1);
   assert.strictEqual(half / mode.base, 0.5);
@@ -742,9 +705,8 @@ test('#1286: a `serves:` recipe is never given whole-recipe or half steps', () =
 });
 
 // --- "1 large egg", not "1 large eggs" -----------------------------------------
-// Helen: "at 0.5x, that should read '1 large egg' not 'eggs'. Going from 1x to
-// 0.5x eggs will be the only kind of occasion where a plural reduces to a
-// single. Can we fix please?"
+// A plural comes down to a single only where an amount scales to exactly one,
+// as two eggs do at half a recipe.
 
 /** ingredient_words.yml's `singulars`, read as the flat map it is. */
 function yamlMap(file, key) {
@@ -788,7 +750,7 @@ test('#1286: an amount that comes down to exactly one says so, and only then', (
 
 test('#1286: "1 large egg, separated" -- the item\'s leading noun goes singular', () => {
   const one = (item) => foodScale.singularItem(item, SINGULARS);
-  // The waffles' own line, and the other shapes the published collection writes.
+  // The shapes the published collection writes.
   assert.strictEqual(one('eggs, separated'), 'egg, separated');
   assert.strictEqual(one('eggs'), 'egg');
   assert.strictEqual(one('egg yolks'), 'egg yolk');
@@ -825,10 +787,9 @@ test('#1286: an item that cannot be made singular safely is left as written', ()
 });
 
 test('#1286: Delia\'s pancakes -- "about 8 pancakes" is 8 pancakes, then 16', () => {
-  // Helen: 'Can Delia\'s pancakes please scale as "8 pancakes", "16 pancakes".'
   // The spec is what _plugins/food_yield.rb returns for `makes: "about 8
-  // pancakes"` (tests/test_food_yield.py pins that); the "about" is printed
-  // by the layout in front of the box, as it is for "about 300 ml".
+  // pancakes"` (tests/test_food_yield.py pins that); the "about" is printed by
+  // the layout in front of the box, as it is for "about 300 ml".
   const mode = yieldMode({ kind: 'count', base: 8, prefix: 'about', stem: 'pancakes', rest: '',
     invariable: false, singular: false, times: false, plus: false }, false);
   assert.strictEqual(reads(mode, mode.base), '8 pancakes');

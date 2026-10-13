@@ -1,37 +1,18 @@
 """One headless-Chromium smoke test of both indexes, a recipe and a drink (#1200).
 
-WHY THIS EXISTS. Nothing else in the suite executes a built page. The stub-DOM
-harness (`tests/js/`) runs the real scripts in the real order against a
-stand-in DOM, and by design it cannot see a `<script>` tag missing from the
-page, a script that throws on a real DOM, or a layout that overflows. DECISIONS
-§12 (2026-09-10): the drinks index lost a script tag for two days with the
-suite green throughout, and the note said only a browser could have seen it.
+Nothing else in the suite executes a built page: the stub-DOM harness
+(`tests/js/`) cannot see a `<script>` tag missing from the page, a script that
+throws on a real DOM, or a layout that overflows. This checks console errors,
+sideways overflow at the harness's two widths, and that each index lists rows
+and a filter click changes its count. Pixel comparison, a11y and other
+browsers are #1102. The pages come from conftest's `prod_site` build.
 
-WHAT IT CHECKS, AND NOTHING MORE -- the issue's list:
-  - no console error and no uncaught exception on any of the four pages;
-  - no horizontal overflow at 360 and 1280, the harness's own widths;
-  - each index lists rows once its script has run to its last line;
-  - a filter click changes the "N survivors" count.
-Not pixel comparison, not an a11y audit, not other browsers: those are #1102.
-
-IT LOADS PAGES OUT OF THE PRODUCTION BUILD THE RENDERED-PAGES TESTS ALREADY
-MAKE -- `prod_site`, from conftest.py -- served at the site's own baseurl.
-It adds no build of its own.
-
-IT SKIPS ON WHETHER CHROMIUM CAN LAUNCH, NEVER ON WHETHER PLAYWRIGHT IMPORTS.
-CI installs the Python binding (requirements-test.txt) and no browser, because
-browsers are a separate download the workflow does not make. An import-based
-skip would run there, fail to launch, and gate the deploy -- the expected-to-
-fail arrangement Helen ruled out on 2026-09-20 (DECISIONS §10, #1127). So the
-`chromium` fixture below launches once per session and skips, with the launch
-error as its reason, if that fails.
-
-A SKIP THAT HAPPENS EVERY RUN IS A TEST THAT NEVER RUNS, so it is not left to
-scroll past: conftest.pytest_terminal_summary names it at the END of the run,
-where a green run is actually read, and test_suite_hygiene.py holds that every
-test here goes through the probe rather than an import skip. Setting
-`HT_REQUIRE_BROWSER=1` turns the skip into a failure, for a machine -- CI once
-it installs Chromium -- where no browser is a broken setup rather than a fact.
+Every test takes the `chromium` fixture, which skips when Chromium cannot
+LAUNCH, never on whether playwright imports: CI installs the binding and no
+browser, so an import-based skip would run there, fail, and gate the deploy
+(DECISIONS §10, #1127). conftest names the skip at the end of the run and
+test_suite_hygiene.py holds the tests to the fixture. `HT_REQUIRE_BROWSER=1`
+turns the skip into a failure.
 """
 from __future__ import annotations
 
@@ -49,15 +30,11 @@ pytestmark = pytest.mark.shared
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASEURL = "/helen-triages"
 
-# WHERE CHROMIUM IS, mirroring scripts/browser/env.sh's search, same order and
-# same precedence. Images built before 2026-09-29 set PLAYWRIGHT_BROWSERS_PATH
-# inside two RUN layers only, so the binding left alone looked in
-# ~/.cache/ms-playwright, found nothing, and could not launch; the Dockerfile
-# now carries an ENV too, and this search still wins over it, as env.sh's does:
-# a worktree's own install.sh copy exists because the image was older than the
-# pin, which is exactly when the image's path is the wrong one. Neither
-# directory: leave the variable alone, right on a host whose `playwright
-# install` used its default.
+# Where Chromium is, in scripts/browser/env.sh's order. This search wins over
+# the image's own PLAYWRIGHT_BROWSERS_PATH: a worktree's install.sh copy exists
+# because the image is older than the pin, which is when the image's path is
+# the wrong one. Neither directory: the variable is left alone, which is right
+# on a host whose `playwright install` used its default.
 BROWSER_DIRS = (
     ROOT / "tmp" / "browser" / "ms-playwright",
     pathlib.Path("/opt/playwright/ms-playwright"),
@@ -255,20 +232,12 @@ def test_the_page_runs_clean_and_fits(chromium, visit, prod_site, which, width):
         f"{url} at {width}px reported {len(v.errors)} error(s) in a real "
         f"browser:\n  " + "\n  ".join(v.errors)
     )
-    # MEASURE THE SETTLED PAGE -- #1295, 2026-10-04. This failed about one run
-    # in four on the cocktails index at 360px ("376px wide", "398px wide", a
-    # `drink-card-name--fitted` at right=397) and passed when run again with
-    # nothing changed. assets/js/card-name-fit.js fits the card names once at
-    # load and AGAIN on `document.fonts.ready`, "because until the real" face
-    # is in, the widths it measured are the fallback's. `networkidle` and the
-    # index script's canary say nothing about that second pass, so the width
-    # could be read between the font arriving and the names being refitted.
-    # Waiting for the fonts, then two frames for the refit to lay out, reads
-    # the page a visitor ends up with.
-    #
-    # NOT PROVEN TO BE THE CAUSE: the failure is too rare to reproduce on
-    # demand. If this test flakes again with this wait in place, the overflow
-    # is real at some moment a visitor can see and the fitting is what to fix.
+    # Measure the settled page (#1295). assets/js/card-name-fit.js fits the
+    # card names at load and again on `document.fonts.ready`; `networkidle`
+    # and the canary say nothing about that second pass, so wait for the
+    # fonts, then two frames for the refit to lay out. Not proven to be the
+    # cause of the intermittent overflow: if this flakes with the wait in
+    # place, the overflow is real and the fitting is what to fix.
     v.page.evaluate("""() => document.fonts.ready.then(() => new Promise(
         done => requestAnimationFrame(() => requestAnimationFrame(done))))""")
     wide = v.overflow()

@@ -1,24 +1,19 @@
-// =============================================================================
-// Tests for assets/js/card-line-budget.js — issue #776.
+// Tests for assets/js/card-line-budget.js (#776).
 //
 //   node --test tests/js/*.test.js
 //
-// WHAT THIS IS FOR. The script answers one question CSS cannot ask: how many
-// lines did the ingredient line ACTUALLY render? `-webkit-line-clamp: 3` is a
-// ceiling and most cards do not reach it, so a rule keyed on the clamp would
-// cap the chips on every card for what the tiki drinks do.
+// The script answers what CSS cannot ask: how many lines the ingredient line
+// actually rendered. `-webkit-line-clamp: 3` is a ceiling most cards do not
+// reach, so a rule keyed on the clamp would cap the chips on every card.
 //
-// SO THE ARITHMETIC IS THE WHOLE OF IT, and it is the arithmetic that is easy
-// to get subtly wrong: height divided by line-height, ROUNDED. Rounding rather
-// than flooring is load-bearing — `line-height: 1.5` at `font-size: 0.82rem` is
-// not a whole pixel and three lines can measure as 2.98, which floors to two and
-// silently drops the rule on a card that visibly has three.
+// The arithmetic is height over line-height, rounded and not floored:
+// `line-height: 1.5` at `font-size: 0.82rem` is not a whole pixel, so three
+// lines can measure as 2.98, which floors to two and drops the rule on a card
+// that visibly has three.
 //
-// THE DOM IS STUBBED, the way tests/js/cocktail-scale.test.js stubs one, and for
-// the same stated reason: run the SHIPPED source byte for byte inside a fake
-// `window` and read what it did. The stub carries only what the script touches —
-// `querySelectorAll`, `querySelector`, `classList` and the two measurement APIs.
-// =============================================================================
+// The DOM is stubbed, as tests/js/cocktail-scale.test.js stubs one: the shipped
+// source runs byte for byte inside a fake `window`, and the stub carries only
+// what the script touches.
 'use strict';
 
 const test = require('node:test');
@@ -94,9 +89,8 @@ test('three lines of ingredients cap the chips', () => {
 });
 
 test('a fractional three lines still counts as three', () => {
-  // THE BUG THIS EXISTS FOR. Sub-pixel metrics make three lines measure just
-  // under; flooring would call it two and drop the rule on a card that has
-  // visibly overflowed.
+  // Sub-pixel metrics make three lines measure just under; flooring would call
+  // it two and drop the rule on a card that has visibly overflowed.
   const c = card(LH * 3 - 0.4, LH, true);
   assert.strictEqual(Math.floor((LH * 3 - 0.4) / LH), 2, 'floor would say two');
   run([c]);
@@ -110,8 +104,8 @@ test('one line is not three', () => {
 });
 
 test('the class is removed again when a re-run no longer earns it', () => {
-  // Reset-before-measure, the bug card-name-fit.js's step 1 exists to prevent:
-  // without it a card widened by a resize can never lose the cap.
+  // Reset before measuring: without it a card widened by a resize can never
+  // lose the cap.
   const c = card(LH * 3, LH, true);
   run([c]);
   assert.strictEqual(c.capped(), true);
@@ -156,13 +150,10 @@ test('it hangs itself off HTF so the index can re-run it', () => {
   assert.strictEqual(typeof sandbox.HTF.cardLineBudget, 'function');
 });
 
-// -----------------------------------------------------------------------------
-// THE SHIP AND THE LAST CHIP ROW, 2026-09-10. #760 took the verdict out of flow
-// and masked it over the chips; Helen saw "sugar crav" and "strong brown drin"
-// on the live index the same evening. The pass now measures whether a chip on
-// the ship's row reaches past the ship's left edge, and only then marks the
+// --- the ship and the last chip row (#760) -------------------------------------
+// The verdict is out of flow, over the chips. The pass measures whether a chip
+// on the ship's row reaches past the ship's left edge, and only then marks the
 // card so the stylesheet can pad that card's chips clear.
-// -----------------------------------------------------------------------------
 
 /**
  * A card with a ship at `ship` and chips at `chips` (each {top, bottom, left,
@@ -246,15 +237,11 @@ test('a card with no ship is left alone', () => {
   assert.strictEqual(c.cleared(), false);
 });
 
-// -----------------------------------------------------------------------------
-// THE CHIPS ARE PACKED -- #1308. Helen: "it feels like there's lots of space on
-// the right-hand side of the tag block", and "allowing tags to wrap if we tweak
-// the order rather than requiring them to be alphabetical".
-//
+// --- the chips are packed (#1308) ----------------------------------------------
+// Chips need not stay alphabetical where another order uses the width better.
 // `HTF.packChips` is the search with no DOM in it, so it is asked directly. The
-// widths are the real ones, measured off the built index at 1280px: a chip's
-// own width, and 14.5px more when another chip follows it (the dot).
-// -----------------------------------------------------------------------------
+// widths are measured off the built index at 1280px: a chip's own width, and
+// 14.5px more when another chip follows it (the dot).
 
 const DOT = 14.5;
 
@@ -308,10 +295,10 @@ test('chips that fit one row stay in alphabetical order', () => {
 });
 
 test('an order is found that frees the rows from the ship', () => {
-  // German Vacation, the shape in the issue's screenshot. Alphabetically its
-  // last row reaches the ship, so the block was padded clear and drew THREE
-  // short rows: festive, ice ice baby / sharp, sugar craving / sunny terrace,
-  // warming. Packed, it is two rows at the card's full width.
+  // German Vacation (#1308). Alphabetically its last row reaches the ship, so
+  // padded clear it draws three short rows: festive, ice ice baby / sharp,
+  // sugar craving / sunny terrace, warming. Packed, it is two rows at the
+  // card's full width.
   const chips = chipWidths([49, 84, 35, 91, 91, 49]);
   const W = 278.4, lastW = 216.9;
   const alphabetical = draw([0, 1, 2, 3, 4, 5], chips, W, 3);
@@ -328,11 +315,10 @@ test('an order is found that frees the rows from the ship', () => {
 });
 
 test('the upper rows are filled as full as they will go', () => {
-  // HELEN'S PICK, 2026-10-06: "Option C, chef's kiss!" Moscow Mule already
-  // fitted two rows alphabetically -- ice ice baby, sharp, sugar craving /
-  // sunny terrace -- and a rule that only mended broken cards left it alone.
-  // This one does not: sharp, sugar craving, sunny terrace fills the first row
-  // 7px further, so that is the first row, and the rows step down.
+  // Moscow Mule already fits two rows alphabetically (ice ice baby, sharp,
+  // sugar craving / sunny terrace) and is repacked all the same: sharp, sugar
+  // craving, sunny terrace fills the first row further, so that is the first
+  // row, and the rows step down (#1308).
   const chips = chipWidths([84, 35, 91, 91]);
   const W = 278.4;
   const got = packer()(chips.adv, chips.lastAdv, 0,
@@ -376,18 +362,15 @@ test('no order is offered when none keeps the ship\'s row short', () => {
   assert.strictEqual(got, null);
 });
 
-// -----------------------------------------------------------------------------
-// A ROW MAY BE ENDED EARLY -- #1331, 2026-10-07. Helen: "sometimes chips on
-// cards don't wrap properly -- varies with screen width", seen between about
-// 822px and 915px. The widths below are the real ones at 830px, where a card's
-// foot is 243.4px and the ship starts 174.3px along it.
-// -----------------------------------------------------------------------------
+// --- a row may be ended early (#1331) ------------------------------------------
+// The widths below are the real ones at 830px, where a card's foot is 243.4px
+// and the ship starts 174.3px along it.
 
 test('chips that fit one full row but not beside the ship split in two', () => {
   // Jungle Bird: aperitivo, fruity, sharp, tiki. All four fit the foot's full
-  // width, so greedy wrapping draws one row -- into the ship -- whatever the
-  // order. Before this the only way out was the padding, which drew
-  // `aperitivo, fruity / sharp, tiki` in a block 159px wide.
+  // width, so greedy wrapping draws one row, into the ship, whatever the order.
+  // Padding alone would draw `aperitivo, fruity / sharp, tiki` in a narrow
+  // block.
   const chips = chipWidths([63, 42, 35, 28]);
   const W = 243.4, lastW = 174.3;
   const oneRow = draw([0, 1, 2, 3], chips, W, 3);
