@@ -2739,6 +2739,15 @@ def test_both_indexes_filter_chips_wear_the_shared_tape():
                if not (ROOT / "assets" / "img" / "chrome" / "tag-shapes" / f"{s}.svg").is_file()]
     assert shapes and not missing, f"Shapes in POOL with no file in assets/img/chrome/tag-shapes/: {missing}"
 
+    # A chip's own `data-tag-shape` (#1369) bypasses the hash, so nothing at
+    # run time would notice a typo: it would fetch a file that is not there.
+    assert "host.getAttribute('data-tag-shape')" in decorations, (
+        "tagShapes() no longer reads a host's data-tag-shape.")
+    named = re.findall(r'data-tag-shape="([^"]*)"', cocktails + group
+                       + (ROOT / "food" / "index.html").read_text(encoding="utf-8"))
+    stray = [n for n in named if n not in shapes]
+    assert not stray, f"data-tag-shape names a shape that is not in POOL: {stray}"
+
     for entry in ("food.scss", "cocktails.scss"):
         assert '@import "shared/tag-shape";' in (ROOT / "assets" / "css" / entry).read_text(encoding="utf-8"), (
             f"assets/css/{entry} does not import the tape slot.")

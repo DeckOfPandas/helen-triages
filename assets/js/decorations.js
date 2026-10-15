@@ -172,7 +172,9 @@
   // --- Tag shapes ------------------------------------------------------------
   // The torn-tape background behind a pill or a filter button (#1219).
   // Assigned by a hash of the tag's own text, never randomly or by position:
-  // a tag must wear the same shape in the filter section and in the list.
+  // a tag must wear the same shape in the filter section and in the list. A
+  // host's `data-tag-shape` names its shape outright, for a chip Helen has
+  // picked one for by looking (#1369); it must name a member of POOL.
   // The pool leaves out mirror images, because a row mixing both disagrees
   // about which end is torn; shape 4 keeps its flip (torn at both ends).
   // Shape 8 is out as too diagonal, and shape 9 for short text only: its
@@ -212,11 +214,15 @@
       var text = (host ? host.textContent : '').trim().toLowerCase();
       if (!text) return;
 
+      // This runs again whenever a script adds a slot, so a slot is restyled
+      // from scratch each time rather than keeping an earlier pass's class.
+      slot.classList.remove('tag-shape--stretch');
+
       var shape;
       if (host.classList.contains('title-hit')) {
         shape = TITLE_HIT_SHAPE;
       } else {
-        shape = pickShape(text);
+        shape = host.getAttribute('data-tag-shape') || pickShape(text);
         // tag-shape-2's torn top-left corner draws the eye on a wide pill, so
         // long text on it is marked for extra stretch. Short text must never
         // get the class.
