@@ -1814,6 +1814,29 @@ def test_the_built_site_root_holds_nothing_unexpected(prod_site):
     )
 
 
+# Wording that only a note to Helen uses. Phrases, not words: "remove" alone
+# is in recipes.
+NOTE_TO_SELF = re.compile(
+    r"remove this (?:note|line)|remove once (?:confirmed|you)|checked once|your call whether",
+    re.IGNORECASE)
+
+
+def test_no_published_file_ships_a_note_to_helen(prod_site):
+    """A note written for Helen in a data file must not reach a reader, not
+    even in a page's embedded JSON, where view-source shows it (#1387).
+    Covers every HTML and JSON file in the production build."""
+    files = sorted(prod_site.rglob("*.html")) + sorted(prod_site.rglob("*.json"))
+    assert files, f"No HTML or JSON under {prod_site} -- an empty scan passes."
+    found = []
+    for path in files:
+        for m in NOTE_TO_SELF.finditer(path.read_text(encoding="utf-8")):
+            found.append(f"{path.relative_to(prod_site)}: ...{m.group(0)}...")
+    assert not found, (
+        "The production build ships text written for Helen:\n  " + "\n  ".join(found[:10])
+        + "\n\nEither drop the field from what the page embeds (`without_keys`, "
+          "_plugins/without_keys.rb) or resolve the note in the data.")
+
+
 def test_the_cocktail_index_marks_and_styles_everything_it_lights_up(site):
     """Three JS-applied classes on the drinks index, and each must have a rule.
 
