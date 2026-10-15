@@ -3309,18 +3309,20 @@ def test_every_makes_recipe_reaches_the_shopping_list_as_a_batch_row(prod_site):
     )
 
 
-def test_a_fruit_written_as_its_juice_or_zest_is_marked_for_the_list(prod_site):
+def test_a_fruit_written_as_its_juice_or_zest_is_marked_for_the_list(site):
     """'zest of 1 lemon' reaches the list as one lemon's zest -- #1297.
 
     The matcher is Ruby inside Jekyll (_plugins/food_shopping.rb,
     `mark_fruit`), so the built page is the only place it can be checked.
-    Three real lines, one per shape:
+    The local build, because it keeps a recipe held back for proofreading:
+    the zest line's only published example may be one. Three real lines,
+    one per shape:
 
       item: "finely grated zest of 1 lemon"      the count is in the item
       amount: "1", item: "lemon, juiced"         the part is after the comma
       amount: "1 tbsp", item: "lemon juice"      NOT a lemon: never marked
     """
-    blob = _shopping_blob(prod_site)
+    blob = _shopping_blob(site)
 
     def line(url, name):
         found = [i for i in blob[url]["i"] if i["n"] == name]
