@@ -1854,8 +1854,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   old names are in `retired_rum_names`. The rum-based one is priced and
   strengthed from Malibu, her meaning of the category. Both count as tiki
   markers; only the rum-based one is a pudding flavour (Helen: *"Tiki
-  only"*). Blue Hawaiian, whose only rum was Malibu, is no longer in the rum
-  family.
+  only"*). Neither is in the rum family, but `rum (all)` finds the rum-based
+  one through `family_reach`: Helen, *"When a user filters for rum, let's
+  show them Malibu. Fine for it not to be hidden by excluding rum."* So Blue
+  Hawaiian answers to `rum (all)` and survives "no rum tonight". The
+  rhum-based Mahina and Créole Shrubb are not reached.
 - **2026-10-15, #1379 — `pineapple rum` is `pineapple-infused rum`.** Helen
   chose the rename knowing two live drinks go back to her for proofreading.
   The card still reads "pineapple rum".

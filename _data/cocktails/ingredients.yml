@@ -1234,6 +1234,13 @@ shelf_of:
   soda water: tops
 
 # Bases with no family, deliberately, each with its reason.
+# A generic a family's `(all)` chip FINDS without the generic being in the
+# family (#1379): searching `rum (all)` shows a Malibu drink, and excluding
+# rum leaves it in, because a liqueur is not a reason to skip a drink. A
+# mapping, so it mints no generic. test_family_reach_names_real_things.
+family_reach:
+  "coconut rum-based liqueur": rum
+
 family_less:
   "coconut-flower arrack": >-
     Coconut flower sap, sharing only a name with Batavia arrack. Used once, in

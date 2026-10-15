@@ -312,6 +312,24 @@
       });
     }
 
+    // `family_reach` (#1379): a generic a family's chip finds on include only,
+    // so `rum (all)` shows a Malibu drink and excluding rum keeps it. Keyed by
+    // the generic and its card name, as the family index is.
+    var reachIndex = Object.create(null);
+    Object.keys(voc.family_reach || {}).forEach(function (generic) {
+      var family = voc.family_reach[generic];
+      [generic, cardNames[generic]].forEach(function (name) {
+        var key = normalise(name);
+        if (key) reachIndex[key] = family;
+      });
+    });
+
+    function entryReachedBy(entries, family) {
+      return (entries || []).some(function (entry) {
+        return reachIndex[normalise(entry)] === family;
+      });
+    }
+
     // --- the pool -------------------------------------------------------------
 
     // Returns chips, { value, terms }: `value` is what the button says and
@@ -571,7 +589,10 @@
     // `gin (all)` is the precise answer.
     function matchesInclude(entries, chip) {
       if (!chip) return false;
-      if (isFamilyValue(chip)) return entryHasFamily(entries, chipFamily(chip));
+      if (isFamilyValue(chip)) {
+        var family = chipFamily(chip);
+        return entryHasFamily(entries, family) || entryReachedBy(entries, family);
+      }
       // Everything exclude would take, plus the fuzzy reach below. A card-name
       // chip must never select FEWER drinks than the same chip would exclude.
       if (matchesExclude(entries, chip)) return true;

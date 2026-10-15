@@ -999,6 +999,21 @@ test('an umbrella is not a family: familiesOf never returns one', () => {
   assert.deepStrictEqual(U.familiesOf('rhum agricole blanc'), ['rum']);
 });
 
+test('family_reach: rum (all) finds a Malibu drink, and excluding rum keeps it (#1379)', () => {
+  const R = CS.create(Object.assign({}, VOCAB, {
+    liqueurs: VOCAB.liqueurs.concat(['coconut rum-based liqueur']),
+    family_reach: { 'coconut rum-based liqueur': 'rum' }
+  }), BOTTLES);
+  const chip = 'rum' + CS.FAMILY_SUFFIX;
+  const blueHawaiian = ['pineapple vodka', 'coconut rum-based liqueur', 'malibu'];
+  assert.strictEqual(R.matchesInclude(blueHawaiian, chip), true);
+  assert.strictEqual(R.matchesExclude(blueHawaiian, chip), false);
+  // The card lights the line, by the include rule.
+  assert.strictEqual(R.entryIsHit(['coconut rum-based liqueur'], [chip]), true);
+  // Still not a family member.
+  assert.deepStrictEqual(R.familiesOf('coconut rum-based liqueur'), []);
+});
+
 test('a chosen umbrella is not offered again, and a chosen clairin is not re-listed', () => {
   const found = U.search('rhum', upool(), ['rhum agricole (all)', 'Clairin Communal']);
   assert.deepStrictEqual(found.familyButtons, ['rum']);

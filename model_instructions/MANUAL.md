@@ -2323,6 +2323,10 @@ the pool, ranking, families and the two matching rules (pure, tested);
   `family_labels` make a family reachable however it is spelled (`whisk(e)y`).
   `not_on_cards` keeps the bare sugars, salt, water, zest and honey off a card
   and out of the search; every syrup stays.
+- **A family's `(all)` chip may reach a generic outside the family**
+  (`family_reach`): `rum (all)` finds `coconut rum-based liqueur` on include
+  and never on exclude, so a Malibu drink shows under rum and survives "no
+  rum tonight". `test_family_reach_names_real_things` holds the names.
 - **A search umbrella is an `(all)` button that is not a family**
   (`search.umbrellas`): `rhum agricole (all)` selects both agricoles, offered
   and matched as a family's button is, but `familiesOf` and `family_of` never

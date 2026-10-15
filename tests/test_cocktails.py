@@ -6861,6 +6861,28 @@ def test_search_umbrellas_name_declared_generics():
     assert not wrong, "search umbrella problem(s):\n  " + "\n  ".join(wrong)
 
 
+def test_family_reach_names_real_things():
+    """`family_reach` maps declared generics to declared families -- #1379.
+
+    The search matches by exact name, so a renamed generic silently drops out
+    of `rum (all)`. A generic already in `family_of` needs no reach, and one
+    there for a different family would be found by two families' chips.
+    """
+    vocab = _vocab()
+    declared = _declared_generics(vocab)
+    families = set(vocab.get("families") or [])
+    family_of = vocab.get("family_of") or {}
+    wrong = []
+    for generic, family in (vocab.get("family_reach") or {}).items():
+        if generic not in declared:
+            wrong.append(f"{generic!r} is not a declared generic")
+        if family not in families:
+            wrong.append(f"{generic!r} -> {family!r}, which is not a family")
+        if generic in family_of:
+            wrong.append(f"{generic!r} is already in family_of ({family_of[generic]})")
+    assert not wrong, "family_reach problem(s):\n  " + "\n  ".join(wrong)
+
+
 def test_rum_page_notes_name_real_things():
     """`rum_page_bottle_notes` keys are bottles; `rum_character_notes` keys are
     characters -- #1379. A note on a renamed key silently stops printing.
