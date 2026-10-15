@@ -2704,7 +2704,7 @@ SERVING_OF = re.compile(
 # leaving means one gained a figure, by a data fix or by the rule weakening.
 NO_VOLUME_STATED = {
     "caipirinha",
-    "pear-apricot-and-rosemary-bellini",
+    "pear-and-rosemary-bellini",
 }
 
 
