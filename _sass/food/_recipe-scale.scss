@@ -71,20 +71,12 @@
 }
 
 // The step buttons: the shared shape (shared/_rule.scss), the interactive
-// colour at rest, lighter on hover.
+// colour at rest, lighter on hover and focus. The recipe page's accent, since
+// no section hue applies there (MANUAL §13.5).
 .recipe-scale-step {
   @include scale-step($color-recipe-link, $color-recipe-link-hover);
   font-family: $font-label;
   font-weight: 600;
-
-  // A real outline is the focus ring (#1086); a colour change alone does not
-  // read as focus. Offset 2px to clear the glyph. The recipe page's accent,
-  // since no section hue applies there (MANUAL §13.5).
-  &:focus-visible {
-    outline: 2px solid $color-recipe-link-hover;
-    outline-offset: 2px;
-    color: $color-recipe-link-hover;
-  }
 }
 
 // Which lines are still as written once the portions move. A paragraph of its

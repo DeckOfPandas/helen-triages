@@ -429,12 +429,6 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 .cocktail-scale-step {
   @extend %cocktail-heading-face;
   @include scale-step($color-accent, $color-wicked-woowoo);
-
-  &:focus-visible {
-    outline: none;
-    color: $color-wicked-woowoo;
-    border-color: $color-wicked-woowoo;
-  }
 }
 
 // `[hidden]` is restated because any author `display` beats the UA rule for

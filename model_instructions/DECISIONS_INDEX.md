@@ -844,6 +844,7 @@ argument and the rules each field is read by.
 - 2026-09-11 · §14 · #985 · the rum page has three levels of vertical space, all from tokens: 1.5rem inside a section, $spacing-section-gap above a shelf heading, $spacing-section-top above a section rule.
 - 2026-09-11 · §14 · #920 · a wrapped heading on the rum page wears the mark under its last line only.
 - 2026-09-15 · §14 · #1086 · from the axe-core review: the footer's reference word is an 82% mix, three food controls have a real focus ring, and the ship icon is aria-hidden.
+- 2026-10-15 · §14 · #1394 · both sites' scaler − / + are one shape from one piece of code: 32px buttons, a 44px tap area, and the same focus ring.
 - 2026-09-10 · §14 · the rum page's "two things I care about" list uses the about page's numbered-list styling.
 - 2026-09-10 · §14 · #919 · the rum-adjacent block renders before the Flavoured shelf.
 - 2026-09-10 · §14 · links in the rum page's prose look like links: absinthe and underlined at rest, wicked woowoo on hover.

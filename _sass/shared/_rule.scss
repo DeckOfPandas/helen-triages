@@ -420,10 +420,10 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 // --- The scaler's − and + ------------------------------------------------------
 // One shape for both sites' scalers, with the colours as arguments: food's
 // `.recipe-scale-*` and cocktails' `.cocktail-scale-*` include these, so the
-// two cannot drift. The typeface and the focus ring stay each site's own.
-// The gap must stay wide enough that the 44px area stops short of the number
-// box, or it takes the box's taps. A control may not change its own footprint
-// (#389): the border is transparent at rest, never absent.
+// two cannot drift. Only the typeface stays each site's own. The gap must
+// stay wide enough that the 44px area stops short of the number box, or it
+// takes the box's taps. A control may not change its own footprint (#389),
+// so focus is an outline, never a border or a size (DECISIONS §14, #1086).
 @mixin scale-controls {
   display: inline-flex;
   align-items: center;
@@ -446,6 +446,14 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   cursor: pointer;
 
   &:hover { color: $hover; }
+
+  // Offset 2px to clear the glyph; a colour change alone does not read as
+  // focus.
+  &:focus-visible {
+    outline: 2px solid $hover;
+    outline-offset: 2px;
+    color: $hover;
+  }
 }
 
 // --- The chip in a search pool ------------------------------------------------
