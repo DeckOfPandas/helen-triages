@@ -313,9 +313,7 @@ loop to mark.
 
 **Every stylesheet in `assets/css/` imports from `shared/`, and a partial may
 too.** `food.scss` and `cocktails.scss` are the two sites;
-`longform-demo.scss` is an additive overlay `<link>`ed by the
-`/food/longform-demo/` pages on top of `food.css`, taking only `shared/tokens`
-and `shared/rule`; `_sass/food/_timings.scss` re-imports those two itself.
+`_sass/food/_timings.scss` re-imports `shared/tokens` and `shared/rule` itself.
 Grep for `@import "shared/` across `assets/css/` and `_sass/` before
 renaming or splitting a shared partial: the importer you forget is the one
 that fails at the next build of a page you never visit.

@@ -4773,13 +4773,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   reading of her sentence, not a pick of hers.** Say so in the PR; the first
   one she looks at and dislikes is a one-line change (#1324, #1325, #1328,
   #1354, #1357, #1358).
-- **Undated — the runner-up long-form design, C, is kept in the project so
-  Helen can change her mind.** Helen: *"C has charm though... keep the
-  stylesheet for C somewhere in the project so I can change my mind."*
-  `assets/css/longform-demo.scss` and the two pages under
-  `food/longform-demo/`, which alone load it. It overrides the live styling
-  and does not copy it, so it cannot go stale. Do not delete it as dead: the
-  file and the pages go together, when she adopts C or lets it go.
+- **2026-10-15, #1394 — the runner-up long-form design, C, is let go.** Its
+  two demo pages were reachable on the live site by URL, and nothing used
+  them. Helen: *"Delete the longform demos."* The pages and their stylesheet
+  are in git history if C is ever wanted back.
 
 **§13.12 Decisions that are Helen's: the words.**
 
