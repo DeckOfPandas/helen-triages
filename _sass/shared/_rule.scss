@@ -402,11 +402,15 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 // food's `.btn-tag` and cocktails' `.btn-pool` both include these, so the two
 // cannot drift. Bare, with no fill and no outline; what sits behind it is a
 // `.tag-shape` slot the site colours.
+// A chip moves to the next line whole, and wraps inside itself only when it
+// is wider than the entire row: a long ingredient name would otherwise push a
+// phone page sideways. An inline-block or flex item is sized to fit first.
 @mixin index-chip($rest) {
   position: relative;
   display: inline-block;
+  max-width: 100%;
   font-family: $font-headings;
-  white-space: nowrap;
+  white-space: normal;
   text-transform: lowercase;
   font-weight: 700;
   border: none;

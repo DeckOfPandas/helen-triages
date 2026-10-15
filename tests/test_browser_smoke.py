@@ -297,6 +297,27 @@ def test_the_index_lists_rows_and_a_filter_changes_the_count(chromium, visit, na
     )
 
 
+def test_every_recipe_and_drink_page_fits_a_phone(chromium, visit, prod_site):
+    """test_the_page_runs_clean_and_fits loads one recipe and one drink; a
+    fault in one page's data (a long badge row) shows on that page only, and
+    26 recipes scrolled sideways unseen. Every page, at 360px."""
+    pages = sorted(prod_site.glob("food/recipes/*/index.html")) \
+        + sorted(prod_site.glob("cocktails/recipes/*/index.html"))
+    assert len(pages) > 50, f"only {len(pages)} recipe and drink pages built"
+    v = visit("/food/", 360)
+    wide = []
+    for path in pages:
+        url = "/" + str(path.parent.relative_to(prod_site)) + "/"
+        v.page.goto(v.page.url.split(BASEURL)[0] + BASEURL + url, wait_until="load")
+        w = v.page.evaluate("document.documentElement.scrollWidth")
+        if w > 360:
+            wide.append(f"{url} is {w}px")
+    assert not wide, (
+        f"{len(wide)} of {len(pages)} pages scroll sideways at 360px:\n  "
+        + "\n  ".join(wide[:12]))
+    assert not v.errors, "page error(s):\n  " + "\n  ".join(v.errors[:8])
+
+
 # Deals row `i` of the universe's pool through its own "deal again" button by
 # steering the one Math.random() call the deal makes (assets/js/universe.js).
 DEAL_ROW = """async (i) => {

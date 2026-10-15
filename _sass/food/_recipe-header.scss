@@ -389,8 +389,11 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 }
 
 // --- Recipe Badges on recipe page --------------------------------------------
+// Wraps: a recipe with five or six badges is wider than a phone, and an
+// unwrapped row scrolls the whole page sideways.
 .recipe-badges {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
   gap: $space-sm;
