@@ -1431,9 +1431,10 @@ function renderResultsPool() {
         var typed = Number(input.value);
         shown = HTF.shortlist.setBatches(url,
           batchCount(url, input.value, batchesFor(url))) || 1;
-        // Only the spinner's 1½ is rewritten under the cursor; anything else
-        // waits for `change`, so a figure half typed is not snatched away.
-        if (typed > 1 && typed % 1 !== 0) input.value = String(shown);
+        // Only the spinner's 1½ is rewritten under the cursor. Typing carries
+        // an `inputType` and waits for `change`: rewriting "2.2" to "2" mid-
+        // figure made the next key give "25" (#1386).
+        if (!ev.inputType && typed > 1 && typed % 1 !== 0) input.value = String(shown);
       } else {
         shown = HTF.shortlist.setPortions(url, input.value) || portionsFor(url);
       }
@@ -1446,12 +1447,13 @@ function renderResultsPool() {
       renderTotals();
     });
 
-    /* On `change`, a batch box shows what it was taken as: "0.2" where no
-       half is offered is one batch. */
+    /* On `change`, a box shows what it was taken as: "0.2" where no half is
+       offered is one batch, and "1.5" portions is 1. */
     shoppingRecipes.addEventListener('change', function (ev) {
       var input = ev.target;
       if (!input.classList || !input.classList.contains('shopping-list-portions')) return;
-      if (isBatch(input.dataset.url)) input.value = String(batchesFor(input.dataset.url));
+      var url = input.dataset.url;
+      input.value = String(isBatch(url) ? batchesFor(url) : portionsFor(url));
     });
   }
 
@@ -1459,15 +1461,28 @@ function renderResultsPool() {
     /* Set all writes every recipe's own number and keeps no state. It ships
        empty: each recipe starts at its own yield, so no one number means "as
        written". */
+    /* Number(), not parseInt: parseInt reads "1e9" as 1, and the list then
+       disagreed with the box. */
+    function setAllValue() {
+      var n = Number(setAllInput.value);
+      return isFinite(n) && n >= 1 ? Math.min(99, Math.floor(n)) : null;
+    }
+
     setAllInput.addEventListener('input', function () {
-      var n = parseInt(setAllInput.value, 10);
-      if (!isFinite(n) || n < 1) return;
+      var n = setAllValue();
+      if (n === null) return;
       /* A batch row is left alone (#1297): "6 portions" has no answer for a
          recipe that makes 18 cookies. */
       shortlistedRecipes().forEach(function (url) {
         if (!isBatch(url)) HTF.shortlist.setPortions(url, n);
       });
       renderShoppingList();
+    });
+
+    /* On `change` the box shows what was applied, or empties if nothing was. */
+    setAllInput.addEventListener('change', function () {
+      var n = setAllValue();
+      setAllInput.value = n === null ? '' : String(n);
     });
   }
 

@@ -301,6 +301,11 @@
     return name;
   }
 
+  /* The most a box can hold: 99 portions, or 99 times a `makes:` recipe. The
+     shopping list stops at the same 99 (assets.js MAX_COUNT); past it a
+     typed figure printed amounts like "6.2e+28 kg". */
+  var MAX_MULTIPLE = 99;
+
   /* A MODE is what the wiring asks for; recipe-scale.js holds no arithmetic:
      `base` (the figure the recipe is written for; factor = value / base),
      `clamp(n)` (a typed or stepped value made into one the box can hold),
@@ -313,7 +318,7 @@
     function multiple(n) {
       var m = n / base;
       if (half && m < 0.75) return 0.5;
-      return Math.max(1, Math.round(m));
+      return Math.min(MAX_MULTIPLE, Math.max(1, Math.round(m)));
     }
     return {
       base: base,
@@ -343,7 +348,7 @@
     if (whole) return wholeRecipes(base, box, word, half);
     return {
       base: base,
-      clamp: function (n) { return Math.max(1, Math.round(n)); },
+      clamp: function (n) { return Math.min(MAX_MULTIPLE, Math.max(1, Math.round(n))); },
       step: function (n, delta) { return n + delta; },
       box: box,
       word: word

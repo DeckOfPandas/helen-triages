@@ -257,7 +257,7 @@ window.HTF = window.HTF || {};
         if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
           Object.keys(raw).forEach(function (url) {
             var n = raw[url];
-            if (typeof n === 'number' && isFinite(n) && n > 1) counts[url] = Math.floor(n);
+            if (typeof n === 'number' && isFinite(n) && n > 1) counts[url] = Math.min(MAX_COUNT, Math.floor(n));
           });
         }
       } catch (e) { /* everything is one glass, and the page works */ }
@@ -293,7 +293,7 @@ window.HTF = window.HTF || {};
           Object.keys(raw).forEach(function (url) {
             var n = raw[url];
             if (typeof n === 'number' && isFinite(n) && n > 0) {
-              servings[url] = Math.floor(n);
+              servings[url] = Math.min(MAX_COUNT, Math.floor(n));
             }
           });
         }
@@ -316,6 +316,11 @@ window.HTF = window.HTF || {};
        THIS recipe may have a half (page.half_recipe) is the caller's question.
        A missing entry is one batch. */
     var BATCHES_PREFIX = 'htf-shortlist-batches-';
+
+    // The most of anything a list holds: glasses, portions or batches. Equal
+    // to the `max` the shopping list's boxes declare. A box's `max` is not
+    // enforced on typing, and an uncapped count prints "6.2e+28 kg".
+    var MAX_COUNT = 99;
     var batchCounts = null;
 
     function batchesKey() {
@@ -326,7 +331,7 @@ window.HTF = window.HTF || {};
       var value = Number(n);
       if (!isFinite(value) || value <= 0) return null;
       if (value < 0.75) return 0.5;
-      return Math.max(1, Math.round(value));
+      return Math.min(MAX_COUNT, Math.max(1, Math.round(value)));
     }
 
     function readBatches() {
@@ -432,7 +437,7 @@ window.HTF = window.HTF || {};
       setGlasses: function (url, n) {
         if (!url) return 1;
         var all = readGlasses();
-        var value = Math.floor(Number(n));
+        var value = Math.min(MAX_COUNT, Math.floor(Number(n)));
         if (!isFinite(value) || value <= 1) delete all[url];
         else all[url] = value;
         writeGlasses();
@@ -456,7 +461,7 @@ window.HTF = window.HTF || {};
       setPortions: function (url, n) {
         if (!url) return null;
         var all = readPortions();
-        var value = Math.floor(Number(n));
+        var value = Math.min(MAX_COUNT, Math.floor(Number(n)));
         if (!isFinite(value) || value < 1) {
           delete all[url];
           writePortions();

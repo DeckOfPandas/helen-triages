@@ -578,6 +578,11 @@
        so the radio just chosen keeps its focus. */
     shoppingDrinks.addEventListener('change', function (ev) {
       var input = ev.target;
+      // A glasses box shows what it was taken as: "2.5" is 2, "500" is 99.
+      if (input.classList && input.classList.contains('shopping-list-glasses')) {
+        input.value = String(HTF.shortlist.glasses(input.dataset.url));
+        return;
+      }
       if (!input.dataset || !input.dataset.generic) return;
       var url = input.dataset.url;
       CHOSEN[url] = CHOSEN[url] || {};
@@ -592,12 +597,25 @@
   }
 
   if (setAllInput) {
-    /* Set all writes every drink's own count; there is no global factor. */
+    /* Set all writes every drink's own count; there is no global factor.
+       Number(), not parseInt, which reads "1e9" as 1 (food's twin in
+       filters.js does the same). */
+    function setAllValue() {
+      var n = Number(setAllInput.value);
+      return isFinite(n) && n >= 1 ? Math.min(99, Math.floor(n)) : null;
+    }
+
     setAllInput.addEventListener('input', function () {
-      var n = parseInt(setAllInput.value, 10);
-      if (!isFinite(n) || n < 1) return;
+      var n = setAllValue();
+      if (n === null) return;
       shortlistedDrinks().forEach(function (url) { HTF.shortlist.setGlasses(url, n); });
       renderShoppingList();
+    });
+
+    /* On `change` the box shows what was applied, or empties if nothing was. */
+    setAllInput.addEventListener('change', function () {
+      var n = setAllValue();
+      setAllInput.value = n === null ? '' : String(n);
     });
   }
 
