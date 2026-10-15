@@ -1,4 +1,4 @@
-"""Tap areas on a phone: MANUAL 13.11, one round. Ships nothing.
+"""Tap areas on a phone: MANUAL 13.11, round two. Ships nothing.
 
 Build first:
   bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock
@@ -10,18 +10,20 @@ bar on top), drink.html and cocktails.html (full documents of the drink page
 and the cocktail index, sharing the bar's memory), and phone.html (both at
 390px side by side).
 
-The switches on the bar:
+Round one settled three (Helen): read it / make it and the header doors
+take a 44px tap area, and "deal again" is a bit bigger. Those are base CSS
+here. The switches left on the bar:
 
-  steppers  today | 32 | 44    the − and + beside the multiple box
-  toggle    today | 32 | 44    read it / the switch / make it
-  doors     today | 32 | 44    the header's links to the other site and ??
-  deal      today | a bit | more    "deal again": the VISIBLE size
+  steppers  today | 32 | big   the − and + beside the multiple box: a 32px
+                               tap area, or BIG -- 32x32 buttons with a
+                               larger glyph, 12px gaps, and a 44px tap area
+                               that stops short of the multiple box
   show      off | on           paints the tap areas so they can be judged
 
-A tap area is an invisible ::after centred on the control, at least the
-chosen size in each direction it has room for: the steppers grow both ways,
-the toggle and the doors grow in height only, so neighbours never overlap.
-Nothing on screen moves. 44 is Apple's guidance, 24 WCAG 2.2's floor.
+A tap area is an invisible ::after centred on the control: the steppers grow
+both ways, the toggle and the doors in height only, so neighbours never
+overlap. At today's 5px gaps a 44px stepper area would cover 3.5px of the
+box, which is why 44 needs the bigger buttons. 44 is Apple's guidance.
 """
 import os, sys
 
@@ -31,45 +33,53 @@ sys.path.insert(0, HERE)
 import mock_bundle
 from reference_candidates import BAR_CSS, bar_html, switcher, document
 
-SIZES = [("today", "today"), ("32", "32px"), ("44", "44px")]
 GROUPS = [
-    ("steppers", "− / +", SIZES),
-    ("toggle", "read / make", SIZES),
-    ("doors", "header doors", SIZES),
-    ("deal", "deal again", [("today", "today"), ("bit", "a bit bigger"), ("more", "bigger")]),
+    ("steppers", "− / +", [("today", "today"), ("32", "32px area"), ("big", "bigger buttons, 44px area")]),
     ("show", "show tap areas", [("off", "off"), ("on", "on")]),
 ]
-DEFAULTS = {"steppers": "44", "toggle": "44", "doors": "44", "deal": "bit", "show": "on"}
-KEY = "tapcand-1"
+DEFAULTS = {"steppers": "big", "show": "on"}
+KEY = "tapcand-2"
 
-# (switch, selector, grows sideways too)
-TARGETS = [
-    ("steppers", ".cocktail-scale-step", True),
-    ("toggle", ".cocktail-toggle-label, .cocktail-toggle-track", False),
-    ("doors", ".site-nav-icon-link", False),
-]
+AREA = ('content: ""; position: absolute; left: 50%; top: 50%; '
+        'transform: translate(-50%, -50%);')
+
+DECIDED = f"""
+/* decided in round one: 44px tall areas, and deal again a bit bigger */
+.cocktail-toggle-label, .cocktail-toggle-track, .site-nav-icon-link {{ position: relative; }}
+.cocktail-toggle-label::after, .cocktail-toggle-track::after, .site-nav-icon-link::after {{
+  {AREA} width: 100%; height: max(100%, 44px);
+}}
+.btn-universe-again {{ font-size: 0.92rem; padding: 0.3rem 0; }}
+"""
+
+STEPPERS = f"""
+html[data-steppers="32"] .cocktail-scale-step,
+html[data-steppers="big"] .cocktail-scale-step {{ position: relative; }}
+html[data-steppers="32"] .cocktail-scale-step::after {{
+  {AREA} width: max(100%, 32px); height: max(100%, 32px);
+}}
+/* BIG: a 2rem square button, the glyph up a third, the row's gaps to 12px,
+   so a 44px area reaches 6px past the button and stops short of the box. */
+html[data-steppers="big"] .cocktail-scale-controls {{ gap: 0.75rem; }}
+html[data-steppers="big"] .cocktail-scale-step {{
+  width: 2rem; height: 2rem; padding: 0; font-size: 1.25rem; line-height: 1;
+}}
+html[data-steppers="big"] .cocktail-scale-step::after {{ {AREA} width: 44px; height: 44px; }}
+"""
+
+SHOW = """
+html[data-show="on"] .cocktail-scale-step::after,
+html[data-show="on"] .cocktail-toggle-label::after,
+html[data-show="on"] .cocktail-toggle-track::after,
+html[data-show="on"] .site-nav-icon-link::after {
+  background: rgba(255, 0, 200, 0.28); outline: 1px solid #ff00c8;
+}
+html[data-show="on"] .btn-universe-again { outline: 1px dashed #ff00c8; }
+"""
 
 
 def css():
-    out = ["/* the tap area: invisible unless shown */"]
-    for attr, sel, wide in TARGETS:
-        for size in ("32", "44"):
-            hosts = ", ".join(f'html[data-{attr}="{size}"] {s.strip()}' for s in sel.split(","))
-            afters = ", ".join(f'html[data-{attr}="{size}"] {s.strip()}::after' for s in sel.split(","))
-            width = f"max(100%, {size}px)" if wide else "100%"
-            out.append(f"{hosts} {{ position: relative; }}")
-            out.append(f"{afters} {{ content: \"\"; position: absolute; left: 50%; top: 50%; "
-                       f"width: {width}; height: max(100%, {size}px); transform: translate(-50%, -50%); }}")
-    for attr, sel, _ in TARGETS:
-        afters = ", ".join(f'html[data-show="on"] {s.strip()}::after' for s in sel.split(","))
-        out.append(f"{afters} {{ background: rgba(255, 0, 200, 0.28); outline: 1px solid #ff00c8; }}")
-    out.append("""
-/* deal again: the visible size */
-html[data-deal="bit"] .btn-universe-again { font-size: 0.92rem; padding: 0.3rem 0; }
-html[data-deal="more"] .btn-universe-again { font-size: 1.02rem; padding: 0.45rem 0; }
-html[data-show="on"] .btn-universe-again { outline: 1px dashed #ff00c8; }
-""")
-    return "\n".join(out)
+    return DECIDED + STEPPERS + SHOW
 
 
 def page(path, title, links):
