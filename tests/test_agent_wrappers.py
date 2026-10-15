@@ -322,6 +322,36 @@ def test_the_hook_leaves_single_quoted_and_escaped_dollar_brackets_alone(command
     assert not _unanalyzable_denies(command), f"refused {command!r}"
 
 
+# --- guard-unanalyzable-bash.py shape 12: an unquoted lone `&` ---------------
+#
+# The shell splits the command there, and the checker reads the second half
+# as a fragment and asks Helen, whatever the allow list says.
+
+@pytest.mark.parametrize("command", [
+    # a real call she was asked about
+    "sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/issues?state=open&per_page=100 --each number,title",
+    "sh scripts/browser/serve.sh &",
+    "git status & git log",
+])
+def test_the_hook_refuses_an_unquoted_lone_ampersand(command):
+    assert _unanalyzable_denies(command), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    # the same call with the endpoint quoted, which is what to write instead
+    "sh scripts/gh-read.sh 'repos/DeckOfPandas/helen-triages/issues?state=open&per_page=100' --each number,title",
+    # redirections are not this shape
+    "python3 scripts/verify.py > tmp/verify.txt 2>&1",
+    "python3 scripts/verify.py >&2",
+    "python3 scripts/verify.py &> tmp/verify.txt",
+    # prose and patterns inside quotes are inert
+    'grep -n "a & b" _data/cocktails/taxonomy.yml',
+    "grep -rn '&amp;' _includes/",
+])
+def test_the_hook_leaves_quoted_ampersands_and_redirections_alone(command):
+    assert not _unanalyzable_denies(command), f"refused {command!r}"
+
+
 # --- session-ground-truth.py: the one hook that TELLS rather than refuses ----
 #
 # Every other hook here refuses something; this one reports where the session
