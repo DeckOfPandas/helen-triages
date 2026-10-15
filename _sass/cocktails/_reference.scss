@@ -304,7 +304,10 @@ $ref-list-gutter: 1.3rem;
   @include ref-marked-list("→");
 }
 
-.rum-retired-word {
+// The characters wear the retired words' face too (#1379): the page's two
+// flat lists look alike.
+.rum-retired-word,
+.rum-char {
   font-family: $font-label;
   color: $color-text;
 }
