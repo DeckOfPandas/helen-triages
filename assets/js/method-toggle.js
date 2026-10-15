@@ -17,10 +17,14 @@
     btn.textContent    =  isShort ? 'click for full method' : 'click for short method';
     btn.setAttribute('aria-pressed', isShort ? 'true' : 'false');
     btn.classList.toggle('active', isShort);
-    sessionStorage.setItem(SESSION_KEY, mode);
+    // Storage can be blocked (a strict private window) and then throws; the
+    // toggle must still work, only unremembered (#1386).
+    try { sessionStorage.setItem(SESSION_KEY, mode); } catch (e) {}
   }
 
-  if (sessionStorage.getItem(SESSION_KEY) === 'short') setMode('short');
+  var remembered = null;
+  try { remembered = sessionStorage.getItem(SESSION_KEY); } catch (e) {}
+  if (remembered === 'short') setMode('short');
 
   btn.addEventListener('click', function () {
     setMode(shortMethod.hidden === false ? 'full' : 'short');

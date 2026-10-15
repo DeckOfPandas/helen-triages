@@ -120,7 +120,9 @@ while `--jq .body` is fine.
 #### The headless browser
 
 Looking is cheaper than reasoning. The devcontainer image carries Playwright
-and its Chromium under `/opt/playwright`; `sh scripts/browser/install.sh`
+with Chromium and WebKit (Safari's engine, for a script that launches
+`webkit` itself; the harness and the suite use Chromium) under
+`/opt/playwright`; `sh scripts/browser/install.sh`
 checks the image's copy is the pinned version and stops. Outside the image,
 or in an image built before the pin moved, it installs both under
 `tmp/browser/`, and `scripts/browser/env.sh` prefers that local copy when it
@@ -311,9 +313,7 @@ loop to mark.
 
 **Every stylesheet in `assets/css/` imports from `shared/`, and a partial may
 too.** `food.scss` and `cocktails.scss` are the two sites;
-`longform-demo.scss` is an additive overlay `<link>`ed by the
-`/food/longform-demo/` pages on top of `food.css`, taking only `shared/tokens`
-and `shared/rule`; `_sass/food/_timings.scss` re-imports those two itself.
+`_sass/food/_timings.scss` re-imports `shared/tokens` and `shared/rule` itself.
 Grep for `@import "shared/` across `assets/css/` and `_sass/` before
 renaming or splitting a shared partial: the importer you forget is the one
 that fails at the next build of a page you never visit.

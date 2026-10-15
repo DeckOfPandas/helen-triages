@@ -717,7 +717,7 @@ argument and the rules each field is read by.
 - 2026-10-06 · §13 · #733 · anything that paints a lot goes to her phone before the merge, as an Artifact bundle of the real build.
 - 2026-10-08 · §13 · #733 · choices that interact go on one page side by side.
 - 2026-10-10 · §13 · a small job whose issue names its own fix may be built once with no candidates page, and every value in it is then the session's reading of her sentence, not a pick of hers.
-- undated · §13 · Undated — the runner-up long-form design, C, is kept in the project so Helen can change her mind.
+- 2026-10-15 · §13 · #1394 · the runner-up long-form design, C, is let go.
 - 2026-09-15 · §13 · #1097 · "recipes" means recipes on both sites; "food recipes" and "cocktail recipes" name one site's; counts are sometimes "portions" / "drinks".
 - 2026-09-15 · §13 · #1086 · the cocktail scaler reads − [1] drinks +, the word after the box.
 - 2026-09-15 · §13 · #1100 · PR #1100 — the shortlist panel is a share link and nothing else.
@@ -846,6 +846,7 @@ argument and the rules each field is read by.
 - 2026-09-11 · §14 · #985 · the rum page has three levels of vertical space, all from tokens: 1.5rem inside a section, $spacing-section-gap above a shelf heading, $spacing-section-top above a section rule.
 - 2026-09-11 · §14 · #920 · a wrapped heading on the rum page wears the mark under its last line only.
 - 2026-09-15 · §14 · #1086 · from the axe-core review: the footer's reference word is an 82% mix, three food controls have a real focus ring, and the ship icon is aria-hidden.
+- 2026-10-15 · §14 · #1394 · both sites' scaler − / + are one shape from one piece of code: 32px buttons, a 44px tap area, and the same focus ring.
 - 2026-09-10 · §14 · the rum page's "two things I care about" list uses the about page's numbered-list styling.
 - 2026-09-10 · §14 · #919 · the rum-adjacent block renders before the Flavoured shelf.
 - 2026-09-10 · §14 · links in the rum page's prose look like links: absinthe and underlined at rest, wicked woowoo on hover.

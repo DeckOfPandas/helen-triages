@@ -188,7 +188,10 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   flex-shrink: 0;
 }
 
+// Each of the three is 44px tall to tap; height only, so the label and the
+// switch beside it never take each other's taps.
 .cocktail-toggle-label {
+  @include tap-area(44px);
   white-space: nowrap;
 }
 
@@ -209,7 +212,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 }
 
 .cocktail-toggle-track {
-  position: relative;
+  @include tap-area(44px);
   width: 2.4rem;
   height: 1.2rem;
   border: 1.5px solid $color-electric-absinthe-deep;
@@ -421,42 +424,18 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   letter-spacing: 0.08em;
 }
 
-// The step buttons either side of the box (#731). $color-accent at rest,
-// woowoo on hover and focus. A control may not change its own footprint
-// (#389): the border is transparent at rest, not absent, and only its colour
-// moves. Same font-size, vertical padding and border as the input, so the
-// three share a height with no hand-tuned figure.
+// The step buttons either side of the box (#731): the shared shape
+// (shared/_rule.scss). $color-accent at rest, woowoo on hover and focus.
 .cocktail-scale-step {
   @extend %cocktail-heading-face;
-  display: inline-block;
-  box-sizing: border-box;
-  width: 1.7rem;
-  font-size: 0.95rem;
-  padding: $space-xxs 0;
-  border: 1px solid transparent;
-  background: none;
-  color: $color-accent;
-  text-align: center;
-  cursor: pointer;
-
-  &:hover {
-    color: $color-wicked-woowoo;
-  }
-
-  &:focus-visible {
-    outline: none;
-    color: $color-wicked-woowoo;
-    border-color: $color-wicked-woowoo;
-  }
+  @include scale-step($color-accent, $color-wicked-woowoo);
 }
 
 // `[hidden]` is restated because any author `display` beats the UA rule for
 // the attribute, and the control ships hidden until cocktail-scale.js reveals
 // it. The margin holds it close to the list it belongs to.
 .cocktail-scale-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: $space-xs;
+  @include scale-controls;
   margin: $space-md 0 0;
 
   &[hidden] { display: none; }

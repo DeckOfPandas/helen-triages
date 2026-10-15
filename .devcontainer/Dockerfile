@@ -56,9 +56,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Playwright and its headless Chromium, for scripts/browser/ (MANUAL §1), with
-# every system library Chromium needs (`--with-deps` apt-installs Playwright's
-# own list, which supersedes the hand-picked libs above -- they stay, harmless).
+# Playwright with headless Chromium and WebKit (Safari's engine), for
+# scripts/browser/ (MANUAL §1), with every system library both need
+# (`--with-deps` apt-installs Playwright's own list, which supersedes the
+# hand-picked libs above -- they stay, harmless).
 # Helen, 2026-09-15: "shall I pre-install Playwright (and its dependencies) into
 # this Docker image?" -- because sessions now start in fresh worktrees, and
 # tmp/browser/ belongs to one worktree, so every session that wanted a
@@ -75,7 +76,7 @@ RUN mkdir -p /opt/playwright \
     && cd /opt/playwright \
     && npm init -y > /dev/null \
     && npm install --no-audit --no-fund playwright@1.63.0 \
-    && PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright npx playwright install --with-deps chromium \
+    && PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright npx playwright install --with-deps chromium webkit \
     && rm -rf /var/lib/apt/lists/* /root/.npm
 
 # GitHub CLI, matching the project's own `gh` usage (read/write on Issues

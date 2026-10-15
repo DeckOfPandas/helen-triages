@@ -173,20 +173,29 @@
   // The torn-tape background behind a pill or a filter button (#1219).
   // Assigned by a hash of the tag's own text, never randomly or by position:
   // a tag must wear the same shape in the filter section and in the list.
-  // The pool leaves out mirror images, because a row mixing both disagrees
-  // about which end is torn; shape 4 keeps its flip (torn at both ends).
-  // Shape 8 is out as too diagonal, and shape 9 for short text only: its
-  // diagonal turns near-vertical on a narrow pill.
+  // CHOSEN overrides the hash for a tag Helen picked a shape for by looking,
+  // keyed by its text so every copy of the tag agrees (#1369). A host's
+  // `data-tag-shape` overrides both, for a candidates page.
   function tagShapes() {
     var slots = document.querySelectorAll('.tag-shape');
     if (!slots.length) return;
 
+    // No mirror images, because a row mixing both disagrees about which end
+    // is torn; shape 4 keeps its flip (torn at both ends). Shape 8 is out as
+    // too diagonal, and shape 9 is for short text only: its diagonal turns
+    // near-vertical on a narrow pill.
     var SHORT_TEXT_MAX = 6;
     var POOL = [
       'tag-shape-1', 'tag-shape-2', 'tag-shape-3',
       'tag-shape-4', 'tag-shape-4-flip',
       'tag-shape-5', 'tag-shape-6', 'tag-shape-7', 'tag-shape-9'
     ];
+
+    // The text as the hash reads it: trimmed and lowercased. Values are POOL's.
+    var CHOSEN = {
+      'i’m open to chaos': 'tag-shape-6',
+      'strong brown drink': 'tag-shape-7'
+    };
 
     function pickShape(text) {
       var pool = POOL;
@@ -212,11 +221,15 @@
       var text = (host ? host.textContent : '').trim().toLowerCase();
       if (!text) return;
 
+      // This runs again whenever a script adds a slot, so a slot is restyled
+      // from scratch each time rather than keeping an earlier pass's class.
+      slot.classList.remove('tag-shape--stretch');
+
       var shape;
       if (host.classList.contains('title-hit')) {
         shape = TITLE_HIT_SHAPE;
       } else {
-        shape = pickShape(text);
+        shape = host.getAttribute('data-tag-shape') || CHOSEN[text] || pickShape(text);
         // tag-shape-2's torn top-left corner draws the eye on a wide pill, so
         // long text on it is marked for extra stretch. Short text must never
         // get the class.

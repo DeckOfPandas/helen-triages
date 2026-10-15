@@ -397,16 +397,80 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 }
 
 
+// --- A tap area ----------------------------------------------------------------
+// A bigger place to tap without a bigger control: an invisible ::after
+// centred on the element, at least $height tall and, with $width, that wide.
+// Nothing on screen moves. The caller must leave the room: an area that
+// reaches a neighbouring control takes its taps. 44px is Apple's guidance;
+// scripts/tap_target_candidates.py is where Helen chose each one.
+@mixin tap-area($height, $width: null) {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    @if $width { width: max(100%, #{$width}); } @else { width: 100%; }
+    height: max(100%, #{$height});
+    transform: translate(-50%, -50%);
+  }
+}
+
+// --- The scaler's − and + ------------------------------------------------------
+// One shape for both sites' scalers, with the colours as arguments: food's
+// `.recipe-scale-*` and cocktails' `.cocktail-scale-*` include these, so the
+// two cannot drift. Only the typeface stays each site's own. The gap must
+// stay wide enough that the 44px area stops short of the number box, or it
+// takes the box's taps. A control may not change its own footprint (#389),
+// so focus is an outline, never a border or a size (DECISIONS §14, #1086).
+@mixin scale-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@mixin scale-step($rest, $hover) {
+  @include tap-area(44px, 44px);
+  display: inline-block;
+  box-sizing: border-box;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0;
+  border: 1px solid transparent;
+  background: none;
+  color: $rest;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover { color: $hover; }
+
+  // Offset 2px to clear the glyph; a colour change alone does not read as
+  // focus.
+  &:focus-visible {
+    outline: 2px solid $hover;
+    outline-offset: 2px;
+    color: $hover;
+  }
+}
+
 // --- The chip in a search pool ------------------------------------------------
 // One chip for both sites' search pools, with the colours as arguments:
 // food's `.btn-tag` and cocktails' `.btn-pool` both include these, so the two
 // cannot drift. Bare, with no fill and no outline; what sits behind it is a
 // `.tag-shape` slot the site colours.
+
+// A chip moves to the next line whole, and wraps inside itself only when it
+// is wider than the entire row: a long ingredient name would otherwise push a
+// phone page sideways. An inline-block or flex item is sized to fit first.
 @mixin index-chip($rest) {
   position: relative;
   display: inline-block;
+  max-width: 100%;
   font-family: $font-headings;
-  white-space: nowrap;
+  white-space: normal;
   text-transform: lowercase;
   font-weight: 700;
   border: none;

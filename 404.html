@@ -21,11 +21,11 @@ sitemap: false
 
 {% comment %} ── The 404 page (#1086, #1088) ──
   The shared chrome, Helen's sentence and the two doors, in about.html's shape
-  (.recipe wrapper, .recipe-body-content.about-page). The doors are the
-  header's own `.site-nav-icon-link` (_layouts/default.html), reused rather
-  than redrawn (#991), so a change to the header's door reaches this page. The
-  arrow is the drawn one (#993), after the word and pointing out; not
-  `.about-ways`, whose arrow is a `::before` on the left.
+  (.recipe wrapper, .recipe-body-content.about-page). Each door is the site's
+  bracketed word on a tape (#1382, Helen's pick on a candidates page): a
+  `[data-card-tape]` slot that decorations.js's cardTapes() fills from the
+  wordmark's tape set, lettered as the wordmark is. The arrow is the drawn one
+  (#993), after the tape and pointing out.
 {% endcomment %}
 
 <article class="recipe">
@@ -45,15 +45,21 @@ sitemap: false
        "[ " + word + " ]". {% endcomment %}
     <ul class="not-found-ways">
       <li>
-        <a href="{{ '/food/' | relative_url }}" class="site-nav-icon-link">
-          <span class="site-nav-word">[ {{ site.data.sites.food.word }} ]</span>
-          {% include icons/arrow-right.svg class="site-nav-arrow" %}
+        <a href="{{ '/food/' | relative_url }}" class="not-found-door">
+          <span class="not-found-tape">
+            <span class="not-found-tape-bg" data-card-tape="1" aria-hidden="true"></span>
+            <span class="not-found-word"><span class="not-found-bracket">[ </span>{{ site.data.sites.food.word }}<span class="not-found-bracket"> ]</span></span>
+          </span>
+          {% include icons/arrow-right.svg class="not-found-arrow" %}
         </a>
       </li>
       <li>
-        <a href="{{ '/cocktails/' | relative_url }}" class="site-nav-icon-link">
-          <span class="site-nav-word">[ {{ site.data.sites.cocktails.word }} ]</span>
-          {% include icons/arrow-right.svg class="site-nav-arrow" %}
+        <a href="{{ '/cocktails/' | relative_url }}" class="not-found-door">
+          <span class="not-found-tape">
+            <span class="not-found-tape-bg" data-card-tape="2" aria-hidden="true"></span>
+            <span class="not-found-word"><span class="not-found-bracket">[ </span>{{ site.data.sites.cocktails.word }}<span class="not-found-bracket"> ]</span></span>
+          </span>
+          {% include icons/arrow-right.svg class="not-found-arrow" %}
         </a>
       </li>
     </ul>

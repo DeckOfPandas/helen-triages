@@ -164,7 +164,9 @@ main {
 
 // Every link in the header's second row, the doors and `??` alike. Resting
 // colour only; the accent hover is in shared/_chrome.scss.
+// 44px tall to tap, on a line of type 20px tall.
 .site-nav-icon-link {
+  @include tap-area(44px);
   display: inline-flex;
   align-items: center;
   color: $color-clear-text;
@@ -312,11 +314,14 @@ main {
 
   // No accent colour at rest (Helen's ruling): the signal is the underline
   // and the pointer. Resting colour only; the hover is in shared/_chrome.scss.
+  // `nowrap` makes a link's whole text the column's minimum width, so the
+  // `1fr` tracks hold it and the `auto` centre gives way instead (#1389).
   a {
     color: inherit;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
+    white-space: nowrap;
   }
 }
 
@@ -366,6 +371,7 @@ main {
 // opacity and not a hex; 82% is what keeps it over the 4.5:1 WCAG AA text
 // minimum against $color-bg on both sites (#1086).
 .site-footer-ref-word {
+  white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: mix($color-clear-text, $color-bg, 82%);
@@ -414,10 +420,12 @@ main {
   }
 }
 
-// The two licence sentences are one paragraph of two spans, inline until a
-// phone, where each takes its own line (#902).
+// The two licence sentences are one paragraph of two spans, each one
+// unbreakable, so a squeezed centre column breaks between them and never
+// inside one (#1389). On a phone each takes its own line (#902).
 .site-footer-license-line {
-  display: inline;
+  display: inline-block;
+  white-space: nowrap;
 }
 
 @media (max-width: 600px) {

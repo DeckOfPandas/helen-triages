@@ -4808,13 +4808,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   reading of her sentence, not a pick of hers.** Say so in the PR; the first
   one she looks at and dislikes is a one-line change (#1324, #1325, #1328,
   #1354, #1357, #1358).
-- **Undated — the runner-up long-form design, C, is kept in the project so
-  Helen can change her mind.** Helen: *"C has charm though... keep the
-  stylesheet for C somewhere in the project so I can change my mind."*
-  `assets/css/longform-demo.scss` and the two pages under
-  `food/longform-demo/`, which alone load it. It overrides the live styling
-  and does not copy it, so it cannot go stale. Do not delete it as dead: the
-  file and the pages go together, when she adopts C or lets it go.
+- **2026-10-15, #1394 — the runner-up long-form design, C, is let go.** Its
+  two demo pages were reachable on the live site by URL, and nothing used
+  them. Helen: *"Delete the longform demos."* The pages and their stylesheet
+  are in git history if C is ever wanted back.
 
 **§13.12 Decisions that are Helen's: the words.**
 
@@ -5587,9 +5584,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `.site-footer-ref-word` at 65% measured 3.27:1; 82% gives 4.90:1 on food and
   4.71:1 on cocktails and still reads quieter than the links, so do not
   quieten it below 4.5:1 again. The food chips, `.page-search-input` and
-  `.recipe-scale-step` take a 2px `outline` on `:focus-visible`, never a
+  both sites' scaler − / + take a 2px `outline` on `:focus-visible`, never a
   change of size or border. The ship icon's rating word beside it already
   carries the meaning.
+- **2026-10-15, #1394 — both sites' scaler − / + are one shape from one piece
+  of code: 32px buttons, a 44px tap area, and the same focus ring.** Helen:
+  *"the same executed code, not just the same bytes"*, and of the focus ring,
+  *"the same same, not copied."* `scale-step` and `scale-controls` in
+  `_sass/shared/_rule.scss`; each site passes only its colours and typeface.
 - **2026-09-10 — the rum page's "two things I care about" list uses the about
   page's numbered-list styling.** Helen: *"please use the numbered list
   styling from the start of the about page for my 'two things I care about'

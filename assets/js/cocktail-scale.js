@@ -86,9 +86,10 @@
 
   /** Render the drink at a whole multiple, or leave it as it is. */
   function apply(wanted) {
-    /* Rounded to a whole recipe and never below one: `1.5` becomes 2, and
-       `settle` writes the rounded number back so the reader sees it. */
-    var n = Math.max(1, Math.round(wanted));
+    /* Rounded to a whole recipe, never below one and never above 99 (the
+       shopping list's own ceiling): `1.5` becomes 2, and `settle` writes the
+       rounded number back so the reader sees it. */
+    var n = Math.min(99, Math.max(1, Math.round(wanted)));
 
     var verdict = HTF.scale.scale(original, n);
     if (!verdict.ok) {

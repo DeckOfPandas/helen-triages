@@ -144,31 +144,105 @@ article.recipe .recipe-body-content.about-page {
     }
   }
 
-  // --- The 404's two ways out (#1088) ----------------------------------------
-  // The doors are the header's own (`.site-nav-icon-link` and its word and
-  // arrow, shared/_layout.scss). This rule exists for the cascade:
-  // `article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf)` in
-  // _recipe-header.scss paints every link in a recipe magenta at 600 and
-  // out-specifies a bare `.site-nav-icon-link`. Nested here it wins.
+  // --- The 404's two ways out: tape doors (#1382) ----------------------------
+  // Each site's bracketed word on a tape, lettered as the wordmark is
+  // (shared/_layout.scss `.site-logo-word`, through the same custom
+  // properties), then the drawn arrow. Nested here for the cascade: the
+  // recipe body's `ul li` would add its em dash, and `article.recipe a` would
+  // paint the link magenta.
   .not-found-ways {
     list-style: none;
     padding-left: 0;
-    margin: 0 0 $space-xl 0;
+    margin: $space-xxl 0 ($space-xxl * 1.5) 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.1rem;
 
     > li {
-      margin-bottom: $space-sm;
-    }
+      padding-left: 0;
+      margin: 0;
 
-    .site-nav-icon-link {
-      color: $color-clear-text;
-      font-weight: 400;
-
-      &:hover,
-      &:focus-visible {
-        color: $color-text;
-      }
+      &::before { content: none; }
     }
   }
+
+  .not-found-door {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: $color-text;
+    font-weight: 400;
+    text-decoration: none;
+
+    &:focus-visible {
+      outline: 2px solid $color-recipe-link;
+      outline-offset: 4px;
+    }
+  }
+}
+
+// Outside the .about-page scope: none of the recipe body's rules reach these,
+// so they need no extra weight.
+.not-found-tape {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55em 1.2em;
+  font-size: 1.15rem;
+}
+
+// The band is centred by moving the artwork: every tape SVG sits 1.765% low in
+// its own box (_sass/cocktails/_cards.scss `.drink-card-tape-bg`).
+.not-found-tape-bg {
+  position: absolute;
+  left: 0;
+  top: -1.765%;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+
+  svg { width: 100%; height: 100%; display: block; }
+}
+
+.not-found-word {
+  position: relative;
+  z-index: 1;
+  font-family: $font-headings;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--wordmark-word-color, #ECE9EA);
+  text-shadow: var(--wordmark-word-shadow,
+                   -1.0px -1.0px 0 #fdfbfe,
+                   -1.8px -1.8px 0 rgba(253, 251, 254, 0.75),
+                    1.0px  1.0px 0 rgba(5, 5, 5, 0.90),
+                    1.8px  1.8px 0 rgba(5, 5, 5, 0.45));
+}
+
+.not-found-bracket { letter-spacing: 0; }
+
+.not-found-arrow {
+  width: 1.3rem;
+  height: auto;
+  flex: none;
+  transition: transform 0.12s ease;
+}
+
+.not-found-door:hover,
+.not-found-door:focus-visible {
+  .not-found-word { color: #fff; }
+  .not-found-arrow { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .not-found-arrow { transition: none; }
+}
+
+article.recipe .recipe-body-content.about-page {
 
   // --- The FAQ ---------------------------------------------------------------
   // A question and its answer share one gutter, so the answer does not fall

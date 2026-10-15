@@ -315,11 +315,13 @@
 
       var renderedKeys = new Set();
 
+      // The query is folded, so the entry's words are too, and the dedupe key
+      // is the single-word path's: "creme fraiche" finds crème fraîche once.
       if (multiWord) {
         var multiMatches = [];
         masterIngredientsList.forEach(function (ing) {
-          var ingWords = getMatchWords(ing);
-          var ingKey = ingWords.map(normaliseIngredientWord).join(' ');
+          var ingWords = getMatchWords(ing).map(fold);
+          var ingKey = entryKey(ing);
           var allMatch = queryWords.every(function (qw) {
             return ingWords.some(function (iw) { return iw.indexOf(qw) !== -1; });
           });

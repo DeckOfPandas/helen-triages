@@ -129,6 +129,16 @@
       return;
     }
 
+    /* The box's own min and max are the range the data is good for; a browser
+       does not enforce them on typing, and past them a time is nonsense
+       ("550000000h"). PLACEHOLDER COPY, not Helen's words yet. */
+    var lo = parseFloat(els.weight.min), hi = parseFloat(els.weight.max);
+    if ((isFinite(lo) && kg < lo) || (isFinite(hi) && kg > hi)) {
+      els.summary.textContent = "Times are worked out for " + els.weight.min +
+        " to " + els.weight.max + " kg.";
+      return;
+    }
+
     /* Cleared, or the prompt above would be stranded over a filled list once
        a weight is typed. */
     els.summary.textContent = "";

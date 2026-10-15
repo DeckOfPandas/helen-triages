@@ -408,3 +408,29 @@ test('#1297: clear() empties the batches too', () => {
   HTF.shortlist._forget();
   assert.strictEqual(HTF.shortlist.batches('/a/'), null);
 });
+
+// --- the ceiling --------------------------------------------------------------
+// A box's `max` is not enforced on typing; uncapped, 1e9 portions printed
+// "6.2e+28 kg mussels" and came back after a reload.
+
+test('no count goes past 99, however it is typed', () => {
+  const { HTF } = pageWith();
+  [100, 1e9, '123456789012345678901234567890', 1e300].forEach((value) => {
+    assert.strictEqual(HTF.shortlist.setPortions('/a/', value), 99, String(value));
+    assert.strictEqual(HTF.shortlist.setBatches('/a/', value), 99, String(value));
+    assert.strictEqual(HTF.shortlist.setGlasses('/a/', value), 99, String(value));
+  });
+  assert.strictEqual(HTF.shortlist.setPortions('/a/', 99), 99);
+  assert.strictEqual(HTF.shortlist.setGlasses('/a/', 98), 98);
+});
+
+test('a huge count saved before the ceiling comes back as 99', () => {
+  const { HTF } = pageWith(workingStorage({
+    'htf-shortlist-portions-food-v2': JSON.stringify({ '/a/': 1.2345678901234568e+29 }),
+    'htf-shortlist-batches-food-v1': JSON.stringify({ '/a/': 5000 }),
+    'htf-shortlist-glasses-food-v1': JSON.stringify({ '/a/': 1e12 })
+  }));
+  assert.strictEqual(HTF.shortlist.portions('/a/'), 99);
+  assert.strictEqual(HTF.shortlist.batches('/a/'), 99);
+  assert.strictEqual(HTF.shortlist.glasses('/a/'), 99);
+});
