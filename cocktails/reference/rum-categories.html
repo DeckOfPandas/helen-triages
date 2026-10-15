@@ -39,11 +39,11 @@ permalink: /cocktails/reference/rum-categories/
       <li>how to use it in a cocktail.</li>
     </ol>
 
-    <p class="ref-prose">What colour a rum is tells me very little about how a rum tastes. Boring trainspotting facts like "pot still" or "made in a distillery owned by this particular old white guy" don't interest me at all, and, again, tell me very little about how a rum tastes. The history of Caribbean colonialism also tells me — wait for it — very little about how a rum tastes.</p>
+    <p class="ref-prose">What colour a rum is tells me very little about how it tastes. How a rum was made tells me a little, but not much, about how it tastes — "pot still" is like saying you like cheese, which can be true, but then you're surprised when someone hands you gorgonzola instead of cheddar. Other boring trainspotting facts like "made in a distillery owned by this particular old white guy" don't interest me at all, and, again, tell me very little about how a rum tastes. The history of Caribbean colonialism is of course in every bottle on my rum shelf, but still tells me — wait for it — very little about how a rum tastes.</p>
 
     {% comment %} Helen's paragraph, verbatim. The list stays whole, and the
        last sentence ends on "taste" so the next paragraph hangs off it. {% endcomment %}
-    <p class="ref-prose">Rum tastes like sunshine. Human ingenuity has applied itself with zeal to making alcohol from sugar cane. Like wine, rum tastes like the ground it grows in and what grows around it. Sweet, fruity, warm, deep, rich, buttery, toasted, spicy, floral, dry, earthy, grassy, salty, woody, funky, bouncy, sticky, banana, orange, coconut, pineapple, mango, cinnamon, ginger, nutmeg, cloves, fire, petrol, coffee, toffee, caramel, vanilla, honey, brown sugar, white sugar, sugar sugar, it's just endless. How can you squash all of that down to "gold coloured" like it means anything about taste?</p>
+    <p class="ref-prose">Rum tastes like sunshine. Human ingenuity has applied itself with zeal to making alcohol from every part of sugarcane: the juice, the syrup, the molasses, even the skimmings. And, like wine, rum tastes like the ground it grows in and what grows around it. The result is endless: sweet, fruity, warm, deep, rich, buttery, toasted, spicy, floral, dry, earthy, grassy, salty, woody, funky, bouncy, sticky, banana, orange, coconut, pineapple, mango, cinnamon, ginger, nutmeg, cloves, fire, petrol, coffee, toffee, caramel, vanilla, honey, brown sugar, white sugar, sugar sugar. How can you squash all of that down to "gold coloured" like it means anything about taste?</p>
 
     <p class="ref-prose">And if you don't care how a drink tastes, why on earth are you going to all the sticky, impractical effort of making mixed drinks?</p>
 
@@ -55,7 +55,8 @@ permalink: /cocktails/reference/rum-categories/
     <h2 class="ref-section-heading ref-section-heading--major" id="categories"><span>Rum categories I recognise</span></h2>
 
     <p class="ref-prose">The below is almost identical to the classification
-      system by Matt Pietrek of Minimalist Tiki
+      system by Matt Pietrek, author of <em>Minimalist Tiki</em> and the
+      <em>Cocktail Wonk</em> blog
       (<a href="https://cocktailwonk.com/2023/06/nine-essential-tiki-rum-styles.html">2023</a>,
       which updates
       <a href="https://cocktailwonk.com/2019/10/six-essential-tiki-rum-categories.html">2019</a>).</p>
@@ -169,15 +170,12 @@ permalink: /cocktails/reference/rum-categories/
     {% comment %} A word on this list that is also in `rum_characters` is
        correct, and gets the parenthetical, in Helen's words (#975). It is a
        lookup, not a literal, so a second such word cannot arrive without the
-       note. {% endcomment %}
+       note. Alphabetical (#1379), sorted here: the data keeps its own order. {% endcomment %}
+    {% capture retired_blob %}{% for pair in ing.retired_rum_styles %}{% assign initial = pair[0] | slice: 0 %}{% assign initial_lower = initial | downcase %}{% if initial == initial_lower %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
+    {% assign retired_words = retired_blob | split: "||" | sort_natural %}
     <ul class="rum-retired">
-      {% for pair in ing.retired_rum_styles %}
-        {% assign word = pair[0] %}
-        {% assign initial = word | slice: 0 %}
-        {% assign initial_lower = initial | downcase %}
-        {% if initial == initial_lower %}
+      {% for word in retired_words %}
         <li class="rum-retired-word">{{ word }}{% if ing.rum_characters contains word %} (is a rum character not a rum type){% endif %}</li>
-        {% endif %}
       {% endfor %}
     </ul>
     </section>
@@ -196,8 +194,11 @@ permalink: /cocktails/reference/rum-categories/
     <p class="ref-prose">I find it useful to note when a recipe leans on a rum for a particular taste component. Character is not inherent to a bottle. It's just a request from a recipe, which can then be satisfied (or not).</p>
 
     <p class="ref-prose">These words are useful to me:</p>
+    {% comment %} Alphabetical (#1379). A word's note is Helen's, from
+       `rum_character_notes`. {% endcomment %}
+    {% assign chars = ing.rum_characters | sort_natural %}
     <ul class="rum-chars">
-      {% for ch in ing.rum_characters %}<li class="rum-char">{{ ch }}</li>{% endfor %}
+      {% for ch in chars %}<li class="rum-char">{{ ch }}{% if ing.rum_character_notes[ch] %} {{ ing.rum_character_notes[ch] }}{% endif %}</li>{% endfor %}
     </ul>
 
     </section>

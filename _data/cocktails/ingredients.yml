@@ -350,6 +350,10 @@ rum_characters:
   # The raw-cane-sugar (panela) note of a Panamanian silver rum (#1108).
   - "raspadura"
 
+# Helen's words after a character on the rum page, printed verbatim (#1379).
+rum_character_notes:
+  "Spanish-style": "(is here because it means something a recipe can request, even though it's not something I'll sort my bottles by)"
+
 # Peat is orthogonal to single-malt-versus-blended, so it is a character and
 # not a style. A closed list, like rum's; a gin's character is free text.
 whisky_characters:
@@ -1221,6 +1225,12 @@ retired_rum_styles:
   dark: >-
     same reason again, and the most misleading of the three: a dark rum may be
     Jamaican caramel-forward, Demerara aged, or a blackstrap. Issue #314.
+  silver: >-
+    a colour, as `light` is, and retired for its reason (#1379). Re-type
+    against rum_styles; the bottle usually answers it.
+  amber: >-
+    a colour, as `gold` is, and retired for its reason (#1379). An agricole
+    labelled ambré is `rhum agricole vieux`; otherwise the bottle answers it.
   # Other people's vocabulary, which keeps arriving in ingested sources: the
   # three below are a permanent inbound filter, not tombstones.
   navy: >-
