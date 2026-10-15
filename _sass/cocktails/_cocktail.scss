@@ -188,7 +188,10 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   flex-shrink: 0;
 }
 
+// Each of the three is 44px tall to tap; height only, so the label and the
+// switch beside it never take each other's taps.
 .cocktail-toggle-label {
+  @include tap-area(44px);
   white-space: nowrap;
 }
 
@@ -209,7 +212,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 }
 
 .cocktail-toggle-track {
-  position: relative;
+  @include tap-area(44px);
   width: 2.4rem;
   height: 1.2rem;
   border: 1.5px solid $color-electric-absinthe-deep;

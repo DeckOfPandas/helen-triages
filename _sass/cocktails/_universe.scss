@@ -53,7 +53,9 @@
   justify-self: end;
   font-family: $font-body;
   font-weight: 600;
-  font-size: 0.82rem;
+  // Bigger than the line beside it so a thumb finds it (Helen's pick on the
+  // tap-areas candidates page); the padding is tap room, not look.
+  font-size: 0.92rem;
   white-space: nowrap;
   -webkit-text-stroke: 0;
   text-shadow: none;
@@ -61,7 +63,7 @@
   background: none;
   border: 0;
   cursor: pointer;
-  padding: 0;
+  padding: 0.3rem 0;
   color: $color-accent;
 
   &:hover,

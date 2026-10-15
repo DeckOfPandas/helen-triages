@@ -164,7 +164,9 @@ main {
 
 // Every link in the header's second row, the doors and `??` alike. Resting
 // colour only; the accent hover is in shared/_chrome.scss.
+// 44px tall to tap, on a line of type 20px tall.
 .site-nav-icon-link {
+  @include tap-area(44px);
   display: inline-flex;
   align-items: center;
   color: $color-clear-text;
