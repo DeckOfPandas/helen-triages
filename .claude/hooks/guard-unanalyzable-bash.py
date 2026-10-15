@@ -32,6 +32,10 @@ Refused:
      gives up on. It arrives as a regex with a class after a dollar. A
      backslash-escaped dollar is inert and passes; a dollar after an escaped
      backslash is live and refused. `${...}` is not refused.
+ 12. An unquoted lone `&`: the shell backgrounds what comes before it and
+     runs the rest as a second command, which the checker sees as a fragment
+     and asks Helen about. It arrives in an unquoted URL query string.
+     `&&` is shape 5; `2>&1`, `>&2` and `&>file` are redirections.
 
 Allowed on purpose, because a guard that fires on harmless commands gets
 routed around:
@@ -80,6 +84,10 @@ _LEGACY_ARITHMETIC = re.compile(r"(?<!\\)(?:\\\\)*\$\[")
 # far more often a regex or a URL query than a glob, and `*` is the form every
 # CLAUDE.md example uses.
 _GLOB = re.compile(r"\*")
+
+# Shape 12, applied BEFORE _REDIRECT, which leaves `&> file` as a bare `&`.
+# Neither half of `&&`, nor the `&` of `2>&1`, `<&0` or `&>file`.
+_LONE_AMPERSAND = re.compile(r"(?<![&<>])&(?![&>])")
 
 # The only command shape 7 applies to: a committed wrapper run as `sh scripts/`.
 _SCRIPT_CALL = re.compile(r"^\s*sh\s+scripts/")
@@ -223,6 +231,15 @@ def _offence(command: str) -> tuple[str, str] | None:
                 "whole, so it matches neither part's allow rule even when both "
                 "parts are allowed on their own. Two calls cost a round trip; "
                 "one chained call costs Helen an interruption")
+
+    if _LONE_AMPERSAND.search(bare):
+        return ("an unquoted `&`, which backgrounds the first half and runs "
+                "the rest as a second command the checker cannot read",
+                "quote the argument that carries it -- a URL with a query "
+                "string goes in single quotes: `sh scripts/gh-read.sh "
+                "'repos/o/r/issues?state=open&per_page=100' --each "
+                "number,title`. To run something in the background, use the "
+                "Bash tool's run_in_background, never a trailing `&`")
 
     # Shape 9. An unquoted parenthesis is a subshell or, as in an unquoted
     # `git log --format=%(trailers)`, a parse error. A backslash-escaped paren
