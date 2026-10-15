@@ -3,7 +3,7 @@ title: "Courgette and Orange Cake with Cream Cheese Frosting"
 tagline: "Lighter and more savoury than carrot cake."
 source: "Adapted from Good Food, recipe Sara Buenfeld"
 source_type: website
-makes: "12 slices"
+makes: "one 1-kg loaf cake (12 slices)"
 serves_estimate: 12
 prep_time: "10 mins"
 cook_time: "50 mins"
@@ -54,6 +54,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---
