@@ -427,15 +427,18 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // The step buttons either side of the box (#731). $color-accent at rest,
 // woowoo on hover and focus. A control may not change its own footprint
 // (#389): the border is transparent at rest, not absent, and only its colour
-// moves. Same font-size, vertical padding and border as the input, so the
-// three share a height with no hand-tuned figure.
+// moves. 32px square with a 44px tap area; the controls' gap must stay wide
+// enough that the area stops short of the box, or it steals the box's taps.
 .cocktail-scale-step {
   @extend %cocktail-heading-face;
+  @include tap-area(44px, 44px);
   display: inline-block;
   box-sizing: border-box;
-  width: 1.7rem;
-  font-size: 0.95rem;
-  padding: $space-xxs 0;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0;
   border: 1px solid transparent;
   background: none;
   color: $color-accent;
@@ -459,7 +462,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 .cocktail-scale-controls {
   display: inline-flex;
   align-items: center;
-  gap: $space-xs;
+  gap: 0.75rem;
   margin: $space-md 0 0;
 
   &[hidden] { display: none; }

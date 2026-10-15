@@ -15,7 +15,7 @@
 .recipe-scale-controls {
   display: inline-flex;
   align-items: center;
-  gap: $space-xs;
+  gap: 0.75rem;
   margin: $space-sm 0 0;
 
   // The `hidden` attribute's UA rule loses to any author `display`, so
@@ -74,14 +74,19 @@
 
 // The step buttons: the interactive colour at rest, lighter on hover. The box
 // must not grow on hover or focus: the border is always 1px transparent.
+// 32px square with a 44px tap area; the controls' gap must stay wide enough
+// that the area stops short of the box, or it steals the box's taps.
 .recipe-scale-step {
+  @include tap-area(44px, 44px);
   display: inline-block;
   box-sizing: border-box;
-  width: 1.7rem;
+  width: 2rem;
+  height: 2rem;
   font-family: $font-label;
-  font-size: 0.95rem;
+  font-size: 1.25rem;
+  line-height: 1;
   font-weight: 600;
-  padding: $space-xxs 0;
+  padding: 0;
   border: 1px solid transparent;
   background: none;
   color: $color-recipe-link;
