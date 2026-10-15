@@ -945,3 +945,62 @@ test('the winning band decides which term is reported, not the first one seen', 
   assert.strictEqual(hit.via, 'falernum');
   assert.strictEqual(hit.viaKind, 'own');
 });
+
+// --- search-only umbrellas (#1376) --------------------------------------------
+// Its own vocabulary, so the shared fixture's family tests keep their meaning.
+const AGRICOLES = ['rhum agricole blanc', 'rhum agricole vieux'];
+const CLAIRINS = ['Clairin Communal', 'Clairin Vaval'];
+const UVOCAB = Object.assign({}, VOCAB, {
+  search: Object.assign({}, VOCAB.search, {
+    umbrellas: [{ label: 'rhum agricole', names: ['agricole'], covers: AGRICOLES, then_offer: CLAIRINS }]
+  }),
+  cane_and_palm_spirits: VOCAB.cane_and_palm_spirits.concat(AGRICOLES, CLAIRINS),
+  // As in ingredients.yml: every rum generic has a card name, so the clairins'
+  // chips keep their capitals although the attribute is downcased.
+  card_names: Object.assign({}, VOCAB.card_names,
+    Object.fromEntries(AGRICOLES.concat(CLAIRINS).map((g) => [g, g]))),
+  family_of: Object.assign({}, VOCAB.family_of,
+    Object.fromEntries(AGRICOLES.concat(CLAIRINS).map((g) => [g, 'rum'])))
+});
+const U = CS.create(UVOCAB, BOTTLES);
+const upool = () => U.buildPool(pours('rhum agricole blanc', 'rhum agricole vieux',
+  'clairin communal', 'coconut rhum-based liqueur', 'aged demerara rum'));
+
+test('"rhum" offers the umbrella beside the rum family, and the clairins follow the agricoles', () => {
+  const found = U.search('rhum', upool());
+  assert.deepStrictEqual(found.familyButtons, ['rum', 'rhum agricole']);
+  // Clairin Vaval is in then_offer but in no drink, so it is not offered.
+  assert.deepStrictEqual(found.results.map((r) => r.entry),
+    ['rhum agricole blanc', 'rhum agricole vieux', 'Clairin Communal', 'coconut rhum-based liqueur']);
+});
+
+test('an umbrella answers to its other names, and not below the button threshold', () => {
+  assert.deepStrictEqual(U.search('agricole', upool()).familyButtons, ['rhum agricole']);
+  assert.deepStrictEqual(U.search('rh', upool()).familyButtons, []);
+});
+
+test('with no umbrella on offer the clairins are ranked as anything else is', () => {
+  const found = U.search('clai', upool());
+  assert.deepStrictEqual(found.familyButtons, []);
+  assert.deepStrictEqual(found.results.map((r) => r.entry), ['Clairin Communal']);
+});
+
+test('the umbrella chip selects both agricoles and no clairin, either way', () => {
+  const chip = 'rhum agricole' + CS.FAMILY_SUFFIX;
+  for (const g of AGRICOLES) {
+    assert.strictEqual(U.matchesInclude([g], chip), true, g);
+    assert.strictEqual(U.matchesExclude([g], chip), true, g);
+  }
+  assert.strictEqual(U.matchesInclude(['clairin communal'], chip), false);
+  assert.strictEqual(U.matchesExclude(['clairin communal'], chip), false);
+});
+
+test('an umbrella is not a family: familiesOf never returns one', () => {
+  assert.deepStrictEqual(U.familiesOf('rhum agricole blanc'), ['rum']);
+});
+
+test('a chosen umbrella is not offered again, and a chosen clairin is not re-listed', () => {
+  const found = U.search('rhum', upool(), ['rhum agricole (all)', 'Clairin Communal']);
+  assert.deepStrictEqual(found.familyButtons, ['rum']);
+  assert.ok(!found.results.some((r) => r.entry === 'Clairin Communal'));
+});

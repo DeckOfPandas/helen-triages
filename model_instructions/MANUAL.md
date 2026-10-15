@@ -2323,6 +2323,13 @@ the pool, ranking, families and the two matching rules (pure, tested);
   `family_labels` make a family reachable however it is spelled (`whisk(e)y`).
   `not_on_cards` keeps the bare sugars, salt, water, zest and honey off a card
   and out of the search; every syrup stays.
+- **A search umbrella is an `(all)` button that is not a family**
+  (`search.umbrellas`): `rhum agricole (all)` selects both agricoles, offered
+  and matched as a family's button is, but `familiesOf` and `family_of` never
+  see it, so cards and the rum family are unchanged. Its `then_offer` chips
+  (the clairins) are listed straight after the chips beginning with its
+  label whenever its button is on offer. `test_search_umbrellas_name_declared_generics`
+  holds its names.
 
 ### 9.3.4 Units of alcohol
 

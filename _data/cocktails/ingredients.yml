@@ -168,6 +168,18 @@ search:
   # Bulleit`. A bottle that legitimately carries one is simply not offered.
   prose_marks: ["--", "—", "?", "!", ">", ","]
 
+  # Search-only `(all)` buttons over a declared set of generics (#1376),
+  # offered and matched as a family's button is, but no family: exclusion by
+  # `family_of` and the cards never see one. `names` are other words that
+  # offer it. `then_offer` chips are listed straight after the chips whose
+  # names begin with the label, whenever the button is on offer.
+  # test_search_umbrellas_name_declared_generics.
+  umbrellas:
+    - label: "rhum agricole"
+      names: ["agricole"]
+      covers: ["rhum agricole blanc", "rhum agricole vieux"]
+      then_offer: ["Clairin Vaval", "Clairin Casimir", "Clairin Communal", "Clairin Sajous"]
+
 # --- things a card never mentions --------------------------------------------
 # Never on a card and never in the search pool (#580, #691): each is a making
 # fact, not a choosing one. EXACT matches only, never substrings: bare `water`

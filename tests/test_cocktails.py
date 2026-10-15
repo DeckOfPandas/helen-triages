@@ -6837,6 +6837,30 @@ def test_rum_liqueur_shelf_names_declared_liqueurs():
     )
 
 
+def test_search_umbrellas_name_declared_generics():
+    """Every generic a search umbrella covers or offers is declared -- #1376.
+
+    assets/js/cocktail-search.js matches an umbrella's members by exact name,
+    so a renamed generic leaves the `(all)` button selecting nothing, with
+    every other check green. A label that is also a family would give two
+    buttons one name.
+    """
+    vocab = _vocab()
+    declared = _declared_generics(vocab)
+    families = set(vocab.get("families") or [])
+    wrong = []
+    for u in (vocab.get("search") or {}).get("umbrellas") or []:
+        label = u.get("label")
+        if not label or not u.get("covers"):
+            wrong.append(f"{u!r}: an umbrella needs a label and covers")
+        if label in families:
+            wrong.append(f"{label!r} is already a family")
+        for key in ("covers", "then_offer"):
+            wrong += [f"{label!r} {key}: {g!r} is not a declared generic"
+                      for g in u.get(key) or [] if g not in declared]
+    assert not wrong, "search umbrella problem(s):\n  " + "\n  ".join(wrong)
+
+
 def test_rum_page_notes_name_real_things():
     """`rum_page_bottle_notes` keys are bottles; `rum_character_notes` keys are
     characters -- #1379. A note on a renamed key silently stops printing.
