@@ -335,7 +335,10 @@ mood_ingredients:
     - grenadine
     - pineapple-infused rum
     - coconut rum-based liqueur
-    - blackstrap          # a rum CHARACTER, not a generic — #314
+    # A tiki marker as its rum-based sibling is, but not a pudding flavour
+    # (#1379).
+    - coconut rhum-based liqueur
+    - blackstrap         # a rum CHARACTER, not a generic — #314
     - overproof Demerara rum, lightly aged
     - overproof Jamaican rum, unaged
     - passion fruit

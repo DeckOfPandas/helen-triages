@@ -1852,7 +1852,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   replace `coconut rum` (Malibu, now with Koko Kanu, 37.5%, £22) and `coconut
   rhum` (Clément Mahina), which #606 had made official two days before; both
   old names are in `retired_rum_names`. The rum-based one is priced and
-  strengthed from Malibu, her meaning of the category.
+  strengthed from Malibu, her meaning of the category. Both count as tiki
+  markers; only the rum-based one is a pudding flavour (Helen: *"Tiki
+  only"*). Blue Hawaiian, whose only rum was Malibu, is no longer in the rum
+  family.
 - **2026-10-15, #1379 — `pineapple rum` is `pineapple-infused rum`.** Helen
   chose the rename knowing two live drinks go back to her for proofreading.
   The card still reads "pineapple rum".
@@ -2093,6 +2096,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   resolves to the bottle's one declared name before the pool is built, and a
   `suggestion` string offering alternatives is never offered as a chip. The
   shopping list collapses spellings through the same aliases.
+- **2026-10-15, #1376 — "rhum agricole (all)" is a search-only button over
+  both agricoles, and typing "rhum" lists the clairins straight after the
+  agricole chips.** Helen: *"I'd like cocktail ingredient search to collapse
+  'rhum' so I don't have to specify which agricole I want to use -- I want to
+  browse"*, then *"also return the clairin, just after chips with 'rhum
+  agricole' directly"* and *"the chip should read 'rhum agricole (all)'"*.
+  `search.umbrellas` in `ingredients.yml`. The cards and the blanc and vieux
+  chips are unchanged, "rhum" still offers `rum (all)` too, and the button
+  selects no clairin.
 - **2026-08-29 — a family is reached by its other spellings, and the button
   always carries the family's canonical name.** Helen: *"'whiskey (all)'
   should return all whisky and bourbon and rye, and the same for 'whisky'."*
@@ -2276,6 +2288,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   just harsher)."*; *"Lightly aged and filtered rum will be one of Havana 3 or
   El Dorado 3 99% of the time."* `default_bottles` in `costs.yml`. The 1840 is
   not a cognac input. One bottle gives a point price; a pair is a real range.
+- **2026-10-15, #1379 — `moderately aged rum` is priced from Planteray 5 and
+  Havana 7, and Helen chooses its bottle by the drink.** Helen: *"For a
+  standard sociable drink with lots of layers, I'd use Planteray 5 or Havana 7
+  with normal guests! For a more opinionated drink, i.e. one without fruit
+  juice in it (other than lime or lemon), or a more opinionated guest, I'd go
+  Chairman's, Ango 5 or Ango 7. Ango XO is unlikely to get poured unless it's
+  a two-ingredient drink and I like you! If the character is blackstrap, then
+  Gosling's is the default. Pusser's blue or gunpowder would only go in where
+  a bite-y character (a technical term) is actively noticable."* The first
+  pair are the `default_bottles`; the rest is how a `suggestion` gets chosen,
+  hers to apply. "Ango XO" is taken to be the Angostura 1824.
 - **2026-09-05 — champagne is a point price, £20 for 75 cl.** Helen: *"Let's
   say champage is GBP 20 -- I buy crates of Heidsieck Blue Top on sale at
   Christmas!!!!!"* Heidsieck Blue Top is the reason for the figure, named in

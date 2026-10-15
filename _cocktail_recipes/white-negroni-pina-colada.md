@@ -29,6 +29,8 @@ method:
 to_serve: ""
 mood:
   - "fruity"
+  - "sugar craving"
+  - "tiki"
   - "sunny terrace"
   - "so wrong it's right"
 notes: []
