@@ -283,7 +283,7 @@
     var everyMatch = true;
     values.forEach(function (value) {
       if (!everyMatch) return;
-      var key = String(value).replace(FAMILY_SUFFIX, '').trim();
+      var key = isFamilyValue(value) ? familyKey(value) : String(value).trim();
       if (!familyMatch || !familyMatch(list, key)) everyMatch = false;
     });
     return everyMatch;

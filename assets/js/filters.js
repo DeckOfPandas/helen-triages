@@ -354,6 +354,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Wraps the part of each title that matches state.nameQuery in
   // mark.title-hit. Rebuilt from the stashed original text every time.
+  // Folded one character at a time, so an index into it is an index into the
+  // original and the highlight lands on the letters that matched. A character
+  // whose fold would change length is kept as it is (#1386).
+  function foldInPlace(str) {
+    var out = '';
+    for (var i = 0; i < str.length; i++) {
+      var ch = str.charAt(i).toLowerCase();
+      var folded = HTF.ingredientSearch.fold(ch);
+      out += folded.length === 1 ? folded : ch;
+    }
+    return out;
+  }
+
   function updateTitleHighlights() {
     titleLinks.forEach(function (a) {
       var original = a.dataset.titleText;
@@ -361,7 +374,10 @@ document.addEventListener('DOMContentLoaded', function () {
         a.textContent = original;
         return;
       }
-      var idx = HTF.ingredientSearch.fold(original.toLowerCase()).indexOf(state.nameQuery);
+      // Composed first: a decomposed é is two characters and its accent alone
+      // folds to nothing. NFC looks the same on screen.
+      original = original.normalize('NFC');
+      var idx = foldInPlace(original).indexOf(state.nameQuery);
       if (idx === -1) {
         a.textContent = original;
         return;

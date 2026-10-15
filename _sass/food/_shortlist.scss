@@ -119,10 +119,11 @@
     border-color: $color-recipe-link-hover;
   }
 
+  // 700: Courier Prime ships 400 and 700 only (#1386).
   &.is-on {
     color: $color-recipe-link;
     border-color: $color-recipe-link;
-    font-weight: 600;
+    font-weight: 700;
 
     &:hover,
     &:focus-visible {

@@ -435,3 +435,22 @@ test('a prefix still reaches a longer word, which is the point of prefix', () =>
   assert.strictEqual(m.entriesMatchKey(['chicken thighs'], 'chick'), true);
   assert.strictEqual(m.entriesMatchKey(['coriander'], 'cori'), true);
 });
+
+// #1386. A phone keyboard types no accents, so a two-word query must fold the
+// entry as the one-word query always has.
+test('a two-word query typed without accents finds the accented entry', () => {
+  const master = ['crème fraîche', 'cream cheese', 'comté'];
+  const found = (q) => matcher().search(q, master).results.map((r) => r.ing);
+  assert.deepStrictEqual(found('creme'), ['crème fraîche']);
+  assert.deepStrictEqual(found('creme fraiche'), ['crème fraîche']);
+  assert.deepStrictEqual(found('fraiche creme'), ['crème fraîche']);
+  assert.ok(found('creme fraiche')[0] === 'crème fraîche');
+});
+
+test('a two-word query lists an entry once however its accents or plural are spelled', () => {
+  const master = ['crème fraîche', 'creme fraiche', 'sour cherries', 'sour cherry'];
+  const once = (q) => matcher().search(q, master).results.length;
+  assert.strictEqual(once('creme'), 1, 'one word: one result, as before');
+  assert.strictEqual(once('creme fr'), 1);
+  assert.strictEqual(once('sour cherr'), 1);
+});

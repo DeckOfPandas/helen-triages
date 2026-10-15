@@ -38,10 +38,11 @@
   &:hover,
   &:focus-visible { border-color: $color-wicked-woowoo; }
 
-  // On is the border and a weight, never a fill.
+  // On is the border and a weight, never a fill. 700: Courier Prime ships
+  // 400 and 700 only, and a browser answers 600 with 700 anyway.
   &.is-on {
     border-color: $color-wicked-woowoo;
-    font-weight: 600;
+    font-weight: 700;
   }
 }
 

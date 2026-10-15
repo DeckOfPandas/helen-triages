@@ -51,7 +51,8 @@
     return Math.max(0.5, Math.round(quantity * 2) / 2);
   }
 
-  /* The nearest quarter, never less than one (#1297): 1 sprig ×7/6 is 1¼.
+  /* The nearest quarter, and never below a quarter, so nothing scales to
+     nothing (#1297): 1 sprig ×7/6 is 1¼, and ×1/6 is ¼.
      `quarter_step_measures` in scaling.yml, passed in as
      `options.quarterStep`. */
   function quarterStep(quantity) {
