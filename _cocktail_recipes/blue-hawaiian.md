@@ -10,7 +10,7 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 mood:
   - "sugar craving"
   - "pudding in a glass"
@@ -23,7 +23,7 @@ ingredients:
   - amount: "30 ml"
     generic: "blue Curaçao"
   - amount: "30 ml"
-    generic: "coconut rum"
+    generic: "coconut rum-based liqueur"
     suggestion: ["Malibu"]
   - amount: "15 ml"
     generic: "amaretto"

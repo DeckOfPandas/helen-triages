@@ -6789,6 +6789,71 @@ def test_rum_adjacent_before_names_a_real_group():
     )
 
 
+def test_no_bottle_under_a_combined_rum_row():
+    """A `combined` rum row lists its own styles, never their bottles -- #1379.
+
+    The rum page prints a combined row's styles in its bottles column and
+    skips them as rows of their own, so a bottle declared under one of them
+    would appear nowhere. Each combined style must also be on its group's
+    shelf, or the row names a style the partition never placed.
+    """
+    groups = _vocab().get("rum_groups") or []
+    bottles = _bottles().get("bottles") or {}
+    wrong = []
+    for g in groups:
+        on_shelf = set(g.get("styles") or [])
+        for row in g.get("combined") or []:
+            for style in row.get("styles") or []:
+                if style not in on_shelf:
+                    wrong.append(f"{g.get('name')}: {style!r} is combined but not on the shelf")
+                for name, entry in bottles.items():
+                    if isinstance(entry, dict) and entry.get("generic") == style:
+                        wrong.append(f"{name!r} is a bottle under combined style {style!r}")
+    assert not wrong, (
+        "combined rum row(s) the page cannot print whole:\n  " + "\n  ".join(wrong)
+        + "\n\nA combined row lists generics, not bottles. A style with a bottle "
+          "needs its own row: take it out of `combined`."
+    )
+
+
+def test_rum_liqueur_shelf_names_declared_liqueurs():
+    """Every row of `rum_liqueur_shelf` names a generic in `liqueurs` -- #1379.
+
+    The page looks each row's bottles up by that generic, so a renamed or
+    misspelt one renders an empty row with nothing else failing.
+    """
+    vocab = _vocab()
+    shelf = vocab.get("rum_liqueur_shelf") or {}
+    rows = shelf.get("rows") or []
+    assert shelf.get("name") and rows, (
+        "`rum_liqueur_shelf` has no name or no rows, so the rum page prints an "
+        "empty section."
+    )
+    liqueurs = set(vocab.get("liqueurs") or [])
+    stray = [r.get("generic") for r in rows if r.get("generic") not in liqueurs]
+    assert not stray, (
+        "rum_liqueur_shelf row(s) naming no declared liqueur:\n  "
+        + "\n  ".join(repr(s) for s in stray)
+    )
+
+
+def test_rum_page_notes_name_real_things():
+    """`rum_page_bottle_notes` keys are bottles; `rum_character_notes` keys are
+    characters -- #1379. A note on a renamed key silently stops printing.
+    """
+    vocab = _vocab()
+    bottles = set(_bottles().get("bottles") or {})
+    characters = set(vocab.get("rum_characters") or [])
+    stale = ([f"bottle {k!r}" for k in (vocab.get("rum_page_bottle_notes") or {})
+              if k not in bottles]
+             + [f"character {k!r}" for k in (vocab.get("rum_character_notes") or {})
+                if k not in characters])
+    assert not stale, (
+        "rum page note(s) keyed by a name that does not exist:\n  "
+        + "\n  ".join(stale)
+    )
+
+
 def test_bottle_origin_is_declared():
     """A bottle's `origin:` is a value `bottle_origins` declares -- #591.
 

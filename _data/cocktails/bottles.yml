@@ -53,6 +53,7 @@ bottles:
   "El Dorado 3 Year Old":
     generic: "lightly aged and filtered rum"
     aliases: ["El Dorado 3 year old rum", "El Dorado 3", "ED3", "El Dorado 3yo", "El Dorado 3yo rum"]
+    origin: "Guyana"
   "El Dorado 5 Year Old":
     generic: "aged Demerara rum"
     aliases: ["El Dorado 5 year old rum", "El Dorado 5"]
@@ -79,39 +80,62 @@ bottles:
   "Pusser's Blue Label":
     generic: "moderately aged rum"
     aliases: ["Pusser's Blue"]
+    origin: "multi-country origin"
   "Pusser's Gunpowder":
     generic: "moderately aged rum"
     aliases: ["Pusser's Gunpowder Proof", "Pusser's Navy rum 54.5%"]
+    origin: "multi-country origin"
   # Reached for for its blackstrap, which is a recipe's `character` and never
   # a generic (#314).
   "Gosling's Black Seal":
     generic: "moderately aged rum"
     aliases: ["Gosling's", "Goslings"]
+    origin: "multi-country origin"
   "Havana Club 7 year old":
     generic: "moderately aged rum"
     aliases: ["Havana Club 7", "Havana 7", "Havana Club 7yo"]
+    origin: "Cuba"
   "Planteray 5 Year Old Barbados":
     generic: "moderately aged rum"
     aliases: ["Planteray Barbados 5", "Plantation Barbados 5",
               "Plantation Barbados 5 year old rum"]
+    origin: "Barbados"
   # A St Croix rum, so the origin-free style (#1108).
   "Cruzan Single Barrel":
     generic: "moderately aged rum"
     aliases: ["Cruzan Single Barrel rum"]
+    origin: "US Virgin Islands"
+  # Helen's three Angosturas (#1379). No bare `Angostura` alias: that is the
+  # bitters.
+  "Angostura 5 Year Old Superior Gold":
+    generic: "moderately aged rum"
+    aliases: ["Angostura 5", "Angostura 5 Year Old"]
+    origin: "Trinidad & Tobago"
+  "Angostura 7 Year Old House Signature":
+    generic: "moderately aged rum"
+    aliases: ["Angostura 7", "Angostura 7 Year Old"]
+    origin: "Trinidad & Tobago"
+  "Angostura 1824 12 Year Old":
+    generic: "moderately aged rum"
+    aliases: ["Angostura 1824"]
+    origin: "Trinidad & Tobago"
 
   # --- lightly aged and filtered ---
   "Havana Club 3 year old":
     generic: "lightly aged and filtered rum"
     aliases: ["Havana Club 3", "Havana 3", "Havana Club 3yo rum", "Havana 3 year old",
               "Havana Club Original Añejo 3 Años Cuban rum"]
+    origin: "Cuba"
   "Flor de Caña Extra Dry":
     generic: "lightly aged and filtered rum"
     aliases: ["Flor de Caña extra dry white rum"]
+    origin: "Nicaragua"
   # The key is Helen's wording (#1108). Not a pricing input: `default_bottles`
   # in costs.yml prices the category.
   "Pedro Mandinga Panama silver rum":
     generic: "lightly aged and filtered rum"
     aliases: ["Pedro Mandinga Silver", "Pedro Mandinga silver rum"]
+    origin: "Panama"
 
   # JW Spicers is deliberately absent: what is cheap or needs using up is a
   # fact about the shelf, not about a drink.
@@ -123,24 +147,30 @@ bottles:
     generic: "clear blended multi-region rum"
     aliases: ["Plantation 3 Stars", "Plantation 3 Stars rum", "Planteray 3",
               "Plantation 3"]
+    origin: "multi-country origin"
 
-  # --- overproof and flavoured rums ---
+  # --- overproof and flavoured rums, and two rum-based liqueurs ---
   # A Guyana/Jamaica/Barbados blend: its own category, not a Demerara (#314).
   "Planteray O.F.T.D.":
     generic: "blended overproof rum"
     aliases: ["Plantation OFTD", "Planteray OFTD", "OFTD"]
+    origin: "multi-country origin"
   # All Guyanese, so it passes the 100% DDL rule that the other two Pusser's
   # fail (DECISIONS §9.3.2).
   "Pusser's 151":
     generic: "overproof Demerara rum, lightly aged"
     aliases: ["Pussers 151", "Pusser's Navy Rum 151"]
   "Planteray Stiggins' Fancy":
-    generic: "pineapple rum"
+    generic: "pineapple-infused rum"
     aliases: ["Plantation Stiggins Fancy Pineapple rum",
               "Plantation pineapple-infused rum"]
+  # Liqueurs on a rum base (#1379), filed here beside the rums they were.
   "Malibu":
-    generic: "coconut rum"
+    generic: "coconut rum-based liqueur"
     aliases: ["Coconut rum"]
+  "Koko Kanu":
+    generic: "coconut rum-based liqueur"
+    aliases: []
 
   # --- cane juice: agricole and cachaça ---
   # Each carries an `origin:` (#591), from the closed list `bottle_origins` in
@@ -245,6 +275,7 @@ bottles:
   "Chairman's Reserve":
     generic: "moderately aged rum"
     aliases: ["Chairmans Reserve", "Chairman's"]
+    origin: "St Lucia"
   "Disaronno":
     generic: "amaretto"
     aliases: ["Disaronno Originale"]
@@ -530,7 +561,7 @@ bottles:
   # A rhum-based liqueur, filed with the liqueurs like Créole Shrubb, so "no
   # rum tonight" does not drop it.
   "Clément Mahina Coconut Rhum Liqueur":
-    generic: "coconut rhum"
+    generic: "coconut rhum-based liqueur"
     aliases: ["Clement Mahina Coconut Rhum Liqueur", "Clément Mahina Coco",
               "Clement Mahina Coco", "Mahina Coco"]
     origin: "Martinique"

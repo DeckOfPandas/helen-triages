@@ -9,7 +9,7 @@ serve:
   ice: "none"
 ingredients:
   - amount: "40 ml"
-    generic: "pineapple rum"
+    generic: "pineapple-infused rum"
     suggestion: ["Planteray Stiggins' Fancy"]
   - amount: "15 ml"
     generic: "lime juice"
@@ -30,5 +30,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

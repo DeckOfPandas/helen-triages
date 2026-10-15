@@ -5,30 +5,22 @@
   it renders from inside that loop with no shelf's name in the template (#919).
 
   `cane_and_palm_spirits` are not rum styles. Takes `ing` and `bottles` from the
-  including page.
+  including page. Two columns: none of these has a card name of its own.
 {% endcomment %}
 <section class="ref-block ref-block--adjacent">
   {% comment %} Helen's heading. An h3 like the shelf headings it sits among. {% endcomment %}
   <h3 class="ref-section-heading" id="adjacent"><span>Rum-adjacent sugarcane spirits</span></h3>
 
-  <ul class="rum-cats rum-cats--adjacent">
+  <ul class="rum-cats rum-cats--adjacent rum-cats--no-card">
+    {% comment %} The shelves' own head row and words (#1379). {% endcomment %}
+    <li class="rum-cat rum-cat--head" aria-hidden="true">
+      <span class="rum-cat-name">category</span>
+      <span class="rum-cat-bottles">examples</span>
+    </li>
     {% for style in include.ing.cane_and_palm_spirits %}
-      {% capture blob %}{% for pair in include.bottles %}{% if pair[1].generic == style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-      {% comment %} Alphabetical (#972), the same filter the page's own rows
-         take. {% endcomment %}
-      {% assign bottle_names = blob | split: "||" | sort_natural %}
       <li class="rum-cat">
         <span class="rum-cat-name">{{ style }}</span>
-        <span class="rum-cat-card"></span>
-        {% if bottle_names.size > 0 %}
-        <ul class="rum-cat-bottles">
-          {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
-        </ul>
-        {% else %}
-        {% comment %} Empty, on purpose, as on the page's own rows: the span
-           stays so the grid keeps its third track. {% endcomment %}
-        <span class="rum-cat-bottles"></span>
-        {% endif %}
+        {% include cocktails/rum-bottles.html style=style ing=include.ing bottles=include.bottles flat=true %}
         {% comment %} No note under the row (#889): the `family_less` reason
            stays in the data, and Helen's line below says it in her voice. {% endcomment %}
       </li>

@@ -78,7 +78,7 @@ not** -- so typing can turn the suite red on `costs.yml` and `abv.yml`. Do NOT
 invent those numbers: a placeholder row at `confidence: low`, with a `basis`
 that says it is a placeholder and not shop-checked, and (for a strength) a `qq:`
 saying what Helen has to check, is the sanctioned shape, and it goes on her
-list. A NEW generic (`ginger beer`, `coconut rhum`) is hers to say: ask, and
+list. A NEW generic (`ginger beer`, `coconut rhum-based liqueur`) is hers to say: ask, and
 register it in `ingredients.yml` -- **its list, `shelf_of`, and a cost row** --
 once she has. A generic with no `shelf_of` entry falls to the end of her
 shopping list in an unlabelled group, which nothing reports.
