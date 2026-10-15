@@ -278,7 +278,8 @@ argument and the rules each field is read by.
 - 2026-09-04 · §9.3.1 · aguardiente and kirschwasser are generics, not bottles.
 - 2026-09-05 · §9.3.1 · Créole Shrubb is its own generic, filed under liqueurs: where no category name would help Helen choose, the bottle is the category.
 - 2026-09-05 · §9.3.1 · #314 · navy, overproof navy and black are not rum categories and are retired for good.
-- 2026-10-13 · §9.3.1 · #606 · coconut rhum is a generic, and no longer provisional.
+- 2026-10-15 · §9.3.1 · #1379 · two coconut generics by base: coconut rum-based liqueur and coconut rhum-based liqueur, both filed under liqueurs.
+- 2026-10-15 · §9.3.1 · #1379 · pineapple rum is pineapple-infused rum — Helen chose the rename knowing two live drinks go back to her for proofreading.
 - 2026-09-20 · §9.3.1 · #1068 #1069 · ginger beer is its own generic, in no category.
 - 2026-09-25 · §9.3.1 · #1186 · a declared generic or glass that no drink uses stays: the vocabulary is a spec, not residue.
 - undated · §9.3.1 · #314 · Undated, #314 — cachaça is its own generic, and Batavia arrack's family is rum.
@@ -824,7 +825,11 @@ argument and the rules each field is read by.
 - 2026-09-06 · §14 · #529 #459 · a cocktails reference page must answer a question the cards stopped answering; a bare list does not pass #459.
 - 2026-09-06 · §14 · the rum page has its own anatomy (the .ref- classes), in one hue.
 - 2026-09-06 · §14 · the rum page is a table, with column labels on every section and one rum per line.
-- 2026-09-06 · §14 · the shelf headings "Non-geographical" and "Rum-adjacent" are Helen's words.
+- 2026-10-15 · §14 · #1379 · the rum shelves are Jamaican, Demerara, "Other molasses rum", Cane juice, (rum-adjacent), Flavoured, then "Rum-based liqueurs".
+- 2026-10-15 · §14 · #1379 · on "Other molasses rum" the bottles group by country, and a blend says "multi-country origin".
+- 2026-10-15 · §14 · #1379 · the clairins stay four generics, and the rum page shows them as one "clairin" row, listed under HAITI.
+- 2026-10-15 · §14 · #1379 · Créole Shrubb keeps its own generic; the rum page labels its row "fruit rum liqueur", with "(rhum-based)" after the bottle.
+- 2026-10-15 · §14 · #1379 · small rum-page rulings — The "site display name" column is dropped from a section where no row has one.
 - 2026-09-06 · §14 · rum_groups is declared, not derived, and the rum page walks the groups.
 - 2026-09-10 · §14 · #813 · an agricole's country goes inside the bottles column, not into a row of its own.
 - 2026-09-10 · §14 · the sipping shelf is deleted, page and data both.
