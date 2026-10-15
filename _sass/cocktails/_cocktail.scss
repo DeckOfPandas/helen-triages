@@ -424,30 +424,11 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   letter-spacing: 0.08em;
 }
 
-// The step buttons either side of the box (#731). $color-accent at rest,
-// woowoo on hover and focus. A control may not change its own footprint
-// (#389): the border is transparent at rest, not absent, and only its colour
-// moves. 32px square with a 44px tap area; the controls' gap must stay wide
-// enough that the area stops short of the box, or it steals the box's taps.
+// The step buttons either side of the box (#731): the shared shape
+// (shared/_rule.scss). $color-accent at rest, woowoo on hover and focus.
 .cocktail-scale-step {
   @extend %cocktail-heading-face;
-  @include tap-area(44px, 44px);
-  display: inline-block;
-  box-sizing: border-box;
-  width: 2rem;
-  height: 2rem;
-  font-size: 1.25rem;
-  line-height: 1;
-  padding: 0;
-  border: 1px solid transparent;
-  background: none;
-  color: $color-accent;
-  text-align: center;
-  cursor: pointer;
-
-  &:hover {
-    color: $color-wicked-woowoo;
-  }
+  @include scale-step($color-accent, $color-wicked-woowoo);
 
   &:focus-visible {
     outline: none;
@@ -460,9 +441,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // the attribute, and the control ships hidden until cocktail-scale.js reveals
 // it. The margin holds it close to the list it belongs to.
 .cocktail-scale-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
+  @include scale-controls;
   margin: $space-md 0 0;
 
   &[hidden] { display: none; }

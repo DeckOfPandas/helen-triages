@@ -417,6 +417,37 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   }
 }
 
+// --- The scaler's − and + ------------------------------------------------------
+// One shape for both sites' scalers, with the colours as arguments: food's
+// `.recipe-scale-*` and cocktails' `.cocktail-scale-*` include these, so the
+// two cannot drift. The typeface and the focus ring stay each site's own.
+// The gap must stay wide enough that the 44px area stops short of the number
+// box, or it takes the box's taps. A control may not change its own footprint
+// (#389): the border is transparent at rest, never absent.
+@mixin scale-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@mixin scale-step($rest, $hover) {
+  @include tap-area(44px, 44px);
+  display: inline-block;
+  box-sizing: border-box;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0;
+  border: 1px solid transparent;
+  background: none;
+  color: $rest;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover { color: $hover; }
+}
+
 // --- The chip in a search pool ------------------------------------------------
 // One chip for both sites' search pools, with the colours as arguments:
 // food's `.btn-tag` and cocktails' `.btn-pool` both include these, so the two

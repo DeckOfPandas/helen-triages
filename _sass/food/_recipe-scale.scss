@@ -13,9 +13,7 @@
 // `.ingredients li` carries $space-md below each row, so the control sits one
 // row-gap under the last ingredient.
 .recipe-scale-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
+  @include scale-controls;
   margin: $space-sm 0 0;
 
   // The `hidden` attribute's UA rule loses to any author `display`, so
@@ -72,28 +70,12 @@
   letter-spacing: normal;
 }
 
-// The step buttons: the interactive colour at rest, lighter on hover. The box
-// must not grow on hover or focus: the border is always 1px transparent.
-// 32px square with a 44px tap area; the controls' gap must stay wide enough
-// that the area stops short of the box, or it steals the box's taps.
+// The step buttons: the shared shape (shared/_rule.scss), the interactive
+// colour at rest, lighter on hover.
 .recipe-scale-step {
-  @include tap-area(44px, 44px);
-  display: inline-block;
-  box-sizing: border-box;
-  width: 2rem;
-  height: 2rem;
+  @include scale-step($color-recipe-link, $color-recipe-link-hover);
   font-family: $font-label;
-  font-size: 1.25rem;
-  line-height: 1;
   font-weight: 600;
-  padding: 0;
-  border: 1px solid transparent;
-  background: none;
-  color: $color-recipe-link;
-  text-align: center;
-  cursor: pointer;
-
-  &:hover { color: $color-recipe-link-hover; }
 
   // A real outline is the focus ring (#1086); a colour change alone does not
   // read as focus. Offset 2px to clear the glyph. The recipe page's accent,
