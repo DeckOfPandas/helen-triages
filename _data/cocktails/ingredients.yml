@@ -352,7 +352,8 @@ rum_groups:
 # The rum page's shelf after Flavoured (#1379): liqueurs, so not rum styles and
 # not in `rum_groups`. A row prints its `label` where Helen gave one, else its
 # generic. Créole Shrubb keeps its own generic and reads "fruit rum liqueur"
-# here only. test_rum_liqueur_shelf_names_declared_liqueurs.
+# here only. Every rum or rhum liqueur belongs here and in `family_reach`:
+# test_every_rum_based_liqueur_is_reached_by_rum.
 rum_liqueur_shelf:
   name: "Rum-based liqueurs"
   rows:
@@ -1235,11 +1236,15 @@ shelf_of:
 
 # Bases with no family, deliberately, each with its reason.
 # A generic a family's `(all)` chip FINDS without the generic being in the
-# family (#1379): searching `rum (all)` shows a Malibu drink, and excluding
-# rum leaves it in, because a liqueur is not a reason to skip a drink. A
-# mapping, so it mints no generic. test_family_reach_names_real_things.
+# family (#1379): searching `rum (all)` shows a rum or rhum liqueur, and
+# excluding rum leaves it in, because a liqueur is not a reason to skip a
+# drink. Every generic on `rum_liqueur_shelf` must be here:
+# test_every_rum_based_liqueur_is_reached_by_rum. A mapping, so it mints no
+# generic.
 family_reach:
   "coconut rum-based liqueur": rum
+  "coconut rhum-based liqueur": rum
+  "Créole Shrubb": rum
 
 family_less:
   "coconut-flower arrack": >-

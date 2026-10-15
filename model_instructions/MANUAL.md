@@ -2324,9 +2324,12 @@ the pool, ranking, families and the two matching rules (pure, tested);
   `not_on_cards` keeps the bare sugars, salt, water, zest and honey off a card
   and out of the search; every syrup stays.
 - **A family's `(all)` chip may reach a generic outside the family**
-  (`family_reach`): `rum (all)` finds `coconut rum-based liqueur` on include
-  and never on exclude, so a Malibu drink shows under rum and survives "no
-  rum tonight". `test_family_reach_names_real_things` holds the names.
+  (`family_reach`): `rum (all)` finds every rum and rhum liqueur on include
+  and never on exclude, so a Malibu or Créole Shrubb drink shows under rum
+  and survives "no rum tonight". **Every generic on `rum_liqueur_shelf` must
+  be reached** (`test_every_rum_based_liqueur_is_reached_by_rum`), and a
+  liqueur whose name says rum or rhum must be on that shelf, so a new one
+  cannot be missed. `test_family_reach_names_real_things` holds the names.
 - **A search umbrella is an `(all)` button that is not a family**
   (`search.umbrellas`): `rhum agricole (all)` selects both agricoles, offered
   and matched as a family's button is, but `familiesOf` and `family_of` never

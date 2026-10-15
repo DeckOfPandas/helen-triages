@@ -1857,8 +1857,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   only"*). Neither is in the rum family, but `rum (all)` finds the rum-based
   one through `family_reach`: Helen, *"When a user filters for rum, let's
   show them Malibu. Fine for it not to be hidden by excluding rum."* So Blue
-  Hawaiian answers to `rum (all)` and survives "no rum tonight". The
-  rhum-based Mahina and Créole Shrubb are not reached.
+  Hawaiian answers to `rum (all)` and survives "no rum tonight". Mahina and
+  Créole Shrubb are reached too, and so is every future rum or rhum liqueur:
+  Helen, *"please add something to our data transformation instructions to
+  mean this is automatically considered for future rum and rhum liqueurs
+  rather than me having to remember."* A test ties `family_reach` to the rum
+  page's liqueur shelf, and the ingest instructions say so.
 - **2026-10-15, #1379 — `pineapple rum` is `pineapple-infused rum`.** Helen
   chose the rename knowing two live drinks go back to her for proofreading.
   The card still reads "pineapple rum".

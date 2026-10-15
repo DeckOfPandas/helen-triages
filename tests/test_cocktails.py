@@ -6883,6 +6883,37 @@ def test_family_reach_names_real_things():
     assert not wrong, "family_reach problem(s):\n  " + "\n  ".join(wrong)
 
 
+def test_every_rum_based_liqueur_is_reached_by_rum():
+    """A rum or rhum liqueur is on the rum page's liqueur shelf and answers to
+    `rum (all)` -- #1379.
+
+    So a new one is found by `rum (all)` without anyone having to remember
+    to say so. What a liqueur is made from is not in its name
+    (Créole Shrubb), so the shelf is the declaration and this test makes the
+    reach follow from it. A liqueur whose NAME says rum or rhum must be on
+    the shelf, which catches the next one typed in without being placed.
+    """
+    vocab = _vocab()
+    reach = vocab.get("family_reach") or {}
+    shelf = [r.get("generic") for r in
+             (vocab.get("rum_liqueur_shelf") or {}).get("rows") or []]
+    assert shelf, "`rum_liqueur_shelf` has no rows, so this check has nothing to hold."
+    unreached = [g for g in shelf if reach.get(g) != "rum"]
+    named = [g for key in ("liqueurs", "herbal_liqueurs")
+             for g in vocab.get(key) or []
+             if re.search(r"\brh?um\b", g, re.I) and g not in shelf]
+    assert not (unreached or named), (
+        "rum-based liqueur(s) that `rum (all)` would not find:\n  "
+        + "\n  ".join([f"{g!r}: on rum_liqueur_shelf, missing from family_reach"
+                       for g in unreached]
+                      + [f"{g!r}: a rum or rhum liqueur not on rum_liqueur_shelf"
+                         for g in named])
+        + "\n\nA rum or rhum liqueur goes on `rum_liqueur_shelf` (the rum page "
+          "lists it) and in `family_reach` as rum (search finds it). Both are "
+          "in _data/cocktails/ingredients.yml."
+    )
+
+
 def test_rum_page_notes_name_real_things():
     """`rum_page_bottle_notes` keys are bottles; `rum_character_notes` keys are
     characters -- #1379. A note on a renamed key silently stops printing.
