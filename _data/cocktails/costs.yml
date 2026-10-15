@@ -765,6 +765,11 @@ default_bottles:
   # The other bottles under this generic stay declared and are not inputs.
   lightly aged and filtered rum: ["Havana Club 3 year old", "El Dorado 3 Year Old"]
 
+  # What Helen pours in a sociable, many-layered drink with normal guests. The
+  # opinionated bottles, Gosling's for blackstrap and the Pusser's for bite are
+  # each a recipe's `suggestion`, not the category's price (DECISIONS §9.3.5).
+  moderately aged rum: ["Planteray 5 Year Old Barbados", "Havana Club 7 year old"]
+
   reposado tequila: ["Rooster Rojo Tequila Reposado", "Patrón Reposado"]
   añejo tequila: ["Rooster Rojo Tequila Añejo", "Patrón Añejo"]
 

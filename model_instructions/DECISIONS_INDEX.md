@@ -314,6 +314,7 @@ argument and the rules each field is read by.
 - 2026-08-31 · §9.3.3 · #603 · a chip found through a name it does not show carries that name.
 - 2026-08-31 · §9.3.3 · a multi-word query matches a hidden name from its start, and each category gets one chip wearing the card's name.
 - 2026-08-29 · §9.3.3 · #529 · one bottle written several ways is one bottle in the search, and no chip has an "X or Y" shape.
+- 2026-10-15 · §9.3.3 · #1376 · "rhum agricole (all)" is a search-only button over both agricoles, and typing "rhum" lists the clairins straight after the agricole chips.
 - 2026-08-29 · §9.3.3 · a family is reached by its other spellings, and the button always carries the family's canonical name.
 - 2026-09-02 · §9.3.3 · #653 · HAS TO HAVE and LEAVE OUT mark the same chips: a prefix match of any word is marked in both pools, a substring match in neither.
 - 2026-09-06 · §9.3.4 · #297 · a drink page states units of alcohol, not ABV.
@@ -340,6 +341,7 @@ argument and the rules each field is read by.
 - 2026-09-06 · §9.3.5 · the drinks shopping list shows each drink's cost, quietly, on a local build only.
 - 2026-09-05 · §9.3.5 · #547 · a generic that names one product is priced as a point and carries its own strength, with no bottle entry.
 - 2026-09-05 · §9.3.5 · #547 · orgeat is priced from Monin, mezcal from Del Maguey Vida, cognac across Courvoisier and Pierre Ferrand Ambré, and lightly aged and filtered rum across Havana Club 3 and El Dorado …
+- 2026-10-15 · §9.3.5 · #1379 · moderately aged rum is priced from Planteray 5 and Havana 7, and Helen chooses its bottle by the drink.
 - 2026-09-05 · §9.3.5 · champagne is a point price, £20 for 75 cl.
 - 2026-09-14 · §9.3.5 · #1014 · cream is £4.50 a litre and is non-alcoholic.
 - 2026-10-07 · §9.3.5 · an unbottled rhum agricole vieux is 45%, and lemon vodka is 40% from Absolut Citron.

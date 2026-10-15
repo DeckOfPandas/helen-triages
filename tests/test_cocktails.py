@@ -6837,6 +6837,83 @@ def test_rum_liqueur_shelf_names_declared_liqueurs():
     )
 
 
+def test_search_umbrellas_name_declared_generics():
+    """Every generic a search umbrella covers or offers is declared -- #1376.
+
+    assets/js/cocktail-search.js matches an umbrella's members by exact name,
+    so a renamed generic leaves the `(all)` button selecting nothing, with
+    every other check green. A label that is also a family would give two
+    buttons one name.
+    """
+    vocab = _vocab()
+    declared = _declared_generics(vocab)
+    families = set(vocab.get("families") or [])
+    wrong = []
+    for u in (vocab.get("search") or {}).get("umbrellas") or []:
+        label = u.get("label")
+        if not label or not u.get("covers"):
+            wrong.append(f"{u!r}: an umbrella needs a label and covers")
+        if label in families:
+            wrong.append(f"{label!r} is already a family")
+        for key in ("covers", "then_offer"):
+            wrong += [f"{label!r} {key}: {g!r} is not a declared generic"
+                      for g in u.get(key) or [] if g not in declared]
+    assert not wrong, "search umbrella problem(s):\n  " + "\n  ".join(wrong)
+
+
+def test_family_reach_names_real_things():
+    """`family_reach` maps declared generics to declared families -- #1379.
+
+    The search matches by exact name, so a renamed generic silently drops out
+    of `rum (all)`. A generic already in `family_of` needs no reach, and one
+    there for a different family would be found by two families' chips.
+    """
+    vocab = _vocab()
+    declared = _declared_generics(vocab)
+    families = set(vocab.get("families") or [])
+    family_of = vocab.get("family_of") or {}
+    wrong = []
+    for generic, family in (vocab.get("family_reach") or {}).items():
+        if generic not in declared:
+            wrong.append(f"{generic!r} is not a declared generic")
+        if family not in families:
+            wrong.append(f"{generic!r} -> {family!r}, which is not a family")
+        if generic in family_of:
+            wrong.append(f"{generic!r} is already in family_of ({family_of[generic]})")
+    assert not wrong, "family_reach problem(s):\n  " + "\n  ".join(wrong)
+
+
+def test_every_rum_based_liqueur_is_reached_by_rum():
+    """A rum or rhum liqueur is on the rum page's liqueur shelf and answers to
+    `rum (all)` -- #1379.
+
+    So a new one is found by `rum (all)` without anyone having to remember
+    to say so. What a liqueur is made from is not in its name
+    (Créole Shrubb), so the shelf is the declaration and this test makes the
+    reach follow from it. A liqueur whose NAME says rum or rhum must be on
+    the shelf, which catches the next one typed in without being placed.
+    """
+    vocab = _vocab()
+    reach = vocab.get("family_reach") or {}
+    shelf = [r.get("generic") for r in
+             (vocab.get("rum_liqueur_shelf") or {}).get("rows") or []]
+    assert shelf, "`rum_liqueur_shelf` has no rows, so this check has nothing to hold."
+    unreached = [g for g in shelf if reach.get(g) != "rum"]
+    named = [g for key in ("liqueurs", "herbal_liqueurs")
+             for g in vocab.get(key) or []
+             if re.search(r"\brh?um\b", g, re.I) and g not in shelf]
+    assert not (unreached or named), (
+        "rum-based liqueur(s) that `rum (all)` would not find:\n  "
+        + "\n  ".join([f"{g!r}: on rum_liqueur_shelf, missing from family_reach"
+                       for g in unreached]
+                      + [f"{g!r}: a rum or rhum liqueur not on rum_liqueur_shelf"
+                         for g in named])
+        + "\n\nA rum or rhum liqueur goes on `rum_liqueur_shelf` (the rum page "
+          "lists it) and in `family_reach` as rum (search finds it). Both are "
+          "in _data/cocktails/ingredients.yml."
+    )
+
+
 def test_rum_page_notes_name_real_things():
     """`rum_page_bottle_notes` keys are bottles; `rum_character_notes` keys are
     characters -- #1379. A note on a renamed key silently stops printing.

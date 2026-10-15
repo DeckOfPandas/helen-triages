@@ -168,6 +168,18 @@ search:
   # Bulleit`. A bottle that legitimately carries one is simply not offered.
   prose_marks: ["--", "—", "?", "!", ">", ","]
 
+  # Search-only `(all)` buttons over a declared set of generics (#1376),
+  # offered and matched as a family's button is, but no family: exclusion by
+  # `family_of` and the cards never see one. `names` are other words that
+  # offer it. `then_offer` chips are listed straight after the chips whose
+  # names begin with the label, whenever the button is on offer.
+  # test_search_umbrellas_name_declared_generics.
+  umbrellas:
+    - label: "rhum agricole"
+      names: ["agricole"]
+      covers: ["rhum agricole blanc", "rhum agricole vieux"]
+      then_offer: ["Clairin Vaval", "Clairin Casimir", "Clairin Communal", "Clairin Sajous"]
+
 # --- things a card never mentions --------------------------------------------
 # Never on a card and never in the search pool (#580, #691): each is a making
 # fact, not a choosing one. EXACT matches only, never substrings: bare `water`
@@ -340,7 +352,8 @@ rum_groups:
 # The rum page's shelf after Flavoured (#1379): liqueurs, so not rum styles and
 # not in `rum_groups`. A row prints its `label` where Helen gave one, else its
 # generic. Créole Shrubb keeps its own generic and reads "fruit rum liqueur"
-# here only. test_rum_liqueur_shelf_names_declared_liqueurs.
+# here only. Every rum or rhum liqueur belongs here and in `family_reach`:
+# test_every_rum_based_liqueur_is_reached_by_rum.
 rum_liqueur_shelf:
   name: "Rum-based liqueurs"
   rows:
@@ -1222,6 +1235,17 @@ shelf_of:
   soda water: tops
 
 # Bases with no family, deliberately, each with its reason.
+# A generic a family's `(all)` chip FINDS without the generic being in the
+# family (#1379): searching `rum (all)` shows a rum or rhum liqueur, and
+# excluding rum leaves it in, because a liqueur is not a reason to skip a
+# drink. Every generic on `rum_liqueur_shelf` must be here:
+# test_every_rum_based_liqueur_is_reached_by_rum. A mapping, so it mints no
+# generic.
+family_reach:
+  "coconut rum-based liqueur": rum
+  "coconut rhum-based liqueur": rum
+  "Créole Shrubb": rum
+
 family_less:
   "coconut-flower arrack": >-
     Coconut flower sap, sharing only a name with Batavia arrack. Used once, in

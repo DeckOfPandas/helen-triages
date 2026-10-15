@@ -81,7 +81,11 @@ saying what Helen has to check, is the sanctioned shape, and it goes on her
 list. A NEW generic (`ginger beer`, `coconut rhum-based liqueur`) is hers to say: ask, and
 register it in `ingredients.yml` -- **its list, `shelf_of`, and a cost row** --
 once she has. A generic with no `shelf_of` entry falls to the end of her
-shopping list in an unlabelled group, which nothing reports.
+shopping list in an unlabelled group, which nothing reports. **A new rum or
+rhum liqueur** (any liqueur on a rum or rhum base, whatever its name says)
+also goes on `rum_liqueur_shelf`, which puts it on the rum page, and in
+`family_reach` as `rum`, which lets `rum (all)` find it.
+`test_every_rum_based_liqueur_is_reached_by_rum` fails until both are done.
 
 **Three things a `QQ` is not.** It is not an error: do not flag it, fix it, or
 convert it. It is not a prompt to answer from general knowledge -- that is the

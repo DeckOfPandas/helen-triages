@@ -93,6 +93,8 @@
       Object.keys(familyAliases).forEach(function (alias) {
         if (familyAliases[alias] === family) names.push(alias);
       });
+      var umbrella = umbrellaFor(family);
+      if (umbrella) names = names.concat((umbrella.names || []).map(String));
       return names;
     }
 
@@ -277,9 +279,54 @@
       return (familyIndex[normalise(entry)] || []).slice();
     }
 
+    // Search-only umbrellas (`search.umbrellas`, #1376): an `(all)` button over
+    // a declared set of generics, offered and matched exactly as a family's is.
+    // Not a family: `familiesOf` never returns one, so nothing beyond search
+    // treats it as one. Kept in its own index for that reason.
+    var umbrellas = (cfg.umbrellas || []).filter(function (u) { return u && u.label; });
+    var buttonFamilies = families.concat(umbrellas.map(function (u) { return String(u.label); }));
+    var umbrellaIndex = Object.create(null);
+    umbrellas.forEach(function (u) {
+      (u.covers || []).forEach(function (generic) {
+        [generic, cardNames[generic]].forEach(function (name) {
+          var key = normalise(name);
+          if (!key) return;
+          if (!umbrellaIndex[key]) umbrellaIndex[key] = [];
+          if (umbrellaIndex[key].indexOf(u.label) === -1) umbrellaIndex[key].push(u.label);
+        });
+      });
+    });
+
+    function umbrellaFor(label) {
+      return umbrellas.filter(function (u) { return u.label === label; })[0] || null;
+    }
+
+    // Every button an entry answers to: its families and its umbrellas.
+    function groupsOf(entry) {
+      return familiesOf(entry).concat(umbrellaIndex[normalise(entry)] || []);
+    }
+
     function entryHasFamily(entries, family) {
       return (entries || []).some(function (entry) {
-        return familiesOf(entry).indexOf(family) !== -1;
+        return groupsOf(entry).indexOf(family) !== -1;
+      });
+    }
+
+    // `family_reach` (#1379): a generic a family's chip finds on include only,
+    // so `rum (all)` shows a Malibu drink and excluding rum keeps it. Keyed by
+    // the generic and its card name, as the family index is.
+    var reachIndex = Object.create(null);
+    Object.keys(voc.family_reach || {}).forEach(function (generic) {
+      var family = voc.family_reach[generic];
+      [generic, cardNames[generic]].forEach(function (name) {
+        var key = normalise(name);
+        if (key) reachIndex[key] = family;
+      });
+    });
+
+    function entryReachedBy(entries, family) {
+      return (entries || []).some(function (entry) {
+        return reachIndex[normalise(entry)] === family;
       });
     }
 
@@ -455,7 +502,7 @@
       // it has at least one member in the pool.
       var familyButtons = [];
       if (typed.length >= FAMILY_BUTTON_MIN_CHARS) {
-        families.forEach(function (family) {
+        buttonFamilies.forEach(function (family) {
           // Reached by any of its names, labelled with one: a single button
           // per family, never one per spelling.
           var label = labelForFamily(family);
@@ -469,7 +516,7 @@
 
           var present = (pool || []).some(function (chip) {
             var terms = (chip && chip.terms) ? chip.terms : [chip];
-            return terms.some(function (t) { return familiesOf(t).indexOf(family) !== -1; });
+            return terms.some(function (t) { return groupsOf(t).indexOf(family) !== -1; });
           });
           if (present) familyButtons.push(label);
         });
@@ -483,6 +530,38 @@
       var umbrellaNames = familyButtons.map(normalise);
       var offered = ordered.filter(function (candidate) {
         return umbrellaNames.indexOf(normalise(candidate.entry)) === -1;
+      });
+
+      // An umbrella's `then_offer` chips follow the chips whose names begin
+      // with its label, whenever its button is on offer (#1376): typing
+      // "rhum" lists the clairins straight after the agricoles. Only chips the
+      // pool holds, and none already chosen.
+      umbrellas.forEach(function (u) {
+        if (familyButtons.indexOf(String(u.label)) === -1) return;
+        var head = normalise(u.label);
+        var extras = [];
+        (u.then_offer || []).forEach(function (generic) {
+          var key = normalise(chipForTerm[normalise(generic)] || generic);
+          if (taken.indexOf(key) !== -1) return;
+          // The pool's own value, which is what a chosen chip stores.
+          var value = null;
+          (pool || []).forEach(function (chip) {
+            var v = chip && chip.value !== undefined ? chip.value : chip;
+            if (normalise(v) === key) value = v;
+          });
+          if (value === null) return;
+          offered = offered.filter(function (c) { return normalise(c.entry) !== key; });
+          extras.push(value);
+        });
+        if (!extras.length) return;
+        extras.sort(function (a, b) { return a.toLowerCase().localeCompare(b.toLowerCase()); });
+        var at = 0;
+        offered.forEach(function (c, i) { if (normalise(c.entry).indexOf(head) === 0) at = i + 1; });
+        var band = at ? offered[at - 1].band : 1;
+        offered.splice.apply(offered, [at, 0].concat(extras.map(function (value) {
+          return { entry: value, via: value, viaKind: 'own', viaReplacesName: false,
+                   isPrefixMatch: false, hasWordMatch: false, band: band };
+        })));
       });
 
       return {
@@ -510,7 +589,10 @@
     // `gin (all)` is the precise answer.
     function matchesInclude(entries, chip) {
       if (!chip) return false;
-      if (isFamilyValue(chip)) return entryHasFamily(entries, chipFamily(chip));
+      if (isFamilyValue(chip)) {
+        var family = chipFamily(chip);
+        return entryHasFamily(entries, family) || entryReachedBy(entries, family);
+      }
       // Everything exclude would take, plus the fuzzy reach below. A card-name
       // chip must never select FEWER drinks than the same chip would exclude.
       if (matchesExclude(entries, chip)) return true;
@@ -530,7 +612,7 @@
     function chipFamily(chip) {
       var wanted = familyKey(chip);
       var hit = null;
-      families.forEach(function (family) {
+      buttonFamilies.forEach(function (family) {
         if (hit) return;
         if (namesForFamily(family).some(function (n) { return normalise(n) === wanted; })) {
           hit = family;
