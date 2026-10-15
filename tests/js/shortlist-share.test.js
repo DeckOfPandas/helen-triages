@@ -43,7 +43,7 @@ function store(storage) {
 const LIVE = [
   '/cocktails/recipes/aviation/',
   '/cocktails/recipes/negroni/',
-  '/cocktails/recipes/pear-apricot-and-rosemary-bellini/'
+  '/cocktails/recipes/pear-and-rosemary-bellini/'
 ];
 
 test('slugOf is the last path segment, lowercased', () => {

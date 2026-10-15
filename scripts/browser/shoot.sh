@@ -12,7 +12,7 @@ label="$1"
 shift
 if [ "$#" -eq 0 ]; then
   set -- /cocktails/ /cocktails/recipes/arrack-christmas-punch-wife-3/ \
-    /cocktails/recipes/pear-apricot-and-rosemary-bellini/ /cocktails/recipes/cobras-fang/ \
+    /cocktails/recipes/pear-and-rosemary-bellini/ /cocktails/recipes/cobras-fang/ \
     /food/ /food/recipes/moules-mariniere/ /food/recipes/pineapple-ginger-spatchcock-chicken/ \
     /food/reference/internal-temperatures/ /food/reference/cooking-methods-and-timings/ /about/
 fi
