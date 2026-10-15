@@ -5429,8 +5429,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   names to group some of the rums… 'multi-country origin' is fine where
   applicable."* Gosling's is multi-country, with *"(blended in Bermuda)"*
   after its name on the rum page only. Her three Angosturas (5, 7, 1824) are
-  the Trinidad & Tobago bottles, `moderately aged rum` by an agent's reading
-  of the shelf. Cruzan is under "US Virgin Islands".
+  the Trinidad & Tobago bottles, and `moderately aged rum`: an agent's
+  reading of the shelf, which Helen confirmed (*"I agree with you!"*).
+  Cruzan is under "US Virgin Islands".
 - **2026-10-15, #1379 — the clairins stay four generics, and the rum page
   shows them as one "clairin" row, listed under HAITI.** Helen chose this
   over one `clairin` generic: *"closest to 1, but where a recipe lists
