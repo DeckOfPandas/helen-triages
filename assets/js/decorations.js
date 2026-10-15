@@ -175,14 +175,14 @@
   // a tag must wear the same shape in the filter section and in the list. A
   // host's `data-tag-shape` names its shape outright, for a chip Helen has
   // picked one for by looking (#1369); it must name a member of POOL.
-  // The pool leaves out mirror images, because a row mixing both disagrees
-  // about which end is torn; shape 4 keeps its flip (torn at both ends).
-  // Shape 8 is out as too diagonal, and shape 9 for short text only: its
-  // diagonal turns near-vertical on a narrow pill.
   function tagShapes() {
     var slots = document.querySelectorAll('.tag-shape');
     if (!slots.length) return;
 
+    // No mirror images, because a row mixing both disagrees about which end
+    // is torn; shape 4 keeps its flip (torn at both ends). Shape 8 is out as
+    // too diagonal, and shape 9 is for short text only: its diagonal turns
+    // near-vertical on a narrow pill.
     var SHORT_TEXT_MAX = 6;
     var POOL = [
       'tag-shape-1', 'tag-shape-2', 'tag-shape-3',
