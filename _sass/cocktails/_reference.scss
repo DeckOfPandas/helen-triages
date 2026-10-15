@@ -84,6 +84,17 @@ $ref-col-card:    minmax(6rem, 9rem);
   margin: $spacing-section-top 0 0;
 }
 
+// A change of pace inside the prose, not a new section: the About page's
+// light dashed rule, at the prose's measure. $color-clear-text, because the
+// border grey that serves food's light ground disappears on the leopard.
+.ref-pause {
+  border: 0;
+  border-top: 1px dashed $color-clear-text;
+  height: 0;
+  max-width: 34rem;
+  margin: $spacing-section-gap 0;
+}
+
 .ref-section-heading {
   font-size: 1.5rem;
   font-weight: 400;
@@ -123,7 +134,7 @@ $ref-col-card:    minmax(6rem, 9rem);
 // =============================================================================
 // THE CATEGORY ROWS
 // =============================================================================
-// A three-column table (Helen's choice). Every row is its own grid with a
+// A table (Helen's choice), three columns or two. Every row is its own grid with a
 // fixed template, not one grid with `display: contents` rows: the first two
 // tracks are the same length on every row, so the rows align as a table does,
 // the border stays on the row, and the narrow breakpoint below is two lines.
@@ -142,6 +153,14 @@ $ref-col-card:    minmax(6rem, 9rem);
 
   padding: $space-md 0;
   border-bottom: 1px solid $color-grey-light;
+}
+
+// A section with no "site display name" to show drops that column (#1379).
+// The name track keeps its width, so the bottles start at the same x on every
+// two-column section.
+.rum-cats--no-card .rum-cat {
+  grid-template-columns: $ref-col-name 1fr;
+  grid-template-areas: "name bottles";
 }
 
 // The column labels, once per section. `aria-hidden` in the markup: a screen
@@ -296,7 +315,10 @@ $ref-list-gutter: 1.3rem;
   @include ref-marked-list("→");
 }
 
-.rum-retired-word {
+// The characters wear the retired words' face too (#1379): the page's two
+// flat lists look alike.
+.rum-retired-word,
+.rum-char {
   font-family: $font-label;
   color: $color-text;
 }
@@ -403,6 +425,11 @@ $glass-shelf-height: 11rem;
   .rum-cat {
     grid-template-columns: 1fr;
     grid-template-areas: "name" "card" "bottles";
+  }
+
+  .rum-cats--no-card .rum-cat {
+    grid-template-columns: 1fr;
+    grid-template-areas: "name" "bottles";
   }
 
   .rum-cat--head {

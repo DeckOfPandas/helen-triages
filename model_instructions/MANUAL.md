@@ -2198,8 +2198,8 @@ vodka`, `pineapple vodka`; `sloe gin` its own generic); `lavender-forward
 bitters` not `lavender bitters`; `apple brandy` by the fruit, so an applejack
 and a Spanish apple brandy share it, and it is not `calvados`; `cucumber` and
 `kaffir lime leaves` bare — the leaf is not a variety of lime. Brand-named
-styles are generalised (`pineapple rum`, `blended overproof rum`, `coconut
-rum`). `Chartreuse Verte` / `Jaune`, not green / yellow. "Pernod" names two
+styles are generalised (`pineapple-infused rum`, `blended overproof rum`,
+`coconut rum-based liqueur`). `Chartreuse Verte` / `Jaune`, not green / yellow. "Pernod" names two
 bottles: write the product, not the house.
 
 **Renaming a generic is quote-anchored**: every occurrence is quoted, so match
@@ -4880,17 +4880,25 @@ page restates a fact the data holds.
 |---|---|
 | the shelves and their order | `rum_groups` in `ingredients.yml` |
 | a category | the group's `styles` (members of `rum_styles`) |
-| "site display name" | `card_names`, printed only where it differs from the category |
-| the example bottles | `bottles.yml` entries whose `generic` is that category, alphabetical, grouped by `origin` where bottles carry one (`bottle_origins` is the closed list) |
+| one row for several styles (the clairins) | the group's `combined`: the styles listed under its `origin` in the examples column |
+| "site display name" | `card_names`, printed only where it differs from the category; the column is dropped from a section where no row has one |
+| the example bottles | `bottles.yml` entries whose `generic` is that category, alphabetical, grouped by `origin` where bottles carry one (`bottle_origins` is the closed list and its order), through `_includes/cocktails/rum-bottles.html` |
+| words after a country label, or after a bottle | the group's `origin_notes`; `rum_page_bottle_notes` |
 | the rum-adjacent block and where it sits | `cane_and_palm_spirits` and `rum_adjacent_before`, through `_includes/cocktails/rum-adjacent.html` |
-| the "styles" she does not recognise | the lowercase keys of `retired_rum_styles`, as a bare list |
-| the characters | `rum_characters` |
+| the rum-based liqueurs, after every rum shelf | `rum_liqueur_shelf`: rows naming `liqueurs` generics, each with an optional page-only `label` |
+| the "styles" she does not recognise | the lowercase keys of `retired_rum_styles`, alphabetical, as a bare list |
+| the characters | `rum_characters`, alphabetical, with `rum_character_notes` |
 
 - **The page walks the groups, not `rum_styles`**, so a style added and not
   placed in a group would be invisible with nothing else failing.
   `test_rum_groups_partition_the_styles` holds every style in exactly one
   group, and `test_rum_adjacent_before_names_a_real_group` holds the block's
-  position.
+  position. `test_no_bottle_under_a_combined_rum_row`,
+  `test_rum_liqueur_shelf_names_declared_liqueurs` and
+  `test_rum_page_notes_name_real_things` hold the other lookups.
+- **A renamed rum generic goes in `retired_rum_names`, not
+  `retired_rum_styles`**: the page prints the second's lowercase keys as
+  words Helen does not recognise.
 - **The case of a `retired_rum_styles` key is data:** lowercase is a word a
   recipe asks for (shown); capitalised is a bottle whose brand-generic was
   retired (hidden). `test_retired_rum_style_keys_split_by_case` guards it.
@@ -4907,8 +4915,9 @@ page restates a fact the data holds.
   ("category", "site display name", "examples"). §13.12 applies with full
   force: an agent ships a placeholder, never a sentence, and never polishes
   one of hers. There is no placeholder on the page.
-- **Section order** is categories, then the "styles" she does not
-  recognise, then characters last.
+- **Section order** is the rum shelves (the rum-adjacent block among them),
+  the rum-based liqueurs, then the "styles" she does not recognise, then
+  characters last.
 - **The tab and the footer link say "rum categories" and the h1 says "My
   Philosophy of Rum", on purpose.** The label is wayfinding, the headline is
   voice; do not make them agree.

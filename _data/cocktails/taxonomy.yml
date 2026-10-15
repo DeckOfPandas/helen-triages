@@ -333,8 +333,8 @@ mood_ingredients:
     - cinnamon syrup
     - pineapple juice
     - grenadine
-    - pineapple rum
-    - coconut rum
+    - pineapple-infused rum
+    - coconut rum-based liqueur
     - blackstrap          # a rum CHARACTER, not a generic — #314
     - overproof Demerara rum, lightly aged
     - overproof Jamaican rum, unaged
@@ -394,7 +394,7 @@ mood_ingredients:
     - crème de banane
     - crème de menthe
     - coconut cream
-    - coconut rum
+    - coconut rum-based liqueur
     - vanilla syrup
     - espresso
     - cola

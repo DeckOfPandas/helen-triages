@@ -1845,12 +1845,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   source's "navy rum" fails with an explanation and is typed by what the
   bottle is: strength belongs to the bottle, and a black rum is an aged
   Jamaican or a `blackstrap` character.
-- **2026-10-13, #606 — `coconut rhum` is a generic, and no longer
-  provisional.** Helen, asked whether it still was: *"No, it's an official
-  generic."* For Clément Mahina Coconut Rhum Liqueur in the White Negroni Piña
-  Colada; her figures, 2026-09-26: *"18% ABV, £22"*. Filed under `liqueurs`
-  for the reason Créole Shrubb is, and not `coconut rum`, which is a rum
-  style. Do not tidy the spelling to match.
+- **2026-10-15, #1379 — two coconut generics by base: `coconut rum-based
+  liqueur` and `coconut rhum-based liqueur`, both filed under `liqueurs`.**
+  Helen, asked whether Mahina, Koko Kanu and Malibu were one row: *"two
+  generics, coconut rum-based liqueur and coconut rhum-based liqueur."* They
+  replace `coconut rum` (Malibu, now with Koko Kanu, 37.5%, £22) and `coconut
+  rhum` (Clément Mahina), which #606 had made official two days before; both
+  old names are in `retired_rum_names`. The rum-based one is priced and
+  strengthed from Malibu, her meaning of the category.
+- **2026-10-15, #1379 — `pineapple rum` is `pineapple-infused rum`.** Helen
+  chose the rename knowing two live drinks go back to her for proofreading.
+  The card still reads "pineapple rum".
 - **2026-09-20, #1068 #1069 — `ginger beer` is its own generic, in no
   category.** Helen: *"Ginger Beer is a new ingredient, no category, so that's
   the name."* It is under `other` in `ingredients.yml` and shelves with the
@@ -5408,14 +5413,44 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   call, against a comma-separated sentence: the eight agricoles share their
   first two words and wrap into a ribbon, and a column you check your own
   shelf against is scanned, not read.
-- **2026-09-06 — the shelf headings "Non-geographical" and "Rum-adjacent" are
-  Helen's words.** They replaced a session's "By age" and "Next to rum, and
-  not rum". "By age" named the sort order and left the membership rule to be
-  worked out; "Non-geographical" states the rule — what is left once origin
-  stops being the answer. The styles inside are still in age order. The
-  shelves themselves are her brief: *"reorganise the table into useful
-  sections like Jamaican rum, Demerara rum, cane juice, (no name unless you
-  can think of one, but organised by agedness), flavoured."*
+- **2026-10-15, #1379 — the rum shelves are Jamaican, "Demerara rum
+  (Guyana)", "Other molasses rum", Cane juice, (rum-adjacent), Flavoured, then "Rum-based
+  liqueurs".** Helen: *"Move the non-geographical section above the cane
+  juice section, and rename it 'other molasses rum'"*. Guyana is in the
+  Demerara heading *"to stay in step with Jamaica"*, chosen over a country
+  label beside or under it. Flavoured holds only
+  `pineapple-infused rum`; the coconut liqueurs and Créole Shrubb moved to the
+  new last shelf. "Rum-adjacent" is still her word.
+- **2026-10-15, #1379 — on "Other molasses rum" the bottles group by
+  country, and a blend says "multi-country origin".** Helen: *"Add country
+  names to group some of the rums… 'multi-country origin' is fine where
+  applicable."* Gosling's is multi-country, with *"(blended in Bermuda)"*
+  after its name on the rum page only. Her three Angosturas (5, 7, 1824) are
+  the Trinidad & Tobago bottles, `moderately aged rum` by an agent's reading
+  of the shelf. Cruzan is under "US Virgin Islands".
+- **2026-10-15, #1379 — the clairins stay four generics, and the rum page
+  shows them as one "clairin" row, listed under HAITI.** Helen chose this
+  over one `clairin` generic: *"closest to 1, but where a recipe lists
+  clairin, every time it should note which"* — which the four generics
+  already force. A bare "clairin" from a source is retired with that reason.
+- **2026-10-15, #1379 — Créole Shrubb keeps its own generic; the rum page
+  labels its row "fruit rum liqueur", with "(rhum-based)" after the
+  bottle.** Helen chose the page-only label over a `fruit rum liqueur`
+  generic, which would have let any fruit rum liqueur stand in for it
+  (2026-09-05: *"it's not replaceable"*).
+- **2026-10-15, #1379 — small rum-page rulings.** The "site display name"
+  column is dropped from a section where no row has one. The rum-adjacent
+  block has the head row. The retired-words and characters lists are
+  alphabetical. `silver` and `amber` are retired as colour words.
+  "Spanish-style" carries her note, and the characters take the retired
+  words' face. Under rhum agricole vieux, HAITI reads *"(not strictly
+  agricoles)"*.
+- **2026-10-15, #1379 — the rum page's first prose paragraph is a sentence
+  a paragraph, and a light dashed rule sits above "Rum tastes like
+  sunshine."** Helen: *"let's split paragraph 1 please"* and *"to help the
+  change of pace and temperature, let's try a light rule"*, the About page's
+  pattern. Paragraph two stays whole. The rule is the column-label grey: the
+  About page's border grey is invisible on the leopard.
 - **2026-09-06 — `rum_groups` is declared, not derived, and the rum page walks
   the groups.** A session's call, not Helen's ruling: no rule recovers the
   shelves ("Jamaican" is in two of that shelf's three style names and absent

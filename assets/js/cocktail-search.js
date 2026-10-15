@@ -133,8 +133,8 @@
 
     // Declared vocabulary (generics and card names) versus transcribed
     // suggestions. The prose and bottle rules below apply only to suggestions:
-    // `coconut rum` is a generic and also an alias of the bottle Malibu, and
-    // must not resolve to the brand (#501). Every list-valued key is a generic
+    // a generic that is also some bottle's alias must not resolve to the
+    // brand (#501). Every list-valued key is a generic
     // vocabulary except `families` and the `<family>_characters` lists.
     var declaredVocabulary = Object.create(null);
     Object.keys(voc).forEach(function (key) {

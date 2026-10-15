@@ -15,7 +15,7 @@ ingredients:
     generic: "gentian liqueur"
     suggestion: ["Suze"]
   - amount: "15 ml"
-    generic: "coconut rhum"
+    generic: "coconut rhum-based liqueur"
     suggestion: ["Clément Mahina Coconut Rhum Liqueur"]
   - amount: "15 ml"
     generic: "lemon juice"
@@ -39,5 +39,5 @@ meta:
   ship: "who knows"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

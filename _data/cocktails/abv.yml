@@ -53,6 +53,10 @@ bottles:
   "Planteray 5 Year Old Barbados":             { abv: 40,   confidence: medium }
   "Chairman's Reserve":               { abv: 40,   confidence: high }
   "Cruzan Single Barrel":             { abv: 40,   confidence: high }
+  # Helen's figures (#1379).
+  "Angostura 5 Year Old Superior Gold": { abv: 40, confidence: high }
+  "Angostura 7 Year Old House Signature": { abv: 40, confidence: high }
+  "Angostura 1824 12 Year Old":       { abv: 40,   confidence: high }
 
   # --- rum: light, blended and flavoured ---------------------------------
   "Havana Club 3 year old":           { abv: 40,   confidence: high }
@@ -65,6 +69,8 @@ bottles:
   "Pusser's 151":                     { abv: 75.5, confidence: high }
   "Planteray Stiggins' Fancy":        { abv: 40,   confidence: high }
   "Malibu":                           { abv: 21,   confidence: high }
+  # Helen's figure (#1379).
+  "Koko Kanu":                        { abv: 37.5, confidence: high }
 
   # --- rhum agricole and clairin -----------------------------------------
   # The strength is part of the name on two of these, which is why Damoiseau
@@ -86,8 +92,8 @@ bottles:
   # The 3 Star's figure carried across; Helen confirmed it (#1351).
   "Barbancourt 5 Star":               { abv: 43,   confidence: medium }
   "Rhum Clément Créole Shrubb":       { abv: 40,   confidence: high }
-  # Helen's figure. The bottle under `coconut rhum`, so that generic has no
-  # row below.
+  # Helen's figure. The bottle under `coconut rhum-based liqueur`, so that
+  # generic has no row below.
   "Clément Mahina Coconut Rhum Liqueur": { abv: 18, confidence: high }
 
   # --- cachaça and arrack ------------------------------------------------

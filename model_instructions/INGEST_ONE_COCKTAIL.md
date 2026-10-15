@@ -413,8 +413,8 @@ does not give one you cannot pick: that is a `QQ`.
 `overproof Demerara rum, lightly aged` · `overproof Jamaican rum, unaged` ·
 `rhum agricole blanc` · `rhum agricole vieux` · `Clairin Vaval` ·
 `Clairin Casimir` · `Clairin Communal` · `Clairin Sajous` ·
-`clear blended multi-region rum` · `pineapple rum` · `blended overproof rum` ·
-`coconut rum`
+`clear blended multi-region rum` · `pineapple-infused rum` ·
+`blended overproof rum`
 
 **Gin styles:** `London dry gin` · `Old Tom gin` · `Plymouth gin` ·
 `New Western dry gin` · `genever` · `navy strength gin` · `speciality` ·
@@ -440,10 +440,10 @@ does not give one you cannot pick: that is a `QQ`.
 `Grand Marnier` · `blue Curaçao` · `Créole Shrubb` · `maraschino liqueur` ·
 `crème de mûre` · `crème de cassis` · `crème de pêche` · `crème de banane` ·
 `crème de violette` · `brown crème de cacao` · `white crème de cacao` ·
-`coconut rhum` · `crème de menthe` · `cherry liqueur` · `cherry brandy` ·
-`apricot liqueur` · `coffee liqueur` · `ginger liqueur` ·
-`passion fruit liqueur` · `gentian liqueur` · `apple schnapps` ·
-`peach schnapps` · `mastiha liqueur` · `allspice dram` ·
+`coconut rum-based liqueur` · `coconut rhum-based liqueur` · `crème de menthe` ·
+`cherry liqueur` · `cherry brandy` · `apricot liqueur` · `coffee liqueur` ·
+`ginger liqueur` · `passion fruit liqueur` · `gentian liqueur` ·
+`apple schnapps` · `peach schnapps` · `mastiha liqueur` · `allspice dram` ·
 `black raspberry liqueur` · `crème de myrtille` · `kümmel` · `tomato liqueur` ·
 `amaretto`
 
