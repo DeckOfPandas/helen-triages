@@ -5,10 +5,9 @@ permalink: /cocktails/reference/rum-categories/
 ---
 
 {% comment %}
-  RUM CATEGORIES (#529). Cards name categories, not bottles (#501); the bottles
-  column says which bottle is which; a category with none is correct. Rum only.
-  Every name is a lookup: `rum_groups`, `card_names`, `retired_rum_styles`,
-  and the bottles.yml entries whose `generic` matches. The prose and headings
+  RUM CATEGORIES (#529). Cards name categories, not bottles (#501); a category
+  with no bottle is correct. Every name is a lookup in ingredients.yml (the
+  `rum_*` keys, `card_names`) or a bottles.yml entry whose `generic` matches. The prose and headings
   are Helen's, not to be polished (MANUAL §13.12). The title and the sites.yml
   link text are the wayfinding label, the h1 the headline: do not align them.
 {% endcomment %}
@@ -68,87 +67,89 @@ permalink: /cocktails/reference/rum-categories/
     {% comment %} The categories, in Helen's sections. The shelves are
        `rum_groups` in ingredients.yml, declared and not derived by any rule
        here; `test_rum_groups_partition_the_styles` stops a style being
-       invisible. One markup: a three-track grid whose head row repeats once per
-       section, the unit a reader scans. {% endcomment %}
+       invisible. One markup: a grid whose head row repeats once per section,
+       the unit a reader scans. The bottles column is
+       _includes/cocktails/rum-bottles.html. {% endcomment %}
     {% for group in ing.rum_groups %}
       {% comment %} The rum-adjacent block renders before one named shelf, not
          after all of them (#919). Which shelf is `rum_adjacent_before` in
          ingredients.yml, so renaming a shelf cannot move it silently. {% endcomment %}
       {% if group.name == ing.rum_adjacent_before %}{% include cocktails/rum-adjacent.html ing=ing bottles=bottles %}{% endif %}
+
+      {% comment %} The "site display name" column only on a shelf where some
+         card name differs from its category (#1379). {% endcomment %}
+      {% assign has_card = false %}
+      {% for style in group.styles %}{% assign card = ing.card_names[style] %}{% if card and card != style %}{% assign has_card = true %}{% endif %}{% endfor %}
+      {% capture combined_blob %}{% for c in group.combined %}{% for s in c.styles %}{{ s }}||{% endfor %}{% endfor %}{% endcapture %}
+      {% assign combined_styles = combined_blob | split: "||" %}
+
       {% comment %} The shelf headings are the `rum_groups` names, all Helen's
          words. {% endcomment %}
       <h3 class="ref-section-heading" id="group-{{ group.name | slugify }}"><span>{{ group.name }}</span></h3>
 
-      <ul class="rum-cats">
+      <ul class="rum-cats{% unless has_card %} rum-cats--no-card{% endunless %}">
 
         <li class="rum-cat rum-cat--head" aria-hidden="true">
           {% comment %} "category" is Helen's word (#784), not a placeholder. {% endcomment %}
           <span class="rum-cat-name">category</span>
           {% comment %} "site display name", Helen's words: the shorter name a
              drink card uses where it differs from the category. {% endcomment %}
-          <span class="rum-cat-card">site display name</span>
+          {% if has_card %}<span class="rum-cat-card">site display name</span>{% endif %}
           {% comment %} "examples", Helen's word (#888). {% endcomment %}
           <span class="rum-cat-bottles">examples</span>
         </li>
 
         {% for style in group.styles %}
+          {% if combined_styles contains style %}{% continue %}{% endif %}
           {% assign card = ing.card_names[style] %}
-          {% comment %} Alphabetical (#972), sorted where the page prints:
-             bottles.yml keeps its own order, which other consumers read.
-             `sort_natural`, not `sort`: it is case-insensitive, where `sort`
-             compares codepoints. {% endcomment %}
-          {% capture blob %}{% for pair in bottles %}{% if pair[1].generic == style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-          {% assign bottle_names = blob | split: "||" | sort_natural %}
           <li class="rum-cat">
             <span class="rum-cat-name">{{ style }}</span>
             {% comment %} The short name only where it differs: many card names
                repeat the generic verbatim, and printing a word twice on one row
                teaches nothing. {% endcomment %}
-            <span class="rum-cat-card">{% unless card == style %}{{ card }}{% endunless %}</span>
-            {% if bottle_names.size > 0 %}
-            {% comment %} Grouped by country where there is one (#813): one row
-               per category, with the country inside the bottles column, because
-               a row per country would read as an origin-qualified category
-               (#591). Driven by the data: any style whose bottles declare an
-               `origin` groups, and every other row renders the flat list. {% endcomment %}
-            {% capture origin_blob %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin %}{{ pair[1].origin }}||{% endif %}{% endfor %}{% endcapture %}
-            {% assign any_origin = origin_blob | split: "||" %}
+            {% if has_card %}<span class="rum-cat-card">{% unless card == style %}{{ card }}{% endunless %}</span>{% endif %}
+            {% assign style_origin_notes = group.origin_notes[style] %}
+            {% include cocktails/rum-bottles.html style=style ing=ing bottles=bottles origin_notes=style_origin_notes %}
+          </li>
+        {% endfor %}
+
+        {% comment %} A combined row names several generics, each its own because
+           none substitutes for another, as one category; its bottles column
+           lists the generics under their country (#1379). No bottle may sit
+           under one: test_no_bottle_under_a_combined_rum_row. {% endcomment %}
+        {% for c in group.combined %}
+          {% assign c_names = c.styles | sort_natural %}
+          <li class="rum-cat">
+            <span class="rum-cat-name">{{ c.row }}</span>
+            {% if has_card %}<span class="rum-cat-card"></span>{% endif %}
             <ul class="rum-cat-bottles">
-              {% if any_origin.size > 0 %}
-                {% comment %} `bottle_origins` order, so the countries read the
-                   same way on every row rather than alphabetically per row. {% endcomment %}
-                {% for origin in ing.bottle_origins %}
-                  {% capture in_origin %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin == origin %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-                  {% comment %} Alphabetical within the country (#972); the
-                     countries keep `bottle_origins` order. {% endcomment %}
-                  {% assign origin_names = in_origin | split: "||" | sort_natural %}
-                  {% if origin_names.size > 0 %}
-                    <li class="rum-origin-head">{{ origin }}</li>
-                    {% for b in origin_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
-                  {% endif %}
-                {% endfor %}
-                {% comment %} A bottle in this category with no origin still has
-                   to appear. `test_cane_juice_bottles_declare_an_origin` means
-                   nothing hits this, but a row that silently dropped a bottle
-                   would be the worst failure this page has. {% endcomment %}
-                {% capture no_origin %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin == nil %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-                {% assign orphan_names = no_origin | split: "||" | sort_natural %}
-                {% for b in orphan_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
-              {% else %}
-                {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
-              {% endif %}
+              <li class="rum-origin-head">{{ c.origin }}</li>
+              {% for s in c_names %}<li class="rum-bottle">{{ s }}</li>{% endfor %}
             </ul>
-            {% else %}
-            {% comment %} Nothing, on purpose: an empty third track is the
-               honest rendering of a category with no bottle. The span stays so
-               the grid keeps its three tracks. {% endcomment %}
-            <span class="rum-cat-bottles"></span>
-            {% endif %}
           </li>
         {% endfor %}
 
       </ul>
     {% endfor %}
+
+    {% comment %} Liqueurs on a rum or rhum base, after every rum shelf
+       (#1379): `rum_liqueur_shelf`, whose rows name liqueur generics. A row's
+       `label` is Helen's word for it on this page only. {% endcomment %}
+    {% assign liq = ing.rum_liqueur_shelf %}
+    <h3 class="ref-section-heading" id="group-{{ liq.name | slugify }}"><span>{{ liq.name }}</span></h3>
+
+    <ul class="rum-cats rum-cats--no-card">
+      <li class="rum-cat rum-cat--head" aria-hidden="true">
+        <span class="rum-cat-name">category</span>
+        <span class="rum-cat-bottles">examples</span>
+      </li>
+      {% for row in liq.rows %}
+        <li class="rum-cat">
+          <span class="rum-cat-name">{{ row.label | default: row.generic }}</span>
+          {% include cocktails/rum-bottles.html style=row.generic ing=ing bottles=bottles flat=true %}
+        </li>
+      {% endfor %}
+    </ul>
 
     {% comment %} The rum-adjacent spirits (`cane_and_palm_spirits`) are
        _includes/cocktails/rum-adjacent.html, included from the loop above. {% endcomment %}

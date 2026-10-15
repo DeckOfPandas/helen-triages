@@ -287,16 +287,16 @@ rum_styles:
   - "clear blended multi-region rum"
   # `blended overproof rum` is Guyana, Jamaica and Barbados at 69%: a home
   # `moderately aged rum` cannot give, since it says nothing about strength.
-  - "pineapple rum"
+  - "pineapple-infused rum"
   - "blended overproof rum"
-  - "coconut rum"
 
-# How the styles group for reading on the rum reference page (#529). Not a
-# second vocabulary: every `rum_styles` entry appears exactly once and nothing
-# else may (test_rum_groups_partition_the_styles). Not `family_of` either:
-# cachaça is in the rum family and on no rum shelf.
-# `Non-geographical` is Helen's name for the styles that name no place; they
-# are in age order.
+# How the styles group on the rum reference page (#529), in Helen's names. Not
+# a second vocabulary: every `rum_styles` entry appears exactly once
+# (test_rum_groups_partition_the_styles). Not `family_of` either: cachaça is
+# in the rum family and on no rum shelf. "Other molasses rum" is in age order.
+# `combined` prints several styles as one row listing them under `origin`: the
+# four clairins, no two interchangeable, read as one category (#1379).
+# `origin_notes` puts Helen's words after a country label in one row.
 rum_groups:
   - name: "Jamaican rum"
     styles:
@@ -307,6 +307,12 @@ rum_groups:
     styles:
       - "aged Demerara rum"
       - "overproof Demerara rum, lightly aged"
+  - name: "Other molasses rum"
+    styles:
+      - "clear blended multi-region rum"
+      - "lightly aged and filtered rum"
+      - "moderately aged rum"
+      - "blended overproof rum"
   # Pressed cane juice fermented fresh; the other groups are molasses.
   - name: "Cane juice"
     styles:
@@ -316,16 +322,37 @@ rum_groups:
       - "Clairin Casimir"
       - "Clairin Communal"
       - "Clairin Sajous"
-  - name: "Non-geographical"
-    styles:
-      - "clear blended multi-region rum"
-      - "lightly aged and filtered rum"
-      - "moderately aged rum"
-      - "blended overproof rum"
+    combined:
+      - row: "clairin"
+        origin: "Haiti"
+        styles:
+          - "Clairin Vaval"
+          - "Clairin Casimir"
+          - "Clairin Communal"
+          - "Clairin Sajous"
+    origin_notes:
+      "rhum agricole vieux":
+        "Haiti": "(not strictly agricoles)"
   - name: "Flavoured"
     styles:
-      - "pineapple rum"
-      - "coconut rum"
+      - "pineapple-infused rum"
+
+# The rum page's shelf after Flavoured (#1379): liqueurs, so not rum styles and
+# not in `rum_groups`. A row prints its `label` where Helen gave one, else its
+# generic. Créole Shrubb keeps its own generic and reads "fruit rum liqueur"
+# here only. test_rum_liqueur_shelf_names_declared_liqueurs.
+rum_liqueur_shelf:
+  name: "Rum-based liqueurs"
+  rows:
+    - generic: "coconut rum-based liqueur"
+    - generic: "coconut rhum-based liqueur"
+    - generic: "Créole Shrubb"
+      label: "fruit rum liqueur"
+
+# Helen's words after a bottle's name, on the rum page only (#1379).
+rum_page_bottle_notes:
+  "Gosling's Black Seal": "(blended in Bermuda)"
+  "Rhum Clément Créole Shrubb": "(rhum-based)"
 
 # The rum page renders its rum-adjacent block immediately before the shelf
 # named here (#919). Declared so that renaming the shelf cannot silently move
@@ -368,11 +395,22 @@ whisky_characters:
 # Demeraras, the clairins) and on the bottle where it changes the flavour.
 # A closed list of the values in use, held by test_bottle_origin_is_declared,
 # and named in NOT_GENERIC_LISTS so that these do not become generics.
+# The page prints a row's countries in this order. The molasses countries
+# (#1379) are alphabetical, and a blend of several countries' rums comes last.
 bottle_origins:
   - "Martinique"
   - "Guadeloupe"
   - "Haiti"
   - "Brazil"
+  - "Barbados"
+  - "Cuba"
+  - "Guyana"
+  - "Nicaragua"
+  - "Panama"
+  - "St Lucia"
+  - "Trinidad & Tobago"
+  - "US Virgin Islands"
+  - "multi-country origin"
 
 # The name each generic shows on a card (#501, DECISIONS §9.10). The drink
 # page does not read this map: it prints `generic` verbatim, so a ratio or a
@@ -403,10 +441,9 @@ card_names:
   "Clairin Casimir": "Clairin Casimir"
   "Clairin Communal": "Clairin Communal"
   "Clairin Sajous": "Clairin Sajous"
-  "pineapple rum": "pineapple rum"
+  "pineapple-infused rum": "pineapple rum"
   # Distinct from the two single-origin overproofs above.
   "blended overproof rum": "blended overproof rum"
-  "coconut rum": "coconut rum"
   "cachaça": "cachaça"
   "Batavia arrack": "Batavia arrack"
   # Not a rum and in no family (see `family_less`); it has a row so that the
@@ -610,9 +647,10 @@ liqueurs:
   # source that does not say which is a question for Helen.
   - "brown crème de cacao"
   - "white crème de cacao"
-  # A rhum-based liqueur (#606), so filed here for the reason `Créole
-  # Shrubb` is. Not `coconut rum`, which is a rum style.
-  - "coconut rhum"
+  # Coconut by base (#1379), filed here for the reason `Créole Shrubb` is: a
+  # rhum-based one is not a rum-based one.
+  - "coconut rum-based liqueur"
+  - "coconut rhum-based liqueur"
   - "crème de menthe"
   # A liqueur is sweetened and an eau de vie is not: the eau de vie is under
   # `brandy_styles`.
@@ -878,9 +916,8 @@ family_of:
   "Clairin Communal": rum
   "Clairin Sajous": rum
   "clear blended multi-region rum": rum
-  "pineapple rum": rum
+  "pineapple-infused rum": rum
   "blended overproof rum": rum
-  "coconut rum": rum
   "cachaça": rum
   "Batavia arrack": rum
   "London dry gin": gin
@@ -994,7 +1031,6 @@ shelf_of:
   calvados: spirits
   caramel-forward Jamaican rum: spirits
   clear blended multi-region rum: spirits
-  coconut rum: spirits
   coconut-flower arrack: spirits
   cognac: spirits
   eau de vie: spirits
@@ -1011,7 +1047,7 @@ shelf_of:
   overproof Demerara rum, lightly aged: spirits
   overproof Jamaican rum, unaged: spirits
   peach brandy: spirits
-  pineapple rum: spirits
+  pineapple-infused rum: spirits
   pineapple vodka: spirits
   lemon vodka: spirits
   pisco: spirits
@@ -1061,7 +1097,8 @@ shelf_of:
   brown crème de cacao: liqueurs
   cherry brandy: liqueurs
   cherry liqueur: liqueurs
-  coconut rhum: liqueurs
+  coconut rhum-based liqueur: liqueurs
+  coconut rum-based liqueur: liqueurs
   coffee liqueur: liqueurs
   crème de banane: liqueurs
   crème de cassis: liqueurs
@@ -1207,15 +1244,14 @@ family_less:
 retired_rum_styles:
   "Planteray Stiggins' Fancy": >-
     was permitted as a generic because nothing generalised it. Something does:
-    `pineapple rum`. The bottle is a `suggestion` now -- #314's amendment,
-    Helen 2026-08-29.
+    `pineapple-infused rum`. The bottle is a `suggestion` now -- #314's
+    amendment, Helen 2026-08-29.
   "Planteray O.F.T.D. Overproof": >-
     as Stiggins'. Now `blended overproof rum`, which is what it IS: Guyana,
     Jamaica and Barbados at 69%.
   "Malibu": >-
-    as Stiggins'. Now `coconut rum` -- and both drinks using it already said
-    "Coconut rum" in their `item`, so the data had answered this before the
-    vocabulary did. Helen: "to me coconut rum means Malibu for now."
+    as Stiggins'. Now `coconut rum-based liqueur` (#1379), which Koko Kanu
+    shares.
   light: >-
     describes colour, not production, and colour is routinely adjusted with
     caramel. Re-type against rum_styles — issue #314.
@@ -1261,6 +1297,24 @@ retired_rum_styles:
     another rum, like this: Moderately aged (character: blackstrap)". So the
     rum still needs a real style of its own, and blackstrap rides alongside
     it. Don's Own Grog and Georgetown Punch already have this shape.
+
+# Rum generics renamed or split, kept apart from `retired_rum_styles` because
+# the rum page lists that map's lowercase keys as words Helen does not
+# recognise, and she recognises all of these.
+retired_rum_names:
+  "pineapple rum": >-
+    renamed `pineapple-infused rum`, Helen, #1379. The card still reads
+    "pineapple rum".
+  "coconut rum": >-
+    renamed `coconut rum-based liqueur` and filed with the liqueurs, Helen,
+    #1379: Malibu and Koko Kanu are liqueurs on a rum base.
+  "coconut rhum": >-
+    renamed `coconut rhum-based liqueur`, Helen, #1379, to pair with `coconut
+    rum-based liqueur`. Clément Mahina is its bottle.
+  "clairin": >-
+    not one generic: each clairin is its own, because no two are
+    interchangeable (#1108). A source that says "clairin" without naming one
+    is Helen's question. The rum page reads the four as one row (#1379).
 
 retired_honeys:
   "Honey water 2:1": >-

@@ -1,0 +1,43 @@
+{% comment %}
+  THE BOTTLES COLUMN of one row on the rum page: every bottle whose `generic`
+  is `include.style`, alphabetical (#972), grouped under its country where any
+  declares an `origin` (#813). Takes `style`, `ing`, `bottles`, and optionally
+  `origin_notes`, a map of country to Helen's words after its label (#1379),
+  and `flat`, which never groups: the rum-adjacent block and the liqueur shelf
+  list bottles without countries.
+  A bottle's note is `rum_page_bottle_notes`. Shared by the shelves, the
+  rum-adjacent block and the liqueur shelf. Assigned variables are
+  `rb_`-prefixed: an include shares the page's scope.
+{% endcomment %}
+{% capture rb_blob %}{% for pair in include.bottles %}{% if pair[1].generic == include.style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
+{% assign rb_names = rb_blob | split: "||" | sort_natural %}
+{% if rb_names.size > 0 %}
+{% capture rb_origin_blob %}{% for pair in include.bottles %}{% if pair[1].generic == include.style and pair[1].origin %}{{ pair[1].origin }}||{% endif %}{% endfor %}{% endcapture %}
+{% assign rb_any_origin = rb_origin_blob | split: "||" %}
+<ul class="rum-cat-bottles">
+  {% if rb_any_origin.size > 0 and include.flat != true %}
+    {% comment %} `bottle_origins` order, so the countries read the same way on
+       every row. {% endcomment %}
+    {% for rb_origin in include.ing.bottle_origins %}
+      {% capture rb_in_origin %}{% for pair in include.bottles %}{% if pair[1].generic == include.style and pair[1].origin == rb_origin %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
+      {% assign rb_origin_names = rb_in_origin | split: "||" | sort_natural %}
+      {% if rb_origin_names.size > 0 %}
+        <li class="rum-origin-head">{{ rb_origin }}{% if include.origin_notes[rb_origin] %} {{ include.origin_notes[rb_origin] }}{% endif %}</li>
+        {% for b in rb_origin_names %}<li class="rum-bottle">{{ b }}{% if include.ing.rum_page_bottle_notes[b] %} {{ include.ing.rum_page_bottle_notes[b] }}{% endif %}</li>{% endfor %}
+      {% endif %}
+    {% endfor %}
+    {% comment %} A bottle with no origin in a row that groups still appears,
+       last: a row that silently dropped a bottle is the worst failure this
+       page has. {% endcomment %}
+    {% capture rb_no_origin %}{% for pair in include.bottles %}{% if pair[1].generic == include.style and pair[1].origin == nil %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
+    {% assign rb_orphans = rb_no_origin | split: "||" | sort_natural %}
+    {% for b in rb_orphans %}<li class="rum-bottle">{{ b }}{% if include.ing.rum_page_bottle_notes[b] %} {{ include.ing.rum_page_bottle_notes[b] }}{% endif %}</li>{% endfor %}
+  {% else %}
+    {% for b in rb_names %}<li class="rum-bottle">{{ b }}{% if include.ing.rum_page_bottle_notes[b] %} {{ include.ing.rum_page_bottle_notes[b] }}{% endif %}</li>{% endfor %}
+  {% endif %}
+</ul>
+{% else %}
+{% comment %} Empty, on purpose (#921): the honest rendering of a category
+   with no bottle. The span keeps the grid's last track. {% endcomment %}
+<span class="rum-cat-bottles"></span>
+{% endif %}

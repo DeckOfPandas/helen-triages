@@ -15,7 +15,7 @@ ingredients:
     generic: "moderately aged rum"
     suggestion: ["Havana Club 7 year old"]
   - amount: "30 ml"
-    generic: "pineapple rum"
+    generic: "pineapple-infused rum"
     suggestion: ["Planteray Stiggins' Fancy"]
   - amount: "15 ml"
     generic: "dry orange Curaçao"
@@ -52,5 +52,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
