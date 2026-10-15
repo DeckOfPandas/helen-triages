@@ -5418,10 +5418,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   call, against a comma-separated sentence: the eight agricoles share their
   first two words and wrap into a ribbon, and a column you check your own
   shelf against is scanned, not read.
-- **2026-10-15, #1379 — the rum shelves are Jamaican, Demerara, "Other
-  molasses rum", Cane juice, (rum-adjacent), Flavoured, then "Rum-based
+- **2026-10-15, #1379 — the rum shelves are Jamaican, "Demerara rum
+  (Guyana)", "Other molasses rum", Cane juice, (rum-adjacent), Flavoured, then "Rum-based
   liqueurs".** Helen: *"Move the non-geographical section above the cane
-  juice section, and rename it 'other molasses rum'"*. Flavoured holds only
+  juice section, and rename it 'other molasses rum'"*. Guyana is in the
+  Demerara heading *"to stay in step with Jamaica"*, chosen over a country
+  label beside or under it. Flavoured holds only
   `pineapple-infused rum`; the coconut liqueurs and Créole Shrubb moved to the
   new last shelf. "Rum-adjacent" is still her word.
 - **2026-10-15, #1379 — on "Other molasses rum" the bottles group by
@@ -5445,8 +5447,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   column is dropped from a section where no row has one. The rum-adjacent
   block has the head row. The retired-words and characters lists are
   alphabetical. `silver` and `amber` are retired as colour words.
-  "Spanish-style" carries her note. Under rhum agricole vieux, HAITI reads
-  *"(not strictly agricoles)"*.
+  "Spanish-style" carries her note, and the characters take the retired
+  words' face. Under rhum agricole vieux, HAITI reads *"(not strictly
+  agricoles)"*.
+- **2026-10-15, #1379 — the rum page's first prose paragraph is a sentence
+  a paragraph, and a light dashed rule sits above "Rum tastes like
+  sunshine."** Helen: *"let's split paragraph 1 please"* and *"to help the
+  change of pace and temperature, let's try a light rule"*, the About page's
+  pattern. Paragraph two stays whole. The rule is the column-label grey: the
+  About page's border grey is invisible on the leopard.
 - **2026-09-06 — `rum_groups` is declared, not derived, and the rum page walks
   the groups.** A session's call, not Helen's ruling: no rule recovers the
   shelves ("Jamaican" is in two of that shelf's three style names and absent

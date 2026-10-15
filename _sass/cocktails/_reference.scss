@@ -84,6 +84,17 @@ $ref-col-card:    minmax(6rem, 9rem);
   margin: $spacing-section-top 0 0;
 }
 
+// A change of pace inside the prose, not a new section: the About page's
+// light dashed rule, at the prose's measure. $color-clear-text, because the
+// border grey that serves food's light ground disappears on the leopard.
+.ref-pause {
+  border: 0;
+  border-top: 1px dashed $color-clear-text;
+  height: 0;
+  max-width: 34rem;
+  margin: $spacing-section-gap 0;
+}
+
 .ref-section-heading {
   font-size: 1.5rem;
   font-weight: 400;

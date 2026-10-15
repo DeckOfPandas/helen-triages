@@ -825,11 +825,12 @@ argument and the rules each field is read by.
 - 2026-09-06 · §14 · #529 #459 · a cocktails reference page must answer a question the cards stopped answering; a bare list does not pass #459.
 - 2026-09-06 · §14 · the rum page has its own anatomy (the .ref- classes), in one hue.
 - 2026-09-06 · §14 · the rum page is a table, with column labels on every section and one rum per line.
-- 2026-10-15 · §14 · #1379 · the rum shelves are Jamaican, Demerara, "Other molasses rum", Cane juice, (rum-adjacent), Flavoured, then "Rum-based liqueurs".
+- 2026-10-15 · §14 · #1379 · the rum shelves are Jamaican, "Demerara rum (Guyana)", "Other molasses rum", Cane juice, (rum-adjacent), Flavoured, then "Rum-based liqueurs".
 - 2026-10-15 · §14 · #1379 · on "Other molasses rum" the bottles group by country, and a blend says "multi-country origin".
 - 2026-10-15 · §14 · #1379 · the clairins stay four generics, and the rum page shows them as one "clairin" row, listed under HAITI.
 - 2026-10-15 · §14 · #1379 · Créole Shrubb keeps its own generic; the rum page labels its row "fruit rum liqueur", with "(rhum-based)" after the bottle.
 - 2026-10-15 · §14 · #1379 · small rum-page rulings — The "site display name" column is dropped from a section where no row has one.
+- 2026-10-15 · §14 · #1379 · the rum page's first prose paragraph is a sentence a paragraph, and a light dashed rule sits above "Rum tastes like sunshine."
 - 2026-09-06 · §14 · rum_groups is declared, not derived, and the rum page walks the groups.
 - 2026-09-10 · §14 · #813 · an agricole's country goes inside the bottles column, not into a row of its own.
 - 2026-09-10 · §14 · the sipping shelf is deleted, page and data both.
