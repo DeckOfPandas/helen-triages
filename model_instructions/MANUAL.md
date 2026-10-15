@@ -120,7 +120,9 @@ while `--jq .body` is fine.
 #### The headless browser
 
 Looking is cheaper than reasoning. The devcontainer image carries Playwright
-and its Chromium under `/opt/playwright`; `sh scripts/browser/install.sh`
+with Chromium and WebKit (Safari's engine, for a script that launches
+`webkit` itself; the harness and the suite use Chromium) under
+`/opt/playwright`; `sh scripts/browser/install.sh`
 checks the image's copy is the pinned version and stops. Outside the image,
 or in an image built before the pin moved, it installs both under
 `tmp/browser/`, and `scripts/browser/env.sh` prefers that local copy when it
