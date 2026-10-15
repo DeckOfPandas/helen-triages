@@ -172,9 +172,10 @@
   // --- Tag shapes ------------------------------------------------------------
   // The torn-tape background behind a pill or a filter button (#1219).
   // Assigned by a hash of the tag's own text, never randomly or by position:
-  // a tag must wear the same shape in the filter section and in the list. A
-  // host's `data-tag-shape` names its shape outright, for a chip Helen has
-  // picked one for by looking (#1369); it must name a member of POOL.
+  // a tag must wear the same shape in the filter section and in the list.
+  // CHOSEN overrides the hash for a tag Helen picked a shape for by looking,
+  // keyed by its text so every copy of the tag agrees (#1369). A host's
+  // `data-tag-shape` overrides both, for a candidates page.
   function tagShapes() {
     var slots = document.querySelectorAll('.tag-shape');
     if (!slots.length) return;
@@ -189,6 +190,12 @@
       'tag-shape-4', 'tag-shape-4-flip',
       'tag-shape-5', 'tag-shape-6', 'tag-shape-7', 'tag-shape-9'
     ];
+
+    // The text as the hash reads it: trimmed and lowercased. Values are POOL's.
+    var CHOSEN = {
+      'i’m open to chaos': 'tag-shape-6',
+      'strong brown drink': 'tag-shape-7'
+    };
 
     function pickShape(text) {
       var pool = POOL;
@@ -222,7 +229,7 @@
       if (host.classList.contains('title-hit')) {
         shape = TITLE_HIT_SHAPE;
       } else {
-        shape = host.getAttribute('data-tag-shape') || pickShape(text);
+        shape = host.getAttribute('data-tag-shape') || CHOSEN[text] || pickShape(text);
         // tag-shape-2's torn top-left corner draws the eye on a wide pill, so
         // long text on it is marked for extra stretch. Short text must never
         // get the class.

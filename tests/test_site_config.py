@@ -2739,14 +2739,25 @@ def test_both_indexes_filter_chips_wear_the_shared_tape():
                if not (ROOT / "assets" / "img" / "chrome" / "tag-shapes" / f"{s}.svg").is_file()]
     assert shapes and not missing, f"Shapes in POOL with no file in assets/img/chrome/tag-shapes/: {missing}"
 
-    # A chip's own `data-tag-shape` (#1369) bypasses the hash, so nothing at
-    # run time would notice a typo: it would fetch a file that is not there.
-    assert "host.getAttribute('data-tag-shape')" in decorations, (
-        "tagShapes() no longer reads a host's data-tag-shape.")
+    # Helen's picks (#1369) bypass the hash, so nothing at run time notices a
+    # typo in a shape (a missing file) or a key no chip says (a pick that
+    # silently stops applying when a tag is renamed).
+    chosen_block = re.search(r"var CHOSEN = \{(.*?)\};", decorations, re.S)
+    assert chosen_block, "decorations.js's tagShapes() no longer declares CHOSEN."
+    chosen = dict(re.findall(r"'([^']+)':\s*'([^']+)'", chosen_block.group(1)))
+    assert chosen, "CHOSEN declares no picks, or its entries are not 'text': 'shape'."
+    stray = {k: v for k, v in chosen.items() if v not in shapes}
+    assert not stray, f"CHOSEN names a shape that is not in POOL: {stray}"
+    chip_texts = {re.sub(r"<[^>]+>", "", c).replace("&rsquo;", "’").strip().lower()
+                  for c in chips}
+    moods = yaml.safe_load((ROOT / "_data" / "cocktails" / "taxonomy.yml").read_text(encoding="utf-8"))
+    chip_texts |= {str(m).lower() for m in (moods.get("moods") or {})}
+    unknown = [k for k in chosen if k not in chip_texts]
+    assert not unknown, f"CHOSEN keys that no filter chip says: {unknown}"
     named = re.findall(r'data-tag-shape="([^"]*)"', cocktails + group
                        + (ROOT / "food" / "index.html").read_text(encoding="utf-8"))
-    stray = [n for n in named if n not in shapes]
-    assert not stray, f"data-tag-shape names a shape that is not in POOL: {stray}"
+    stray_attr = [n for n in named if n not in shapes]
+    assert not stray_attr, f"data-tag-shape names a shape that is not in POOL: {stray_attr}"
 
     for entry in ("food.scss", "cocktails.scss"):
         assert '@import "shared/tag-shape";' in (ROOT / "assets" / "css" / entry).read_text(encoding="utf-8"), (
