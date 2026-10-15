@@ -40,7 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrandr2 \
     libgbm1 \
     libasound2 \
-    fonts-liberation\
+    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 # Node, for the `claude` CLI itself and the project's JS tests.
@@ -174,6 +174,11 @@ RUN mkdir -p "$CLAUDE_CONFIG_DIR" "$BUNDLE_PATH" \
 # the host versions: Jekyll's default 127.0.0.1-only bind is invisible from
 # outside the container even with the port published, so these need to
 # listen on every interface to be reachable at all.
+# THE HOST FILES ARE SOURCED ONCE PER SHELL (2026-10-14). Helen's host dotfiles
+# each reload ~/.bashrc, which inside the container is THIS file, so mounting them
+# looped until Ctrl-C. The flag stops the second pass. No `export`: it is a
+# same-process re-entry guard, and an exported one would make child shells skip
+# the host aliases.
 RUN echo '' >> /home/helen/.bashrc \
     && echo "alias jekyll-local='bundle exec jekyll serve --config _config.yml,_config_local.yml --port 4001 --host 0.0.0.0'" >> /home/helen/.bashrc \
     && echo "alias jekyll-prod='JEKYLL_ENV=production bundle exec jekyll serve --config _config.yml --port 4002 --host 0.0.0.0'" >> /home/helen/.bashrc \
@@ -181,9 +186,12 @@ RUN echo '' >> /home/helen/.bashrc \
     && echo '# Optional: run.sh bind-mounts Helen'"'"'s real dotfiles here (read-only,' >> /home/helen/.bashrc \
     && echo '# only if she opted in) at alternate paths so they layer on top of the' >> /home/helen/.bashrc \
     && echo '# aliases above instead of overwriting this file outright.' >> /home/helen/.bashrc \
-    && echo '[ -f "$HOME/.host-bashrc" ] && . "$HOME/.host-bashrc"' >> /home/helen/.bashrc \
-    && echo '[ -f "$HOME/.host-bash_aliases" ] && . "$HOME/.host-bash_aliases"' >> /home/helen/.bashrc \
-    && echo '[ -f "$HOME/.host-bash_profile" ] && . "$HOME/.host-bash_profile"' >> /home/helen/.bashrc \
+    && echo 'if [ -z "$_HOST_RC_DONE" ]; then' >> /home/helen/.bashrc \
+    && echo '  _HOST_RC_DONE=1' >> /home/helen/.bashrc \
+    && echo '  [ -f "$HOME/.host-bashrc" ] && . "$HOME/.host-bashrc"' >> /home/helen/.bashrc \
+    && echo '  [ -f "$HOME/.host-bash_aliases" ] && . "$HOME/.host-bash_aliases"' >> /home/helen/.bashrc \
+    && echo '  [ -f "$HOME/.host-bash_profile" ] && . "$HOME/.host-bash_profile"' >> /home/helen/.bashrc \
+    && echo 'fi' >> /home/helen/.bashrc \
     && chown helen:helen /home/helen/.bashrc
 
 # CLAUDE CODE, AT WHATEVER VERSION run.sh FOUND ON NPM THIS MORNING (2026-10-04).
