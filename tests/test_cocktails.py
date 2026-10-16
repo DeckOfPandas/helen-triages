@@ -223,13 +223,11 @@ def _is_character_list(key):
 # that reads the drafts alone leaves a promoted drink checked by nothing.
 
 NO_DRINKS_REASON = (
-    "No drinks on this machine to check. `_cocktail_recipes/` holds no promoted "
-    "drinks -- it does not exist on disk at all yet, which is deliberate "
-    "(MANUAL.md §9.1) -- and `_cocktail_drafts/` is a separate private "
-    "repo (helen-triages-cocktails-private), gitignored here, so a clean "
-    "checkout of the public repo legitimately has none either. Clone the drafts "
-    "into _cocktail_drafts/ to check those; promote a drink to check it here "
-    "AND in CI."
+    "No drinks on this machine to check: neither `_cocktail_recipes/` nor "
+    "`_cocktail_drafts/` holds one here. `_cocktail_drafts/` is a separate "
+    "private repo (helen-triages-cocktails-private), gitignored here, so CI and "
+    "a fresh worktree never have it. Clone the drafts into _cocktail_drafts/ to "
+    "check those; promote a drink to check it here AND in CI."
 )
 
 
@@ -355,8 +353,16 @@ def _load_draft_files():
     the ordinary state of CI.
     """
     out = [d for d in _load_files() if DRAFTS in d.path.parents]
+    if not out and DRAFTS.is_dir():
+        pytest.fail("`_cocktail_drafts/` exists but yielded no parseable drafts, "
+                    "so this loader has gone stale. Do not let it report green.")
     if not out:
-        pytest.skip(NO_DRINKS_REASON)
+        pytest.skip(
+            "`_cocktail_drafts/` is not on this machine, so there is no draft "
+            "for a draft-only rule to check. It is a separate private repo "
+            "(helen-triages-cocktails-private), so CI never has it; clone it "
+            "into _cocktail_drafts/ to run this."
+        )
     return out
 
 
@@ -380,8 +386,8 @@ def _load_staged():
             "Neither `_cocktail_recipes/` nor any staging folder "
             f"({', '.join(d.name for d in STAGED_DIRS)}) is on this machine, so "
             "there is no staged drink to check. The staging folders are in the "
-            "private drafts repo (gitignored here), and `_cocktail_recipes/` "
-            "starts empty -- see NO_DRINKS_REASON."
+            "private drafts repo (gitignored here); `_cocktail_recipes/` is in "
+            "this repo, so its absence means the checkout is incomplete."
         )
     pytest.skip(
         "No drinks are staged for publication. `_cocktail_recipes/` is empty "
@@ -665,8 +671,9 @@ def test_no_unknown_top_level_keys():
     assert not bad, (
         "Undeclared top-level key(s):\n  " + "\n  ".join(bad)
         + "\n\nEither it is a typo for a declared key -- in which case nothing "
-          "has been reading it -- or it is real, and belongs in TOP_LEVEL_KEYS "
-          "at the top of this file with a note saying what renders it."
+          "has been reading it -- or it is real, and belongs in "
+          "TOP_LEVEL_KEYS_IN_ORDER at the top of this file, at the place "
+          "_layouts/cocktail.html renders it, with a note saying what that is."
     )
 
 
@@ -3612,10 +3619,10 @@ def test_no_method_step_opens_with_express():
     assert not bad, (
         "Method step(s) writing the twist step by hand:\n  " + "\n  ".join(bad)
         + "\n\nDELETE THEM. _layouts/cocktail.html adds \"Express the twist "
-          "over the drink and drop it in.\" as the last step of any drink whose "
-          "`garnish` names a citrus twist, and \"...and discard it.\" where the "
-          "garnish says `(discarded)`. Helen ruled on 2026-09-04 that no drink "
-          "writes it. If the drink really does express something, say what it "
+          "over the drink then drop it in.\" as the last step of any drink whose "
+          "`garnish` names a citrus twist, and \"...then discard it.\" where the "
+          "garnish says `(discarded)`, both from `canonical.express` in "
+          "methods.yml. Helen's ruling is that no drink writes it. If the drink really does express something, say what it "
           "is doing to the drink and lead with that verb."
     )
     assert checked, (
@@ -4266,8 +4273,9 @@ def test_every_icon_has_a_real_world_height():
         + (f"  icons with no height: {missing}\n" if missing else "")
         + (f"  heights for no icon:  {phantom}\n" if phantom else "")
         + "\nAn icon with no height renders at ZERO height on /dev/glasses/ "
-          "-- an invisible gap, not an error. Add a typical height in mm; it "
-          "does not need to be exact, and #295 will replace the lot."
+          "-- an invisible gap, not an error. Give the icon's glass type rows "
+          "in glass_survey.yml, or a `height_overrides` entry with its reason, "
+          "then run `python3 scripts/glass_survey_stats.py --write`."
     )
     bad = sorted(f"{k}={v!r}" for k, v in heights.items()
                  if not isinstance(v, (int, float)) or v <= 0)
@@ -5449,7 +5457,7 @@ def test_the_quoted_scalar_list_names_real_drink_fields():
     assert not unknown, (
         f"DRINK_SCALAR_FIELDS names {unknown}, which the schema does not "
         f"declare. A name that matches no field checks nothing and fails "
-        f"nothing -- add it to TOP_LEVEL_KEYS if it is real, or fix the "
+        f"nothing -- add it to TOP_LEVEL_KEYS_IN_ORDER if it is real, or fix the "
         f"spelling here."
     )
 

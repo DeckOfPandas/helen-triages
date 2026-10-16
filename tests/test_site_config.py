@@ -151,7 +151,7 @@ def test_vocabulary_is_emitted_to_the_page():
     # The <script src> tag specifically: the template's comments also say
     # "filters.js".
     tag = re.search(r"<script src=[^>]*filters\.js", html)
-    assert tag, "food/index.html no longer loads js/filters.js at all."
+    assert tag, "food/index.html no longer loads assets/js/filters.js at all."
     assert html.index('id="ingredient-vocabulary"') < tag.start(), (
         "The ingredient-vocabulary block must appear BEFORE the filters.js "
         "script tag, or the script will run before the data exists."
@@ -909,7 +909,7 @@ def test_filters_js_holds_no_ingredient_vocabulary():
     js = read("assets", "js", "filters.js")
     for name in ("var singularMap = {", "var synonymMap = {"):
         assert name not in js, (
-            f"js/filters.js declares `{name}...` inline. The ingredient "
+            f"assets/js/filters.js declares `{name}...` inline. The ingredient "
             f"vocabulary lives in _data/food/ingredient_words.yml and is read from "
             f"the page; adding a word should be a YAML edit, not a code edit."
         )
@@ -947,7 +947,7 @@ def test_deleted_data_files_stay_deleted(relpath):
     """
     assert not (ROOT / relpath).exists(), (
         f"{relpath} has reappeared. Colour belongs in _sass/food/_palette.scss only; "
-        f"section shape and texture are chosen in js/highlighter.js."
+        f"highlighter shape and texture are chosen in assets/js/decorations.js."
     )
 
 
@@ -1143,7 +1143,7 @@ def test_base_url_is_derived_in_exactly_one_place():
         if hits and path.name != "assets.js":
             offenders.append(f"{path.name} ({hits})")
     assert not offenders, (
-        f"base-url is read outside js/assets.js: {offenders}.\n"
+        f"base-url is read outside assets/js/assets.js: {offenders}.\n"
         f"Use window.HTF.base or window.HTF.asset(path) instead. assets.js is "
         f"loaded first in default.html precisely so that it can be."
     )
@@ -1354,7 +1354,7 @@ def test_svg_fetching_goes_through_the_shared_helper():
             snippet = text[max(0, match.start() - 30):match.end() + 30].replace("\n", " ")
             offenders.append(f"{path.name}: …{snippet}…")
     assert not offenders, (
-        "Direct fetch() call(s) found outside js/assets.js:\n  "
+        "Direct fetch() call(s) found outside assets/js/assets.js:\n  "
         + "\n  ".join(offenders)
         + "\n\nUse window.HTF.fetchSvg(url, cb) so the call gets caching and a "
           "diagnostic warning on failure."
@@ -2628,7 +2628,7 @@ def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
     assert "node --test tests/js/*.test.js" in src, (
         "The JS suite must be invoked with the glob. `node --test tests/js/` "
         "treats the directory as a single test file and reports 'tests 1, "
-        "fail 1' without running the 144 tests inside it."
+        "fail 1' without running any of the tests inside it."
     )
 
 

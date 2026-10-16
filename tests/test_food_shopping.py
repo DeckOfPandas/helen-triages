@@ -104,7 +104,9 @@ def test_every_draft_states_how_many_it_feeds():
     """
     folder = ROOT / "_food_drafts"
     if not folder.is_dir():
-        pytest.skip("_food_drafts/ not cloned; see MANUAL §9.1")
+        pytest.skip("_food_drafts/ is not cloned here, so there is no draft to "
+                    "check: sh scripts/git-clone-agent.sh "
+                    "helen-triages-food-private _food_drafts")
 
     missing = []
     for path in recipe_paths(["_food_drafts"]):

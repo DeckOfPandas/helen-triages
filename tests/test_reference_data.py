@@ -180,7 +180,7 @@ def test_every_temperature_fits_on_the_chart_axis(internal_temperatures):
         f"these figures fall outside the charts' {lo:g}–{hi:g}°C axis, so their "
         f"bars would be drawn off the end of the track:\n  "
         + "\n  ".join(outside)
-        + "\n\nWiden $tc-min/$tc-max in assets/css/reference-demo.scss."
+        + "\n\nWiden $tc-min/$tc-max in _sass/food/_temperature-chart.scss."
     )
 
 
