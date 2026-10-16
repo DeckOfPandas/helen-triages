@@ -3286,13 +3286,18 @@ hidden until `assets/js/cocktail-scale.js` reveals it. The word is final.
 
 Four related cocktails after the footer.
 
-- **The score is shared moods plus shared ingredient generics, ties broken by
-  title, and nothing else.** No `meta.ship` weighting, no per-field weight.
-  Only a candidate scoring above zero is offered.
+- **The ranking is more shared moods, then more shared ingredient generics,
+  then title.** No `meta.ship` weighting. Only a candidate sharing a mood or a
+  generic is offered.
+- **The first three cards are the top three; the fourth is the candidate a
+  quarter of the way down the ranking** (never above fourth), so a cluster of
+  alike drinks, the tiki ones above all, cannot fill the row with each other.
 - It is Liquid in the layout, not a plugin. Liquid cannot sort by a computed
-  number, so each candidate becomes a `rank~title~url` string with
-  `rank = 999 - score`, sorted as text: highest score first, A to Z within a
-  score.
+  number, so each candidate becomes a `mood~generics~title~url` string, each
+  count written as `99 - n`, sorted as text.
+- `test_the_related_picks_are_the_scripts_picks_in_the_scripts_order` holds
+  every built page, food and drink, to its script's picks in its script's
+  order.
 - **The collection is the published set.** `publish_gate.rb` removes a
   held-back cocktail from `site.cocktail_recipes` before the layout runs, so no
   gate check is needed here. Drafts are a different collection and are never
@@ -3316,7 +3321,10 @@ wraps two and two.
 
 The section is hidden in `make it` and in print. The heading text is final.
 Food's row of the same name is its own markup and scoring in
-`_layouts/recipe.html`, with `scripts/related_recipes.py` as its mirror.
+`_layouts/recipe.html`, with `scripts/related_recipes.py` as its mirror: three
+recipes, ranked by the same star ingredient, then more shared mood tags, then
+more shared other tags plus main ingredients, then shared non-larder
+ingredients, larder staples, and title.
 
 ### 9.14 `heights_mm` sizes the canvas
 

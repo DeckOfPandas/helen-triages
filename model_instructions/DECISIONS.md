@@ -3508,14 +3508,16 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 
 **Related drinks.**
 
-- **2026-09-10, #927 — "If you liked this, how about…" scores shared moods
-  plus shared ingredient generics, ties broken by title, and nothing else.**
-  Helen: *"Not a full recommendation engine! But I expect we can do something
-  with coincidental tagging."*, and when a `meta.ship` weighting was on the
-  table: *"Keep it simple."* No weights, no tuning. In Liquid in the layout,
-  not a plugin, and hidden in `make it` and in print: a session's calls.
-  `scripts/related_drinks.py` is the same scoring, to check the template
-  against. Four cards since 2026-09-24.
+- **2026-09-28, #1090 — "If you liked this, how about…" on a drink ranks by
+  shared moods, then shared ingredient generics, then title.** Helen, on the
+  order star, mood, ingredients: *"That's a great ordering. Let's go."* Drinks
+  have no star, so moods lead. Still no `meta.ship` weighting (#927, *"Keep it
+  simple."*). In Liquid in the layout, hidden in `make it` and in print;
+  `scripts/related_drinks.py` is its mirror and a test holds them equal.
+- **2026-10-16, #1183 — the fourth related drink is a renegade, taken a
+  quarter of the way down the ranking.** Helen, on tiki drinks all suggesting
+  each other: *"make the fourth one renegade -- maybe hop to 25% or 50% down
+  the list?"*, and chose 25%. Half way down often shares a single generic.
 - **2026-09-11, #955 — a divider separates the end of the recipe from "If you
   liked this…".** Helen: *"Please add some kind of divider between the end of
   the recipe (whether serve or notes or anything else) and 'If you liked
@@ -4894,14 +4896,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-09-14, #1005 — food scales by portions; drinks scale by whole
   recipes.** Helen: *"Portions. Things like '2 large' can scale, surely, then
   let's add a note to bitters and handfuls"*.
-- **2026-09-14, #1005 — related recipes rank by shared tags plus shared main
-  ingredients, star-and-mood first, ties broken by shared real ingredients,
-  then larder staples, then A–Z.** Helen: *"prioritise (star*mood)"*; on the
-  tie-break, *"Agree with your version, please go ahead."* Declined on
-  measurement: weighting ingredients above tags, which changed 49 of 69 pages
-  and gave cauliflower cheese both chocolate ice creams on "whole milk"
-  (`pantry.yml` is exact, so that gap decides too much). Same key in
-  `scripts/related_recipes.py`.
+- **2026-09-28, #1090 — related recipes rank by the same star ingredient,
+  then shared mood tags, then shared other tags plus main ingredients, then
+  shared real ingredients, larder staples, and A–Z.** Helen: *"That's a great
+  ordering. Let's go."* The poultry showstopper should suggest the duck before
+  the chai. Other tags stay counted with the ingredients: weighting
+  ingredients above all tags was declined on measurement in #1005 (cauliflower
+  cheese got both chocolate ice creams on "whole milk"). Same key in
+  `scripts/related_recipes.py`, held equal by a test.
 - **2026-09-14 — every action is in Courier capitals, on both sites.** Helen:
   *"Let's try all actions in capitals (shortlist button at top of index lists
   too) to help show they're actions????"* The question marks are hers: a try
