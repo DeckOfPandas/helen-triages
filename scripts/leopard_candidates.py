@@ -17,9 +17,9 @@ whether the repeat is offset, and whether the header carries the print. All of
 that is decided and live, so a new round starts by changing GROUPS and
 CANDIDATE_RULES to the new question.
 
-Two things here differ from the live site and want fixing before a band is
+One thing here differs from the live site and wants fixing before a band is
 asked about again: this page's bands carry the nap where the live ones are
-flat, and GROUND is not the live `$color-paper`.
+flat. GROUND must stay the live `$color-paper` (`_sass/cocktails/_palette.scss`).
 """
 import json, os, sys
 
@@ -30,7 +30,7 @@ import mock_bundle
 from leopard_splodge import splodge_tile, ground_tile
 
 DRINK = "negroni"
-GROUND = "#060607"
+GROUND = "#030304"
 
 GROUPS = [
     ("band", "Header and footer", [("b0", "today"), ("b1", "darker"), ("b2", "darker still"), ("b3", "same as the page")]),
@@ -110,7 +110,7 @@ def bar_html(other_href, other_label):
 SWITCHER = """
 (function () {
   var DEFAULTS = %s;
-  var KEY = "leopard-round-five";
+  var KEY = "leopard-candidates";
   var state = {};
   try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { state = {}; }
   var root = document.documentElement;
@@ -138,7 +138,7 @@ SWITCHER = """
 
 def page(src, other_href, other_label, css):
     return mock_bundle.bundle(
-        src, "cocktails.css", "Leopard Round Two",
+        src, "cocktails.css", "Leopard Candidates",
         extra_style=css,
         body_transform=lambda body: bar_html(other_href, other_label) + body,
         extra_scripts="<script>" + SWITCHER + "</script>",

@@ -11,7 +11,8 @@
 // where its bar sits on the axis, so a colour ramp would state it twice.
 // Colour is spent only on what position cannot show: out-at against rested
 // (one hue, fill against outline) and the food-safety threshold, which takes
-// a hatch and a label rather than a new hue.
+// a hatch and a label rather than a new hue. scripts/check_chart_ramp.py prints
+// the contrast figures a ramp fails on.
 
 // --- The scale ---------------------------------------------------------------
 // One axis for every protein, deliberately not per-protein: comparing salmon

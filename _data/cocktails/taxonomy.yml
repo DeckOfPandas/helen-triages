@@ -127,13 +127,11 @@ moods:
     46 and adds to them only. The rest stay hers to type.
   pudding in a glass: >-
     Rich and thick rather than merely sweet: cream, a whole egg, coconut cream.
-    A White Russian, a flip, an Alexander. DECLARED WITH ZERO MEMBERS ON
-    PURPOSE, the same choice as declaring Plymouth and Genever gin while owning
-    neither -- this is a spec, not an inventory. The collection genuinely has
-    none of these yet; see issue #337. The index must not render a button for a
-    mood with no drinks — ENFORCED since 2026-08-26: cocktails/index.html counts
-    each mood's members and skips the empty ones, rather than naming this one as
-    an exception, so the rule holds for whichever mood is empty next.
+    A White Russian, a flip, an Alexander. Declared as a spec, not an
+    inventory, the same choice as declaring Plymouth and Genever gin while
+    owning neither (#337). The index renders no button for a mood with no
+    drinks: cocktails/index.html counts each mood's members and skips the empty
+    ones, so the rule holds for whichever mood is empty next.
   tiki: >-
     Two or more tiki markers -- orgeat, falernum, passion fruit, pineapple,
     cinnamon syrup, grenadine, an overproof or pineapple rum -- AND complexity,
@@ -554,7 +552,7 @@ mood_include:
   sapins-swizzle:
     moods: [I want to faff]
     why: >-
-      Helen, 2026-09-10: "A muddled Swizzle is faff." SHE LOST THIS DRINK'S MOOD BY ACCIDENT THE DAY BEFORE, and that is the whole story: her ruling that "swizzles are not faff" took `swizzle` and `churn` out of `mood_step_words.faff`, which was right about coffey-park-swizzle -- the drink she was looking at -- and took this one with it. It muddles AND swizzles, which was two faff moments and became one, and the threshold is two. So it lands on the rule's own existing line, the same one kill-devil-punch and arrack-punch sit on: one muddle where the rule wants two. A CORRECTION RATHER THAN A LOWER THRESHOLD, because "one muddle is faff" would retag every drink that muddles anything, and she has ruled on this one.
+      Helen, 2026-09-10: "A muddled Swizzle is faff." SHE LOST THIS DRINK'S MOOD BY ACCIDENT THE DAY BEFORE, and that is the whole story: her ruling that "swizzles are not faff" took `swizzle` and `churn` out of `mood_step_words.faff`, which was right about coffey-park-swizzle -- the drink she was looking at -- and took this one with it. It muddles AND swizzles, which was two faff moments and became one, and the threshold is two. So it lands on the rule's own existing line, the same one kill-devil-punch sits on: one muddle where the rule wants two. A CORRECTION RATHER THAN A LOWER THRESHOLD, because "one muddle is faff" would retag every drink that muddles anything, and she has ruled on this one.
   6th-street-swizzle:
     moods: [sharp]
     why: >-

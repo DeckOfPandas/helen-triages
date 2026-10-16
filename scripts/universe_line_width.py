@@ -33,7 +33,7 @@ ROOT_PX = 16
 DEALABLE = ("yes", "oh gods yes")
 
 # The label in cocktails/index.html, with its ellipsis typed as three dots.
-LABEL = "the universe says..."
+LABEL = "the universe says…"
 
 # An ingredient line worth showing at all: roughly two short items before the
 # ellipsis. Below this the brackets are holding almost nothing, which is the
