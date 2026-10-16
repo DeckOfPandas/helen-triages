@@ -14,19 +14,7 @@ permalink: /food/reference/internal-temperatures/
 {% assign t = site.data.food.internal_temperatures %}
 
 
-{% capture axis %}
-  <div class="tc-axis">
-    <div class="tc-axis-scale">
-      <div class="tc-tick" style="--t:40;">40°C</div>
-      <div class="tc-tick" style="--t:50;">50</div>
-      <div class="tc-tick" style="--t:60;">60</div>
-      <div class="tc-tick" style="--t:70;">70</div>
-      <div class="tc-tick" style="--t:80;">80</div>
-      <div class="tc-tick" style="--t:90;">90</div>
-      <div class="tc-tick" style="--t:100;">100°C</div>
-    </div>
-  </div>
-{% endcapture %}
+{% capture axis %}{% include food/temp_axis.html %}{% endcapture %}
 
 <article class="recipe">
   <div class="recipe-title">
