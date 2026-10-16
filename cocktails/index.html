@@ -26,16 +26,6 @@ permalink: /cocktails/
 
   {% assign taxonomy   = site.data.cocktails.taxonomy %}
   {% assign glasses    = site.data.cocktails.glasses %}
-  {% comment %} The card's ingredient line is built by
-     _plugins/cocktail_card_ingredients.rb, which reads `card_names`,
-     `card_name_joins` and `not_on_cards` itself; nothing below reads these
-     three assignments. {% endcomment %}
-  {% assign card_names = site.data.cocktails.ingredients.card_names %}
-  {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
-  {% comment %} `not_on_cards` (#580, #640): what a card never mentions, by
-     exact membership of the bare word, so `soda water` stays while `water`
-     goes. ingredients.yml holds the list and its reasoning. {% endcomment %}
-  {% assign not_on_cards = site.data.cocktails.ingredients.not_on_cards %}
 
   {% comment %} Tallest glass counted live from the data, never hardcoded: a new
      glass with a bigger `heights_mm` must not need this template touched. {% endcomment %}

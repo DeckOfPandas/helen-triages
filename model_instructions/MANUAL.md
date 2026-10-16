@@ -4353,10 +4353,9 @@ compiled CSS: food's `.active` and cocktails' `.is-on`.
 | `$color-name-search-root` | `$color-blazing-banana` | I KNOW WHAT I WANT |
 
 Each root drives its section's rule, buttons, active states, clear link and
-row badges. Each has an `-active` tone (darkened for a button label) and a
-`-bright` tone (the smallest darkening that clears contrast, for the search
-dropdown's group headings); how far to darken is a property of the hue, so
-a hue that moves section takes its step with it.
+row badges. Each has an `-active` tone (darkened for a button label); how
+far to darken is a property of the hue, so a hue that moves section takes
+its step with it.
 `scripts/palette_measure.py` measures the contrast.
 
 LEAVE OUT takes no hue: `$color-exclude-active` and `$color-exclude-hover`

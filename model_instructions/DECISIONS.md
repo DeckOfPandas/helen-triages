@@ -5069,10 +5069,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-09-15, #1050 / #1053 — food's dropdown group titles are Selawik 700
   at 0.7rem; the five `-bright` tones no longer colour them (#1136).** Helen:
   *"food site: group headings need to be brighter, closer to core colours
-  although obviously we're limited by contrast"*. Each `-bright` in
-  `_sass/food/_palette.scss` is its root darkened by exactly what 4.5:1 costs;
-  nothing reads them now, because the headings are filled with the section's
-  root hue and lettered dark (§13.13). #1053: *"Switch font to the other one
+  although obviously we're limited by contrast"*. A `-bright` was its root
+  darkened by exactly what 4.5:1 costs; the palette no longer carries them,
+  because the headings are filled with the section's root hue and lettered
+  dark (§13.13). #1053: *"Switch font to the other one
   if you have to"*.
 - **2026-09-15, #1096 — the box and the index's own searches both stay as they
   are; the box's placeholder is "I know what I want..." with no label, only
@@ -5104,7 +5104,7 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   *"omnisearch dropdown result group headings should take their section's
   background colour with black lettering, like active chips on the index
   page."*, and *"the same for the food site"*. The root hues, not the
-  `-bright` tones, which exist to be read as text on the panel; this replaces
+  `-bright` tones, which were darkened to be read as text on the panel; this replaces
   #1053's `-bright` headings. `.page-search-group--<kind>
   .page-search-group-label`.
 

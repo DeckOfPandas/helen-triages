@@ -187,7 +187,7 @@ module HelenTriages
     end
 
     # Millilitres for an amount string, or nil when the pour is excluded. `(top)`
-    # is handled by the caller, which knows the generic.
+    # is handled by `ml_range`, which knows the generic.
     def volume_ml(amount)
       a = amount.to_s.strip
       return nil if @excluded.include?(a)
@@ -196,13 +196,29 @@ module HelenTriages
       number * @per_ml[unit].to_f
     end
 
+    # [lo, hi] millilitres for one ingredient's amount, or nil when it has no
+    # volume: a `(top)` spans its generics' `top_up_ml` rows, anything else is
+    # a point. `cost_for` and `choices_for` both measure an amount through this.
+    def ml_range(amount, generics)
+      if amount == "(top)"
+        tops = generics.filter_map { |g| @costs["top_up_ml"][g] }
+        return nil if tops.empty?
+        return [tops.map { |t| t["ml_min"].to_f }.min, tops.map { |t| t["ml_max"].to_f }.max]
+      end
+      ml = volume_ml(amount)
+      ml && [ml, ml]
+    end
+
+    # The bottles an ingredient's `suggestion` names, resolved through the aliases.
+    def suggested_bottles(ing)
+      Array(ing["suggestion"]).map(&:to_s).filter_map { |s| @alias[s.downcase] }
+    end
+
     # Where a pour offers a choice of bottle, and what each would cost (#818,
     # chosen per drink). A choice is two or more resolvable, priced bottles on
     # one pour. The browser only does arithmetic with it:
     #
     #     lo' = drink.lo - choice.lo + choice.bottles[chosen]
-    #
-    # This repeats part of `cost_for` on purpose; keep the two in step.
     def choices_for(ingredients)
       return [] unless ingredients.is_a?(Array)
 
@@ -212,18 +228,10 @@ module HelenTriages
         amount = ing["amount"].to_s.strip
         generics = Array(ing["generic"]).map(&:to_s)
 
-        if amount == "(top)"
-          tops = generics.filter_map { |g| @costs["top_up_ml"][g] }
-          next if tops.empty?
-          lo_ml = tops.map { |t| t["ml_min"].to_f }.min
-          hi_ml = tops.map { |t| t["ml_max"].to_f }.max
-        else
-          ml = volume_ml(amount) or next
-          lo_ml = hi_ml = ml
-        end
+        range = ml_range(amount, generics) or next
+        lo_ml, hi_ml = range
 
-        names = Array(ing["suggestion"]).map(&:to_s)
-                  .filter_map { |s| @alias[s.downcase] }.uniq
+        names = suggested_bottles(ing).uniq
         priced = names.filter_map { |n| [n, bottle_rate(n)] if bottle_rate(n) }
         next if priced.length < 2
 
@@ -256,35 +264,28 @@ module HelenTriages
         generics = Array(ing["generic"]).map(&:to_s)
 
         # --- how much liquid, if any ---------------------------------------
-        if amount == "(top)"
-          tops = generics.filter_map { |g| @costs["top_up_ml"][g] }
-          next if tops.empty?
-          lo_ml = tops.map { |t| t["ml_min"].to_f }.min
-          hi_ml = tops.map { |t| t["ml_max"].to_f }.max
-        else
-          ml = volume_ml(amount)
-          if ml.nil?
-            # A counted fruit or weighed solid with a price row is a priced pour
-            # (#748). It has no millilitres, so it skips the rate arithmetic below.
-            if (solid = solid_cost(amount, generics))
-              min += solid.first
-              max += solid.last
-              priced += 1
-              next
-            end
-            # Excluded. Only an ingredient-sized exclusion counts against `complete`;
-            # see `substantial < priced` below.
-            substantial += 1 if SUBSTANTIAL.match?(amount)
+        range = ml_range(amount, generics)
+        if range.nil?
+          # A `(top)` with no declared range is simply left out.
+          next if amount == "(top)"
+          # A counted fruit or weighed solid with a price row is a priced pour
+          # (#748). It has no millilitres, so it skips the rate arithmetic below.
+          if (solid = solid_cost(amount, generics))
+            min += solid.first
+            max += solid.last
+            priced += 1
             next
           end
-          lo_ml = hi_ml = ml
+          # Excluded. Only an ingredient-sized exclusion counts against `complete`;
+          # see `substantial < priced` below.
+          substantial += 1 if SUBSTANTIAL.match?(amount)
+          next
         end
+        lo_ml, hi_ml = range
 
         # --- at what rate ----------------------------------------------------
         # A named bottle wins: a point price, not a category span.
-        sug = Array(ing["suggestion"]).map(&:to_s)
-        rates = sug.filter_map { |s| @alias[s.downcase] }
-                   .filter_map { |n| bottle_rate(n) }
+        rates = suggested_bottles(ing).filter_map { |n| bottle_rate(n) }
 
         if rates.empty?
           # A generic written as a LIST means "either would do" (issue #441),

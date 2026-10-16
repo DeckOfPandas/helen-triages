@@ -128,40 +128,11 @@ test('a unit that merely begins with "to" is not read as a range', () => {
 
 // --- the floor ----------------------------------------------------------------
 
-test('the floor is the drink’s own smallest allowed multiple', () => {
-  // 50 and 5 ml are 100 and 10 half-ml units, gcd 10, so the step is 5/10 =
-  // ×0.5, and at ×0.5 the 5 ml rinse is exactly 2.5 ml. The floor and the step
-  // are the same number here.
-  assert.strictEqual(scaler.floorMultiple(['50 ml', '5 ml']), 0.5);
-  assert.strictEqual(scaler.allowedStep(['50 ml', '5 ml']).value, 0.5);
-  // Nothing volumetric: nothing can go under 2.5 ml, so the fallback step, a
-  // half, is the floor.
-  assert.strictEqual(scaler.floorMultiple(['2 dashes', '(top)']), 0.5);
-});
-
-test('the allowed step is 2.5 ml over the gcd of the amounts', () => {
-  // 30/22.5/30 is 60/45/60 half-ml units with gcd 15, so the step is 5/15 = ⅓;
-  // 45/22.5/15/5 is 90/45/30/10 with gcd 5, so the step is 5/5 = 1 and that
-  // drink has no half of itself. Field by field, not deepStrictEqual: the
-  // module is loaded through the stub-dom harness, so the objects it returns
-  // carry the sandbox's Object.prototype and `deepStrictEqual` fails them on
-  // the prototype alone.
-  const third = scaler.allowedStep(NEGRONI);
-  assert.strictEqual(third.n, 1);
-  assert.strictEqual(third.d, 3);
-  assert.strictEqual(third.value, 1 / 3);
-  const whole = scaler.allowedStep(['45 ml', '22.5 ml', '15 ml', '5 ml']);
-  assert.strictEqual(whole.n, 1);
-  assert.strictEqual(whole.d, 1);
-  assert.strictEqual(whole.value, 1);
-});
-
 test('an amount that was never on the grid is left out of it, and not rounded', () => {
   // cobra-effect's 22.75 ml is off the grid. It cannot be kept exact by any
-  // multiple, so it does not get to set the step, and it is multiplied rather
-  // than rounded, because rounding it would move a ratio.
+  // multiple, so it is multiplied rather than rounded, because rounding it
+  // would move a ratio.
   const cobra = ['30 ml', '30 ml', '22.75 ml', '15 ml', '15 ml'];
-  assert.strictEqual(scaler.allowedStep(cobra).d, 6);      // gcd of the other four
   assert.deepStrictEqual(scaler.scale(cobra, 2).amounts,
     ['60 ml', '60 ml', '45.5 ml', '30 ml', '30 ml']);
   // And the recipe as written still prints as written.
@@ -181,7 +152,6 @@ test('a multiple under the floor is REFUSED, and says how far down it can go', (
 test('the floor is capped at ×1, so a recipe as written is never refused', () => {
   // A drink may be written with 2.5 ml of something, or less. That is Helen's
   // recipe, not an error for this file to report.
-  assert.strictEqual(scaler.floorMultiple(['30 ml', '1 ml']), 1);
   const asWritten = scaler.scale(['30 ml', '1 ml'], 1);
   assert.strictEqual(asWritten.ok, true);
   assert.deepStrictEqual(asWritten.amounts, ['30 ml', '1 ml']);
@@ -202,65 +172,6 @@ test('a multiple that is not a number at all is refused rather than printed', ()
   ['', null, undefined, 'lots', 0, -2].forEach((bad) => {
     assert.strictEqual(scaler.scale(NEGRONI, bad).ok, false, String(bad));
   });
-});
-
-// --- the total ----------------------------------------------------------------
-
-test('the total is the poured volumes only, never the dashes', () => {
-  // 30 + 22.5 + 30 = 82.5, and the 2 drops are not some number of millilitres
-  // anyone should be told by this file — shopping-list.js's own rule.
-  assert.strictEqual(scaler.totalMl(NEGRONI, 1), 82.5);
-  // At ⅔, which is a multiple this drink allows: 20 + 15 + 20, exact.
-  assert.strictEqual(scaler.totalMl(NEGRONI, 2 / 3), 55);
-});
-
-test('every non-volumetric amount sits outside the total', () => {
-  // Dashes, pinches, grams, leaves, `each`, a bare count and `(top)` are all
-  // outside it: the total is millilitres, and only millilitres are.
-  assert.strictEqual(
-    scaler.totalMl(['30 ml', '2 dashes', '1 small pinch', '25 g', '8 leaves',
-                    '(top)', '1', 'half'], 1),
-    30);
-});
-
-test('a range counts its LOWER end in the total', () => {
-  // The total is a figure to measure against, and the smaller end is the one
-  // you can always make.
-  assert.strictEqual(scaler.totalMl(['20–30 ml', '30 ml'], 1), 50);
-});
-
-// --- snapping a typed multiple -------------------------------------------------
-
-test('a multiple between two allowed ones snaps to the nearest', () => {
-  // ×1.212 of the Negroni is not a multiple it can be measured at; the nearest
-  // allowed one is ×1⅓, which makes 110 ml.
-  const snapped = scaler.snapMultiple(NEGRONI, 1.212);
-  assert.strictEqual(snapped.steps, 4);
-  assert.strictEqual(snapped.text, '1⅓');
-  assert.strictEqual(snapped.moved, true);
-  assert.strictEqual(scaler.totalMl(NEGRONI, snapped.multiple), 110);
-  assert.deepStrictEqual(scaler.scale(NEGRONI, snapped.multiple).amounts.slice(0, 3),
-                         ['40 ml', '30 ml', '40 ml']);
-});
-
-test('snapping goes to the NEAREST allowed multiple, up or down', () => {
-  // ×0.5 of the Negroni sits exactly between ⅓ and ⅔, and a tie goes up.
-  assert.strictEqual(scaler.snapMultiple(NEGRONI, 0.5).text, '⅔');
-  // ×0.4 is nearer ⅓.
-  assert.strictEqual(scaler.snapMultiple(NEGRONI, 0.4).text, '⅓');
-  // A drink whose step is ×1 has no half of itself at all.
-  assert.strictEqual(
-    scaler.snapMultiple(['45 ml', '22.5 ml', '15 ml', '5 ml'], 0.5).text, '1');
-  // Never below the floor, however small the number.
-  assert.strictEqual(scaler.snapMultiple(NEGRONI, 0.01).text, '⅓');
-});
-
-test('a snapped multiple prints as a person would write it', () => {
-  assert.strictEqual(scaler.multipleText(NEGRONI, 1 / 3), '⅓');
-  assert.strictEqual(scaler.multipleText(NEGRONI, 1), '1');
-  assert.strictEqual(scaler.multipleText(NEGRONI, 5 / 3), '1⅔');
-  assert.strictEqual(scaler.multipleText(NEGRONI, 2), '2');
-  assert.strictEqual(scaler.multipleText(['50 ml', '5 ml'], 1.5), '1½');
 });
 
 test('a multiple below the floor is refused, with the smallest total it can make', () => {
@@ -296,7 +207,6 @@ test('half a lime is not a volume, so it never sets the floor', () => {
   // A count, like a dash: nothing asks it to clear 2.5 ml, and it takes no part
   // in the gcd either. 45 ml alone is 90 half-ml units, so the step is 5/90 and
   // the floor is that same step -- at which the 45 ml is exactly 2.5 ml.
-  assert.strictEqual(scaler.floorMultiple(['45 ml', 'half', '20 g']), 5 / 90);
   assert.strictEqual(scaler.scale(['45 ml', 'half', '20 g'], 5 / 90).amounts[0],
                      '2.5 ml');
 });

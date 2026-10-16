@@ -628,21 +628,20 @@
     /* No early exit when nothing matched: `wanted` is then the original
        order, which is what restores a row after a mood is cleared. */
     var wanted = matched.concat(others);
-    if (!wanted.length) return false;
+    if (!wanted.length) return;
     var parent = wanted[0].parentNode;
-    if (!parent) return false;
+    if (!parent) return;
 
     var kids = parent.children;
     var same = true;
     for (var i = 0; i < wanted.length; i++) {
       if (kids[i] !== wanted[i]) { same = false; break; }
     }
-    if (same) return false;
+    if (same) return;
 
     var frag = document.createDocumentFragment();
     wanted.forEach(function (chip) { frag.appendChild(chip); });
     parent.appendChild(frag);
-    return true;
   }
 
   /* The note over a shared list, and its "keep these" (#1093). */
@@ -669,7 +668,6 @@
     if (!state.shortlisted) { sharedKeys = null; sharedUnmatched = []; }
     var shown = 0;
     var ranked = [];
-    var chipsMoved = false;
     activeInclude = chosen('include');
     activeExclude = chosen('exclude');
 
@@ -697,7 +695,7 @@
         /* Announced as well as painted: a screen reader cannot see a class. */
         chip.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
-      if (moveMatchedChipsFirst(d, matchedChips, otherChips)) chipsMoved = true;
+      moveMatchedChipsFirst(d, matchedChips, otherChips);
 
       /* Matched against data-ing, not the rendered text (#501): a card found
          by a bottle name prints no such words. Search.entryIsHit is the rule
