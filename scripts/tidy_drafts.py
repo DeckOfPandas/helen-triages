@@ -81,7 +81,9 @@ text, an ingredient's `note`) and fixes there only what
   - a `QQ` line, by the suite's predicate (`conftest.checkable_text`), which
     sees a marker behind a key (`tagline: "QQ ..."`). See `drink_editable`.
   - `suggestion`, `source` or `source_url`: somebody else's words
-    (`test_cocktails.VERBATIM_KEYS`), which the drinks suite blanks too.
+    (`test_cocktails.VERBATIM_KEYS`), which the drinks suite blanks too. The
+    one exception is quoting a bare `source:` or `source_url:`, which changes
+    no word and which `test_drink_scalar_fields_are_quoted` requires.
   - `glass`, `garnish`, `mood`, `generic` or `character`: closed vocabularies
     declared in `_data/cocktails/`. A dash or an accent written into one is a
     change to the vocabulary, which is a question for `_data/`.
@@ -256,8 +258,17 @@ def drink_editable(text):
     return editable
 
 
-def only_where_editable(fixer):
-    """Wrap a line-wise fixer so it sees, and answers for, the editable lines.
+def not_qq(text):
+    """One bool per line: not a `QQ` line, by the suite's predicate. Quoting a
+    verbatim value (`source:`) changes none of its words, so this is the mask
+    for that one rule."""
+    return [not (raw and not checked) for raw, checked in
+            zip(text.split("\n"), checkable_text(text).split("\n"))]
+
+
+def only_where_editable(fixer, mask=drink_editable):
+    """Wrap a line-wise fixer so it sees, and answers for, the lines `mask`
+    allows (by default `drink_editable`'s).
 
     The rest are blanked, not dropped, so a line's index survives; the fixer's
     answer is taken where the line was editable and the original elsewhere.
@@ -266,7 +277,7 @@ def only_where_editable(fixer):
     so that raises.
     """
     def run(text, path):
-        editable = drink_editable(text)
+        editable = mask(text)
         lines = text.split("\n")
         masked = "\n".join(l if ok else "" for l, ok in zip(lines, editable))
         out, notes = fixer(masked, path)
@@ -1023,6 +1034,10 @@ DRINK_FIXERS = [
     ("notes", fix_notes_slot),
     ("quoting", only_where_editable(
         partial(fix_scalar_quoting, fields=DRINK_SCALAR_FIELDS))),
+    # `source` and `source_url` are verbatim, so the mask above blanks them;
+    # quotes change no word, so they get their own pass that spares only QQ.
+    ("quoting", only_where_editable(
+        partial(fix_scalar_quoting, fields=["source", "source_url"]), mask=not_qq)),
     ("dashes", only_where_editable(fix_en_dashes)),
     ("typography", only_where_editable(fix_typography)),
     ("units", only_where_editable(fix_unit_spacing)),
@@ -1237,11 +1252,12 @@ def main(argv=None):
     print("\n  DRINKS: everything that is not Helen's own prose. An `amount`, "
           "a `method`\n  step, a `glass`/`garnish`/`mood`/`generic`/"
           "`character` (closed vocabularies\n  declared in _data/cocktails/), "
-          "an `item` or a `suggestion` (somebody else's\n  words), and every "
-          "`QQ` line. A dash or an accent inside one of those is a\n  question "
-          "for the vocabulary or for the source, not a formatting fix -- see "
-          "the\n  module docstring, and the reported-never-changed section "
-          "above for the ones\n  the drinks suite will still fail on.")
+          "a `suggestion` or a `source` (somebody else's\n  words, though a bare "
+          "`source:` is quoted), and every `QQ` line. A dash or an\n  accent "
+          "inside one of those is a question for the vocabulary or for the "
+          "source,\n  not a formatting fix -- see the module docstring, and the "
+          "reported-never-changed\n  section above for the ones the drinks "
+          "suite will still fail on.")
     if not args.apply:
         print("\nNothing was written. Re-run with --apply to write the fixes.")
 

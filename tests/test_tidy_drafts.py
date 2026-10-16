@@ -180,6 +180,25 @@ def write_drink(root, name="test-drink.md", text=BEFORE):
     return path
 
 
+def test_a_bare_drink_source_is_quoted_and_a_qq_one_is_not(drinks):
+    """#1387: `source` is verbatim, so the prose mask blanks it, but quoting
+    changes no word and `test_drink_scalar_fields_are_quoted` requires it.
+    Only the quotes move; a `QQ` source is left as written."""
+    bare = BEFORE.replace('source: ""\nsource_url: ""',
+                          "source: Difford's Guide -- 2-3 ways\n"
+                          "source_url: https://example.com/drink")
+    path = write_drink(drinks, text=bare)
+    run(drinks, "--only", "quoting", "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert "source: \"Difford's Guide -- 2-3 ways\"\n" in got, got
+    assert 'source_url: "https://example.com/drink"\n' in got, got
+
+    qq = BEFORE.replace('source: ""', "source: QQ Somebody's Book")
+    path = write_drink(drinks, name="qq-drink.md", text=qq)
+    run(drinks, "--only", "quoting", "--apply")
+    assert "source: QQ Somebody's Book\n" in path.read_text(encoding="utf-8")
+
+
 # =============================================================================
 
 def test_the_report_names_every_fault_and_writes_nothing(drinks):
