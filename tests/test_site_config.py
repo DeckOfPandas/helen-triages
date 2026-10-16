@@ -151,7 +151,7 @@ def test_vocabulary_is_emitted_to_the_page():
     # The <script src> tag specifically: the template's comments also say
     # "filters.js".
     tag = re.search(r"<script src=[^>]*filters\.js", html)
-    assert tag, "food/index.html no longer loads js/filters.js at all."
+    assert tag, "food/index.html no longer loads assets/js/filters.js at all."
     assert html.index('id="ingredient-vocabulary"') < tag.start(), (
         "The ingredient-vocabulary block must appear BEFORE the filters.js "
         "script tag, or the script will run before the data exists."
@@ -909,7 +909,7 @@ def test_filters_js_holds_no_ingredient_vocabulary():
     js = read("assets", "js", "filters.js")
     for name in ("var singularMap = {", "var synonymMap = {"):
         assert name not in js, (
-            f"js/filters.js declares `{name}...` inline. The ingredient "
+            f"assets/js/filters.js declares `{name}...` inline. The ingredient "
             f"vocabulary lives in _data/food/ingredient_words.yml and is read from "
             f"the page; adding a word should be a YAML edit, not a code edit."
         )
@@ -947,7 +947,7 @@ def test_deleted_data_files_stay_deleted(relpath):
     """
     assert not (ROOT / relpath).exists(), (
         f"{relpath} has reappeared. Colour belongs in _sass/food/_palette.scss only; "
-        f"section shape and texture are chosen in js/highlighter.js."
+        f"highlighter shape and texture are chosen in assets/js/decorations.js."
     )
 
 
@@ -988,7 +988,7 @@ def test_pantry_entries_are_actually_used():
     from conftest import ALL_RECIPES, ALL_DRAFTS
     path = DATA / "pantry.yml"
     if not path.exists():
-        pytest.skip("_data/food/pantry.yml does not exist yet")
+        pytest.fail("_data/food/pantry.yml is gone. Every test that reads it would skip, not fail, without this line.")
     pantry = yaml.safe_load(path.read_text(encoding="utf-8")) or []
 
     # Some pantry entries are used only by drafts, and `_food_drafts/` is a
@@ -1032,7 +1032,7 @@ def test_pantry_entries_are_well_formed():
     """
     path = DATA / "pantry.yml"
     if not path.exists():
-        pytest.skip("_data/food/pantry.yml does not exist yet")
+        pytest.fail("_data/food/pantry.yml is gone. Every test that reads it would skip, not fail, without this line.")
     pantry = yaml.safe_load(path.read_text(encoding="utf-8")) or []
     assert pantry, (
         "_data/food/pantry.yml is empty. Every main_ingredients entry would be "
@@ -1067,7 +1067,7 @@ def test_pantry_list_is_lowercase():
     """
     path = DATA / "pantry.yml"
     if not path.exists():
-        pytest.skip("_data/food/pantry.yml does not exist yet")
+        pytest.fail("_data/food/pantry.yml is gone. Every test that reads it would skip, not fail, without this line.")
     pantry = yaml.safe_load(path.read_text(encoding="utf-8")) or []
 
     not_lower = [p for p in pantry if p != p.lower()]
@@ -1131,19 +1131,19 @@ def test_base_url_is_derived_in_exactly_one_place():
     """
     pattern = re.compile(r"""meta\[name=["']base-url["']\]""")
     offenders = []
-    for path in sorted(JS_DIR.glob("*.js")) + [ROOT / "_layouts" / "default.html",
-                                               ROOT / "_layouts" / "recipe.html",
-                                               ROOT / "food" / "index.html"]:
-        if not path.exists():
-            continue
+    scripts = sorted(JS_DIR.glob("*.js"))
+    assert any(p.name == "assets.js" for p in scripts), "assets/js/assets.js is gone."
+    # The pattern is the CSS selector a reader queries, so default.html's
+    # `<meta name="base-url">`, which emits the tag, does not match it.
+    for path in scripts + [ROOT / "_layouts" / "default.html",
+                           ROOT / "_layouts" / "recipe.html",
+                           ROOT / "food" / "index.html"]:
+        assert path.exists(), f"{path.relative_to(ROOT)} is gone; scan its successor."
         hits = len(pattern.findall(path.read_text(encoding="utf-8")))
-        # default.html legitimately EMITS the meta tag once; that is not a read.
-        if path.name == "default.html":
-            hits = max(0, hits)
         if hits and path.name != "assets.js":
             offenders.append(f"{path.name} ({hits})")
     assert not offenders, (
-        f"base-url is read outside js/assets.js: {offenders}.\n"
+        f"base-url is read outside assets/js/assets.js: {offenders}.\n"
         f"Use window.HTF.base or window.HTF.asset(path) instead. assets.js is "
         f"loaded first in default.html precisely so that it can be."
     )
@@ -1354,7 +1354,7 @@ def test_svg_fetching_goes_through_the_shared_helper():
             snippet = text[max(0, match.start() - 30):match.end() + 30].replace("\n", " ")
             offenders.append(f"{path.name}: …{snippet}…")
     assert not offenders, (
-        "Direct fetch() call(s) found outside js/assets.js:\n  "
+        "Direct fetch() call(s) found outside assets/js/assets.js:\n  "
         + "\n  ".join(offenders)
         + "\n\nUse window.HTF.fetchSvg(url, cb) so the call gets caching and a "
           "diagnostic warning on failure."
@@ -1451,7 +1451,7 @@ def test_every_glass_icon_named_in_the_data_exists():
     """
     path = ROOT / "_data" / "cocktails" / "glasses.yml"
     if not path.exists():
-        pytest.skip("_data/cocktails/glasses.yml does not exist yet")
+        pytest.fail("_data/cocktails/glasses.yml is gone. Every test that reads it would skip, not fail, without this line.")
     icons = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("icons") or {}
     assert icons, (
         "_data/cocktails/glasses.yml declares no `icons:` map, so this check "
@@ -1642,10 +1642,11 @@ def test_the_method_is_called_method_everywhere():
     `method` too.
     """
     offenders = []
-    for relpath in ("_layouts/recipe.html", "_sass/food/_recipe.scss", "assets/js/method-toggle.js"):
+    for relpath in ("_layouts/recipe.html", "_sass/food/_recipe-ingredients-method.scss",
+                    "assets/js/method-toggle.js"):
         path = ROOT / relpath
-        if not path.exists():
-            continue
+        # A missing file would pass by scanning nothing, so a rename must fail here.
+        assert path.exists(), f"{relpath} is gone; point this test at its successor."
         for line in path.read_text(encoding="utf-8").splitlines():
             stripped = line.strip()
             # A comment may use the word.
@@ -2627,7 +2628,7 @@ def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
     assert "node --test tests/js/*.test.js" in src, (
         "The JS suite must be invoked with the glob. `node --test tests/js/` "
         "treats the directory as a single test file and reports 'tests 1, "
-        "fail 1' without running the 144 tests inside it."
+        "fail 1' without running any of the tests inside it."
     )
 
 
@@ -2859,8 +2860,10 @@ def test_the_cocktail_search_thresholds_are_not_hardcoded():
             f"assets/js/cocktail-search.js no longer reads `{key}` from the "
             f"vocabulary it was handed."
         )
-    # A literal beside the name is the shape of a value that has crept back in.
-    for bad in re.findall(r"(min_query_chars|family_button_min_chars|pool_cap)\s*[:=]\s*\d", js):
+    # A literal beside the name, in either case or as an `||` fallback, is the
+    # shape of a value that has crept back in.
+    for bad in re.findall(r"(min_query_chars|family_button_min_chars)\s*(?:[:=]|\|\|)\s*\d",
+                          js, re.I):
         raise AssertionError(
             f"assets/js/cocktail-search.js assigns `{bad}` a number of its own. "
             f"The value belongs in _data/cocktails/ingredients.yml."
@@ -2908,18 +2911,22 @@ def test_the_cocktail_index_scripts_load_in_dependency_order():
     """The drinks index's scripts load in dependency order.
 
     Each reads its dependency at startup, not on first use: cocktail-index.js
-    reads HTF.cocktailSearch and HTF.filterState as it runs, and
-    cocktail-search.js reads HTF.ingredientSearch as it loads.
+    reads HTF.cocktailSearch, HTF.filterState and HTF.shoppingList (to fold
+    bottle aliases) as it runs, and cocktail-search.js reads
+    HTF.ingredientSearch as it loads.
     """
     html = read("cocktails", "index.html")
-    order = ["ingredient-search.js", "filter-state.js", "cocktail-search.js", "cocktail-index.js"]
+    needs = [("ingredient-search.js", "cocktail-search.js"),
+             ("filter-state.js", "cocktail-index.js"),
+             ("cocktail-search.js", "cocktail-index.js"),
+             ("shopping-list.js", "cocktail-index.js")]
     positions = {}
-    for name in order:
+    for name in {n for pair in needs for n in pair}:
         tag = re.search(rf"""<script src=["']?\{{\{{ '/assets/js/{re.escape(name)}'""", html)
         assert tag, f"cocktails/index.html no longer loads assets/js/{name}."
         positions[name] = tag.start()
 
-    for earlier, later in zip(order, order[1:]):
+    for earlier, later in needs:
         assert positions[earlier] < positions[later], (
             f"{earlier} must load BEFORE {later} on cocktails/index.html, or the "
             f"namespace it provides will not exist yet when {later} runs."

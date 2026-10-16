@@ -46,10 +46,12 @@ meta:
 
 ## What I could not know
 
-- **The recipe is cut off.** The source ends mid-build: the gnocchi are drained, the butter is made, and no step brings them together or uses the parmesan.
-- **No `tagline`.** The source's intro was marketing copy, so `QQ`.
-- **No `star_ingredient`.** Gnocchi is not one of the fourteen.
-- **`carbs party` is a proposal.** `cheese-tastic` is arguable on 30 g of parmesan.
+- **The recipe is cut off.** The source ends mid-build: the gnocchi are drained, the butter is made, and no step brings them together or uses the parmesan. Flagged in a note rather than finished.
+- **No `tagline`.** The source has no intro, so a bare `QQ` and nothing drafted in its place.
+- **The salted water in step 1 is not an ingredient line.** The method names it and the source's list does not, so it stays in the step. "Salt and pepper" is in the source's list, and is kept.
+- **No `star_ingredient`.** Gnocchi is not on the list and nothing else is the hero.
+- **`carbs party` is a proposal.** `cheese-tastic` is arguable on 30 g of parmesan; I did not add it.
+- **"Medium heat" is the source's own**, and there is no oven, so no fan-temperature question arises here.
 
 ## Fingerprint
 

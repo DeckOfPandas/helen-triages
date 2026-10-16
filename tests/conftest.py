@@ -290,10 +290,10 @@ def pytest_generate_tests(metafunc):
 
 # --- what this run never looked at --------------------------------------------
 # Reports, never fails: nothing here can turn a run red (DECISIONS §11).
-# When the drafts are absent, the per-file cases of a `draft`-parametrised test
-# are never created, so the run is quieter, not noisier, and no single test can
-# show how much went unopened. `UNCREATED` names those tests at collection
-# time. It covers food's `draft` fixture only: the cocktails suite has its own
+# When the drafts are absent, a `draft`-parametrised test creates no per-file
+# cases: pytest reports it as ONE skip, "got empty parameter set", so no single
+# line shows how much went unopened. `UNCREATED` names those tests at
+# collection time. It covers food's `draft` fixture only: the cocktails suite has its own
 # loader and skips with a reason, which is already visible.
 COCKTAIL_DRAFTS_DIR = ROOT / "_cocktail_drafts"
 
@@ -363,7 +363,8 @@ def _report_absent_drafts(write):
     if UNCREATED:
         n = len(UNCREATED)
         write(f"  {n} per-draft check{'s' if n != 1 else ''} in this suite "
-              f"produced no tests at all, rather than failing or skipping.")
+              f"ran over no drafts, each reported as a single skip "
+              f"(\"got empty parameter set\").")
     write("  Cloning is reading: it needs no ask, and both clones make the "
           "suite whole.")
 

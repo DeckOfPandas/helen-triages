@@ -202,8 +202,10 @@ def test_meta_block_complete(recipe):
     missing = [f for f in ("rewritten", "awaiting_fix", "proofread") if f not in meta]
     assert not missing, (
         f"{where(recipe)} `meta:` is missing {missing}. "
-        f"All three are booleans and all three must be present — a missing one "
-        f"reads as false, which is indistinguishable from a deliberate false."
+        f"All three are booleans and all three must be present. The publish "
+        f"gate fails closed, so a missing `awaiting_fix` or `proofread` holds "
+        f"the recipe back as surely as the wrong value; a missing `rewritten` "
+        f"records no answer at all."
     )
 
 
@@ -860,14 +862,9 @@ def test_agent_edited_recipes_are_not_marked_proofread():
           "invisible still passes, which is the check that keeps this honest.\n"
           "  3. If Helen reviewed the change herself, move BASELINE_COMMIT "
           "forward, in a commit of its own, quoting her. It is hers to grant.\n\n"
-          "There is NO per-recipe exemption list. HELEN_CLEARED was deleted on "
-          "2026-09-20 because it matched on FILENAME and so never expired: a "
-          "recipe named in it was exempt from this rule for ever, including "
-          "every future edit. Helen: 'If I change one of those files again, the "
-          "flag will need to go back to false until I proofread it again.' If "
-          "you find yourself wanting one back, what you actually want is an "
-          "entry that clears ONE COMMIT -- and that is worth building properly, "
-          "with the case in front of you, not reinstating the filename version."
+          "There is no per-recipe exemption list: one keyed on a filename never "
+          "expires, so it would excuse every future edit to that file too. "
+          "DECISIONS §4.0."
     )
 
 

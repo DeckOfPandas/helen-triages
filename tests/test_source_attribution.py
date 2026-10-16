@@ -169,7 +169,7 @@ def _bad_publisher(source, kind):
         return (
             f"A citation names its source, not its publisher.\n"
             f"  source: {source!r}\n"
-            f"Helen's ruling 8, 2026-08-20. The bracket comes off. If the "
+            f"Rule 5 of {SPEC}. The bracket comes off. If the "
             f"bracket is part of the actual title rather than a publisher, say "
             f"so in {SPEC} and narrow this rule deliberately."
         )

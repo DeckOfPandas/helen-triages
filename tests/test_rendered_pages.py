@@ -2789,10 +2789,11 @@ def test_the_drinks_that_state_no_volume_are_exactly_the_ones_that_cannot(prod_s
         f"{sorted(silent - expected)}\n"
         f"  newly speaking (gained one): {sorted(expected - silent)}\n"
         "`volume_for` in _plugins/cocktail_units.rb has the rule: a drink says "
-        "nothing only when its excluded pours ARE the drink, so a figure would "
-        "be wrong rather than rough. A topped drink is NOT such a drink -- it "
-        "spends the midpoint of its declared range (Helen, 2026-09-17: "
-        "\"Midpoint please, I'll cope on the spot\")."
+        "nothing only when its excluded ingredients ARE the drink, so a figure "
+        "would be wrong rather than rough. A topped drink is NOT such a drink: "
+        "its top is sized from its glass by `fitted_top_ml` (#1179), and falls "
+        "back to the midpoint of its declared range only where the glass gives "
+        "no answer."
     )
 
 

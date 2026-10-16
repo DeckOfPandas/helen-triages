@@ -1652,7 +1652,8 @@ other tree) and a copy goes stale silently; clone.
 
 **A green `pytest` in a worktree without the clones is not evidence about the
 drafts or the per-draft checks.** Most of what is missing is parametrised per
-file, so it is never created rather than skipped. `tests/conftest.py` prints
+file, so its per-file cases are never created: each such test shows as one
+bare skip, "got empty parameter set". `tests/conftest.py` prints
 one line in the report header and the same fact in the terminal summary,
 naming each absent clone and the command that fetches it; it reports and never
 fails, and is silent when both clones are present.

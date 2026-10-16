@@ -20,24 +20,26 @@ ingredients:
     generic: "QQ blackstrap rum"
     suggestion: []
   - amount: "22.5 ml"
-    generic: "QQ Campari"
+    generic: "Campari"
     suggestion: []
   - amount: "15 ml"
-    generic: "QQ lime juice"
+    generic: "lime juice"
     suggestion: []
   - amount: "15 ml"
     generic: "QQ simple syrup"
     suggestion: []
   - amount: "45 ml"
-    generic: "QQ pineapple juice"
+    generic: "pineapple juice"
     suggestion: []
+serve:
+  ice: "crushed"
 method:
   - "Shake all ingredients with ice."
-  - "Strain over crushed ice."
+  - "Strain."
 to_serve: "Straw."
 notes:
   - label: "QQ"
-    text: "QQ - `generic` and `suggestion` not filled in. The source names one bottle (Campari) and otherwise gives categories, and a category is not derivable from a bottle name."
+    text: "QQ - two pours carry the source's words behind a `QQ`. `blackstrap` is a character rather than a category, and `simple syrup` does not say which sugar or what ratio. No `suggestion` is filled in."
 source: "QQ"
 source_url: ""
 ---
@@ -45,9 +47,8 @@ source_url: ""
 
 ## What I could not know
 
-- **No `generic` typed on any pour, per the standing rule** -- each carries `QQ` and then the source's own words, so you can see what the page said.
-- **`mood: []` needs deriving** -- run `python3 scripts/derive_cocktail_moods.py --write`.
-- **No source recorded** -- tell me the book and I will write the citation.
+- **Three ingredients are typed, two are not.** `Campari`, `lime juice` and `pineapple juice` are exact matches in the printed vocabulary, so they are lookups. "Blackstrap rum" is close to a category but `blackstrap` is a character, and "simple syrup" does not say which sugar or what ratio, so both carry the source's words behind a `QQ`.
+- **No source recorded.** Tell me the book and I will write the citation.
 - **Jungle Bird is a well-known drink and may already be in your collection in a different form.** Compare the formula, not the name.
 
 ## Fingerprint

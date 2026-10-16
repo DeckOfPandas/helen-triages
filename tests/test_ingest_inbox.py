@@ -14,7 +14,8 @@ The two valid fixtures are the documents' own worked examples
 (`INGEST_ONE_RECIPE.md` §9, `INGEST_ONE_COCKTAIL.md` §9), re-checked here
 against the schema constants in `test_front_matter.py` and `test_cocktails.py`.
 A fixture that drifts from its document teaches this parser a shape no browser
-sends.
+sends, so `test_the_valid_fixture_is_its_documents_worked_example` compares
+them.
 """
 from __future__ import annotations
 
@@ -95,6 +96,29 @@ def test_the_fixture_fingerprint_is_the_one_its_document_prints(name, site, doc)
     )
 
 
+@pytest.mark.parametrize("name,doc", [
+    ("valid_food", "INGEST_ONE_RECIPE.md"),
+    ("valid_cocktail", "INGEST_ONE_COCKTAIL.md"),
+])
+def test_the_valid_fixture_is_its_documents_worked_example(name, doc):
+    """The fixture is the §9 envelope, character for character.
+
+    The document is uploaded to a web Project, so it is the source and the
+    fixture follows it: copy the four-backtick block into the fixture.
+    """
+    fence = "`" * 4
+    printed = (DOCS / doc).read_text(encoding="utf-8")
+    blocks = re.findall(rf"^{fence}\n(.*?)^{fence}$", printed, re.S | re.M)
+    assert len(blocks) == 1, (
+        f"{doc} has {len(blocks)} four-backtick blocks; this expects its worked "
+        f"example to be the only one."
+    )
+    assert envelope_text(name) == blocks[0], (
+        f"tests/fixtures/ingest_inbox/{name}.md has drifted from {doc} §9. "
+        f"Copy the document's four-backtick block into the fixture."
+    )
+
+
 def test_the_food_fixture_obeys_the_food_schema():
     """The same constants `test_front_matter.py` holds recipes to, imported."""
     from test_front_matter import META_ORDER, REQUIRED, SCALAR_STRING_FIELDS
@@ -163,9 +187,9 @@ def test_a_malformed_envelope_is_rejected_with_its_reason(name, site, expected):
 
 COCKTAIL_NOTE = (
     '  - label: "QQ"\n'
-    '    text: "QQ - `generic` and `suggestion` not filled in. The source names '
-    'one bottle (Campari) and otherwise gives categories, and a category is not '
-    'derivable from a bottle name."\n'
+    '    text: "QQ - two pours carry the source\'s words behind a `QQ`. '
+    '`blackstrap` is a character rather than a category, and `simple syrup` '
+    'does not say which sugar or what ratio. No `suggestion` is filled in."\n'
 )
 FOOD_NOTE = (
     '  - label: "QQ"\n'
