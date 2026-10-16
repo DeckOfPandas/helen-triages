@@ -285,6 +285,7 @@ permalink: /food/reference/internal-temperatures/
            section above shows. The list runs by lower bound. {% endcomment %}
         {% include food/temp_span.html label="Venison roast" doneness=t.venison.loin.doneness %}
         {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness %}
+        {% include food/temp_span.html label="Duck breast" doneness=t.poultry.duck_breast_separate.doneness %}
         {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness %}
 
         {% comment %} The single-figure rows go through temp_row.html like every other row: it
@@ -293,6 +294,7 @@ permalink: /food/reference/internal-temperatures/
         {% include food/temp_row.html label="Fish, chefs" spec=t.fish.general_chefs %}
         {% include food/temp_row.html label="Fish, general" spec=t.fish.general %}
         {% include food/temp_row.html label="Poultry" spec=t.poultry.chicken %}
+        {% include food/temp_row.html label="Duck" spec=t.poultry.duck %}
         {% include food/temp_row.html label="Cured ham" spec=t.ham.cured %}
         {% include food/temp_row.html label="Slow-cooked" spec=t.beef.tough_cuts %}
       </div>
