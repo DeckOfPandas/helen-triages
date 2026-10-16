@@ -176,11 +176,28 @@ permalink: /food/reference/internal-temperatures/
     <div class="tc">
       <div class="tc-plot">
         {% comment %} Most of these rows sit on top of each other: one endpoint covers every
-           whole bird, and the interesting row is the one that does not. Duck breast
-           cooked on its own comes off far below the same bird roasted whole. {% endcomment %}
+           whole bird. Duck breast closes the chart as one span over its levels,
+           which the chart below draws one by one. {% endcomment %}
         {% for bird in t.poultry %}
-          {% assign label = bird[0] | replace: "_", " " | capitalize %}
+          {% if bird[1].doneness %}{% continue %}{% endif %}
+          {% assign label = bird[0] | replace: "_", " " | capitalize | append: " (whole)" %}
           {% assign spec = bird[1] %}
+          {% include food/temp_row.html label=label spec=spec %}
+        {% endfor %}
+        {% include food/temp_span.html label="Duck breast" doneness=t.poultry.duck_breast_separate.doneness %}
+      </div>
+      {{ axis }}
+    </div>
+
+    {% comment %} Duck breast cooked on its own is a spectrum, so it is its own chart under
+       the same heading, with no subtitle: duck is poultry. Each row names the
+       duck, since nothing above the chart does. {% endcomment %}
+    {% include food/temp_key.html rested=true carry=true %}
+    <div class="tc">
+      <div class="tc-plot">
+        {% for level in t.poultry.duck_breast_separate.doneness %}
+          {% assign label = level[0] | replace: "_", " " | prepend: "Duck breast, " %}
+          {% assign spec = level[1] %}
           {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
       </div>
@@ -275,8 +292,11 @@ permalink: /food/reference/internal-temperatures/
         {% comment %} The single-figure rows go through temp_row.html like every other row: it
            builds the figure from the numbers on whichever key the node carries
            (endpoint, target, tender_at) and says "tender at" for the last. {% endcomment %}
+        {% include food/temp_row.html label="Fish, chefs" spec=t.fish.general_chefs %}
         {% include food/temp_row.html label="Fish, general" spec=t.fish.general %}
-        {% include food/temp_row.html label="Poultry" spec=t.poultry.chicken %}
+        {% include food/temp_row.html label="Poultry (whole)" spec=t.poultry.chicken %}
+        {% include food/temp_row.html label="Duck (whole)" spec=t.poultry.duck %}
+        {% include food/temp_span.html label="Duck breast" doneness=t.poultry.duck_breast_separate.doneness %}
         {% include food/temp_row.html label="Cured ham" spec=t.ham.cured %}
         {% include food/temp_row.html label="Slow-cooked" spec=t.beef.tough_cuts %}
       </div>
