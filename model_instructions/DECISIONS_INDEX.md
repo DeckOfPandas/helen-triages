@@ -691,7 +691,7 @@ argument and the rules each field is read by.
 - 2026-09-15 · §13 · #1086 · below 600px the wordmark lockup is two thirds size ($wordmark-phone-scale: 0.6667).
 - 2026-09-15 · §13 · #1086 · /about/ shows both doors on one line and no ??.
 - 2026-09-21 · §13 · #1148 · the ?? is nudged top: -0.12em so its ink sits level with the door's.
-- 2026-10-08 · §13 · #1322 · the header has 15px over the door's row and 15px under it, at every width.
+- 2026-10-16 · §13 · #1386 #1322 · the door's row hangs close under the tape: 0.1rem over the door and the ??, 0.1rem over the local search box under the door, 0.2rem from the row to the header's border, at every …
 - 2026-10-08 · §13 · #1288 #965 · the door stays at the right-hand end of the header (#965).
 - 2026-10-10 · §13 · #1328 · below the header's stack width /about/'s two doors take an edge each, and the first one's arrow points outwards.
 - undated · §13 · #395 · Undated, #395 — the about page belongs to no site, and wherever its title would appear it reads ??.

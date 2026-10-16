@@ -4656,13 +4656,16 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   aligned the marks. A session's measured fix. Rejected: `align-self: baseline`
   on both, because it drops the door's row 6px and that gap is hers. The row is
   the anchor; the `??` is the mark that moves.
-- **2026-10-08, #1322 — the header has 15px over the door's row and 15px under
-  it, at every width.** Helen: *"Sorry, changed my mind, 15 over 15 under
-  please!"* The row and `??` carry `0.9rem` of top margin and that is the whole
-  space over them; `$space-sm` under. Replaces *"0 over, 15 under"* of the same
-  day and #1086's halved gap below 600px, whose stacked-grid gap and phone
-  variants stay deleted. /about/, having no `??`, carries 0.4rem instead to
-  keep her 15.
+- **2026-10-16, #1386 #1322 — the door's row hangs close under the tape:
+  0.1rem over the door and the `??`, 0.1rem over the local search box under
+  the door, 0.2rem from the row to the header's border, at every width.**
+  Helen, shown candidates at 0.5, 0.25 and 0: *"I'd like 0.1rem margin top for
+  each of the ?? and the door, then 0.1rem top for the search box. ... bottom
+  edge padding of the header section ... I suspect 0.2rem would do it."* One
+  variable, `$header-door-gap`, carries the 0.1rem for all three. Replaces
+  *"15 over, 15 under"* of 2026-10-08. The stacked grid has no gap and there is
+  no phone variant; /about/, having no `??`, carries 0.4rem under its doors so
+  they sit as far from the border as a door beside a `??`.
 - **2026-10-08, #1288 — the door stays at the right-hand end of the header
   (#965).** A centred door was picked only as part of the live omnisearch
   design that was not built; it is not a standing ruling. Helen: *"With no
