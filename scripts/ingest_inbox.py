@@ -519,8 +519,9 @@ def _envelopes(args) -> list:
     try:
         issues = fetch_issues(args.site, args.issue)
     except urllib.error.HTTPError as exc:
-        sys.exit(f"GitHub said {exc.code} for {REPOS[args.site]}. The token is "
-                 f"issues-only on three repos; nothing here routes around that.")
+        sys.exit(f"GitHub said {exc.code} for {REPOS[args.site]}. A 401 or 403 "
+                 f"is the answer, not a problem to route around (CLAUDE.md); "
+                 f"if access is genuinely missing, Helen grants it by hand.")
     except urllib.error.URLError as exc:
         sys.exit(f"could not reach GitHub: {exc.reason}")
     return [(i["number"], i.get("body") or "") for i in issues]
@@ -564,7 +565,7 @@ def main(argv=None) -> int:
     ap.add_argument("--drafts-dir", default=None,
                     help="operate on a different directory. Exists so this can "
                          "be proved against a COPY before it is ever pointed "
-                         "at Helen's real drafts -- see the command doc.")
+                         "at Helen's real drafts.")
     args = ap.parse_args(argv)
 
     if args.write and args.dry_run:

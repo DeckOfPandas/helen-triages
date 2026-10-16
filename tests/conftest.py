@@ -24,6 +24,22 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 
 
+# --- `tmp_path`, under this repo's own tmp/ -----------------------------------
+# Overrides pytest's fixture of the same name for the whole suite: nothing here
+# may write under the system /tmp (CLAUDE.md). GIT_CEILING_DIRECTORIES stops git
+# climbing from inside it into this worktree's own repository, so a test that
+# wants "no repository here" still gets none.
+@pytest.fixture
+def tmp_path(request, monkeypatch):
+    name = re.sub(r"[^A-Za-z0-9_.-]", "_", request.node.name)[:60]
+    path = ROOT / "tmp" / "pytest" / f"{name}-{os.getpid()}-{id(request)}"
+    shutil.rmtree(path, ignore_errors=True)
+    path.mkdir(parents=True)
+    monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(path.parent))
+    yield path
+    shutil.rmtree(path, ignore_errors=True)
+
+
 # --- the two session builds ---------------------------------------------------
 # Defined here, not in a test module: a session fixture imported into a second
 # module is a second definition with its own cache, so the site would build

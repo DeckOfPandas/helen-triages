@@ -125,7 +125,7 @@ def main() -> int:
         return 0                    # not a repo, detached, or a working branch
 
     verb = match.group(1)
-    where = directory if directory != pathlib.Path.cwd() else pathlib.Path.cwd()
+    where = directory
 
     print(json.dumps({
         "hookSpecificOutput": {
