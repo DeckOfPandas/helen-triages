@@ -25,11 +25,11 @@ poultry:
     carryover_max: 3
   turkey:
     chart_anchor: poultry
-    endpoint: "74–75°C in the thigh"
+    endpoint: "74°C in the thigh, out at 71°C"
     endpoint_min: 74
-    endpoint_max: 75
-    carryover: "1–3°C"
-    carryover_min: 1
+    endpoint_max: 74
+    carryover: "3°C"
+    carryover_min: 3
     carryover_max: 3
     note: "Probe the thickest part of the thigh, not touching bone. Also check the breast reaches at least 70°C."
   goose:
