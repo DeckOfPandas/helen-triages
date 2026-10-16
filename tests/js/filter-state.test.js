@@ -301,12 +301,23 @@ test('the two predicates are genuinely two -- some field separates them', () => 
 
 // --- clearing ------------------------------------------------------------------
 
+// Clear-all in filters.js and cocktail-index.js is `state = emptyState()`, so
+// what it yields is checked against each spec's own `empty()`, field by field.
 test('clearing returns something equal to a fresh empty state', () => {
-  const dirty = FS.emptyState();
-  FS.FIELDS.forEach((f) => { dirty[f] = aNonEmptyValueLike(FS.emptyState()[f], f); });
-  assert.strictEqual(FS.hasAnythingToClear(dirty), true);
-  assert.deepStrictEqual(FS.emptyState(), FS.emptyState());
-  assert.strictEqual(FS.isEmpty(FS.emptyState()), true);
+  [FS.FOOD_FIELDS, FS.COCKTAIL_FIELDS].forEach((spec) => {
+    const bound = FS.create(spec);
+    let state = bound.emptyState();
+    bound.FIELDS.forEach((f) => { state[f] = aNonEmptyValueLike(state[f], f); });
+    assert.strictEqual(bound.hasAnythingToClear(state), true);
+    state = bound.emptyState();
+    const expected = {};
+    Object.keys(spec).forEach((f) => { expected[f] = spec[f].empty(); });
+    assert.deepStrictEqual(state, expected);
+    bound.FIELDS.forEach((f) => {
+      assert.strictEqual(FS.isFieldSet(state[f]), false, `${f} survives a clear`);
+    });
+    assert.strictEqual(bound.isEmpty(state), true);
+  });
 });
 
 test('emptyState hands out FRESH collections, never one shared Set', () => {

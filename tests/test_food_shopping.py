@@ -43,6 +43,21 @@ def recipe_paths(dirs=ALL_DIRS):
         yield from sorted((ROOT / folder).glob("*.md"))
 
 
+def published_paths(folder):
+    """One published collection's files, never an empty pass.
+
+    The magic bag may legitimately hold nothing, and git keeps no empty
+    directory, so an empty magic bag skips; an empty `_food_recipes/` is a
+    broken glob and fails.
+    """
+    paths = list(recipe_paths([folder]))
+    if not paths:
+        if folder == "_food_magic_bag":
+            pytest.skip("_food_magic_bag/ has no entries yet; this runs on the first one.")
+        pytest.fail(f"{folder}/ yielded no recipe files, so this would check nothing.")
+    return paths
+
+
 def front_matter(path: Path) -> dict:
     try:
         return yaml.safe_load(path.read_text(encoding="utf-8").split("---", 2)[1]) or {}
@@ -66,7 +81,7 @@ def test_every_published_recipe_states_how_many_it_feeds(folder):
     950 ml is not 950 portions.
     """
     missing = []
-    for path in recipe_paths([folder]):
+    for path in published_paths(folder):
         fm = front_matter(path)
         if states_people(fm):
             continue
@@ -109,7 +124,7 @@ def test_every_draft_states_how_many_it_feeds():
 @pytest.mark.parametrize("folder", PUBLISHED_DIRS)
 def test_serves_estimate_is_a_positive_whole_number_of_people(folder):
     bad = []
-    for path in recipe_paths([folder]):
+    for path in published_paths(folder):
         value = front_matter(path).get("serves_estimate")
         if value is None:
             continue
@@ -132,7 +147,7 @@ def test_no_estimate_contradicts_a_serving_size_helen_wrote(folder):
     `~` and a stated one is not.
     """
     shadowed = []
-    for path in recipe_paths([folder]):
+    for path in published_paths(folder):
         fm = front_matter(path)
         if states_people(fm) and "serves_estimate" in fm:
             shadowed.append(f"{path.name} (serves: {fm['serves']!r})")

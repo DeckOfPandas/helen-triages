@@ -450,6 +450,7 @@ WHOLE_COLLECTION_ONLY = {
     "test_the_plural_unit_rule_is_exercised",
     "test_every_mood_correction_is_reachable_and_needed",
     "test_no_drink_note_exception_is_stale",
+    "test_no_as_exception_is_stale",
 }
 
 
@@ -999,7 +1000,7 @@ def test_every_ingredient_has_an_amount():
                 continue
             if item.get("amount") is None:
                 bad.append(f"{slug} entry {i}: "
-                           f"{item.get('generic') or item.get('item')!r}")
+                           f"{item.get('generic')!r}")
     assert not bad, (
         "Ingredient entr(ies) with no `amount`:\n  " + "\n  ".join(bad)
         + "\n\nThere is no amount-less case. A top-up is `amount: \"to top\"` "
@@ -1235,7 +1236,7 @@ def test_agent_edited_drinks_are_not_marked_proofread():
 
 def _vocab():
     if not VOCAB.exists():
-        pytest.skip("_data/cocktails/ingredients.yml does not exist yet.")
+        pytest.fail("_data/cocktails/ingredients.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(VOCAB) or {}
 
 
@@ -1503,7 +1504,7 @@ SERVE = ROOT / "_data" / "cocktails" / "serve.yml"
 
 def _serve_vocab():
     if not SERVE.exists():
-        pytest.skip("_data/cocktails/serve.yml does not exist yet.")
+        pytest.fail("_data/cocktails/serve.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(SERVE) or {}
 
 
@@ -1512,7 +1513,7 @@ SOURCES = ROOT / "_data" / "cocktails" / "sources.yml"
 
 def _sources_data():
     if not SOURCES.exists():
-        pytest.skip("_data/cocktails/sources.yml does not exist yet.")
+        pytest.fail("_data/cocktails/sources.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(SOURCES) or {}
 
 
@@ -1961,7 +1962,7 @@ def test_speciality_gin_declares_a_character():
             if isinstance(character, str):
                 character = [character] if character.strip() else []
             if not character:
-                bad.append(f"{slug}: {item.get('item') or '?'!r}")
+                bad.append(f"{slug}: {item.get('generic') or '?'!r}")
     assert not bad, (
         f"{len(bad)} ingredient(s) typed as a generic that requires a "
         f"`character`, without one:\n  " + "\n  ".join(bad)
@@ -2042,7 +2043,7 @@ def _character_scan():
                 checked += 1
                 if value not in permitted:
                     bad.append(
-                        f"{slug}: {item.get('item') or '?'!r} -> {value!r} "
+                        f"{slug}: {item.get('generic') or '?'!r} -> {value!r} "
                         f"(family {'/'.join(sorted(families))})"
                     )
     return checked, bad, declared
@@ -2267,7 +2268,7 @@ def test_every_card_name_join_is_reachable():
 
 def _bottles():
     if not BOTTLES.exists():
-        pytest.skip("_data/cocktails/bottles.yml does not exist yet.")
+        pytest.fail("_data/cocktails/bottles.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(BOTTLES) or {}
 
 
@@ -2596,7 +2597,7 @@ def _cross_category_scan():
                 if item.get("note"):
                     continue
                 bad.append(
-                    f"{slug}: {item.get('item') or '?'!r} asks for "
+                    f"{slug}: {item.get('generic') or '?'!r} asks for "
                     f"{generics} and suggests {canonical!r} "
                     f"({bottle_generic!r}) — no note"
                 )
@@ -2665,7 +2666,7 @@ def _amount_scan():
                     continue
                 bad.append(
                     f"{slug}: amount {item['amount']!r} on "
-                    f"{item.get('item') or item.get('generic')!r} -- {why}"
+                    f"{item.get('generic')!r} -- {why}"
                 )
             else:
                 read += 1
@@ -2815,7 +2816,7 @@ def test_no_amount_uses_a_us_unit():
             if hit:
                 bad.append(
                     f"{slug}: {item['amount']!r} on "
-                    f"{item.get('generic') or item.get('item')!r} -- {sorted(hit)}"
+                    f"{item.get('generic')!r} -- {sorted(hit)}"
                 )
 
     assert not bad, (
@@ -2874,7 +2875,7 @@ def test_no_ingredient_stores_a_millilitre_figure():
     A returning key is read by nothing and can only drift from the string
     beside it. Copying an older drink as a template is how it comes back.
     """
-    bad = [f"{slug}: {item.get('item') or item.get('generic')!r} has ml: {item['ml']!r}"
+    bad = [f"{slug}: {item.get('generic')!r} has ml: {item['ml']!r}"
            for slug, fm in _load()
            for item in (fm.get("ingredients") or [])
            if isinstance(item, dict) and "ml" in item]
@@ -3639,7 +3640,7 @@ def test_optional_is_a_real_boolean():
             seen += 1
             if not isinstance(item["optional"], bool):
                 bad.append(
-                    f"{slug}: {item.get('item') or item.get('generic')!r} has "
+                    f"{slug}: {item.get('generic')!r} has "
                     f"optional: {item['optional']!r} "
                     f"({type(item['optional']).__name__}, not bool)"
                 )
@@ -4842,7 +4843,7 @@ METHODS = ROOT / "_data" / "cocktails" / "methods.yml"
 
 def _methods():
     if not METHODS.exists():
-        pytest.skip("_data/cocktails/methods.yml does not exist yet.")
+        pytest.fail("_data/cocktails/methods.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(METHODS) or {}
 
 
@@ -4994,7 +4995,7 @@ def test_every_proposal_still_matches_a_real_step():
 
 def _taxonomy():
     if not TAXONOMY.exists():
-        pytest.skip("_data/cocktails/taxonomy.yml does not exist yet.")
+        pytest.fail("_data/cocktails/taxonomy.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(TAXONOMY) or {}
 
 
@@ -5153,7 +5154,7 @@ CARD_PLUGIN = ROOT / "_plugins" / "cocktail_card_ingredients.rb"
 
 def _plugin_source():
     if not CARD_PLUGIN.exists():
-        pytest.skip("_plugins/cocktail_card_ingredients.rb does not exist yet.")
+        pytest.fail("_plugins/cocktail_card_ingredients.rb is gone. Every test that reads it would skip, not fail, without this line.")
     return CARD_PLUGIN.read_text(encoding="utf-8")
 
 
@@ -5553,7 +5554,7 @@ def test_ingredient_as_is_declared(drink_file):
         if not isinstance(item, dict) or not item.get("as"):
             continue
         if str(item["as"]) not in declared:
-            bad.append(f"{item.get('generic') or item.get('item')}: {item['as']!r}")
+            bad.append(f"{item.get('generic')}: {item['as']!r}")
 
     assert not bad, (
         f"{_drink_where(drink_file)} uses an undeclared `as` value:\n  "
@@ -5577,8 +5578,12 @@ def test_no_as_exception_is_stale():
     """Every `_AS_EXCEPTIONS` entry still describes a live gap.
 
     An exemption that outlives its defect reads as outstanding work while
-    excusing that drink for whoever edits it next.
+    excusing that drink for whoever edits it next. Needs the whole collection:
+    with the drafts absent, an entry for a draft is indistinguishable from a
+    stale one.
     """
+    _require_whole_collection("a stale `as` exception")
+
     live = []
     for slug, fm in _load():
         steps = " ".join(
@@ -5937,13 +5942,13 @@ COST_CONFIDENCE = {"high", "medium", "low"}
 
 def _costs():
     if not COSTS.exists():
-        pytest.skip("_data/cocktails/costs.yml does not exist yet.")
+        pytest.fail("_data/cocktails/costs.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(COSTS) or {}
 
 
 def _declared_bottles():
     if not BOTTLES.exists():
-        pytest.skip("_data/cocktails/bottles.yml does not exist yet.")
+        pytest.fail("_data/cocktails/bottles.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return (_parsed(BOTTLES) or {}).get(
         "bottles"
     ) or {}
@@ -6381,7 +6386,7 @@ ML_PER_UNIT = 1000.0
 
 def _abv():
     if not ABV.exists():
-        pytest.skip("_data/cocktails/abv.yml does not exist yet.")
+        pytest.fail("_data/cocktails/abv.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(ABV) or {}
 
 

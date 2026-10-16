@@ -793,9 +793,11 @@ def test_homemade_pastry_has_salt(recipe):
 
 # --- unsalted butter needs salt somewhere, or an explicit note --------------
 # #138. The method need not say "salt" where a catch-all step covers every
-# ingredient ("Blend everything together").
+# ingredient ("Blend everything together"). A bare "all" is not one: "mix all
+# the flour in" names one ingredient, and would excuse any method.
 _SALT_WORD = re.compile(r"(?<!un)salt", re.I)
-_CATCH_ALL_METHOD = re.compile(r"\beverything\b|\ball\b", re.I)
+_CATCH_ALL_METHOD = re.compile(
+    r"\beverything\b|\ball (?:of )?(?:the )?ingredients\b", re.I)
 
 
 def test_unsalted_butter_has_salt_or_a_note(recipe):
