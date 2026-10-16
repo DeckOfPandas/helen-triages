@@ -1,10 +1,10 @@
 """Add per-group prose and column sets to _data/food/cooking_methods.yml.
 
-DO NOT RUN THIS. It is a spent migration tool, kept as the record of how the
-page's prose reached the data. It has no flags and no `__main__` guard:
-running or importing it rewrites `_data/food/cooking_methods.yml` through a
-YAML dumper. That file has been edited by hand since and no longer carries
-`groups` (DECISIONS §14).
+A spent migration tool, kept as the record of how the page's prose reached the
+data. `_data/food/cooking_methods.yml` has been edited by hand since and no
+longer carries `groups` (DECISIONS §14). Run or imported, this refuses before
+doing anything unless that file still opens with the `# GENERATED` header
+scripts/build_cooking_methods.py wrote, which a hand-edited file does not.
 
 It ran after scripts/build_cooking_methods.py. It reads the page as it stood
 at the commit PRE_MIGRATION, through `git show`, and the data file, with the
@@ -20,11 +20,15 @@ page's outbound links. Sections with no timings are not touched.
 import pathlib
 import re
 import subprocess
+import sys
 
 import yaml
 
 SRC = pathlib.Path("food/reference/cooking-methods.html")
 OUT = pathlib.Path("_data/food/cooking_methods.yml")
+if not OUT.read_text(encoding="utf-8").startswith("# GENERATED"):
+    sys.exit(f"refused: {OUT} has been edited by hand since this migration "
+             f"ran, and a run would overwrite it. Edit it directly (DECISIONS §14).")
 # The source is pinned to git, not read from the working tree: the page now
 # renders from the data, so the working copy holds no tables. A re-run
 # reproduces the migration and overwrites every hand edit made since.

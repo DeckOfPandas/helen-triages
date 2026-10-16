@@ -939,3 +939,31 @@ def test_every_figure_a_recipe_can_point_at_has_a_chart_anchor(internal_temperat
         "so their 'more temperatures' link is silently omitted:\n  "
         + "\n  ".join(orphans)
     )
+
+
+@pytest.mark.parametrize("script", ["build_cooking_methods.py",
+                                    "build_cooking_methods_prose.py"])
+def test_the_cooking_method_generators_refuse_the_hand_edited_file(script):
+    """#1383, DECISIONS §14. Run against a copy of the real data file in this
+    repo's `tmp/`, never the file itself: each script must exit non-zero and
+    leave the copy byte for byte, since a run would erase the hand edits."""
+    import shutil
+    import subprocess
+    import sys
+
+    work = ROOT / "tmp" / f"test-generator-refuses-{script[:-3]}"
+    data = work / "_data" / "food" / "cooking_methods.yml"
+    shutil.rmtree(work, ignore_errors=True)
+    data.parent.mkdir(parents=True)
+    real = (ROOT / "_data" / "food" / "cooking_methods.yml").read_text(encoding="utf-8")
+    data.write_text(real, encoding="utf-8")
+    try:
+        run = subprocess.run([sys.executable, str(ROOT / "scripts" / script)],
+                             cwd=work, capture_output=True, text=True, timeout=60)
+        assert run.returncode != 0 and "refused" in run.stderr, (
+            f"scripts/{script} did not refuse the hand-edited cooking_methods.yml "
+            f"(exit {run.returncode}): {run.stdout[-300:]}{run.stderr[-300:]}")
+        assert data.read_text(encoding="utf-8") == real, (
+            f"scripts/{script} wrote to cooking_methods.yml before refusing.")
+    finally:
+        shutil.rmtree(work, ignore_errors=True)

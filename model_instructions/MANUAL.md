@@ -4819,7 +4819,8 @@ on purpose: they have no timings.
 **Trap:** `scripts/build_cooking_methods.py` and
 `scripts/build_cooking_methods_prose.py` are migration tools pinned to an
 old commit. **Do not re-run them**: the data has been hand-edited since and
-a re-run destroys it.
+a re-run destroys it. Each refuses, run or imported, unless the data file
+still opens with its `# GENERATED` header, which it no longer does.
 
 ### Recipe wiring
 
