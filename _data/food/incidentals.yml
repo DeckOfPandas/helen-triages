@@ -2,8 +2,9 @@
 # holds a `fats_and_flours` word and whose only use is a `uses` word ("butter,
 # for greasing") carries `incidental: true`. On a real line, the same use
 # tacked on after "plus" (", plus extra for the tin") is trimmed. A
-# `not_incidental` word in the use keeps the line as it is: deep-frying oil is
-# bought by the litre, and a drizzle or a serve is eaten. Read by
+# `not_incidental` word in the use keeps the line on the list: deep-frying oil
+# is listed with no amount as "<oil>, for deep frying", and a drizzle or a
+# serve is eaten. Read by
 # `incidental_verdict` in tests/test_taxonomy.py, which scripts/tidy_drafts.py
 # imports.
 fats_and_flours: [butter, oil, lard, ghee, dripping, flour, semolina]

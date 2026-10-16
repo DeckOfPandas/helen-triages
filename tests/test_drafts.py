@@ -555,6 +555,10 @@ def test_no_real_line_carries_its_tin_and_pan_extra(draft):
     _tx.test_no_real_line_carries_its_tin_and_pan_extra(draft)
 
 
+def test_deep_frying_oil_is_listed_without_an_amount(draft):
+    _tx.test_deep_frying_oil_is_listed_without_an_amount(draft)
+
+
 def test_internal_links_have_trailing_slash(draft):
     _tx.test_internal_links_have_trailing_slash(draft)
 

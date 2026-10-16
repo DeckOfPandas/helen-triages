@@ -364,22 +364,32 @@ _FAT_OR_FLOUR = _any_word(_INCIDENTALS["fats_and_flours"])
 _USE = _any_word(_INCIDENTALS["uses"])
 _NOT_INCIDENTAL = _any_word(_INCIDENTALS["not_incidental"])
 _BRACKETED = re.compile(r"\([^)]*\)")
+_DEEP_FRY = re.compile(r"\bdeep[- ]?fr(?:y|ying|ied)\b", re.I)
+DEEP_FRYING = ", for deep frying"
 _PLUS_TAIL = re.compile(r",?\s+plus\b[^,]*$", re.I)
 _USE_CLAUSE = re.compile(r"(?:,\s*|\s+)(?:extra,\s*)?(?=(?:for|to)\b)", re.I)
 
 
 def incidental_verdict(text):
-    """("flag", None), ("trim", the item without its tail), or (None, None).
+    """("flag", None), ("trim", the item without its tail), ("deep", the item
+    as it should read), or (None, None).
 
     "flag": the line names a fat or flour and is only for the tin or the pan
     ("butter, for greasing"). "trim": a real line with that use tacked on after
-    "plus" ("175 g butter, softened, plus extra for the tin"). A bracket is not
-    read: "olive oil (a little for frying, the rest for the dressing)" is one
-    real line. A source line (`QQ`) is judged like any other; whether it may
-    be edited is the caller's question.
+    "plus" ("175 g butter, softened, plus extra for the tin"). "deep": a fat
+    for deep frying, which stays on the list with no amount, since the pan
+    decides the volume, and reads "vegetable oil, for deep frying". A bracket
+    is not read: "olive oil (a little for frying, the rest for the dressing)"
+    is one real line. A source line (`QQ`) is judged like any other; whether
+    it may be edited is the caller's question.
     """
     text = str(text or "")
     plain = _BRACKETED.sub("", text)
+    deep = _USE_CLAUSE.search(text)
+    if (deep and "plus" not in text.lower()
+            and _DEEP_FRY.search(text[deep.end():])
+            and _FAT_OR_FLOUR.search(text[:deep.start()])):
+        return "deep", text[:deep.start()] + DEEP_FRYING
     plus = _PLUS_TAIL.search(plain)
     if plus:
         use = plus.group(0)
@@ -432,6 +442,29 @@ def test_no_real_line_carries_its_tin_and_pan_extra(recipe):
         f"{where(recipe)} still carries a tin-and-pan extra on a real line: "
         f"{tails}. Trim it (`python3 scripts/tidy_drafts.py --only incidentals "
         f"--apply` does it on a draft)."
+    )
+
+
+def test_deep_frying_oil_is_listed_without_an_amount(recipe):
+    """#1356, DECISIONS §4: deep-frying oil stays on the list, unquantified,
+    as "<oil>, for deep frying": the pan decides how much. A `QQ` line keeps
+    its words for Helen's rewrite, but not its amount."""
+    wrong = []
+    for item in _items(recipe):
+        verdict, should = incidental_verdict(item.get("item"))
+        if verdict != "deep":
+            continue
+        if item.get("amount") not in (None, ""):
+            wrong.append(f"{item.get('item')!r} has amount {item.get('amount')!r}")
+        elif not is_qq(item.get("item")) and item.get("item") != should:
+            wrong.append(f"{item.get('item')!r} should read {should!r}")
+        elif item.get("incidental"):
+            wrong.append(f"{item.get('item')!r} is flagged incidental, which hides it")
+    assert not wrong, (
+        f"{where(recipe)}: deep-frying oil is listed with no amount, as "
+        f"\"<oil>{DEEP_FRYING}\", and not incidental: {wrong}. "
+        f"`python3 scripts/tidy_drafts.py --only incidentals --apply` fixes "
+        f"the first two on a draft."
     )
 
 

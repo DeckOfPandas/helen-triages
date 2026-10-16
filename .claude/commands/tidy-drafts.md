@@ -48,7 +48,7 @@ script; `--help` prints them):
 | `accents` | both | the words in `_data/accented_words.yml` |
 | `meta` | food | the `meta:` block's keys, order and unquoted booleans; it never invents a flag |
 | `size` | food | `amount: "2"` / `item: "large onions"` → `amount: "2 large"` / `item: "onions"`, only where `test_size_word_is_with_the_count_not_the_item` would fire |
-| `incidentals` | food | a fat or flour only for the tin or the pan (`"butter, for greasing"`) gains `incidental: true`; `", plus extra for the tin"` and its kin are trimmed off a real line. Both by `incidental_verdict` in `tests/test_taxonomy.py`, over the words in `_data/food/incidentals.yml` (#1356). A `QQ` line gains the flag but is never trimmed |
+| `incidentals` | food | a fat or flour only for the tin or the pan (`"butter, for greasing"`) gains `incidental: true`; `", plus extra for the tin"` and its kin are trimmed off a real line; deep-frying oil loses its amount and reads `"<oil>, for deep frying"`. All by `incidental_verdict` in `tests/test_taxonomy.py`, over the words in `_data/food/incidentals.yml` (#1356). A `QQ` line gains the flag but is never trimmed |
 | `titles` | cocktails | Title Case by the suite's `title_cased`: it only raises a letter, and leaves anything in brackets as written |
 | `order` | cocktails | top-level keys into `TOP_LEVEL_KEYS_IN_ORDER` (`tests/test_cocktails.py`); moves whole blocks and edits no line |
 

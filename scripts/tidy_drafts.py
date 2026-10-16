@@ -735,7 +735,8 @@ def fix_incidentals(text, path):
       - "butter, for greasing" gains `incidental: true` as the entry's last
         key, at its keys' indentation;
       - "175 g butter, softened, plus extra for the tin" loses its ", plus ..."
-        tail, keeping the item's quote style.
+        tail, keeping the item's quote style;
+      - deep-frying oil loses its amount and reads "<oil>, for deep frying".
 
     The flag is added to a `QQ` line too, since it changes none of the source's
     words; a `QQ` line's text is never trimmed. An item that cannot be
@@ -747,8 +748,8 @@ def fix_incidentals(text, path):
     open_, fm, close, body = parts
     lines = fm.split("\n")
     changed = []
-    inserts = []
-    for item_i, _ in _ingredient_pairs(lines):
+    inserts, drops = [], []
+    for item_i, amount_i in _ingredient_pairs(lines):
         item_m = KEYED_LINE.match(lines[item_i])
         col = len(item_m.group("lead"))
         start = item_i
@@ -775,8 +776,28 @@ def fix_incidentals(text, path):
         elif verdict == "trim" and not is_qq(lines[item_i]):
             lines[item_i] = _rebuild(item_m, f"{item[1]}{trimmed}{item[1]}")
             changed.append(f"trimmed: {item[0][:70]} -> {trimmed[:50]}")
-    for end, line in sorted(inserts, reverse=True):
-        lines.insert(end + 1, line)
+        elif verdict == "deep":
+            if not is_qq(lines[item_i]) and item[0] != trimmed:
+                quote = item[1] or '"'
+                lines[item_i] = _rebuild(item_m, f"{quote}{trimmed}{quote}")
+                changed.append(f"deep frying: {item[0][:60]} -> {trimmed[:60]}")
+            if amount_i is not None and not is_qq(lines[amount_i]):
+                amount_m = KEYED_LINE.match(lines[amount_i])
+                if amount_m.group("lead").strip() == "-":
+                    # The amount holds the entry's dash: the item takes it.
+                    lines[amount_i] = amount_m.group("lead") + lines[item_i].lstrip()
+                    drops.append(item_i)
+                else:
+                    drops.append(amount_i)
+                changed.append(f"deep frying, amount dropped: "
+                               f"{amount_m.group('value')[:30]} / {trimmed[:50]}")
+    # Bottom up, so no edit moves a line another edit has yet to reach.
+    edits = [(end + 1, line) for end, line in inserts] + [(i, None) for i in drops]
+    for at, line in sorted(edits, key=lambda e: e[0], reverse=True):
+        if line is None:
+            del lines[at]
+        else:
+            lines.insert(at, line)
     if not changed:
         return text, changed
     return open_ + "\n".join(lines) + close + body, changed

@@ -684,6 +684,10 @@ ingredient_groups:
       item: salted butter, softened plus extra for the tin
     - item: "salted butter, to serve (optional), plus extra for the tin"
     - item: "vegetable oil, for deep-frying"
+    - amount: "1 litre"
+      item: sunflower oil, to deep-fry
+    - item: "groundnut oil, for deep frying"
+      amount: "2 litres"
     - item: "icing sugar, to dust"
     - item: "plain flour, for dusting"
       incidental: true
@@ -696,8 +700,8 @@ method:
 ---
 '''
 
-# Six lines differ from `INC_BEFORE`: three `incidental: true` lines added and
-# three items trimmed.
+# Ten changes from `INC_BEFORE`: three `incidental: true` lines added, three
+# items trimmed, two deep-frying items reworded and two amounts dropped.
 INC_AFTER = '''---
 title: "Test Recipe"
 ingredient_groups:
@@ -716,7 +720,9 @@ ingredient_groups:
     - amount: "200 g"
       item: salted butter, softened
     - item: "salted butter, to serve (optional)"
-    - item: "vegetable oil, for deep-frying"
+    - item: "vegetable oil, for deep frying"
+    - item: "sunflower oil, for deep frying"
+    - item: "groundnut oil, for deep frying"
     - item: "icing sugar, to dust"
     - item: "plain flour, for dusting"
       incidental: true
@@ -734,14 +740,14 @@ def test_incidentals_report_names_each_change_and_writes_nothing(food):
     path = food / "test-recipe.md"
     path.write_text(INC_BEFORE, encoding="utf-8")
     out = run_food(food, "--only", "incidentals")
-    assert "would apply 6 mechanical change(s) across 1 file(s)" in out, out
+    assert "would apply 10 mechanical change(s) across 1 file(s)" in out, out
     assert "[incidentals] flagged incidental: butter, for greasing" in out, out
     assert ("[incidentals] trimmed: butter, softened, plus extra for the tin "
             "-> butter, softened") in out, out
     assert path.read_text(encoding="utf-8") == INC_BEFORE
 
 
-def test_incidentals_apply_changes_exactly_six_lines(food):
+def test_incidentals_apply_changes_exactly_the_expected_lines(food):
     """Byte for byte (#1356)."""
     path = food / "test-recipe.md"
     path.write_text(INC_BEFORE, encoding="utf-8")
@@ -768,6 +774,8 @@ def test_incidentals_apply_satisfies_both_recipe_rules(food):
             if incidental_verdict(i["item"])[0] == "trim"
             or (incidental_verdict(i["item"])[0] == "flag" and not i.get("incidental"))]
     assert left == [("QQ butter, plus extra for the tin", "trim")], left
+    deep = [i for i in items if incidental_verdict(i["item"])[0] == "deep"]
+    assert len(deep) == 3 and not any("amount" in i for i in deep), deep
 
 
 def test_size_words_never_run_on_a_drink(drinks):

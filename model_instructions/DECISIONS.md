@@ -432,6 +432,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   tin" and its kin are trimmed, at tidy.** Put to Helen with the 42 draft
   lines that carry one; she chose "Trim it at tidy" over leaving the note. The
   same "we can trust the cook". A `QQ` line keeps its tail for her rewrite.
+- **2026-10-16, #1356 — deep-frying oil is listed, unquantified, as "<oil>,
+  for deep frying", and is not incidental.** Helen: *"Deep-frying oil should
+  appear in the ingredients list, but unquantified, just saying 'for deep
+  frying', because I will use different pans with different volumes."*
+  Held by `test_deep_frying_oil_is_listed_without_an_amount`; `/tidy-drafts`
+  drops the amount and rewords the line.
 - **2026-08-20, #406 — "Adapted from" prefixes published work and only
   published work.** Helen: *"Bare labels don't need 'adapted from', only work
   published by other people."* And why the prefix is always true for the rest:

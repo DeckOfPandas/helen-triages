@@ -616,8 +616,9 @@ takes `proofread` down with it.
   `main_ingredients` must not list (`test_incidental_not_in_main_ingredients`).
   Whether an oil is core is a judgement (unusual oil, stated smoke point,
   finishing drizzle → core), so it is an explicit flag. A fat or flour listed
-  only for the tin or the pan must carry it, and a real line loses a ", plus
-  extra for the tin" tail: the words are `_data/food/incidentals.yml`, read by
+  only for the tin or the pan must carry it, a real line loses a ", plus
+  extra for the tin" tail, and deep-frying oil is listed unflagged with no
+  amount as "<oil>, for deep frying": the words are `_data/food/incidentals.yml`, read by
   `incidental_verdict` in `tests/test_taxonomy.py`, which `/tidy-drafts`'s
   `incidentals` rule applies. Nothing wider takes the flag unasked
   (`.claude/commands/ingest.md`). A flagged line may share its name with a real one: a
