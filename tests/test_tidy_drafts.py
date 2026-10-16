@@ -180,6 +180,25 @@ def write_drink(root, name="test-drink.md", text=BEFORE):
     return path
 
 
+def test_a_bare_drink_source_is_quoted_and_a_qq_one_is_not(drinks):
+    """#1387: `source` is verbatim, so the prose mask blanks it, but quoting
+    changes no word and `test_drink_scalar_fields_are_quoted` requires it.
+    Only the quotes move; a `QQ` source is left as written."""
+    bare = BEFORE.replace('source: ""\nsource_url: ""',
+                          "source: Difford's Guide -- 2-3 ways\n"
+                          "source_url: https://example.com/drink")
+    path = write_drink(drinks, text=bare)
+    run(drinks, "--only", "quoting", "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert "source: \"Difford's Guide -- 2-3 ways\"\n" in got, got
+    assert 'source_url: "https://example.com/drink"\n' in got, got
+
+    qq = BEFORE.replace('source: ""', "source: QQ Somebody's Book")
+    path = write_drink(drinks, name="qq-drink.md", text=qq)
+    run(drinks, "--only", "quoting", "--apply")
+    assert "source: QQ Somebody's Book\n" in path.read_text(encoding="utf-8")
+
+
 # =============================================================================
 
 def test_the_report_names_every_fault_and_writes_nothing(drinks):
@@ -660,6 +679,122 @@ def test_size_words_apply_parses_and_satisfies_the_recipe_rule(food):
              and _LEADING_SIZE_WORD.match(i["item"])]
     assert still == ["large or 2 small onions, roughly chopped",
                      "baby gem lettuces, shredded"], still
+
+
+# ---- #1356: tin-and-pan fats and flour ----
+# To flag: a bare greasing butter, a frying oil with an amount and a note (the
+# flag goes last), and a `QQ` line (the flag edits none of its words). To trim:
+# a tail after a comma, one with no comma, and one after a bracket. Left: a
+# deep-frying oil, icing sugar to dust, an already flagged line, a bracketed use,
+# and a `QQ` line's tail.
+INC_BEFORE = '''---
+title: "Test Recipe"
+ingredient_groups:
+  - name: "the lot"
+    items:
+    - item: "butter, for greasing"
+    - amount: "2 tbsp"
+      item: "sunflower oil, for frying"
+      note: "Or rapeseed."
+    - item: "QQ butter, for greasing"
+    - amount: "175 g"
+      item: "butter, softened, plus extra for the tin"
+    - amount: "200 g"
+      item: salted butter, softened plus extra for the tin
+    - item: "salted butter, to serve (optional), plus extra for the tin"
+    - item: "vegetable oil, for deep-frying"
+    - amount: "1 litre"
+      item: sunflower oil, to deep-fry
+    - item: "groundnut oil, for deep frying"
+      amount: "2 litres"
+    - item: "icing sugar, to dust"
+    - item: "plain flour, for dusting"
+      incidental: true
+    - amount: "3 tbsp"
+      item: "olive oil (a little for frying, the rest for the dressing)"
+    - amount: "250 g"
+      item: "QQ butter, plus extra for the tin"
+method:
+  - "Cook it."
+---
+'''
+
+# Ten changes from `INC_BEFORE`: three `incidental: true` lines added, three
+# items trimmed, two deep-frying items reworded and two amounts dropped.
+INC_AFTER = '''---
+title: "Test Recipe"
+ingredient_groups:
+  - name: "the lot"
+    items:
+    - item: "butter, for greasing"
+      incidental: true
+    - amount: "2 tbsp"
+      item: "sunflower oil, for frying"
+      note: "Or rapeseed."
+      incidental: true
+    - item: "QQ butter, for greasing"
+      incidental: true
+    - amount: "175 g"
+      item: "butter, softened"
+    - amount: "200 g"
+      item: salted butter, softened
+    - item: "salted butter, to serve (optional)"
+    - item: "vegetable oil, for deep frying"
+    - item: "sunflower oil, for deep frying"
+    - item: "groundnut oil, for deep frying"
+    - item: "icing sugar, to dust"
+    - item: "plain flour, for dusting"
+      incidental: true
+    - amount: "3 tbsp"
+      item: "olive oil (a little for frying, the rest for the dressing)"
+    - amount: "250 g"
+      item: "QQ butter, plus extra for the tin"
+method:
+  - "Cook it."
+---
+'''
+
+
+def test_incidentals_report_names_each_change_and_writes_nothing(food):
+    path = food / "test-recipe.md"
+    path.write_text(INC_BEFORE, encoding="utf-8")
+    out = run_food(food, "--only", "incidentals")
+    assert "would apply 10 mechanical change(s) across 1 file(s)" in out, out
+    assert "[incidentals] flagged incidental: butter, for greasing" in out, out
+    assert ("[incidentals] trimmed: butter, softened, plus extra for the tin "
+            "-> butter, softened") in out, out
+    assert path.read_text(encoding="utf-8") == INC_BEFORE
+
+
+def test_incidentals_apply_changes_exactly_the_expected_lines(food):
+    """Byte for byte (#1356)."""
+    path = food / "test-recipe.md"
+    path.write_text(INC_BEFORE, encoding="utf-8")
+    run_food(food, "--only", "incidentals", "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert got == INC_AFTER, "\n".join(
+        f"want {w!r}\ngot  {g!r}" for w, g in
+        zip(INC_AFTER.split("\n"), got.split("\n")) if w != g) or "line counts differ"
+
+
+def test_incidentals_apply_satisfies_both_recipe_rules(food):
+    """The suite's predicate, imported: after the pass nothing is left for it
+    to flag or trim except the `QQ` tail, which is Helen's to rewrite."""
+    import yaml
+    sys.path.insert(0, str(ROOT / "tests"))
+    from test_taxonomy import incidental_verdict
+
+    path = food / "test-recipe.md"
+    path.write_text(INC_BEFORE, encoding="utf-8")
+    run_food(food, "--only", "incidentals", "--apply")
+    items = yaml.safe_load(path.read_text(encoding="utf-8").split("---\n")[1])[
+        "ingredient_groups"][0]["items"]
+    left = [(i["item"], incidental_verdict(i["item"])[0]) for i in items
+            if incidental_verdict(i["item"])[0] == "trim"
+            or (incidental_verdict(i["item"])[0] == "flag" and not i.get("incidental"))]
+    assert left == [("QQ butter, plus extra for the tin", "trim")], left
+    deep = [i for i in items if incidental_verdict(i["item"])[0] == "deep"]
+    assert len(deep) == 3 and not any("amount" in i for i in deep), deep
 
 
 def test_size_words_never_run_on_a_drink(drinks):

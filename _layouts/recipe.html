@@ -317,14 +317,14 @@ layout: default
   </div>
   {% endif %}
 
-  {% comment %} ── If you liked this, how about … (#1005; heading final, #1088) ──
-     Score = shared tags + shared main ingredients; a candidate sharing the star
-     ingredient and a mood tag outranks every one that does not. Ties: more shared
-     non-larder ingredients, then larder staples (_data/food/pantry.yml), then
-     title. No other weighting: DECISIONS §13. Each candidate is one
-     `prio~rank~real~larder~title~url` string, sorted as text;
-     scripts/related_recipes.py is the same rule in Python. `site.food_recipes`
-     is already the published set (_plugins/publish_gate.rb). {% endcomment %}
+  {% comment %} ── If you liked this, how about … (#1090; heading final, #1088) ──
+     Ranked by: the same star ingredient, then more shared mood tags, then more
+     shared other tags plus main ingredients, then more shared non-larder
+     ingredients, then larder staples (_data/food/pantry.yml), then title.
+     DECISIONS §13. Each candidate is one `star~mood~rank~real~larder~title~url`
+     string of fixed-width numbers, sorted as text; scripts/related_recipes.py
+     is the same rule in Python and a test holds the two equal.
+     `site.food_recipes` is already the published set (publish_gate.rb). {% endcomment %}
   {% assign _mood_tags = site.data.food.taxonomy.tags.mood %}
   {% assign _pantry = site.data.food.pantry %}
   {% capture _my_ings %}|{% for _ing in page.main_ingredients %}{{ _ing | downcase }}|{% endfor %}{% endcapture %}
@@ -333,13 +333,16 @@ layout: default
   {% for _other in site.food_recipes %}
     {% unless _other.url == page.url %}
       {% assign _score = 0 %}
+      {% assign _moods = 0 %}
       {% assign _real = 0 %}
       {% assign _larder = 0 %}
-      {% assign _shared_mood = false %}
       {% for _t in page.tags %}
         {% if _other.tags contains _t %}
-          {% assign _score = _score | plus: 1 %}
-          {% if _mood_tags contains _t %}{% assign _shared_mood = true %}{% endif %}
+          {% if _mood_tags contains _t %}
+            {% assign _moods = _moods | plus: 1 %}
+          {% else %}
+            {% assign _score = _score | plus: 1 %}
+          {% endif %}
         {% endif %}
       {% endfor %}
       {% for _ing in _other.main_ingredients %}
@@ -354,16 +357,17 @@ layout: default
           {% endif %}
         {% endif %}
       {% endfor %}
-      {% assign _prio = "1" %}
-      {% if _my_star != "" and _shared_mood %}
+      {% assign _star = "1" %}
+      {% if _my_star != "" %}
         {% assign _other_star = _other.star_ingredient | default: "" | downcase %}
-        {% if _other_star == _my_star %}{% assign _prio = "0" %}{% endif %}
+        {% if _other_star == _my_star %}{% assign _star = "0" %}{% endif %}
       {% endif %}
-      {% if _score > 0 or _prio == "0" %}
+      {% if _score > 0 or _moods > 0 or _star == "0" %}
+        {% assign _mrank = 99 | minus: _moods %}
         {% assign _rank = 999 | minus: _score %}
         {% assign _rrank = 99 | minus: _real %}
         {% assign _lrank = 99 | minus: _larder %}
-        {% capture _related_keys %}{{ _related_keys }}{{ _prio }}~{{ _rank }}~{{ _rrank }}~{{ _lrank }}~{{ _other.title }}~{{ _other.url }};{% endcapture %}
+        {% capture _related_keys %}{{ _related_keys }}{{ _star }}~{{ _mrank }}~{{ _rank }}~{{ _rrank }}~{{ _lrank }}~{{ _other.title }}~{{ _other.url }};{% endcapture %}
       {% endif %}
     {% endunless %}
   {% endfor %}
@@ -377,7 +381,7 @@ layout: default
       <ul class="recipe-list recipe-related">
         {% for _entry in _related_sorted limit: 3 %}
           {% assign _parts = _entry | split: "~" %}
-          {% assign _rel = site.food_recipes | where: "url", _parts[5] | first %}
+          {% assign _rel = site.food_recipes | where: "url", _parts[6] | first %}
           <li data-url="{{ _rel.url }}">
             <div class="recipe-row-content">
               <a class="recipe-title-link" href="{{ _rel.url | relative_url }}">{{ _rel.title }}</a>

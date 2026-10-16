@@ -428,6 +428,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   stay ordinary lines, and an amounted "plus extra for the tin" line is not
   flagged, because that hides the real amount. Every other use of the flag
   stays hers.
+- **2026-10-16, #1356 — on a real fat or flour line, ", plus extra for the
+  tin" and its kin are trimmed, at tidy.** Put to Helen with the 42 draft
+  lines that carry one; she chose "Trim it at tidy" over leaving the note. The
+  same "we can trust the cook". A `QQ` line keeps its tail for her rewrite.
+- **2026-10-16, #1356 — deep-frying oil is listed, unquantified, as "<oil>,
+  for deep frying", and is not incidental.** Helen: *"Deep-frying oil should
+  appear in the ingredients list, but unquantified, just saying 'for deep
+  frying', because I will use different pans with different volumes."*
+  Held by `test_deep_frying_oil_is_listed_without_an_amount`; `/tidy-drafts`
+  drops the amount and rewords the line.
 - **2026-08-20, #406 — "Adapted from" prefixes published work and only
   published work.** Helen: *"Bare labels don't need 'adapted from', only work
   published by other people."* And why the prefix is always true for the rest:
@@ -3508,14 +3518,16 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 
 **Related drinks.**
 
-- **2026-09-10, #927 — "If you liked this, how about…" scores shared moods
-  plus shared ingredient generics, ties broken by title, and nothing else.**
-  Helen: *"Not a full recommendation engine! But I expect we can do something
-  with coincidental tagging."*, and when a `meta.ship` weighting was on the
-  table: *"Keep it simple."* No weights, no tuning. In Liquid in the layout,
-  not a plugin, and hidden in `make it` and in print: a session's calls.
-  `scripts/related_drinks.py` is the same scoring, to check the template
-  against. Four cards since 2026-09-24.
+- **2026-09-28, #1090 — "If you liked this, how about…" on a drink ranks by
+  shared moods, then shared ingredient generics, then title.** Helen, on the
+  order star, mood, ingredients: *"That's a great ordering. Let's go."* Drinks
+  have no star, so moods lead. Still no `meta.ship` weighting (#927, *"Keep it
+  simple."*). In Liquid in the layout, hidden in `make it` and in print;
+  `scripts/related_drinks.py` is its mirror and a test holds them equal.
+- **2026-10-16, #1183 — the fourth related drink is a renegade, taken a
+  quarter of the way down the ranking.** Helen, on tiki drinks all suggesting
+  each other: *"make the fourth one renegade -- maybe hop to 25% or 50% down
+  the list?"*, and chose 25%. Half way down often shares a single generic.
 - **2026-09-11, #955 — a divider separates the end of the recipe from "If you
   liked this…".** Helen: *"Please add some kind of divider between the end of
   the recipe (whether serve or notes or anything else) and 'If you liked
@@ -4894,14 +4906,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-09-14, #1005 — food scales by portions; drinks scale by whole
   recipes.** Helen: *"Portions. Things like '2 large' can scale, surely, then
   let's add a note to bitters and handfuls"*.
-- **2026-09-14, #1005 — related recipes rank by shared tags plus shared main
-  ingredients, star-and-mood first, ties broken by shared real ingredients,
-  then larder staples, then A–Z.** Helen: *"prioritise (star*mood)"*; on the
-  tie-break, *"Agree with your version, please go ahead."* Declined on
-  measurement: weighting ingredients above tags, which changed 49 of 69 pages
-  and gave cauliflower cheese both chocolate ice creams on "whole milk"
-  (`pantry.yml` is exact, so that gap decides too much). Same key in
-  `scripts/related_recipes.py`.
+- **2026-09-28, #1090 — related recipes rank by the same star ingredient,
+  then shared mood tags, then shared other tags plus main ingredients, then
+  shared real ingredients, larder staples, and A–Z.** Helen: *"That's a great
+  ordering. Let's go."* The poultry showstopper should suggest the duck before
+  the chai. Other tags stay counted with the ingredients: weighting
+  ingredients above all tags was declined on measurement in #1005 (cauliflower
+  cheese got both chocolate ice creams on "whole milk"). Same key in
+  `scripts/related_recipes.py`, held equal by a test.
 - **2026-09-14 — every action is in Courier capitals, on both sites.** Helen:
   *"Let's try all actions in capitals (shortlist button at top of index lists
   too) to help show they're actions????"* The question marks are hers: a try
@@ -5057,10 +5069,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-09-15, #1050 / #1053 — food's dropdown group titles are Selawik 700
   at 0.7rem; the five `-bright` tones no longer colour them (#1136).** Helen:
   *"food site: group headings need to be brighter, closer to core colours
-  although obviously we're limited by contrast"*. Each `-bright` in
-  `_sass/food/_palette.scss` is its root darkened by exactly what 4.5:1 costs;
-  nothing reads them now, because the headings are filled with the section's
-  root hue and lettered dark (§13.13). #1053: *"Switch font to the other one
+  although obviously we're limited by contrast"*. A `-bright` was its root
+  darkened by exactly what 4.5:1 costs; the palette no longer carries them,
+  because the headings are filled with the section's root hue and lettered
+  dark (§13.13). #1053: *"Switch font to the other one
   if you have to"*.
 - **2026-09-15, #1096 — the box and the index's own searches both stay as they
   are; the box's placeholder is "I know what I want..." with no label, only
@@ -5092,7 +5104,7 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   *"omnisearch dropdown result group headings should take their section's
   background colour with black lettering, like active chips on the index
   page."*, and *"the same for the food site"*. The root hues, not the
-  `-bright` tones, which exist to be read as text on the panel; this replaces
+  `-bright` tones, which were darkened to be read as text on the panel; this replaces
   #1053's `-bright` headings. `.page-search-group--<kind>
   .page-search-group-label`.
 

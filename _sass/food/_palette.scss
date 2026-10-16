@@ -64,16 +64,6 @@ $color-practicalities-active: darken($color-practicalities-root, $darken-active)
 $color-ingredient-active:     darken($color-ingredient-root,     $darken-active);
 $color-name-search-active:    darken($color-name-search-root,    $darken-active-extra);
 
-// The -bright tones (#1050): each root darkened by the smallest step that
-// clears 4.5:1 as text on $color-surface, which is why they are five numbers
-// and not one. A hue that moves needs its step re-measured
-// (scripts/palette_measure.py), not carried over.
-$color-star-bright:           darken($color-star-root,            8);
-$color-mood-bright:           darken($color-mood-root,           20);
-$color-practicalities-bright: darken($color-practicalities-root, 12);
-$color-ingredient-bright:     darken($color-ingredient-root,     12);
-$color-name-search-bright:    darken($color-name-search-root,    25);
-
 // The quiet grey: secondary text on both pages and in the shared chrome,
 // which names it as part of the palette contract.
 $color-clear-text:   #4f4e4a;

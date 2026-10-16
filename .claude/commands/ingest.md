@@ -270,8 +270,14 @@ else has already done (MANUAL §9.1).
 - **A fat or flour the source's list prints only for the tin or the pan keeps
   its line and gains `incidental: true`** ("butter, for greasing", "oil, for
   frying", "flour, for dusting"). Only those: icing sugar to dust and mustard
-  to brush stay ordinary lines, and so does a real ingredient with the use
-  tacked on ("175 g butter, plus extra for the tin").
+  to brush stay ordinary lines. A real ingredient with the use tacked on
+  ("175 g butter, softened, plus extra for the tin") is not flagged; write it
+  without the tail ("butter, softened"). Deep-frying oil is not incidental:
+  it keeps its line with no amount, reading "vegetable oil, for deep frying",
+  because the pan decides the volume. The words are
+  `_data/food/incidentals.yml`, and `test_tin_and_pan_fats_are_flagged_incidental`,
+  `test_no_real_line_carries_its_tin_and_pan_extra` and
+  `test_deep_frying_oil_is_listed_without_an_amount` hold all three.
 - **Quantities in their own `amount:` key**, never inside `item:` text. The
   highlighter reads `item.amount` and never scans text, so a quantity in the
   wrong field renders unstyled with no error anywhere.

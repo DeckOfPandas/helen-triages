@@ -247,6 +247,39 @@ def test_every_recipe_rule_is_adopted_or_declined():
         + ", ".join(both) + ". Pick one."
     )
 
+
+def test_a_draft_twin_delegates_unless_it_is_declared_divergent():
+    """A draft test named after a recipe rule calls that rule, or is in
+    DIVERGENT_ON_PURPOSE; and every DIVERGENT_ON_PURPOSE entry is such a twin
+    that does not call it.
+    """
+    import inspect
+    import test_front_matter, test_style, test_taxonomy
+
+    here = sys.modules[__name__]
+    rules = {}
+    for alias, mod in (("_fm", test_front_matter), ("_st", test_style),
+                       ("_tx", test_taxonomy)):
+        for name, fn in inspect.getmembers(mod, inspect.isfunction):
+            if name.startswith("test_") and fn.__module__ == mod.__name__:
+                rules[name] = alias
+    twins = {n: fn for n, fn in inspect.getmembers(here, inspect.isfunction)
+             if n in rules and fn.__module__ == __name__}
+    assert twins, "No draft test shares a name with a recipe rule; the scan is broken."
+
+    divergent = {n for n, fn in twins.items()
+                 if f"{rules[n]}.{n}(" not in inspect.getsource(fn)}
+    undeclared = sorted(divergent - set(DIVERGENT_ON_PURPOSE))
+    stale = sorted(set(DIVERGENT_ON_PURPOSE) - divergent)
+    assert not undeclared, (
+        f"Draft test(s) share a recipe rule's name but do not call it: "
+        f"{undeclared}. Delegate, or say why in DIVERGENT_ON_PURPOSE."
+    )
+    assert not stale, (
+        f"DIVERGENT_ON_PURPOSE names {stale}, which no longer diverge (or no "
+        f"longer exist). Delete the entry."
+    )
+
 # --- front matter shape (test_front_matter.py, structural half only) --------
 
 @pytest.mark.parametrize("field", REQUIRED)
@@ -430,35 +463,6 @@ def test_group_names_omit_leading_article(draft):
     _fm.test_group_names_omit_leading_article(draft)
 
 
-# --- un-rewritten `QQ` text is not checked for house style (#426) --------------
-# conftest holds the rule and the shared predicates. `_is_qq` here is the
-# module-local one `test_metadata_time_format` uses.
-_QQ_LINE = re.compile(r"""^\s*             # indent
-                          (?:-\s*)?        # optional list dash
-                          (?:[a-z_]+:\s*)? # optional key, e.g. `step: `
-                          (?:['"])?        # optional opening quote
-                          QQ\b""", re.X)
-
-
-def _is_qq(value) -> bool:
-    """True if this scalar is un-rewritten source text."""
-    return isinstance(value, str) and value.lstrip().startswith("QQ")
-
-
-def _checkable_raw(draft) -> str:
-    """`draft.raw` with every un-rewritten `QQ` line blanked.
-
-    Blanked rather than dropped so the line count is preserved for failure
-    messages.
-    """
-    return "\n".join("" if _QQ_LINE.match(line) else line
-                     for line in draft.raw.split("\n"))
-
-
-def _checkable_prose(draft) -> list[tuple[str, str]]:
-    return [(loc, text) for loc, text in draft.prose if not _is_qq(text)]
-
-
 # --- house style (test_style.py) ---------------------------------------------
 
 @pytest.mark.parametrize("name,pattern,fix",
@@ -505,7 +509,7 @@ def test_metadata_time_format(draft):
         value = draft.fm.get(field)
         if not isinstance(value, str) or not value.strip():
             continue
-        if _is_qq(value) or value.strip() in ("None", "Until done"):
+        if is_qq(value) or value.strip() in ("None", "Until done"):
             continue
         bad_units = re.findall(r"(?<=[0-9])\s*(minutes?|hours?|h)\b", value)
         if bad_units:
@@ -545,6 +549,18 @@ def test_no_claude_markers_left(draft):
 
 def test_incidental_not_in_main_ingredients(draft):
     _tx.test_incidental_not_in_main_ingredients(draft)
+
+
+def test_tin_and_pan_fats_are_flagged_incidental(draft):
+    _tx.test_tin_and_pan_fats_are_flagged_incidental(draft)
+
+
+def test_no_real_line_carries_its_tin_and_pan_extra(draft):
+    _tx.test_no_real_line_carries_its_tin_and_pan_extra(draft)
+
+
+def test_deep_frying_oil_is_listed_without_an_amount(draft):
+    _tx.test_deep_frying_oil_is_listed_without_an_amount(draft)
 
 
 def test_internal_links_have_trailing_slash(draft):

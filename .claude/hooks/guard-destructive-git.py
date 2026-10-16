@@ -5,13 +5,13 @@ Refused while `git status --porcelain` is not empty in the repository the
 command is aimed at: `git checkout -- <paths>`, `git checkout .`,
 `git checkout <path>` where the argument names something that exists,
 `git reset --hard`, `git clean -f`, and `git restore` unless it is `--staged`
-without `--worktree`. Refused whenever `git stash list`, run in the hook's own
-directory, is not empty, clean tree or not: `git stash drop` and
+without `--worktree`. Refused whenever `git stash list` in that same
+repository is not empty, clean tree or not: `git stash drop` and
 `git stash clear`. DECISIONS §11.
 
 The repository is found by reading a `cd <path>` and then a `git -C <path>`
 out of the command, so a command aimed at a nested drafts repo is judged by
-that repo's tree, not the outer one's.
+that repo's tree and stash list, not the outer one's.
 
 Allowed on purpose:
 
@@ -105,12 +105,13 @@ HEREDOC = re.compile(
 STASH_DESTRUCTIVE = re.compile(_GIT + r"stash\s+(drop|clear)\b")
 
 
-def _stash_entries() -> list[str]:
-    """`git stash list` lines, or [] if there are none or this is not a repo."""
+def _stash_entries(directory: pathlib.Path) -> list[str]:
+    """`git stash list` lines in `directory`, or [] if there are none or it is
+    not a repo."""
     try:
         result = subprocess.run(
             ["git", "stash", "list"],
-            capture_output=True, text=True, timeout=15,
+            cwd=directory, capture_output=True, text=True, timeout=15,
         )
     except (OSError, subprocess.SubprocessError):
         return []
@@ -215,7 +216,7 @@ def main() -> int:
     # the stash list, not the working tree, so tree cleanliness says nothing.
     stash_label = _matched_stash(command)
     if stash_label:
-        entries = _stash_entries()
+        entries = _stash_entries(_repo_dir(command))
         if not entries:
             return 0        # nothing stashed, so nothing to lose
         shown = "\n  ".join(entries[:10])

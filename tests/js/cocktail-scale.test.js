@@ -469,9 +469,9 @@ test('the note goes away again on the way back down to ×1', () => {
   assert.strictEqual(p.batch.hidden, true, 'it is a state, not a ratchet');
 });
 
-test('production renders none of these elements, and nothing breaks', () => {
-  // The layout renders no batch note for a drink without dashes; the scaler
-  // must not need one.
+test('a page with no batch note element still scales', () => {
+  // The layout renders the batch note only for a drink with dashes; on every
+  // other drink page the element is absent, and the scaler must not need it.
   const p = page(AVIATION, { batch: false });
   assert.strictEqual(p.batch, null);
   p.type(p.input, '3');

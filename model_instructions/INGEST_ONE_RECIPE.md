@@ -226,7 +226,10 @@ prints is kept.
   the method meets them, and say in your list that you did.
 - **A fat or flour the source's own list prints only for the tin or the pan
   keeps its line and gains `incidental: true`**: "butter, for greasing", "oil,
-  for frying", "flour, for dusting".
+  for frying", "flour, for dusting". A real line with the use tacked on
+  ("175 g butter, softened, plus extra for the tin") is not flagged: write it
+  without the tail ("butter, softened"). Deep-frying oil is not flagged
+  either: write it with no amount, as "vegetable oil, for deep frying".
 
   ```yaml
   ingredient_groups:

@@ -75,6 +75,8 @@ argument and the rules each field is read by.
 - 2026-10-10 · §4 · #1356 · one source step is one pair, however many actions it holds.
 - 2026-10-10 · §4 · #1356 · the ingredient list is the source's own list; nothing joins it from the method.
 - 2026-10-10 · §4 · #1356 · a fat or flour the source lists only for the tin or the pan is kept and flagged incidental: true, at every ingest.
+- 2026-10-16 · §4 · #1356 · on a real fat or flour line, ", plus extra for the tin" and its kin are trimmed, at tidy.
+- 2026-10-16 · §4 · #1356 · deep-frying oil is listed, unquantified, as "<oil>, for deep frying", and is not incidental.
 - 2026-08-20 · §4 · #406 · "Adapted from" prefixes published work and only published work.
 - 2026-08-20 · §4 · #406 · a source with no date is a website; a publication is a print issue and always carries one.
 - 2026-08-20 · §4 · #406 · a source nobody has established is source: "QQ" with source_type: unknown, and on a published recipe it is meant to break the build.
@@ -524,7 +526,8 @@ argument and the rules each field is read by.
 - 2026-09-15 · §9.13 · #1086 · a printed drink page has its own palette, scoped to .cocktail inside @media print.
 - 2026-09-20 · §9.13 · #1088 · the scaler says nothing when it will not go lower.
 - 2026-09-04 · §9.13 · #545 · scaling a drink never moves its ratios: the multiple is snapped so every amount lands on 2.5 ml, and no amount is rounded.
-- 2026-09-10 · §9.13 · #927 · "If you liked this, how about…" scores shared moods plus shared ingredient generics, ties broken by title, and nothing else.
+- 2026-09-28 · §9.13 · #1090 · "If you liked this, how about…" on a drink ranks by shared moods, then shared ingredient generics, then title.
+- 2026-10-16 · §9.13 · #1183 · the fourth related drink is a renegade, taken a quarter of the way down the ranking.
 - 2026-09-11 · §9.13 · #955 · a divider separates the end of the recipe from "If you liked this…".
 - 2026-09-12 · §9.13 · #991 · the related cards ARE the index's cards; there is no variant.
 - 2026-08-30 · §9.13 · #452 · a mood is evocative, not a flat flavour descriptor.
@@ -733,7 +736,7 @@ argument and the rules each field is read by.
 - 2026-09-07 · §13 · #783 · the footer's columns sit under the sides of the main page container.
 - 2026-09-14 · §13 · #1005 · a recipe page and a drink page carry the same controls; the scaler and "if you liked this" are on both.
 - 2026-09-14 · §13 · #1005 · food scales by portions; drinks scale by whole recipes.
-- 2026-09-14 · §13 · #1005 · related recipes rank by shared tags plus shared main ingredients, star-and-mood first, ties broken by shared real ingredients, then larder staples, then A–Z.
+- 2026-09-28 · §13 · #1090 · related recipes rank by the same star ingredient, then shared mood tags, then shared other tags plus main ingredients, then shared real ingredients, larder staples, and A–Z.
 - 2026-09-14 · §13 · every action is in Courier capitals, on both sites.
 - 2026-09-15 · §13 · #1086 · below 600px the recipe's SERVES / PREP / COOK boxes stack.
 - 2026-09-15 · §13 · #1086 · below 400px a recipe title is 1.9rem at 1.1 line-height.

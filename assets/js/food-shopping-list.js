@@ -42,13 +42,16 @@
   /* Grams and millilitres are the only units totalled in; kilograms, litres
      and centilitres fold into them by definition, so `1½ l` and `500 ml` of
      stock are one row. Nothing else is converted. `displayUnit` re-expresses
-     a total of a thousand or more. */
+     a total of a thousand or more. food-scale.js folds with this same table. */
   var CANONICAL = {
     kg: { unit: 'g', factor: 1000 },
     l: { unit: 'ml', factor: 1000 },
     litre: { unit: 'ml', factor: 1000 },
     cl: { unit: 'ml', factor: 10 }
   };
+
+  // A size standing in for a noun nobody writes: "2 large" counts the item.
+  var SIZE_UNITS = { large: true, medium: true, small: true };
 
   var BIGGER = { g: { unit: 'kg', factor: 1000 }, ml: { unit: 'l', factor: 1000 } };
 
@@ -221,8 +224,6 @@
      _data/food/scaling.yml), because the last word of a name is often not
      the counted noun. Left as written otherwise, and where the name is a
      choice or a phrase. */
-  var SIZE_UNITS = { large: true, medium: true, small: true };
-
   function isPluralName(name) {
     var key = foldKey(name);
     return foldUnit(key) !== key;
@@ -447,6 +448,8 @@
   return {
     build: build,
     totalText: totalText,
-    amountNumber: amountNumber
+    amountNumber: amountNumber,
+    CANONICAL: CANONICAL,
+    SIZE_UNITS: SIZE_UNITS
   };
 });

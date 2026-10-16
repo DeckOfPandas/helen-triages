@@ -1,8 +1,10 @@
 #!/bin/bash
-# Updates both private drafts repos to the latest main. Stops immediately
-# on any git error rather than attempting to fix it -- if something's
-# wrong (uncommitted changes, a diverged history, network trouble), you
-# see the real git error and decide what to do, not a script guessing.
+# Helen's, run on the HOST (README.md, "General dev workflow"): updates both
+# private drafts repos to the latest main over her SSH `origin`. An agent never
+# runs it -- it checks out `main`, and SSH dies in the container; an agent
+# clones or fetches with scripts/git-clone-agent.sh / git-fetch-agent.sh.
+# Stops on any git error rather than attempting to fix it, so you see the real
+# error (uncommitted changes, a diverged history, network trouble) and decide.
 
 set -e
 

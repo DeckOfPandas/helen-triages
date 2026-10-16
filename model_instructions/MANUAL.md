@@ -615,9 +615,13 @@ takes `proofread` down with it.
   greasing butter, flour for dusting) that the Ingredients section skips and
   `main_ingredients` must not list (`test_incidental_not_in_main_ingredients`).
   Whether an oil is core is a judgement (unusual oil, stated smoke point,
-  finishing drizzle → core), so it is an explicit flag;
-  `.claude/commands/ingest.md` says which lines take it at ingest and that
-  nothing wider does. A flagged line may share its name with a real one: a
+  finishing drizzle → core), so it is an explicit flag. A fat or flour listed
+  only for the tin or the pan must carry it, a real line loses a ", plus
+  extra for the tin" tail, and deep-frying oil is listed unflagged with no
+  amount as "<oil>, for deep frying": the words are `_data/food/incidentals.yml`, read by
+  `incidental_verdict` in `tests/test_taxonomy.py`, which `/tidy-drafts`'s
+  `incidentals` rule applies. Nothing wider takes the flag unasked
+  (`.claude/commands/ingest.md`). A flagged line may share its name with a real one: a
   cheesecake that greases with butter and bakes with it is right to list
   butter. The test objects only where nothing but an incidental line accounts
   for a main ingredient.
@@ -1648,7 +1652,8 @@ other tree) and a copy goes stale silently; clone.
 
 **A green `pytest` in a worktree without the clones is not evidence about the
 drafts or the per-draft checks.** Most of what is missing is parametrised per
-file, so it is never created rather than skipped. `tests/conftest.py` prints
+file, so its per-file cases are never created: each such test shows as one
+bare skip, "got empty parameter set". `tests/conftest.py` prints
 one line in the report header and the same fact in the terminal summary,
 naming each absent clone and the command that fetches it; it reports and never
 fails, and is silent when both clones are present.
@@ -3286,13 +3291,18 @@ hidden until `assets/js/cocktail-scale.js` reveals it. The word is final.
 
 Four related cocktails after the footer.
 
-- **The score is shared moods plus shared ingredient generics, ties broken by
-  title, and nothing else.** No `meta.ship` weighting, no per-field weight.
-  Only a candidate scoring above zero is offered.
+- **The ranking is more shared moods, then more shared ingredient generics,
+  then title.** No `meta.ship` weighting. Only a candidate sharing a mood or a
+  generic is offered.
+- **The first three cards are the top three; the fourth is the candidate a
+  quarter of the way down the ranking** (never above fourth), so a cluster of
+  alike drinks, the tiki ones above all, cannot fill the row with each other.
 - It is Liquid in the layout, not a plugin. Liquid cannot sort by a computed
-  number, so each candidate becomes a `rank~title~url` string with
-  `rank = 999 - score`, sorted as text: highest score first, A to Z within a
-  score.
+  number, so each candidate becomes a `mood~generics~title~url` string, each
+  count written as `99 - n`, sorted as text.
+- `test_the_related_picks_are_the_scripts_picks_in_the_scripts_order` holds
+  every built page, food and drink, to its script's picks in its script's
+  order.
 - **The collection is the published set.** `publish_gate.rb` removes a
   held-back cocktail from `site.cocktail_recipes` before the layout runs, so no
   gate check is needed here. Drafts are a different collection and are never
@@ -3316,7 +3326,10 @@ wraps two and two.
 
 The section is hidden in `make it` and in print. The heading text is final.
 Food's row of the same name is its own markup and scoring in
-`_layouts/recipe.html`, with `scripts/related_recipes.py` as its mirror.
+`_layouts/recipe.html`, with `scripts/related_recipes.py` as its mirror: three
+recipes, ranked by the same star ingredient, then more shared mood tags, then
+more shared other tags plus main ingredients, then shared non-larder
+ingredients, larder staples, and title.
 
 ### 9.14 `heights_mm` sizes the canvas
 
@@ -4340,10 +4353,9 @@ compiled CSS: food's `.active` and cocktails' `.is-on`.
 | `$color-name-search-root` | `$color-blazing-banana` | I KNOW WHAT I WANT |
 
 Each root drives its section's rule, buttons, active states, clear link and
-row badges. Each has an `-active` tone (darkened for a button label) and a
-`-bright` tone (the smallest darkening that clears contrast, for the search
-dropdown's group headings); how far to darken is a property of the hue, so
-a hue that moves section takes its step with it.
+row badges. Each has an `-active` tone (darkened for a button label); how
+far to darken is a property of the hue, so a hue that moves section takes
+its step with it.
 `scripts/palette_measure.py` measures the contrast.
 
 LEAVE OUT takes no hue: `$color-exclude-active` and `$color-exclude-hover`
@@ -4808,7 +4820,8 @@ on purpose: they have no timings.
 **Trap:** `scripts/build_cooking_methods.py` and
 `scripts/build_cooking_methods_prose.py` are migration tools pinned to an
 old commit. **Do not re-run them**: the data has been hand-edited since and
-a re-run destroys it.
+a re-run destroys it. Each refuses, run or imported, unless the data file
+still opens with its `# GENERATED` header, which it no longer does.
 
 ### Recipe wiring
 

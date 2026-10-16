@@ -29,18 +29,9 @@
   var splitParenthetical = shoppingList.splitParenthetical;
   var unitLabel = shoppingList.unitLabel;
   var totalText = foodShoppingList.totalText;
-
-  // A size standing in for a noun nobody writes: "2 large" counts the item.
-  var SIZE_UNITS = { large: true, medium: true, small: true };
-
-  /* The same fold food-shopping-list.js applies on the way in; that file
-     keeps its copy private. */
-  var CANONICAL = {
-    kg: { unit: 'g', factor: 1000 },
-    l: { unit: 'ml', factor: 1000 },
-    litre: { unit: 'ml', factor: 1000 },
-    cl: { unit: 'ml', factor: 10 }
-  };
+  // The same unit fold and size words the shopping list applies.
+  var CANONICAL = foodShoppingList.CANONICAL;
+  var SIZE_UNITS = foodShoppingList.SIZE_UNITS;
 
   /* A measure taken by hand or eye scales to the nearest half, never less
      than a half (#1125): 1 pinch ×3 is 3, ×1.5 is 1½, ×2/3 is ½. Which

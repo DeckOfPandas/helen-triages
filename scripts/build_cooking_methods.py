@@ -1,10 +1,11 @@
 """Emit _data/food/cooking_methods.yml from cooking-methods.html's own tables.
 
-DO NOT RUN THIS. It is a spent migration tool, kept as the record of how the
-data file was made. It has no flags and no `__main__` guard: running or
-importing it OVERWRITES `_data/food/cooking_methods.yml`, which has been
-edited by hand since and is the source of truth (DECISIONS §14, MANUAL §14).
-Edit the data file directly.
+A spent migration tool, kept as the record of how the data file was made.
+`_data/food/cooking_methods.yml` has been edited by hand since and is the
+source of truth (DECISIONS §14, MANUAL §14): edit it directly. Run or
+imported, this refuses before doing anything unless that file still opens
+with the `# GENERATED` header this script wrote, which a hand-edited file
+does not.
 
 It reads `food/reference/cooking-methods.html` as it stood at the commit
 PRE_MIGRATION, through `git show`, and expects the repository root as the
@@ -24,9 +25,13 @@ What it does to a row on the way through:
 import pathlib
 import re
 import subprocess
+import sys
 
 SRC = pathlib.Path("food/reference/cooking-methods.html")
 OUT = pathlib.Path("_data/food/cooking_methods.yml")
+if not OUT.read_text(encoding="utf-8").startswith("# GENERATED"):
+    sys.exit(f"refused: {OUT} has been edited by hand since this migration "
+             f"ran, and a run would overwrite it. Edit it directly (DECISIONS §14).")
 # The source is pinned to git, not read from the working tree: the page now
 # renders from this script's output, so the working copy holds no tables and
 # would yield an empty data file. A re-run reproduces the migration and
@@ -407,6 +412,5 @@ OUT.write_text("\n".join(lines), encoding="utf-8")
 print(f"wrote {OUT} — {sum(counts.values())} methods")
 print(f"  sentences moved to source_note: {len(source_sentences)}")
 print(f"  correction-history sentences dropped: {len(dropped_sentences)}")
-_have = sum(1 for v in [None] for _ in [0])
 for k, v in sorted(counts.items(), key=lambda kv: -kv[1]):
     print(f"  {k:<12} {v}")

@@ -598,24 +598,26 @@ layout: default
     </div>
   {% endif %}
 
-  {% comment %} IF YOU LIKED THIS, HOW ABOUT…: score = shared moods + shared
-     ingredient generics, ties broken by title; scripts/related_drinks.py is the
-     same scoring in Python. `site.cocktail_recipes` is already the published
-     set (publish_gate.rb), and drafts are deliberately never concatenated in,
-     on any config (#235). Liquid cannot sort by a computed number, so each
-     candidate is a `rank~title~url` string with rank = 999 - score, sorted as
-     text. MANUAL §9.13. {% endcomment %}
+  {% comment %} IF YOU LIKED THIS, HOW ABOUT…: ranked by more shared moods,
+     then more shared ingredient generics, then title (#1090). The first three
+     cards are the top three; the fourth is the candidate a quarter of the way
+     down, so a cluster of alike drinks cannot fill the row (#1183).
+     scripts/related_drinks.py is the same rule in Python and a test holds the
+     two equal. `site.cocktail_recipes` is already the published set
+     (publish_gate.rb); drafts are never concatenated in (#235). Each candidate
+     is a `mood~generics~title~url` string of `99 - n`s, sorted as text. MANUAL §9.13. {% endcomment %}
   {% capture my_generics %}{% for ing in page.ingredients %}{% for g in ing.generic %}|{{ g }}|{% endfor %}{% endfor %}{% endcapture %}
   {% assign related_keys = "" %}
   {% for other in site.cocktail_recipes %}
     {% unless other.url == page.url %}
+      {% assign moods = 0 %}
       {% assign score = 0 %}
       {% comment %} `contains` on an array is membership, not a substring probe,
          so a mood needs no delimiters round it. A generic does: it is compared
          against one flat string of every generic on this page, and `|lime|`
          must not match inside `|lime juice|`. {% endcomment %}
       {% for m in page.mood %}
-        {% if other.mood contains m %}{% assign score = score | plus: 1 %}{% endif %}
+        {% if other.mood contains m %}{% assign moods = moods | plus: 1 %}{% endif %}
       {% endfor %}
       {% for ing in other.ingredients %}
         {% for g in ing.generic %}
@@ -623,13 +625,18 @@ layout: default
           {% if my_generics contains token %}{% assign score = score | plus: 1 %}{% endif %}
         {% endfor %}
       {% endfor %}
-      {% if score > 0 %}
-        {% assign rank = 999 | minus: score %}
-        {% capture related_keys %}{{ related_keys }}{{ rank }}~{{ other.title }}~{{ other.url }};{% endcapture %}
+      {% if moods > 0 or score > 0 %}
+        {% assign mrank = 99 | minus: moods %}
+        {% assign rank = 99 | minus: score %}
+        {% capture related_keys %}{{ related_keys }}{{ mrank }}~{{ rank }}~{{ other.title }}~{{ other.url }};{% endcapture %}
       {% endif %}
     {% endunless %}
   {% endfor %}
-  {% assign related_sorted = related_keys | split: ";" | sort_natural %}
+  {% assign related_ranked = related_keys | split: ";" | sort_natural %}
+  {% assign renegade_at = related_ranked.size | times: 25 | divided_by: 100 %}
+  {% if renegade_at < 3 %}{% assign renegade_at = 3 %}{% endif %}
+  {% assign renegade = related_ranked | slice: renegade_at, 1 %}
+  {% assign related_sorted = related_ranked | slice: 0, 3 | concat: renegade %}
 
   {% if related_sorted.size > 0 %}
     {% comment %} The heading is final (#1088); it wraps on a phone, so its span
@@ -645,7 +652,7 @@ layout: default
     <ul class="cocktail-related drink-cards">
       {% for entry in related_sorted limit: 4 %}
         {% assign parts = entry | split: "~" %}
-        {% assign rel = site.cocktail_recipes | where: "url", parts[2] | first %}
+        {% assign rel = site.cocktail_recipes | where: "url", parts[3] | first %}
         {% comment %} The first glass with artwork, the same "" accumulator as the
            head, drawn at the INDEX card's compression (0.5–1.0, `display_scale`).
            An empty span when there is none, so the tape starts at the same x. {% endcomment %}

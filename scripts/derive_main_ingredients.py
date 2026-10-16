@@ -116,8 +116,22 @@ class Tables:
             for k, aisle in pairs]
         self.never_aisle = {fold(n) for n in (aisles.get("never") or [])}
 
+        # A category star (`poultry`) names no item, so it also matches the
+        # title words taxonomy.yml's tag_hints give it (`chicken`, `turkey`).
         tax = _yaml(DATA / "taxonomy.yml")
-        self.stars = set(tax.get("star_ingredients") or [])
+        hints = (tax.get("tag_hints") or {}).get("star_ingredient") or {}
+        self.star_words = {fold(s): {fold(s)} | {fold(w) for w in (h or {}).get("title") or []}
+                           for s, h in hints.items()}
+
+    def is_star(self, key: str, stars) -> bool:
+        """`key` contains, or is contained in, a star or one of its words. A
+        stock is never the star: `beef stock` is not the beef."""
+        if re.search(r"\bstock\b", key):
+            return False
+        words = set()
+        for s in stars:
+            words |= self.star_words.get(fold(s), {fold(s)})
+        return any(w in key or key in w for w in words)
 
     def aisle(self, name: str) -> int:
         """The aisle's rank in Helen's walk round the shop; last if unmatched."""
@@ -178,7 +192,8 @@ def derive(fm: dict, t: Tables) -> list[str]:
     The sort is Helen's four signals in her own order:
 
       1. the star first: an item whose name contains a `star_ingredient`
-         value, or is contained in one;
+         value or one of its title words in taxonomy.yml, or is contained in
+         one;
       2. how much of a game over it would be: a pantry staple ranks lower,
          because you already have it. It never excludes;
       3. proportion, biggest first;
@@ -197,7 +212,7 @@ def derive(fm: dict, t: Tables) -> list[str]:
             if not name or not key or key in seen or NEVER.match(key):
                 continue
             seen.add(key)
-            is_star = any(fold(s) in key or key in fold(s) for s in stars)
+            is_star = t.is_star(key, stars)
             rows.append((
                 0 if is_star else 1,
                 1 if key in t.pantry else 0,
@@ -236,7 +251,7 @@ def reorder(fm: dict, t: Tables) -> list[str]:
         item = ranked.get(key) or next(
             (v for k, v in ranked.items() if key and key in k), None)
         amount = (item or {}).get("amount") or ""
-        is_star = any(fold(s) in key or key in fold(s) for s in stars)
+        is_star = t.is_star(key, stars)
         rows.append((
             0 if is_star else 1,
             1 if key in t.pantry else 0,

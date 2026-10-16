@@ -8,9 +8,10 @@ what is proved is that the hook agrees with git. The nested-repository case
 the outer repository gives the wrong answer silently.
 
 `cwd` is always a throwaway repo, never this worktree. `guard-destructive-git.py`
-reads `git stash list` in the process's own directory, and the stash stack is
-shared between the primary checkout and every worktree, so a stash test run
-here would pass or fail on another session's work.
+reads `git stash list` in the repository the command is aimed at, and the
+stash stack is shared between the primary checkout and every worktree, so a
+stash test run here would pass or fail on another session's work. `tmp_path`
+is conftest's, under this repo's `tmp/`, with git's discovery stopped there.
 
 Not `git worktree add`: an interrupted test would leave an entry only
 `git worktree prune` clears, which is Helen's.
@@ -353,6 +354,41 @@ def test_destructive_guard_stops_a_stash_drop_whatever_the_tree_looks_like(tmp_p
         assert "probe-stash" in reason, (
             f"the refusal does not name the stash it would destroy:\n{reason}"
         )
+
+
+def test_destructive_guard_asks_the_nested_repo_for_its_stashes(tmp_path):
+    """#1384. Outer repo with nothing stashed, nested repo with a stash:
+    `git -C _food_drafts stash drop` is judged by the nested stash list. And
+    the other way round, the outer stash does not block a drop aimed at a
+    nested repo that has none."""
+    outer = _repo(tmp_path / "outer")
+    nested = _repo(outer / "_food_drafts")
+    _dirty(nested)
+    stashed = _git(nested, *IDENTITY, "stash", "push", "-u", "-m", "nested-stash")
+    if stashed.returncode != 0:
+        pytest.skip(f"could not stash in a probe repo: {stashed.stderr.strip()}")
+
+    reason = _decision("guard-destructive-git.py",
+                       "git -C _food_drafts stash drop", outer)
+    assert reason is not None and "nested-stash" in reason, (
+        f"a drop aimed at the nested repo's stash was judged by the outer "
+        f"repo's empty list:\n{reason}")
+
+    other = _repo(outer / "_cocktail_drafts")
+    assert not _git(other, "stash", "list").stdout.strip()
+    assert _decision("guard-destructive-git.py",
+                     "git -C _cocktail_drafts stash drop", outer) is None
+
+
+def test_tmp_path_is_this_repos_and_git_cannot_climb_out_of_it(tmp_path):
+    """conftest's `tmp_path`: under this repo's tmp/, never the system /tmp,
+    and git run inside it finds no repository above it."""
+    root = HOOKS.parents[1]
+    assert (root / "tmp") in tmp_path.parents, tmp_path
+    probe = _git(tmp_path, "rev-parse", "--show-toplevel")
+    assert probe.returncode != 0, (
+        f"git found {probe.stdout.strip()} from inside tmp_path, so a "
+        "'no repository here' test would be judged by this worktree")
 
 
 def test_destructive_guard_allows_a_stash_drop_when_nothing_is_stashed(tmp_path):

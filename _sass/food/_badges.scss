@@ -68,17 +68,6 @@
     color: lighten($color-clear-text, 12%);
   }
 
-  // No template emits the next two classes (#562).
-  &-meta-rewrite {
-    background-color: rgba($color-text, 0.05);
-    color: lighten($color-clear-text, 12%);
-  }
-
-  &-meta-proofread {
-    background-color: rgba($color-text, 0.05);
-    color: lighten($color-clear-text, 12%);
-  }
-
   // Tape shape, no clip-path and no background: the SVG is the fill.
   // .tag-shape takes its own colour, separate from the text colour, so the
   // word stays readable on top of the shape. These three are <a> elements

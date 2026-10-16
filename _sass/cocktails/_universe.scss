@@ -113,8 +113,6 @@ $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
   justify-content: center;
   align-self: center;
 
-  &::after { content: none; }
-
   svg {
     height: $universe-glass-height;
     width: auto;

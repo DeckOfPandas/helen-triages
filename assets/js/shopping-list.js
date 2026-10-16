@@ -486,7 +486,6 @@
           bottleKeys: {},
           bottleNames: [],
           bottleNameKeys: {},
-          bare: 0,
           units: {},
           unitOrder: [],
           /* A top's declared range rides beside the fixed `ml` total, not
@@ -519,8 +518,6 @@
             group.bottleNames.push(name);
           }
         });
-      } else {
-        group.bare += 1;
       }
 
       /* An entry's own `glasses` wins; `options.multiplier` is the fallback

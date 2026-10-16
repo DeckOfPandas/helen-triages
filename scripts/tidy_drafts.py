@@ -14,8 +14,8 @@ of its `fix_*` function.
     python3 scripts/tidy_drafts.py --drafts-dir <copy> --site food
 
 `--only` takes a comma-separated subset of RULE_NAMES: `notes`, `quoting`,
-`dashes`, `typography`, `units` and `accents` run on both collections, `meta`
-and `size` on food alone, `titles` and `order` on cocktails alone.
+`dashes`, `typography`, `units` and `accents` run on both collections, `meta`,
+`size` and `incidentals` on food alone, `titles` and `order` on cocktails alone.
 
 It reads every `.md` with front matter under the two drafts folders (a file
 without front matter, such as a README, is named and skipped),
@@ -45,8 +45,9 @@ On both collections:
 
 On food alone: `main_ingredients` and `tags` flow quoting, the quoting of a
 group's `- name:`, the #429 `meta:` block (retired keys dropped, flags in
-`META_ORDER`), and the #577 size word (`2` / `large onions` -> `2 large` /
-`onions`).
+`META_ORDER`), the #577 size word (`2` / `large onions` -> `2 large` /
+`onions`), and the #1356 tin-and-pan incidentals ("butter, for greasing" gains
+`incidental: true`; ", plus extra for the tin" is trimmed off a real line).
 
 On cocktails alone: Title Case for `title` (#1089: capitals only, nothing is
 lowered, a qualifier in brackets is left as written) and top-level keys in
@@ -80,7 +81,9 @@ text, an ingredient's `note`) and fixes there only what
   - a `QQ` line, by the suite's predicate (`conftest.checkable_text`), which
     sees a marker behind a key (`tagline: "QQ ..."`). See `drink_editable`.
   - `suggestion`, `source` or `source_url`: somebody else's words
-    (`test_cocktails.VERBATIM_KEYS`), which the drinks suite blanks too.
+    (`test_cocktails.VERBATIM_KEYS`), which the drinks suite blanks too. The
+    one exception is quoting a bare `source:` or `source_url:`, which changes
+    no word and which `test_drink_scalar_fields_are_quoted` requires.
   - `glass`, `garnish`, `mood`, `generic` or `character`: closed vocabularies
     declared in `_data/cocktails/`. A dash or an accent written into one is a
     change to the vocabulary, which is a question for `_data/`.
@@ -136,6 +139,8 @@ from test_cocktails import (  # noqa: E402
 )
 # The size-word pattern is the recipe rule's own (#149, #577).
 from test_style import _LEADING_SIZE_WORD  # noqa: E402
+# The tin-and-pan incidentals predicate (#1356) and its word list in data.
+from test_taxonomy import incidental_verdict  # noqa: E402
 
 FLOW_FIELDS = ["main_ingredients", "tags"]
 
@@ -253,8 +258,17 @@ def drink_editable(text):
     return editable
 
 
-def only_where_editable(fixer):
-    """Wrap a line-wise fixer so it sees, and answers for, the editable lines.
+def not_qq(text):
+    """One bool per line: not a `QQ` line, by the suite's predicate. Quoting a
+    verbatim value (`source:`) changes none of its words, so this is the mask
+    for that one rule."""
+    return [not (raw and not checked) for raw, checked in
+            zip(text.split("\n"), checkable_text(text).split("\n"))]
+
+
+def only_where_editable(fixer, mask=drink_editable):
+    """Wrap a line-wise fixer so it sees, and answers for, the lines `mask`
+    allows (by default `drink_editable`'s).
 
     The rest are blanked, not dropped, so a line's index survives; the fixer's
     answer is taken where the line was editable and the original elsewhere.
@@ -263,7 +277,7 @@ def only_where_editable(fixer):
     so that raises.
     """
     def run(text, path):
-        editable = drink_editable(text)
+        editable = mask(text)
         lines = text.split("\n")
         masked = "\n".join(l if ok else "" for l, ok in zip(lines, editable))
         out, notes = fixer(masked, path)
@@ -723,6 +737,83 @@ def fix_size_words(text, path):
     return open_ + "\n".join(lines) + close + body, changed
 
 
+ENTRY_KEY = re.compile(r"^(?P<lead>\s*(?:-\s+)?)(?P<key>[a-z_]+):")
+
+
+def fix_incidentals(text, path):
+    """Tin-and-pan fats and flour (#1356), by `incidental_verdict`:
+
+      - "butter, for greasing" gains `incidental: true` as the entry's last
+        key, at its keys' indentation;
+      - "175 g butter, softened, plus extra for the tin" loses its ", plus ..."
+        tail, keeping the item's quote style;
+      - deep-frying oil loses its amount and reads "<oil>, for deep frying".
+
+    The flag is added to a `QQ` line too, since it changes none of the source's
+    words; a `QQ` line's text is never trimmed. An item that cannot be
+    rewrapped safely is SKIPPED in the report.
+    """
+    parts = split_front_matter(text)
+    if not parts:
+        return text, []
+    open_, fm, close, body = parts
+    lines = fm.split("\n")
+    changed = []
+    inserts, drops = [], []
+    for item_i, amount_i in _ingredient_pairs(lines):
+        item_m = KEYED_LINE.match(lines[item_i])
+        col = len(item_m.group("lead"))
+        start = item_i
+        while start > 0 and not LIST_ENTRY.match(lines[start]):
+            start -= 1
+        indent = len(lines[start]) - len(lines[start].lstrip())
+        end, keys = start, set()
+        for j in range(start, len(lines)):
+            probe = lines[j]
+            if j > start and probe.strip() and len(probe) - len(probe.lstrip()) <= indent:
+                break
+            keyed = ENTRY_KEY.match(probe)
+            if keyed and len(keyed.group("lead")) == col:
+                keys.add(keyed.group("key"))
+            if probe.strip():
+                end = j
+        item = _unwrap(item_m.group("value"))
+        if item is None:
+            continue
+        verdict, trimmed = incidental_verdict(item[0])
+        if verdict == "flag" and "incidental" not in keys:
+            inserts.append((end, " " * col + "incidental: true"))
+            changed.append(f"flagged incidental: {item[0][:60]}")
+        elif verdict == "trim" and not is_qq(lines[item_i]):
+            lines[item_i] = _rebuild(item_m, f"{item[1]}{trimmed}{item[1]}")
+            changed.append(f"trimmed: {item[0][:70]} -> {trimmed[:50]}")
+        elif verdict == "deep":
+            if not is_qq(lines[item_i]) and item[0] != trimmed:
+                quote = item[1] or '"'
+                lines[item_i] = _rebuild(item_m, f"{quote}{trimmed}{quote}")
+                changed.append(f"deep frying: {item[0][:60]} -> {trimmed[:60]}")
+            if amount_i is not None and not is_qq(lines[amount_i]):
+                amount_m = KEYED_LINE.match(lines[amount_i])
+                if amount_m.group("lead").strip() == "-":
+                    # The amount holds the entry's dash: the item takes it.
+                    lines[amount_i] = amount_m.group("lead") + lines[item_i].lstrip()
+                    drops.append(item_i)
+                else:
+                    drops.append(amount_i)
+                changed.append(f"deep frying, amount dropped: "
+                               f"{amount_m.group('value')[:30]} / {trimmed[:50]}")
+    # Bottom up, so no edit moves a line another edit has yet to reach.
+    edits = [(end + 1, line) for end, line in inserts] + [(i, None) for i in drops]
+    for at, line in sorted(edits, key=lambda e: e[0], reverse=True):
+        if line is None:
+            del lines[at]
+        else:
+            lines.insert(at, line)
+    if not changed:
+        return text, changed
+    return open_ + "\n".join(lines) + close + body, changed
+
+
 def report_size_words_with_no_count(path, text):
     """A size word on an item with no `amount:` to carry it. Surfaced, never moved.
 
@@ -928,6 +1019,7 @@ FOOD_FIXERS = [
     ("accents", fix_accents),
     ("meta", fix_meta_block),
     ("size", fix_size_words),
+    ("incidentals", fix_incidentals),
 ]
 
 # Two tables, not one with a site test inside each fixer. A drink has no
@@ -942,6 +1034,10 @@ DRINK_FIXERS = [
     ("notes", fix_notes_slot),
     ("quoting", only_where_editable(
         partial(fix_scalar_quoting, fields=DRINK_SCALAR_FIELDS))),
+    # `source` and `source_url` are verbatim, so the mask above blanks them;
+    # quotes change no word, so they get their own pass that spares only QQ.
+    ("quoting", only_where_editable(
+        partial(fix_scalar_quoting, fields=["source", "source_url"]), mask=not_qq)),
     ("dashes", only_where_editable(fix_en_dashes)),
     ("typography", only_where_editable(fix_typography)),
     ("units", only_where_editable(fix_unit_spacing)),
@@ -1156,11 +1252,12 @@ def main(argv=None):
     print("\n  DRINKS: everything that is not Helen's own prose. An `amount`, "
           "a `method`\n  step, a `glass`/`garnish`/`mood`/`generic`/"
           "`character` (closed vocabularies\n  declared in _data/cocktails/), "
-          "an `item` or a `suggestion` (somebody else's\n  words), and every "
-          "`QQ` line. A dash or an accent inside one of those is a\n  question "
-          "for the vocabulary or for the source, not a formatting fix -- see "
-          "the\n  module docstring, and the reported-never-changed section "
-          "above for the ones\n  the drinks suite will still fail on.")
+          "a `suggestion` or a `source` (somebody else's\n  words, though a bare "
+          "`source:` is quoted), and every `QQ` line. A dash or an\n  accent "
+          "inside one of those is a question for the vocabulary or for the "
+          "source,\n  not a formatting fix -- see the module docstring, and the "
+          "reported-never-changed\n  section above for the ones the drinks "
+          "suite will still fail on.")
     if not args.apply:
         print("\nNothing was written. Re-run with --apply to write the fixes.")
 

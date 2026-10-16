@@ -39,12 +39,6 @@ $ref-col-card:    minmax(6rem, 9rem);
   line-height: $line-height-body;
 }
 
-.ref-intro,
-.ref-note {
-  color: $color-clear-text;
-  max-width: 34rem;
-}
-
 // The body of a prose page. In ink, and capped at 34rem: an unclassed <p>
 // runs the full width of the window, which is a line you lose your place in.
 .ref-prose {

@@ -11,8 +11,9 @@ from __future__ import annotations
 import re
 
 import pytest
+import yaml
 
-from conftest import ALL_RECIPES, where
+from conftest import ALL_RECIPES, ROOT, is_qq, where
 
 pytestmark = pytest.mark.food
 
@@ -344,6 +345,126 @@ def test_incidental_not_in_main_ingredients(recipe):
         f"fluid shouldn't show up as a recipe-row pill or an ingredient-"
         f"search hit -- remove it from main_ingredients, or drop the "
         f"incidental flag if it's actually core."
+    )
+
+
+# --- tin-and-pan fats and flour are incidental (#1356) ------------------------
+# The words are data, `_data/food/incidentals.yml`; `incidental_verdict` is the
+# one reading of them, and scripts/tidy_drafts.py imports it to apply them.
+
+_INCIDENTALS = yaml.safe_load(
+    (ROOT / "_data" / "food" / "incidentals.yml").read_text(encoding="utf-8"))
+
+
+def _any_word(words):
+    return re.compile(r"\b(?:" + "|".join(map(re.escape, words)) + r")\b", re.I)
+
+
+_FAT_OR_FLOUR = _any_word(_INCIDENTALS["fats_and_flours"])
+_USE = _any_word(_INCIDENTALS["uses"])
+_NOT_INCIDENTAL = _any_word(_INCIDENTALS["not_incidental"])
+_BRACKETED = re.compile(r"\([^)]*\)")
+_DEEP_FRY = re.compile(r"\bdeep[- ]?fr(?:y|ying|ied)\b", re.I)
+DEEP_FRYING = ", for deep frying"
+_PLUS_TAIL = re.compile(r",?\s+plus\b[^,]*$", re.I)
+_USE_CLAUSE = re.compile(r"(?:,\s*|\s+)(?:extra,\s*)?(?=(?:for|to)\b)", re.I)
+
+
+def incidental_verdict(text):
+    """("flag", None), ("trim", the item without its tail), ("deep", the item
+    as it should read), or (None, None).
+
+    "flag": the line names a fat or flour and is only for the tin or the pan
+    ("butter, for greasing"). "trim": a real line with that use tacked on after
+    "plus" ("175 g butter, softened, plus extra for the tin"). "deep": a fat
+    for deep frying, which stays on the list with no amount, since the pan
+    decides the volume, and reads "vegetable oil, for deep frying". A bracket
+    is not read: "olive oil (a little for frying, the rest for the dressing)"
+    is one real line. A source line (`QQ`) is judged like any other; whether
+    it may be edited is the caller's question.
+    """
+    text = str(text or "")
+    plain = _BRACKETED.sub("", text)
+    deep = _USE_CLAUSE.search(text)
+    if (deep and "plus" not in text.lower()
+            and _DEEP_FRY.search(text[deep.end():])
+            and _FAT_OR_FLOUR.search(text[:deep.start()])):
+        return "deep", text[:deep.start()] + DEEP_FRYING
+    plus = _PLUS_TAIL.search(plain)
+    if plus:
+        use = plus.group(0)
+        if (_USE.search(use) and not _NOT_INCIDENTAL.search(use)
+                and _FAT_OR_FLOUR.search(plain.split(",")[0])):
+            cut = _PLUS_TAIL.search(text)
+            return ("trim", text[:cut.start()]) if cut else (None, None)
+        return None, None
+    clause = _USE_CLAUSE.search(plain)
+    if not clause:
+        return None, None
+    use = plain[clause.end():]
+    if (_USE.search(use) and not _NOT_INCIDENTAL.search(use)
+            and _FAT_OR_FLOUR.search(plain[:clause.start()])):
+        return "flag", None
+    return None, None
+
+
+def _items(recipe):
+    for group in recipe.fm.get("ingredient_groups") or []:
+        for item in (group or {}).get("items") or []:
+            if isinstance(item, dict):
+                yield item
+
+
+def test_tin_and_pan_fats_are_flagged_incidental(recipe):
+    """#1356, DECISIONS §4: "butter, for greasing" carries `incidental: true`,
+    which hides it from the ingredients and the shopping list and keeps it
+    visible to the exclusion filter. `/tidy-drafts` adds the flag."""
+    unflagged = [item.get("item") for item in _items(recipe)
+                 if incidental_verdict(item.get("item"))[0] == "flag"
+                 and item.get("incidental") is not True]
+    assert not unflagged, (
+        f"{where(recipe)} lists a fat or flour only for the tin or the pan "
+        f"without `incidental: true`: {unflagged}. Add the flag (`python3 "
+        f"scripts/tidy_drafts.py --only incidentals --apply` does it on a "
+        f"draft), or, if the line is not a tin-and-pan use, narrow the words in "
+        f"_data/food/incidentals.yml."
+    )
+
+
+def test_no_real_line_carries_its_tin_and_pan_extra(recipe):
+    """#1356: ", plus extra for the tin" on a fat or flour is trimmed; the cook
+    greases a tin without being told. A source line (`QQ`) is left for Helen's
+    rewrite, so it is not held here."""
+    tails = [item.get("item") for item in _items(recipe)
+             if not is_qq(item.get("item"))
+             and incidental_verdict(item.get("item"))[0] == "trim"]
+    assert not tails, (
+        f"{where(recipe)} still carries a tin-and-pan extra on a real line: "
+        f"{tails}. Trim it (`python3 scripts/tidy_drafts.py --only incidentals "
+        f"--apply` does it on a draft)."
+    )
+
+
+def test_deep_frying_oil_is_listed_without_an_amount(recipe):
+    """#1356, DECISIONS §4: deep-frying oil stays on the list, unquantified,
+    as "<oil>, for deep frying": the pan decides how much. A `QQ` line keeps
+    its words for Helen's rewrite, but not its amount."""
+    wrong = []
+    for item in _items(recipe):
+        verdict, should = incidental_verdict(item.get("item"))
+        if verdict != "deep":
+            continue
+        if item.get("amount") not in (None, ""):
+            wrong.append(f"{item.get('item')!r} has amount {item.get('amount')!r}")
+        elif not is_qq(item.get("item")) and item.get("item") != should:
+            wrong.append(f"{item.get('item')!r} should read {should!r}")
+        elif item.get("incidental"):
+            wrong.append(f"{item.get('item')!r} is flagged incidental, which hides it")
+    assert not wrong, (
+        f"{where(recipe)}: deep-frying oil is listed with no amount, as "
+        f"\"<oil>{DEEP_FRYING}\", and not incidental: {wrong}. "
+        f"`python3 scripts/tidy_drafts.py --only incidentals --apply` fixes "
+        f"the first two on a draft."
     )
 
 

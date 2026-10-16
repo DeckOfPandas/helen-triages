@@ -24,6 +24,22 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 
 
+# --- `tmp_path`, under this repo's own tmp/ -----------------------------------
+# Overrides pytest's fixture of the same name for the whole suite: nothing here
+# may write under the system /tmp (CLAUDE.md). GIT_CEILING_DIRECTORIES stops git
+# climbing from inside it into this worktree's own repository, so a test that
+# wants "no repository here" still gets none.
+@pytest.fixture
+def tmp_path(request, monkeypatch):
+    name = re.sub(r"[^A-Za-z0-9_.-]", "_", request.node.name)[:60]
+    path = ROOT / "tmp" / "pytest" / f"{name}-{os.getpid()}-{id(request)}"
+    shutil.rmtree(path, ignore_errors=True)
+    path.mkdir(parents=True)
+    monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(path.parent))
+    yield path
+    shutil.rmtree(path, ignore_errors=True)
+
+
 # --- the two session builds ---------------------------------------------------
 # Defined here, not in a test module: a session fixture imported into a second
 # module is a second definition with its own cache, so the site would build
@@ -274,10 +290,10 @@ def pytest_generate_tests(metafunc):
 
 # --- what this run never looked at --------------------------------------------
 # Reports, never fails: nothing here can turn a run red (DECISIONS §11).
-# When the drafts are absent, the per-file cases of a `draft`-parametrised test
-# are never created, so the run is quieter, not noisier, and no single test can
-# show how much went unopened. `UNCREATED` names those tests at collection
-# time. It covers food's `draft` fixture only: the cocktails suite has its own
+# When the drafts are absent, a `draft`-parametrised test creates no per-file
+# cases: pytest reports it as ONE skip, "got empty parameter set", so no single
+# line shows how much went unopened. `UNCREATED` names those tests at
+# collection time. It covers food's `draft` fixture only: the cocktails suite has its own
 # loader and skips with a reason, which is already visible.
 COCKTAIL_DRAFTS_DIR = ROOT / "_cocktail_drafts"
 
@@ -347,7 +363,8 @@ def _report_absent_drafts(write):
     if UNCREATED:
         n = len(UNCREATED)
         write(f"  {n} per-draft check{'s' if n != 1 else ''} in this suite "
-              f"produced no tests at all, rather than failing or skipping.")
+              f"ran over no drafts, each reported as a single skip "
+              f"(\"got empty parameter set\").")
     write("  Cloning is reading: it needs no ask, and both clones make the "
           "suite whole.")
 

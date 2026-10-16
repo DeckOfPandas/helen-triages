@@ -223,13 +223,11 @@ def _is_character_list(key):
 # that reads the drafts alone leaves a promoted drink checked by nothing.
 
 NO_DRINKS_REASON = (
-    "No drinks on this machine to check. `_cocktail_recipes/` holds no promoted "
-    "drinks -- it does not exist on disk at all yet, which is deliberate "
-    "(MANUAL.md §9.1) -- and `_cocktail_drafts/` is a separate private "
-    "repo (helen-triages-cocktails-private), gitignored here, so a clean "
-    "checkout of the public repo legitimately has none either. Clone the drafts "
-    "into _cocktail_drafts/ to check those; promote a drink to check it here "
-    "AND in CI."
+    "No drinks on this machine to check: neither `_cocktail_recipes/` nor "
+    "`_cocktail_drafts/` holds one here. `_cocktail_drafts/` is a separate "
+    "private repo (helen-triages-cocktails-private), gitignored here, so CI and "
+    "a fresh worktree never have it. Clone the drafts into _cocktail_drafts/ to "
+    "check those; promote a drink to check it here AND in CI."
 )
 
 
@@ -355,8 +353,16 @@ def _load_draft_files():
     the ordinary state of CI.
     """
     out = [d for d in _load_files() if DRAFTS in d.path.parents]
+    if not out and DRAFTS.is_dir():
+        pytest.fail("`_cocktail_drafts/` exists but yielded no parseable drafts, "
+                    "so this loader has gone stale. Do not let it report green.")
     if not out:
-        pytest.skip(NO_DRINKS_REASON)
+        pytest.skip(
+            "`_cocktail_drafts/` is not on this machine, so there is no draft "
+            "for a draft-only rule to check. It is a separate private repo "
+            "(helen-triages-cocktails-private), so CI never has it; clone it "
+            "into _cocktail_drafts/ to run this."
+        )
     return out
 
 
@@ -380,8 +386,8 @@ def _load_staged():
             "Neither `_cocktail_recipes/` nor any staging folder "
             f"({', '.join(d.name for d in STAGED_DIRS)}) is on this machine, so "
             "there is no staged drink to check. The staging folders are in the "
-            "private drafts repo (gitignored here), and `_cocktail_recipes/` "
-            "starts empty -- see NO_DRINKS_REASON."
+            "private drafts repo (gitignored here); `_cocktail_recipes/` is in "
+            "this repo, so its absence means the checkout is incomplete."
         )
     pytest.skip(
         "No drinks are staged for publication. `_cocktail_recipes/` is empty "
@@ -450,6 +456,7 @@ WHOLE_COLLECTION_ONLY = {
     "test_the_plural_unit_rule_is_exercised",
     "test_every_mood_correction_is_reachable_and_needed",
     "test_no_drink_note_exception_is_stale",
+    "test_no_as_exception_is_stale",
 }
 
 
@@ -664,8 +671,9 @@ def test_no_unknown_top_level_keys():
     assert not bad, (
         "Undeclared top-level key(s):\n  " + "\n  ".join(bad)
         + "\n\nEither it is a typo for a declared key -- in which case nothing "
-          "has been reading it -- or it is real, and belongs in TOP_LEVEL_KEYS "
-          "at the top of this file with a note saying what renders it."
+          "has been reading it -- or it is real, and belongs in "
+          "TOP_LEVEL_KEYS_IN_ORDER at the top of this file, at the place "
+          "_layouts/cocktail.html renders it, with a note saying what that is."
     )
 
 
@@ -999,7 +1007,7 @@ def test_every_ingredient_has_an_amount():
                 continue
             if item.get("amount") is None:
                 bad.append(f"{slug} entry {i}: "
-                           f"{item.get('generic') or item.get('item')!r}")
+                           f"{item.get('generic')!r}")
     assert not bad, (
         "Ingredient entr(ies) with no `amount`:\n  " + "\n  ".join(bad)
         + "\n\nThere is no amount-less case. A top-up is `amount: \"to top\"` "
@@ -1235,7 +1243,7 @@ def test_agent_edited_drinks_are_not_marked_proofread():
 
 def _vocab():
     if not VOCAB.exists():
-        pytest.skip("_data/cocktails/ingredients.yml does not exist yet.")
+        pytest.fail("_data/cocktails/ingredients.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(VOCAB) or {}
 
 
@@ -1503,7 +1511,7 @@ SERVE = ROOT / "_data" / "cocktails" / "serve.yml"
 
 def _serve_vocab():
     if not SERVE.exists():
-        pytest.skip("_data/cocktails/serve.yml does not exist yet.")
+        pytest.fail("_data/cocktails/serve.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(SERVE) or {}
 
 
@@ -1512,7 +1520,7 @@ SOURCES = ROOT / "_data" / "cocktails" / "sources.yml"
 
 def _sources_data():
     if not SOURCES.exists():
-        pytest.skip("_data/cocktails/sources.yml does not exist yet.")
+        pytest.fail("_data/cocktails/sources.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(SOURCES) or {}
 
 
@@ -1961,7 +1969,7 @@ def test_speciality_gin_declares_a_character():
             if isinstance(character, str):
                 character = [character] if character.strip() else []
             if not character:
-                bad.append(f"{slug}: {item.get('item') or '?'!r}")
+                bad.append(f"{slug}: {item.get('generic') or '?'!r}")
     assert not bad, (
         f"{len(bad)} ingredient(s) typed as a generic that requires a "
         f"`character`, without one:\n  " + "\n  ".join(bad)
@@ -2042,7 +2050,7 @@ def _character_scan():
                 checked += 1
                 if value not in permitted:
                     bad.append(
-                        f"{slug}: {item.get('item') or '?'!r} -> {value!r} "
+                        f"{slug}: {item.get('generic') or '?'!r} -> {value!r} "
                         f"(family {'/'.join(sorted(families))})"
                     )
     return checked, bad, declared
@@ -2267,7 +2275,7 @@ def test_every_card_name_join_is_reachable():
 
 def _bottles():
     if not BOTTLES.exists():
-        pytest.skip("_data/cocktails/bottles.yml does not exist yet.")
+        pytest.fail("_data/cocktails/bottles.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(BOTTLES) or {}
 
 
@@ -2596,7 +2604,7 @@ def _cross_category_scan():
                 if item.get("note"):
                     continue
                 bad.append(
-                    f"{slug}: {item.get('item') or '?'!r} asks for "
+                    f"{slug}: {item.get('generic') or '?'!r} asks for "
                     f"{generics} and suggests {canonical!r} "
                     f"({bottle_generic!r}) — no note"
                 )
@@ -2665,7 +2673,7 @@ def _amount_scan():
                     continue
                 bad.append(
                     f"{slug}: amount {item['amount']!r} on "
-                    f"{item.get('item') or item.get('generic')!r} -- {why}"
+                    f"{item.get('generic')!r} -- {why}"
                 )
             else:
                 read += 1
@@ -2815,7 +2823,7 @@ def test_no_amount_uses_a_us_unit():
             if hit:
                 bad.append(
                     f"{slug}: {item['amount']!r} on "
-                    f"{item.get('generic') or item.get('item')!r} -- {sorted(hit)}"
+                    f"{item.get('generic')!r} -- {sorted(hit)}"
                 )
 
     assert not bad, (
@@ -2874,7 +2882,7 @@ def test_no_ingredient_stores_a_millilitre_figure():
     A returning key is read by nothing and can only drift from the string
     beside it. Copying an older drink as a template is how it comes back.
     """
-    bad = [f"{slug}: {item.get('item') or item.get('generic')!r} has ml: {item['ml']!r}"
+    bad = [f"{slug}: {item.get('generic')!r} has ml: {item['ml']!r}"
            for slug, fm in _load()
            for item in (fm.get("ingredients") or [])
            if isinstance(item, dict) and "ml" in item]
@@ -3611,10 +3619,10 @@ def test_no_method_step_opens_with_express():
     assert not bad, (
         "Method step(s) writing the twist step by hand:\n  " + "\n  ".join(bad)
         + "\n\nDELETE THEM. _layouts/cocktail.html adds \"Express the twist "
-          "over the drink and drop it in.\" as the last step of any drink whose "
-          "`garnish` names a citrus twist, and \"...and discard it.\" where the "
-          "garnish says `(discarded)`. Helen ruled on 2026-09-04 that no drink "
-          "writes it. If the drink really does express something, say what it "
+          "over the drink then drop it in.\" as the last step of any drink whose "
+          "`garnish` names a citrus twist, and \"...then discard it.\" where the "
+          "garnish says `(discarded)`, both from `canonical.express` in "
+          "methods.yml. Helen's ruling is that no drink writes it. If the drink really does express something, say what it "
           "is doing to the drink and lead with that verb."
     )
     assert checked, (
@@ -3639,7 +3647,7 @@ def test_optional_is_a_real_boolean():
             seen += 1
             if not isinstance(item["optional"], bool):
                 bad.append(
-                    f"{slug}: {item.get('item') or item.get('generic')!r} has "
+                    f"{slug}: {item.get('generic')!r} has "
                     f"optional: {item['optional']!r} "
                     f"({type(item['optional']).__name__}, not bool)"
                 )
@@ -4265,8 +4273,9 @@ def test_every_icon_has_a_real_world_height():
         + (f"  icons with no height: {missing}\n" if missing else "")
         + (f"  heights for no icon:  {phantom}\n" if phantom else "")
         + "\nAn icon with no height renders at ZERO height on /dev/glasses/ "
-          "-- an invisible gap, not an error. Add a typical height in mm; it "
-          "does not need to be exact, and #295 will replace the lot."
+          "-- an invisible gap, not an error. Give the icon's glass type rows "
+          "in glass_survey.yml, or a `height_overrides` entry with its reason, "
+          "then run `python3 scripts/glass_survey_stats.py --write`."
     )
     bad = sorted(f"{k}={v!r}" for k, v in heights.items()
                  if not isinstance(v, (int, float)) or v <= 0)
@@ -4842,7 +4851,7 @@ METHODS = ROOT / "_data" / "cocktails" / "methods.yml"
 
 def _methods():
     if not METHODS.exists():
-        pytest.skip("_data/cocktails/methods.yml does not exist yet.")
+        pytest.fail("_data/cocktails/methods.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(METHODS) or {}
 
 
@@ -4994,7 +5003,7 @@ def test_every_proposal_still_matches_a_real_step():
 
 def _taxonomy():
     if not TAXONOMY.exists():
-        pytest.skip("_data/cocktails/taxonomy.yml does not exist yet.")
+        pytest.fail("_data/cocktails/taxonomy.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(TAXONOMY) or {}
 
 
@@ -5153,7 +5162,7 @@ CARD_PLUGIN = ROOT / "_plugins" / "cocktail_card_ingredients.rb"
 
 def _plugin_source():
     if not CARD_PLUGIN.exists():
-        pytest.skip("_plugins/cocktail_card_ingredients.rb does not exist yet.")
+        pytest.fail("_plugins/cocktail_card_ingredients.rb is gone. Every test that reads it would skip, not fail, without this line.")
     return CARD_PLUGIN.read_text(encoding="utf-8")
 
 
@@ -5448,7 +5457,7 @@ def test_the_quoted_scalar_list_names_real_drink_fields():
     assert not unknown, (
         f"DRINK_SCALAR_FIELDS names {unknown}, which the schema does not "
         f"declare. A name that matches no field checks nothing and fails "
-        f"nothing -- add it to TOP_LEVEL_KEYS if it is real, or fix the "
+        f"nothing -- add it to TOP_LEVEL_KEYS_IN_ORDER if it is real, or fix the "
         f"spelling here."
     )
 
@@ -5553,7 +5562,7 @@ def test_ingredient_as_is_declared(drink_file):
         if not isinstance(item, dict) or not item.get("as"):
             continue
         if str(item["as"]) not in declared:
-            bad.append(f"{item.get('generic') or item.get('item')}: {item['as']!r}")
+            bad.append(f"{item.get('generic')}: {item['as']!r}")
 
     assert not bad, (
         f"{_drink_where(drink_file)} uses an undeclared `as` value:\n  "
@@ -5577,8 +5586,12 @@ def test_no_as_exception_is_stale():
     """Every `_AS_EXCEPTIONS` entry still describes a live gap.
 
     An exemption that outlives its defect reads as outstanding work while
-    excusing that drink for whoever edits it next.
+    excusing that drink for whoever edits it next. Needs the whole collection:
+    with the drafts absent, an entry for a draft is indistinguishable from a
+    stale one.
     """
+    _require_whole_collection("a stale `as` exception")
+
     live = []
     for slug, fm in _load():
         steps = " ".join(
@@ -5937,13 +5950,13 @@ COST_CONFIDENCE = {"high", "medium", "low"}
 
 def _costs():
     if not COSTS.exists():
-        pytest.skip("_data/cocktails/costs.yml does not exist yet.")
+        pytest.fail("_data/cocktails/costs.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(COSTS) or {}
 
 
 def _declared_bottles():
     if not BOTTLES.exists():
-        pytest.skip("_data/cocktails/bottles.yml does not exist yet.")
+        pytest.fail("_data/cocktails/bottles.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return (_parsed(BOTTLES) or {}).get(
         "bottles"
     ) or {}
@@ -6381,7 +6394,7 @@ ML_PER_UNIT = 1000.0
 
 def _abv():
     if not ABV.exists():
-        pytest.skip("_data/cocktails/abv.yml does not exist yet.")
+        pytest.fail("_data/cocktails/abv.yml is gone. Every test that reads it would skip, not fail, without this line.")
     return _parsed(ABV) or {}
 
 

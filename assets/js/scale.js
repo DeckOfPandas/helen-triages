@@ -27,9 +27,8 @@
 })(typeof window !== 'undefined' ? window : this, function (SL) {
   'use strict';
 
-  /** The smallest pour anyone measures, and the grid every pour lands on. */
+  /** The smallest volume anyone measures. */
   var MIN_POUR = 2.5;
-  var POUR_STEP = 2.5;
 
   /* The fallback step, for a drink with no gridded volume at all: there are
      no ratios to preserve, so halves. Otherwise see `stepFor`. */
@@ -69,11 +68,6 @@
   function asList(value) {
     if (value === null || value === undefined) return [];
     return Array.isArray(value) ? value : [value];
-  }
-
-  /** A volume, on the 2.5 ml grid. */
-  function roundPour(ml) {
-    return tidy(Math.round(tidy(ml) / POUR_STEP) * POUR_STEP);
   }
 
   // An integer prints as an integer: `40 ml`, never `40.0 ml`.
@@ -314,19 +308,6 @@
     };
   }
 
-  /** The step this drink's amounts allow, as `{n, d, value}` -- see `stepFor`. */
-  function allowedStep(amounts) {
-    var step = stepFor(asList(amounts).map(read));
-    return { n: step.n, d: step.d, value: step.value };
-  }
-
-  /** How a multiple is printed: `⅓`, `1½`, `2`. */
-  function multipleText(amounts, multiple) {
-    var here = plan(amounts);
-    var k = stepsFor(here.step, multiple);
-    return k === null ? show(Number(multiple)) : stepText(here.step, k);
-  }
-
   /**
    * Refused below the floor (`why: 'floor'`) or off the allowed steps ('grid').
    * @param {string[]} amounts - the strings as printed, in page order
@@ -366,26 +347,6 @@
     };
   }
 
-  /** The floor alone, for setting the control's `min` before anyone types. */
-  function floorMultiple(amounts) {
-    var here = plan(amounts);
-    return multipleOf(here.step, here.floor.steps);
-  }
-
-  /** The volumetric total at a multiple. */
-  function totalMl(amounts, multiple) {
-    var here = plan(amounts);
-    var k = stepsFor(here.step, multiple);
-    if (k === null) {
-      // An unsnapped multiple still gets an answer: the approximate total.
-      var m = Number(multiple);
-      return tidy(here.entries.reduce(function (sum, entry) {
-        return entry.kind === 'volume' ? sum + entry.low * m : sum;
-      }, 0));
-    }
-    return totalFor(here.entries, here.step, k);
-  }
-
   /**
    * A printed amount split into its number and its one-word unit (#1132), for
    * the rows _layouts/cocktail.html marks `data-unit-quiet`. Split at the LAST
@@ -404,14 +365,7 @@
   return {
     scale: scale,
     splitUnit: splitUnit,
-    floorMultiple: floorMultiple,
-    totalMl: totalMl,
-    snapMultiple: snapMultiple,
-    allowedStep: allowedStep,
-    multipleText: multipleText,
-    roundPour: roundPour,
     MIN_POUR: MIN_POUR,
-    POUR_STEP: POUR_STEP,
     MULTIPLE_STEP: MULTIPLE_STEP
   };
 });

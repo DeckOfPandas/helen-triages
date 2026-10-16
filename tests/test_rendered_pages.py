@@ -10,6 +10,7 @@ from __future__ import annotations
 import contextlib
 import decimal
 import html as html_module
+import importlib.util
 import json
 import pathlib
 import re
@@ -2435,9 +2436,9 @@ def _drink_pages(built_site):
 def test_every_published_drink_page_offers_four_other_published_drinks(prod_site):
     """#927. Exactly four, never itself, and every one of them a real page.
 
-    Exactly four, not "at most": the template emits only candidates scoring
-    above zero, so a drink sharing nothing would render a short row on its own
-    page alone. `scripts/related_drinks.py` names which drink ran out of
+    Exactly four, not "at most": the template emits only candidates sharing a
+    mood or a generic, so a drink sharing nothing would render a short row on
+    its own page alone. `scripts/related_drinks.py` names which drink ran out of
     candidates. The template excludes `page.url`, so no row offers itself.
     """
     pages = _drink_pages(prod_site)
@@ -2640,9 +2641,9 @@ def _recipe_pages(built_site):
 def test_every_published_recipe_page_offers_three_other_published_recipes(prod_site):
     """#1005. Exactly three, never itself, and every one of them a real page.
 
-    The template emits only a candidate scoring above zero or sharing the
-    star and a mood, so a recipe unlike everything else would render a short
-    row on its own page alone. A promotion or a taxonomy edit can cause it.
+    The template emits only a candidate sharing a star, a tag or a main
+    ingredient, so a recipe unlike everything else would render a short row
+    on its own page alone. A promotion or a taxonomy edit can cause it.
     """
     pages = _recipe_pages(prod_site)
     assert len(pages) > 20, (
@@ -2679,6 +2680,54 @@ def test_every_published_recipe_page_offers_three_other_published_recipes(prod_s
     assert not problems, (
         "the related-recipes row (#1005) is wrong on these pages:\n  "
         + "\n  ".join(problems[:20])
+    )
+
+
+def _script(name):
+    spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / f"{name}.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _offered_slugs(text, section_re, link_re):
+    section = section_re.search(text)
+    if not section:
+        return []
+    return [href.rstrip("/").rsplit("/", 1)[-1] for href in link_re.findall(section.group(1))]
+
+
+@pytest.mark.parametrize("kind", ["food", "drinks"])
+def test_the_related_picks_are_the_scripts_picks_in_the_scripts_order(prod_site, kind):
+    """#1090, #1183. Every built page offers exactly what
+    `scripts/related_recipes.py` or `scripts/related_drinks.py` says, in the
+    same order: the scripts are how a ranking is inspected, so a Liquid key
+    that drifts from them makes every reading of them false."""
+    if kind == "food":
+        mirror = _script("related_recipes")
+        corpus, moods = mirror.published(), mirror.mood_tags()
+        expected = {s: mirror.picks(s, d, corpus, moods) for s, d in corpus}
+        pages, section_re, link_re = (_recipe_pages(prod_site),
+                                      RELATED_RECIPES_SECTION, RELATED_RECIPE_LINK)
+    else:
+        mirror = _script("related_drinks")
+        corpus = mirror.published()
+        expected = {s: [r["slug"] for r in mirror.picks(s, d, corpus)] for s, d in corpus}
+        pages, section_re, link_re = _drink_pages(prod_site), RELATED_SECTION, RELATED_LINK
+    built = {p.parent.name: _offered_slugs(p.read_text(encoding="utf-8"), section_re, link_re)
+             for p in pages}
+
+    assert sorted(built) == sorted(expected), (
+        f"the {kind} script's published set and the build's pages differ: "
+        f"only built {sorted(set(built) - set(expected))}, "
+        f"only in the script {sorted(set(expected) - set(built))}. Its "
+        "`published()` must read the same flags as _plugins/publish_gate.rb."
+    )
+    wrong = [f"{slug}: page {built[slug]}, script {expected[slug]}"
+             for slug in sorted(built) if built[slug] != expected[slug]]
+    assert not wrong, (
+        f"{len(wrong)} {kind} page(s) offer different picks from the script:\n  "
+        + "\n  ".join(wrong[:15])
     )
 
 
@@ -2740,10 +2789,11 @@ def test_the_drinks_that_state_no_volume_are_exactly_the_ones_that_cannot(prod_s
         f"{sorted(silent - expected)}\n"
         f"  newly speaking (gained one): {sorted(expected - silent)}\n"
         "`volume_for` in _plugins/cocktail_units.rb has the rule: a drink says "
-        "nothing only when its excluded pours ARE the drink, so a figure would "
-        "be wrong rather than rough. A topped drink is NOT such a drink -- it "
-        "spends the midpoint of its declared range (Helen, 2026-09-17: "
-        "\"Midpoint please, I'll cope on the spot\")."
+        "nothing only when its excluded ingredients ARE the drink, so a figure "
+        "would be wrong rather than rough. A topped drink is NOT such a drink: "
+        "its top is sized from its glass by `fitted_top_ml` (#1179), and falls "
+        "back to the midpoint of its declared range only where the glass gives "
+        "no answer."
     )
 
 

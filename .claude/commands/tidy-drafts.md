@@ -1,5 +1,5 @@
 ---
-description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block, a size word stranded in item: (#577), a cocktail's key order (#1213) and Title Case (#1089) -- and report everything that needs Helen instead.
+description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block, a size word stranded in item: (#577), tin-and-pan incidentals (#1356), a cocktail's key order (#1213) and Title Case (#1089) -- and report everything that needs Helen instead.
 ---
 
 Helen has asked for a drafts tidy-up. Run `scripts/tidy_drafts.py`, which is the
@@ -48,6 +48,7 @@ script; `--help` prints them):
 | `accents` | both | the words in `_data/accented_words.yml` |
 | `meta` | food | the `meta:` block's keys, order and unquoted booleans; it never invents a flag |
 | `size` | food | `amount: "2"` / `item: "large onions"` → `amount: "2 large"` / `item: "onions"`, only where `test_size_word_is_with_the_count_not_the_item` would fire |
+| `incidentals` | food | a fat or flour only for the tin or the pan (`"butter, for greasing"`) gains `incidental: true`; `", plus extra for the tin"` and its kin are trimmed off a real line; deep-frying oil loses its amount and reads `"<oil>, for deep frying"`. All by `incidental_verdict` in `tests/test_taxonomy.py`, over the words in `_data/food/incidentals.yml` (#1356). A `QQ` line gains the flag but is never trimmed |
 | `titles` | cocktails | Title Case by the suite's `title_cased`: it only raises a letter, and leaves anything in brackets as written |
 | `order` | cocktails | top-level keys into `TOP_LEVEL_KEYS_IN_ORDER` (`tests/test_cocktails.py`); moves whole blocks and edits no line |
 
@@ -132,7 +133,7 @@ oversight:
    own edits it does not.
 
    Use `--only` with any of
-   `notes,quoting,meta,dashes,typography,units,accents,titles,size,order` to do
+   `notes,quoting,meta,dashes,typography,units,accents,titles,size,incidentals,order` to do
    one class at a time if the full pass is too much to review in one go.
 
 5. **Verify, and not by reading the diff.** Run the suite for the half you

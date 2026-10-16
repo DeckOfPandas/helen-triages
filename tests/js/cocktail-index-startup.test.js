@@ -205,8 +205,8 @@ test('#695: answering both mood questions outranks answering one of them twice',
   const order = titlesInOrder(r.page).slice(0, 2);
   assert.deepStrictEqual(order, ['Negroni', 'Daiquiri'],
     'Negroni answers both questions (sharp AND no juicing) and Daiquiri ' +
-    'answers one, so Negroni must come first. Both have the same moodScore ' +
-    'of the old ranking would have left this to the random key.');
+    'answers one, so Negroni must come first, not wherever the random key ' +
+    'happens to put it.');
 });
 
 test('#695: with only one section asked, the order is unchanged', () => {

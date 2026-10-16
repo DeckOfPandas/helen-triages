@@ -24,8 +24,8 @@ replays `_plugins/cocktail_units.rb`'s resolution, in the same order (MANUAL
 
 It is a second implementation of the plugin's lookup: re-run it after a change
 to the vocabulary, the bottle list or `default_bottles`. A drink counts as
-published on `awaiting_fix: false` and `proofread: true`; it does not read
-the gate's third cocktail flag, `rewritten`.
+published on the gate's three flags: `awaiting_fix: false`, `proofread:
+true` and `rewritten: true`.
 """
 import glob
 import os
@@ -156,7 +156,8 @@ def published_drinks():
         if not isinstance(fm, dict):
             continue
         meta = fm.get("meta") or {}
-        if meta.get("awaiting_fix") is False and meta.get("proofread") is True:
+        if (meta.get("awaiting_fix") is False and meta.get("proofread") is True
+                and meta.get("rewritten") is True):
             yield fm.get("title") or os.path.basename(path), fm
 
 
@@ -212,7 +213,7 @@ def markdown(r, live, users, unsettled):
         "**The affected lists are not a grep.** They replay "
         "`_plugins/cocktail_units.rb`'s own resolution: a named `suggestion:` "
         "wins, otherwise the generic resolves to `default_bottles` or to every "
-        "bottle declared under it, and a pour whose amount does not parse to "
+        "bottle declared under it, and an ingredient whose amount does not parse to "
         "millilitres does not count at all. That last rule is why bitters sold "
         "in dashes affect nothing, however unsure their strength is.",
         "",
