@@ -5291,12 +5291,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   The key's "below the cited safety figure" entry and the poultry subtitle
   went with them. The cut-list subtitles stay: they say what a chart covers,
   which is not a note.
-- **2026-10-09 — chart gridlines sit on multiples of ten.** Helen: *"The
-  scientist in me is upset by the x axis lines."* They were a repeating
-  gradient with a 10°C period from the plot's left edge, which is 35°C, so the
-  lines fell at 35, 45, 55 under ticks reading 40, 50, 60. Each line is its
-  own stop now, from the same `$tc-min`/`$tc-max` arithmetic as the ticks and
-  the bars.
+- **2026-10-16 — chart gridlines sit on every multiple of five: the tens
+  labelled, the fives between them paler and unlabelled, at every width.**
+  Helen: *"We ask for 1-2 degree precision by eye, then offer no help.
+  Honestly I'd love something every 2 degrees....but I'll accept 5."* Every 2°C
+  was declined because on a phone the lines would be 10 px apart, narrower
+  than many bars. The lines sit on the figures, not at a fixed period from the
+  35°C edge (2026-10-09: *"The scientist in me is upset by the x axis
+  lines"*): each is its own stop, from the same `$tc-min`/`$tc-max`
+  arithmetic as the ticks and the bars.
 - **2026-10-09 — on the methods page the weight sits under the dropdown, the
   four birds read "(whole)", and times are compact (`4h50m – 5h30m`).** Helen:
   *"So the user is saying 'I have chicken, 3 kg'."* Of the times: *"Collapse

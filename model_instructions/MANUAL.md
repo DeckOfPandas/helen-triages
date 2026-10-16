@@ -4756,8 +4756,9 @@ the two sites, which is why the footer links are the only way in.
   the column's full width, the same at every width.
 - A figure is the two numbers its bar is drawn from, never the data's
   display string, so no row says where to probe.
-- The gridlines are generated from `$tc-min` / `$tc-max` in
-  `_sass/food/_temperature-chart.scss`.
+- A gridline sits on every multiple of five: the tens, which the ticks
+  label, in `$color-border`, and the fives between them paler. They are
+  generated from `$tc-min` / `$tc-max` in `_sass/food/_temperature-chart.scss`.
 - There is no hover text, no note under a chart and no key entry for the
   shaded zone (its own label names the figure).
 - The contents list is a row of one-word chips that wraps.

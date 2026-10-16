@@ -802,7 +802,7 @@ argument and the rules each field is read by.
 - 2026-10-08 · §14 · #1327 · the temperature charts stay one scroll, with the contents as sticky chips; no per-protein picker.
 - 2026-10-08 · §14 · #1329 #1330 · the methods page is stacked blocks grouped by cut, each with its oven setting; fish and shellfish are lists with no notes.
 - 2026-10-09 · §14 · a chart figure is numbers only, and no chart has a note under it.
-- 2026-10-09 · §14 · chart gridlines sit on multiples of ten.
+- 2026-10-16 · §14 · chart gridlines sit on every multiple of five: the tens labelled, the fives between them paler and unlabelled, at every width.
 - 2026-10-09 · §14 · on the methods page the weight sits under the dropdown, the four birds read "(whole)", and times are compact (4h50m – 5h30m).
 - 2026-10-09 · §14 · the slow-cooked cuts are one chart section of their own.
 - 2026-10-09 · §14 · a chart row's words belong to the bar directly under them: label and figure share a baseline, the bar sits tight below, and all the row's air is under the bar.
