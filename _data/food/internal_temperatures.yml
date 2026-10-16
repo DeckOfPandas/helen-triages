@@ -52,16 +52,39 @@ poultry:
     carryover_min: 1
     carryover_max: 3
     note: "Cooking a whole duck as one piece means accepting the breast will be more well-done than it would be cooked alone."
+  # The rested figures are Helen's targets; each out-at is 2°C below, the
+  # middle of this node's carryover.
   duck_breast_separate:
     chart_anchor: poultry
-    endpoint: "54–57°C for pink meat, then rested"
-    endpoint_min: 54
-    endpoint_max: 57
     carryover: "1–3°C"
     carryover_min: 1
     carryover_max: 3
     note: "Only applies when a breast is cooked on its own, off the bone."
-    sources: "America's Test Kitchen; ThermoWorks; Rouxbe — all centre on 54–57°C for pink medium-rare duck breast. Corrected 2026-08-12 from an original 57–60°C, which independent research found a touch high (nudges toward medium/well rather than pink). Checked once — remove this line once you've confirmed it yourself."
+    sources: "Helen's own targets. America's Test Kitchen, ThermoWorks and Rouxbe all centre on 54–57°C for pink duck breast, the deep-pink level here."
+    doneness:
+      very_pink:
+        out_at: "50–52°C"
+        out_at_min: 50
+        out_at_max: 52
+        rested: "~52–54°C"
+        rested_min: 52
+        rested_max: 54
+      deep_pink:
+        out_at: "52–55°C"
+        out_at_min: 52
+        out_at_max: 55
+        rested: "~54–57°C"
+        rested_min: 54
+        rested_max: 57
+        description: "Fine dining standard"
+      blushing_pink:
+        out_at: "58°C"
+        out_at_min: 58
+        out_at_max: 58
+        rested: "~60°C"
+        rested_min: 60
+        rested_max: 60
+        description: "Lighter, blushing pink"
 
 beef:
   tender_roast:
@@ -288,8 +311,16 @@ fish:
     carryover: "1–2°C"
     carryover_min: 1
     carryover_max: 2
-    note: "The FSA/USDA food-safety benchmark for fish generally, and where most fish are conventionally taken in UK home cooking. cooking-methods.html's own rule of thumb used to say ~55–60°C, which sits below this and reflects chef/texture preference (many out_at salmon and similar fish lower for a moister result) rather than the safety endpoint — both pages now say the same thing, reconciled 2026-08-12."
-    sources: "USDA FSIS: 145°F/62.8°C. UK FSA points to ~63°C as the standard fish safety benchmark. Checked once — remove this note once you've confirmed it yourself."
+    note: "The FSA/USDA food-safety benchmark for fish generally. Chefs take most fish lower, at 54–60°C (`general_chefs`). Don't leave at 63°C for long, to avoid overcooking."
+    sources: "USDA FSIS: 145°F/62.8°C. UK FSA points to ~63°C as the standard fish safety benchmark."
+  # Drawn beside `general` on the page's "All" chart, so the gap between the
+  # chefs' range and the safety figure shows without words.
+  general_chefs:
+    chart_anchor: fish-salmon
+    endpoint: "54–60°C, the chefs' range"
+    endpoint_min: 54
+    endpoint_max: 60
+    sources: "Helen's own range, the one chefs cook fish to."
   salmon:
     safety_min: 63
     safety_label: "FSA/USDA 63°C"
