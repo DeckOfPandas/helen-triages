@@ -159,7 +159,7 @@ pork:
         rested: "~71–72°C"
         rested_min: 71
         rested_max: 72
-    safety_note: "FOOD SAFETY: the 'medium' out_at temp above (60–62°C) does not clear the UK FSA's own core-temperature equivalence table for pork specifically (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec — held at that temperature, not passed through via carryover). FSA does not extend beef/lamb's 'pink is fine' reasoning to pork (hepatitis E risk cited). USDA's own standard is more permissive (145°F/62.8°C + 3min rest), but that's a different regulatory bar. The well-done option (68–70°C, clears 70°C at out_at with margin) is the one that unambiguously satisfies FSA guidance. Flagging, not changing the medium figure — your call whether to keep it, since plenty of UK cooking still serves pork pink. Checked once, 2026-08-12 — remove this note once you've made your own call and confirmed the figure you want to keep."
+    safety_note: "FOOD SAFETY: the 'medium' out_at temp above (60–62°C) does not clear the UK FSA's own core-temperature equivalence table for pork specifically (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec — held at that temperature, not passed through via carryover). FSA does not extend beef/lamb's 'pink is fine' reasoning to pork (hepatitis E risk cited). USDA's own standard is more permissive (145°F/62.8°C + 3min rest), but that's a different regulatory bar. The well-done option (68–70°C, clears 70°C at out_at with margin) is the one that unambiguously satisfies FSA guidance. Helen keeps the medium figure: plenty of UK cooking still serves pork pink."
   slow_cooked:
     chart_anchor: slow-cooked-cuts
     tender_at: "90–95°C"
@@ -229,7 +229,7 @@ ham:
         out_at: "68–70°C"
         out_at_min: 68
         out_at_max: 70
-    safety_note: "FOOD SAFETY: same issue as pork's medium doneness above (a fresh ham is pork leg) — 60–62°C doesn't clear the FSA's pork-specific core-temperature equivalence table (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec, held not passed-through). The well-done option (68–70°C) is the one that clears FSA guidance unambiguously. Flagging, not changing the hint-of-pink figure. Checked once, 2026-08-12 — remove once you've made your own call."
+    safety_note: "FOOD SAFETY: same issue as pork's medium doneness above (a fresh ham is pork leg) — 60–62°C doesn't clear the FSA's pork-specific core-temperature equivalence table (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec, held not passed-through). The well-done option (68–70°C) is the one that clears FSA guidance unambiguously. Helen keeps the hint-of-pink figure."
   cured:
     chart_anchor: ham
     carryover: "3–4°C"
@@ -239,7 +239,7 @@ ham:
     target_min: 70
     target_max: 75
     caveat: "Cured ham labelling varies a lot (unsmoked vs smoked, wet vs dry-cured, cook-before-eating vs ready-to-eat) — check packaging instructions against the thermometer reading rather than relying on this figure alone."
-    sources: "Waitrose targets 75°C; FSA's general reference point is 70°C. Corrected 2026-08-12 from an original 68–72°C, which sat a little under both. Checked once — remove once confirmed."
+    sources: "Waitrose targets 75°C; FSA's general reference point is 70°C. Confirmed by Helen."
 
 steak:
   chart_anchor: beef-steak
