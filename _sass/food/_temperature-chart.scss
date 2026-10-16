@@ -81,22 +81,24 @@ $tc-threshold-height: 1.35rem;
 }
 
 // --- The gridlines -----------------------------------------------------------
-// One line at every multiple of ten, drawn as a gradient on the plot's
-// background. Each line is its own pair of stops at the position the ticks
-// and the bars compute for the same figure, so the three cannot disagree; a
-// repeating gradient measured from the left edge would fall at $tc-min + 10n.
-// The line at $tc-max is drawn one pixel inside the edge, where a line at the
-// edge would be clipped.
+// A line at every multiple of five, drawn as a gradient on the plot's
+// background: the tens, which the ticks label, in $color-border, and the fives
+// between them paler and unlabelled. Each line is its own pair of stops at the
+// position the ticks and the bars compute for the same figure, so they cannot
+// disagree. The line at $tc-max is drawn one pixel inside the edge, where a
+// line at the edge would be clipped; the left edge ($tc-min) carries none.
+$tc-gridline-minor: mix($color-border, $color-bg, 50%);
 $tc-gridlines: ();
-@for $tens from 0 through 30 {
-  $deg: $tens * 10;
-  @if $deg >= $tc-min and $deg <= $tc-max {
+@for $fives from 0 through 60 {
+  $deg: $fives * 5;
+  @if $deg > $tc-min and $deg <= $tc-max {
     $at: if($deg == $tc-max,
              "100% - 1px",
              "100% * #{$deg - $tc-min} / #{$tc-max - $tc-min}");
+    $line: if($deg % 10 == 0, $color-border, $tc-gridline-minor);
     $tc-gridlines: append($tc-gridlines, transparent calc(#{$at}), comma);
-    $tc-gridlines: append($tc-gridlines, $color-border calc(#{$at}), comma);
-    $tc-gridlines: append($tc-gridlines, $color-border calc(#{$at} + 1px), comma);
+    $tc-gridlines: append($tc-gridlines, $line calc(#{$at}), comma);
+    $tc-gridlines: append($tc-gridlines, $line calc(#{$at} + 1px), comma);
     $tc-gridlines: append($tc-gridlines, transparent calc(#{$at} + 1px), comma);
   }
 }
