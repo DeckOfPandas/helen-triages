@@ -547,6 +547,14 @@ def test_incidental_not_in_main_ingredients(draft):
     _tx.test_incidental_not_in_main_ingredients(draft)
 
 
+def test_tin_and_pan_fats_are_flagged_incidental(draft):
+    _tx.test_tin_and_pan_fats_are_flagged_incidental(draft)
+
+
+def test_no_real_line_carries_its_tin_and_pan_extra(draft):
+    _tx.test_no_real_line_carries_its_tin_and_pan_extra(draft)
+
+
 def test_internal_links_have_trailing_slash(draft):
     _tx.test_internal_links_have_trailing_slash(draft)
 

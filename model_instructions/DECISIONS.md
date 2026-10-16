@@ -428,6 +428,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   stay ordinary lines, and an amounted "plus extra for the tin" line is not
   flagged, because that hides the real amount. Every other use of the flag
   stays hers.
+- **2026-10-16, #1356 — on a real fat or flour line, ", plus extra for the
+  tin" and its kin are trimmed, at tidy.** Put to Helen with the 42 draft
+  lines that carry one; she chose "Trim it at tidy" over leaving the note. The
+  same "we can trust the cook". A `QQ` line keeps its tail for her rewrite.
 - **2026-08-20, #406 — "Adapted from" prefixes published work and only
   published work.** Helen: *"Bare labels don't need 'adapted from', only work
   published by other people."* And why the prefix is always true for the rest:

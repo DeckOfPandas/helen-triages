@@ -14,8 +14,8 @@ of its `fix_*` function.
     python3 scripts/tidy_drafts.py --drafts-dir <copy> --site food
 
 `--only` takes a comma-separated subset of RULE_NAMES: `notes`, `quoting`,
-`dashes`, `typography`, `units` and `accents` run on both collections, `meta`
-and `size` on food alone, `titles` and `order` on cocktails alone.
+`dashes`, `typography`, `units` and `accents` run on both collections, `meta`,
+`size` and `incidentals` on food alone, `titles` and `order` on cocktails alone.
 
 It reads every `.md` with front matter under the two drafts folders (a file
 without front matter, such as a README, is named and skipped),
@@ -45,8 +45,9 @@ On both collections:
 
 On food alone: `main_ingredients` and `tags` flow quoting, the quoting of a
 group's `- name:`, the #429 `meta:` block (retired keys dropped, flags in
-`META_ORDER`), and the #577 size word (`2` / `large onions` -> `2 large` /
-`onions`).
+`META_ORDER`), the #577 size word (`2` / `large onions` -> `2 large` /
+`onions`), and the #1356 tin-and-pan incidentals ("butter, for greasing" gains
+`incidental: true`; ", plus extra for the tin" is trimmed off a real line).
 
 On cocktails alone: Title Case for `title` (#1089: capitals only, nothing is
 lowered, a qualifier in brackets is left as written) and top-level keys in
@@ -136,6 +137,8 @@ from test_cocktails import (  # noqa: E402
 )
 # The size-word pattern is the recipe rule's own (#149, #577).
 from test_style import _LEADING_SIZE_WORD  # noqa: E402
+# The tin-and-pan incidentals predicate (#1356) and its word list in data.
+from test_taxonomy import incidental_verdict  # noqa: E402
 
 FLOW_FIELDS = ["main_ingredients", "tags"]
 
@@ -723,6 +726,62 @@ def fix_size_words(text, path):
     return open_ + "\n".join(lines) + close + body, changed
 
 
+ENTRY_KEY = re.compile(r"^(?P<lead>\s*(?:-\s+)?)(?P<key>[a-z_]+):")
+
+
+def fix_incidentals(text, path):
+    """Tin-and-pan fats and flour (#1356), by `incidental_verdict`:
+
+      - "butter, for greasing" gains `incidental: true` as the entry's last
+        key, at its keys' indentation;
+      - "175 g butter, softened, plus extra for the tin" loses its ", plus ..."
+        tail, keeping the item's quote style.
+
+    The flag is added to a `QQ` line too, since it changes none of the source's
+    words; a `QQ` line's text is never trimmed. An item that cannot be
+    rewrapped safely is SKIPPED in the report.
+    """
+    parts = split_front_matter(text)
+    if not parts:
+        return text, []
+    open_, fm, close, body = parts
+    lines = fm.split("\n")
+    changed = []
+    inserts = []
+    for item_i, _ in _ingredient_pairs(lines):
+        item_m = KEYED_LINE.match(lines[item_i])
+        col = len(item_m.group("lead"))
+        start = item_i
+        while start > 0 and not LIST_ENTRY.match(lines[start]):
+            start -= 1
+        indent = len(lines[start]) - len(lines[start].lstrip())
+        end, keys = start, set()
+        for j in range(start, len(lines)):
+            probe = lines[j]
+            if j > start and probe.strip() and len(probe) - len(probe.lstrip()) <= indent:
+                break
+            keyed = ENTRY_KEY.match(probe)
+            if keyed and len(keyed.group("lead")) == col:
+                keys.add(keyed.group("key"))
+            if probe.strip():
+                end = j
+        item = _unwrap(item_m.group("value"))
+        if item is None:
+            continue
+        verdict, trimmed = incidental_verdict(item[0])
+        if verdict == "flag" and "incidental" not in keys:
+            inserts.append((end, " " * col + "incidental: true"))
+            changed.append(f"flagged incidental: {item[0][:60]}")
+        elif verdict == "trim" and not is_qq(lines[item_i]):
+            lines[item_i] = _rebuild(item_m, f"{item[1]}{trimmed}{item[1]}")
+            changed.append(f"trimmed: {item[0][:70]} -> {trimmed[:50]}")
+    for end, line in sorted(inserts, reverse=True):
+        lines.insert(end + 1, line)
+    if not changed:
+        return text, changed
+    return open_ + "\n".join(lines) + close + body, changed
+
+
 def report_size_words_with_no_count(path, text):
     """A size word on an item with no `amount:` to carry it. Surfaced, never moved.
 
@@ -928,6 +987,7 @@ FOOD_FIXERS = [
     ("accents", fix_accents),
     ("meta", fix_meta_block),
     ("size", fix_size_words),
+    ("incidentals", fix_incidentals),
 ]
 
 # Two tables, not one with a site test inside each fixer. A drink has no
