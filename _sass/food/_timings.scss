@@ -3,16 +3,8 @@
 // =============================================================================
 // The timings calculator (.ct-*) and the fish lists on
 // /food/reference/cooking-methods-and-timings/, loaded via food.scss. The
-// doneness charts are in _sass/food/_temperature-chart.scss.
-//
-// These four are already imported by food.scss before this file. Importing
-// shared/rule and food/rule twice is safe only because each guards its own
-// :root block.
-
-@import "food/palette";
-@import "shared/tokens";
-@import "shared/rule";
-@import "food/rule";
+// doneness charts are in _sass/food/_temperature-chart.scss. The palette,
+// tokens and rule partials it uses come from food.scss's own imports.
 
 // --- The timing calculator ---------------------------------------------------
 

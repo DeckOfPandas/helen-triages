@@ -153,10 +153,11 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 
   // Only the horizontal padding is widened, not the bleed, so the tape's left
   // edge stays where the card's is and the lettering starts later. em of the
-  // title, so it follows `.drink-card-name--step` down. The vertical half is
-  // replaced by the tape-band block further down.
+  // title, so it follows `.drink-card-name--step` down. The vertical padding
+  // is the tape-band block's, further down.
   .drink-card-tape {
-    padding: 0.5em $title-tape-pad-x;
+    padding-left: $title-tape-pad-x;
+    padding-right: $title-tape-pad-x;
   }
 }
 
@@ -167,6 +168,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   display: inline-flex;
   align-items: center;
   gap: $space-sm;
+  flex-shrink: 0;
 }
 
 // The controls row, under the title block's rule (#897): the toggle on the
@@ -184,18 +186,11 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   flex-wrap: nowrap;
 }
 
-.cocktail-toggle {
-  flex-shrink: 0;
-}
-
 // Each of the three is 44px tall to tap; height only, so the label and the
 // switch beside it never take each other's taps.
 .cocktail-toggle-label {
   @include tap-area(44px);
   white-space: nowrap;
-}
-
-.cocktail-toggle-label {
   @extend %cocktail-heading-face;
   font-size: 0.78rem;
   letter-spacing: 0.08em;

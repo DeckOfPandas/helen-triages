@@ -51,10 +51,6 @@
 .drink-search--include .drink-field-label-text { @include heading-rule($color-heading-include); }
 .drink-filter--name    .drink-field-label-text { @include heading-rule($color-heading-name); }
 
-// Leave out carries no hue and no bar, on purpose: excluding matters less for
-// drinks than for food, and the section has not earned a colour.
-.drink-search--exclude .drink-field-label { color: $color-clear-text; }
-
 // The search-for-anything dropdown's group headings (#1050, #1136). The shape
 // is shared/_furniture.scss's; here each kind of result is filled with the hue
 // of the index section it lands on, lettered in $color-bg like every other

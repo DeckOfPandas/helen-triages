@@ -26,15 +26,6 @@ main {
   -webkit-text-stroke: 1px;
   letter-spacing: 0.5em;
   text-align: center;
-}
-
-.site-title-link {
-  display: inline-block;
-  text-decoration: none;
-}
-
-
-.site-header {
   position: relative;   // anchors .site-header-inner's inset:0, below
   // 0.2rem under the door's row, at every width, and `$header-door-gap` over
   // it (#1322): the row hangs close under the tape. The row's grid line is as
@@ -161,6 +152,8 @@ $header-door-gap: 0.1rem;
 // wordmark too wide for the viewport is handled by `.site-logo-top`'s 92vw
 // cap and by the header stacking below $header-stack-width.
 .site-title-link {
+  display: inline-block;
+  text-decoration: none;
   grid-row: 1;
   grid-column: 2;
 }
