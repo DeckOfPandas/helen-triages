@@ -407,9 +407,10 @@ second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
   one image (§1).
 - **Position.** The row sits at the right-hand end of the header's second
   row and the `??` about link (a literal `/about/`) at the left end, both on
-  the cards' edges, at every width, with equal space over and under
-  (`0.9rem` of top margin on the row and on `??`, `$space-sm` of bottom
-  padding on `.site-header`).
+  the cards' edges, at every width, hanging close under the tape:
+  `$header-door-gap` (0.1rem) of top margin on the row, on `??` and on the
+  local search box under the door, and 0.2rem of bottom padding on
+  `.site-header` (DECISIONS §13).
 - **`.site-header-inner` is the cards' width**: `$width-content` minus
   `main`'s padding, because `main`'s width includes its padding. Below
   `$header-stack-width` the header stacks into one column.

@@ -36,11 +36,11 @@ main {
 
 .site-header {
   position: relative;   // anchors .site-header-inner's inset:0, below
-  // $space-sm under the second row, at every width (#1322). With the row's
-  // own 0.9rem top margin that is 15px over the row and 15px under it: the
-  // row's grid line is as tall as `??`, 6.4px taller than the door's
-  // lettering, and that plus the 1px border makes up the rest.
-  padding: $space-xl $space-xl $space-sm;
+  // 0.2rem under the door's row, at every width, and `$header-door-gap` over
+  // it (#1322): the row hangs close under the tape. The row's grid line is as
+  // tall as `??`, taller than the door's lettering, so the door's ink sits a
+  // little further from the border than the figure says.
+  padding: $space-xl $space-xl 0.2rem;
   border-bottom: 1px solid $color-border;
   // A custom property with the palette's value as its fallback (#733):
   // cocktails re-points it to a darker band (_sass/cocktails/_leopard.scss),
@@ -84,16 +84,18 @@ main {
 // word and an arrow). A `site_neutral` page (about) belongs to no site and
 // gets every site's link.
 //
-// The 0.9rem top margin is the whole of the space over the row (#1322): the
-// stacked grid has no gap and there is no phone variant. `.site-about-link`
-// carries the same margin and must move with it.
+// The whole of the space over the door's row (#1322): the stacked grid has no
+// gap and there is no phone variant. `.site-about-link` shares it, so the two
+// ends of the row cannot drift apart.
+$header-door-gap: 0.1rem;
+
 .site-nav-icons {
   // Row 2, column 3, ending on the cards' right edge (#965).
   grid-row: 2;
   grid-column: 3;
   justify-self: end;
   align-self: start;
-  margin: 0.9rem 0 0;
+  margin: $header-door-gap 0 0;
   display: flex;
   align-items: center;
   gap: 1.6rem;
@@ -110,8 +112,9 @@ main {
 // spans all three tracks (#1086); default.html emits no `??` there, so the
 // span takes room from nothing. `nowrap` is the one declaration here that
 // could overflow a phone: scripts/browser/shoot.sh reports OVERFLOW if it
-// does. `margin-bottom` stands in for the `??` this page lacks (#1322), which
-// elsewhere makes the row's grid line taller than the lettering.
+// does. `margin-bottom` stands in for the `??` this page lacks, which
+// elsewhere makes the row's grid line taller than the lettering, so the doors
+// sit the same distance from the border on every page.
 .site-neutral .site-nav-icons {
   grid-column: 1 / -1;
   justify-self: end;
@@ -199,8 +202,7 @@ main {
   grid-column: 1;
   justify-self: start;
   align-self: center;
-  // The same top margin as `.site-nav-icons` (#1322).
-  margin: 0.9rem 0 0;
+  margin: $header-door-gap 0 0;
   font-family: $font-body;
   font-size: 1.05rem;
   font-weight: 400;
@@ -218,13 +220,13 @@ main {
 // renders it when `show_header_search` is set, which only _config_local.yml
 // does. A third, implicit row in the door's column, on its right edge; the
 // deployed header has no such element and so no such row. The box itself is
-// shared/_furniture.scss's. The margin has not been re-tuned since the door's
-// own margin became 0.9rem (#1322).
+// shared/_furniture.scss's. The margin is the door row's own gap, so the box
+// hangs under the door as the door hangs under the tape.
 .site-header .page-search {
   grid-row: 3;
   grid-column: 3;
   justify-self: end;
-  margin-top: 0.45rem;
+  margin-top: $header-door-gap;
 }
 
 // As wide as the article, so the two reference columns sit under the content

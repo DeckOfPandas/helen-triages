@@ -209,7 +209,9 @@ excerpt_separator: ""
       return isNaN(f) ? fallback : f;
     }
 
-    var GLASS_SCALE = num(document.documentElement, '--card-glass-scale', 13);
+    // The fallback is $card-glass-scale (_cards.scss), for a browser that
+    // cannot read the custom property; it must never differ from the ship.
+    var GLASS_SCALE = num(document.documentElement, '--card-glass-scale', 10.4);
     var PANEL = probe ? probe.getBoundingClientRect().height : 0;
 
     // These are the SHIPPED values, and they have to stay that way -- the page
