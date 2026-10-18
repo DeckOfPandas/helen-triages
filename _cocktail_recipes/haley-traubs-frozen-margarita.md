@@ -35,7 +35,7 @@ source: "Punch"
 source_url: "https://punchdrink.com/recipes/haley-traubs-frozen-margarita/"
 meta:
   made_before: true
-  ship: "who knows"
+  ship: "IOU"
   rewritten: true
   awaiting_fix: false
   proofread: true
