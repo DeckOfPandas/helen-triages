@@ -264,9 +264,6 @@
       moods: (card.dataset.moods || '').split('|').filter(Boolean),
       name: card.dataset.name || '',
       chaos: card.dataset.chaos || '',
-      /* A string, not a boolean (#732): `dataset` gives 'false', which is
-         truthy. matches() compares against 'false'. */
-      madeBefore: card.dataset.madeBefore || '',
       draft: card.classList.contains('drink-card--draft'),
       /* The shortlist's key (#546). Whether it is shortlisted is asked in
          matches(), because that can change under the page. */
@@ -352,12 +349,9 @@
     if (state.moods.size && moodScore(d) === 0) return false;
 
     /* `open` is a state, not a filter: it shows every drink. Only `good`
-       and `unmade` narrow. */
+       and `chaos` narrow, each to the cards stamped with its own name. */
     if (state.chaos === 'good' && d.chaos !== 'good') return false;
-
-    /* `unmade` (#732) reads `madeBefore`, not `chaos`: `made_before` flips
-       when a drink is made, while `ship` stays `who knows` until it is rated. */
-    if (state.chaos === 'unmade' && d.madeBefore !== 'false') return false;
+    if (state.chaos === 'chaos' && d.chaos !== 'chaos') return false;
 
     /* Include chips are AND: each one narrows. */
     var i;

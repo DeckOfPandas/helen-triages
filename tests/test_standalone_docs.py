@@ -359,7 +359,7 @@ def _drink_problems(fm: dict) -> list[str]:
         if not (fm.get("glass") or []):
             problems.append("no glass -- #491, every drink names one")
         # `who knows`, not `QQ`: `QQ` is not in the ship vocabulary
-        # (test_cocktails.py::test_meta_ship_is_a_rung_or_who_knows), so an
+        # (test_cocktails.py::test_meta_ship_is_a_rung_or_off_scale), so an
         # example writing it teaches a file that fails the suite on arrival.
         if fm.get("meta", {}).get("ship") != "who knows":
             problems.append(

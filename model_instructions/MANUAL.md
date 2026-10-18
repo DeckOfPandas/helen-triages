@@ -2538,10 +2538,12 @@ DECISIONS §9.4.1.
 ### 9.5 `meta.ship` and `meta.made_before`
 
 **`meta.ship` is a closed, ordered vocabulary**: `ship_scale` in
-`_data/cocktails/taxonomy.yml`, lowest rung first. `who knows` is deliberately
-off the scale and renders as `ship_unrated_word`. `QQ` is not a ship value: an
-unmade cocktail says `who knows`. `test_meta_ship_is_a_rung_or_who_knows` holds
-it.
+`_data/cocktails/taxonomy.yml`, lowest rung first. Two values are deliberately
+off the scale, in `ship_off_scale` with the word each renders as: `who knows`
+(`???`), never made; and `IOU` (`IOU`), made and liked but never rated. `QQ`
+is not a ship value. `test_meta_ship_is_a_rung_or_off_scale` holds the
+vocabulary, and `test_ship_agrees_with_made_before` holds `who knows` to
+exactly the drinks with `made_before: false`.
 
 `_includes/cocktails/ship.html` draws the mark on the card and on the drink
 page. It asks `ship_scale` whether a value is a rung and never names a
@@ -2549,9 +2551,10 @@ vocabulary value itself. The card passes `short=true` to print the
 `ship_card_names` spelling.
 
 **`meta.made_before` is a boolean and gates nothing.** It is first in `meta:`.
-An unmade cocktail may publish (§9.1.1). The index's `chaos only` filter reads
-it (§9.13), and `_dev/no-verdict.html` lists the cocktails Helen has made and
-not yet rated.
+An unmade cocktail may publish (§9.1.1). Nothing on the index reads it: the
+YOLO filters read `ship` (§9.13), which agrees with it by test.
+`_dev/no-verdict.html` lists the IOUs, the cocktails Helen has made and not yet
+rated.
 
 `garnish`'s `["no garnish"]` and `[]` are §9.12.1. The cocktails test suite is
 §10.
@@ -3081,7 +3084,7 @@ Five named questions, in Helen's order:
 
 | section | control | reads |
 |---|---|---|
-| YOLO? | `no chaos please` / `I'm open to chaos` / `chaos only` | `data-chaos` (`good`, `open`, `unmade`) |
+| YOLO? | `no chaos please` / `I'm open to chaos` / `chaos only` | `data-chaos` (`good`, `open`, `chaos`) |
 | Mood | chips: what the drink is | `data-moods` |
 | Hassle | chips: what it costs | `data-moods` |
 | Has to have / Leave out | a search box and a pool of chips each | `data-ingredients`, `data-ing` |
@@ -3089,8 +3092,10 @@ Five named questions, in Helen's order:
 
 - **`open` applies no filter at all.** The button for "I'll try anything" must
   never narrow.
-- **`chaos only` reads `data-made-before`**, never the rating: the two come
-  apart the day Helen makes the drink.
+- **`no chaos please` and `chaos only` each keep one list in taxonomy.yml's
+  `chaos`**, read off `meta.ship`: `yes` and `oh gods yes`; `not really`,
+  `meh` and `who knows`. The index stamps each card `good`, `chaos` or
+  `middle`, and `middle` (`sure`, `IOU`) shows only under `open`.
 - **Mood and Hassle share one `state.moods` set, and it is ORed**: a drink
   carrying any chosen word from either section survives. The order then ranks
   them: drinks answering both sections first, then more chosen words matched,

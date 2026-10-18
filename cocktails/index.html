@@ -67,16 +67,14 @@ permalink: /cocktails/
         <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
       </div>
-      {% comment %} The third button narrows to `meta.made_before: false`
-         (#732), through `data-made-before` and never `data-ship`: the two come
-         apart when Helen makes an unrated drink, whose `ship` stays `who knows`
-         until she rates it. The three labels are her names for the rungs of one
-         scale, not descriptions of the mechanism; the script reads
-         `data-chaos`, not the words. {% endcomment %}
+      {% comment %} `good` and `chaos` each keep one of taxonomy.yml's `chaos`
+         lists, read off `meta.ship` (#1413). The three labels are Helen's
+         names for the rungs of one scale, not descriptions of the mechanism;
+         the script reads `data-chaos`, not the words. {% endcomment %}
       <div class="drink-btns">
         <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>no chaos please</button>
         <button type="button" class="btn-chaos" data-chaos="open" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>I&rsquo;m open to chaos</button>
-        <button type="button" class="btn-chaos" data-chaos="unmade" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>chaos only</button>
+        <button type="button" class="btn-chaos" data-chaos="chaos" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>chaos only</button>
       </div>
     </div>
 
@@ -242,12 +240,14 @@ permalink: /cocktails/
          _includes/cocktails/ship.html derives the word: it also drives
          `data-ship` below, for filtering. {% endcomment %}
 
-      {% comment %} `good` is ship yes or oh gods yes; everything else is
-         `yolo`, duds included. taxonomy.yml `chaos`. {% endcomment %}
-      {% if ship == "yes" or ship == "oh gods yes" %}
+      {% comment %} Which of taxonomy.yml's `chaos` lists the drink's ship is
+         in; `middle` is neither, and only `open` shows it. {% endcomment %}
+      {% if taxonomy.chaos.good contains ship %}
         {% assign chaos = "good" %}
+      {% elsif taxonomy.chaos.chaos contains ship %}
+        {% assign chaos = "chaos" %}
       {% else %}
-        {% assign chaos = "yolo" %}
+        {% assign chaos = "middle" %}
       {% endif %}
 
       {% comment %} The searchable text is the plugin's `card_ingredients`, the list
@@ -264,11 +264,6 @@ permalink: /cocktails/
           data-url="{{ drink.url }}"
           data-ship="{{ ship }}"
           data-chaos="{{ chaos }}"
-          {% comment %} Straight off the drink, not derived from `ship` like
-             `chaos` above it (#732). `| default: false` so a drink with no
-             `meta.made_before` does not emit an empty attribute, which reads as
-             neither true nor false. {% endcomment %}
-          data-made-before="{{ drink.meta.made_before | default: false }}"
           data-moods="{% for m in drink.mood %}{{ m }}|{% endfor %}"
           data-ingredients="{{ searchable | downcase }}"
           data-name="{{ drink.title | downcase }}">

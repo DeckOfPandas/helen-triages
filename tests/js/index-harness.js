@@ -112,7 +112,7 @@ function buildPage(doc, options) {
   // YOLO
   const chaos = el('div', 'drink-filter drink-filter--chaos');
   filters.appendChild(chaos);
-  ['good', 'open'].forEach((v) => {
+  ['good', 'open', 'chaos'].forEach((v) => {
     chaos.appendChild(el('button', 'btn-chaos', { 'data-chaos': v, type: 'button' }));
   });
   chaos.appendChild(el('button', 'btn-clear-filter', { id: 'clear-chaos' }));
@@ -186,7 +186,6 @@ function addCard(doc, list, spec) {
   card.setAttribute('data-name', spec.name);
   card.setAttribute('data-moods', (spec.moods || []).join('|') + '|');
   card.setAttribute('data-chaos', spec.chaos || 'good');
-  card.setAttribute('data-made-before', spec.madeBefore === false ? 'false' : 'true');
   card.setAttribute('data-ingredients', (spec.ingredients || []).join('|'));
 
   /* The page's real shape: cocktails/index.html emits
