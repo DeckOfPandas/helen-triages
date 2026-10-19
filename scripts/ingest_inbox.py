@@ -93,6 +93,8 @@ LABEL = "ingest"
 MARKER = re.compile(r"^<!--\s*ingest\s+v(\d+)\s+([a-z]+)\s*-->$")
 FENCE = re.compile(r"^```(.*)$")
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
+BATCH_HEADING = re.compile(r"^#\s+ingest:\s*(\S+)\s*$")
+SEPARATOR = re.compile(r"^(-{3,}|\*{3,}|_{3,})$")
 HAND_BACK_HEADING = "## What I could not know"
 FINGERPRINT_HEADING = "## Fingerprint"
 SLUG_OK = re.compile(r"^[a-z0-9-]+$")
@@ -162,13 +164,18 @@ def _section(prose: str, heading: str) -> list:
     return out
 
 
+QQ_LABEL = re.compile(r"^QQ( \S.*)?$")
+
+
 def _reject_unlabelled_notes(fm: dict) -> None:
-    """Every note an ingest adds is `label: "QQ"` with text beginning `QQ`.
+    """Every note an ingest adds is labelled `QQ` or `QQ <topic>`, with text
+    beginning `QQ`.
 
     The page titles a note with no label "note", which looks finished, so an
     unread note would publish under a heading that says nothing is wrong
-    (#1120). An envelope carries no note of Helen's, so this is demanded of
-    every entry but the empty pair.
+    (#1120). A topic after the `QQ` still reads unfinished, and leaves Helen
+    the heading to keep (DECISIONS §4). Demanded of every entry but the empty
+    pair, since an envelope carries no note of hers.
     """
     notes = fm.get("notes")
     if not isinstance(notes, list):
@@ -180,8 +187,9 @@ def _reject_unlabelled_notes(fm: dict) -> None:
             problem = f"is a {type(note).__name__}, not a `{{label, text}}` pair"
         elif note == {"label": "", "text": ""}:
             continue    # the empty pair: a slot for Helen, not a note (#1258)
-        elif note.get("label") != "QQ":
-            problem = f"is labelled {note.get('label')!r}, not 'QQ'"
+        elif not (isinstance(note.get("label"), str)
+                  and QQ_LABEL.match(note["label"])):
+            problem = f"is labelled {note.get('label')!r}, not 'QQ' or 'QQ <topic>'"
         elif not (isinstance(note.get("text"), str)
                   and note["text"].lstrip().startswith("QQ")):
             problem = "has text that does not begin `QQ`"
@@ -189,9 +197,39 @@ def _reject_unlabelled_notes(fm: dict) -> None:
             continue
         raise Rejected(
             f"note {number} {problem}; every note an ingest adds is "
-            f'`label: "QQ"` with text beginning `QQ`, because a note with no '
+            f'`label: "QQ"` or `"QQ <topic>"` with text beginning `QQ`, because a note with no '
             f'label is titled "note" on the page and looks finished (#1120)'
         )
+
+
+def split_batch(body: str) -> list:
+    """(heading slug or None, envelope text) for each envelope in one body.
+
+    A batch is several envelopes, each under its own `# ingest: <slug>` line
+    (CLAUDE_WEB_INGEST.md §2). Text before the first heading is the batch's
+    index and is dropped; a horizontal rule ending a section is a separator.
+    Headings inside a fence never split. A body with no heading is one
+    envelope, so a single-envelope file or issue reads exactly as before.
+    """
+    sections, current, inside = [], None, False
+    for line in body.replace("\r\n", "\n").splitlines(keepends=True):
+        bare = line.rstrip("\n")
+        if FENCE.match(bare):
+            inside = not inside
+        heading = None if inside else BATCH_HEADING.match(bare.strip())
+        if heading:
+            current = [heading.group(1), []]
+            sections.append(current)
+        elif current is not None:
+            current[1].append(line)
+    if not sections:
+        return [(None, body)]
+    out = []
+    for slug, lines in sections:
+        while lines and (not lines[-1].strip() or SEPARATOR.match(lines[-1].strip())):
+            lines.pop()
+        out.append((slug, "".join(lines) + "\n"))
+    return out
 
 
 def parse_envelope(body: str, site: str) -> Envelope:
@@ -355,6 +393,7 @@ def scan_drafts(root: Path, site: str) -> list:
 @dataclass
 class Plan:
     number: object = None
+    origin: str = ""            # where the envelope came from, for the report
     reason: str = ""            # set iff the envelope was rejected
     envelope: object = None
     slug: str = ""
@@ -392,8 +431,9 @@ class Plan:
         return "\n".join(lines)
 
 
-def plan_for(body: str, site: str, existing: list, root: Path, number=None) -> Plan:
-    plan = Plan(number=number)
+def plan_for(body: str, site: str, existing: list, root: Path, number=None,
+             origin="", heading=None) -> Plan:
+    plan = Plan(number=number, origin=origin)
     try:
         envelope = parse_envelope(body, site)
     except Rejected as why:
@@ -406,6 +446,9 @@ def plan_for(body: str, site: str, existing: list, root: Path, number=None) -> P
         plan.reason = (f"slug {slug!r} from title {envelope.fm['title']!r} is "
                        f"not [a-z0-9-]")
         return plan
+    if heading and heading != slug:
+        plan.notes.append(f"the batch heading says {heading!r}; the title "
+                          f"gives {slug!r}, which is the one used")
 
     same_formula = next(
         (e for e in existing if e.fingerprint == envelope.fingerprint), None)
@@ -509,13 +552,19 @@ def post_comment(site: str, number: int, text: str) -> None:
 
 # =============================================================================
 
-def _envelopes(args) -> list:
-    """(issue number or None, body) for everything this run should consider."""
+def _bodies(args) -> list:
+    """(issue number or None, origin, body) before any batch is split."""
     if args.from_file:
         path = Path(args.from_file)
-        if not path.is_file():
-            sys.exit(f"--from-file {path} is not a file.")
-        return [(None, path.read_text(encoding="utf-8"))]
+        if path.is_dir():
+            files = sorted(path.glob("*.md"))
+            if not files:
+                sys.exit(f"--from-file {path}/ holds no .md files.")
+        elif path.is_file():
+            files = [path]
+        else:
+            sys.exit(f"--from-file {path} is neither a file nor a folder.")
+        return [(None, f.name, f.read_text(encoding="utf-8")) for f in files]
     try:
         issues = fetch_issues(args.site, args.issue)
     except urllib.error.HTTPError as exc:
@@ -524,7 +573,18 @@ def _envelopes(args) -> list:
                  f"if access is genuinely missing, Helen grants it by hand.")
     except urllib.error.URLError as exc:
         sys.exit(f"could not reach GitHub: {exc.reason}")
-    return [(i["number"], i.get("body") or "") for i in issues]
+    return [(i["number"], f"#{i['number']}", i.get("body") or "") for i in issues]
+
+
+def _envelopes(args) -> list:
+    """(issue number or None, origin, heading slug or None, envelope text) for
+    every envelope this run should consider, a batch split into its parts."""
+    out = []
+    for number, origin, body in _bodies(args):
+        for heading, text in split_batch(body):
+            where = f"{origin} {heading}" if heading else origin
+            out.append((number, where, heading, text))
+    return out
 
 
 def render(plans: list, site: str, wrote: bool) -> str:
@@ -533,8 +593,7 @@ def render(plans: list, site: str, wrote: bool) -> str:
                 f"which is a fact about the inbox, not a failure.")
     out = [f"{len(plans)} envelope(s) from {REPOS[site]}.", ""]
     for plan in plans:
-        where = f"#{plan.number}" if plan.number is not None else "--from-file"
-        out.append(f"{where}: {plan.one_line()}")
+        out.append(f"{plan.origin}: {plan.one_line()}")
         for note in plan.notes:
             out.append(f"    {note}")
         for item in (plan.envelope.hand_back if plan.envelope else []):
@@ -576,8 +635,8 @@ def main(argv=None) -> int:
     existing = scan_drafts(root, args.site)
 
     plans = []
-    for number, body in _envelopes(args):
-        plan = plan_for(body, args.site, existing, root, number)
+    for number, origin, heading, body in _envelopes(args):
+        plan = plan_for(body, args.site, existing, root, number, origin, heading)
         if args.write and plan.ok:
             write(plan)
             existing.append(Existing(plan.slug, plan.envelope.fm["title"],

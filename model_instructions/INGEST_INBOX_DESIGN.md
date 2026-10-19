@@ -26,7 +26,14 @@ source text that may be copyright.
 **Who raises it.** Helen, pasting the browser's output into a new issue. The
 browser session has no issue-writing access of its own, and giving it any is
 her decision. The same text saved as a local file is read with
-`--from-file <path>` and no issue at all.
+`--from-file <path>` and no issue at all; the path may be a folder.
+
+**A batch.** One body may carry several envelopes, each under a line reading
+`# ingest: <slug>`. `split_batch` cuts there first, outside any fence, drops
+the text above the first heading and a horizontal rule ending a section, and
+every rule below then applies to each envelope alone. A heading whose slug
+disagrees with the title's is reported, and the title's is used. A body with
+no such heading is one envelope.
 
 **The issue.** Title `ingest: <slug>`, label `ingest`. The script fetches the
 open issues carrying that label and does not read the title. `--issue <N>`
@@ -62,11 +69,12 @@ crispy sage butter gnocchi | 500 g | 60 g | 12 | 1 | 30 g
 - **The block is the complete file**, exactly as it should be saved. It begins
   with `---`, its front matter is closed by a second `---`, and the front
   matter parses as YAML with a mapping at the top and a non-empty `title`.
-- **Every entry in `notes`** is `label: "QQ"` with text beginning `QQ`. A note
-  with no label is titled "note" on the page and looks finished, so an unread
-  note would publish under a heading that says nothing is wrong. An envelope
-  carries no note of Helen's, so the rule is demanded of every entry: a bare
-  string, another label, or `QQ` text under a different label is a rejection.
+- **Every entry in `notes`** is labelled `QQ` or `QQ <topic>`, with text
+  beginning `QQ`. A note with no label is titled "note" on the page and looks
+  finished, so an unread note would publish under a heading that says nothing
+  is wrong; a topic after the `QQ` still reads unfinished. An envelope carries
+  no note of Helen's, so the rule is demanded of every entry: a bare string,
+  another label, or `QQ` text under a different label is a rejection.
   The one exception is the empty pair, `label: ""` with `text: ""`, which is
   a slot for Helen and not a note.
 - **`## What I could not know`** is present. Its non-blank lines, up to the
