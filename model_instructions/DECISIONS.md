@@ -769,6 +769,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
   conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
   says "170°C fan"; the `QQ original` keeps the printed figure.
+- **2026-10-19 — Good Food prints both units; keep the metric, bakes
+  included.** Asked whether its "100g/4oz" should keep only the grams, Helen
+  chose *"Metric only, bakes too"*, over the general rule that baking keeps
+  its ounces. Per-source rulings like this and Riverford's live in
+  `_data/food/sources.yml`, which `INGEST_ONE_RECIPE.md` §5 prints.
 - **2026-10-19 — an unlabelled oven pair 20 degrees apart is conventional and
   fan.** Helen: *"Oven pairings when one temp is 20 degrees lower than the
   other mean conventional / fan, I'm just so sure. Interpret that way
@@ -3879,6 +3884,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   nothing posts it for her: *"I am new to this and quite conservative."*
   `/ingest-inbox` reads those issues; its parser rejects and never repairs,
   and an absent drafts clone is a refusal, not a clean inbox.
+- **2026-10-19 — an ingest batch reaches Helen as one review page, with what
+  her rulings settle counted rather than asked.** Offered seven ways to cut
+  her share of an ingest, she chose four: *"I would like 1, 2, 3 and4
+  please!"* So the hand-back list folds every bullet a standing ruling
+  settles, but never one that asks (`ingest_inbox.FOLDS`); per-source
+  rulings live in `_data/food/sources.yml`; `ingest_review.py` writes one
+  table of tags, star, servings and times for corrections only; and a web
+  Claude runs `scripts/envelope.py`, the inbox's own parser, before handing
+  back.
 - **2026-09-07 — pushing a branch and opening its PR need no ask, in all three
   repos.** Helen: *"push no longer needs my say so. I had this rule because
   multiple Claudes were trampling each other and it's easier to fix that

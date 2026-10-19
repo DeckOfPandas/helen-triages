@@ -124,6 +124,7 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
+- 2026-10-19 · §5 · Good Food prints both units; keep the metric, bakes included.
 - 2026-10-19 · §5 · an unlabelled oven pair 20 degrees apart is conventional and fan.
 - 2026-10-19 · §5 · a title keeps its accents, and gains any the house list declares.
 - 2026-08-10 · §5 · within one ingredient group the base spices run coriander, cumin, turmeric, fennel, and the warm spices follow in any order.
@@ -581,6 +582,7 @@ argument and the rules each field is read by.
 - 2026-09-01 · §11 · a title that differs from its slug is not a finding on a draft.
 - 2026-09-01 · §11 · a possessive in a recipe title is for the famous and for Helen's family only.
 - 2026-09-02 · §11 · the ingest envelope is an issue Helen pastes into the private repo herself, titled ingest: <slug> and labelled ingest.
+- 2026-10-19 · §11 · an ingest batch reaches Helen as one review page, with what her rulings settle counted rather than asked.
 - 2026-09-07 · §11 · pushing a branch and opening its PR need no ask, in all three repos.
 - 2026-09-08 · §11 · never sed, the whole tool, no safe form; guard-sed.py refuses any command that names it.
 - 2026-09-08 · §11 · every Claude session runs in its own worktree.
