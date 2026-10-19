@@ -393,6 +393,24 @@ def test_scalar_fields_are_quoted(recipe):
     )
 
 
+def test_group_names_are_quoted(recipe):
+    """Every ingredient and method group's `- name:` is double-quoted (#1416).
+
+    Quoted and bare parse the same, so no page shows the fault and only this
+    keeps the files alike. The line shape is
+    `tidy_drafts.fix_group_name_quoting`'s, which fixes what this reports.
+    """
+    match = re.match(r"\A---\n(.*?\n)---", recipe.raw, re.S)
+    bad = [m.group(1).strip() for m in
+           re.finditer(r"^[ \t]*- name:[ \t]*(.+)$", match.group(1), re.M)
+           if not m.group(1).strip().startswith('"')]
+    assert not bad, (
+        f"{where(recipe)} has unquoted group name(s): {bad!r}. Write "
+        f'`- name: "dressing"`; `python3 scripts/tidy_drafts.py --only quoting '
+        f"--apply` does it on a draft."
+    )
+
+
 # --- provenance: an agent-edited recipe is not proofread (#367) --------------
 # Helen's proofread covers the words she read. An agent edit after it must set
 # `meta.proofread` back to false in the same commit. The flag is a leg of the

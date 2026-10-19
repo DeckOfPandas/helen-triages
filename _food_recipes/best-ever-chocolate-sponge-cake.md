@@ -11,7 +11,7 @@ main_ingredients: ["cocoa powder", "dark chocolate", "salted butter", "eggs", "p
 star_ingredient: "chocolate"
 tags: ["bakes", "showstopper"]
 ingredient_groups:
-  - name: cake
+  - name: "cake"
     items:
     - amount: "200 g"
       item: plain flour
@@ -35,7 +35,7 @@ ingredient_groups:
       item: eggs
     - amount: ½ tsp
       item: vanilla extract
-  - name: buttercream filling
+  - name: "buttercream filling"
     items:
     - amount: "100 g"
       item: "dark chocolate, 70% cacao"
@@ -46,7 +46,7 @@ ingredient_groups:
     - amount: "1 large"
       item: egg yolk
 method_groups:
-  - name: cake
+  - name: "cake"
     steps:
     - step: "Sift the flour, cocoa, baking powder and bicarbonate of soda together. Stir in the salt."
       note: Actually do sift this time, Helen. I can see you. Cocoa powder is sneaky and you're not above this.
@@ -57,7 +57,7 @@ method_groups:
     - Bake at 160°C fan for 20–25 mins until the centres are springy and the sides begin to pull away from the tin.
     - step: "Leave to cool in the tins for a few mins, then turn out upside down on a wire rack and prick the bottoms all over with a fork."
       note: "Cooling upside down flattens the tops ready for stacking."
-  - name: buttercream filling
+  - name: "buttercream filling"
     steps:
     - Melt the chocolate over a bain-marie, bowl not touching the water, and stir until smooth.
     - "Cream the butter and icing sugar, then beat in the egg yolk bit by bit and whisk until shiny."

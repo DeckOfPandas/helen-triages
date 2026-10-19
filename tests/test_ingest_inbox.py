@@ -212,6 +212,13 @@ FOOD_NOTE = (
     ("valid_cocktail", "cocktail", COCKTAIL_NOTE,
      COCKTAIL_NOTE + '  - "QQ - a second note, bare."\n',
      "note 2 is a bare string"),
+    # A topic must follow a space: `QQnutrition` and a trailing space are typos.
+    ("valid_cocktail", "cocktail", COCKTAIL_NOTE,
+     '  - label: "QQnutrition"\n    text: "QQ - generics not filled in."\n',
+     "note 1 is labelled 'QQnutrition'"),
+    ("valid_cocktail", "cocktail", COCKTAIL_NOTE,
+     '  - label: "QQ "\n    text: "QQ - generics not filled in."\n',
+     "note 1 is labelled 'QQ '"),
     # The food site has the same fallback title and the same rule.
     ("valid_food", "food", FOOD_NOTE,
      '  - "QQ - the source stops after the garlic."\n',
@@ -231,6 +238,21 @@ def test_a_note_that_is_not_labelled_qq_is_rejected(name, site, old, new, expect
     assert expected in reason, f"reason was {reason!r}"
     assert "#1120" in reason
     assert "\n" not in reason, "a rejection is ONE line -- it is read in a list"
+
+
+@pytest.mark.parametrize("name,site", [
+    ("valid_cocktail", "cocktail"),
+    ("valid_food", "food"),
+])
+def test_a_qq_label_may_carry_a_topic(name, site):
+    """`QQ nutrition` reads as unfinished on the page, and when Helen proofreads
+    she deletes the `QQ ` and keeps the heading (DECISIONS §4)."""
+    text = envelope_text(name)
+    old = COCKTAIL_NOTE if site == "cocktail" else FOOD_NOTE
+    assert old in text, f"the {name} fixture's note has moved; update this test"
+    topical = text.replace(old, old.replace('label: "QQ"', 'label: "QQ nutrition"'))
+    assert topical != text
+    assert inbox.parse_envelope(topical, site).fm["notes"][0]["label"] == "QQ nutrition"
 
 
 @pytest.mark.parametrize("name,site", [
@@ -388,6 +410,56 @@ def test_the_run_writes_what_the_dry_run_promised(drafts, monkeypatch, capsys):
     assert "wrote crispy-sage-butter-gnocchi.md" in wet
     assert [p.name for p in drafts.rglob("*.md")] == ["crispy-sage-butter-gnocchi.md"]
     assert "no issue was closed" in wet
+
+
+def _batch(*parts) -> str:
+    """A combined batch file in the shape CLAUDE_WEB_INGEST.md §2 asks for."""
+    out = ["# Recipe ingest batch: test\n\n## Index\n\n1. Something\n\n---\n\n"]
+    for heading, body in parts:
+        out.append(f"# ingest: {heading}\n\n{body}\n\n---\n\n")
+    return "".join(out)
+
+
+def test_a_batch_splits_at_its_headings_and_drops_the_index():
+    """Each `# ingest: <slug>` section is one envelope, and the trailing rule
+    between sections is not read as a second fingerprint line."""
+    body = _batch(("crispy-sage-butter-gnocchi", envelope_text("valid_food")),
+                  ("whatever", envelope_text("no_marker")))
+    parts = inbox.split_batch(body)
+    assert [h for h, _ in parts] == ["crispy-sage-butter-gnocchi", "whatever"]
+    assert inbox.parse_envelope(parts[0][1], "food").fm["title"] == \
+        "Crispy Sage Butter Gnocchi"
+    with pytest.raises(inbox.Rejected):
+        inbox.parse_envelope(parts[1][1], "food")
+
+
+def test_a_body_with_no_batch_heading_is_one_envelope():
+    text = envelope_text("valid_food")
+    assert inbox.split_batch(text) == [(None, text)]
+
+
+def test_a_batch_from_file_reports_every_envelope(drafts, monkeypatch, capsys):
+    """A folder of files, one of them a batch: every envelope gets its own
+    line naming the file and the heading, and a heading that disagrees with
+    the title is reported rather than obeyed."""
+    monkeypatch.setattr(inbox, "fetch_issues", lambda *a, **k: pytest.fail(
+        "--from-file must not reach GitHub"))
+    inbox_dir = drafts.parent / "test_ingest_inbox_batch"
+    if inbox_dir.exists():
+        shutil.rmtree(inbox_dir)
+    inbox_dir.mkdir()
+    try:
+        (inbox_dir / "batch.md").write_text(_batch(
+            ("not-the-title", envelope_text("valid_food")),
+            ("cut-off", "<!-- ingest v1 food -->\n")), encoding="utf-8")
+        assert inbox.main(["--site", "food", "--drafts-dir", str(drafts),
+                           "--from-file", str(inbox_dir)]) == 0
+        out = capsys.readouterr().out
+        assert "batch.md not-the-title: would write crispy-sage-butter-gnocchi.md" in out
+        assert "the batch heading says 'not-the-title'" in out
+        assert "batch.md cut-off: REJECTED: 0 fenced code blocks" in out
+    finally:
+        shutil.rmtree(inbox_dir)
 
 
 def test_comment_is_a_no_op_with_from_file(drafts, monkeypatch, capsys):

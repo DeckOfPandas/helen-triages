@@ -11,7 +11,7 @@ main_ingredients: ["black peppercorns", "green cardamom pods", "cinnamon stick",
 star_ingredient:
 tags: ["extras"]
 ingredient_groups:
-  - name: spices
+  - name: "spices"
     items:
     - amount: "1 tbsp (8 g)"
       item: black peppercorns
@@ -35,14 +35,14 @@ ingredient_groups:
       item: "whole nutmeg"
       note: "break open with a nutcracker or pestle and mortar before dry-frying"
 method_groups:
-  - name: Prepare and dry-fry
+  - name: "Prepare and dry-fry"
     steps:
       - "Break open the nutmeg with a nutcracker or in a mortar and pestle, and peel the black cardamom pods."
       - "Add the larger spices to a pan: cinnamon stick, green cardamom pods, black cardamom peels, and star anise. Dry-fry gently on a low heat for 3–4 mins."
       - "Add the black peppercorns, black cardamom seeds, whole cloves and fennel seeds. Dry-fry for 2–3 mins, stirring continuously so they don't catch."
       - "Add the crushed whole nutmeg and dry-fry for just a minute."
       - "Turn off the heat, then add the ground ginger, and mix until the ginger turns fragrant without heating further."
-  - name: Grind
+  - name: "Grind"
     steps:
       - step: "Cool completely, then grind to a powder."
         note: "Coarse is fine for chai alone, but a fine powder blends better as an ingredient for food recipes."

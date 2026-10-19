@@ -11,7 +11,7 @@ star_ingredient: "poultry"
 internal_temp_ref: poultry.turkey
 tags: ["festive", "showstopper", "main"]
 ingredient_groups:
-  - name: turkey
+  - name: "turkey"
     items:
     - amount: "1"
       item: "free-range turkey (ideally Norfolk Black or Bronze), about 5–5.5 kg"
@@ -40,10 +40,10 @@ ingredient_groups:
     - amount: "1 small bunch"
       item: "flat-leaf parsley, leaves only, chopped"
 method_groups:
-  - name: Herb butter
+  - name: "Herb butter"
     steps:
       - "Mix the butter and olive oil in a large bowl. Season. Add the lemon zest and juice, crushed garlic and chopped parsley. Mix well."
-  - name: turkey
+  - name: "turkey"
     steps:
       - "Remove the giblets from the cavity. Season the cavity well with salt and pepper, then stuff with the onions, lemon, garlic halves and 2 bay leaves."
       - "Loosen the skin on the breasts from both ends of the bird, keeping the skin intact, then do the same on the legs."

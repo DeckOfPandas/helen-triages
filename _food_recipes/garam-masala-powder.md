@@ -10,7 +10,7 @@ cook_time: "10 mins"
 main_ingredients: ["bay leaves", "green cardamom pods", "whole cloves", "black peppercorns", "cinnamon sticks", "whole nutmeg", "star anise", "black cardamom pods", "mace", "cumin seeds", "coriander seeds", "fennel seeds"]
 tags: ["extras"]
 ingredient_groups:
-  - name: spices
+  - name: "spices"
     items:
     - amount: "4 medium (1 g)"
       item: "dried bay leaves, torn"

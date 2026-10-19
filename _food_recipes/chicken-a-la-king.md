@@ -10,7 +10,7 @@ main_ingredients: ["chicken breast", "mushrooms", "crème fraîche", "peas", "wh
 star_ingredient: "poultry"
 tags: ["freezable", "make-ahead", "one-handed food", "main"]
 ingredient_groups:
-  - name: sauce
+  - name: "sauce"
     items:
     - amount: "600 g"
       item: boneless skinless chicken breast

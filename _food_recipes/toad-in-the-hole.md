@@ -10,7 +10,7 @@ main_ingredients: ["sausages", "plain flour", "eggs", "whole milk", "red onions"
 star_ingredient: "pork"
 tags: ["carbs party", "main"]
 ingredient_groups:
-  - name: sausages
+  - name: "sausages"
     items:
     - amount: "8"
       item: thick sausages
@@ -26,7 +26,7 @@ ingredient_groups:
       item: balsamic vinegar
     - amount: "1 level tbsp"
       item: vegetable stock powder or 1 organic vegetable stock cube
-  - name: batter
+  - name: "batter"
     items:
     - amount: "285 ml"
       item: "whole milk"
@@ -35,7 +35,7 @@ ingredient_groups:
     - amount: "3 large"
       item: free-range eggs
 method_groups:
-  - name: toad and hole
+  - name: "toad and hole"
     steps:
     - Whisk the batter ingredients with a pinch of salt.
     - step: "Put 2 tbsp sunflower oil in a thin-walled baking tin, and heat in the oven at 220°C fan until sizzling."
@@ -43,7 +43,7 @@ method_groups:
     - "When up to temperature, roast the sausages in the tin until slightly golden, turning once or twice."
     - "Pour the batter over the sausages (carefully because the oil will spit), add the rosemary sprigs, then oven."
     - "Don't open the oven for at least 20 mins. Remove when golden and crisp."
-  - name: onion gravy
+  - name: "onion gravy"
     steps:
     - Fry the finely sliced onions in the butter on a medium heat for about 5 mins until translucent.
     - "Add the garlic a minute before they're done."

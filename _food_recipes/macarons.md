@@ -11,7 +11,7 @@ main_ingredients: ["ground almonds", "icing sugar", "cocoa powder", "egg whites"
 star_ingredient:
 tags: ["bakes", "showstopper", "sweet snack", "fiddly and fun"]
 ingredient_groups:
-  - name: vanilla biscuits
+  - name: "vanilla biscuits"
     items:
     - amount: "140 g"
       item: finely ground almonds
@@ -23,7 +23,7 @@ ingredient_groups:
       item: egg whites
     - amount: "½ tbsp"
       item: cream of tartar
-  - name: chocolate biscuits
+  - name: "chocolate biscuits"
     items:
     - amount: "15 g"
       item: plain flour
@@ -37,7 +37,7 @@ ingredient_groups:
       item: "egg whites, with 90 g caster sugar whisked in after peaks start to form"
     - amount: "½ tbsp"
       item: cream of tartar
-  - name: filling
+  - name: "filling"
     items:
     - amount: "100 g"
       item: mascarpone

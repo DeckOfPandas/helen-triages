@@ -319,10 +319,13 @@ def check_food(path, fm, rep, ctx):
                             "is free now and a hand-worked backlog later.")
 
     for field in ("prep_time", "cook_time"):
-        if str(fm.get(field) or "").strip() in ("", "QQ"):
+        value = str(fm.get(field) or "").strip()
+        if value in ("", "QQ") or value.lower().startswith("estimated"):
             rep.add("TIMES THE SOURCE DID NOT STATE", f"{field}={fm.get(field)!r}", slug,
-                    why="Left QQ deliberately -- `Estimated N mins` is banned outright\n"
-                        "(MANUAL 5). Fill in from the source, or from cooking it.")
+                    why="An unprinted time is written `Estimated N mins` at ingest\n"
+                        "(DECISIONS 4), and `QQ` where nothing could be estimated.\n"
+                        "Replace it from the source or from cooking it: a draft in\n"
+                        "4-promote/ fails the suite while it says either.")
 
     # A blank `star_ingredient` is not reported: it is correct for many
     # recipes, and a report that fires on a large share of the corpus gets

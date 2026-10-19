@@ -10,7 +10,7 @@ main_ingredients: ["lamb shoulder", "Greek yoghurt", "hummus", "pomegranate seed
 star_ingredient: "lamb"
 tags: ["fakeaway", "one-handed food", "main"]
 ingredient_groups:
-  - name: skewers
+  - name: "skewers"
     items:
     - amount: "150 g"
       item: full-fat Greek yoghurt
@@ -26,7 +26,7 @@ ingredient_groups:
       item: ground turmeric
     - amount: "800 g"
       item: diced lamb shoulder
-  - name: to serve
+  - name: "to serve"
     items:
     - amount: "500 g"
       item: hummus

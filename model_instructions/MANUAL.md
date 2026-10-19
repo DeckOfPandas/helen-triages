@@ -959,23 +959,29 @@ a hook for making these pages look different.
 the about page, the index pages and the reference pages, including the words
 those pages render out of `_data/food/*.yml`.
 
-**It stops at a `QQ` line and does not stop at a `QQ Claude` line.** A step
-beginning `QQ` is still the source's wording awaiting a rewrite; correcting
-its dash edits someone else's words. `QQ Claude` is our prose and is held to
-house style. Both `conftest._QQ_LINE` and `scripts/tidy_drafts.py` match
+**The tests stop at a `QQ` line; on food, the formatter does not.** A step
+beginning `QQ` is still the source's wording awaiting a rewrite, so no test
+holds it to house style and no rule changes a word of it. But
+`tidy_drafts.py` formats a food `QQ` line's dashes, unit spaces and accents,
+so Helen rewrites from text already in house style; on a drink it leaves the
+line alone. The one test that reads a `QQ` line is the drafts accent test,
+which the formatter satisfies. `QQ Claude` is our prose and is held to house
+style everywhere. Both `conftest._QQ_LINE` and `scripts/tidy_drafts.py` match
 `QQ\b(?!\s+Claude\b)` as a prefix, so a finished step that merely mentions
 the marker is checked like any other prose.
 
 **Time.** `prep_time` / `cook_time` use `20 mins` / `1 hr 30 mins` / `2 hrs`;
 prose uses `mins` / `hours` / `seconds`; only numeric quantities abbreviate.
-`cook_time: "Until done"` for family bakes with no stated time. **`Estimated
-N mins` must never appear in a published recipe** — a poor estimate
-publishes, a `QQ` blocks. `test_no_estimated_timings` catches it; if one
-turns up, leave it for Helen.
+`cook_time: "Until done"` for family bakes with no stated time. **An
+unprinted time is written `Estimated N mins` at ingest, and never reaches a
+published recipe**: `test_no_estimated_time_reaches_promotion` fails on one
+in `4-promote/`, before the copy, and `test_no_estimated_timings` on one in
+`_food_recipes/`. Helen replaces it from the source or from cooking it.
 
 **Accents** come from `_data/accented_words.yml`: a curated
-unaccented-to-accented map plus a `no_accent:` list. Prose only — never
-slugs, filenames or `source:` (reproduced as the publication spells it).
+unaccented-to-accented map plus a `no_accent:` list. Prose and titles, a
+title gaining an accent its source did not print — never slugs, filenames or
+`source:` (reproduced as the publication spells it).
 
 The test for a mechanical fix: does it lose information or make a judgement?
 `1/2` → `½` does neither; a spelling is a word, not a character, and is

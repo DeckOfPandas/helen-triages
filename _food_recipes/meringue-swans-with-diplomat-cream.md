@@ -11,7 +11,7 @@ main_ingredients: ["egg whites", "white caster sugar", "icing sugar", "whole mil
 star_ingredient: "eggs"
 tags: ["dessert", "showstopper", "make-ahead", "fiddly and fun"]
 ingredient_groups:
-  - name: meringue
+  - name: "meringue"
     items:
     - amount: "150 g"
       item: egg whites
@@ -21,7 +21,7 @@ ingredient_groups:
       item: "lemon juice"
     - amount: "1 tsp"
       item: cornflour
-  - name: diplomat cream
+  - name: "diplomat cream"
     items:
     - amount: "250 ml"
       item: whole milk
@@ -41,14 +41,14 @@ ingredient_groups:
     - amount: "200 ml"
       item: "double cream, cold"
     - item: "a healthy grab of salt"
-  - name: finishing
+  - name: "finishing"
     items:
     - amount: "20 g"
       item: "dark chocolate, 70% cacao, melted"
       note: "for beaks, and for gluing snapped necks back on"
     - item: "icing sugar, to dust"
 method_groups:
-  - name: crème pâtissière
+  - name: "crème pâtissière"
     steps:
       - "Heat the milk with the vanilla until steaming."
       - "Whisk the yolks with the sugar until pale, whisk in the cornflour, then pour the hot milk over slowly, whisking continuously. Return to the rinsed-out pan."
@@ -58,7 +58,7 @@ method_groups:
       - "Soak the gelatine in cold water for 5 mins, squeeze the water out, then whisk it into the cooling custard until completely dissolved."
       - step: "Press cling film onto the surface and chill until cold and set, at least 2 hours or overnight."
         note: "Any air contact will result in skin."
-  - name: meringue
+  - name: "meringue"
     steps:
       - "Line two trays with parchment. Fit a large star nozzle to one piping bag and a plain 3–4 mm nozzle to another."
       - "Heat the egg whites, caster sugar and lemon juice over a bain-marie, whisking constantly until it reaches 60°C and the sugar has dissolved (smooth between fingers)."
@@ -70,7 +70,7 @@ method_groups:
       - "Pipe two wings per swan with the same nozzle, commas about half the size of the bodies."
       - step: "Bake at 100°C fan, necks for 1 hour, and the rest for about 1 hour 15 mins, until they lift cleanly off the parchment and sound hollow. Turn the oven off and leave everything inside to dry, another hour at least, ideally overnight."
         note: "Achieving shells rather than chewy discs is determined by proper cooling."
-  - name: assemble
+  - name: "assemble"
     steps:
       - step: "Whisk the set custard smooth."
       - step: "Salt the cream, and whip to soft-medium peaks and fold it through in two additions."

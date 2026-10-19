@@ -12,13 +12,13 @@ internal_temp_ref: fish.salmon
 doneness: medium
 tags: ["virtuous", "main"]
 ingredient_groups:
-  - name: salmon
+  - name: "salmon"
     items:
     - amount: "350 g"
       item: short-grain sticky rice
     - amount: "1 kg"
       item: salmon side
-  - name: glaze
+  - name: "glaze"
     items:
     - amount: "50 ml"
       item: light soy sauce
@@ -32,7 +32,7 @@ ingredient_groups:
       item: oyster sauce
     - amount: "2 tbsp"
       item: light brown soft sugar
-  - name: salad
+  - name: "salad"
     items:
     - amount: "30 g"
       item: sesame seeds

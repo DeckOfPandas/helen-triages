@@ -33,11 +33,16 @@ private drafts repos, so it cannot check for duplicates.
    the issue title above it and a one-line index of the whole dump first.
 3. **Three ways home:**
    - **In bulk, at a desk:** ask the chat for the envelopes as files, one `.md`
-     per recipe, zipped. Unzip them into `tmp/inbox/` in a Claude Code session
-     and say so. That session runs `scripts/ingest_inbox.py --from-file` over
-     each, and no issue is raised. This is the route for a big batch: a Claude
+     per recipe zipped, or as one combined file with each envelope under its
+     `# ingest: <slug>` heading. Put them in `tmp/inbox/` in a Claude Code
+     session and say so. That session runs `scripts/ingest_inbox.py
+     --from-file tmp/inbox`, which reads the folder and splits a combined
+     file, and no issue is raised. This is the route for a big batch: a Claude
      Code session never files dozens of issues (`CLAUDE.md`, "never create
-     issues or PRs in a burst").
+     issues or PRs in a burst"). **Never paste a batch into an issue on the
+     public repo**: the envelopes carry the source's text. And an issue body
+     stops at 65,536 characters, which a batch of twenty passes, silently
+     cutting the last envelope.
    - **From a phone:** paste each envelope into a new issue on the matching
      private repo, title as given, label `ingest`. Later, at a desk,
      `/ingest-inbox` writes the files and hands you one list of what needs you.
@@ -154,8 +159,14 @@ from a phone.
 IF HELEN ASKS FOR THE WHOLE BATCH AS FILES, write one file per recipe, named
 <slug>.md, each holding that recipe's COMPLETE ENVELOPE (marker, yaml block,
 "What I could not know", fingerprint) and nothing else, and offer them as one
-download. She unzips them into her repository's tmp/inbox/ and a session there
-parses them. Do not write her a prompt asking that session to file GitHub
+download. A single combined file is also accepted: the index first, then each
+complete envelope under a line reading exactly `# ingest: <slug>`. She puts
+either in her repository's tmp/inbox/ and a session there parses it.
+
+WHEN A RULE IS THE SAME FOR EVERY RECIPE IN THE BATCH — all from one issue of
+one magazine, every oven figure printed the same way — say it ONCE, in the
+index, rather than as the same bullet in every envelope. Each envelope's list
+keeps what is particular to that recipe. Do not write her a prompt asking that session to file GitHub
 issues: it does not, and a batch of issues from an automated account is the
 one thing her repository forbids.
 

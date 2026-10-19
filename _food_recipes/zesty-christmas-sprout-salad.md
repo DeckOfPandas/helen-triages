@@ -10,7 +10,7 @@ main_ingredients: ["Brussels sprouts", "pomegranate seeds", "walnuts", "apple", 
 star_ingredient: "greens"
 tags: ["salad", "no-cook", "virtuous", "festive", "extras"]
 ingredient_groups:
-  - name: salad
+  - name: "salad"
     items:
     - amount: "350 g"
       item: Brussels sprouts
@@ -24,7 +24,7 @@ ingredient_groups:
       item: walnuts
     - amount: "1 handful"
       item: "mint leaves, chopped, plus extra to garnish"
-  - name: dressing
+  - name: "dressing"
     items:
     - amount: "1"
       item: "lemon, zested and juiced"

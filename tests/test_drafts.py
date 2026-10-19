@@ -117,9 +117,9 @@ NOT_FOR_DRAFTS = {
         "fan/conventional pair is the fan one needs the original source, and "
         "they are not always in the same order (MANUAL 5)",
     "test_no_estimated_timings":
-        "8 drafts. Helen's standing rule is that she replaces these by hand "
-        "rather than have them converted, so flagging them in drafts would be "
-        "asking her to do published-recipe work early",
+        "an ingest writes `Estimated N mins` for an unprinted time (DECISIONS "
+        "§4), so the pool is full of them on purpose; "
+        "test_no_estimated_time_reaches_promotion holds them at 4-promote/",
     "test_ingredient_notes_are_lowercase_fragments":
         "9 drafts, and flag-only even for recipes -- Helen: 'I'll look at "
         "violations myself because I care about tone of voice'",
@@ -304,6 +304,10 @@ def test_no_retired_fields(draft):
 
 def test_scalar_fields_are_quoted(draft):
     _fm.test_scalar_fields_are_quoted(draft)
+
+
+def test_group_names_are_quoted(draft):
+    _fm.test_group_names_are_quoted(draft)
 
 
 def test_main_ingredients_entries_are_quoted(draft):
@@ -519,6 +523,16 @@ def test_metadata_time_format(draft):
         + "; ".join(problems)
         + ". Metadata fields use the terse forms `mins`/`hrs`."
     )
+
+
+def test_no_estimated_time_reaches_promotion(draft):
+    """A draft in `4-promote/` is copied live next, where an `Estimated` time
+    fails `test_no_estimated_timings` and a red `main` stops every deploy
+    (DECISIONS §4). Anywhere else in the pool an estimate is expected.
+    """
+    if "4-promote" not in draft.path.parts:
+        return
+    _st.test_no_estimated_timings(draft)
 
 
 def test_prose_abbreviates_minutes_only(draft):

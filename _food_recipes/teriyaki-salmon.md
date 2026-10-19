@@ -12,11 +12,11 @@ internal_temp_ref: fish.salmon
 doneness: medium
 tags: ["fakeaway", "main"]
 ingredient_groups:
-  - name: salmon
+  - name: "salmon"
     items:
     - amount: "800 g"
       item: "salmon, cut into four 2-inch fillets"
-  - name: teriyaki marinade
+  - name: "teriyaki marinade"
     items:
     - amount: 120 ml
       item: tamari

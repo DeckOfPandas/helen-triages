@@ -11,7 +11,7 @@ main_ingredients: ["plain flour", "unsalted butter", "egg yolk", "lemon curd", "
 star_ingredient:
 tags: ["bakes", "dessert", "showstopper", "fiddly and fun"]
 ingredient_groups:
-  - name: pastry base
+  - name: "pastry base"
     items:
     - amount: "8 oz"
       item: plain flour
@@ -24,10 +24,10 @@ ingredient_groups:
       item: egg yolk
     - amount: "1 pinch"
       item: salt
-  - name: filling
+  - name: "filling"
     items:
     - item: "[grandma's lemon curd](../grandmas-lemon-curd/)"
-  - name: meringue
+  - name: "meringue"
     items:
     - amount: "4 large"
       item: egg whites
@@ -36,13 +36,13 @@ ingredient_groups:
     - amount: "4 oz"
       item: "white caster sugar"
 method_groups:
-  - name: bake the pastry
+  - name: "bake the pastry"
     steps:
       - "Mix the flour, sugar and salt, then rub in the butter lightly with fingertips."
       - "Mix in the egg yolk and combine gently."
       - "Squish half the pastry into the dish and flatten it ish, freezing the other half."
       - "Bake at 190°C fan for 30 mins."
-  - name: assemble the pie
+  - name: "assemble the pie"
     steps:
       - "Spread the curd onto the baked pastry."
       - "Beat the egg whites with a pinch of cream of tartar until soft peaks form."

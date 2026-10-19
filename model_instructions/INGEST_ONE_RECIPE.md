@@ -133,20 +133,24 @@ name you give is a courtesy rather than a contract.
 
 | Field | Rule |
 |---|---|
-| `title` | The dish's name. **`and`, never `&`.** Keep the source's own name unless it is unusable. |
+| `title` | The dish's name. **`and`, never `&`.** Keep the source's own name unless it is unusable. **Keep its accents, and add any §6 lists that it lacks**: "Rich ragu" is titled "Rich Ragù". Helen: *"Accents in titles should be preserved, or added if missing."* |
 | `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
-| `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **If the source does not support an estimate, ask Helen in your list rather than guess** — her rule: "Claudes can check with me if unsure." |
-| `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. Not in the source? `"QQ"`. **Never estimate one** — an invented time publishes, a `QQ` does not. `cook_time: "None"` for a genuinely uncooked dish. |
+| `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **Where the source gives little to go on, estimate anyway and say so in your list**: the session with her repository confirms every estimate with her when the file lands — her rule: "Claudes can check with me if unsure." |
+| `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. **Not in the source? Estimate it, as `"Estimated 20 mins"`, and say so in your list** — Helen: *"I would like "Estimated 10 mins" to be written, then our tidying scripts block promotion for recipes with estimated times."* Her repository refuses to promote a recipe whose time still says `Estimated`, so a guess never publishes. Write `"QQ"` only where you cannot estimate at all. `cook_time: "None"` for a genuinely uncooked dish. |
 | `main_ingredients` | Section 4. Lowercase, a flat list. |
 | `star_ingredient` | Section 4. **Optional** — leave it out rather than force one. |
 | `tags` | Section 4. Only from the declared list. |
 | `ingredient_groups` | Below. |
 | `method` **xor** `method_groups` | Section 3 — the part that matters most. Flat `method:` for a recipe with one phase, `method_groups:` when the source has more. **Never both** — the layout renders one and silently drops the other. |
 | `method_short` | Always exactly `[""]`. It means "not written", and Helen writes it herself. |
-| `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s, replaces the label with a real heading and the text with her own words, and never has to recall the shape. **A bare string note is not legal**: her suite refuses one. An empty pair (`label: ""`, `text: ""`) is the placeholder for a note you have nothing to put in yet, and the page does not print it. **If you have no note to add, write exactly that one empty pair — never `notes: []`**: it leaves Helen somewhere to type without recalling the shape. Three at most; more than that and the material wants to be prose. |
+| `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen: "It's annoying for me to remember how to type YAML every time." The label is `"QQ"`, or `"QQ"`, a space and a short topic (`"QQ nutrition"`, `"QQ freezing"`); nothing else. She finds the `QQ`s, replaces the label with a real heading and the text with her own words, and never has to recall the shape. **A bare string note is not legal**: her suite refuses one. An empty pair (`label: ""`, `text: ""`) is the placeholder for a note you have nothing to put in yet, and the page does not print it. **If you have no note to add, write exactly that one empty pair — never `notes: []`**: it leaves Helen somewhere to type without recalling the shape. Three at most; more than that and the material wants to be prose. |
 | a tip printed under the source's own label | **Transcribe the tip; drop the label.** Good Food runs its asides under a standing `gf tip` rubric, which on her page is an abbreviation nobody can expand, or one that reads as *gluten-free*: a false allergen claim. `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence (*"the magazine likes Kallo"* stays). **Never carry an unexplained abbreviation across**: expand it while the source is in front of you, or drop it. |
+| a nutrition box, or badges | **Ignore them entirely**: kcal, fat, carbs, "per serving", and badges such as "gluten free", "iron", "2 of 5-a-day", "V". Not a note, not a line in your list. Helen: *"Drop them and add clear instructions for ingestion to ignore these."* |
+| a "you will need" list | **Ignore it.** Cake rings, thermometers, palette knives and foil are never an ingredient group or a note. Helen: *"the rule is "trust the cook"."* |
+| page furniture | **Drop anything that sells something**: a show appearance, a ticket line or phone number, a book plug, a TV listing, a "next month" teaser, a web pointer, a "what to drink" box with bottles and prices. **Keep writing about the dish**: an essay, a bio of the cook, a boxed aside, which go in the body below the front matter. Helen: *"Drop ads, keep essays."* |
+| a sidebar box with no list | A box such as "Kale crisps" or "Mastering perfect mash" becomes a file in the usual shape (quantities lifted from its text, per §2) and **has no body**: its words are already in the `QQ original` lines, and a body repeating them would publish the book's text unmarked. |
 | `meta` | Exactly these three keys, in this order, all `false`. See below. |
 
 **`meta:` is three flags, in that order, and on a new file all three are
@@ -371,10 +375,16 @@ is correct for plenty of recipes.
 - **Never convert a temperature, and never guess which figure is the fan
   one.** The `QQ original` line keeps whatever the source prints, all of it.
   **The `QQ Claude` line gives the FAN figure alone, where the source LABELS
-  one** — "200C/180C fan/gas 6" becomes "180°C fan" (Helen's ruling). Where
-  the pair is not labelled ("180C/160C/gas 4"), or there is only one figure,
-  or it is 350°F, the rewrite keeps what the source has and your list says so:
-  the figures are not always in the same order, and picking one is a guess.
+  one** — "200C/180C fan/gas 6" becomes "180°C fan" (Helen's ruling). **An
+  unlabelled pair 20 degrees apart is conventional and fan**, whichever order
+  it is printed in: "180C/160C/gas 4" becomes "160°C fan". Helen: *"Oven
+  pairings when one temp is 20 degrees lower than the other mean conventional
+  / fan, I'm just so sure."* Any other unlabelled pair, a single figure, or
+  350°F: the rewrite keeps what the source has and your list says so.
+  **The exception is a book Helen has ruled on.** *Riverford Companions*
+  prints one conventional figure with its gas mark ("190°C/Gas 5"); the fan
+  figure is 20 lower, so the rewrite says "170°C fan". Her ruling:
+  *"Conventional: fan is 20 less".*
 - **Weights: old-style recipes and almost all baking keep their ounces.**
   Helen's ruling. Delia in particular. Do not convert a baking recipe to metric.
 - **Never merge, split or reorder steps.** A source step becomes exactly one
@@ -579,8 +589,8 @@ website). Keep one that points into the same book the recipe came from.
   **So a `QQ Claude` line says "1 hour 30 mins" and never "1 hr 30 mins".**
 - Cross-recipe links, if you write one at all, are relative markdown:
   `[display text](../other-slug/)`. Never root-relative.
-- **Accents on food words** — the two lists below. In prose only, never in the
-  filename and never in `source`.
+- **Accents on food words** — the two lists below. In prose and in the title,
+  never in the filename and never in `source`.
 
 **The accented spellings her house style declares:**
 
@@ -611,7 +621,8 @@ agonising over.** Get it right where it is easy; do not let it slow down section
 
 ## 7. Never do these
 
-- **Never write `Estimated 30 mins`** or any invented time. Banned outright.
+- **Never write an estimated time without the word `Estimated`.** A bare
+  `"30 mins"` the source did not print reads as measured and publishes.
 - **Never set `meta.rewritten` or `meta.proofread` to `true`.** Those are
   Helen's claims about her own reading, not yours.
 - **Never remove a `QQ`**, of any kind, or delete a `QQ original` line.
@@ -635,8 +646,10 @@ Worth knowing, because it tells you where to spend effort and where not to.
 Helen saves it into `_food_drafts/`, where it is private and unpublished. Her
 test suite then checks the schema, the citation, the tags, the typography and
 the ingredient spellings, and a formatter fixes quoting, dashes, unit spaces,
-accents and the `meta:` block mechanically. **So a mechanical fault costs her
-seconds.**
+accents and the `meta:` block mechanically. It formats the dashes, unit
+spaces and accents of your `QQ original` lines too, so transcribe those
+exactly as printed and leave the formatting to it. **So a mechanical fault
+costs her seconds.**
 
 What no machine of hers can recover is a step you garbled, a quantity you
 guessed, or a qualifier you invented — because the page it came from is gone by

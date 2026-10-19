@@ -200,8 +200,9 @@ without its flag, so run it dry first if you want to see what it will do.
    cocktails --only order --apply`, which puts its keys in page order by moving
    whole blocks and editing no line;
    `test_a_draft_drinks_keys_are_in_page_order` fails until it has. Then
-   `/tidy-drafts`, either collection, if the quoting or typography needs it. It
-   never touches a `QQ` line, so the transcription is safe.
+   `/tidy-drafts`, either collection, if the quoting or typography needs it. On
+   food it formats a `QQ` line's dashes, unit spaces and accents and changes no
+   other word; on a drink it never touches one.
 6. **`pytest`**, once. Everything mechanical shows up here -- quoting, dashes,
    accents, an undeclared tag, a missing glass.
 7. **Work whatever is left against the three tiers.** What steps 2 to 6 left
@@ -259,8 +260,23 @@ else has already done (MANUAL §9.1).
 - **The fan oven temperature**, from the printed pair. Check WHICH is the fan
   figure; they are not always in the same order. **A `QQ Claude` line gives the
   fan figure alone; its `QQ original` keeps everything the source printed.**
-  Where the pair is not labelled, the rewrite keeps the pair and the question
-  goes on her list.
+  An unlabelled pair 20 degrees apart is conventional and fan, so the lower
+  is the fan figure (Helen: *"I'm just so sure"*); any other unlabelled pair
+  keeps the pair and the question goes on her list. **A book she has ruled on
+  is not a question**: *Riverford
+  Companions* prints the conventional figure ("190°C/Gas 5"), so the fan figure
+  is 20 lower (Helen: *"Conventional: fan is 20 less"*).
+- **A time the source does not print is `Estimated N mins`**, with the estimate
+  on her list. Helen: *"I would like "Estimated 10 mins" to be written, then
+  our tidying scripts block promotion for recipes with estimated times."*
+  `test_no_estimated_time_reaches_promotion` fails on one in `4-promote/`.
+- **What is never transcribed**: a nutrition box and its badges (*"Drop them
+  and add clear instructions for ingestion to ignore these"*); a "you will
+  need" equipment list (*"the rule is "trust the cook""*); anything on the page
+  that sells something -- a show, a ticket line, a book plug, a TV listing,
+  "next month", a web pointer, a wine box (*"Drop ads, keep essays"*). An essay
+  or a bio about the dish is kept, in the body. **A sidebar box with no list
+  has no body**: its words are already its `QQ original` lines.
 - **The ingredient list is the source's own list; never add to it from the
   method.** Helen: *"We shouldn't list incidentals. We can trust the cook."*
   "Pour over 75 ml boiling water", "a pinch of salt", flour for dusting: none
@@ -290,9 +306,10 @@ else has already done (MANUAL §9.1).
   **`makes:` is never read as people** however numeric it looks. The shopping
   list divides by this, and a recipe without one gets no scaler at all. Read it
   off the recipe: a round cake 12, a loaf 10, a 950 ml tub of ice cream 8,
-  18 cookies 9 (two each), 12 Yorkshire puddings 6. **Where the source does not
-  support one -- `serves: QQ`, "Some", "however many you make" -- this becomes
-  a TIER 3 question rather than a guess.** Helen: *"Claudes can check with me
+  18 cookies 9 (two each), 12 Yorkshire puddings 6. **Where the source gives
+  little to go on -- `serves: QQ`, "Some", "however many you make" -- estimate
+  anyway and put the figure on her list**; a web Claude may do the same, and
+  the next local pass confirms it with her. Helen: *"Claudes can check with me
   if unsure."*
 - **Split `ingredient_groups` and `method_groups`** -- once, here, and never
   again afterwards. Phases are usually obvious from the source and re-reading
@@ -321,14 +338,16 @@ else has already done (MANUAL §9.1).
     phase is fine there.
   - **Quote every group name, on both sides**: `- name: "dressing"`,
     `- name: "Make the dressing"`. Quoted and bare parse to the same string, so
-    this is only about every file reading the same way; `/tidy-drafts`
-    (`--only quoting`) fixes a bare one.
+    this is only about every file reading the same way;
+    `test_group_names_are_quoted` fails on a bare one and `/tidy-drafts`
+    (`--only quoting`) fixes it.
 - **House style** -- en dashes, `°C`, unicode fractions, quoting, accents, and
   **a space between a number and its unit** (`15ml` -> `15 ml`). The units are
   `kg`, `g`, `ml`, `cl`, `cm`, `mm`, `oz`, `tsp`, `tbsp`; a temperature is NOT
   one of them, because `180C` wants a degree sign and spacing it would half-fix
   it. `scripts/tidy_drafts.py --only units` is the same rule for a drafts pass.
-  Outside `QQ` lines, always.
+  On food the formatting reaches `QQ` lines too, so Helen rewrites from house
+  style; a `QQ original` still keeps every word the source printed.
 - **The citation**, per `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`. For
   food that is `source` + `source_type`; a dated magazine is a `publication`, an
   undated one is a `website`, and that distinction catches everyone out. For
@@ -464,8 +483,10 @@ that has been read as a budget, and her own recipes run to fourteen.
 
 Rewriting a method step into her voice. `incidental:` on anything but the
 tin-and-pan fats and flour TIER 1 names. The case-by-case tags
-(`freezable`, `virtuous`, `one-handed food`). Inventing a time or temperature --
-`Estimated N mins` is banned outright. Setting `meta.rewritten` or
+(`freezable`, `virtuous`, `one-handed food`). Inventing a temperature, or a
+time that does not say so: an unprinted time is written `Estimated N mins`
+(DECISIONS §4), and `test_no_estimated_time_reaches_promotion` holds it at
+`4-promote/`. Setting `meta.rewritten` or
 `meta.proofread` to `true`, or choosing a `meta.ship`. **Reconstructing a
 truncated step**, even when every sibling recipe on the page ends the same way.
 **Declaring a bottle in `bottles.yml`** from the ingredient beside it.

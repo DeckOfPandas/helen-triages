@@ -47,8 +47,10 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
    browser's output, so a malformed one is a question for her, and guessing
    what it meant is the invention this whole channel exists to prevent.
 
-   `--issue N` works one envelope. `--from-file PATH` parses a local file
-   instead of fetching, which is what a paste from the clipboard uses.
+   `--issue N` works one envelope. `--from-file PATH` parses a local file, or
+   every `.md` in a folder, instead of fetching. A file may be a whole batch:
+   it is split at its `# ingest: <slug>` headings, the index above the first is
+   dropped, and each envelope is reported as `<file> <slug>`.
 
 4. **Write**: `--write`. Then the finishing pass from `/ingest`, steps 2 to 8,
    in its order. `ingest.md` has the detail of each; the order is the one the
@@ -66,7 +68,7 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
       order --apply`.** An envelope can arrive with its keys in another order,
       and `test_a_draft_drinks_keys_are_in_page_order` fails until this runs.
       Then `/tidy-drafts`, either collection, if the quoting or typography
-      needs it. It never touches a `QQ` line.
+      needs it. It formats a food `QQ` line and never rewords one.
    5. **`pytest`.** Once, and never two at a time.
    6. **`python3 scripts/ingest_preflight.py`** -- undeclared bottles,
       near-miss garnishes, unstated times, in the same shape a photo batch
@@ -129,6 +131,15 @@ a dictionary settles (step 4); everything else here binds the session too.
 
 ## Traps
 
+- **A batch pasted into an issue is cut off at GitHub's 65,536-character
+  body limit**, and the cut lands after a marker line, so the last envelope
+  rejects as "0 fenced code blocks". Split batches end that way, and the
+  envelope is in no issue at all: ask Helen to paste it again.
+- **A batch in a PUBLIC-repo issue** is source text that may be copyright
+  (INGEST_INBOX_DESIGN.md §8). Save the bodies to `tmp/` with `sh
+  scripts/gh-read.sh repos/DeckOfPandas/helen-triages/issues/<N> --jq .body >
+  tmp/<dir>/<N>.md`, run `--from-file` over the folder, and tell Helen first:
+  only she can delete an issue. A private-repo `Fixes #N` does not reach it.
 - **A probable duplicate is a report, not a verdict.** The fingerprint compares
   formulas, so a match is strong evidence and still hers to confirm -- an
   identical drink transcribed from a second book is a citation worth having.

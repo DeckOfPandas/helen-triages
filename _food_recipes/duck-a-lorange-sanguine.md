@@ -11,11 +11,11 @@ star_ingredient: "duck"
 internal_temp_ref: poultry.duck
 tags: ["showstopper", "main"]
 ingredient_groups:
-  - name: duck
+  - name: "duck"
     items:
     - amount: "1"
       item: "whole duck, with giblets, about 2 kg"
-  - name: sauce
+  - name: "sauce"
     items:
     - amount: "1 tsp"
       item: black peppercorns

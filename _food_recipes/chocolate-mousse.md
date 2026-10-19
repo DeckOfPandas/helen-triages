@@ -10,7 +10,7 @@ main_ingredients: ["dark chocolate", "eggs", "cream", "golden caster sugar", "un
 star_ingredient: "chocolate"
 tags: ["dessert", "make-ahead", "no-cook"]
 ingredient_groups:
-  - name: mousse
+  - name: "mousse"
     items:
     - amount: "3 large"
       item: eggs
@@ -23,7 +23,7 @@ ingredient_groups:
     - amount: "35 g"
       item: golden caster sugar
     - item: salt, more than one might think
-  - name: to serve
+  - name: "to serve"
     items:
     - item: whipped cream
     - item: dark chocolate shavings
