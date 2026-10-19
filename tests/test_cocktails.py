@@ -1155,7 +1155,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # test with the old value, which must name only the granted files, then move
 # it in a commit of its own quoting her grant (DECISIONS §4.0). A grant covers
 # that commit and nothing after; parallel grants need the merge behind both.
-COCKTAIL_BASELINE_COMMIT = "d9fea67b"   # #1391's five, with every earlier grant behind it
+COCKTAIL_BASELINE_COMMIT = "8ef2be8e"   # the ten promoted after #1413; has `22d6c4c1` (its IOU marks) behind it
 
 
 def _newest_commit_per_published_drink():
@@ -4588,16 +4588,17 @@ def test_the_cocktail_drafts_clone_is_in_step():
     assert problem is None, problem
 
 
-def test_meta_ship_is_a_rung_or_who_knows():
-    """`meta.ship` is a rung on `ship_scale` or the string "who knows", on every
-    drink, drafts included. `QQ` is not a ship value: "nobody has asked" is
-    `made_before: false` (#722), and two markers for one fact drift.
+def test_meta_ship_is_a_rung_or_off_scale():
+    """`meta.ship` is a rung on `ship_scale` or a key of `ship_off_scale`
+    ("who knows", "IOU"), on every drink, drafts included. `QQ` is not a ship
+    value (#722).
 
     An unmade drink may publish (#722), so there is no promotion-only version.
     """
-    scale = set(_taxonomy().get("ship_scale") or [])
+    taxonomy = _taxonomy()
+    scale = set(taxonomy.get("ship_scale") or [])
     assert scale, "taxonomy.yml has no `ship_scale:` to check against."
-    allowed = scale | {"who knows"}
+    allowed = scale | set(taxonomy.get("ship_off_scale") or {})
 
     offenders = []
     for slug, fm in _load():
@@ -4609,12 +4610,36 @@ def test_meta_ship_is_a_rung_or_who_knows():
             offenders.append(f"{slug}: meta.ship is {meta.get('ship')!r}")
 
     assert not offenders, (
-        "Drink(s) whose `meta.ship` is not a rung or \"who knows\":\n  "
+        "Drink(s) whose `meta.ship` is not a rung or an off-scale value:\n  "
         + "\n  ".join(sorted(offenders))
         + f"\n\nAllowed: {sorted(allowed)}. `QQ` is not one of them -- a drink "
-          "nobody has an opinion about says \"who knows\", which is a verdict "
-          "of sorts rather than a missing field, and `made_before: false` is "
-          "where 'she has never made it' is recorded."
+          "Helen has never made says \"who knows\", and one she made and liked "
+          "but never rated says \"IOU\"."
+    )
+
+
+def test_ship_agrees_with_made_before():
+    """`who knows` is exactly the unmade drinks; every other ship says made (#1413).
+
+    The YOLO filters read `ship` alone, so `chaos only` lists an unmade drink
+    only because it says `who knows`. A drink made and not rated is `IOU`;
+    leaving it `who knows` would offer it as a gamble.
+    """
+    bad = []
+    for slug, fm in _load():
+        meta = fm.get("meta")
+        if not isinstance(meta, dict) or not isinstance(meta.get("made_before"), bool):
+            continue  # test_made_before_is_a_real_boolean names these
+        unmade_word = meta.get("ship") == "who knows"
+        if unmade_word == meta["made_before"]:
+            bad.append(f"{slug}: made_before {meta['made_before']}, "
+                       f"ship {meta.get('ship')!r}")
+    assert not bad, (
+        "Drink(s) whose `meta.ship` and `meta.made_before` disagree:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nNever made is `made_before: false` with `ship: \"who knows\"`. "
+          "Made but not rated is `made_before: true` with `ship: \"IOU\"`. A "
+          "rung means she has made it."
     )
 
 
@@ -4644,29 +4669,53 @@ def test_made_before_is_a_real_boolean():
     )
 
 
-def test_the_off_scale_ship_has_a_word():
-    """`ship_unrated_word` is a non-empty string and is not a rung (#722).
+def test_every_off_scale_ship_has_a_word():
+    """Each `ship_off_scale` value and its word are non-empty and not rungs
+    (#722, #1413).
 
-    `_includes/cocktails/ship.html` prints it for any ship not on `ship_scale`.
-    A missing key is nil in Liquid and prints as nothing, so deleting it draws
-    the ship mark with no word beside it and no error. The word is Helen's to
-    change; it must never read as a rating (MANUAL §9.9).
+    `_includes/cocktails/ship.html` prints the word for any ship not on
+    `ship_scale`. A missing word is nil in Liquid and prints as nothing: the
+    ship mark with no word beside it and no error. The words are Helen's to
+    change; they must never read as a rating (MANUAL §9.9).
     """
     taxonomy = _taxonomy()
-    word = taxonomy.get("ship_unrated_word")
-
-    assert isinstance(word, str) and word.strip(), (
-        f"taxonomy.yml has no usable `ship_unrated_word` (got {word!r}). Every "
-        "drink whose ship is not a rung -- 'who knows', and it is the only one "
-        "-- would draw the ship mark with nothing beside it, on the cards AND "
-        "on the drink page, with no error to say so."
+    off = taxonomy.get("ship_off_scale")
+    assert isinstance(off, dict) and {"who knows", "IOU"} <= set(off), (
+        f"taxonomy.yml's `ship_off_scale` must map at least \"who knows\" and "
+        f"\"IOU\" to a word (got {off!r})."
     )
 
     scale = taxonomy.get("ship_scale") or []
-    assert word not in scale, (
-        f"`ship_unrated_word` is {word!r}, which is also a rung on "
-        f"`ship_scale`. The off-scale word must not read as a rating: that is "
-        f"the sixth term the scale exists to avoid inventing."
+    for value, word in off.items():
+        assert isinstance(word, str) and word.strip(), (
+            f"`ship_off_scale` gives {value!r} no usable word (got {word!r}), "
+            "so its drinks draw the ship mark with nothing beside it, on the "
+            "cards AND on the drink page."
+        )
+        assert value not in scale and word not in scale, (
+            f"`ship_off_scale` entry {value!r}: {word!r} is also a rung on "
+            "`ship_scale`. An off-scale value must not read as a rating."
+        )
+
+
+def test_the_chaos_lists_name_only_real_ship_values():
+    """taxonomy.yml's `chaos` lists name rungs or off-scale values, and share none.
+
+    A misspelt value fails no comparison loudly: its drinks just fall into
+    `middle`, the bucket only `I'm open to chaos` shows (#1413).
+    """
+    taxonomy = _taxonomy()
+    known = set(taxonomy.get("ship_scale") or []) | set(taxonomy.get("ship_off_scale") or {})
+    chaos = taxonomy.get("chaos") or {}
+    assert set(chaos) == {"good", "chaos"}, (
+        f"taxonomy.yml `chaos` should have exactly `good` and `chaos` lists, the "
+        f"two YOLO buttons that narrow (got {sorted(chaos)})."
+    )
+    for name, values in chaos.items():
+        unknown = sorted(set(values) - known)
+        assert not unknown, f"`chaos.{name}` names no real ship value: {unknown}"
+    assert not set(chaos["good"]) & set(chaos["chaos"]), (
+        "A ship value is in both `chaos.good` and `chaos.chaos`."
     )
 
 
@@ -5447,7 +5496,7 @@ def _prose_fields(drink):
 # The string-valued top-level keys only. The `meta:` booleans must never be
 # quoted: a quoted one is the string "true", which the publish gate reads as
 # neither true nor false (test_the_gate_flags_are_real_booleans). `meta.ship`
-# is checked by test_meta_ship_is_a_rung_or_who_knows.
+# is checked by test_meta_ship_is_a_rung_or_off_scale.
 DRINK_SCALAR_FIELDS = ["title", "tagline", "snippet", "source", "source_url",
                        "to_serve"]
 

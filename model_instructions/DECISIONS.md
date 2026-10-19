@@ -2490,11 +2490,21 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   because it's a positive presence"*. A published drink's ship is never empty
   (Helen, 2026-08-30: *"every cocktail we publish must have the ship field
   filled in"*), and `who knows` counts as filled in. The page shows it as
-  `???` (`ship_unrated_word` in `taxonomy.yml`), which is not a rating. The
+  `???` (`ship_off_scale` in `taxonomy.yml`), which is not a rating. The
   word must not be a rung of `ship_scale`: *"unambiguously not on the same
   rating scale. (It's also funny)."* Helen, 2026-10-11: *"The ??? mark means
-  'I've never made this so I simply don't know'."* `_dev/no-verdict.html` is
-  the worklist.
+  'I've never made this so I simply don't know'."*
+- **2026-10-18, #1413 — a drink Helen has made and liked but never rated says
+  `ship: "IOU"`, shown as `IOU` on the card and the drink page; `who knows` is
+  only ever an unmade drink.** Her issue: *"I propose 'IOU' for drinks I've
+  made and liked but didn't rate."* Like `who knows`, it is off the scale, not
+  a rung. `who knows` had covered two facts, never made and made-but-unrated
+  (75 drinks, six of them live); the split made them agree with `made_before`
+  by test (`test_ship_agrees_with_made_before`). All 75 became IOU at once,
+  and on the six live ones Helen granted the mark without a proofread flip:
+  *"if this mark is the only change then the proofread flag doesn't need to be
+  flipped, so no recipe goes dark. Explicit grant this time only."*
+  `_dev/no-verdict.html` is the worklist of IOUs.
 
 ### §9.7 / §9.8
 
@@ -3046,11 +3056,19 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   (#693: the eye had read "the universe says deal again"). Kept on cocktails
   though dropped on food: *"almost always more open to persuasion about what I
   drink than what I eat"*.
-- **2026-09-06, #732 — the third YOLO button is `chaos only`, and it reads
-  `made_before`, never `ship`.** Helen: *"the name of the third YOLO filter
-  should be 'chaos only'"*, replacing `never made it` within hours. It is a
-  name on a scale, not a description. `made_before: false` and `ship: who
-  knows` agree today and come apart the day she makes an unrated drink.
+- **2026-09-06, #732 — the third YOLO button is `chaos only`.** Helen: *"the
+  name of the third YOLO filter should be 'chaos only'"*, replacing `never
+  made it` within hours. It is a name on a scale, not a description.
+- **2026-10-18, #1413 — the YOLO buttons read `ship`: `no chaos please` keeps
+  `yes` and `oh gods yes`; `chaos only` keeps `meh`, `not really` and `???`;
+  `sure` and `IOU` show only under `I'm open to chaos`.** Her issue: *"no chaos
+  please -> only yes and yes^2 / chaos only -> only meh and not really, plus
+  never made (now ???) / I'm open to chaos -> everything"*. Asked whether IOU
+  belongs in `chaos only` (*"It really is chaotic, just leaning towards the
+  good end. I could argue either way honestly"*), she kept it out: the dial is
+  risk, an IOU's is about `sure`'s, and #1412's ship-mark filter lists IOUs
+  directly. The lists are `chaos` in `taxonomy.yml`. Replaces #732's "reads
+  `made_before`, never `ship`", made safe by `test_ship_agrees_with_made_before`.
 - **2026-09-10 — no line of words goes under the wordmark.** Offered a
   strapline (*"What shall we cook?"*) in the design pass, Helen: *"No words
   under the wordmark section please."*
@@ -3099,11 +3117,18 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   whole fruits needed, like this '375 ml lemon juice (X to Y lemons)'."* The
   range comes from `juice_yields` in `ingredients.yml`, which gives each
   fruit's yield as a range, so the count is a range too and never one figure.
-- **2026-09-05 — the "ship it?" legend sits in the row under the count, beside
-  the shortlisted button.** Helen: *"move the ship mark into the same row so
-  it's not hovering above the cards."* It had ended the count line.
-  `.drink-count-row` in `cocktails/index.html`: what you can do with the list
-  on the left, what the mark on every card means on the right.
+- **2026-10-18, #1412 — a card's ship mark is a filter to that exact value;
+  the legend names the chosen value and `× clear ship` sits under it.** Helen,
+  offered a fourth YOLO button or a clear in the count row: *"Neither! My guess
+  is to update the ship legend to '[ship] SHIP IT? = YES' or whatever it is,
+  then add a 'clear ship' button below. Vertical placement can match the X
+  survivors text and shortlist button on the left."* So `.drink-count-block`
+  is two by two: count and legend, then shortlisted and the clear. The value
+  is the card's word, and it ANDs with the YOLO buttons rather than replacing
+  them. The drink page's SHIP IT? word links to `?ship=`. This replaces
+  2026-09-05's legend on the shortlisted row (*"move the ship mark into the
+  same row so it's not hovering above the cards"*): the clear now holds that
+  row.
 - **Undated, #692 — "the universe says…" deals only from the top two ship
   rungs, `yes` and `oh gods yes`.** Helen: *"It's pretty funny when the top
   line of the site shows a drink loudly marked 'MEH', but it's still not the
@@ -3151,11 +3176,6 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   section's tape); the rule has not. `:not(.is-on)` on the hover selectors in
   `_sass/cocktails/_filters.scss` is load-bearing, because `:hover` and
   `.is-on` are equally specific.
-- **2026-09-05 — the "ship it?" legend sits in the row under the count, at its
-  right, opposite the SHORTLISTED button.** Helen: *"move the ship mark into
-  the same row so it's not hovering above the cards."* `.drink-count-legend`
-  in `.drink-count-row`: the one line on the page that says what the ship on
-  every card means, in the card's own type and muted because it is a caption.
 - **2026-09-05, #729 / #730 — the shortlisted-only control is a bordered pill
   in the row under the count, on both indexes.** Helen: *"Style it nicely.
   Maybe as a toggle [show shortlist]. Possibly place it below X survivors."*

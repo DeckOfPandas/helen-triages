@@ -123,6 +123,15 @@ test('parseName is empty when there is no q, an empty q, or no search at all', (
   assert.strictEqual(FS.parseName('?tag=soup'), '');
 });
 
+test('parseShip reads one whole ?ship= value, the last one winning (#1412)', () => {
+  assert.strictEqual(FS.parseShip('?ship=IOU'), 'IOU');
+  assert.strictEqual(FS.parseShip('?ship=oh+gods+yes#results'.split('#')[0]), 'oh gods yes');
+  assert.strictEqual(FS.parseShip('?ship=meh&ship=who%20knows'), 'who knows');
+  assert.strictEqual(FS.parseShip('?mood=sharp'), '');
+  assert.strictEqual(FS.parseShip('?ship='), '');
+  assert.deepStrictEqual(FS.parseQuery('?ship=IOU'), { star: [], tag: [], mood: [], ing: [] });
+});
+
 test('parseName does not leak into parseQuery', () => {
   assert.deepStrictEqual(FS.parseQuery('?q=negroni'), { star: [], tag: [], mood: [], ing: [] });
 });

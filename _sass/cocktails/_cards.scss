@@ -627,6 +627,22 @@ $card-tagline-top: 0.584rem;
   white-space: nowrap;
 }
 
+// On the index the mark is a <button> that filters to its ship value (#1412),
+// so it takes the click back and undoes the UA's button styling. A related
+// card on a drink page keeps the plain span, and its corner opens the drink.
+button.drink-card-ship {
+  pointer-events: auto;
+  border: 0;
+  border-radius: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-right: 0;
+  cursor: pointer;
+
+  &:hover .drink-card-ship-word,
+  &:focus-visible .drink-card-ship-word { color: $color-wicked-woowoo; }
+}
+
 .drink-card-ship-icon {
   flex: none;
   width: 1rem;

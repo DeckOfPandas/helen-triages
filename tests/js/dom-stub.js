@@ -212,6 +212,11 @@ class Element {
 
   matches(selector) { return selectorMatches(this, parseCompound(selector)); }
 
+  contains(other) {
+    for (let node = other; node; node = node.parentNode) if (node === this) return true;
+    return false;
+  }
+
   closest(selector) {
     const compound = parseCompound(selector);
     let node = this;

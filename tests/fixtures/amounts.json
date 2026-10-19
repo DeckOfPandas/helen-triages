@@ -425,6 +425,16 @@
   }
  },
  {
+  "amount": "5 cubes",
+  "number": 5.0,
+  "unit": "cubes",
+  "ml": null,
+  "js": {
+   "quantity": 5,
+   "unit": "cube"
+  }
+ },
+ {
   "amount": "5 dashes",
   "number": 5.0,
   "unit": "dashes",
@@ -542,6 +552,26 @@
   "js": {
    "quantity": 75,
    "unit": "ml"
+  }
+ },
+ {
+  "amount": "9 cubes",
+  "number": 9.0,
+  "unit": "cubes",
+  "ml": null,
+  "js": {
+   "quantity": 9,
+   "unit": "cube"
+  }
+ },
+ {
+  "amount": "9 each",
+  "number": 9.0,
+  "unit": "each",
+  "ml": null,
+  "js": {
+   "quantity": 9,
+   "unit": "each"
   }
  },
  {

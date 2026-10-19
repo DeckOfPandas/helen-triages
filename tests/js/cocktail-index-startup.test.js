@@ -24,13 +24,13 @@ const ROOT = path.join(__dirname, '..', '..');
 const DRINKS = [
   // `sharp` only: answers the MOOD question and not the HASSLE one.
   { url: '/a', name: 'daiquiri', title: 'Daiquiri', moods: ['sharp'],
-    ingredients: ['lime juice|lime juice'], chaos: 'good', madeBefore: true },
+    ingredients: ['lime juice|lime juice'], chaos: 'good' },
   // `sharp` AND `no juicing`: answers both questions. #695's case.
   { url: '/b', name: 'negroni', title: 'Negroni', moods: ['sharp', 'no juicing'],
-    ingredients: ['gin|gin'], chaos: 'good', madeBefore: true },
-  // Never made, for #732.
+    ingredients: ['gin|gin'], chaos: 'good' },
+  // Never made: in `chaos only`'s list (#1413).
   { url: '/c', name: 'bamboo', title: 'Bamboo', moods: ['aperitivo'],
-    ingredients: ['dry vermouth|dry vermouth'], chaos: 'open', madeBefore: false }
+    ingredients: ['dry vermouth|dry vermouth'], chaos: 'chaos' }
 ];
 
 function titlesInOrder(page) {
@@ -85,6 +85,81 @@ test('startup actually applied the filters rather than merely not crashing', () 
     r.page.list.children.map(function (c) { return c.hidden; }), [false, false, false],
     'no filter is set, so every card should be visible.'
   );
+});
+
+test('each narrowing YOLO button keeps only the cards stamped with its name', () => {
+  // #1413: `good` and `chaos` each keep one taxonomy.yml list; `open` keeps all.
+  const r = boot({ drinks: DRINKS.concat([
+    { url: '/d', name: 'iou', title: 'IOU', moods: ['sharp'],
+      ingredients: ['gin|gin'], chaos: 'middle' }
+  ]) });
+  clickByData(r.page, 'data-chaos', 'good');
+  assert.deepStrictEqual(visibleTitles(r.page).sort(), ['Daiquiri', 'Negroni']);
+  clickByData(r.page, 'data-chaos', 'chaos');
+  assert.deepStrictEqual(visibleTitles(r.page), ['Bamboo']);
+  clickByData(r.page, 'data-chaos', 'open');
+  assert.strictEqual(visibleTitles(r.page).length, 4);
+});
+
+// --- the ship mark is a filter (#1412) ---------------------------------------
+
+const SHIPS = [
+  { url: '/a', name: 'a', title: 'A', moods: ['sharp'], ingredients: ['gin|gin'],
+    chaos: 'middle', ship: 'IOU' },
+  { url: '/b', name: 'b', title: 'B', moods: ['sharp'], ingredients: ['gin|gin'],
+    chaos: 'middle', ship: 'IOU' },
+  { url: '/c', name: 'c', title: 'C', moods: ['sharp'], ingredients: ['gin|gin'],
+    chaos: 'good', ship: 'oh gods yes', ship_word: 'yes²' }
+];
+
+function shipMark(page, title) {
+  const li = page.list.children.filter(function (c) {
+    return c.querySelector('.drink-card-name a').textContent === title;
+  })[0];
+  return li.querySelector('.drink-card-ship');
+}
+
+function legendWord(r) {
+  const value = r.doc.querySelector('[data-ship-legend-value]');
+  return value.hidden ? null : r.doc.querySelector('[data-ship-legend-word]').textContent;
+}
+
+test('#1412: pressing a card\'s ship mark keeps that value and the legend names it', () => {
+  const r = boot({ drinks: SHIPS });
+  assert.strictEqual(legendWord(r), null, 'no ship chosen, so the legend shows no value');
+  assert.strictEqual(r.doc.getElementById('clear-ship').hidden, true);
+
+  shipMark(r.page, 'C').dispatch('click');
+  assert.deepStrictEqual(visibleTitles(r.page), ['C']);
+  assert.strictEqual(legendWord(r), 'yes²', 'the legend uses the card\'s word, not the raw value');
+  assert.strictEqual(r.doc.getElementById('clear-ship').hidden, false);
+
+  shipMark(r.page, 'C').dispatch('click');
+  assert.strictEqual(visibleTitles(r.page).length, 3, 'a second press clears it');
+  assert.strictEqual(legendWord(r), null);
+});
+
+test('#1412: `× clear ship` clears only the ship, and clear all clears it too', () => {
+  const r = boot({ drinks: SHIPS });
+  shipMark(r.page, 'A').dispatch('click');
+  assert.deepStrictEqual(visibleTitles(r.page).sort(), ['A', 'B']);
+  r.doc.getElementById('clear-ship').dispatch('click');
+  assert.strictEqual(visibleTitles(r.page).length, 3);
+
+  shipMark(r.page, 'A').dispatch('click');
+  r.doc.querySelector('.btn-clear').dispatch('click');
+  assert.strictEqual(visibleTitles(r.page).length, 3);
+  assert.strictEqual(legendWord(r), null);
+});
+
+test('#1412: ?ship= from a drink page narrows the list; an unknown value is dropped', () => {
+  const r = boot({ drinks: SHIPS, search: '?ship=IOU' });
+  assert.deepStrictEqual(visibleTitles(r.page).sort(), ['A', 'B']);
+  assert.strictEqual(legendWord(r), 'IOU');
+
+  const bad = boot({ drinks: SHIPS, search: '?ship=nonsense' });
+  assert.strictEqual(visibleTitles(bad.page).length, 3);
+  assert.strictEqual(legendWord(bad), null);
 });
 
 // --- the guard's own guard ---------------------------------------------------
@@ -229,8 +304,7 @@ function manyDrinks(n) {
       title: 'Drink ' + i,
       moods: ['sharp'],
       ingredients: ['gin|gin'],
-      chaos: 'good',
-      madeBefore: true
+      chaos: 'good'
     });
   }
   return out;
@@ -322,8 +396,7 @@ const CHIPPY = [{
   // Alphabetical, as the page renders them (#710).
   moods: ['aperitivo', 'clear', 'nightcap', 'no juicing', 'tiki', 'warming'],
   ingredients: ['rye|rye'],
-  chaos: 'good',
-  madeBefore: true
+  chaos: 'good'
 }];
 
 // The panel has to offer every mood this drink carries, or the test would be
@@ -476,9 +549,9 @@ test('#1130: either half of a joined "X or Y" pour finds the drink', () => {
   const drinks = [
     { url: '/sling', name: 'sling', title: 'Singapore Sling', moods: ['sharp'],
       ingredients: ['cherry brandy|cherry liqueur|cherry heering'],
-      chaos: 'good', madeBefore: true },
+      chaos: 'good' },
     { url: '/other', name: 'other', title: 'Other', moods: ['sharp'],
-      ingredients: ['gin|gin'], chaos: 'good', madeBefore: true }
+      ingredients: ['gin|gin'], chaos: 'good' }
   ];
 
   ['cherry brandy', 'cherry liqueur'].forEach(function (half) {

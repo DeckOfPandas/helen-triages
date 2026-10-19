@@ -2,8 +2,8 @@
    page so the two cannot disagree. Takes `ship`, the raw `meta.ship`, which may
    be absent.
 
-   A rung's own word if it is on `ship_scale`, and taxonomy.yml's
-   `ship_unrated_word` if it is not (#722). The template names no vocabulary
+   A rung's own word if it is on `ship_scale`, and its `ship_off_scale` word in
+   taxonomy.yml if it is not (#722, #1413). The template names no vocabulary
    value: "not a rung" is asked of `ship_scale`, never tested against a literal
    (MANUAL §9.9).
 
@@ -20,6 +20,6 @@
     {% assign ship_word = ship %}
   {% endif %}
 {% else %}
-  {% assign ship_word = taxonomy.ship_unrated_word %}
+  {% assign ship_word = taxonomy.ship_off_scale[ship] %}
 {% endif %}
 <span class="drink-card-ship-icon">{% include icons/ship.svg %}</span><span class="drink-card-ship-word">{{ ship_word }}</span>

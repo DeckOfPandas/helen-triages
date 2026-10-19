@@ -36,7 +36,7 @@ source: "Punch"
 source_url: "https://punchdrink.com/recipes/bitter-mai-tai-2/"
 meta:
   made_before: true
-  ship: "who knows"
+  ship: "IOU"
   rewritten: true
   awaiting_fix: false
   proofread: true

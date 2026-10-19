@@ -266,6 +266,12 @@ TRUSTED_DYNAMIC = (
     # tests/test_site_config.py).
     re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?mood="
                r"\{\{\s*m\s*\|\s*url_encode\s*\}\}#filter-\{\{\s*chip\s*\}\}$"),
+    # A drink page's SHIP IT? word, linking to the index filtered to that ship
+    # value (#1412). Same `index_home`; `?ship=` does not change the page
+    # fetched, a value no card carries is dropped by cocktail-index.js, and
+    # `#results` is the count line's id on the index.
+    re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?ship="
+               r"\{\{\s*page_ship\s*\|\s*url_encode\s*\}\}#results$"),
 )
 
 

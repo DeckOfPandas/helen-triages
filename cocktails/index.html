@@ -67,16 +67,14 @@ permalink: /cocktails/
         <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
       </div>
-      {% comment %} The third button narrows to `meta.made_before: false`
-         (#732), through `data-made-before` and never `data-ship`: the two come
-         apart when Helen makes an unrated drink, whose `ship` stays `who knows`
-         until she rates it. The three labels are her names for the rungs of one
-         scale, not descriptions of the mechanism; the script reads
-         `data-chaos`, not the words. {% endcomment %}
+      {% comment %} `good` and `chaos` each keep one of taxonomy.yml's `chaos`
+         lists, read off `meta.ship` (#1413). The three labels are Helen's
+         names for the rungs of one scale, not descriptions of the mechanism;
+         the script reads `data-chaos`, not the words. {% endcomment %}
       <div class="drink-btns">
         <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>no chaos please</button>
         <button type="button" class="btn-chaos" data-chaos="open" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>I&rsquo;m open to chaos</button>
-        <button type="button" class="btn-chaos" data-chaos="unmade" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>chaos only</button>
+        <button type="button" class="btn-chaos" data-chaos="chaos" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>chaos only</button>
       </div>
     </div>
 
@@ -163,6 +161,11 @@ permalink: /cocktails/
     </div>
   </div>
 
+  {% comment %} Two by two (#1412): the count and the ship legend, then the
+     shortlisted button and `× clear ship`. The legend says what the mark on
+     every card means, and which value is chosen once one is pressed;
+     cocktail-index.js fills and reveals the value. {% endcomment %}
+  <div class="drink-count-block">
   {% comment %} "survivors", matching food's (#489). cocktail-index.js rewrites
      the number and the word, so it must agree with this plural rule. {% endcomment %}
   {% comment %} A plain paragraph, not a flex row: a flex container discards the
@@ -175,6 +178,21 @@ permalink: /cocktails/
     <strong class="results-count-number" id="drink-count-n">{{ all_drinks.size }}</strong>
     <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
   </p>
+  <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?<span class="drink-count-legend-value" data-ship-legend-value hidden>= <span data-ship-legend-word></span></span></span>
+
+  {% comment %} The shortlisted-only view (#546) is a filter on this index, not
+     a page of its own and not a sixth filter section. It ships `hidden` and
+     cocktail-index.js reveals it. No link to the share panel here (#849): the
+     panel at the foot of the page is the one way in. {% endcomment %}
+  <p class="drink-count-row">
+    <button type="button"
+            class="btn-shortlist-only"
+            id="shortlist-only"
+            aria-pressed="false"
+            hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
+  </p>
+  <button type="button" class="btn-clear-filter drink-count-clear-ship" id="clear-ship" hidden>&times; clear ship</button>
+  </div>
 
   {% comment %} The sticky results bar: a mirror of the count above and of the
      top `× clear all`, revealed by assets/js/results-bar.js once `#results` has
@@ -187,21 +205,6 @@ permalink: /cocktails/
     </div>
   </div>
 
-  {% comment %} The row under the count: what you can do with the list on the
-     left, what the mark on every card means on the right. The shortlisted-only
-     view (#546) is a filter on this index, not a page of its own and not a
-     sixth filter section. It ships `hidden` and cocktail-index.js reveals it;
-     the legend is static. {% endcomment %}
-  <p class="drink-count-row">
-    <button type="button"
-            class="btn-shortlist-only"
-            id="shortlist-only"
-            aria-pressed="false"
-            hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
-    {% comment %} No link to the share panel here (#849): the panel at the foot
-       of the page is the one way in. {% endcomment %}
-    <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
-  </p>
   {% comment %} Hide / show drafts, local builds only (#1358): inside the gate
      that lets a draft into `all_drinks`, so the deployed index has no such
      element. Ships `hidden`; cocktail-index.js reveals and wires it.
@@ -242,12 +245,14 @@ permalink: /cocktails/
          _includes/cocktails/ship.html derives the word: it also drives
          `data-ship` below, for filtering. {% endcomment %}
 
-      {% comment %} `good` is ship yes or oh gods yes; everything else is
-         `yolo`, duds included. taxonomy.yml `chaos`. {% endcomment %}
-      {% if ship == "yes" or ship == "oh gods yes" %}
+      {% comment %} Which of taxonomy.yml's `chaos` lists the drink's ship is
+         in; `middle` is neither, and only `open` shows it. {% endcomment %}
+      {% if taxonomy.chaos.good contains ship %}
         {% assign chaos = "good" %}
+      {% elsif taxonomy.chaos.chaos contains ship %}
+        {% assign chaos = "chaos" %}
       {% else %}
-        {% assign chaos = "yolo" %}
+        {% assign chaos = "middle" %}
       {% endif %}
 
       {% comment %} The searchable text is the plugin's `card_ingredients`, the list
@@ -264,11 +269,6 @@ permalink: /cocktails/
           data-url="{{ drink.url }}"
           data-ship="{{ ship }}"
           data-chaos="{{ chaos }}"
-          {% comment %} Straight off the drink, not derived from `ship` like
-             `chaos` above it (#732). `| default: false` so a drink with no
-             `meta.made_before` does not emit an empty attribute, which reads as
-             neither true nor false. {% endcomment %}
-          data-made-before="{{ drink.meta.made_before | default: false }}"
           data-moods="{% for m in drink.mood %}{{ m }}|{% endfor %}"
           data-ingredients="{{ searchable | downcase }}"
           data-name="{{ drink.title | downcase }}">
@@ -346,8 +346,10 @@ permalink: /cocktails/
           {% comment %} The ship mark and its word come from
              _includes/cocktails/ship.html, which the drink page also calls, so
              the two cannot render a different word for the same rung.
-             `short=true` asks for the card's abbreviations. {% endcomment %}
-          <span class="drink-card-ship">{% include cocktails/ship.html ship=ship short=true %}</span>
+             `short=true` asks for the card's abbreviations. A <button>: pressing
+             it filters the index to this exact ship value (#1412), which
+             cocktail-index.js reads off its `data-ship`. {% endcomment %}
+          <button type="button" class="drink-card-ship" data-ship="{{ ship }}" aria-pressed="false" aria-label="ship it? {{ ship }}: show only these">{% include cocktails/ship.html ship=ship short=true %}</button>
         </div>
 
         {% comment %} The shortlist toggle, top right (#546). The mark alone,

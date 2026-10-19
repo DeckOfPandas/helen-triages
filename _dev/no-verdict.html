@@ -19,19 +19,16 @@ excerpt_separator: ""
 {% assign taxonomy = site.data.cocktails.taxonomy %}
 {% assign scale = taxonomy.ship_scale %}
 
-{% comment %} Every drink in the collection, drafts and promoted alike. A
-   promoted drink with no verdict would be a bug rather than a worklist item —
-   it should not have got past the gate — so including `_cocktail_recipes` is
-   how this page would SAY SO rather than hide it. {% endcomment %}
+{% comment %} Every drink in the collection, drafts and promoted alike: an IOU
+   may publish (#1413), so a live one is still a rating owed. {% endcomment %}
 {% assign every_drink = site.cocktail_drafts | concat: site.cocktail_recipes | sort: "title" %}
 
 {% comment %} Counted in a loop rather than filtered into an array: Liquid has no `push`
    and `where_exp` has no negation, so "ship not on the scale" cannot be a
    filter chain. The same two guards run over the count and the list, so they
    cannot disagree. A drink with `made_before: false` is answered, not
-   outstanding, and is counted separately below. The two guards are not
-   redundant: a drink she then makes flips `made_before` and appears here with
-   `who knows` intact. {% endcomment %}
+   outstanding, and is counted separately below; what is left is the IOUs
+   (test_ship_agrees_with_made_before). {% endcomment %}
 {% assign unrated_count = 0 %}
 {% assign unmade_count = 0 %}
 {% for drink in every_drink %}
@@ -50,9 +47,9 @@ excerpt_separator: ""
   <p class="dev-note">
     {{ unrated_count }} of {{ every_drink | size }} drinks say you have made
     them and still carry no rating — <code>meta.ship</code> is
-    <code>who knows</code> rather than a rung on the scale in
-    <code>_data/cocktails/taxonomy.yml</code>, so their cards show a mark with
-    no word beside it. Rate one, or say you have not made it after all. Answers
+    <code>IOU</code> rather than a rung on the scale in
+    <code>_data/cocktails/taxonomy.yml</code>. Rate one, or say you have not
+    made it after all. Answers
     are kept in this browser as you click; the box at the bottom is how you get
     them out.
   </p>
@@ -96,7 +93,7 @@ excerpt_separator: ""
           <h2><a href="{{ drink.url | relative_url }}">{{ drink.title }}</a></h2>
           <span class="dev-verdict-was">currently <code>{{ drink.meta.ship | default: "(absent)" }}</code></span>
           {% if drink.collection == "cocktail_recipes" %}
-            <span class="dev-verdict-flag">PUBLISHED — this one should not be on this list</span>
+            <span class="dev-verdict-flag">live</span>
           {% endif %}
         </div>
 

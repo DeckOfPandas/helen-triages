@@ -153,6 +153,8 @@ using, outliving the turn that made it.
   the live site is where she picks what to try next, and she reads the recipe
   there while making it. The two halves are easy to swap by mistake: unmade is
   fine, unrewritten is not. She rewrites a cocktail recipe before she makes it.
+  An unmade drink's `ship` is `"who knows"`; once she has made it, it is a rung
+  or `"IOU"` (made and liked, not yet rated), never `"who knows"` again.
 - `awaiting_fix: true` — one thing is ticketed; she has read it; it will not
   publish until the flag is false again.
 - `proofread: true` — she read the rendered page. Any agent edit after that

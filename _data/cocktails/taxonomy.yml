@@ -812,16 +812,14 @@ mood_groups:
     - easy peasy
     - I want to faff
 
-# Appetite for chaos: how much risk tonight, read off `meta.ship`.
+# Appetite for chaos: how much risk tonight, read off `meta.ship` (#1413).
+# Which ship values each narrowing YOLO button keeps; `I'm open to chaos`
+# keeps every drink. A value in neither list (`sure`, `IOU`) shows only under
+# `open`. cocktails/index.html stamps each card with the list it is in.
 chaos:
-  definitely good: "ship is yes or oh gods yes"
-  YOLO: "everything else, including the five drinks rated `not really`"
+  good: ["yes", "oh gods yes"]
+  chaos: ["not really", "meh", "who knows"]
 
-# `who knows` is not on this scale: it is an absence of verdict, not a low one,
-# and the only `meta.ship` value that is not a rung
-# (test_meta_ship_is_a_rung_or_who_knows). A drink Helen has not made says
-# `who knows` and may still publish (DECISIONS §9.4).
-#
 # Every value is quoted: YAML reads a bare `yes` as the boolean true, which
 # silently fails every comparison against `meta.ship`.
 ship_scale:
@@ -839,12 +837,14 @@ ship_card_names:
   "not really": "hmm"
   "oh gods yes": "yes²"
 
-# What an off-scale ship is called, on the card and on the drink page (#722).
-# A scalar, not a map keyed by "who knows", so the include names no vocabulary
-# value: it asks `ship_scale` whether a value is a rung and prints this for
-# everything else. It does not belong in `ship_card_names`, which is the
-# card's alone.
-ship_unrated_word: "???"
+# The two `meta.ship` values that are not rungs, and what the card and the
+# drink page print for each. Neither is a rating, so neither may be a rung
+# (DECISIONS §9.4). `who knows`: never made, so `made_before: false`. `IOU`:
+# made and liked but never rated, so `made_before: true` (#1413). The include
+# looks a value up here once `ship_scale` says it is not a rung.
+ship_off_scale:
+  "who knows": "???"
+  "IOU": "IOU"
 
 # Deliberately absent: `star_ingredients` (there is no star axis) and `co_tags`
 # (no cocktail mood has met food's test for one).
