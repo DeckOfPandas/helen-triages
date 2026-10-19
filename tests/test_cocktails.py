@@ -2806,10 +2806,13 @@ def test_no_amount_uses_a_us_unit():
     the units its source prints. `oz` and `tsp` stay declared in `measures:`
     on purpose: that table is the conversion record
     test_the_declared_measures_produce_the_figures_the_data_used_to_store
-    reads. A dash, a pinch, a cube and a sprig are not US units.
+    reads. A dash, a pinch, a cube and a sprig are not US units. A dry sugar
+    measured by the spoon keeps its `tsp` (Helen, DECISIONS §9.3.6): a spoon
+    of sugar is not a volume.
     """
     measures = _vocab().get("measures") or {}
     ignored = {w.lower() for w in (measures.get("ignored_words") or [])}
+    sugars = set(_vocab().get("sugars") or [])
 
     checked = 0
     bad = []
@@ -2820,6 +2823,10 @@ def test_no_amount_uses_a_us_unit():
             checked += 1
             words = {w.strip(".,").lower() for w in str(item["amount"]).split()}
             hit = (words - ignored) & (US_UNITS | NOT_UNITS)
+            generic = item.get("generic")
+            generics = set(generic) if isinstance(generic, list) else {generic}
+            if hit == {"tsp"} and generics and generics <= sugars:
+                hit = set()
             if hit:
                 bad.append(
                     f"{slug}: {item['amount']!r} on "
@@ -3287,8 +3294,10 @@ def test_a_qq_note_carries_a_qq_label():
                 continue
             text = str(note.get("text", ""))
             label = note.get("label")
-            if text.strip().startswith("QQ") and label != "QQ":
-                bad.append(f"{slug}: QQ note labelled {label!r}, not 'QQ'")
+            # `QQ` or `QQ <topic>`, as the ingest contract writes it (DECISIONS §4).
+            if text.strip().startswith("QQ") and not (
+                    isinstance(label, str) and re.match(r"^QQ( \S.*)?$", label)):
+                bad.append(f"{slug}: QQ note labelled {label!r}, not 'QQ' or 'QQ <topic>'")
     assert not bad, (
         "QQ notes and their labels disagree:\n  " + "\n  ".join(bad)
         + "\n\nA note whose text begins `QQ` is written as:\n"
