@@ -338,8 +338,9 @@ else has already done (MANUAL §9.1).
     phase is fine there.
   - **Quote every group name, on both sides**: `- name: "dressing"`,
     `- name: "Make the dressing"`. Quoted and bare parse to the same string, so
-    this is only about every file reading the same way; `/tidy-drafts`
-    (`--only quoting`) fixes a bare one.
+    this is only about every file reading the same way;
+    `test_group_names_are_quoted` fails on a bare one and `/tidy-drafts`
+    (`--only quoting`) fixes it.
 - **House style** -- en dashes, `°C`, unicode fractions, quoting, accents, and
   **a space between a number and its unit** (`15ml` -> `15 ml`). The units are
   `kg`, `g`, `ml`, `cl`, `cm`, `mm`, `oz`, `tsp`, `tbsp`; a temperature is NOT

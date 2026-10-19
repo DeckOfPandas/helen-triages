@@ -306,6 +306,10 @@ def test_scalar_fields_are_quoted(draft):
     _fm.test_scalar_fields_are_quoted(draft)
 
 
+def test_group_names_are_quoted(draft):
+    _fm.test_group_names_are_quoted(draft)
+
+
 def test_main_ingredients_entries_are_quoted(draft):
     _tx.test_main_ingredients_entries_are_quoted(draft)
 
