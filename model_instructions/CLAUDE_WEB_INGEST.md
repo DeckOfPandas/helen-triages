@@ -177,6 +177,15 @@ tell her in the index that the file says otherwise, and put her instruction in
 that recipe's hand-back list so the session with her repository sees it. Her
 repository is where a rule changes; a chat cannot change one.
 
+CHECK YOUR ENVELOPES BEFORE YOU HAND THEM BACK, if you can run code. Fetch
+https://raw.githubusercontent.com/DeckOfPandas/helen-triages/main/scripts/envelope.py
+and run `python3 envelope.py <file>` on each file, or on the combined batch
+file. It is the very parser Helen's repository runs, standard library and
+PyYAML only. It prints each envelope's filename and fingerprint line, or the
+one-line reason her repository would reject it. Fix every rejection before you
+hand back; a rejection that reaches her costs her a round trip. If you cannot
+run code, say so once in the index.
+
 THE VERSION MARKER on the first line of every envelope is whatever §0 of the
 document says. If the two files ever disagree about it, use each file's
 own for its own site and say so in the index.

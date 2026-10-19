@@ -74,12 +74,22 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
       near-miss garnishes, unstated times, in the same shape a photo batch
       gets.
 
-5. **Bring Helen one list.** Every rejection, every probable duplicate, every
-   same-name-different-recipe case (the script's "Sazerac case"), and every
-   hand-back bullet from every envelope, grouped by file, plus whatever the
-   pre-flight found. **Treat each as a tier 3 question**: ask, do not fill in.
-   Not a question at a time -- arriving in a trickle is the failure the
-   pre-flight was built to fix.
+5. **Bring Helen one page**, built by
+
+       python3 scripts/ingest_review.py --from-file <the same path> --out tmp/review.md
+
+   and put in the drafts PR's description: a table of every recipe's tags,
+   star, servings and times as the drafts now stand, for her to answer with
+   corrections only, then every hand-back bullet no standing ruling settles.
+   A bullet a ruling settles (`ingest_inbox.FOLDS`, and per source
+   `_data/food/sources.yml`) is counted, not asked; a bullet that asks
+   something is never folded. Add every rejection, probable duplicate and
+   Sazerac case, plus whatever the pre-flight found. **Treat each as a tier 3
+   question**: ask, do not fill in. Not a question at a time -- arriving in a
+   trickle is the failure the pre-flight was built to fix. **When she rules
+   on something that will recur for one book or magazine, add it to
+   `sources.yml`** and run `python3 scripts/build_ingest_vocab.py --write`:
+   the next web Claude reads it, and the next batch never asks.
 
 6. **Run `python3 scripts/verify.py` before anything is pushed, every time.**
    Nothing else runs the drafts checks (`PIPELINE.md` §3), and an inbox pass

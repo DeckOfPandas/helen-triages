@@ -6,8 +6,15 @@ into a draft file or says why not, and `.claude/commands/ingest-inbox.md` is
 the procedure for running it.
 
 Two sections, under the numbers other files cite. §6 is the envelope's shape;
-`parse_envelope` in the script is the authority, and where this page and the
-parser disagree the parser is right. §8 is the argument for the route.
+`parse_envelope` in `scripts/envelope.py` is the authority, and where this
+page and the parser disagree the parser is right. §8 is the argument for the
+route.
+
+`envelope.py` imports nothing from this repository, so a web Claude fetches
+it from `main` and checks its own envelopes before handing them back
+(`CLAUDE_WEB_INGEST.md` §2). `ingest_inbox.py` imports it rather than keeping
+a copy, so what passes there is exactly what the inbox accepts;
+`tests/test_ingest_inbox.py` holds the import rule.
 
 The principle both rest on: the browser transcribes and writes `QQ` for every
 judgement; the repo side parses, never interprets. A malformed envelope is

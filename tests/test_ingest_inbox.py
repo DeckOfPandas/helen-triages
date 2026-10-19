@@ -556,3 +556,102 @@ def test_both_documents_name_a_supported_version():
     )
     assert not problems, "the envelope version handshake has broken:\n  " + \
         "\n  ".join(problems)
+
+
+# ---- envelope.py, the parser a web Claude runs on its own ----
+
+import ast  # noqa: E402
+import subprocess  # noqa: E402
+
+ENVELOPE = ROOT / "scripts" / "envelope.py"
+
+
+def test_envelope_py_imports_nothing_from_the_repository():
+    """A claude.ai chat fetches this one file and runs it. An import of a
+    repo module would work here and fail there, which is the silent case."""
+    tree = ast.parse(ENVELOPE.read_text(encoding="utf-8"))
+    names = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            names |= {a.name.split(".")[0] for a in node.names}
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            names.add(node.module.split(".")[0])
+    allowed = set(sys.stdlib_module_names) | {"yaml", "__future__"}
+    assert names <= allowed, f"envelope.py imports {sorted(names - allowed)}"
+
+
+def test_envelope_py_folds_as_the_search_layer_does():
+    """Its `_fold` is restated, not imported (above); this holds the two together."""
+    import envelope
+    from test_taxonomy import _fold
+    for text in ("Röstis", "Pâté", "Crème Fraîche", "jalapeño", "Rich Ragù"):
+        assert envelope._fold(text) == _fold(text), text
+
+
+def test_envelope_py_runs_alone_and_exits_on_a_rejection():
+    good = subprocess.run([sys.executable, "-I", str(ENVELOPE),
+                           str(FIXTURES / "valid_food.md")],
+                          capture_output=True, text=True)
+    assert good.returncode == 0, good.stdout + good.stderr
+    assert "OK, crispy-sage-butter-gnocchi.md" in good.stdout
+    assert "fingerprint: crispy sage butter gnocchi" in good.stdout
+    bad = subprocess.run([sys.executable, "-I", str(ENVELOPE),
+                          str(FIXTURES / "no_marker.md")],
+                         capture_output=True, text=True)
+    assert bad.returncode == 1 and "REJECTED" in bad.stdout, bad.stdout
+
+
+# ---- folding the bullets a standing ruling settles ----
+
+def test_a_settled_bullet_folds_and_a_question_never_does():
+    fm = {"source": "Adapted from Somebody's Book"}
+    settled = "**Times not printed.** Estimated, not from the source: prep 10 mins."
+    asking = "**Butter is unspecified in the source.** Which do you want?"
+    other = "**The apple is never added in the source.**"
+    kept, folded = inbox.fold_hand_back([settled, asking, other], fm)
+    assert kept == [asking, other]
+    assert [b for _, b in folded] == [settled]
+
+
+def test_a_page_check_folds_even_though_it_asks():
+    """Helen takes page checks at rewrite, from the source; the exception is named."""
+    bullet = "**The page was angled.** Please check \"400 ml stock\"."
+    kept, folded = inbox.fold_hand_back([bullet], {})
+    assert not kept and folded[0][0] == inbox.PHOTO_LABEL
+
+
+def test_a_source_ruling_folds_only_for_its_own_source():
+    oven = "**The oven is 190°C/Gas 5 with no fan figure.** I kept it as printed."
+    riverford = {"source": "Adapted from Riverford Companions: Autumn and Winter Veg, Guy Watson"}
+    elsewhere = {"source": "Adapted from Somebody's Book"}
+    assert inbox.fold_hand_back([oven], riverford)[0] == []
+    assert inbox.fold_hand_back([oven], elsewhere)[0] == [oven]
+
+
+def test_the_report_counts_what_it_folds(drafts, monkeypatch, capsys):
+    text = envelope_text("valid_food").replace(
+        "## What I could not know\n",
+        "## What I could not know\n\n- **Times not printed.** Estimated, prep 5 mins.\n", 1)
+    monkeypatch.setattr(inbox, "fetch_issues", lambda site, number=None:
+                        [{"number": 3, "body": text}])
+    assert inbox.main(["--site", "food", "--drafts-dir", str(drafts)]) == 0
+    out = capsys.readouterr().out
+    assert "Times not printed" not in out
+    assert "an unprinted time, written as `Estimated N mins`: 1" in out
+    assert inbox.main(["--site", "food", "--drafts-dir", str(drafts),
+                       "--every-bullet"]) == 0
+    assert "Times not printed" in capsys.readouterr().out
+
+
+# ---- ingest_review.py ----
+
+def test_the_review_page_has_a_row_per_recipe_and_its_open_questions(drafts):
+    import ingest_review
+    body = envelope_text("valid_food")
+    page = ingest_review.review([(None, "valid_food.md", None, body)], drafts)
+    assert "| 1 | Crispy Sage Butter Gnocchi (not written) |" in page
+    env = inbox.parse_envelope(body, "food")
+    kept, _ = inbox.fold_hand_back(env.hand_back, env.fm)
+    for bullet in kept:
+        assert bullet in page, f"an open question is missing: {bullet!r}"
+    assert f"## Questions still open: {len(kept)}" in page
