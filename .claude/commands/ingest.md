@@ -260,8 +260,10 @@ else has already done (MANUAL §9.1).
 - **The fan oven temperature**, from the printed pair. Check WHICH is the fan
   figure; they are not always in the same order. **A `QQ Claude` line gives the
   fan figure alone; its `QQ original` keeps everything the source printed.**
-  Where the pair is not labelled, the rewrite keeps the pair and the question
-  goes on her list. **A book she has ruled on is not a question**: *Riverford
+  An unlabelled pair 20 degrees apart is conventional and fan, so the lower
+  is the fan figure (Helen: *"I'm just so sure"*); any other unlabelled pair
+  keeps the pair and the question goes on her list. **A book she has ruled on
+  is not a question**: *Riverford
   Companions* prints the conventional figure ("190°C/Gas 5"), so the fan figure
   is 20 lower (Helen: *"Conventional: fan is 20 less"*).
 - **A time the source does not print is `Estimated N mins`**, with the estimate

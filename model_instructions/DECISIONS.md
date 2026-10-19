@@ -769,6 +769,14 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
   conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
   says "170°C fan"; the `QQ original` keeps the printed figure.
+- **2026-10-19 — an unlabelled oven pair 20 degrees apart is conventional and
+  fan.** Helen: *"Oven pairings when one temp is 20 degrees lower than the
+  other mean conventional / fan, I'm just so sure. Interpret that way
+  please."* So "180C/160C/gas 4" is "160°C fan" on a `QQ Claude` line. Any
+  other gap is still a question.
+- **2026-10-19 — a title keeps its accents, and gains any the house list
+  declares.** Helen: *"Accents in titles should be preserved, or added if
+  missing."* "Rich ragu" is titled "Rich Ragù".
 - **2026-08-10 — within one ingredient group the base spices run coriander,
   cumin, turmeric, fennel, and the warm spices follow in any order.** Helen's
   own cooking convention, confirmed that day and prompted by

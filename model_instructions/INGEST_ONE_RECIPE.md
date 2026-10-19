@@ -133,7 +133,7 @@ name you give is a courtesy rather than a contract.
 
 | Field | Rule |
 |---|---|
-| `title` | The dish's name. **`and`, never `&`.** Keep the source's own name unless it is unusable. |
+| `title` | The dish's name. **`and`, never `&`.** Keep the source's own name unless it is unusable. **Keep its accents, and add any §6 lists that it lacks**: "Rich ragu" is titled "Rich Ragù". Helen: *"Accents in titles should be preserved, or added if missing."* |
 | `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
@@ -375,10 +375,12 @@ is correct for plenty of recipes.
 - **Never convert a temperature, and never guess which figure is the fan
   one.** The `QQ original` line keeps whatever the source prints, all of it.
   **The `QQ Claude` line gives the FAN figure alone, where the source LABELS
-  one** — "200C/180C fan/gas 6" becomes "180°C fan" (Helen's ruling). Where
-  the pair is not labelled ("180C/160C/gas 4"), or there is only one figure,
-  or it is 350°F, the rewrite keeps what the source has and your list says so:
-  the figures are not always in the same order, and picking one is a guess.
+  one** — "200C/180C fan/gas 6" becomes "180°C fan" (Helen's ruling). **An
+  unlabelled pair 20 degrees apart is conventional and fan**, whichever order
+  it is printed in: "180C/160C/gas 4" becomes "160°C fan". Helen: *"Oven
+  pairings when one temp is 20 degrees lower than the other mean conventional
+  / fan, I'm just so sure."* Any other unlabelled pair, a single figure, or
+  350°F: the rewrite keeps what the source has and your list says so.
   **The exception is a book Helen has ruled on.** *Riverford Companions*
   prints one conventional figure with its gas mark ("190°C/Gas 5"); the fan
   figure is 20 lower, so the rewrite says "170°C fan". Her ruling:
@@ -587,8 +589,8 @@ website). Keep one that points into the same book the recipe came from.
   **So a `QQ Claude` line says "1 hour 30 mins" and never "1 hr 30 mins".**
 - Cross-recipe links, if you write one at all, are relative markdown:
   `[display text](../other-slug/)`. Never root-relative.
-- **Accents on food words** — the two lists below. In prose only, never in the
-  filename and never in `source`.
+- **Accents on food words** — the two lists below. In prose and in the title,
+  never in the filename and never in `source`.
 
 **The accented spellings her house style declares:**
 

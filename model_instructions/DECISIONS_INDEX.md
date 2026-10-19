@@ -124,6 +124,8 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
+- 2026-10-19 · §5 · an unlabelled oven pair 20 degrees apart is conventional and fan.
+- 2026-10-19 · §5 · a title keeps its accents, and gains any the house list declares.
 - 2026-08-10 · §5 · within one ingredient group the base spices run coriander, cumin, turmeric, fennel, and the warm spices follow in any order.
 - 2026-08-10 · §5 · #74 · butter is always "salted butter" or "unsalted butter", and sugar and flour each have a closed list of allowed names.
 - undated · §5 · #136 · Undated, #136 — ginger says fresh, ground or paste, in the ingredient list as well as in main_ingredients.

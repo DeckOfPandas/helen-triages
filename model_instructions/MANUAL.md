@@ -979,8 +979,9 @@ in `4-promote/`, before the copy, and `test_no_estimated_timings` on one in
 `_food_recipes/`. Helen replaces it from the source or from cooking it.
 
 **Accents** come from `_data/accented_words.yml`: a curated
-unaccented-to-accented map plus a `no_accent:` list. Prose only — never
-slugs, filenames or `source:` (reproduced as the publication spells it).
+unaccented-to-accented map plus a `no_accent:` list. Prose and titles, a
+title gaining an accent its source did not print — never slugs, filenames or
+`source:` (reproduced as the publication spells it).
 
 The test for a mechanical fix: does it lose information or make a judgement?
 `1/2` → `½` does neither; a spelling is a word, not a character, and is
