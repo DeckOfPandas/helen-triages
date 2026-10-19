@@ -49,7 +49,12 @@ argument and the rules each field is read by.
 - 2026-08-29 · §4 · ingredient and method groups are split at ingest, once, and not again afterwards.
 - 2026-09-01 · §4 · Helen keeps the rewrite staging folder, and no agent deletes a QQ original line or moves a file between staging folders unasked.
 - 2026-09-03 · §4 · a recipe's filename is the whole title slugged, not the head clause.
-- 2026-09-04 · §4 · every note an ingest adds is {label, text} with both fields set and both beginning QQ.
+- 2026-10-18 · §4 · every note an ingest adds is {label, text} with both fields set and both beginning QQ; the label may carry a topic, QQ nutrition.
+- 2026-10-18 · §4 · a time the source does not print is written Estimated N mins, and promotion refuses it.
+- 2026-10-18 · §4 · an ingest ignores a nutrition box and its badges.
+- 2026-10-18 · §4 · an ingest ignores a "you will need" equipment list.
+- 2026-10-18 · §4 · page furniture: drop what sells, keep what is written about the dish.
+- 2026-10-18 · §4 · a sidebar box ingested as a recipe has no body.
 - 2026-09-05 · §4 · a QQ Claude rewrite follows four patterns taken from Helen's own rewrite of one.
 - 2026-09-07 · §4 · #814 · a grouping an ingest left out is derived from the draft and reviewed by Helen: no proposals: block, no calibration round, no re-reading of sources.
 - 2026-10-01 · §4 · a note is always {label, text}; the bare-string form is retired on both sites.
@@ -109,7 +114,7 @@ argument and the rules each field is read by.
 - 2026-08-26 · §4.3 · a magic-bag entry always has a tagline: line, and its value may be empty.
 - undated · §4.3 · Undated — a magic-bag entry's minimum is an ingredients list.
 - 2026-08-21 · §5 · #413 · en dashes are scoped by what a reader SEES.
-- 2026-08-21 · §5 · #426 · house style stops at a QQ line — Helen: "don't normalise oven temp, the dash, or 'minutes' -- ideally just skip the whole line for simple normalisation tasks".
+- 2026-10-18 · §5 · on food, the formatter reaches a QQ line; it still never rewords one.
 - 2026-09-07 · §5 · #800 · a tip printed under a source's own rubric is transcribed without the label; gf tip: is Good Food, the magazine, not gluten-free.
 - 2026-10-08 · §5 · #1089 · cocktail titles are Title Case, and a qualifier in brackets is not.
 - 2026-10-08 · §5 · #1089 · snippet: is an optional second tagline for the meta description and link preview.
@@ -118,6 +123,7 @@ argument and the rules each field is read by.
 - 2026-09-06 · §5 · #711 · every note starts with a capital letter and ends with a full stop, on both sites.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
+- 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
 - 2026-08-10 · §5 · within one ingredient group the base spices run coriander, cumin, turmeric, fennel, and the warm spices follow in any order.
 - 2026-08-10 · §5 · #74 · butter is always "salted butter" or "unsalted butter", and sugar and flour each have a closed list of allowed names.
 - undated · §5 · #136 · Undated, #136 — ginger says fresh, ground or paste, in the ingredient list as well as in main_ingredients.

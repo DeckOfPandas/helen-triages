@@ -284,10 +284,30 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-09-03 — a recipe's filename is the whole title slugged, not the head
   clause.** Helen: *"Slug the whole title"*, so two "with" dishes sharing a
   head clause do not collide. Existing files keep their names.
-- **2026-09-04 — every note an ingest adds is `{label, text}` with both
-  fields set and both beginning `QQ`.** Helen: *"It's annoying for me to
-  remember how to type YAML every time."* Unchanged by the 2026-10-02 label
-  ruling; `ingest_inbox.py` demands it.
+- **2026-10-18 — every note an ingest adds is `{label, text}` with both
+  fields set and both beginning `QQ`; the label may carry a topic, `QQ
+  nutrition`.** Helen, 2026-09-04: *"It's annoying for me to remember how to
+  type YAML every time."* On 2026-10-18 she chose to allow the topic over
+  renaming 22 envelopes' labels to bare `QQ`: the label still reads
+  unfinished, and when she proofreads she deletes `QQ ` and keeps the
+  heading. `ingest_inbox.py` demands `QQ` or `QQ <topic>`.
+- **2026-10-18 — a time the source does not print is written `Estimated N
+  mins`, and promotion refuses it.** Helen: *"I would like "Estimated 10
+  mins" to be written, then our tidying scripts block promotion for recipes
+  with estimated times."* She chose it over keeping the guess behind a `QQ`.
+  `test_no_estimated_time_reaches_promotion` fails on one in `4-promote/`.
+- **2026-10-18 — an ingest ignores a nutrition box and its badges.** Helen:
+  *"Drop them and add clear instructions for ingestion to ignore these."*
+- **2026-10-18 — an ingest ignores a "you will need" equipment list.** Helen:
+  *"the rule is "trust the cook"."* As a group it had put a cake ring on the
+  shopping list.
+- **2026-10-18 — page furniture: drop what sells, keep what is written about
+  the dish.** Helen: *"Drop ads, keep essays."* Shows, ticket lines, book plugs,
+  TV listings, "next month", web pointers and wine boxes go; essays, bios and
+  boxed asides go in the body.
+- **2026-10-18 — a sidebar box ingested as a recipe has no body.** Helen chose
+  *"Delete the bodies"*: the body repeated the `QQ original` lines unmarked,
+  and would have published the book's text.
 - **2026-09-05 — a `QQ Claude` rewrite follows four patterns taken from
   Helen's own rewrite of one.** From `sticky-squidge-ginger-loaf.md`, which
   she rewrote as a comparison: do not re-narrate what the ingredient list
@@ -677,11 +697,14 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `cook_time: "20-25 mins"`: *"These still render to the user, so correct to
   en dash please."* So house style reaches front matter that renders, the
   prose pages and the reference data, not only recipe prose.
-- **2026-08-21, #426 — house style stops at a `QQ` line.** Helen: *"don't
-  normalise oven temp, the dash, or 'minutes' -- ideally just skip the whole
-  line for simple normalisation tasks"*. Correcting the source's dash edits
-  someone else's words that are about to be deleted. A `QQ Claude` line is NOT
-  exempt (since 2026-08-31): it is ours.
+- **2026-10-18 — on food, the formatter reaches a `QQ` line; it still never
+  rewords one.** Helen, asked whether the accents test or the skip should give
+  way over a printed "ragu": *"Perform mechanical formatting on QQ lines so
+  when I come to rewrite or edit I already have the correct formatting
+  availabe to me."* Dashes, typography, unit spaces and accents only; a drink's
+  `QQ` lines stay as written. (Replaces #426, 2026-08-21: *"ideally just skip
+  the whole line for simple normalisation tasks"*.) A `QQ Claude` line is
+  ours and always tidied.
 - **2026-09-07, #800 — a tip printed under a source's own rubric is
   transcribed without the label; `gf tip:` is Good Food, the magazine, not
   gluten-free.** Helen, asked what it meant: *"I actually have no idea what
@@ -742,6 +765,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   Asked whether that is still her wish, Helen: *"No"*. Every oven temperature
   says "fan" (`test_oven_temperature_says_fan`), and a bare one is fixed like
   any other house-style fault, with `proofread: false` on a recipe.
+- **2026-10-18 — *Riverford Companions* prints a conventional oven figure;
+  the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
+  conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
+  says "170°C fan"; the `QQ original` keeps the printed figure.
 - **2026-08-10 — within one ingredient group the base spices run coriander,
   cumin, turmeric, fennel, and the warm spices follow in any order.** Helen's
   own cooking convention, confirmed that day and prompted by
@@ -1059,7 +1086,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   times and `serves:` gives none 20 times. The `~` is her ruling in the same
   message. A side file that held the estimates outside the recipes was deleted
   the same day: one home, beside the words it estimates from. A `QQ` in
-  `serves:` stays untouched beside the new key.
+  `serves:` stays untouched beside the new key. On 2026-10-18 she widened who
+  estimates: a web Claude may write one *"if they want to, then for Claude
+  Code to tidy at the next round"*, so an unsure figure is written and put to
+  her, never left out.
 - **2026-09-07 — the shopping list never prints a recipe's yield after its
   name.** Helen, on a row reading `7  Moules Marinière serves 4`: *"please
   don't say 'serves X' after the recipe name at the top of the scaler. This
