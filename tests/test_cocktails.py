@@ -1155,7 +1155,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # test with the old value, which must name only the granted files, then move
 # it in a commit of its own quoting her grant (DECISIONS §4.0). A grant covers
 # that commit and nothing after; parallel grants need the merge behind both.
-COCKTAIL_BASELINE_COMMIT = "22d6c4c1"   # #1413's six IOU marks; has `49822c36` and `e5d693ab` behind it
+COCKTAIL_BASELINE_COMMIT = "8ef2be8e"   # the ten promoted after #1413; has `22d6c4c1` (its IOU marks) behind it
 
 
 def _newest_commit_per_published_drink():
