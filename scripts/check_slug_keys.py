@@ -42,6 +42,10 @@ DECLARED = [
     ("taxonomy.yml", "mood_exclude"),
 ]
 
+# Files keyed by something else that a drink slug can coincide with: a glass
+# name (`old-fashioned` is a glass and an IBA drink). Discovery skips them.
+NOT_SLUG_KEYED = {"glasses.yml"}
+
 
 def collection_slugs(root):
     return {p.stem for p in root.rglob("*.md")} if root.is_dir() else set()
@@ -88,6 +92,8 @@ def main() -> int:
 
     registries = {}          # (filename, dotted key path) -> the mapping
     for filename, document in documents.items():
+        if filename in NOT_SLUG_KEYED:
+            continue
         for dotted, mapping in mappings(document):
             keys = [k for k in mapping if isinstance(k, str)]
             if keys and any(k in known for k in keys):
