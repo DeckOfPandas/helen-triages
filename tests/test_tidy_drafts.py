@@ -259,8 +259,9 @@ def test_the_lines_the_pass_must_not_touch_survive_apply(drinks, line):
 
 
 # ---- The food half ----
-# The fixture carries `2-3` and `--` in prose the pass should fix, and the
-# identical faults behind a `QQ` where it must not.
+# The fixture carries `2-3` and `--` in prose and the identical faults behind
+# a `QQ`. On food both are formatted (DECISIONS §5); on a drink the QQ ones
+# are left, which the drinks half above pins.
 
 FOOD_BEFORE = '''---
 title: "Test Recipe"
@@ -307,28 +308,35 @@ def run_food(root, *extra):
     return _tidy("food", root, *extra)
 
 
-@pytest.mark.parametrize("line", [
-    'tagline: "QQ - rewrite: a bright, sharp thing, 2-3 ways"',
-    'prep_time: "QQ, plus 30 mins resting -- it needs it"',
-    '    text: "QQ - the source said 2-3 mins -- reproduce, do not correct"',
-    '  - "QQ original Fry for 2-3 mins -- until golden."',
+@pytest.mark.parametrize("before,after", [
+    ('tagline: "QQ - rewrite: a bright, sharp thing, 2-3 ways"',
+     'tagline: "QQ - rewrite: a bright, sharp thing, 2–3 ways"'),
+    ('prep_time: "QQ, plus 30 mins resting -- it needs it"',
+     'prep_time: "QQ, plus 30 mins resting — it needs it"'),
+    ('    text: "QQ - the source said 2-3 mins -- reproduce, do not correct"',
+     '    text: "QQ - the source said 2–3 mins — reproduce, do not correct"'),
+    ('  - "QQ original Fry for 2-3 mins -- until golden."',
+     '  - "QQ original Fry for 2–3 mins — until golden."'),
 ])
-def test_a_food_qq_behind_a_key_survives_apply(food, line):
-    """A marker behind a key is still a marker.
+def test_a_food_qq_line_is_formatted_and_keeps_its_marker(food, before, after):
+    """Helen rewrites from a QQ line, so it arrives in house style.
 
-    Three cases sit behind a key and the fourth behind a list dash. Each
-    carries a `2-3` or a `--` that the pass fixes elsewhere in the same file,
-    so a pattern that sees only the list-dash shape leaks here.
+    Three cases sit behind a key and the fourth behind a list dash. The
+    marker's own ` - ` is not a range or a double hyphen and must survive:
+    the line is formatted, never reworded or unmarked.
     """
     path = food / "test-recipe.md"
     path.write_text(FOOD_BEFORE, encoding="utf-8")
-    assert line in path.read_text(encoding="utf-8"), (
-        f"the fixture no longer contains {line!r}, so this case checks nothing. "
+    assert before in path.read_text(encoding="utf-8"), (
+        f"the fixture no longer contains {before!r}, so this case checks nothing. "
         f"Fix the fixture, never this assertion."
     )
     run_food(food, "--apply")
-    assert line in path.read_text(encoding="utf-8"), (
-        f"the food tidy pass edited a QQ line it must leave alone:\n  {line}"
+    got = path.read_text(encoding="utf-8")
+    assert after in got, (
+        f"the food tidy pass did not format this QQ line as expected:\n  "
+        f"{before}\n  wanted {after}\n"
+        + "\n".join(l for l in got.split("\n") if "QQ" in l)
     )
 
 
@@ -364,8 +372,8 @@ def test_food_prose_outside_a_qq_is_still_fixed(food):
 
 # ---- The unit space (DECISIONS §5) ----
 # One fixture carrying every shape the rule meets: a food `amount:`, an `item:`
-# with a unit mid-phrase, a `QQ Claude` line that must be fixed, a `QQ original`
-# line that must not, and three near-misses that are silent if the pattern is
+# with a unit mid-phrase, a `QQ Claude` and a `QQ original` line that are both
+# fixed, and three near-misses that are silent if the pattern is
 # loose -- `2kg` (a short-first alternation gives `2k g`), an already-spaced
 # amount, and a temperature, which wants a degree sign from a different rule.
 UNITS_BEFORE = '''---
@@ -442,21 +450,20 @@ def test_unit_spacing_matches_the_longest_unit_first(food):
         )
 
 
-def test_unit_spacing_leaves_a_qq_original_alone_and_fixes_qq_claude(food):
+def test_unit_spacing_fixes_both_halves_of_a_food_pair(food):
     """The pair, in one test, because they are one decision.
 
-    A `QQ original` line is the source's own wording awaiting Helen's rewrite,
-    and respacing it is editing someone else's text (MANUAL §5). `QQ Claude` is
-    our paraphrase and is held to house style. A skip wide enough to swallow
-    both passes the other unit tests.
+    A `QQ original` line is respaced so Helen rewrites from house style
+    (DECISIONS §5), and its `180C` is left to the temperature rule, which is
+    a report. `QQ Claude` is our paraphrase and is held to house style.
     """
     path = food / "test-recipe.md"
     path.write_text(UNITS_BEFORE, encoding="utf-8")
     run_food(food, "--apply")
     got = path.read_text(encoding="utf-8")
 
-    assert '"QQ original Melt 40g of butter and heat the oven to 180C."' in got, (
-        "the QQ original line was edited:\n"
+    assert '"QQ original Melt 40 g of butter and heat the oven to 180C."' in got, (
+        "the QQ original line should gain its unit space and nothing else:\n"
         + "\n".join(l for l in got.split("\n") if "QQ original" in l)
     )
     assert "QQ Claude Melt 40 g of butter" in got, (

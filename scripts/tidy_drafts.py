@@ -55,9 +55,11 @@ page order (#1213: whole blocks move and no line is edited).
 
 WHAT IT WILL NOT DO
 
-  - Touch a `QQ` line: that is the source's wording awaiting Helen's rewrite,
-    and correcting its dash edits someone else's words (MANUAL §5). A
-    `QQ Claude` line is ours and is tidied like any other prose.
+  - Reword a `QQ` line: that is the source's wording awaiting Helen's
+    rewrite. On food the four formatting rules (dashes, typography, units,
+    accents) do reach it, so she rewrites from text already in house style;
+    no other rule does (MANUAL §5). A `QQ Claude` line is ours and is tidied
+    like any other prose.
   - Touch `source:`: a citation is spelled as the publication spells itself,
     so "Cafe Delites" is correct and accenting it is a misquote.
   - Touch a slug or filename, rename a file, or retitle one. A draft's title
@@ -155,10 +157,10 @@ META_OPTIONAL = ["claude_rewritten"]
 
 ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 NUMBER_RANGE = re.compile(r"(?<![\d.])(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)(?![\d.])")
-# A QQ line is somebody else's wording and is never edited (MANUAL §5). A key
-# may sit in front of the marker (`text: "QQ - ..."`, `tagline: "QQ ..."`).
-# `QQ Claude` is excluded: that line is our paraphrase and is held to house
-# style. This mirrors `_QQ_LINE` in tests/conftest.py; keep the two in step.
+# A QQ line is somebody else's wording: on food only the formatting rules
+# reach it, and on a drink none does (MANUAL §5). A key may sit in front of the
+# marker (`text: "QQ - ..."`, `tagline: "QQ ..."`). `QQ Claude` is excluded:
+# that line is our paraphrase. Mirrors `_QQ_LINE` in tests/conftest.py.
 QQ_LINE = re.compile(r"^\s*(-\s*)?(?:[a-z_]+:\s*)?[\"']?QQ\b(?!\s+Claude\b)")
 
 
@@ -403,14 +405,13 @@ def fix_flow_quoting(text, path):
     return changed, notes
 
 
-def fix_en_dashes(text, path):
-    """`3-4 mins` -> `3–4 mins`, skipping QQ lines and ISO dates.
-
-    Correcting a dash on a QQ line is editing someone else's text (MANUAL §5).
+def fix_en_dashes(text, path, skip_qq=True):
+    """`3-4 mins` -> `3–4 mins`, skipping ISO dates, and QQ lines unless
+    `skip_qq` is off, as it is on food (MANUAL §5).
     """
     out, changed = [], []
     for line in text.split("\n"):
-        if is_qq(line):
+        if skip_qq and is_qq(line):
             out.append(line)
             continue
         blanked = ISO_DATE.sub(lambda m: "\x00" * len(m.group()), line)
@@ -431,11 +432,11 @@ TYPOGRAPHY_FIXES = [
 ]
 
 
-def fix_typography(text, path):
-    """`--` -> an em dash and `->` -> an arrow, skipping QQ lines."""
+def fix_typography(text, path, skip_qq=True):
+    """`--` -> an em dash and `->` -> an arrow; QQ lines as `fix_en_dashes`."""
     out, changed = [], []
     for line in text.split("\n"):
-        if is_qq(line):
+        if skip_qq and is_qq(line):
             out.append(line)
             continue
         for pattern, replacement, label in TYPOGRAPHY_FIXES:
@@ -463,8 +464,8 @@ UNIT_SPACE = re.compile(
     r"(?<=\d)(" + "|".join(sorted(UNITS, key=len, reverse=True)) + r")\b")
 
 
-def fix_unit_spacing(text, path):
-    """`15ml` -> `15 ml`, skipping QQ lines but not `QQ Claude` (MANUAL §5).
+def fix_unit_spacing(text, path, skip_qq=True):
+    """`15ml` -> `15 ml`; QQ lines as `fix_en_dashes`.
 
     On a drink this runs through `only_where_editable`, so a cocktail's
     `amount` is never touched; the module docstring says why. Food's amounts
@@ -472,7 +473,7 @@ def fix_unit_spacing(text, path):
     """
     out, changed = [], []
     for line in text.split("\n"):
-        if is_qq(line):
+        if skip_qq and is_qq(line):
             out.append(line)
             continue
         if UNIT_SPACE.search(line):
@@ -518,15 +519,15 @@ def _accent_map():
     return words, no_accent
 
 
-def fix_accents(text, path, _cache={}):
-    """Prose only. Never `source:`, never a QQ line, never a slug."""
+def fix_accents(text, path, skip_qq=True, _cache={}):
+    """Prose only. Never `source:` or a slug; QQ lines as `fix_en_dashes`."""
     if "map" not in _cache:
         _cache["map"] = _accent_map()
     words, no_accent = _cache["map"]
 
     out, changed = [], []
     for line in text.split("\n"):
-        if is_qq(line) or re.match(r"^source(_url)?:", line):
+        if (skip_qq and is_qq(line)) or re.match(r"^source(_url)?:", line):
             out.append(line)
             continue
         for plain, accented in words.items():
@@ -1013,10 +1014,12 @@ FOOD_FIXERS = [
     ("quoting", fix_scalar_quoting),
     ("quoting", fix_flow_quoting),
     ("quoting", fix_group_name_quoting),
-    ("dashes", fix_en_dashes),
-    ("typography", fix_typography),
-    ("units", fix_unit_spacing),
-    ("accents", fix_accents),
+    # Formatting reaches a food QQ line, so Helen rewrites from text already
+    # in house style (DECISIONS §5). A drink's QQ lines stay as written.
+    ("dashes", partial(fix_en_dashes, skip_qq=False)),
+    ("typography", partial(fix_typography, skip_qq=False)),
+    ("units", partial(fix_unit_spacing, skip_qq=False)),
+    ("accents", partial(fix_accents, skip_qq=False)),
     ("meta", fix_meta_block),
     ("size", fix_size_words),
     ("incidentals", fix_incidentals),

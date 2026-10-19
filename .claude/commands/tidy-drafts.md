@@ -20,10 +20,11 @@ the fan one, whether a note's first word is a proper noun.
 A draft's title disagreeing with its filename is neither, and is not reported:
 the title is still the source's title while the slug is already the dish.
 
-It never touches a `QQ` line. That is the source's own wording awaiting Helen's
-rewrite, and correcting its dash or its degree sign is editing someone else's
-words (MANUAL §5). A `QQ Claude` line is ours and is tidied like any other
-prose.
+It never rewords a `QQ` line: that is the source's own wording awaiting
+Helen's rewrite. **On food, `dashes`, `typography`, `units` and `accents` do
+format one**, so she rewrites from text already in house style; nothing else
+reaches it, and on a drink nothing does (MANUAL §5). A `QQ Claude` line is ours
+and is tidied like any other prose.
 
 It never touches `source:` (a citation is spelled as the publication spells
 itself), never renames a file, and never runs a YAML dumper over a draft.
