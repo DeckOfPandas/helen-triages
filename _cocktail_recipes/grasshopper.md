@@ -1,0 +1,38 @@
+---
+title: "Grasshopper"
+tagline: "Mint choc chip is my favourite ice cream flavour, so this drink had an easy in with me."
+glass:
+  - "coupe"
+garnish:
+  - "mint sprig"
+  - "mint leaf"
+  - "grated nutmeg"
+meta:
+  made_before: true
+  ship: "yes"
+  rewritten: yes
+  awaiting_fix: false
+  proofread: true
+mood:
+  - "pudding in a glass"
+  - "nightcap"
+  - "no juicing"
+ingredients:
+  - amount: "30 ml"
+    generic: "crème de menthe"
+  - amount: "40 ml"
+    generic: "white crème de cacao"
+  - amount: "35 ml"
+    generic: "cream"
+    note: "Single cream."
+serve:
+  ice: "none"
+method:
+  - "Shake all ingredients with ice."
+  - "Fine strain."
+notes:
+  - label: ""
+    text: ""
+source: ""
+source_url: ""
+---
