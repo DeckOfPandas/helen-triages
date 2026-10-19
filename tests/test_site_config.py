@@ -2210,6 +2210,13 @@ def test_no_element_can_force_horizontal_scroll():
 # nothing static can compute. Each row here is a declared exception with the
 # claim it makes. An entry for a row that has a narrow variant fails the test.
 MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
+    ".drink-count-block": (
+        "`1fr auto` (#1412): the count or the shortlisted pill, beside the ship "
+        "legend or `× clear ship`. The widest right cell is `SHIP IT? = ` plus "
+        "one card word (`ship_card_names` keeps every rung to one short word), "
+        "about 150px; measured at 390px with room to spare, so it is believed "
+        "to fit 360px."
+    ),
     ".recipe-pagination": (
         "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "
         "of Courier all told, so it is believed to fit a 360px phone -- BELIEVED, "
@@ -3210,28 +3217,18 @@ def test_every_yolo_button_value_is_handled_by_the_index_script():
     )
 
 
-def test_the_unmade_filter_reads_made_before_and_not_ship():
-    """The `unmade` filter reads `meta.made_before`, never `ship` (#732).
+def test_the_card_s_chaos_stamp_comes_from_the_taxonomy_lists():
+    """A card's `data-chaos` is read off taxonomy.yml's `chaos` lists (#1413).
 
-    An unmade drink says `ship: "who knows"`, so both give the same list
-    until a drink is made and not yet rated: `made_before` flips and `ship`
-    does not. Nothing fails; the list offers a drink already made.
+    A literal list of rungs here would drift from the taxonomy in silence: a
+    rung added to `chaos.good` would never reach `no chaos please`.
     """
     html = read("cocktails", "index.html")
-    assert 'data-made-before="{{ drink.meta.made_before' in html, (
-        "the drink card no longer emits `data-made-before` from "
-        "`drink.meta.made_before`. If it is being derived from `ship` or from "
-        "`chaos` instead, see this test's docstring -- they agree today and "
-        "stop agreeing the moment Helen makes an unmade drink."
-    )
-
-    script = (ROOT / "assets" / "js" / "cocktail-index.js").read_text(encoding="utf-8")
-    clause = re.search(r"state\.chaos === 'unmade'[^;]*;", script)
-    assert clause, "cocktail-index.js has no `unmade` clause in matches()."
-    assert "madeBefore" in clause.group(0), (
-        "the `unmade` filter no longer reads `madeBefore`. Reading `chaos` or "
-        "`ship` gives the same answer today and the wrong one later."
-    )
+    for name in ("good", "chaos"):
+        assert f"taxonomy.chaos.{name} contains ship" in html, (
+            f"cocktails/index.html no longer stamps `data-chaos` from "
+            f"`taxonomy.chaos.{name}`."
+        )
 
 
 # --- the leopard on the cocktails page ground (#733) --------------------------

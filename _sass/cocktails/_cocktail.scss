@@ -309,6 +309,19 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   align-items: center;
   gap: $space-xs;
 
+  // The link to the index filtered to this value (#1412) carries the icon and
+  // the word, so it takes the same row; the word keeps its own colour.
+  .cocktail-ship-link {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    color: inherit;
+    text-decoration: none;
+
+    &:hover .drink-card-ship-word,
+    &:focus-visible .drink-card-ship-word { color: $color-wicked-woowoo; }
+  }
+
   // Larger than the card's, which is sized for a foot row shared with chips.
   .drink-card-ship-icon {
     width: 1.1rem;

@@ -35,7 +35,7 @@ source: "Difford's"
 source_url: ""
 meta:
   made_before: true
-  ship: "who knows"
+  ship: "IOU"
   rewritten: true
   awaiting_fix: false
   proofread: true

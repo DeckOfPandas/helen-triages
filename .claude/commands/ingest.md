@@ -38,7 +38,7 @@ what makes it findable, and there are exactly these:**
 | butter the source does not specify | `item: "QQ butter"` -- Helen: *"Write QQ butter in the ingredients list where it isn't specified."* Never "salted" by default and never plain "butter" |
 | a `generic` the vocabulary does not settle outright | `generic: "QQ <the source's words>"` -- see the block below |
 | a `suggestion` | `suggestion: []` unless a DECLARED bottle names it; the bottle the source names goes in that ingredient's `note` as `"Originally <bottle>."` |
-| a cocktail's `meta.ship` | `"who knows"`, never `"QQ"` -- `QQ` is not a ship value (`test_meta_ship_is_a_rung_or_who_knows`); `meta.made_before: false` beside it says she has not made it |
+| a cocktail's `meta.ship` | `"who knows"`, never `"QQ"` -- `QQ` is not a ship value (`test_meta_ship_is_a_rung_or_off_scale`); `meta.made_before: false` beside it says she has not made it, and the two must agree (`test_ship_agrees_with_made_before`) |
 | a food method step | the PAIR: `QQ original <verbatim>` then `QQ Claude <the rewrite>` |
 | any note an ingest ADDS | `- label: "QQ"` / `text: "QQ - …"` -- **both fields set, both beginning `QQ`**. A note with no label is titled "note" on the page and looks finished, so this is what stops an unread note publishing unnoticed |
 | an amount with no unit in the source | the figure as it stands, plus a note whose text says `QQ - no unit in the source` |

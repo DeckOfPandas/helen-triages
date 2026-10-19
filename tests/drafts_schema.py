@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # checkout to be satisfiable. Bump one of these in the same commit as the rule
 # that requires it, and say why in the changelog below.
 REQUIRED = {
-    "_cocktail_drafts": 2,
+    "_cocktail_drafts": 3,
     "_food_drafts": 1,
 }
 
@@ -39,6 +39,9 @@ CHANGELOG = {
            "prints them (`TOP_LEVEL_KEYS_IN_ORDER` in tests/test_cocktails.py), "
            "written by `python3 scripts/tidy_drafts.py --site cocktails --only "
            "order --apply`.",
+        3: "2026-10-18, #1413 -- `meta.ship` may also be \"IOU\" (made, liked, "
+           "never rated), and `ship: \"who knows\"` exactly when `made_before: "
+           "false` (`test_ship_agrees_with_made_before`).",
     },
     "_food_drafts": {
         1: "2026-09-05, #624 -- the state on the day the handshake was added. "

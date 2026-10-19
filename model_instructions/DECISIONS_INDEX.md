@@ -371,6 +371,7 @@ argument and the rules each field is read by.
 - 2026-08-17 · §9.4 / §9.4.1 / §9.5 · the site is canon; deviation happens in the kitchen.
 - 2026-09-05 · §9.4 / §9.4.1 / §9.5 · #722 · meta.made_before is a boolean that gates nothing, and an unmade drink may publish.
 - 2026-09-05 · §9.4 / §9.4.1 / §9.5 · #722 · an unmade drink's ship says who knows; QQ is not a ship value.
+- 2026-10-18 · §9.4 / §9.4.1 / §9.5 · #1413 · a drink Helen has made and liked but never rated says ship: "IOU", shown as IOU on the card and the drink page; who knows is only ever an unmade drink.
 - 2026-09-26 · §9.7 / §9.8 · #1212 · a blank "To serve" draws no section — Helen: "don't show 'to serve' section if it's blank." to_serve: "" is how an ingest leaves a drink with nothing to say.
 - 2026-08-27 · §9.10 / §9.10.1 · #501 · a card names the category, always, even where the recipe names a real bottle.
 - 2026-08-27 · §9.10 / §9.10.1 · #501 · a drink using two kinds of the same rum prints the card name twice.
@@ -451,7 +452,8 @@ argument and the rules each field is read by.
 - 2026-08-29 · §9.13 · the drinks index shows drafts on a local build only.
 - 2026-08-31 · §9.13 · #595 · going back to the drinks index restores the list you left.
 - 2026-09-05 · §9.13 · "the universe says…" is one line above the five questions, not a box.
-- 2026-09-06 · §9.13 · #732 · the third YOLO button is chaos only, and it reads made_before, never ship.
+- 2026-09-06 · §9.13 · #732 · the third YOLO button is chaos only — Helen: "the name of the third YOLO filter should be 'chaos only'", replacing never made it within hours.
+- 2026-10-18 · §9.13 · #1413 · the YOLO buttons read ship: no chaos please keeps yes and oh gods yes; chaos only keeps meh, not really and ???; sure and IOU show only under I'm open to chaos.
 - 2026-09-10 · §9.13 · no line of words goes under the wordmark.
 - 2026-09-10 · §9.13 · left alone on purpose in the design pass: the header's balance, the food index pills' faintness at rest, and the chip type size on cards.
 - 2026-09-11 · §9.13 · #966 #967 · / #967 — the MOOD and HASSLE buttons are in the order Helen typed them.
@@ -461,7 +463,7 @@ argument and the rules each field is read by.
 - 2026-09-04 · §9.13 · #546 · the shortlist ends in a shopping list that totals each ingredient, with a count of glasses per drink.
 - 2026-09-04 · §9.13 · #546 · a shopping-list row leads with the generic as the drink wrote it, with its bottles in brackets on the same line.
 - 2026-09-04 · §9.13 · #546 · a juice line on the shopping list also says how many whole fruits it comes to, as a range.
-- 2026-09-05 · §9.13 · the "ship it?" legend sits in the row under the count, beside the shortlisted button.
+- 2026-10-18 · §9.13 · #1412 · a card's ship mark is a filter to that exact value; the legend names the chosen value and × clear ship sits under it.
 - undated · §9.13 · #692 · Undated, #692 — "the universe says…" deals only from the top two ship rungs, yes and oh gods yes.
 - 2026-09-10 · §9.13 · #849 · the count row has no link to the share panel; the panel at the foot of the page is the one way in.
 - 2026-08-17 · §9.13 · the drinks index has no spirit filter and no glass filter, and neither may be added.
@@ -469,7 +471,6 @@ argument and the rules each field is read by.
 - 2026-08-30 · §9.13 · the drinks index's three text inputs take food's input type and food's neutral grey underline, not a section hue.
 - 2026-09-02 · §9.13 · an index search input's placeholder disappears on focus, not on the first keystroke.
 - 2026-09-02 · §9.13 · a chosen filter chip keeps its chosen colours while the pointer is still over it.
-- 2026-09-05 · §9.13 · the "ship it?" legend sits in the row under the count, at its right, opposite the SHORTLISTED button.
 - 2026-09-05 · §9.13 · #729 #730 · / #730 — the shortlisted-only control is a bordered pill in the row under the count, on both indexes.
 - 2026-09-05 · §9.13 · on a narrow screen the universe line stacks in two stages and hides nothing.
 - undated · §9.13 · Undated — the universe line has no square brackets round the tape, and ingredients that are cut off end with an ellipsis and a closing round bracket.
