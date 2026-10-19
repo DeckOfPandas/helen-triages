@@ -2828,11 +2828,18 @@ def test_no_drink_page_prints_a_batch_volume(prod_site):
 
     #1121 asked for that line and #1257 removed it; this stops the older
     ruling being restored in good faith.
+
+    The words are looked for between the scaler and the method only: an
+    ingredient note of Helen's ("Approximately 90 ml for this one.") sits
+    above the scaler and is not a batch line.
     """
     offenders = []
     for page in _drink_pages(prod_site):
         html = page.read_text(encoding="utf-8")
-        if "cocktail-scale-total" in html or re.search(r"Approximately\s", html):
+        start = html.find('class="cocktail-scale-controls"')
+        end = html.find('class="cocktail-method', start)
+        scaler = html[start:end] if start != -1 else ""
+        if "cocktail-scale-total" in html or re.search(r"Approximately\s", scaler):
             offenders.append(page.parent.name)
     assert not offenders, (
         "these drink pages print a batch volume line again: "
