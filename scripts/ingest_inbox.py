@@ -161,9 +161,12 @@ def scan_drafts(root: Path, site: str, where: str = "") -> list:
 # drops its text: the two exceptions are page checks, which Helen takes at
 # rewrite, and tags, which the review table carries in full. Every entry is a
 # ruling of hers (DECISIONS §4 and §5, MANUAL §5).
-ASKS = re.compile(r"\?|\bplease\b|\bsay (if|which)\b|\bconfirm\b|\bcheck\b", re.I)
+ASKS = re.compile(r"\?|\bplease\b|\bsay (if|which|how)\b|\btell me\b|\bconfirm\b|"
+                  r"\bcheck\b|\bconsider\b", re.I)
 TAGS_LABEL = "tags and star proposed (in the review table)"
 PHOTO_LABEL = "a photo or page check (Helen picks these up at rewrite)"
+# Its only question ("tell me if this batch should differ") is what it settles.
+IBA_LABEL = "IBA's empty source, by the standing ruling"
 FOLDS = [
     ("an unprinted time, written as `Estimated N mins`", r"^\*\*Times not printed"),
     ("printed times used as written", r"^\*\*Times (and serving )?are printed"),
@@ -191,6 +194,19 @@ FOLDS = [
      r"The source has no ingredient list)"),
     ("a sidebar box: no body, by the 2026-10-18 ruling",
      r"^\*\*This is a sidebar|^\*\*Helen's chat ruling: (sections like this|this will become)"),
+    # Cocktails. The typing ones are settled by resolve_pours.py, which lists
+    # what it leaves; the name ones by the inbox's own same-name check.
+    ("a drink's standing values: mood [], made_before false, ship who knows",
+     r"^\*\*`mood: \[\]`, `made_before: false` and `ship: \"who knows\"`"),
+    ("the glass from the pre-chill line, not the photo caption",
+     r"^\*\*The \"Photographed in a"),
+    ("Difford's as the source, read off the page", r"^\*\*`source` is `Difford's`"),
+    (IBA_LABEL, r"^\*\*`source` and `source_url` are both empty"),
+    ("a strained drink's `serve.ice: none`", r"^\*\*`serve\.ice` is `none`\*\*"),
+    ("a name that may already exist: the inbox compares formulas itself",
+     r"compare the formula, not the name"),
+    ("which pours were typed (resolve_pours.py lists what is left)",
+     r"^\*\*(Only `[^`]+` is typed|Typed:|Every ingredient is typed|No ingredient is typed)"),
     (TAGS_LABEL, r"^\*\*Tags are"),
     # The bold opening, and a word about the picture's quality: "the
     # photograph points to James Martin" is a credit question, not a check.
@@ -217,7 +233,7 @@ def fold_hand_back(bullets: list, fm: dict) -> tuple:
     kept, folded = [], []
     for bullet in bullets:
         hit = next((label for label, pat in rules if re.search(pat, bullet, re.I)), None)
-        if hit and ASKS.search(bullet) and hit not in (TAGS_LABEL, PHOTO_LABEL):
+        if hit and ASKS.search(bullet) and hit not in (TAGS_LABEL, PHOTO_LABEL, IBA_LABEL):
             hit = None
         if hit:
             folded.append((hit, bullet))

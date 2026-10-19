@@ -643,6 +643,41 @@ def test_the_report_counts_what_it_folds(drafts, monkeypatch, capsys):
     assert "Times not printed" in capsys.readouterr().out
 
 
+def test_a_dry_run_counts_each_envelope_for_the_next(drafts, monkeypatch, capsys):
+    """Two envelopes with one slug, and two with one formula, in a single run:
+    the dry run reports the -2 and the duplicate a --write would make."""
+    text = envelope_text("valid_food")
+    other = text.replace("| 500 g |", "| 400 g |").replace('"500 g"', '"400 g"')
+    assert other != text
+    monkeypatch.setattr(inbox, "fetch_issues", lambda site, number=None: [
+        {"number": 1, "body": text}, {"number": 2, "body": text},
+        {"number": 3, "body": other}])
+    assert inbox.main(["--site", "food", "--drafts-dir", str(drafts)]) == 0
+    out = capsys.readouterr().out
+    assert "#2: PROBABLE DUPLICATE of crispy-sage-butter-gnocchi (earlier in this run)" in out
+    assert "#3: would write crispy-sage-butter-gnocchi-2.md" in out
+    assert not list(drafts.rglob("*.md")), "still a dry run"
+
+
+def test_a_published_recipe_counts_as_existing(drafts, monkeypatch, capsys):
+    """A duplicate of a PUBLISHED recipe is a duplicate, reported as such."""
+    published = drafts.parent / "test_ingest_inbox_published"
+    if published.exists():
+        shutil.rmtree(published)
+    published.mkdir()
+    try:
+        env = inbox.parse_envelope(envelope_text("valid_food"), "food")
+        (published / "crispy-sage-butter-gnocchi.md").write_text(env.block, encoding="utf-8")
+        monkeypatch.setattr(inbox, "fetch_issues", lambda site, number=None:
+                            [{"number": 4, "body": envelope_text("valid_food")}])
+        assert inbox.main(["--site", "food", "--drafts-dir", str(drafts),
+                           "--recipes-dir", str(published)]) == 0
+        assert "PROBABLE DUPLICATE of published crispy-sage-butter-gnocchi" in \
+            capsys.readouterr().out
+    finally:
+        shutil.rmtree(published)
+
+
 # ---- ingest_review.py ----
 
 def test_the_review_page_has_a_row_per_recipe_and_its_open_questions(drafts):
