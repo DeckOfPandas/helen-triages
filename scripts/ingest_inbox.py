@@ -88,6 +88,13 @@ DRAFT_ROOTS = {
     "cocktail": ROOT / "_cocktail_drafts",
 }
 
+# Read too: a duplicate of a published recipe is as much a duplicate, and a
+# slug taken there collides at promotion.
+PUBLISHED_ROOTS = {
+    "food": ROOT / "_food_recipes",
+    "cocktail": ROOT / "_cocktail_recipes",
+}
+
 LABEL = "ingest"
 
 
@@ -98,6 +105,15 @@ class Existing:
     slug: str
     title: str
     fingerprint: str
+    where: str = ""     # "" a draft, "published", or "planned" earlier this run
+
+    @property
+    def label(self) -> str:
+        if self.where == "published":
+            return f"published {self.slug}"
+        if self.where == "planned":
+            return f"{self.slug} (earlier in this run)"
+        return self.slug
 
 
 def drafts_root(site: str, override=None) -> Path:
@@ -114,13 +130,16 @@ def require_drafts(root: Path, site: str):
         )
 
 
-def scan_drafts(root: Path, site: str) -> list:
-    """Every draft already on disk, with its fingerprint.
+def scan_drafts(root: Path, site: str, where: str = "") -> list:
+    """Every draft (or, with `where="published"`, every recipe) on disk, with
+    its fingerprint.
 
     `rglob`, not `glob`: `_food_drafts/` has staging subfolders and the files
     closest to promotion live in them.
     """
     out = []
+    if not root.is_dir():
+        return out
     for path in sorted(root.rglob("*.md")):
         match = FRONT_MATTER.match(path.read_text(encoding="utf-8"))
         if not match:
@@ -132,7 +151,7 @@ def scan_drafts(root: Path, site: str) -> list:
         if not isinstance(fm, dict):
             continue
         out.append(Existing(path.stem, str(fm.get("title") or ""),
-                            fingerprint(fm, site)))
+                            fingerprint(fm, site), where))
     return out
 
 
@@ -252,7 +271,7 @@ class Plan:
         if self.reason:
             return f"REJECTED: {self.reason}"
         if self.duplicate_of:
-            return (f"PROBABLE DUPLICATE of {self.duplicate_of}.md -- same "
+            return (f"PROBABLE DUPLICATE of {self.duplicate_of} -- same "
                     f"fingerprint, nothing written")
         verb = "wrote" if self.written else "would write"
         return f"{verb} {self.path.name}"
@@ -300,14 +319,14 @@ def plan_for(body: str, site: str, existing: list, root: Path, number=None,
         (e for e in existing if e.fingerprint == envelope.fingerprint), None)
     if same_formula:
         plan.slug = slug
-        plan.duplicate_of = same_formula.slug
+        plan.duplicate_of = same_formula.label
         return plan
 
     same_title = [e for e in existing
                   if e.title.strip().lower() == envelope.fm["title"].strip().lower()]
     if same_title:
         plan.notes.append(
-            f"THE SAZERAC CASE: {', '.join(e.slug for e in same_title)} "
+            f"THE SAZERAC CASE: {', '.join(e.label for e in same_title)} "
             f"share(s) this title and has a DIFFERENT fingerprint, so this is "
             f"a different recipe under the same name. Written separately; "
             f"Helen names it."
@@ -480,6 +499,9 @@ def main(argv=None) -> int:
                     help="operate on a different directory. Exists so this can "
                          "be proved against a COPY before it is ever pointed "
                          "at Helen's real drafts.")
+    ap.add_argument("--recipes-dir", default=None,
+                    help="the published collection to check for duplicates; "
+                         "the real one by default, none with --drafts-dir")
     ap.add_argument("--every-bullet", action="store_true",
                     help="print the hand-back bullets a standing ruling settles too")
     args = ap.parse_args(argv)
@@ -490,14 +512,23 @@ def main(argv=None) -> int:
     root = drafts_root(args.site, args.drafts_dir)
     require_drafts(root, args.site)
     existing = scan_drafts(root, args.site)
+    # A run on a copy (--drafts-dir) reads published recipes only if told where.
+    published = (Path(args.recipes_dir) if args.recipes_dir
+                 else None if args.drafts_dir else PUBLISHED_ROOTS[args.site])
+    if published:
+        existing += scan_drafts(published, args.site, "published")
 
     plans = []
     for number, origin, heading, body in _envelopes(args):
         plan = plan_for(body, args.site, existing, root, number, origin, heading)
         if args.write and plan.ok:
             write(plan)
+        # Every envelope counts for the ones after it, written or not, so a
+        # dry run shows the same -2 and the same duplicate a --write would.
+        if plan.ok:
             existing.append(Existing(plan.slug, plan.envelope.fm["title"],
-                                     plan.envelope.fingerprint))
+                                     plan.envelope.fingerprint,
+                                     "" if plan.written else "planned"))
         plans.append(plan)
 
     print(render(plans, args.site, args.write, args.every_bullet))
