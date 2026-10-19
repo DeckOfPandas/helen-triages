@@ -158,7 +158,14 @@ function buildPage(doc, options) {
   count.appendChild(el('span', '', { id: 'drink-count-n' }));
   count.appendChild(el('span', '', { id: 'drink-count-word' }));
   doc.body.appendChild(count);
+  // The ship legend and its clear (#1412), beside the count on the page.
+  const legend = el('span', 'drink-count-legend');
+  const legendValue = el('span', 'drink-count-legend-value', { 'data-ship-legend-value': '' });
+  legendValue.appendChild(el('span', '', { 'data-ship-legend-word': '' }));
+  legend.appendChild(legendValue);
+  doc.body.appendChild(legend);
   doc.body.appendChild(el('button', 'btn-shortlist-only', { id: 'shortlist-only' }));
+  doc.body.appendChild(el('button', 'btn-clear-filter', { id: 'clear-ship' }));
 
   const list = el('ul', 'drink-cards');
   doc.body.appendChild(list);
@@ -186,6 +193,7 @@ function addCard(doc, list, spec) {
   card.setAttribute('data-name', spec.name);
   card.setAttribute('data-moods', (spec.moods || []).join('|') + '|');
   card.setAttribute('data-chaos', spec.chaos || 'good');
+  card.setAttribute('data-ship', spec.ship || 'meh');
   card.setAttribute('data-ingredients', (spec.ingredients || []).join('|'));
 
   /* The page's real shape: cocktails/index.html emits
@@ -258,9 +266,15 @@ function addCard(doc, list, spec) {
   });
   foot.appendChild(moods);
 
-  const ship = doc.createElement('span');
+  /* A <button> carrying its value, as on the page (#1412); the word is the
+     card's spelling, `ship_word` where a test needs it to differ. */
+  const ship = doc.createElement('button');
   ship.setAttribute('class', 'drink-card-ship');
-  ship.textContent = spec.ship || 'meh';
+  ship.setAttribute('data-ship', spec.ship || 'meh');
+  const shipWord = doc.createElement('span');
+  shipWord.setAttribute('class', 'drink-card-ship-word');
+  shipWord.textContent = spec.ship_word || spec.ship || 'meh';
+  ship.appendChild(shipWord);
   if (spec.ship_box) ship.__box = spec.ship_box;
   foot.appendChild(ship);
 

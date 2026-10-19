@@ -3074,11 +3074,18 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   whole fruits needed, like this '375 ml lemon juice (X to Y lemons)'."* The
   range comes from `juice_yields` in `ingredients.yml`, which gives each
   fruit's yield as a range, so the count is a range too and never one figure.
-- **2026-09-05 — the "ship it?" legend sits in the row under the count, beside
-  the shortlisted button.** Helen: *"move the ship mark into the same row so
-  it's not hovering above the cards."* It had ended the count line.
-  `.drink-count-row` in `cocktails/index.html`: what you can do with the list
-  on the left, what the mark on every card means on the right.
+- **2026-10-18, #1412 — a card's ship mark is a filter to that exact value;
+  the legend names the chosen value and `× clear ship` sits under it.** Helen,
+  offered a fourth YOLO button or a clear in the count row: *"Neither! My guess
+  is to update the ship legend to '[ship] SHIP IT? = YES' or whatever it is,
+  then add a 'clear ship' button below. Vertical placement can match the X
+  survivors text and shortlist button on the left."* So `.drink-count-block`
+  is two by two: count and legend, then shortlisted and the clear. The value
+  is the card's word, and it ANDs with the YOLO buttons rather than replacing
+  them. The drink page's SHIP IT? word links to `?ship=`. This replaces
+  2026-09-05's legend on the shortlisted row (*"move the ship mark into the
+  same row so it's not hovering above the cards"*): the clear now holds that
+  row.
 - **Undated, #692 — "the universe says…" deals only from the top two ship
   rungs, `yes` and `oh gods yes`.** Helen: *"It's pretty funny when the top
   line of the site shows a drink loudly marked 'MEH', but it's still not the
@@ -3126,11 +3133,6 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   section's tape); the rule has not. `:not(.is-on)` on the hover selectors in
   `_sass/cocktails/_filters.scss` is load-bearing, because `:hover` and
   `.is-on` are equally specific.
-- **2026-09-05 — the "ship it?" legend sits in the row under the count, at its
-  right, opposite the SHORTLISTED button.** Helen: *"move the ship mark into
-  the same row so it's not hovering above the cards."* `.drink-count-legend`
-  in `.drink-count-row`: the one line on the page that says what the ship on
-  every card means, in the card's own type and muted because it is a caption.
 - **2026-09-05, #729 / #730 — the shortlisted-only control is a bordered pill
   in the row under the count, on both indexes.** Helen: *"Style it nicely.
   Maybe as a toggle [show shortlist]. Possibly place it below X survivors."*

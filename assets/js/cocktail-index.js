@@ -264,6 +264,8 @@
       moods: (card.dataset.moods || '').split('|').filter(Boolean),
       name: card.dataset.name || '',
       chaos: card.dataset.chaos || '',
+      ship: card.dataset.ship || '',
+      shipEl: card.querySelector('.drink-card-ship'),
       draft: card.classList.contains('drink-card--draft'),
       /* The shortlist's key (#546). Whether it is shortlisted is asked in
          matches(), because that can change under the page. */
@@ -352,6 +354,9 @@
        and `chaos` narrow, each to the cards stamped with its own name. */
     if (state.chaos === 'good' && d.chaos !== 'good') return false;
     if (state.chaos === 'chaos' && d.chaos !== 'chaos') return false;
+
+    /* One exact ship value, from a card's mark (#1412); ANDed with `chaos`. */
+    if (state.ship !== null && d.ship !== state.ship) return false;
 
     /* Include chips are AND: each one narrows. */
     var i;
@@ -734,6 +739,8 @@
     showClear('clear-mood', moodBtnsIn(false).some(function (b) { return state.moods.has(b.dataset.mood); }));
     showClear('clear-hassle', moodBtnsIn(true).some(function (b) { return state.moods.has(b.dataset.mood); }));
     showClear('clear-chaos', state.chaos !== null);
+    showClear('clear-ship', state.ship !== null);
+    syncShip();
     showClear('clear-name', state.nameQuery !== '');
     showClear('clear-include', state.include.size > 0 || state.isIncludeSearching);
     showClear('clear-exclude', state.exclude.size > 0 || state.isExcludeSearching);
@@ -814,6 +821,14 @@
   var cardList = document.querySelector('.drink-cards');
   if (cardList) {
     cardList.addEventListener('click', function (ev) {
+      /* The ship mark (#1412): a second press on the chosen value clears it. */
+      var mark = ev.target.closest ? ev.target.closest('.drink-card-ship') : null;
+      if (mark && cardList.contains(mark) && mark.dataset.ship) {
+        ev.preventDefault();
+        state.ship = (state.ship === mark.dataset.ship) ? null : mark.dataset.ship;
+        apply();
+        return;
+      }
       var chip = ev.target.closest ? ev.target.closest('.drink-card-mood') : null;
       if (!chip || !cardList.contains(chip)) return;
       var name = chip.dataset.mood;
@@ -835,6 +850,33 @@
       var on = state.moods.has(b.dataset.mood);
       b.classList.toggle('is-on', on);
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  /* The count row's legend says which ship value is chosen, in the card's own
+     word, and every card's mark says whether it is the chosen one (#1412).
+     Painted from state in apply(), as the mood chips are. */
+  var shipLegendValue = document.querySelector('[data-ship-legend-value]');
+  var shipLegendWord = document.querySelector('[data-ship-legend-word]');
+
+  function shipWord(value) {
+    var word = '';
+    model.forEach(function (d) {
+      if (word || d.ship !== value || !d.shipEl) return;
+      var el = d.shipEl.querySelector('.drink-card-ship-word');
+      if (el) word = el.textContent;
+    });
+    return word || value;
+  }
+
+  function syncShip() {
+    if (shipLegendValue) shipLegendValue.hidden = state.ship === null;
+    if (shipLegendWord) shipLegendWord.textContent = state.ship === null ? '' : shipWord(state.ship);
+    model.forEach(function (d) {
+      if (!d.shipEl) return;
+      var on = state.ship !== null && d.ship === state.ship;
+      d.shipEl.classList.toggle('is-on', on);
+      d.shipEl.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   }
 
@@ -1067,6 +1109,8 @@
     syncChaosButtons();
   });
 
+  wireClear('clear-ship', function () { state.ship = null; });
+
   wireClear('clear-name', function () {
     state.nameQuery = '';
     if (nameInput) nameInput.value = '';
@@ -1243,6 +1287,15 @@
       sharedUnmatched = resolvedShared.unmatched;
     }
     /* A different list from the one left, so the remembered scroll goes. */
+    restored = null;
+  }
+
+  /* `?ship=` (#1412), from a drink page's SHIP IT? word: exactly what pressing
+     a card's mark does. A value no card carries is dropped in silence, as
+     `?mood=` is. */
+  var arrivedShip = HTF.filterState.parseShip(location.search);
+  if (arrivedShip && model.some(function (d) { return d.ship === arrivedShip; })) {
+    state.ship = arrivedShip;
     restored = null;
   }
 

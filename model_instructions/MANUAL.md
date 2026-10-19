@@ -3096,6 +3096,11 @@ Five named questions, in Helen's order:
   `chaos`**, read off `meta.ship`: `yes` and `oh gods yes`; `not really`,
   `meh` and `who knows`. The index stamps each card `good`, `chaos` or
   `middle`, and `middle` (`sure`, `IOU`) shows only under `open`.
+- **A card's ship mark is a sixth control with no section** (#1412): a
+  `<button>` that sets `state.ship` to its exact `data-ship`, ANDed with
+  YOLO?. The count row's legend then reads `ship it? = <card word>` and
+  `× clear ship` (`#clear-ship`) appears under it. `?ship=` sets it from a
+  drink page's SHIP IT? link; a value no card carries is dropped.
 - **Mood and Hassle share one `state.moods` set, and it is ORed**: a drink
   carrying any chosen word from either section survives. The order then ranks
   them: drinks answering both sections first, then more chosen words matched,

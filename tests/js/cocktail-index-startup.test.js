@@ -101,6 +101,67 @@ test('each narrowing YOLO button keeps only the cards stamped with its name', ()
   assert.strictEqual(visibleTitles(r.page).length, 4);
 });
 
+// --- the ship mark is a filter (#1412) ---------------------------------------
+
+const SHIPS = [
+  { url: '/a', name: 'a', title: 'A', moods: ['sharp'], ingredients: ['gin|gin'],
+    chaos: 'middle', ship: 'IOU' },
+  { url: '/b', name: 'b', title: 'B', moods: ['sharp'], ingredients: ['gin|gin'],
+    chaos: 'middle', ship: 'IOU' },
+  { url: '/c', name: 'c', title: 'C', moods: ['sharp'], ingredients: ['gin|gin'],
+    chaos: 'good', ship: 'oh gods yes', ship_word: 'yes²' }
+];
+
+function shipMark(page, title) {
+  const li = page.list.children.filter(function (c) {
+    return c.querySelector('.drink-card-name a').textContent === title;
+  })[0];
+  return li.querySelector('.drink-card-ship');
+}
+
+function legendWord(r) {
+  const value = r.doc.querySelector('[data-ship-legend-value]');
+  return value.hidden ? null : r.doc.querySelector('[data-ship-legend-word]').textContent;
+}
+
+test('#1412: pressing a card\'s ship mark keeps that value and the legend names it', () => {
+  const r = boot({ drinks: SHIPS });
+  assert.strictEqual(legendWord(r), null, 'no ship chosen, so the legend shows no value');
+  assert.strictEqual(r.doc.getElementById('clear-ship').hidden, true);
+
+  shipMark(r.page, 'C').dispatch('click');
+  assert.deepStrictEqual(visibleTitles(r.page), ['C']);
+  assert.strictEqual(legendWord(r), 'yes²', 'the legend uses the card\'s word, not the raw value');
+  assert.strictEqual(r.doc.getElementById('clear-ship').hidden, false);
+
+  shipMark(r.page, 'C').dispatch('click');
+  assert.strictEqual(visibleTitles(r.page).length, 3, 'a second press clears it');
+  assert.strictEqual(legendWord(r), null);
+});
+
+test('#1412: `× clear ship` clears only the ship, and clear all clears it too', () => {
+  const r = boot({ drinks: SHIPS });
+  shipMark(r.page, 'A').dispatch('click');
+  assert.deepStrictEqual(visibleTitles(r.page).sort(), ['A', 'B']);
+  r.doc.getElementById('clear-ship').dispatch('click');
+  assert.strictEqual(visibleTitles(r.page).length, 3);
+
+  shipMark(r.page, 'A').dispatch('click');
+  r.doc.querySelector('.btn-clear').dispatch('click');
+  assert.strictEqual(visibleTitles(r.page).length, 3);
+  assert.strictEqual(legendWord(r), null);
+});
+
+test('#1412: ?ship= from a drink page narrows the list; an unknown value is dropped', () => {
+  const r = boot({ drinks: SHIPS, search: '?ship=IOU' });
+  assert.deepStrictEqual(visibleTitles(r.page).sort(), ['A', 'B']);
+  assert.strictEqual(legendWord(r), 'IOU');
+
+  const bad = boot({ drinks: SHIPS, search: '?ship=nonsense' });
+  assert.strictEqual(visibleTitles(bad.page).length, 3);
+  assert.strictEqual(legendWord(bad), null);
+});
+
 // --- the guard's own guard ---------------------------------------------------
 
 test('the harness FAILS on the 2026-08-31 bug, rather than only passing today', () => {

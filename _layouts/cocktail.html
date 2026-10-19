@@ -99,7 +99,10 @@ layout: default
         {% if page.garnish.size > 0 %}
           <div><dt>Garnish</dt><dd>{{ page.garnish | join: ", " }}</dd></div>
         {% endif %}
-        <div class="cocktail-meta-ship"><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
+        {% comment %} A link to the index filtered to this exact ship value
+           (#1412), as the mood chips below link to theirs. {% endcomment %}
+        {% assign page_ship = page.meta.ship | default: "who knows" %}
+        <div class="cocktail-meta-ship"><dt>Ship it?</dt><dd class="cocktail-ship"><a class="cocktail-ship-link" href="{{ index_home | relative_url }}?ship={{ page_ship | url_encode }}#results">{% include cocktails/ship.html ship=page.meta.ship %}</a></dd></div>
       </dl>
 
       {% comment %} Mood chips: the card's chips, as links to the index filtered

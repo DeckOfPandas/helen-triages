@@ -80,6 +80,22 @@
     return name;
   }
 
+  // `?ship=<value>` is one exact `meta.ship` value, from a drink page's SHIP IT?
+  // link (#1412). Not a kind: a single value, never comma-split. The last
+  // `ship` wins; the caller drops a value no card carries.
+  function parseShip(search) {
+    var body = String(search == null ? '' : search).replace(/^[?#]/, '');
+    var ship = '';
+    body.split('&').forEach(function (chunk) {
+      var eq = chunk.indexOf('=');
+      if (eq === -1) return;
+      if (decodeValue(chunk.slice(0, eq)) !== 'ship') return;
+      var value = decodeValue(chunk.slice(eq + 1)).trim();
+      if (value) ship = value;
+    });
+    return ship;
+  }
+
   // The shortlist query is not a kind either, and has two meanings (#1093):
   //   ?shortlist=1                  this browser's own shortlist
   //   ?shortlist=negroni,aviation   a shortlist someone sent, by slug
@@ -176,6 +192,10 @@
   var COCKTAIL_FIELD_SPEC = {
     moods: { empty: function () { return new Set(); }, narrows: true },
     chaos: { empty: function () { return null; }, narrows: true },
+
+    // One exact `meta.ship`, from a card's mark (#1412); ANDed with `chaos`.
+    ship: { empty: function () { return null; }, narrows: true },
+
     include: { empty: function () { return new Set(); }, narrows: true },
     exclude: { empty: function () { return new Set(); }, narrows: true },
     nameQuery: { empty: function () { return ''; }, narrows: true },
@@ -413,6 +433,7 @@
     EXCLUDE_PREFIX: EXCLUDE_PREFIX,
     parseQuery: parseQuery,
     parseName: parseName,
+    parseShip: parseShip,
     parseShortlist: parseShortlist,
     shortlistQuery: shortlistQuery,
     serialise: food.serialise,

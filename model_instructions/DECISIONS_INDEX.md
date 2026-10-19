@@ -455,7 +455,7 @@ argument and the rules each field is read by.
 - 2026-09-04 · §9.13 · #546 · the shortlist ends in a shopping list that totals each ingredient, with a count of glasses per drink.
 - 2026-09-04 · §9.13 · #546 · a shopping-list row leads with the generic as the drink wrote it, with its bottles in brackets on the same line.
 - 2026-09-04 · §9.13 · #546 · a juice line on the shopping list also says how many whole fruits it comes to, as a range.
-- 2026-09-05 · §9.13 · the "ship it?" legend sits in the row under the count, beside the shortlisted button.
+- 2026-10-18 · §9.13 · #1412 · a card's ship mark is a filter to that exact value; the legend names the chosen value and × clear ship sits under it.
 - undated · §9.13 · #692 · Undated, #692 — "the universe says…" deals only from the top two ship rungs, yes and oh gods yes.
 - 2026-09-10 · §9.13 · #849 · the count row has no link to the share panel; the panel at the foot of the page is the one way in.
 - 2026-08-17 · §9.13 · the drinks index has no spirit filter and no glass filter, and neither may be added.
@@ -463,7 +463,6 @@ argument and the rules each field is read by.
 - 2026-08-30 · §9.13 · the drinks index's three text inputs take food's input type and food's neutral grey underline, not a section hue.
 - 2026-09-02 · §9.13 · an index search input's placeholder disappears on focus, not on the first keystroke.
 - 2026-09-02 · §9.13 · a chosen filter chip keeps its chosen colours while the pointer is still over it.
-- 2026-09-05 · §9.13 · the "ship it?" legend sits in the row under the count, at its right, opposite the SHORTLISTED button.
 - 2026-09-05 · §9.13 · #729 #730 · / #730 — the shortlisted-only control is a bordered pill in the row under the count, on both indexes.
 - 2026-09-05 · §9.13 · on a narrow screen the universe line stacks in two stages and hides nothing.
 - undated · §9.13 · Undated — the universe line has no square brackets round the tape, and ingredients that are cut off end with an ellipsis and a closing round bracket.

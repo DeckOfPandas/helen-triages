@@ -161,6 +161,11 @@ permalink: /cocktails/
     </div>
   </div>
 
+  {% comment %} Two by two (#1412): the count and the ship legend, then the
+     shortlisted button and `× clear ship`. The legend says what the mark on
+     every card means, and which value is chosen once one is pressed;
+     cocktail-index.js fills and reveals the value. {% endcomment %}
+  <div class="drink-count-block">
   {% comment %} "survivors", matching food's (#489). cocktail-index.js rewrites
      the number and the word, so it must agree with this plural rule. {% endcomment %}
   {% comment %} A plain paragraph, not a flex row: a flex container discards the
@@ -173,6 +178,21 @@ permalink: /cocktails/
     <strong class="results-count-number" id="drink-count-n">{{ all_drinks.size }}</strong>
     <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
   </p>
+  <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?<span class="drink-count-legend-value" data-ship-legend-value hidden>= <span data-ship-legend-word></span></span></span>
+
+  {% comment %} The shortlisted-only view (#546) is a filter on this index, not
+     a page of its own and not a sixth filter section. It ships `hidden` and
+     cocktail-index.js reveals it. No link to the share panel here (#849): the
+     panel at the foot of the page is the one way in. {% endcomment %}
+  <p class="drink-count-row">
+    <button type="button"
+            class="btn-shortlist-only"
+            id="shortlist-only"
+            aria-pressed="false"
+            hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
+  </p>
+  <button type="button" class="btn-clear-filter drink-count-clear-ship" id="clear-ship" hidden>&times; clear ship</button>
+  </div>
 
   {% comment %} The sticky results bar: a mirror of the count above and of the
      top `× clear all`, revealed by assets/js/results-bar.js once `#results` has
@@ -185,21 +205,6 @@ permalink: /cocktails/
     </div>
   </div>
 
-  {% comment %} The row under the count: what you can do with the list on the
-     left, what the mark on every card means on the right. The shortlisted-only
-     view (#546) is a filter on this index, not a page of its own and not a
-     sixth filter section. It ships `hidden` and cocktail-index.js reveals it;
-     the legend is static. {% endcomment %}
-  <p class="drink-count-row">
-    <button type="button"
-            class="btn-shortlist-only"
-            id="shortlist-only"
-            aria-pressed="false"
-            hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
-    {% comment %} No link to the share panel here (#849): the panel at the foot
-       of the page is the one way in. {% endcomment %}
-    <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
-  </p>
   {% comment %} Hide / show drafts, local builds only (#1358): inside the gate
      that lets a draft into `all_drinks`, so the deployed index has no such
      element. Ships `hidden`; cocktail-index.js reveals and wires it.
@@ -341,8 +346,10 @@ permalink: /cocktails/
           {% comment %} The ship mark and its word come from
              _includes/cocktails/ship.html, which the drink page also calls, so
              the two cannot render a different word for the same rung.
-             `short=true` asks for the card's abbreviations. {% endcomment %}
-          <span class="drink-card-ship">{% include cocktails/ship.html ship=ship short=true %}</span>
+             `short=true` asks for the card's abbreviations. A <button>: pressing
+             it filters the index to this exact ship value (#1412), which
+             cocktail-index.js reads off its `data-ship`. {% endcomment %}
+          <button type="button" class="drink-card-ship" data-ship="{{ ship }}" aria-pressed="false" aria-label="ship it? {{ ship }}: show only these">{% include cocktails/ship.html ship=ship short=true %}</button>
         </div>
 
         {% comment %} The shortlist toggle, top right (#546). The mark alone,

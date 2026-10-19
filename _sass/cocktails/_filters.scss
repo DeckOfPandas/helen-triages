@@ -426,8 +426,9 @@ $pool-chip-rest: mix($color-text, $color-bg, 73%);
   text-transform: none;
   letter-spacing: 0.01em;   // matches the `body, button` rule in shared/_base
   color: $color-text;
-  // `.drink-count-row` is under this and carries the gap to the list.
-  margin: $space-xl 0 $space-xs;   // was $spacing-block-gap 0 $space-xl
+  // The block's margin is the space above and below; this keeps only the step
+  // down to the shortlisted row.
+  margin: 0 0 $space-xs;
   padding-top: $space-md;
 
   // No rule here resetting the number's weight or size: the digits take
@@ -435,27 +436,36 @@ $pool-chip-rest: mix($color-text, $color-bg, 73%);
   // reset nested in this block would beat that class on specificity.
 }
 
-// The row under the count: what you can do with the list on the left, what
-// the mark on every card means on the right. Baseline, because both are text.
-// The legend's own `margin-left: auto` does the pushing.
-.drink-count-row {
-  display: flex;
+// Two by two (#1412): the count and the ship legend, then the shortlisted
+// button and `× clear ship`. What you can do with the list on the left, what
+// the mark on every card means on the right. Baseline, because all four are
+// text. The vertical margin is the count's old one, on the block so it still
+// collapses with the filters above.
+.drink-count-block {
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: baseline;
-  margin: 0 0 $space-lg;
+  column-gap: $space-md;
+  margin: $space-xl 0 $space-lg;
 }
+
+.drink-count-row { margin: 0; }
+
+.drink-count-clear-ship { justify-self: end; }
 
 // The one line on the page that says what the ship on every card means, in
 // the card's own type (`.drink-card-ship`, _cards.scss), muted because it is
 // a caption.
 //
-// `align-items: center`, not baseline (#934): the icon's SVG is
-// `display: block`, so the icon has no text baseline and flexbox synthesises
-// one from its bottom edge, which sits the boat lower than the words.
+// The words sit on the baseline and only the icon is centred (#934, #1412):
+// the icon's SVG is `display: block`, with no text baseline, so a baseline
+// icon would sit the boat low; and if every item were centred the legend's own
+// baseline would come from the icon's bottom edge and ride above the count's.
 .drink-count-legend {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.45rem;
-  margin-left: auto;
+  justify-self: end;
   font-family: $font-headings;
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -463,8 +473,13 @@ $pool-chip-rest: mix($color-text, $color-bg, 73%);
   color: $color-clear-text;
 }
 
+// The chosen value, in full colour: it is the one word here that is state,
+// not caption.
+.drink-count-legend-value { color: $color-text; }
+
 .drink-count-legend-icon {
   flex: none;
+  align-self: center;
   width: 1rem;
   height: 1rem;
   color: $color-raucous-reposado-deep;
