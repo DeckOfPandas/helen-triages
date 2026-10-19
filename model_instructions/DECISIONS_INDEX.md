@@ -220,6 +220,7 @@ argument and the rules each field is read by.
 - 2026-08-31 · §9.2 / §9.2.1 · a named bar's or book's version of a drink Helen already has says so in its title.
 - 2026-09-01 · §9.2 / §9.2.1 · a QQ that has been ANSWERED becomes a plain note recording the answer; only a QQ that was wrong to ask is deleted.
 - 2026-08-30 · §9.2 / §9.2.1 · a drink's source is optional and always will be; sources.yml fixes spelling, never coverage.
+- 2026-10-19 · §9.2 / §9.2.1 · IBA drinks have no source — Helen, in the chat that ingested them: "No source." source and source_url are empty and the URL is kept nowhere.
 - 2026-08-17 · §9.3 · a preferred bottle is a suggestion, never a generic; and glass is a list.
 - 2026-08-26 · §9.3 · #291 · what a drink is served WITH lives in to_serve, and no method step restates it or the garnish.
 - 2026-08-30 · §9.3 · #571 · no ml: key on an ingredient; the amount is one string read through measures:.
@@ -249,6 +250,9 @@ argument and the rules each field is read by.
 - 2026-10-08 · §9.3 · no rule is added for a hand mood if it would tag drinks Helen must then untag.
 - 2026-10-08 · §9.3 · a hand mood Helen NAMES for a drink in the ingest chat is written at ingest.
 - 2026-10-08 · §9.3 · ginger beer is not warming; ice ice baby needs no widening.
+- 2026-10-19 · §9.3 · a step may express INTO the build — Asked whether the express ban should give way for Metexa's "express the oils of a coin-size grapefruit zest over the base of the stirring …
+- 2026-10-19 · §9.3 · a shake means with ice, and a cook's caveat is dropped.
+- 2026-10-19 · §9.3 · ingredients are in build order even where the source lists them otherwise.
 - 2026-08-21 · §9.3.1 · #441 · a list generic means OR, and only OR — Bali Hai takes aguardiente OR kirschwasser: either makes the drink.
 - 2026-08-23 · §9.3.1 · #441 · character lives on the recipe line, never on a bottle.
 - 2026-08-23 · §9.3.1 · #457 · suggestion is bottle names only; the reason goes in that ingredient's note.
@@ -296,6 +300,8 @@ argument and the rules each field is read by.
 - undated · §9.3.1 · #314 · Undated, #314 — cachaça is its own generic, and Batavia arrack's family is rum.
 - 2026-08-26 · §9.3.1 · Undated — sugars deliberately mixes form with type: sugar cube is a generic beside white sugar.
 - 2026-10-11 · §9.3.1 · a made ingredient is named plainly, and how to make it or what stands in for it is a note.
+- 2026-10-19 · §9.3.1 · a list of source wordings, approved as a list.
+- 2026-10-19 · §9.3.1 · four new generics: raspberry syrup, orange flower water, vanilla extract, powdered sugar.
 - 2026-08-30 · §9.3.2 · every bottle a drink names is declared in bottles.yml and classified; never derive a bottle's category from the ingredient beside it.
 - 2026-08-30 · §9.3.2 · #534 · a suggested bottle may sit outside the generic's category, and then the ingredient must carry a note; QQ counts.
 - 2026-09-02 · §9.3.2 · #585 · a bare brand is not a bottle and is never added as an alias.
@@ -368,6 +374,9 @@ argument and the rules each field is read by.
 - 2026-10-04 · §9.3.6 · #1293 · above ×1 an amount in dashes or drops is struck through and starred, and the note under the scaler carries the matching star.
 - 2026-10-04 · §9.3.6 · #1294 · one spirit used twice in a drink is "the first" and "the second"; never "pour" as a noun in anything Helen reads.
 - 2026-09-04 · §9.3.6 · a drink's millilitre total counts millilitres only: drops, dashes and pinches are left out.
+- 2026-10-19 · §9.3.6 · "few" is 2 — Helen chose 2 for IBA's "few dashes" and "few drops".
+- 2026-10-19 · §9.3.6 · a dry sugar measured by the spoon keeps the spoon.
+- 2026-10-19 · §9.3.6 · a 7 oz scoop of ice is 200 ml — in the method step; and a measured top-up keeps its measure ("Keep the measure").
 - 2026-08-16 · §9.4 / §9.4.1 / §9.5 · a drink's ingredients are additive, never a choose-one.
 - 2026-08-17 · §9.4 / §9.4.1 / §9.5 · the site is canon; deviation happens in the kitchen.
 - 2026-09-05 · §9.4 / §9.4.1 / §9.5 · #722 · meta.made_before is a boolean that gates nothing, and an unmade drink may publish.
@@ -395,6 +404,9 @@ argument and the rules each field is read by.
 - 2026-09-28 · §9.10a · a strain step repeats the glass only when the clause riding on it is new.
 - 2026-09-28 · §9.10a · how full the ice is goes in serve.fill, not in a new serve.ice value.
 - 2026-09-05 · §9.10a · a rim is said again in the method or under "To serve", never only on the glass line.
+- 2026-10-19 · §9.10a · serve.ice: cracked is its own value — not crushed: Helen chose "Cracked is its own value".
+- 2026-10-19 · §9.10a · a drink blended with ice is blended — whatever its pour step says.
+- 2026-10-19 · §9.10a · a British flag, and the straw through the ice cone.
 - 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the drink page draws the FIRST listed glass that has artwork.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · on the drink page the glass is compressed and drawn as a fraction of the title block.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #347 · old fashioned is the canonical glass name and rocks fails a test.
@@ -415,6 +427,8 @@ argument and the rules each field is read by.
 - 2026-09-05 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #676 · the glasses are hollowed pineapple and coconut shell, and martini glass resolves to martini.
 - 2026-08-27 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #491 · every drink names a glass: there is no exemption list and no value meaning "it does not matter".
 - 2026-09-28 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · every glass type has a surveyed capacity and height, including an icon no drink uses yet.
+- 2026-10-19 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the julep cup, and a zombie glass is a tiki mug.
+- 2026-10-19 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · IBA's "cocktail glass" is chosen per drink.
 - 2026-08-26 · §9.12 / §9.12.1 · #290 · a change to a canonical method step is proposed, never applied.
 - 2026-08-31 · §9.12 / §9.12.1 · a drink that takes no garnish says no garnish; [] means nobody has filled the field in.
 - 2026-08-31 · §9.12 / §9.12.1 · alternative garnishes are ONE string, the maker's choice.
@@ -433,6 +447,8 @@ argument and the rules each field is read by.
 - 2026-10-07 · §9.12 / §9.12.1 · lemon spiral is a garnish of its own and gets no "Express the twist" step.
 - 2026-10-07 · §9.12 / §9.12.1 · pineapple wheel, apple slice and a second fruit stick are garnishes, and a floated garnish carries (floated) as a tail.
 - 2026-10-07 · §9.12 / §9.12.1 · a garnish is worded to complete "Garnish with…", and a joke too long for that goes in a note.
+- 2026-10-19 · §9.12 / §9.12.1 · new garnishes, and a maker's choice stays one string.
+- 2026-10-19 · §9.12 / §9.12.1 · new canonical steps — Helen approved "Fill with ice cubes.", "Pour back into the shaker.", "Dry shake.", "Regal stir all ingredients with ice.", "Stir until the glass frosts." …
 - 2026-08-29 · §9.13 · the cocktails palette is five saturated accents, "neon bar sign", and campari red and bitter orange are not among them.
 - 2026-08-29 · §9.13 · LEAVE OUT carries no hue at all — Helen: "for food, avoiding can be important whereas for drinks surely less so." Violet spent one revision on it and read as "suddenly busy, and …
 - 2026-09-02 · §9.13 · #469 · the cocktails site is black on black — Helen: "One thing for sure: we're going black on black.

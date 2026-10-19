@@ -270,9 +270,9 @@ test rather than rendering:
 
 <!-- vocab:measures start -->
 `dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
-`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `wedge` ·
-`cm log` · `thick coin` · `g` · `half` · `whole` · `(top)` · `(rinse)` ·
-`(splash)` · `(float)` · `(sprinkle)` · `to taste`
+`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `sprigs` · `strip` ·
+`wedge` · `wedges` · `disc` · `cm log` · `thick coin` · `g` · `half` · `whole` ·
+`(top)` · `(rinse)` · `(splash)` · `(float)` · `(sprinkle)` · `to taste`
 <!-- vocab:measures end -->
 
 Things a source prints as if they were units, and what to do instead (Helen's
@@ -280,6 +280,15 @@ rulings):
 
 - **A barspoon is `"5 ml"`.** Convert it like a teaspoon; her suite rejects
   the word.
+- **The one spoon that stays a spoon is a dry sugar**: "1 tsp powdered sugar"
+  is `amount: "1 tsp"`, `generic: "powdered sugar"`. Helen: *"Dry spoons stay
+  spoons."* A spoon of anything liquid is still millilitres.
+- **"Few" is 2**: "few dashes" is `"2 dashes"`, "few drops" is `"2 drops"`.
+  Helen's ruling.
+- **A scoop of ice is a volume, and a 7 oz scoop is 200 ml**, not the 210 the
+  ounce rule gives. Ice is never an ingredient, so the figure lives in the
+  method step, as free text: "Add a 200 ml scoop of crushed ice and blend some
+  more."
 - **An egg or a sugar cube is an INGREDIENT, not a unit.** `amount: "1 whole"`,
   `generic: "whole egg"`; `amount: "1 cube"`, `generic: "sugar cube"`. Both are
   declared generics and both units are declared, so both are exact matches and
@@ -476,14 +485,14 @@ does not give one you cannot pick: that is a `QQ`.
 **Syrups:** `cane sugar syrup 1:1` · `cane sugar syrup 2:1` ·
 `demerara sugar syrup 2:1` · `turbinado sugar syrup 2:1` · `grenadine` ·
 `ginger syrup` · `passion fruit syrup` · `cinnamon syrup` · `pineapple syrup` ·
-`hazelnut syrup` · `agave syrup` · `vanilla syrup` · `orgeat` · `falernum` ·
-`lime cordial` · `ginger and lemongrass cordial`
+`hazelnut syrup` · `agave syrup` · `vanilla syrup` · `raspberry syrup` ·
+`orgeat` · `falernum` · `lime cordial` · `ginger and lemongrass cordial`
 
 **Honeys:** `honey` · `honey water` · `honey water 1:1` · `honey water 2:1` ·
 `honey water 3:1`
 
 **Sugars:** `white sugar` · `raw sugar` · `golden caster sugar` ·
-`molasses sugar` · `palm sugar` · `sugar cube`
+`molasses sugar` · `palm sugar` · `sugar cube` · `powdered sugar`
 
 **Juices:** `lime juice` · `lemon juice` · `orange juice` ·
 `blood orange juice` · `pineapple juice` · `grapefruit juice` ·
@@ -497,8 +506,9 @@ does not give one you cannot pick: that is a `QQ`.
 
 **Other:** `soda water` · `ginger beer` · `coconut water` · `birch water` ·
 `natural yoghurt` · `water` · `black tea` · `espresso` · `cola` ·
-`coconut cream` · `Coco mix` · `egg white` · `salt` · `ground cinnamon` ·
-`cider vinegar` · `olive oil` · `cream` · `milk` · `whole egg`
+`coconut cream` · `Coco mix` · `egg white` · `orange flower water` ·
+`vanilla extract` · `salt` · `ground cinnamon` · `cider vinegar` · `olive oil` ·
+`cream` · `milk` · `whole egg`
 <!-- vocab:generics end -->
 
 ---
@@ -512,8 +522,8 @@ fits, use the source's own words and flag it in your list.
 
 <!-- vocab:glass start -->
 `coupe` · `sour` · `collins` · `flute` · `highball` · `hurricane` ·
-`nick and nora` · `piña colada` · `punch bowl` · `tiki mug` · `mug` ·
-`mule mug` · `martini` · `wine` · `pilsner` · `sling` · `margarita` ·
+`nick and nora` · `piña colada` · `punch bowl` · `tiki mug` · `julep cup` ·
+`mug` · `mule mug` · `martini` · `wine` · `pilsner` · `sling` · `margarita` ·
 `absinthe` · `goblet` · `chalice` · `hollowed pineapple` · `coconut shell` ·
 `old fashioned` · `double old fashioned` · `brandy glass`
 <!-- vocab:glass end -->
@@ -532,6 +542,8 @@ right-hand form:
 | pineapple | **hollowed pineapple** |
 | coconut | **coconut shell** |
 | pina-colada, pina colada | **piña colada** |
+| julep tin, julep stainless steel cup | **julep cup** |
+| zombie glass | **tiki mug** |
 <!-- vocab:glass_corrections end -->
 
 If the source names no glass, use `glass: []` **and lead your list with it** —
@@ -548,18 +560,19 @@ lemon spiral or mint bouquet ·
 orange peel over the rim (cut to look like a beak)
 
 **Citrus cut:** lime wedge · lime wedge on rim · lime wheel ·
-lime wheel or wedge · lemon wheel · lemon slice · orange slice · orange wheel ·
-grapefruit crescents · citrus wheel · dehydrated lime slice wheel ·
-half an empty lime shell · grapefruit wedge ·
-dehydrated blood orange slice wheel ·
+lime wheel or wedge · lemon wheel · lemon slice · orange slice ·
+orange slice or orange twist · orange wheel · grapefruit crescents ·
+citrus wheel · dehydrated lime slice wheel · half an empty lime shell ·
+grapefruit wedge · dehydrated blood orange slice wheel ·
 lemon wheel and skewered maraschino cherry (like a sail)
 
 **Fruit:** pineapple wedge ·
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wedge on rim ·
-apricot wedge on rim · pineapple wheel · blackberry · dried apple slice ·
-apple slice · banana chip · skewered raspberry · skewered blueberry ·
-three skewered maraschino cherries and a pineapple frond · raspberries ·
-fruit wedges · half an empty passion fruit shell
+pineapple wedge on rim or edible flower · apricot wedge on rim ·
+pineapple wheel · blackberry · blackberries · dried cranberries ·
+dried apple slice · apple slice · banana chip · skewered raspberry ·
+skewered blueberry · three skewered maraschino cherries and a pineapple frond ·
+raspberries · fruit wedges · half an empty passion fruit shell
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
 skewered maraschino cherry · skewered brandied cherry ·
@@ -568,15 +581,17 @@ fruit stick (skewered pineapple cube, raspberry and Luxardo maraschino cherry) �
 fresh cherries
 
 **Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
-pineapple frond · kaffir lime leaves · cucumber wheels · edible violet ·
-edible orchid · mint leaf · thyme sprig · basil leaf (floated) ·
-thin cucumber slice (floated) · length of cucumber peel
+rosemary sprig with dried cranberries, or orange slice · pineapple frond ·
+kaffir lime leaves · cucumber wheels · edible violet · edible orchid ·
+mint leaf · thyme sprig · basil leaf (floated) · thin cucumber slice (floated) ·
+length of cucumber peel
 
 **Spice and other:** grated nutmeg · grated chocolate · Angostura bitters ·
 whipped cream · cinnamon stick · ginger wheel · stem ginger slice ·
 skewered crystallised ginger · desiccated coconut · star anise (floated) ·
 skewered green olive · skewered black olives ·
-small stuffed dead Norwegian Blue · three coffee beans
+small stuffed dead Norwegian Blue · three coffee beans · cocoa powder ·
+icing sugar · ice cone
 <!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:
@@ -592,7 +607,14 @@ Four rules that decide the awkward cases:
   write `raspberries`.
 - **`["no garnish"]` means decided; `[]` means unfilled.** The marker must
   appear alone, never beside a real garnish. Use `[]` if the source is simply
-  silent — that is the honest answer.
+  silent — that is the honest answer. A source that prints "N/A" has decided:
+  `["no garnish"]`.
+- **"Either of these" is ONE string with the "or" inside it** (`orange slice or
+  orange twist`), because the list means all of them. Write the declared string
+  if there is one, and the source's words if not. An "optionally" garnish is
+  listed as normal; Helen trims at rewrite.
+- **A garnish the method dusts on** (`cocoa powder`, `icing sugar`) is in the
+  list and also gets the step `Dust with the <garnish>.` after the strain.
 
 > ### A GARNISH IS NOT AN INGREDIENT, A RIM, OR SERVEWARE
 >
@@ -627,7 +649,7 @@ listed, write the source's words and flag it in your list.
 `ladle and punch glasses`
 
 **Decorations:** `plastic giraffes` · `paper umbrella` · `teeny flamingos` ·
-`zero umbrellas`
+`zero umbrellas` · `british flag`
 
 **Fire:** `more fire` · `more cinnamon sparkles` · `optional fire if tiki mug`
 
@@ -658,6 +680,7 @@ serve:
 - `none` — Served up, in an empty glass.
 - `cubed` — Ordinary cubes, an ice-filled glass.
 - `crushed` — Crushed or pebble ice.
+- `cracked` — Cracked ice: cubes broken into large pieces, coarser than crushed.
 - `large cube` — One big rock.
 - `block` — A large block, in a punch bowl or a pitcher.
 - `blended` — The ice is IN the drink, not under it.
@@ -705,12 +728,17 @@ that needs two is free text.
 `Short shake the remaining ingredients with three ice cubes.` ·
 `Short shake with three ice cubes.`
 
-**Dry shake:** `Dry shake all ingredients.`
+**Dry shake:** `Dry shake all ingredients.` · `Pour back into the shaker.` ·
+`Dry shake.`
 
 **Stir:** `Stir all ingredients with ice.` ·
 `Stir the remaining ingredients with ice.` ·
 `Stir all ingredients other than the champagne with ice.` · `Stir until cold.` ·
-`Stir.` · `Stir all ingredients together.`
+`Stir.` · `Stir all ingredients together.` ·
+`Regal stir all ingredients with ice.` · `Stir until the glass frosts.`
+
+**Churn:** `Churn with a bar spoon.` · `Churn again.` ·
+`Repeat until the glass is full.`
 
 **Blend and swizzle:** `Blend all ingredients until smooth.` ·
 `Swizzle until the glass frosts.` ·
@@ -721,9 +749,9 @@ that needs two is free text.
 **Build:** `Add all ingredients.` · `Add the remaining ingredients.` ·
 `Fill the pitcher half full with ice cubes.` ·
 `Fill the pitcher three-quarters full with ice cubes.` ·
-`Fill with crushed ice.` · `Half-fill with crushed ice.` ·
-`Two-thirds fill with crushed ice.` · `Top with champagne.` ·
-`Top with soda water.` · `Top with more crushed ice.` ·
+`Fill with ice cubes.` · `Fill with crushed ice.` ·
+`Half-fill with crushed ice.` · `Two-thirds fill with crushed ice.` ·
+`Top with champagne.` · `Top with soda water.` · `Top with more crushed ice.` ·
 `Heap crushed ice on top.`
 
 **Rinse and rim:** `Rinse the glass with absinthe and dump.` ·
@@ -744,6 +772,10 @@ that needs two is free text.
 `Add the remaining ingredients other than the <X>.`
 
 **With a slot top:** `Top with <X>.`
+
+**With a slot add:** `Add the <X>.`
+
+**With a slot dust:** `Dust with the <X>.`
 
 **With a slot float:** `Float the <X> on top.` · `Drop the <X> on top.` ·
 `Float the first <X>.`
@@ -782,7 +814,21 @@ What will catch you out:
   source's last line expresses a twist, put the twist in `garnish:` and write
   no step. (`orange twist (discarded)` gets `...and discard it.` instead.)
   The two sentences are in the **Express** group above for recognition only;
-  you never type either.
+  you never type either. **The exception is a step that expresses INTO the
+  build** — "Express the oils of a coin-size grapefruit zest over the base of
+  the stirring glass" — which is making the drink, not garnishing it: write it
+  as the source does. Her suite allows "Express" before the stirring glass, the
+  mixing glass, the shaker or the tin.
+- **A shake means with ice** unless the source says dry: IBA's "Shake well and
+  strain" is `Shake all ingredients with ice.`
+- **A measured top-up keeps its measure**: "top with 60 ml champagne" is
+  `amount: "60 ml"` and the step `Top with champagne.` `(top)` is only for a
+  top with no figure.
+- **Drop a caveat the cook can judge**, such as "omit if using wet ice" beside
+  a water pour. Helen: trust the cook.
+- **A step that carries information is free text even when a canonical one is
+  close**: "Shake all ingredients other than the soda water with ice for two
+  minutes." keeps its two minutes.
 - **Everything expressive stays free text.** "Muddle the lime chunks hard with
   the sugar in the bottom of a shaker until the sugar has dissolved" cannot be
   collapsed without losing the drink. Don't try.
@@ -903,6 +949,29 @@ other Creole-style bitters" is `note: "Or other Créole-style bitters."`
   slice wheel" and later "Garnish with orange slice" — takes the more specific
   wording.
 - "Serve with a straw" is `to_serve: "Straw."`, never a step.
+- "Dry blend … then add a 7oz scoop of crushed ice and blend" then "POUR into
+  chilled glass" is `serve: {ice: "blended"}`: the ice is in the drink, whatever
+  the pour step says. Helen's ruling.
+
+## 6c. IBA — iba-world.com, the official cocktails
+
+**No source.** Helen: *"No source."* `source: ""` and `source_url: ""`, and
+the URL goes nowhere, not even your list.
+
+- **"Chilled cocktail glass" (or "large cocktail glass") is her call per
+  drink.** Write `glass: ["coupe", "martini"]` and a note labelled `QQ glass`:
+  "QQ - IBA prints \"cocktail glass\". Both declared glasses are listed; Helen
+  picks one per drink."
+- **A bare "Gin" stays `QQ Gin`** unless the recipe says which. Helen: *"Not
+  all IBA gin is London Dry, so QQ every time please unless you happen to know
+  which it is!"*
+- **"Sugar Syrup" with no ratio is `cane sugar syrup 1:1`**: her repository
+  types it from her wordings table, so write `QQ Sugar Syrup` and it resolves.
+- **A "N/A" garnish is `["no garnish"]`**: the source has decided.
+- **"Cocktail cherry" is `maraschino cherry`.**
+- **The ingredients go in build order** even where IBA lists them otherwise:
+  its Old Fashioned lists the whiskey first and adds it last, so the whiskey is
+  the last line.
 
 ---
 

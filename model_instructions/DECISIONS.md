@@ -1473,6 +1473,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   must not become a closed vocabulary. `scripts/build_ingest_vocab.py` prints
   it to the ingest documents as spellings only.
 
+- **2026-10-19 — IBA drinks have no source.** Helen, in the chat that ingested them: *"No source."* `source` and `source_url` are empty and the URL is kept nowhere.
+
 ### §9.3 The schema
 
 - **2026-08-17 — a preferred bottle is a `suggestion`, never a `generic`; and
@@ -1645,6 +1647,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   bar Mastiha Mojito, which Helen excluded herself. Per-drink corrections the
   same day: All Jacked Up is a strong brown drink (*"feel strong and brown"*)
   and Three Dots and a Dash is faff (*"yes yes"*).
+
+- **2026-10-19 — a step may express INTO the build.** Asked whether the express ban should give way for Metexa's "express the oils of a coin-size grapefruit zest over the base of the stirring glass", Helen chose *"Allow it inside a build"*. The garnish twist is still the layout's; a step expressing into the stirring glass, mixing glass, shaker or tin is allowed.
+- **2026-10-19 — a shake means with ice, and a cook's caveat is dropped.** Helen chose *"A shake means with ice"* (IBA's "Shake well") and *"Drop 'omit if wet ice'"*.
+- **2026-10-19 — ingredients are in build order even where the source lists them otherwise.** Helen: *"Build order"*, on IBA's Old Fashioned and Mint Julep.
 
 ### §9.3.1 The ingredient vocabulary
 
@@ -1954,6 +1960,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   milk, so it is not `coconut cream`, the unsweetened tin, and `costs.yml`
   prices it from its two parts (#1108). A sugar syrup's ratio is not a recipe
   in brackets and stays in its name.
+
+- **2026-10-19 — a list of source wordings, approved as a list.** Helen approved four groups, so `source_wordings.yml` gained twelve (Rye Whiskey, Sweet Red Vermouth, Plain Water, Vodka Citron, Becherovka liqueur, Créole Shrubb liqueur, Apple Schnapps liqueur, Pimento dram/Allspice liqueur, Clear apple juice (not cloudy), Orange flower/blossom water, and more); eleven were there already. IBA's ratio-less "Sugar Syrup" is `cane sugar syrup 1:1`. A bare IBA "Gin" is NOT mapped: *"Not all IBA gin is London Dry, so QQ every time please unless you happen to know which it is!"*
+- **2026-10-19 — four new generics: raspberry syrup, orange flower water, vanilla extract, powdered sugar.** Each Helen's yes. "Bourbon or Rye Whiskey" is the OR list `[bourbon, rye]`; navy rum with no bottle stays `QQ`.
 
 ### §9.3.2 The bottle dictionary
 
@@ -2467,6 +2476,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `ingredients.yml`, read by `_plugins/cocktail_units.rb` for the serving
   volume and by `scale.js` for its total.
 
+- **2026-10-19 — "few" is 2.** Helen chose 2 for IBA's "few dashes" and "few drops".
+- **2026-10-19 — a dry sugar measured by the spoon keeps the spoon.** Helen: *"Dry spoons stay spoons"*, and, told the cocktail suite converts every tsp: *"Dry sugar keeps its tsp"*. A spoon of anything liquid is still ml.
+- **2026-10-19 — a 7 oz scoop of ice is 200 ml**, in the method step; and a measured top-up keeps its measure (*"Keep the measure"*). Units `sprigs`, `wedges` and `disc` are declared.
+
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
 - **2026-08-16 — a drink's ingredients are additive, never a choose-one.**
@@ -2666,6 +2679,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   the composed strain step; a rimmed drink with no strain step prints it under
   "To serve" instead (`rim_shown`). Do not drop the fallback as duplication.
 
+- **2026-10-19 — `serve.ice: cracked` is its own value**, not crushed: Helen chose *"Cracked is its own value"*. Whether it counts toward a mood is still hers.
+- **2026-10-19 — a drink blended with ice is `blended`**, whatever its pour step says. Helen: *"blended"*.
+- **2026-10-19 — a British flag, and the straw through the ice cone.** Helen, on Navy Grog: *"I want the ice cone, and the straw running through it, then a British flag!"* `british flag` is a to_serve decoration; the ice cone is a garnish, and a method step pushes the straw through it.
+
 ### §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 Glass icons
 
 - **2026-08-17 — the drink page draws the FIRST listed glass that has
@@ -2802,6 +2819,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `survey_only_types`; a missing figure is fixed by adding survey rows, never
   by typing a number in.
 
+- **2026-10-19 — the julep cup, and a zombie glass is a tiki mug.** Helen: *"Declare `julep cup`"*, with `julep tin` and `julep stainless steel cup` as its aliases; `zombie glass` maps to `tiki mug`, *"but add a note somewhere to say I haven't totally ruled out adding a zombie glass to my collection"*.
+- **2026-10-19 — IBA's "cocktail glass" is chosen per drink.** Helen: *"Per drink, my call"*. A draft lists `coupe` and `martini` with a `QQ glass` note.
+
 ### §9.12 / §9.12.1 Methods and garnishes
 
 - **2026-08-26, #290 — a change to a canonical method step is proposed, never
@@ -2918,6 +2938,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   peel over the rim (cut to look like a beak)"*. Dead Parrot Colada's is the
   short `small stuffed dead parrot`, with *"the full thing in a note, labelled
   'Norwegian Blue'"*.
+
+- **2026-10-19 — new garnishes, and a maker's choice stays one string.** Helen declared blackberries, dried cranberries, cocoa powder, icing sugar and ice cone, and made the dehydrated orange slice plain `orange slice`. Told that garnish.yml already writes an either/or as ONE string, she kept that rule over listing each option. A cocktail cherry is `maraschino cherry`; IBA's "N/A" is `["no garnish"]`.
+- **2026-10-19 — new canonical steps.** Helen approved "Fill with ice cubes.", "Pour back into the shaker.", "Dry shake.", "Regal stir all ingredients with ice.", "Stir until the glass frosts.", the churn group, and the shapes "Add the <X>." and "Dust with the <X>." A step that carries information (a timed shake) stays free text, by the file's own rule.
 
 ### §9.13 The visual language — the rounds
 
