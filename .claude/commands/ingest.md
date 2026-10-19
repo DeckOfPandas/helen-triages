@@ -262,10 +262,10 @@ else has already done (MANUAL §9.1).
   fan figure alone; its `QQ original` keeps everything the source printed.**
   An unlabelled pair 20 degrees apart is conventional and fan, so the lower
   is the fan figure (Helen: *"I'm just so sure"*); any other unlabelled pair
-  keeps the pair and the question goes on her list. **A book she has ruled on
-  is not a question**: *Riverford
-  Companions* prints the conventional figure ("190°C/Gas 5"), so the fan figure
-  is 20 lower (Helen: *"Conventional: fan is 20 less"*).
+  keeps the pair and the question goes on her list. **A source she has ruled
+  on is not a question**: `_data/food/sources.yml` holds her rulings per book
+  or magazine (Riverford's single figure is conventional; Good Food is metric
+  only), and `INGEST_ONE_RECIPE.md` §5 prints them.
 - **A time the source does not print is `Estimated N mins`**, with the estimate
   on her list. Helen: *"I would like "Estimated 10 mins" to be written, then
   our tidying scripts block promotion for recipes with estimated times."*

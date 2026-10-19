@@ -57,6 +57,12 @@ own order, and an ingredient with no amount contributes nothing.
 each complete on its own, in the order they appear. One envelope is one issue;
 never fold two recipes into one block.
 
+**If you can run code, check each envelope first** with her repository's own
+parser, which needs nothing but Python and PyYAML:
+`https://raw.githubusercontent.com/DeckOfPandas/helen-triages/main/scripts/envelope.py`.
+`python3 envelope.py <file>` prints the filename and fingerprint it accepts,
+or the one-line reason it would reject. Hand back nothing it rejects.
+
 ---
 
 ## 1. The one rule that matters more than the rest
@@ -381,12 +387,11 @@ is correct for plenty of recipes.
   pairings when one temp is 20 degrees lower than the other mean conventional
   / fan, I'm just so sure."* Any other unlabelled pair, a single figure, or
   350°F: the rewrite keeps what the source has and your list says so.
-  **The exception is a book Helen has ruled on.** *Riverford Companions*
-  prints one conventional figure with its gas mark ("190°C/Gas 5"); the fan
-  figure is 20 lower, so the rewrite says "170°C fan". Her ruling:
-  *"Conventional: fan is 20 less".*
+  **The exception is a source Helen has ruled on**: check §5's list first.
 - **Weights: old-style recipes and almost all baking keep their ounces.**
-  Helen's ruling. Delia in particular. Do not convert a baking recipe to metric.
+  Helen's ruling. Do not convert a baking recipe to metric. **A source in §5's
+  list says which figure of a printed pair to keep**, and that wins, baking
+  included.
 - **Never merge, split or reorder steps.** A source step becomes exactly one
   pair — never fewer, never more, and never out of order.
 - **A step that is really a note stays a step.** Freezer guidance mid-method is
@@ -563,6 +568,24 @@ missing accent — accenting it would misquote the title.
 
 **Drop a page reference to a book nobody here holds** ("see page 167" off a
 website). Keep one that points into the same book the recipe came from.
+
+### Sources Helen has ruled on — read yours before you ask
+
+Each of these settles a question for every recipe from that source, so it is
+never a line in your list. Follow it, and say nothing about it. If a whole
+batch comes from one of them, the index may say so once.
+
+<!-- vocab:food_sources start -->
+**Riverford Companions** — a `source:` containing "Riverford Companions":
+- One oven figure is printed, with its gas mark (190°C/Gas 5). It is the conventional figure, so the fan figure is 20 lower: the rewrite says 170°C fan. Helen: *"Conventional: fan is 20 less"*
+
+**Good Food** — a `source:` containing "Good Food":
+- Both units are printed (100g/4oz). Write the metric figure only, bakes included, and do not list the dropped imperial. Helen: *"Metric only, bakes too"*
+- An aside under the standing "gf tip" rubric is transcribed without the label: it is Good Food's tip, not gluten-free. Helen: *"Good Food tip, the magazine source I use a lot?"*
+
+**Delia Smith** — a `source:` containing "Delia":
+- Keep the ounces. Never convert a Delia recipe to metric.
+<!-- vocab:food_sources end -->
 
 ---
 

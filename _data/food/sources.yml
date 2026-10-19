@@ -1,0 +1,31 @@
+# Rulings Helen has made about one book or magazine as a whole, so a batch
+# from it needs no per-recipe question. build_ingest_vocab.py prints every
+# entry into INGEST_ONE_RECIPE.md, and ingest_inbox.py folds a hand-back
+# bullet an entry settles. `match` is a substring of the recipe's `source:`.
+# `oven` and `units` are read by code; `rulings` are prose for the reader.
+# tests/test_food_sources.py holds the shape. DECISIONS §5 has each ruling.
+
+- name: "Riverford Companions"
+  match: "Riverford Companions"
+  oven: conventional
+  rulings:
+    - rule: "One oven figure is printed, with its gas mark (190°C/Gas 5). It is the conventional figure, so the fan figure is 20 lower: the rewrite says 170°C fan."
+      helen: "Conventional: fan is 20 less"
+      date: 2026-10-18
+
+- name: "Good Food"
+  match: "Good Food"
+  units: metric
+  rulings:
+    - rule: "Both units are printed (100g/4oz). Write the metric figure only, bakes included, and do not list the dropped imperial."
+      helen: "Metric only, bakes too"
+      date: 2026-10-19
+    - rule: "An aside under the standing \"gf tip\" rubric is transcribed without the label: it is Good Food's tip, not gluten-free."
+      helen: "Good Food tip, the magazine source I use a lot?"
+      date: 2026-09-07
+
+- name: "Delia Smith"
+  match: "Delia"
+  units: imperial
+  rulings:
+    - rule: "Keep the ounces. Never convert a Delia recipe to metric."
