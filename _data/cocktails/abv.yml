@@ -355,3 +355,8 @@ non_alcoholic:
   - fruit purée
   - egg white
   - cider vinegar
+  - raspberry syrup
+  - powdered sugar
+  - orange flower water
+  # Alcoholic in the bottle, but measured in drops: too little to count.
+  - vanilla extract

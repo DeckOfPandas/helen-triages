@@ -34,6 +34,10 @@ canonical:
   # No ice, the egg-white technique. Not a variant of `shake:`.
   dry_shake:
     - "Dry shake all ingredients."
+    # What is already in the shaker, as `Shake with ice.` is: the reverse dry
+    # shake strains out the ice, pours back and shakes again without it.
+    - "Pour back into the shaker."
+    - "Dry shake."
 
   stir:
     - "Stir all ingredients with ice."
@@ -43,6 +47,17 @@ canonical:
     - "Stir."
     # Built in the glass and stirred before any ice goes in, so not "with ice".
     - "Stir all ingredients together."
+    # Difford's regal stir: stirred with a piece of citrus zest in the glass.
+    - "Regal stir all ingredients with ice."
+    # The julep's: stirred until the outside of the glass frosts.
+    - "Stir until the glass frosts."
+
+  # Difford's churn: a bar spoon worked up and down through crushed ice, which
+  # is then topped up and churned again until the glass is full.
+  churn:
+    - "Churn with a bar spoon."
+    - "Churn again."
+    - "Repeat until the glass is full."
 
   blend_and_swizzle:
     - "Blend all ingredients until smooth."
@@ -68,6 +83,7 @@ canonical:
     - "Fill the pitcher half full with ice cubes."
     # A different amount of ice is information.
     - "Fill the pitcher three-quarters full with ice cubes."
+    - "Fill with ice cubes."
     - "Fill with crushed ice."
     # How full is the information: this leaves room for what comes next.
     - "Half-fill with crushed ice."
@@ -121,6 +137,13 @@ shapes:
     - "Add the remaining ingredients other than the <X>."
   top:
     - "Top with <X>."
+  # One ingredient added on its own to a build, after the rest (an Old
+  # Fashioned's whiskey over the muddled sugar).
+  add:
+    - "Add the <X>."
+  # `<X>` is a garnish from garnish.yml `spice_and_other`, not an ingredient.
+  dust:
+    - "Dust with the <X>."
   float:
     - "Float the <X> on top."
     - "Drop the <X> on top."
@@ -147,6 +170,7 @@ shapes:
 # (DECISIONS §9.10a).
 in_the_glass:
   "Add all ingredients.": "Add all ingredients to <glass>."
+  "Fill with ice cubes.": "Fill <glass> with ice cubes."
   "Fill with crushed ice.": "Fill <glass> with crushed ice."
   "Half-fill with crushed ice.": "Half-fill <glass> with crushed ice."
   "Two-thirds fill with crushed ice.": "Two-thirds fill <glass> with crushed ice."

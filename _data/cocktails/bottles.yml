@@ -543,7 +543,8 @@ bottles:
   # here. A second Luxardo product is a second entry, and the alias comes off.
   "Luxardo Maraschino":
     generic: "maraschino liqueur"
-    aliases: ["Luxardo"]
+    # IBA prints it backwards (Martinez).
+    aliases: ["Luxardo", "Maraschino Luxardo"]
 
   # --- Gabriel Boudier: declared by product, whether or not a drink names it ---
   "Gabriel Boudier Crème de Banane":

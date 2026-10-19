@@ -94,3 +94,20 @@ wordings:
   "Sugar syrup 'rich' (2 sugar to 1 water) 65.0°Brix": "cane sugar syrup 2:1"
   "Sugar syrup 'rich' (2 sugar to 1 water)": "cane sugar syrup 2:1"
   "Monin Pure Cane sugar syrup (65.0°brix, equivalent to 2 sugar to 1 water)": "cane sugar syrup 2:1"
+
+  # --- Difford's and IBA, a second batch: approved by Helen as a list ---------
+  # IBA's ratio-less "Sugar Syrup" is 1:1, her standing ruling. IBA's bare
+  # "Gin" is deliberately absent: not all IBA gin is London dry.
+
+  "Rye Whiskey": "rye"
+  "Sweet Red Vermouth": "sweet vermouth"
+  "Plain Water": "water"
+  "Vodka Citron": "lemon vodka"
+  "Becherovka liqueur": "Becherovka"
+  "Créole Shrubb liqueur": "Créole Shrubb"
+  "Liquore Strega": "Strega"
+  "Apple Schnapps liqueur": "apple schnapps"
+  "Pimento dram/Allspice liqueur": "allspice dram"
+  "Clear apple juice (not cloudy)": "apple juice"
+  "Sugar Syrup": "cane sugar syrup 1:1"
+  "Orange flower/blossom water": "orange flower water"

@@ -44,9 +44,13 @@ measures:
     - leaf
     - leaves
     - sprig
+    - sprigs
     - strip
     # A cut of fruit you pick up, like `half` below.
     - wedge
+    - wedges
+    # A coin of citrus zest expressed into the build: `1 disc` of grapefruit zest.
+    - disc
     # A two-word unit, as in `2.5 cm log` of cucumber: length and shape
     # together, in centimetres because the house writes no imperial measure.
     - cm log
@@ -784,6 +788,7 @@ syrups:
   - "hazelnut syrup"
   - "agave syrup"
   - "vanilla syrup"
+  - "raspberry syrup"
   - "orgeat"
   - "falernum"
   - "lime cordial"
@@ -811,6 +816,8 @@ sugars:
   - "molasses sugar"
   - "palm sugar"
   - "sugar cube"
+  # Measured by the spoon, as a dry sugar (`1 tsp`), never in millilitres.
+  - "powdered sugar"
 
 # "Fresh" is not part of the generic: freshly squeezed is implied for every
 # juice, and `lime cordial` being named separately is what makes that safe.
@@ -896,6 +903,8 @@ other:
   #       note: "3:1 Coco Lopez to coconut milk."
   - "Coco mix"
   - "egg white"
+  - "orange flower water"
+  - "vanilla extract"
   - "salt"
   # Sprinkled onto a flame, so an ingredient with the amount `(sprinkle)` and
   # not a garnish. Filed as `salt` is: the larder shelf and `not_on_cards`.
@@ -1175,6 +1184,7 @@ shelf_of:
   milk: larder
   mint: fresh produce
   olive oil: larder
+  orange flower water: larder
   orange slice: fresh produce
   passion fruit: fresh produce
   pear: fresh produce
@@ -1183,6 +1193,7 @@ shelf_of:
   rosemary: fresh produce
   ground cinnamon: larder
   salt: larder
+  vanilla extract: larder
   water: larder
   whole egg: larder
   # sugar syrup
@@ -1206,6 +1217,8 @@ shelf_of:
   orgeat: sugar syrup
   palm sugar: sugar syrup
   passion fruit syrup: sugar syrup
+  powdered sugar: sugar syrup
+  raspberry syrup: sugar syrup
   raw sugar: sugar syrup
   sugar cube: sugar syrup
   "turbinado sugar syrup 2:1": sugar syrup

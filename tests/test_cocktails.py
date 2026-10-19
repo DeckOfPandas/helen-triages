@@ -2715,11 +2715,11 @@ def test_the_amount_table_is_exercised():
 
 
 # Only a unit with both forms declared in `non_volumetric` is in scope:
-# `pinch`, `sprig`, `strip` and `each` have no declared plural, and
-# demanding one would invent vocabulary. `half` and `whole` take no
-# number, so there is no count to agree with.
-PLURAL_UNITS = {"dash": "dashes", "drop": "drops",
-                "cube": "cubes", "leaf": "leaves"}
+# `pinch`, `strip` and `each` have no declared plural, and demanding one
+# would invent vocabulary. `half` and `whole` take no number, so there is no
+# count to agree with.
+PLURAL_UNITS = {"dash": "dashes", "drop": "drops", "cube": "cubes",
+                "leaf": "leaves", "sprig": "sprigs", "wedge": "wedges"}
 
 _COUNTED_AMOUNT = re.compile(r"^\s*(\d+(?:\.\d+)?)\s+(.+?)\s*$")
 
@@ -3600,6 +3600,9 @@ def test_a_bracketed_amount_does_not_repeat_its_use():
     )
 
 
+EXPRESS_INTO_BUILD = re.compile(r"\b(stirring glass|mixing glass|shaker|tin)\b", re.I)
+
+
 def test_no_method_step_opens_with_express():
     """No drink writes the twist step: the layout derives it from `garnish:`.
 
@@ -3607,14 +3610,16 @@ def test_no_method_step_opens_with_express():
     disagree: a step saying "discard" beside a garnish that does not. The
     emitted wording is `canonical.express` in methods.yml. Fires only on a
     step that opens with "Express"; one that expresses something in passing
-    stays.
+    stays, and so does one that expresses INTO the build -- the stirring
+    glass, the mixing glass, the shaker or the tin -- which is part of
+    making the drink, not its garnish (Helen, DECISIONS §9.3).
     """
     checked = 0
     bad = []
     for slug, fm in _load():
         for step in _steps(fm):
             checked += 1
-            if re.match(r"\s*express\b", step, re.I):
+            if re.match(r"\s*express\b", step, re.I) and not EXPRESS_INTO_BUILD.search(step):
                 bad.append(f"{slug}: {step!r}")
     assert not bad, (
         "Method step(s) writing the twist step by hand:\n  " + "\n  ".join(bad)

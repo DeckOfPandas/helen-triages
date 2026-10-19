@@ -898,6 +898,9 @@ generics:
   agave syrup:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 3.50 / 350g", confidence: medium }
   vanilla syrup:      { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
   grenadine:          { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
+  raspberry syrup:    { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made; not shop-checked", confidence: low }
+  orange flower water: { gbp_per_litre_min: 20.00, gbp_per_litre_max: 40.00, basis: "GBP 2-4 / 100ml; not shop-checked", confidence: low }
+  vanilla extract:    { gbp_per_litre_min: 80.00, gbp_per_litre_max: 160.00, basis: "GBP 3-6 / 38ml; not shop-checked", confidence: low }
   espresso:           { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 18.00, basis: "18g @ GBP 15-25/kg -> ~30ml", confidence: medium }
   black tea:          { gbp_per_litre_min: 0.30,  gbp_per_litre_max: 0.80, basis: "one bag per ~250ml", confidence: medium }
   fruit purée:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 4-7 / 500ml", confidence: low }
@@ -939,6 +942,7 @@ generics:
   golden caster sugar: { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   palm sugar:         { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   sugar cube:         { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
+  powdered sugar:     { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   salt:               { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   ground cinnamon:    { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
 
