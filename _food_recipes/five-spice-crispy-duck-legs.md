@@ -11,7 +11,7 @@ star_ingredient: "duck"
 internal_temp_ref: poultry.duck
 tags: ["showstopper", "main"]
 ingredient_groups:
-  - name: duck
+  - name: "duck"
     items:
     - amount: "4"
       item: duck legs

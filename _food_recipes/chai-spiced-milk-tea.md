@@ -10,7 +10,7 @@ main_ingredients: ["loose-leaf black tea", "whole milk", "chai spice powder", "g
 star_ingredient:
 tags: ["drinks"]
 ingredient_groups:
-  - name: tea
+  - name: "tea"
     items:
     - amount: "180 ml"
       item: water

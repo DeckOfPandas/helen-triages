@@ -16,7 +16,7 @@ tags: ["showstopper", "make-ahead", "fiddly and fun", "main"]
 internal_temp_ref: beef.tender_roast
 doneness: medium_rare
 ingredient_groups:
-  - name: wellington
+  - name: "wellington"
     items:
     - amount: "2 x 400 g"
       item: beef fillets
@@ -32,7 +32,7 @@ ingredient_groups:
     - amount: "2"
       item: "egg yolks, beaten with 1 tbsp water and a pinch of salt"
     - item: sea salt and freshly ground black pepper
-  - name: red wine sauce
+  - name: "red wine sauce"
     items:
     - amount: "200 g"
       item: beef trimmings
@@ -60,20 +60,20 @@ method_groups:
   - name: "On the day: sear and cool"
     steps:
       - "Quickly sear the fillets in a very hot pan until browned all over and still rare in the middle, 30–60 seconds. Remove, brush with Dijon mustard, and leave to cool completely."
-  - name: Make the duxelle
+  - name: "Make the duxelle"
     steps:
       - "Chop the mushrooms very finely and fry in a hot pan with the thyme leaves and some seasoning. Keep frying over high heat for 10 mins after the juices are released, until all excess moisture has evaporated, leaving a dry mushroom paste. Leave to cool."
-  - name: Assemble
+  - name: "Assemble"
     steps:
       - "Roll each piece of pastry on a lightly floured surface into a rectangle large enough to envelop one fillet. Fridge."
       - "Overlap four slices of Parma ham on cling film to form a rectangle slightly smaller than the pastry. Spread half the duxelle evenly on top."
       - "Season the beef generously, place it on the duxelle and use the cling film to roll the ham tightly around the beef into an even log. Twist the ends to seal. Repeat with the second fillet. Chill for at least 30 mins."
       - "Brush the pastry with egg wash. Remove the cling film from each beef log and roll into the pastry neatly. Trim, seal, and brush all over with egg wash. Chill for at least 30 mins."
-  - name: Red wine sauce
+  - name: "Red wine sauce"
     steps:
       - "Fry the beef trimmings until browned all over. Add the shallots, peppercorns, bay and thyme and cook for about 5 mins until the shallots are golden."
       - "Deglaze with vinegar and bubble until almost dry. Add the wine and boil until almost completely reduced. Add the stock, bring to the boil, then simmer gently for 1 hour, skimming any scum, until the sauce coats the back of a spoon. Strain through a fine sieve. Check seasoning and set aside."
-  - name: Cook and serve
+  - name: "Cook and serve"
     steps:
       - "Score the pastry lightly, making sure not to cut through, and brush again with egg wash."
       - "Bake at 180°C fan for 15–20 mins until the pastry is golden brown (check [internal temperatures chart](#doneness)). Rest for 10 mins before carving."

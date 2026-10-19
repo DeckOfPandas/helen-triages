@@ -11,7 +11,7 @@ main_ingredients: ["light brown soft sugar", "salted butter", "double cream", "c
 star_ingredient:
 tags: ["extras"]
 ingredient_groups:
-  - name: caramel
+  - name: "caramel"
     items:
     - amount: "3 oz"
       item: light brown soft sugar

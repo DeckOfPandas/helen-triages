@@ -11,7 +11,7 @@ main_ingredients: ["honey", "dark soy sauce", "red wine vinegar", "chicken stock
 star_ingredient: "fruit"
 tags: ["extras"]
 ingredient_groups:
-  - name: glaze
+  - name: "glaze"
     items:
     - amount: "3 tbsp"
       item: honey

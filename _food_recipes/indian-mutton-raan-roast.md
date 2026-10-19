@@ -11,7 +11,7 @@ star_ingredient: "lamb"
 internal_temp_ref: lamb.slow_cooked
 tags: ["showstopper", "fiddly and fun", "main"]
 ingredient_groups:
-  - name: mutton
+  - name: "mutton"
     items:
     - amount: "2.5 kg"
       item: "mutton leg, whole and dressed"
@@ -68,7 +68,7 @@ ingredient_groups:
       item: "crispy fried onions (piyaj beresta)"
     - amount: "50 ml"
       item: mustard oil
-  - name: pan sauce
+  - name: "pan sauce"
     items:
     - amount: "1 tbsp"
       item: ginger paste
@@ -84,7 +84,7 @@ ingredient_groups:
     - amount: "50 ml"
       item: ghee
 method_groups:
-  - name: Prepare the leg
+  - name: "Prepare the leg"
     steps:
       - "Wash and clean the mutton leg and pat dry. Bring it to room temperature. Score deep slits."
   - name: "Marination stage 1 (at least 48 hrs before roasting)"
@@ -97,12 +97,12 @@ method_groups:
       - "Take out of the freezer at least 1 hour before marinading."
       - "Mix the plain curd, coriander powder, cumin powder, turmeric powder, garam masala powder, sugar, salt, crispy fried onions and mustard oil."
       - "Apply half to the mutton leg, working it into the slits, and return to the freezer for 8 hours. Keep the remaining marinade in the fridge."
-  - name: Before roasting
+  - name: "Before roasting"
     steps:
       - "Take out of the freezer at least 1 hour before roasting."
       - "Stir the ginger paste, garlic paste and crispy fried onions into the remaining marinade, then apply, working it into the slits."
       - "Leave at room temperature for at least 1 hour, preferably 2, before roasting."
-  - name: Roast
+  - name: "Roast"
     steps:
       - step: "Place in a roasting tin. Fill the sides with the quartered onions and tomatoes, pour over the remaining marinade, then pour over the melted ghee."
       - "Cover tightly with foil and roast at 140°C fan for 2½ hours."

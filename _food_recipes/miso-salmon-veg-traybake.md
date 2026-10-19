@@ -12,7 +12,7 @@ internal_temp_ref: fish.salmon
 doneness: medium
 tags: ["virtuous", "main"]
 ingredient_groups:
-  - name: traybake
+  - name: "traybake"
     items:
     - amount: "2 x 140 g"
       item: salmon or trout fillets
@@ -25,7 +25,7 @@ ingredient_groups:
     - amount: "1 tbsp"
       item: sesame seeds
     - item: "spring onions, finely sliced, to serve"
-  - name: miso marinade
+  - name: "miso marinade"
     items:
     - amount: "1 tsp"
       item: white miso paste

@@ -10,7 +10,7 @@ main_ingredients: ["chicken thighs", "coconut cream", "lemongrass stalks", "lime
 star_ingredient: "poultry"
 tags: ["fakeaway", "freezable", "make-ahead", "one-handed food", "fiddly and fun", "main"]
 ingredient_groups:
-  - name: curry
+  - name: "curry"
     items:
     - amount: "12"
       item: "bone-in chicken thighs"
@@ -48,7 +48,7 @@ ingredient_groups:
     - item: "flavourings to taste, like chicken stock cubes, fish sauce, MSG or anything"
     - item: "Steamed white or sticky rice, to serve"
       note: "I like sticky rice best here"
-  - name: bumbu (spice paste)
+  - name: "bumbu (spice paste)"
     items:
     - amount: "8"
       item: fresh garlic cloves
@@ -64,15 +64,15 @@ ingredient_groups:
       item: macadamia nuts
       note: "candlenuts are better but more effort to get"
 method_groups:
-  - name: marinate
+  - name: "marinate"
     steps:
     - step: "Put the chicken in a large bowl with the lime juice and zest, and some salt. Cover and leave for ≥2h."
       note: "Salt is part of the chemical process, not just a seasoning."
-  - name: bumbu
+  - name: "bumbu"
     steps:
     - Blend the bumbu ingredients with some oil until smooth.
     - "Fry the bumbu, lemongrass, lime leaves, cinnamon, cardamom and ground spices for about 5 mins until fragrant."
-  - name: curry
+  - name: "curry"
     steps:
     - Add the chicken and stir to coat in the spices. Cook for about 5 mins. Don't let it burn.
     - step: "Add the sugar, tamarind and 100 ml water — skip the water if the mixture is already loose. Add chicken stock cubes and other flavourings. Stir, bring to the boil, then reduce to a simmer."

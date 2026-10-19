@@ -10,7 +10,7 @@ main_ingredients: ["ramen noodles", "white miso", "cashew butter", "vegetable st
 star_ingredient: "greens"
 tags: ["soup", "main"]
 ingredient_groups:
-  - name: ramen
+  - name: "ramen"
     items:
     - amount: "2 tbsp"
       item: smooth cashew butter
@@ -29,7 +29,7 @@ ingredient_groups:
     - amount: "1 large"
       item: "garlic clove, grated"
     - item: "thumb-sized piece of fresh ginger, grated"
-  - name: to serve
+  - name: "to serve"
     items:
     - amount: "2 large"
       item: "soft-boiled eggs, halved (optional) — soy mirin eggs, [ajitsuke tamago](../ajitsuke-tamago/), are great"

@@ -11,7 +11,7 @@ main_ingredients: ["unsweetened chocolate", "cocoa powder", "whipping cream", "e
 star_ingredient: "chocolate"
 tags: ["dessert", "ice cream", "make-ahead"]
 ingredient_groups:
-  - name: ice cream
+  - name: "ice cream"
     items:
     - amount: "60 g"
       item: unsweetened chocolate, 100% cacao

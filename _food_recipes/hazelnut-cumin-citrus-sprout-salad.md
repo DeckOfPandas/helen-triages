@@ -10,7 +10,7 @@ main_ingredients: ["Brussels sprouts", "pomegranate seeds", "hazelnuts", "orange
 star_ingredient: "greens"
 tags: ["festive", "salad", "virtuous", "extras"]
 ingredient_groups:
-  - name: salad
+  - name: "salad"
     items:
     - amount: "50 g"
       item: blanched hazelnuts
@@ -25,7 +25,7 @@ ingredient_groups:
       item: "coriander, torn (optional)"
     - amount: "100 g"
       item: pomegranate seeds
-  - name: dressing
+  - name: "dressing"
     items:
     - amount: "1"
       item: "orange, zested, plus 2 tbsp juice"

@@ -11,7 +11,7 @@ star_ingredient: "pork"
 internal_temp_ref: pork.slow_cooked
 tags: ["make-ahead", "one-handed food", "fakeaway", "main"]
 ingredient_groups:
-  - name: pork
+  - name: "pork"
     items:
     - amount: "800 g"
       item: "skin-on boneless pork belly"
@@ -25,7 +25,7 @@ ingredient_groups:
       item: light soy sauce
     - amount: "100 ml"
       item: mirin
-  - name: to serve
+  - name: "to serve"
     items:
     - item: "spring onions, finely chopped"
     - item: "fresh ginger, julienned"

@@ -10,7 +10,7 @@ main_ingredients: ["asparagus", "gruyère", "eggs", "double cream", "parmesan", 
 star_ingredient:
 tags: ["bakes", "cheese-tastic", "make-ahead", "one-handed food", "fiddly and fun", "main"]
 ingredient_groups:
-  - name: pastry
+  - name: "pastry"
     items:
     - amount: "220 g"
       item: plain flour
@@ -26,7 +26,7 @@ ingredient_groups:
     - amount: "1 pinch"
       item: "paprika, unless feeding Helen"
       note: fine to skip
-  - name: filling
+  - name: "filling"
     items:
     - amount: "1 large"
       item: "onion, diced finely"
@@ -43,14 +43,14 @@ ingredient_groups:
       item: plain flour
     - item: "grated parmesan, to top"
 method_groups:
-  - name: pastry
+  - name: "pastry"
     steps:
     - "Mix the dry pastry ingredients with the salt, then rub in the butter lightly with fingertips."
     - "Add the egg yolks, then the water, then knead until smooth. Don't over-knead. Add all the water even if the pastry feels too wet."
     - "Leave to rest wrapped in clingfilm in the fridge for about half an hour. Don't skip this otherwise the pastry won't stretch nicely into the dish, and it will shrink, bend and crack in the oven."
     - Press the pastry into a greased ceramic baking dish. Prick all over with a fork.
     - "Bake blind at 160°C fan for 15 mins, then open at 180°C fan for 10 mins."
-  - name: filling
+  - name: "filling"
     steps:
     - Sweat the onions in butter until soft and golden. This takes a weirdly long time.
     - Blanch the asparagus in boiling water for 1 min then immediately place in iced water.

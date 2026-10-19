@@ -11,7 +11,7 @@ main_ingredients: ["courgette", "orange", "sultanas", "cream cheese", "pistachio
 star_ingredient:
 tags: ["bakes", "freezable"]
 ingredient_groups:
-  - name: cake
+  - name: "cake"
     items:
     - amount: "350 g"
       item: courgettes
@@ -31,7 +31,7 @@ ingredient_groups:
       item: self-raising flour
     - amount: "1 tsp"
       item: baking powder
-  - name: frosting
+  - name: "frosting"
     items:
     - amount: "200 g"
       item: full-fat cream cheese
