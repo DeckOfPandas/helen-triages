@@ -2518,6 +2518,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   *"if this mark is the only change then the proofread flag doesn't need to be
   flipped, so no recipe goes dark. Explicit grant this time only."*
   `_dev/no-verdict.html` is the worklist of IOUs.
+- **2026-10-20 — the ship scale is four rungs: meh, sure, yes, yes².** Asked
+  what each word meant, Helen first kept `meh` and `sure` apart (*"those are
+  different"*), then merged the bottom rung into `meh`: *"let's combine meh
+  and nah into meh. That is enough resolution, and perfectly communicative."*
+  `not really` (shown "hmm" on cards) is gone; its drinks say `meh`, and on
+  the one live drink (Champs-Élysées) she granted the change without a flip.
+  The top rung is shown as `yes²` on the card and the drink page alike
+  (`ship_words`); stored values are unchanged, so filters and URLs still
+  match. A key on the page is parked in #1102.
 
 ### §9.7 / §9.8
 
@@ -3083,8 +3092,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   name of the third YOLO filter should be 'chaos only'"*, replacing `never
   made it` within hours. It is a name on a scale, not a description.
 - **2026-10-18, #1413 — the YOLO buttons read `ship`: `no chaos please` keeps
-  `yes` and `oh gods yes`; `chaos only` keeps `meh`, `not really` and `???`;
-  `sure` and `IOU` show only under `I'm open to chaos`.** Her issue: *"no chaos
+  `yes` and `oh gods yes`; `chaos only` keeps `meh` and `???`; `sure` and
+  `IOU` show only under `I'm open to chaos`.** (`not really` was a third
+  chaos value until it merged into `meh`, 2026-10-20.) Her issue: *"no chaos
   please -> only yes and yes^2 / chaos only -> only meh and not really, plus
   never made (now ???) / I'm open to chaos -> everything"*. Asked whether IOU
   belongs in `chaos only` (*"It really is chaotic, just leaning towards the

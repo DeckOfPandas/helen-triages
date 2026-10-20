@@ -596,8 +596,8 @@ $card-tagline-top: 0.584rem;
 // --- the goodness mark -------------------------------------------------------
 // A ship and a word. The rung is a word because a word cannot be misread as a
 // score out of five. The pair is pinned right with the icon on the left, which
-// holds still only because every rung is one short word on a card
-// (`ship_card_names` in taxonomy.yml).
+// holds still only because every rung is one short word
+// (`ship_words` in taxonomy.yml).
 .drink-card-ship {
   // Out of flow (#760). The foot is positioned, so it is the containing block.
   position: absolute;

@@ -706,7 +706,7 @@ layout: default
                links to the filtered index. The ship is the foot's second child,
                pinned out of flow as on the index. {% endcomment %}
             <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}#filter-{{ chip }}">{{ m }}</a>{% endfor %}</span>
-            <span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span>
+            <span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship %}</span>
           </div>
           {% comment %} The shortlist `+`: the index card's button exactly,
              keyed on the related drink's own url, so it is the same entry the

@@ -2544,7 +2544,8 @@ DECISIONS §9.4.1.
 ### 9.5 `meta.ship` and `meta.made_before`
 
 **`meta.ship` is a closed, ordered vocabulary**: `ship_scale` in
-`_data/cocktails/taxonomy.yml`, lowest rung first. Two values are deliberately
+`_data/cocktails/taxonomy.yml`, lowest rung first: `meh`, `sure`, `yes`, `oh
+gods yes` (shown as `yes²`). Two values are deliberately
 off the scale, in `ship_off_scale` with the word each renders as: `who knows`
 (`???`), never made; and `IOU` (`IOU`), made and liked but never rated. `QQ`
 is not a ship value. `test_meta_ship_is_a_rung_or_off_scale` holds the
@@ -2553,8 +2554,9 @@ exactly the drinks with `made_before: false`.
 
 `_includes/cocktails/ship.html` draws the mark on the card and on the drink
 page. It asks `ship_scale` whether a value is a rung and never names a
-vocabulary value itself. The card passes `short=true` to print the
-`ship_card_names` spelling.
+vocabulary value itself. A rung is shown as its `ship_words` word where it
+has one, on the card and the drink page alike; filters and `?ship=` URLs
+match the stored value.
 
 **`meta.made_before` is a boolean and gates nothing.** It is first in `meta:`.
 An unmade cocktail may publish (§9.1.1). Nothing on the index reads it: the
@@ -3099,8 +3101,8 @@ Five named questions, in Helen's order:
 - **`open` applies no filter at all.** The button for "I'll try anything" must
   never narrow.
 - **`no chaos please` and `chaos only` each keep one list in taxonomy.yml's
-  `chaos`**, read off `meta.ship`: `yes` and `oh gods yes`; `not really`,
-  `meh` and `who knows`. The index stamps each card `good`, `chaos` or
+  `chaos`**, read off `meta.ship`: `yes` and `oh gods yes`; `meh` and `who
+  knows`. The index stamps each card `good`, `chaos` or
   `middle`, and `middle` (`sure`, `IOU`) shows only under `open`.
 - **A card's ship mark is a sixth control with no section** (#1412): a
   `<button>` that sets `state.ship` to its exact `data-ship`, ANDed with

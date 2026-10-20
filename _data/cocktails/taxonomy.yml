@@ -818,23 +818,22 @@ mood_groups:
 # `open`. cocktails/index.html stamps each card with the list it is in.
 chaos:
   good: ["yes", "oh gods yes"]
-  chaos: ["not really", "meh", "who knows"]
+  chaos: ["meh", "who knows"]
 
-# Every value is quoted: YAML reads a bare `yes` as the boolean true, which
-# silently fails every comparison against `meta.ship`.
+# Four rungs, lowest first (DECISIONS §9.4). Every value is quoted: YAML reads
+# a bare `yes` as the boolean true, which silently fails every comparison
+# against `meta.ship`.
 ship_scale:
-  - "not really"
   - "meh"
   - "sure"
   - "yes"
   - "oh gods yes"
 
-# What a rung is called on a CARD, where one word keeps the cards steady.
-# `meta.ship` keeps the full words, and the drink page prints them: only a card
-# asks `_includes/cocktails/ship.html` for these. A rung with no entry shows
-# its own name. `²` is the character, not markup.
-ship_card_names:
-  "not really": "hmm"
+# The word a rung is shown as, on a card and on the drink page alike, where it
+# is not the stored value. `meta.ship` keeps the stored words, which filters
+# and URLs match on. A rung with no entry shows its own name. `²` is the
+# character, not markup.
+ship_words:
   "oh gods yes": "yes²"
 
 # The two `meta.ship` values that are not rungs, and what the card and the

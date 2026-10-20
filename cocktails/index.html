@@ -345,11 +345,10 @@ permalink: /cocktails/
           </span>
           {% comment %} The ship mark and its word come from
              _includes/cocktails/ship.html, which the drink page also calls, so
-             the two cannot render a different word for the same rung.
-             `short=true` asks for the card's abbreviations. A <button>: pressing
+             the two cannot render a different word for the same rung. A <button>: pressing
              it filters the index to this exact ship value (#1412), which
              cocktail-index.js reads off its `data-ship`. {% endcomment %}
-          <button type="button" class="drink-card-ship" data-ship="{{ ship }}" aria-pressed="false" aria-label="ship it? {{ ship }}: show only these">{% include cocktails/ship.html ship=ship short=true %}</button>
+          <button type="button" class="drink-card-ship" data-ship="{{ ship }}" aria-pressed="false" aria-label="ship it? {{ ship }}: show only these">{% include cocktails/ship.html ship=ship %}</button>
         </div>
 
         {% comment %} The shortlist toggle, top right (#546). The mark alone,

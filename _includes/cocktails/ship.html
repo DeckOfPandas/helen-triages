@@ -7,18 +7,14 @@
    value: "not a rung" is asked of `ship_scale`, never tested against a literal
    (MANUAL §9.9).
 
-   `short` chooses the card's abbreviations (`ship_card_names`), and only a card
-   passes it: the drink page has room for the rung's real name.
+   A rung's shown word is `ship_words`' where it has one, on the card and the
+   drink page alike, so the two say the same thing (DECISIONS §9.4).
 
    Emits the two inner spans only; the wrapper is each call site's own. {% endcomment %}
 {% assign taxonomy = site.data.cocktails.taxonomy %}
 {% assign ship = include.ship | default: "who knows" %}
 {% if taxonomy.ship_scale contains ship %}
-  {% if include.short %}
-    {% assign ship_word = taxonomy.ship_card_names[ship] | default: ship %}
-  {% else %}
-    {% assign ship_word = ship %}
-  {% endif %}
+  {% assign ship_word = taxonomy.ship_words[ship] | default: ship %}
 {% else %}
   {% assign ship_word = taxonomy.ship_off_scale[ship] %}
 {% endif %}
