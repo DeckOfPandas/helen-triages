@@ -589,7 +589,7 @@ mood_include:
     moods: [ice ice baby, sharp]
     why: >-
       Helen, 2026-09-18, asked directly because this and gunmetal-blue were the collection's only two `ice ice baby` corrections and the other one turned out to be wrong: "Fish House Punch: a) I call 'ice tea', and b) comes over lots and lots of ice." SO THIS ENTRY IS RIGHT AND STAYS, and the reason is now a fact about the drink rather than the vague "she calls it icy" it said before. `serve.ice` is `cubed`, which the rule deliberately does not count -- crushed, large cube, block and blended are the values that earn the mood -- and the thing the field cannot carry is QUANTITY. Lots and lots of cubed ice is an icy drink; one cube in a rocks glass is not, and both are spelled `cubed`. She calls it sharp; the rule's five-poured-ingredient cap excludes it.
-  hurricane-classic:
+  hurricane:
     moods: [I want to faff]
     why: >-
       Helen, 2026-09-17: "Hurricane gained faff because it has 50000 ingredients AND needs a blender, does that count?" Under the rule it does not, by one on each axis -- eight ingredients where nine is the threshold, and `blend` is one faff word where two hits are wanted -- so neither half reaches on its own and the drink derived nothing. Her judgement is that the two halves together do reach, which is precisely what this block is for. A PER-DRINK CORRECTION AND NOT A RULE CHANGE, measured before choosing: dropping the threshold to eight would hand the mood to six drinks and make the sazerac and pear-and-rosemary-bellini entries below spent (a test then demands their deletion), and counting a blend as two moments would give it to all five drinks that blend, including the four-ingredient frozen-fruit-daiquiri. Both are bigger claims than she made. Note she sits at exactly the same coordinates as sazerac and the bellini -- eight ingredients, a one-hit method -- and both of those needed an entry here too.
@@ -653,7 +653,7 @@ mood_include:
     why: >-
       Helen, 2026-10-08: "Three Dots: yes yes, faff." Eight ingredients where
       nine is the threshold, and one `blend` where two faff words are wanted
-      -- exactly the coordinates hurricane-classic had when she ruled that
+      -- exactly the coordinates hurricane had when she ruled that
       one in, and a per-drink correction for the reasons given there.
   rosita:
     moods: [aperitivo, clear]
@@ -734,7 +734,7 @@ mood_step_words:
   ice: [swizzle, churn, blend]
   # Disqualifies `strong brown drink`, together with `serve.ice` crushed or
   # blended. A big block of ice does not: that is how one is served.
-  churned: ["crushed ice", swizzle, churn, blend]
+  churned: ["crushed ice", "cracked ice", swizzle, churn, blend]
   # Disqualifies `sharp`, together with `serve.ice: blended`. It is the action
   # alone: a drink churned into a slushy is not sharp, and one served over
   # crushed ice still is (the Moscow Mule).
@@ -747,7 +747,7 @@ mood_step_words:
 # test_every_icy_serve_value_is_a_real_one holds each name to serve.yml.
 # `cubed` is absent on purpose: the field cannot carry quantity, so a drink
 # served over a lot of cubed ice takes a `mood_include` instead.
-mood_serve_ice: [crushed, large cube, block, blended]
+mood_serve_ice: [crushed, cracked, large cube, block, blended]
 
 # One mood cancelling another (#853). LEFT wins; RIGHT is removed. Only a
 # DERIVED mood is ever removed: Helen's hand-applied `easy peasy` beats the
