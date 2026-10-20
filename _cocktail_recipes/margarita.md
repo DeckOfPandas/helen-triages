@@ -1,5 +1,5 @@
 ---
-title: "Margarita (classic)"
+title: "Margarita"
 tagline: "Half a salt rim if you respect other people's autonomy."
 glass:
   - "margarita"

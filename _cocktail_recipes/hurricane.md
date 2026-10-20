@@ -1,5 +1,5 @@
 ---
-title: "Hurricane (classic)"
+title: "Hurricane"
 tagline: "Not served out of a giant wall of pick-n-mix slushie machines on Bourbon Street, but loses little for it."
 glass:
   - "hurricane"
