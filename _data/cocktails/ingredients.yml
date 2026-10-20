@@ -202,6 +202,7 @@ not_on_cards:
   - sugar cube
   - honey
   - lemon zest
+  - grapefruit zest
 
 # --- how an ingredient is used, not what it is (#754) ------------------------
 # A closed vocabulary, held by test_ingredient_as_is_declared; adding a member
@@ -626,6 +627,7 @@ other_base_spirits:
   - "vanilla vodka"
   - "pineapple vodka"
   - "lemon vodka"
+  - "bison grass vodka"
   - "absinthe"
   - "aquavit"
 
@@ -727,6 +729,7 @@ fortified_and_aromatised:
   - "sweet vermouth"
   - "dry vermouth"
   - "blanc vermouth"
+  - "rosé vermouth"
   # Lillet Blanc, Dubonnet, Byrrh.
   - "quinquina"
   # Cocchi Americano Bianco.
@@ -866,6 +869,7 @@ fruit_and_herbs:
   - "pear"
   - "dried apricots"
   - "lemon zest"
+  - "grapefruit zest"
   # The flesh is in the name because it is what makes this not a twist.
   - "lime zest with flesh"
   - "mint"
@@ -905,6 +909,7 @@ other:
   - "egg white"
   - "orange flower water"
   - "vanilla extract"
+  - "xanthan gum"
   - "salt"
   # Sprinkled onto a flame, so an ingredient with the amount `(sprinkle)` and
   # not a garnish. Filed as `salt` is: the larder shelf and `not_on_cards`.
@@ -979,6 +984,7 @@ family_of:
   "vanilla vodka": vodka
   "pineapple vodka": vodka
   "lemon vodka": vodka
+  "bison grass vodka": vodka
   "Campari": amaro
   "Aperol": amaro
   "Cynar": amaro
@@ -988,6 +994,7 @@ family_of:
   "sweet vermouth": fortified
   "dry vermouth": fortified
   "blanc vermouth": fortified
+  "rosé vermouth": fortified
   "quinquina": fortified
   "americano": fortified
   "amontillado sherry": fortified
@@ -1072,6 +1079,7 @@ shelf_of:
   pineapple-infused rum: spirits
   pineapple vodka: spirits
   lemon vodka: spirits
+  bison grass vodka: spirits
   pisco: spirits
   reposado tequila: spirits
   rhum agricole blanc: spirits
@@ -1086,6 +1094,7 @@ shelf_of:
   americano: fortified
   amontillado sherry: fortified
   blanc vermouth: fortified
+  rosé vermouth: fortified
   cider: fortified
   dry vermouth: fortified
   oloroso sherry: fortified
@@ -1177,6 +1186,7 @@ shelf_of:
   ginger and lemongrass cordial: larder
   kaffir lime leaves: fresh produce
   lemon zest: fresh produce
+  grapefruit zest: fresh produce
   lime zest with flesh: fresh produce
   lime: fresh produce
   lime cordial: larder
@@ -1194,6 +1204,7 @@ shelf_of:
   ground cinnamon: larder
   salt: larder
   vanilla extract: larder
+  xanthan gum: larder
   water: larder
   whole egg: larder
   # sugar syrup

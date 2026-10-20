@@ -591,6 +591,11 @@ bottles:
     size_ml: 750
     gbp: 14
     confidence: high
+  "Lustau Vermut Rosé":
+    size_ml: 750
+    gbp: 15
+    confidence: low
+    basis: "estimated from typical UK retail listings, not shop-checked"
   "Dolin Blanc":
     size_ml: 750
     gbp: 14
@@ -616,6 +621,11 @@ bottles:
     size_ml: 700
     gbp: 38
     confidence: medium
+  "La Fée Parisienne":
+    size_ml: 700
+    gbp: 40
+    confidence: low
+    basis: "estimated from typical UK retail listings, not shop-checked"
   # --- bitters: small bottles ---
   # A dash is free, so no drink's total depends on these; they are here
   # because every declared bottle has a row.
@@ -898,6 +908,7 @@ generics:
   agave syrup:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 3.50 / 350g", confidence: medium }
   vanilla syrup:      { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
   grenadine:          { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
+  bison grass vodka:  { gbp_per_litre_min: 25.00, gbp_per_litre_max: 32.00, basis: "Zubrowka GBP 18-22 / 70cl; not shop-checked", confidence: low }
   raspberry syrup:    { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made; not shop-checked", confidence: low }
   orange flower water: { gbp_per_litre_min: 20.00, gbp_per_litre_max: 40.00, basis: "GBP 2-4 / 100ml; not shop-checked", confidence: low }
   vanilla extract:    { gbp_per_litre_min: 80.00, gbp_per_litre_max: 160.00, basis: "GBP 3-6 / 38ml; not shop-checked", confidence: low }
@@ -943,6 +954,7 @@ generics:
   palm sugar:         { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   sugar cube:         { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   powdered sugar:     { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
+  xanthan gum:        { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "a quarter barspoon: negligible", confidence: high }
   salt:               { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   ground cinnamon:    { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
 

@@ -110,3 +110,20 @@ wordings:
   "Clear apple juice (not cloudy)": "apple juice"
   "Sugar Syrup": "cane sugar syrup 1:1"
   "Orange flower/blossom water": "orange flower water"
+
+  # --- the same batch: brands dropped to the generic, on Helen's word -----------
+
+  "Giffard White Crème de Cacao Liqueur": "white crème de cacao"
+  "Luxardo Apricot Albicocca Liqueur": "apricot liqueur"
+  "Crossfire Hurricane Jamaican Rum": "moderately aged Jamaican rum"
+  "Eager Pineapple juice": "pineapple juice"
+  "Eager Cranberry Juice Drink": "cranberry juice drink"
+  "Eager Apple Juice": "apple juice"
+  "Cynar or other carciofo amaro": "Cynar"
+  # The source's own words go in the drink's note: aged, overproof and
+  # high-ester match no style exactly.
+  "Overproof aged pot still rum (high-ester 4-6 years old)": "blended overproof rum"
+  "Xanthan gum (E415)": "xanthan gum"
+  "Grapefruit peel/zest": "grapefruit zest"
+  "Difford's Margarita Bitters": "margarita bitters"
+  "Bob's Grapefruit Bitters": "grapefruit bitters"

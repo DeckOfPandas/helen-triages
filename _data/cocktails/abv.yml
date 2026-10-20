@@ -152,10 +152,12 @@ bottles:
   # --- absinthe ----------------------------------------------------------
   "Vieux Pontarlier":                 { abv: 65,   confidence: high }
   "Pernod Absinthe":                  { abv: 68,   confidence: high }
+  "La Fée Parisienne":                { abv: 68,   confidence: medium }
 
   # --- vermouth, sherry, port, aromatised wine ---------------------------
   "Dolin Dry":                        { abv: 17.5, confidence: high }
   "Dolin Blanc":                      { abv: 16,   confidence: high }
+  "Lustau Vermut Rosé":               { abv: 15,   confidence: medium }
   "Dolin Rouge":                      { abv: 16,   confidence: high }
   "Carpano Antica Formula":           { abv: 16.5, confidence: high }
   "Martini Rosso":                    { abv: 15,   confidence: high }
@@ -258,6 +260,7 @@ generics:
   Cynar:              { abv: 16.5, confidence: high }
   Jägermeister:       { abv: 35,   confidence: high }
   Becherovka:         { abv: 38,   confidence: high }
+  bison grass vodka:  { abv: 37.5, confidence: medium }
   Grand Marnier:      { abv: 40,   confidence: high }
   Amaro Nonino:       { abv: 35,   confidence: high }
   Amaro Ciociaro:     { abv: 30,   confidence: high }
@@ -360,3 +363,4 @@ non_alcoholic:
   - orange flower water
   # Alcoholic in the bottle, but measured in drops: too little to count.
   - vanilla extract
+  - xanthan gum
