@@ -849,8 +849,10 @@ Co)', leaving mine as simply 'Sazerac'."*
 
 **So: compare the FORMULA, never the title.** If you are handed a cocktail recipe with a
 classic name, say plainly in your list that it may already exist in a different
-form, and title it with its source in parentheses if the source is a specific
-bar or book.
+form, and title it plainly. **A source in parentheses is only for two drinks
+that share a name**, and her repository adds it when that happens: Helen,
+*"Let's only use a (source) where we have more than one."* A bracket that
+describes the drink rather than its source stays: "Yellow Jacket (gin)".
 
 **NEVER RECONSTRUCT A TRUNCATED RECIPE.** A photograph that stops mid-sentence,
 a screenshot that ends below the ingredients. These do not announce themselves,

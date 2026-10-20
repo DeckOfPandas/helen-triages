@@ -1455,11 +1455,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 
 ### §9.2 / §9.2.1 The sources
 
-- **2026-08-31 — a named bar's or book's version of a drink Helen already has
-  says so in its title.** Helen: *"name it 'Sazerac (Death & Co)', leaving mine
-  as simply 'Sazerac'."* The Death & Co photo batch brought a Sazerac that was
-  a different drink from hers. `INGEST_ONE_COCKTAIL.md` carries the rule for
-  `title`.
+- **2026-10-20 — a (source) goes in a title only where two drinks share a
+  name.** Helen: *"Let's only use a (source) where we have more than one, e.g.
+  'Mai Tai (Difford's)' vs the one I call my signature."* Her own keeps the
+  plain name (2026-08-31: *"name it 'Sazerac (Death & Co)', leaving mine as
+  simply 'Sazerac'"*). So Difford's Mint Julep became "Mint Julep (Difford's)"
+  beside IBA's, and "Margarita on the Rocks (Difford's)" lost its bracket. Two
+  exceptions she chose: the Zombie keeps "(Difford's)" beside the live Zombie
+  Intoxica, and a bracket describing the drink stays (*"keep gin (it's
+  labelling the drink base, and we'll have more of these)"*). "(classic)"
+  went: Hurricane and Margarita, renamed live on her grant ("Break URLs,
+  it's fine").
 - **2026-09-01 — a `QQ` that has been ANSWERED becomes a plain note recording
   the answer; only a `QQ` that was wrong to ask is deleted.** Helen, asked a
   third time about Pic-a-de-Crop Punch's 12 oz of overproof: *"we've agreed

@@ -217,7 +217,7 @@ argument and the rules each field is read by.
 - 2026-10-01 · §9.1.1 · #1256 #1249 · / #1249 — a flaming shell's rum is a measured ingredient, 25 ml, as: "shell"; the fire is to_serve.
 - 2026-10-01 · §9.1.1 · #1256 · a rum-filled shell IS in garnish, and the layout drops its generated "Garnish with…" step.
 - 2026-10-01 · §9.1.1 · #1256 · to_serve items are a declared vocabulary; the field stays one string.
-- 2026-08-31 · §9.2 / §9.2.1 · a named bar's or book's version of a drink Helen already has says so in its title.
+- 2026-10-20 · §9.2 / §9.2.1 · a (source) goes in a title only where two drinks share a name.
 - 2026-09-01 · §9.2 / §9.2.1 · a QQ that has been ANSWERED becomes a plain note recording the answer; only a QQ that was wrong to ask is deleted.
 - 2026-08-30 · §9.2 / §9.2.1 · a drink's source is optional and always will be; sources.yml fixes spelling, never coverage.
 - 2026-10-19 · §9.2 / §9.2.1 · IBA drinks have no source — Helen, in the chat that ingested them: "No source." source and source_url are empty and the URL is kept nowhere.
