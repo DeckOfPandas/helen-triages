@@ -1503,23 +1503,19 @@ def _png_size(path: Path) -> tuple[int, int]:
 
 
 def test_every_link_preview_image_exists_at_the_size_the_layout_claims():
-    """The og:image cards (#1086): one per site in sites.yml, one in
-    _config.yml for the site-neutral pages, all rendered by
-    scripts/render_social_images.py.
+    """The og:image cards (#1086): one per site in sites.yml, rendered by
+    scripts/render_social_images.py. A site-neutral page takes its site_key's.
 
     Every named card exists, its PNG header matches the og:image:width/height
     the layout states, and the layout's numbers match the script's constants.
     """
     sites = yaml.safe_load(read("_data", "sites.yml"))
-    config = yaml.safe_load(read("_config.yml"))
     cards = {f"sites.yml {key}": s.get("social_image") for key, s in sites.items()}
-    cards["_config.yml"] = config.get("social_image")
     missing_key = [where for where, path in cards.items() if not path]
     assert not missing_key, (
         f"No social_image declared for: {missing_key}. Every site names its own "
-        f"card and _config.yml names the [ ?? ] one; _layouts/default.html falls "
-        f"back to text-only for a page with none, which is the state this test "
-        f"exists to end."
+        f"card; _layouts/default.html falls back to text-only for a page with "
+        f"none, which is the state this test exists to end."
     )
 
     layout = read("_layouts", "default.html")

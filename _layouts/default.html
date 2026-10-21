@@ -38,13 +38,12 @@
 
   {% comment %} ── Link previews ───────────────────────────────────────────────
      The image is the site's own wordmark card (#1086): `social_image` in
-     _data/sites.yml per site, and the repo-level one in _config.yml for a
-     site_neutral page. scripts/render_social_images.py makes them; re-run it
-     when the wordmark changes. The width and height below are what that script
+     _data/sites.yml. A site_neutral page takes its site_key's card, which is
+     food's. scripts/render_social_images.py makes them; re-run it when the
+     wordmark changes. The width and height below are what that script
      writes, and tests/test_site_config.py holds the PNG headers to them.
   {% endcomment %}
-  {% assign social_image = this_site.social_image | default: site.social_image %}
-  {% if page.site_neutral %}{% assign social_image = site.social_image | default: social_image %}{% endif %}
+  {% assign social_image = this_site.social_image %}
   <meta property="og:type" content="{% if page.collection %}article{% else %}website{% endif %}">
   <meta property="og:site_name" content="{{ site_title | escape }}">
   <meta property="og:title" content="{{ page.title | default: site_title | escape }}">

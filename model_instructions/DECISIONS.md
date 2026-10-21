@@ -180,14 +180,16 @@ stated. Italics in quotation marks are Helen's own words.
   footer to put the heart SVG at the bottom -- everything else stays in the
   same place."* Margins and the grid placement were checked by eye at 1280px
   and 360px and left alone. (Replaces #915's order, hearts third.)
-- **2026-09-15, #1086 — the link-preview image is the wordmark: one card per
-  site and one for neither.** Helen: *"Let's do the og:image. The wordmark is
-  fine for a start -- I don't think we have anything else that feels like
-  branding anyway."* `social_image` in `_data/sites.yml` per site and in
-  `_config.yml` for `site_neutral` pages. `scripts/render_social_images.py`
-  renders them from the built site, so a changed wordmark means re-running it;
-  the PNGs are committed and wear one fixed tape, because random-per-load
-  (#779) is a ruling about a live page.
+- **2026-10-21, #1086 — the link-preview image is the wordmark, one card per
+  site; the about page takes food's.** Helen: *"About page shouldn't get its
+  own preview, so just set it to the food one, same description line too."*
+  (Earlier, #1086: *"The wordmark is fine for a start -- I don't think we have
+  anything else that feels like branding anyway."*) `social_image` in
+  `_data/sites.yml`; a `site_neutral` page takes its `site_key`'s, which is
+  food. `scripts/render_social_images.py` renders them from the built site, so
+  a changed wordmark means re-running it; the PNGs are committed and wear one
+  fixed tape, because random-per-load (#779) is a ruling about a live page.
+  (Replaces the [ ?? ] card for neither site, 2026-09-15.)
 - **Undated — the about link in the header is a bare `??` in the body face: no
   circle, no border, no heading font.** Helen: *"much more minimalist... a
   naked ? in body font and style"*. `.site-about-link` in

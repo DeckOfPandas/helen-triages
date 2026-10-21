@@ -8,10 +8,10 @@
 `--site` is the built site, `--chrome` the browser binary if it is not on
 PATH, `--tape` which tape file the cards wear, `--out` where the PNGs go.
 
-Writes assets/img/social/food.png, cocktails.png and neutral.png (one per
-site, and one for the pages that belong to neither), each 1200x630 CSS pixels
-at a device scale of 2. _layouts/default.html points at them through
-`social_image` in _data/sites.yml and _config.yml (#1086).
+Writes assets/img/social/food.png and cocktails.png, one per site, each
+1200x630 CSS pixels at a device scale of 2. _layouts/default.html points at
+them through `social_image` in _data/sites.yml (#1086); a site-neutral page
+takes food's.
 
 The image is the real wordmark, not a redrawing. Each card is a page made
 from the built site: its compiled stylesheet, the `<a
@@ -41,13 +41,10 @@ WIDTH, HEIGHT, SCALE = 1200, 630, 2
 DEFAULT_TAPE = 7
 OUT_DIR = ROOT / "assets" / "img" / "social"
 
-# name -> the built page whose header is lifted. /about/ carries the [ ?? ]
-# tape (its own wordmark_word) and food's stylesheet, which is what a page
-# belonging to neither site looks like.
+# name -> the built page whose header is lifted.
 CARDS = {
     "food": "food/index.html",
     "cocktails": "cocktails/index.html",
-    "neutral": "about/index.html",
 }
 
 # decorations.js's TAPE_ATTRS and TAPE_OPEN, kept in step by hand: the tape

@@ -357,8 +357,8 @@ It keys into `_data/sites.yml` (`title`, `word`, `description`, `css`, `home`,
 `icon`, `social_image`, `reference_links`) and into `_data/<key>/` for the
 site's vocabulary. `social_image` is the site's link-preview card, a PNG of
 its own wordmark rendered by `scripts/render_social_images.py` from the built
-site; a site-neutral page takes the `[ ?? ]` card named by `social_image` in
-`_config.yml`.
+site. A site-neutral page (about, 404) carries `site_key: food`, so it takes
+food's card and food's description.
 
 **A root-level page must declare `site_key` in its own front matter**, because
 the defaults assign it by directory and there are only two. A page with no
