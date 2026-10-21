@@ -10,7 +10,7 @@ cook_time: "6 hrs"
 main_ingredients: ["duck legs", "coarse sea salt", "fresh thyme", "garlic cloves", "duck fat"]
 star_ingredient: "duck"
 internal_temp_ref: poultry.duck
-tags: ["fiddly and fun", "make-ahead", "main"]
+tags: ["fiddly and fun", "make-ahead", "main", "knife and fork"]
 ingredient_groups:
   - items:
     - item: duck legs

@@ -9,7 +9,7 @@ prep_time: "20 mins"
 cook_time: "25 mins"
 main_ingredients: ["butternut squash", "goat's cheese", "self-raising flour", "fresh rosemary", "egg", "whole milk"]
 star_ingredient: "root veg"
-tags: ["breakfast", "starter", "virtuous"]
+tags: ["breakfast", "starter", "virtuous", "herbivore-ish"]
 ingredient_groups:
   - items:
     - amount: "200 g"

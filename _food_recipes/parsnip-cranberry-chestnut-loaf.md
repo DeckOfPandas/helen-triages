@@ -8,7 +8,7 @@ prep_time: "30 mins"
 cook_time: "1 hr 30 mins"
 main_ingredients: ["parsnips", "cranberries", "cooked chestnuts", "walnuts", "fresh sage", "breadcrumbs", "ground mace"]
 star_ingredient: "root veg"
-tags: ["virtuous", "festive", "showstopper", "make-ahead", "main"]
+tags: ["virtuous", "festive", "showstopper", "make-ahead", "main", "knife and fork", "herbivore-ish"]
 ingredient_groups:
   - name: "nut mixture"
     items:

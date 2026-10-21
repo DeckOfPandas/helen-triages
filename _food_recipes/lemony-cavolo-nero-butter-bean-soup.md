@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: "20 mins"
 main_ingredients: ["cavolo nero", "butter beans", "carrots", "lemon", "onion", "tomato purée", "vegetable stock"]
 star_ingredient: "greens"
-tags: ["make-ahead", "one-handed food", "virtuous", "main"]
+tags: ["make-ahead", "one-handed food", "virtuous", "main", "herbivore-ish"]
 ingredient_groups:
   - items:
     - amount: "2"

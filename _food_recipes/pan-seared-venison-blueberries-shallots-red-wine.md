@@ -9,7 +9,7 @@ cook_time: "15 mins"
 main_ingredients: ["venison loin", "fresh blueberries", "shallots", "garlic cloves", "red wine", "fresh thyme", "juniper berries"]
 star_ingredient: "game"
 internal_temp_ref: venison.loin
-tags: ["showstopper", "virtuous", "main"]
+tags: ["showstopper", "virtuous", "main", "knife and fork"]
 ingredient_groups:
   - items:
     - amount: "1 small handful"
