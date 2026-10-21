@@ -870,6 +870,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   ingredients."* On herbs: *"I know herbs shouldn't be a showstopper but I
   also think people skip the herbs and are confused about why their food
   doesn't taste of anything."*
+- **2026-10-22 — `main_ingredients` says `butter`, never salted or unsalted,
+  and a `QQ butter` line still earns it.** Helen: *"Add butter to main
+  ingredients even when QQ butter is the ingredient, yes? There's no need to
+  write salted/unsalted in the main ingredients so we won't do that."* The
+  kind stays in the ingredient list, where it is shopped and cooked from.
 
 ## §7 Taxonomy (food)
 

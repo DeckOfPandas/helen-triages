@@ -1012,7 +1012,8 @@ never an input, and is deliberately not enforced.
 
 Cheeses use the bare name where it stands alone (cheddar, feta, comté); keep
 "cheese" only where the qualifier means nothing without it (blue cheese,
-cream cheese). Lowercase; `test_no_main_ingredient_spelling_collisions`
+cream cheese). Butter is `butter`, never salted or unsalted, and a
+`QQ butter` line still earns it. Lowercase; `test_no_main_ingredient_spelling_collisions`
 enforces consistent spelling across recipes and drafts.
 
 ---

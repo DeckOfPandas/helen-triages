@@ -546,7 +546,8 @@ silly". A long spice list that defines a curry belongs in full.
 
 Lowercase throughout. Cheeses use the bare name — `cheddar`, `feta`, `comté` —
 keeping "cheese" only where the qualifier means nothing without it (`blue
-cheese`, `cream cheese`). Leave out frying and greasing oil.
+cheese`, `cream cheese`). Butter is `butter`, never salted or unsalted, and a
+`QQ butter` line still earns it. Leave out frying and greasing oil.
 
 ---
 
