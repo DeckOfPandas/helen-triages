@@ -600,6 +600,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   opening are two different moments: the recipe sits in `_food_recipes/`, off
   the live site, until she reads the built page and flips the flag herself.
   Mechanical suite failures on the copy are fixed and said afterwards.
+- **2026-10-21 — a tag or star change Helen has agreed with a session row by
+  row needs no flip.** Helen: *"No need to flip the proofread flag for tag
+  changes agreed interactively -- new official ruling."* Her row-by-row answer
+  is the review. The mechanism is the existing one: the tag commit leaves
+  `proofread` alone and `BASELINE_COMMIT` moves to it in the next commit,
+  quoting her rows and proved with the old value. A tag change she has not
+  answered for, or any change to another key in the same commit, still flips.
 - **2026-09-20 — there is no per-recipe exemption list: `HELEN_CLEARED` is
   deleted and is not rebuilt in that shape.** Helen: *"I don't want a
   permanent exemption list. If I change one of those files again, the flag
@@ -769,6 +776,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
   conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
   says "170°C fan"; the `QQ original` keeps the printed figure.
+- **2026-10-19 — Good Food prints both units; keep the metric, bakes
+  included.** Asked whether its "100g/4oz" should keep only the grams, Helen
+  chose *"Metric only, bakes too"*, over the general rule that baking keeps
+  its ounces. Per-source rulings like this and Riverford's live in
+  `_data/food/sources.yml`, which `INGEST_ONE_RECIPE.md` §5 prints.
 - **2026-10-19 — an unlabelled oven pair 20 degrees apart is conventional and
   fan.** Helen: *"Oven pairings when one temp is 20 degrees lower than the
   other mean conventional / fan, I'm just so sure. Interpret that way
@@ -860,12 +872,28 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   moods.** Helen's calls. The first two are guessable from the recipe, and
   one-pot would honestly cover 57%; the four are dictated by an external
   structure, not a craving; `freezable` is the one genuinely unguessable tag.
-  `virtuous` was added, narrow. Co-tags: only `ice cream → dessert,
-  make-ahead`.
-- **2026-08-09 — `something unusual` is retired, and `legumes` was considered
-  and not added.** The first is culturally relative, not a real craving and
-  was barely used; the second had two candidates, both already covered.
-  `retired_star_ingredients` makes a retired value fail with its reason.
+  `virtuous` was added, narrow. Co-tags: `ice cream → dessert, make-ahead`
+  (and, from 2026-10-21, `herbivore-ish → main`).
+- **2026-08-09 — `something unusual` is retired.** Culturally relative, not a
+  real craving, and barely used. `retired_star_ingredients` makes a retired
+  value fail with its reason.
+- **2026-10-21 — `legumes` and `mushrooms` are star ingredients, and `greens`
+  means leaves and brassicas.** From a tag audit once the veg-forward books
+  arrived: `legumes` had been declined in August with two candidates, and now
+  had about ten drafts where the pulse is the point and the star was blank;
+  three mushroom dishes and the leek dishes had nowhere to go; `greens` held
+  tomatoes, peppers, courgettes and beans. Helen: *"Yes"* to each. Tomatoes,
+  courgettes, peppers and alliums stay blank: scattered, and rarely the point.
+- **2026-10-21 — `knife and fork` and `herbivore-ish` are moods.** The audit
+  found 39 draft mains with no mood: plainly cooked centrepieces, and
+  vegetables as the main event. On the first Helen ruled out "proper dinner"
+  (*"a bit Jamie Oliver"*) for fear of it meaning *"there has to be an animal
+  on the plate"*, and chose `knife and fork`: the eating, not the plate. On
+  the second, `herbivore-ish` over `plant-o-rama`, `veg VIPs` and renaming
+  `carbs party`: the "-ish" says a supporting anchovy or chorizo is fine,
+  where "plant" reads to a visitor as vegetarian. Then: *"Herbivoreish is only
+  for mains"*, so it is a co-tag rule, `herbivore-ish → main`, and a sprout
+  salad or a cauliflower cheese does not take it.
 - **2026-08-09, #72 — per-recipe tag calls stand and are not "fixed" for
   consistency.** `chicken-cider-stew` and `chicken-sorrel-potato-stew` are
   `freezable`, `pancetta-white-bean-stew` is not: case by case, never added to
@@ -923,11 +951,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `breakfast`, `hot snack`. A derived "dinner" button was the alternative: it
   is wrong at the edges, which are the dishes she scrolls for. Reading "we
   derive" as a proposal, not a deriver, is a session's.
-- **2026-10-11 — eggs and fritters are breakfast or a snack, never a `main`.**
-  Helen, when eight separate noes were put to her as one rule: *"Your
-  observation about eggs and fritters is sound -- please add as a rule."*
-  Omelette, frittata, baked eggs, savoury pancakes, griddle cakes, fritters.
-  (Taken from `_data/food/taxonomy.yml`; the old journal had no entry.)
+- **2026-10-21 — egg dishes and savoury pancakes are breakfast or a snack,
+  never a `main`; a vegetable fritter or griddle cake may be one.** The
+  2026-10-11 rule (*"Your observation about eggs and fritters is sound --
+  please add as a rule."*) covered fritters and griddle cakes too, until
+  Helen, about to add several veg fritters: *"I'm about to add a few
+  veg-based fritters, which are just griddle cakes in another hat, right?
+  Let's allow those to be mains, including the one I already have."* Still
+  never: omelette, frittata, baked eggs, savoury pancakes. A veg fritter or
+  griddle cake is a `main` question like `starter` or `hot snack`.
 - **2026-10-11 — no soup is `one-handed food`.** Helen: *"soup is never called
   one-handed food"*. Thick spoonable soups carried it until then.
 - **2026-10-11 — melting chocolate is prep, so a fridge cake is `no-cook`.**
@@ -1450,11 +1482,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 
 ### §9.2 / §9.2.1 The sources
 
-- **2026-08-31 — a named bar's or book's version of a drink Helen already has
-  says so in its title.** Helen: *"name it 'Sazerac (Death & Co)', leaving mine
-  as simply 'Sazerac'."* The Death & Co photo batch brought a Sazerac that was
-  a different drink from hers. `INGEST_ONE_COCKTAIL.md` carries the rule for
-  `title`.
+- **2026-10-20 — a (source) goes in a title only where two drinks share a
+  name.** Helen: *"Let's only use a (source) where we have more than one, e.g.
+  'Mai Tai (Difford's)' vs the one I call my signature."* Her own keeps the
+  plain name (2026-08-31: *"name it 'Sazerac (Death & Co)', leaving mine as
+  simply 'Sazerac'"*). So Difford's Mint Julep became "Mint Julep (Difford's)"
+  beside IBA's, and "Margarita on the Rocks (Difford's)" lost its bracket. Two
+  exceptions she chose: the Zombie keeps "(Difford's)" beside the live Zombie
+  Intoxica, and a bracket describing the drink stays (*"keep gin (it's
+  labelling the drink base, and we'll have more of these)"*). "(classic)"
+  went: Hurricane and Margarita, renamed live on her grant ("Break URLs,
+  it's fine").
 - **2026-09-01 — a `QQ` that has been ANSWERED becomes a plain note recording
   the answer; only a `QQ` that was wrong to ask is deleted.** Helen, asked a
   third time about Pic-a-de-Crop Punch's 12 oz of overproof: *"we've agreed
@@ -1467,6 +1505,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `source: ""` is correct, nothing requires one, and the publications list
   must not become a closed vocabulary. `scripts/build_ingest_vocab.py` prints
   it to the ingest documents as spellings only.
+
+- **2026-10-19 — IBA drinks have no source.** Helen, in the chat that ingested them: *"No source."* `source` and `source_url` are empty and the URL is kept nowhere.
 
 ### §9.3 The schema
 
@@ -1640,6 +1680,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   bar Mastiha Mojito, which Helen excluded herself. Per-drink corrections the
   same day: All Jacked Up is a strong brown drink (*"feel strong and brown"*)
   and Three Dots and a Dash is faff (*"yes yes"*).
+
+- **2026-10-19 — a step may express INTO the build.** Asked whether the express ban should give way for Metexa's "express the oils of a coin-size grapefruit zest over the base of the stirring glass", Helen chose *"Allow it inside a build"*. The garnish twist is still the layout's; a step expressing into the stirring glass, mixing glass, shaker or tin is allowed.
+- **2026-10-19 — a shake means with ice, and a cook's caveat is dropped.** Helen chose *"A shake means with ice"* (IBA's "Shake well") and *"Drop 'omit if wet ice'"*.
+- **2026-10-19 — ingredients are in build order even where the source lists them otherwise.** Helen: *"Build order"*, on IBA's Old Fashioned and Mint Julep.
 
 ### §9.3.1 The ingredient vocabulary
 
@@ -1949,6 +1993,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   milk, so it is not `coconut cream`, the unsweetened tin, and `costs.yml`
   prices it from its two parts (#1108). A sugar syrup's ratio is not a recipe
   in brackets and stays in its name.
+
+- **2026-10-19 — a list of source wordings, approved as a list.** Helen approved four groups, so `source_wordings.yml` gained twelve (Rye Whiskey, Sweet Red Vermouth, Plain Water, Vodka Citron, Becherovka liqueur, Créole Shrubb liqueur, Apple Schnapps liqueur, Pimento dram/Allspice liqueur, Clear apple juice (not cloudy), Orange flower/blossom water, and more); eleven were there already. IBA's ratio-less "Sugar Syrup" is `cane sugar syrup 1:1`. A bare IBA "Gin" is NOT mapped: *"Not all IBA gin is London Dry, so QQ every time please unless you happen to know which it is!"*
+- **2026-10-19 — four new generics: raspberry syrup, orange flower water, vanilla extract, powdered sugar.** Each Helen's yes. "Bourbon or Rye Whiskey" is the OR list `[bourbon, rye]`; navy rum with no bottle stays `QQ`.
 
 ### §9.3.2 The bottle dictionary
 
@@ -2462,6 +2509,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `ingredients.yml`, read by `_plugins/cocktail_units.rb` for the serving
   volume and by `scale.js` for its total.
 
+- **2026-10-19 — "few" is 2.** Helen chose 2 for IBA's "few dashes" and "few drops".
+- **2026-10-19 — a dry sugar measured by the spoon keeps the spoon.** Helen: *"Dry spoons stay spoons"*, and, told the cocktail suite converts every tsp: *"Dry sugar keeps its tsp"*. A spoon of anything liquid is still ml.
+- **2026-10-19 — a 7 oz scoop of ice is 200 ml**, in the method step; and a measured top-up keeps its measure (*"Keep the measure"*). Units `sprigs`, `wedges` and `disc` are declared.
+
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
 - **2026-08-16 — a drink's ingredients are additive, never a choose-one.**
@@ -2500,6 +2551,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   *"if this mark is the only change then the proofread flag doesn't need to be
   flipped, so no recipe goes dark. Explicit grant this time only."*
   `_dev/no-verdict.html` is the worklist of IOUs.
+- **2026-10-20 — the ship scale is four rungs: meh, sure, yes, yes².** Asked
+  what each word meant, Helen first kept `meh` and `sure` apart (*"those are
+  different"*), then merged the bottom rung into `meh`: *"let's combine meh
+  and nah into meh. That is enough resolution, and perfectly communicative."*
+  `not really` (shown "hmm" on cards) is gone; its drinks say `meh`, and on
+  the one live drink (Champs-Élysées) she granted the change without a flip.
+  The top rung is shown as `yes²` on the card and the drink page alike
+  (`ship_words`); stored values are unchanged, so filters and URLs still
+  match. A key on the page is parked in #1102.
 
 ### §9.7 / §9.8
 
@@ -2661,6 +2721,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   the composed strain step; a rimmed drink with no strain step prints it under
   "To serve" instead (`rim_shown`). Do not drop the fallback as duplication.
 
+- **2026-10-19 — `serve.ice: cracked` is its own value**, not crushed: Helen chose *"Cracked is its own value"*. Whether it counts toward a mood is still hers.
+- **2026-10-19 — a drink blended with ice is `blended`**, whatever its pour step says. Helen: *"blended"*.
+- **2026-10-19 — a British flag, and the straw through the ice cone.** Helen, on Navy Grog: *"I want the ice cone, and the straw running through it, then a British flag!"* `british flag` is a to_serve decoration; the ice cone is a garnish, and a method step pushes the straw through it.
+
 ### §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 Glass icons
 
 - **2026-08-17 — the drink page draws the FIRST listed glass that has
@@ -2797,6 +2861,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `survey_only_types`; a missing figure is fixed by adding survey rows, never
   by typing a number in.
 
+- **2026-10-19 — the julep cup, and a zombie glass is a tiki mug.** Helen: *"Declare `julep cup`"*, with `julep tin` and `julep stainless steel cup` as its aliases; `zombie glass` maps to `tiki mug`, *"but add a note somewhere to say I haven't totally ruled out adding a zombie glass to my collection"*.
+- **2026-10-19 — IBA's "cocktail glass" is chosen per drink.** Helen: *"Per drink, my call"*. A draft lists `coupe` and `martini` with a `QQ glass` note.
+
 ### §9.12 / §9.12.1 Methods and garnishes
 
 - **2026-08-26, #290 — a change to a canonical method step is proposed, never
@@ -2913,6 +2980,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   peel over the rim (cut to look like a beak)"*. Dead Parrot Colada's is the
   short `small stuffed dead parrot`, with *"the full thing in a note, labelled
   'Norwegian Blue'"*.
+
+- **2026-10-19 — new garnishes, and a maker's choice stays one string.** Helen declared blackberries, dried cranberries, cocoa powder, icing sugar and ice cone, and made the dehydrated orange slice plain `orange slice`. Told that garnish.yml already writes an either/or as ONE string, she kept that rule over listing each option. A cocktail cherry is `maraschino cherry`; IBA's "N/A" is `["no garnish"]`.
+- **2026-10-19 — new canonical steps.** Helen approved "Fill with ice cubes.", "Pour back into the shaker.", "Dry shake.", "Regal stir all ingredients with ice.", "Stir until the glass frosts.", the churn group, and the shapes "Add the <X>." and "Dust with the <X>." A step that carries information (a timed shake) stays free text, by the file's own rule.
 
 ### §9.13 The visual language — the rounds
 
@@ -3055,8 +3125,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   name of the third YOLO filter should be 'chaos only'"*, replacing `never
   made it` within hours. It is a name on a scale, not a description.
 - **2026-10-18, #1413 — the YOLO buttons read `ship`: `no chaos please` keeps
-  `yes` and `oh gods yes`; `chaos only` keeps `meh`, `not really` and `???`;
-  `sure` and `IOU` show only under `I'm open to chaos`.** Her issue: *"no chaos
+  `yes` and `oh gods yes`; `chaos only` keeps `meh` and `???`; `sure` and
+  `IOU` show only under `I'm open to chaos`.** (`not really` was a third
+  chaos value until it merged into `meh`, 2026-10-20.) Her issue: *"no chaos
   please -> only yes and yes^2 / chaos only -> only meh and not really, plus
   never made (now ???) / I'm open to chaos -> everything"*. Asked whether IOU
   belongs in `chaos only` (*"It really is chaotic, just leaning towards the
@@ -3899,6 +3970,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   nothing posts it for her: *"I am new to this and quite conservative."*
   `/ingest-inbox` reads those issues; its parser rejects and never repairs,
   and an absent drafts clone is a refusal, not a clean inbox.
+- **2026-10-19 — an ingest batch reaches Helen as one review page, with what
+  her rulings settle counted rather than asked.** Offered seven ways to cut
+  her share of an ingest, she chose four: *"I would like 1, 2, 3 and4
+  please!"* So the hand-back list folds every bullet a standing ruling
+  settles, but never one that asks (`ingest_inbox.FOLDS`); per-source
+  rulings live in `_data/food/sources.yml`; `ingest_review.py` writes one
+  table of tags, star, servings and times for corrections only; and a web
+  Claude runs `scripts/envelope.py`, the inbox's own parser, before handing
+  back.
 - **2026-09-07 — pushing a branch and opening its PR need no ask, in all three
   repos.** Helen: *"push no longer needs my say so. I had this rule because
   multiple Claudes were trampling each other and it's easier to fix that
@@ -4119,10 +4199,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   same shape had closed an issue through a PR Helen opened. PR #1113, with a
   `Closes #N` per line, closed all 22. Keep the trailers for the history, and
   read the issue list after the merge.
-- **2026-09-18 — Helen starts her own dev servers; a session never offers to
-  and never starts one for her.** Helen: *"As a greater point, I start my own
-  local servers, so don't do that."* A session's job is to say which pages
-  need reading and at what URLs, then stop.
+- **2026-10-21 — dev servers are shared work: a session starts one when
+  Helen asks, from its own worktree, and says the URL she can open.** Helen:
+  *"I'm trying a new model where I interact with git at the command line as
+  little as possible, so I don't keep getting tangled up... Let's work
+  together on dev servers from now on."* It replaces 2026-09-18's *"I start
+  my own local servers, so don't do that."* A server on a port the container
+  does not publish (`scripts/browser/serve.sh`'s 4010 and up) is for a
+  session's screenshots, not for her: say the host port, not the inside one.
 - **2026-09-21 — the file tools may read `/workspace/.node-runtime`, and
   nothing may write there.** Helen: *"Reading /workspace/.node-runtime is
   fine, please modify your settings to allow it."* A `Read(...)` allow rule

@@ -1155,7 +1155,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # test with the old value, which must name only the granted files, then move
 # it in a commit of its own quoting her grant (DECISIONS §4.0). A grant covers
 # that commit and nothing after; parallel grants need the merge behind both.
-COCKTAIL_BASELINE_COMMIT = "8ef2be8e"   # the ten promoted after #1413; has `22d6c4c1` (its IOU marks) behind it
+COCKTAIL_BASELINE_COMMIT = "30c6525f"   # Hurricane and Margarita renamed; has every earlier grant (e3e350af, 681357bc) behind it
 
 
 def _newest_commit_per_published_drink():
@@ -2715,11 +2715,11 @@ def test_the_amount_table_is_exercised():
 
 
 # Only a unit with both forms declared in `non_volumetric` is in scope:
-# `pinch`, `sprig`, `strip` and `each` have no declared plural, and
-# demanding one would invent vocabulary. `half` and `whole` take no
-# number, so there is no count to agree with.
-PLURAL_UNITS = {"dash": "dashes", "drop": "drops",
-                "cube": "cubes", "leaf": "leaves"}
+# `pinch`, `strip` and `each` have no declared plural, and demanding one
+# would invent vocabulary. `half` and `whole` take no number, so there is no
+# count to agree with.
+PLURAL_UNITS = {"dash": "dashes", "drop": "drops", "cube": "cubes",
+                "leaf": "leaves", "sprig": "sprigs", "wedge": "wedges"}
 
 _COUNTED_AMOUNT = re.compile(r"^\s*(\d+(?:\.\d+)?)\s+(.+?)\s*$")
 
@@ -2806,10 +2806,13 @@ def test_no_amount_uses_a_us_unit():
     the units its source prints. `oz` and `tsp` stay declared in `measures:`
     on purpose: that table is the conversion record
     test_the_declared_measures_produce_the_figures_the_data_used_to_store
-    reads. A dash, a pinch, a cube and a sprig are not US units.
+    reads. A dash, a pinch, a cube and a sprig are not US units. A dry sugar
+    measured by the spoon keeps its `tsp` (Helen, DECISIONS §9.3.6): a spoon
+    of sugar is not a volume.
     """
     measures = _vocab().get("measures") or {}
     ignored = {w.lower() for w in (measures.get("ignored_words") or [])}
+    sugars = set(_vocab().get("sugars") or [])
 
     checked = 0
     bad = []
@@ -2820,6 +2823,10 @@ def test_no_amount_uses_a_us_unit():
             checked += 1
             words = {w.strip(".,").lower() for w in str(item["amount"]).split()}
             hit = (words - ignored) & (US_UNITS | NOT_UNITS)
+            generic = item.get("generic")
+            generics = set(generic) if isinstance(generic, list) else {generic}
+            if hit == {"tsp"} and generics and generics <= sugars:
+                hit = set()
             if hit:
                 bad.append(
                     f"{slug}: {item['amount']!r} on "
@@ -3287,8 +3294,10 @@ def test_a_qq_note_carries_a_qq_label():
                 continue
             text = str(note.get("text", ""))
             label = note.get("label")
-            if text.strip().startswith("QQ") and label != "QQ":
-                bad.append(f"{slug}: QQ note labelled {label!r}, not 'QQ'")
+            # `QQ` or `QQ <topic>`, as the ingest contract writes it (DECISIONS §4).
+            if text.strip().startswith("QQ") and not (
+                    isinstance(label, str) and re.match(r"^QQ( \S.*)?$", label)):
+                bad.append(f"{slug}: QQ note labelled {label!r}, not 'QQ' or 'QQ <topic>'")
     assert not bad, (
         "QQ notes and their labels disagree:\n  " + "\n  ".join(bad)
         + "\n\nA note whose text begins `QQ` is written as:\n"
@@ -3600,6 +3609,9 @@ def test_a_bracketed_amount_does_not_repeat_its_use():
     )
 
 
+EXPRESS_INTO_BUILD = re.compile(r"\b(stirring glass|mixing glass|shaker|tin)\b", re.I)
+
+
 def test_no_method_step_opens_with_express():
     """No drink writes the twist step: the layout derives it from `garnish:`.
 
@@ -3607,14 +3619,16 @@ def test_no_method_step_opens_with_express():
     disagree: a step saying "discard" beside a garnish that does not. The
     emitted wording is `canonical.express` in methods.yml. Fires only on a
     step that opens with "Express"; one that expresses something in passing
-    stays.
+    stays, and so does one that expresses INTO the build -- the stirring
+    glass, the mixing glass, the shaker or the tin -- which is part of
+    making the drink, not its garnish (Helen, DECISIONS §9.3).
     """
     checked = 0
     bad = []
     for slug, fm in _load():
         for step in _steps(fm):
             checked += 1
-            if re.match(r"\s*express\b", step, re.I):
+            if re.match(r"\s*express\b", step, re.I) and not EXPRESS_INTO_BUILD.search(step):
                 bad.append(f"{slug}: {step!r}")
     assert not bad, (
         "Method step(s) writing the twist step by hand:\n  " + "\n  ".join(bad)

@@ -10,7 +10,7 @@ main_ingredients: ["salmon or trout", "sweet potatoes", "broccoli", "pak choi", 
 star_ingredient: "oily fish"
 internal_temp_ref: fish.salmon
 doneness: medium
-tags: ["virtuous", "main"]
+tags: ["virtuous", "main", "one-handed food"]
 ingredient_groups:
   - name: "traybake"
     items:

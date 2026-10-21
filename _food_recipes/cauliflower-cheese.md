@@ -7,7 +7,7 @@ serves: "5 (or...1)"
 prep_time: "15 mins"
 cook_time: "20–25 mins"
 main_ingredients: ["cauliflower", "cheddar", "lancashire cheese", "cheshire cheese", "breadcrumbs", "whole milk", "salted butter", "plain flour", "English mustard"]
-star_ingredient:
+star_ingredient: "greens"
 tags: ["cheese-tastic", "one-handed food", "make-ahead", "extras"]
 ingredient_groups:
   - items:

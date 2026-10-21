@@ -57,6 +57,12 @@ own order, and an ingredient with no amount contributes nothing.
 each complete on its own, in the order they appear. One envelope is one issue;
 never fold two recipes into one block.
 
+**If you can run code, check each envelope first** with her repository's own
+parser, which needs nothing but Python and PyYAML:
+`https://raw.githubusercontent.com/DeckOfPandas/helen-triages/main/scripts/envelope.py`.
+`python3 envelope.py <file>` prints the filename and fingerprint it accepts,
+or the one-line reason it would reject. Hand back nothing it rejects.
+
 ---
 
 ## 1. The one rule that matters more than the rest
@@ -381,12 +387,11 @@ is correct for plenty of recipes.
   pairings when one temp is 20 degrees lower than the other mean conventional
   / fan, I'm just so sure."* Any other unlabelled pair, a single figure, or
   350°F: the rewrite keeps what the source has and your list says so.
-  **The exception is a book Helen has ruled on.** *Riverford Companions*
-  prints one conventional figure with its gas mark ("190°C/Gas 5"); the fan
-  figure is 20 lower, so the rewrite says "170°C fan". Her ruling:
-  *"Conventional: fan is 20 less".*
+  **The exception is a source Helen has ruled on**: check §5's list first.
 - **Weights: old-style recipes and almost all baking keep their ounces.**
-  Helen's ruling. Delia in particular. Do not convert a baking recipe to metric.
+  Helen's ruling. Do not convert a baking recipe to metric. **A source in §5's
+  list says which figure of a printed pair to keep**, and that wins, baking
+  included.
 - **Never merge, split or reorder steps.** A source step becomes exactly one
   pair — never fewer, never more, and never out of order.
 - **A step that is really a note stays a step.** Freezer guidance mid-method is
@@ -413,8 +418,9 @@ term.
 **Mood** — *what you feel like eating, a craving:*
 <!-- vocab:tags:mood start -->
 `bakes`, `carbs party`, `cheese-tastic`, `dessert`, `drinks`, `fakeaway`,
-`fiddly and fun`, `hot snack`, `ice cream`, `nibbles`, `one-handed food`,
-`salad`, `showstopper`, `soup`, `sweet snack`, `virtuous`
+`fiddly and fun`, `herbivore-ish`, `hot snack`, `ice cream`, `knife and fork`,
+`nibbles`, `one-handed food`, `salad`, `showstopper`, `soup`, `sweet snack`,
+`virtuous`
 <!-- vocab:tags:mood end -->
 
 **Practicalities** — *what the occasion demands of you, regardless:*
@@ -431,10 +437,11 @@ Meanings you would not guess:
   `bakes`, `extras`, `starter`, `breakfast` or `hot snack`: add `main`. With
   one of that second five, it depends on the dish (a quiche is a bake and
   dinner; a starter for two may be a main; a sauce is not), so decide and say
-  which way you went in the hand-back list. **Eggs and fritters are breakfast
-  or a snack, not dinner**: an omelette, a frittata, baked eggs, savoury
-  pancakes, griddle cakes and fritters are never `main`, even where the source
-  says "for lunch or dinner".
+  which way you went in the hand-back list. **Egg dishes are breakfast or a
+  snack, not dinner**: an omelette, a frittata, baked eggs and savoury
+  pancakes are never `main`, even where the source says "for lunch or
+  dinner". A vegetable fritter or griddle cake may be a `main`: decide, and
+  say which way you went.
 - **`one-handed food`** — eat it curled on the sofa. Anything that rolls, spills
   or has to be chased is out. A soup never takes it, however thick.
 - **`no-cook`** answers "can I put this on the table without cooking?" A spice
@@ -450,7 +457,17 @@ Meanings you would not guess:
   chocolate, a frappé.
 - **`virtuous`** is narrow: lean protein, or genuinely veg-forward with a wine
   or citrus sauce doing the work. Not "contains a vegetable".
+- **`herbivore-ish`** — a main where a vegetable, a pulse or a mushroom is the
+  point of the dish and the reason to cook it: a whole roast celeriac,
+  chargrilled radicchio, a leek tart. **Mains only: it is never on a side or
+  an `extras` dish, and it requires `main`.** Not a promise of vegetarian:
+  anchovy, bacon or chorizo in a supporting role is fine. Wider than
+  `virtuous`; a dish can be both.
+- **`knife and fork`** — a sit-down dinner eaten with a knife and fork and
+  cooked properly: a roast, a braise, a whole fish, a vegetable centrepiece.
+  About how it is eaten, not what is on the plate: it needs no animal.
 - **`ice cream`** implies `dessert` and `make-ahead` — write all three.
+  `herbivore-ish` implies `main`.
 
 And the plainer ones, as Helen means them:
 
@@ -489,17 +506,21 @@ And the plainer ones, as Helen means them:
 **Two or three tags is normal. None is legitimate.** Being wrong here is cheap
 for her to fix, so propose rather than agonise — but propose only from the list.
 
-### `star_ingredient` — one of these 14, or omit
+### `star_ingredient` — one of these, or omit
 
 <!-- vocab:stars start -->
 `beef`, `chocolate`, `duck`, `eggs`, `fruit`, `game`, `greens`, `lamb`,
-`oily fish`, `pork`, `poultry`, `root veg`, `shellfish`, `white fish`
+`legumes`, `mushrooms`, `oily fish`, `pork`, `poultry`, `root veg`, `shellfish`,
+`white fish`
 <!-- vocab:stars end -->
 
 **It is the one thing the recipe is ABOUT, and about a quarter of her collection
 correctly leaves it blank.** A plain sponge, a dressing, a spice blend has no
 hero. Egg as a binder or a leavening mechanism is not `eggs`; a dish that is
-literally about the egg is. Squash counts as `root veg`. **If you find yourself
+literally about the egg is. Squash counts as `root veg`. `greens` is leaves
+and brassicas only (kale, cabbage, sprouts, broccoli, cauliflower, chard,
+spinach); a tomato, courgette, pepper or leek dish has no star, and a bean,
+lentil or chickpea one is `legumes`. **If you find yourself
 arguing for one, that is the signal to omit it.**
 
 ### `main_ingredients`
@@ -563,6 +584,24 @@ missing accent — accenting it would misquote the title.
 
 **Drop a page reference to a book nobody here holds** ("see page 167" off a
 website). Keep one that points into the same book the recipe came from.
+
+### Sources Helen has ruled on — read yours before you ask
+
+Each of these settles a question for every recipe from that source, so it is
+never a line in your list. Follow it, and say nothing about it. If a whole
+batch comes from one of them, the index may say so once.
+
+<!-- vocab:food_sources start -->
+**Riverford Companions** — a `source:` containing "Riverford Companions":
+- One oven figure is printed, with its gas mark (190°C/Gas 5). It is the conventional figure, so the fan figure is 20 lower: the rewrite says 170°C fan. Helen: *"Conventional: fan is 20 less"*
+
+**Good Food** — a `source:` containing "Good Food":
+- Both units are printed (100g/4oz). Write the metric figure only, bakes included, and do not list the dropped imperial. Helen: *"Metric only, bakes too"*
+- An aside under the standing "gf tip" rubric is transcribed without the label: it is Good Food's tip, not gluten-free. Helen: *"Good Food tip, the magazine source I use a lot?"*
+
+**Delia Smith** — a `source:` containing "Delia":
+- Keep the ounces. Never convert a Delia recipe to metric.
+<!-- vocab:food_sources end -->
 
 ---
 

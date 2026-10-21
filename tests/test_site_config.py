@@ -2213,7 +2213,7 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
     ".drink-count-block": (
         "`1fr auto` (#1412): the count or the shortlisted pill, beside the ship "
         "legend or `× clear ship`. The widest right cell is `SHIP IT? = ` plus "
-        "one card word (`ship_card_names` keeps every rung to one short word), "
+        "one card word (`ship_words` keeps every rung to one short word), "
         "about 150px; measured at 390px with room to spare, so it is believed "
         "to fit 360px."
     ),

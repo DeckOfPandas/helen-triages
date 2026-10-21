@@ -224,7 +224,7 @@ def derive(drink, sets, step_words, families):
     # `churned` disqualifies a strong brown drink. It is narrower than
     # `mood_serve_ice` on purpose: a big block of ice is how a strong brown
     # drink is served, so `large cube` and `block` are absent here.
-    churned = (drink.get("serve") or {}).get("ice") in ("crushed", "blended") \
+    churned = (drink.get("serve") or {}).get("ice") in ("crushed", "cracked", "blended") \
         or bool(hits_in(steps, step_words.get("churned") or []))
     # `slushy` is `sharp`'s own disqualifier and is narrower (DECISIONS §9):
     # it asks for the action that turns a drink into a slushy, where `churned`

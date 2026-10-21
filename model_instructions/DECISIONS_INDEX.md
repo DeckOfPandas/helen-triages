@@ -101,6 +101,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §4.0 · #1008 · after an agent touches a published file, what happens next comes in three sizes, and the choice is Helen's.
 - 2026-09-14 · §4.0 · #1008 · a flip to proofread: false on a published file raises an issue labelled blocked-on-helen.
 - 2026-09-14 · §4.0 · an agent asked to promote a food draft copies it and never sets rewritten or proofread.
+- 2026-10-21 · §4.0 · a tag or star change Helen has agreed with a session row by row needs no flip.
 - 2026-09-20 · §4.0 · there is no per-recipe exemption list: HELEN_CLEARED is deleted and is not rebuilt in that shape.
 - 2026-10-08 · §4.0 · #1089 · if Helen reads the rendered pages on the branch and says so, the flags go back in a second commit and the baseline moves in a third.
 - 2026-10-10 · §4.0 · a grant to edit live files without the flip is Helen's, is given per batch, and covers only what she named.
@@ -124,6 +125,7 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
+- 2026-10-19 · §5 · Good Food prints both units; keep the metric, bakes included.
 - 2026-10-19 · §5 · an unlabelled oven pair 20 degrees apart is conventional and fan.
 - 2026-10-19 · §5 · a title keeps its accents, and gains any the house list declares.
 - 2026-08-10 · §5 · within one ingredient group the base spices run coriander, cumin, turmeric, fennel, and the warm spices follow in any order.
@@ -138,7 +140,9 @@ argument and the rules each field is read by.
 - 2026-09-22 · §6 · main_ingredients drops a size word and keeps a kind; egg size lives in the ingredient list.
 - 2026-08-01 · §7 · "declared" and "filterable" are the same thing: a tag shown on the page with no filter button was proposed and rejected.
 - 2026-08-02 · §7 · one-pot and scalable are retired, freezable is kept, and breakfast, extras, festive and starter are practicalities, not moods.
-- 2026-08-09 · §7 · something unusual is retired, and legumes was considered and not added.
+- 2026-08-09 · §7 · something unusual is retired — Culturally relative, not a real craving, and barely used.
+- 2026-10-21 · §7 · legumes and mushrooms are star ingredients, and greens means leaves and brassicas.
+- 2026-10-21 · §7 · knife and fork and herbivore-ish are moods.
 - 2026-08-09 · §7 · #72 · per-recipe tag calls stand and are not "fixed" for consistency.
 - 2026-08-12 · §7 · #187 · eggs is a star ingredient only where the dish is about the egg.
 - 2026-10-08 · §7 · food gets no tag deriver; it gets a report.
@@ -147,7 +151,7 @@ argument and the rules each field is read by.
 - 2026-10-10 · §7 · sweets is renamed sweet snack — Helen: "what if we rename 'sweets' to 'sweet snacks', or something else with the word 'sweet' in it?
 - 2026-10-10 · §7 · fiddly and fun is a mood for the PROCESS, and showstopper is narrowed to the RESULT.
 - 2026-10-11 · §7 · main is a real practicality tag, seeded by subtraction, and the same rule is the proposal at ingest.
-- 2026-10-11 · §7 · eggs and fritters are breakfast or a snack, never a main.
+- 2026-10-21 · §7 · egg dishes and savoury pancakes are breakfast or a snack, never a main; a vegetable fritter or griddle cake may be one.
 - 2026-10-11 · §7 · no soup is one-handed food — Helen: "soup is never called one-handed food".
 - 2026-10-11 · §7 · melting chocolate is prep, so a fridge cake is no-cook.
 - 2026-10-11 · §7 · a sweet snack is named for the piece — A brownie or a bar is one; a cake cut up to serve is not.
@@ -216,9 +220,10 @@ argument and the rules each field is read by.
 - 2026-10-01 · §9.1.1 · #1256 #1249 · / #1249 — a flaming shell's rum is a measured ingredient, 25 ml, as: "shell"; the fire is to_serve.
 - 2026-10-01 · §9.1.1 · #1256 · a rum-filled shell IS in garnish, and the layout drops its generated "Garnish with…" step.
 - 2026-10-01 · §9.1.1 · #1256 · to_serve items are a declared vocabulary; the field stays one string.
-- 2026-08-31 · §9.2 / §9.2.1 · a named bar's or book's version of a drink Helen already has says so in its title.
+- 2026-10-20 · §9.2 / §9.2.1 · a (source) goes in a title only where two drinks share a name.
 - 2026-09-01 · §9.2 / §9.2.1 · a QQ that has been ANSWERED becomes a plain note recording the answer; only a QQ that was wrong to ask is deleted.
 - 2026-08-30 · §9.2 / §9.2.1 · a drink's source is optional and always will be; sources.yml fixes spelling, never coverage.
+- 2026-10-19 · §9.2 / §9.2.1 · IBA drinks have no source — Helen, in the chat that ingested them: "No source." source and source_url are empty and the URL is kept nowhere.
 - 2026-08-17 · §9.3 · a preferred bottle is a suggestion, never a generic; and glass is a list.
 - 2026-08-26 · §9.3 · #291 · what a drink is served WITH lives in to_serve, and no method step restates it or the garnish.
 - 2026-08-30 · §9.3 · #571 · no ml: key on an ingredient; the amount is one string read through measures:.
@@ -248,6 +253,9 @@ argument and the rules each field is read by.
 - 2026-10-08 · §9.3 · no rule is added for a hand mood if it would tag drinks Helen must then untag.
 - 2026-10-08 · §9.3 · a hand mood Helen NAMES for a drink in the ingest chat is written at ingest.
 - 2026-10-08 · §9.3 · ginger beer is not warming; ice ice baby needs no widening.
+- 2026-10-19 · §9.3 · a step may express INTO the build — Asked whether the express ban should give way for Metexa's "express the oils of a coin-size grapefruit zest over the base of the stirring …
+- 2026-10-19 · §9.3 · a shake means with ice, and a cook's caveat is dropped.
+- 2026-10-19 · §9.3 · ingredients are in build order even where the source lists them otherwise.
 - 2026-08-21 · §9.3.1 · #441 · a list generic means OR, and only OR — Bali Hai takes aguardiente OR kirschwasser: either makes the drink.
 - 2026-08-23 · §9.3.1 · #441 · character lives on the recipe line, never on a bottle.
 - 2026-08-23 · §9.3.1 · #457 · suggestion is bottle names only; the reason goes in that ingredient's note.
@@ -295,6 +303,8 @@ argument and the rules each field is read by.
 - undated · §9.3.1 · #314 · Undated, #314 — cachaça is its own generic, and Batavia arrack's family is rum.
 - 2026-08-26 · §9.3.1 · Undated — sugars deliberately mixes form with type: sugar cube is a generic beside white sugar.
 - 2026-10-11 · §9.3.1 · a made ingredient is named plainly, and how to make it or what stands in for it is a note.
+- 2026-10-19 · §9.3.1 · a list of source wordings, approved as a list.
+- 2026-10-19 · §9.3.1 · four new generics: raspberry syrup, orange flower water, vanilla extract, powdered sugar.
 - 2026-08-30 · §9.3.2 · every bottle a drink names is declared in bottles.yml and classified; never derive a bottle's category from the ingredient beside it.
 - 2026-08-30 · §9.3.2 · #534 · a suggested bottle may sit outside the generic's category, and then the ingredient must carry a note; QQ counts.
 - 2026-09-02 · §9.3.2 · #585 · a bare brand is not a bottle and is never added as an alias.
@@ -367,11 +377,15 @@ argument and the rules each field is read by.
 - 2026-10-04 · §9.3.6 · #1293 · above ×1 an amount in dashes or drops is struck through and starred, and the note under the scaler carries the matching star.
 - 2026-10-04 · §9.3.6 · #1294 · one spirit used twice in a drink is "the first" and "the second"; never "pour" as a noun in anything Helen reads.
 - 2026-09-04 · §9.3.6 · a drink's millilitre total counts millilitres only: drops, dashes and pinches are left out.
+- 2026-10-19 · §9.3.6 · "few" is 2 — Helen chose 2 for IBA's "few dashes" and "few drops".
+- 2026-10-19 · §9.3.6 · a dry sugar measured by the spoon keeps the spoon.
+- 2026-10-19 · §9.3.6 · a 7 oz scoop of ice is 200 ml — in the method step; and a measured top-up keeps its measure ("Keep the measure").
 - 2026-08-16 · §9.4 / §9.4.1 / §9.5 · a drink's ingredients are additive, never a choose-one.
 - 2026-08-17 · §9.4 / §9.4.1 / §9.5 · the site is canon; deviation happens in the kitchen.
 - 2026-09-05 · §9.4 / §9.4.1 / §9.5 · #722 · meta.made_before is a boolean that gates nothing, and an unmade drink may publish.
 - 2026-09-05 · §9.4 / §9.4.1 / §9.5 · #722 · an unmade drink's ship says who knows; QQ is not a ship value.
 - 2026-10-18 · §9.4 / §9.4.1 / §9.5 · #1413 · a drink Helen has made and liked but never rated says ship: "IOU", shown as IOU on the card and the drink page; who knows is only ever an unmade drink.
+- 2026-10-20 · §9.4 / §9.4.1 / §9.5 · the ship scale is four rungs: meh, sure, yes, yes².
 - 2026-09-26 · §9.7 / §9.8 · #1212 · a blank "To serve" draws no section — Helen: "don't show 'to serve' section if it's blank." to_serve: "" is how an ingest leaves a drink with nothing to say.
 - 2026-08-27 · §9.10 / §9.10.1 · #501 · a card names the category, always, even where the recipe names a real bottle.
 - 2026-08-27 · §9.10 / §9.10.1 · #501 · a drink using two kinds of the same rum prints the card name twice.
@@ -394,6 +408,9 @@ argument and the rules each field is read by.
 - 2026-09-28 · §9.10a · a strain step repeats the glass only when the clause riding on it is new.
 - 2026-09-28 · §9.10a · how full the ice is goes in serve.fill, not in a new serve.ice value.
 - 2026-09-05 · §9.10a · a rim is said again in the method or under "To serve", never only on the glass line.
+- 2026-10-19 · §9.10a · serve.ice: cracked is its own value — not crushed: Helen chose "Cracked is its own value".
+- 2026-10-19 · §9.10a · a drink blended with ice is blended — whatever its pour step says.
+- 2026-10-19 · §9.10a · a British flag, and the straw through the ice cone.
 - 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the drink page draws the FIRST listed glass that has artwork.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · on the drink page the glass is compressed and drawn as a fraction of the title block.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #347 · old fashioned is the canonical glass name and rocks fails a test.
@@ -414,6 +431,8 @@ argument and the rules each field is read by.
 - 2026-09-05 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #676 · the glasses are hollowed pineapple and coconut shell, and martini glass resolves to martini.
 - 2026-08-27 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #491 · every drink names a glass: there is no exemption list and no value meaning "it does not matter".
 - 2026-09-28 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · every glass type has a surveyed capacity and height, including an icon no drink uses yet.
+- 2026-10-19 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the julep cup, and a zombie glass is a tiki mug.
+- 2026-10-19 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · IBA's "cocktail glass" is chosen per drink.
 - 2026-08-26 · §9.12 / §9.12.1 · #290 · a change to a canonical method step is proposed, never applied.
 - 2026-08-31 · §9.12 / §9.12.1 · a drink that takes no garnish says no garnish; [] means nobody has filled the field in.
 - 2026-08-31 · §9.12 / §9.12.1 · alternative garnishes are ONE string, the maker's choice.
@@ -432,6 +451,8 @@ argument and the rules each field is read by.
 - 2026-10-07 · §9.12 / §9.12.1 · lemon spiral is a garnish of its own and gets no "Express the twist" step.
 - 2026-10-07 · §9.12 / §9.12.1 · pineapple wheel, apple slice and a second fruit stick are garnishes, and a floated garnish carries (floated) as a tail.
 - 2026-10-07 · §9.12 / §9.12.1 · a garnish is worded to complete "Garnish with…", and a joke too long for that goes in a note.
+- 2026-10-19 · §9.12 / §9.12.1 · new garnishes, and a maker's choice stays one string.
+- 2026-10-19 · §9.12 / §9.12.1 · new canonical steps — Helen approved "Fill with ice cubes.", "Pour back into the shaker.", "Dry shake.", "Regal stir all ingredients with ice.", "Stir until the glass frosts." …
 - 2026-08-29 · §9.13 · the cocktails palette is five saturated accents, "neon bar sign", and campari red and bitter orange are not among them.
 - 2026-08-29 · §9.13 · LEAVE OUT carries no hue at all — Helen: "for food, avoiding can be important whereas for drinks surely less so." Violet spent one revision on it and read as "suddenly busy, and …
 - 2026-09-02 · §9.13 · #469 · the cocktails site is black on black — Helen: "One thing for sure: we're going black on black.
@@ -453,7 +474,7 @@ argument and the rules each field is read by.
 - 2026-08-31 · §9.13 · #595 · going back to the drinks index restores the list you left.
 - 2026-09-05 · §9.13 · "the universe says…" is one line above the five questions, not a box.
 - 2026-09-06 · §9.13 · #732 · the third YOLO button is chaos only — Helen: "the name of the third YOLO filter should be 'chaos only'", replacing never made it within hours.
-- 2026-10-18 · §9.13 · #1413 · the YOLO buttons read ship: no chaos please keeps yes and oh gods yes; chaos only keeps meh, not really and ???; sure and IOU show only under I'm open to chaos.
+- 2026-10-18 · §9.13 · #1413 · the YOLO buttons read ship: no chaos please keeps yes and oh gods yes; chaos only keeps meh and ???; sure and IOU show only under I'm open to chaos.
 - 2026-09-10 · §9.13 · no line of words goes under the wordmark.
 - 2026-09-10 · §9.13 · left alone on purpose in the design pass: the header's balance, the food index pills' faintness at rest, and the chip type size on cards.
 - 2026-09-11 · §9.13 · #966 #967 · / #967 — the MOOD and HASSLE buttons are in the order Helen typed them.
@@ -582,6 +603,7 @@ argument and the rules each field is read by.
 - 2026-09-01 · §11 · a title that differs from its slug is not a finding on a draft.
 - 2026-09-01 · §11 · a possessive in a recipe title is for the famous and for Helen's family only.
 - 2026-09-02 · §11 · the ingest envelope is an issue Helen pastes into the private repo herself, titled ingest: <slug> and labelled ingest.
+- 2026-10-19 · §11 · an ingest batch reaches Helen as one review page, with what her rulings settle counted rather than asked.
 - 2026-09-07 · §11 · pushing a branch and opening its PR need no ask, in all three repos.
 - 2026-09-08 · §11 · never sed, the whole tool, no safe form; guard-sed.py refuses any command that names it.
 - 2026-09-08 · §11 · every Claude session runs in its own worktree.
@@ -608,7 +630,7 @@ argument and the rules each field is read by.
 - 2026-09-15 · §11 · a leading NAME=value before a command is refused by the hook, and committed wrappers make it unnecessary.
 - 2026-09-15 · §11 · an unquoted ( or ) in a Bash command is refused by the hook.
 - 2026-09-15 · §11 · #1112 · on a PR the agent account opened, the PR description closes the issues, not the commit trailers: one closing keyword per issue per line, never a comma list.
-- 2026-09-18 · §11 · Helen starts her own dev servers; a session never offers to and never starts one for her.
+- 2026-10-21 · §11 · dev servers are shared work: a session starts one when Helen asks, from its own worktree, and says the URL she can open.
 - 2026-09-21 · §11 · the file tools may read /workspace/.node-runtime, and nothing may write there.
 - 2026-09-21 · §11 · Read(//dev/null) and Edit(//dev/null) stay in the settings.
 - 2026-09-21 · §11 · git -C <path> is refused wherever it appears; write the bare command.

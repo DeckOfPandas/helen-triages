@@ -24,6 +24,12 @@ icons:
   piña colada: pina-colada
   punch bowl: punch-bowl
   tiki mug: tiki-mug
+  # A tiki mug for now. Helen has not ruled out a zombie glass of its own;
+  # that would be new artwork and survey rows, and this alias would move.
+  zombie glass: tiki-mug
+  julep cup: julep-cup
+  julep tin: julep-cup
+  julep stainless steel cup: julep-cup
 
   # --- two mugs, two drawings --------------------------------------------------
   mug: mug
@@ -79,6 +85,9 @@ canonical_glasses:
   # The icon slug, corrected to the prose name.
   "pina-colada": "piña colada"
   "pina colada": "piña colada"
+  "julep tin": "julep cup"
+  "julep stainless steel cup": "julep cup"
+  "zombie glass": "tiki mug"
 
 # How a generated step names the glass. `_layouts/cocktail.html` composes
 # "Strain into <phrase><ice clause>." from the method's technique, this phrase
@@ -95,6 +104,7 @@ serving:
   flute: "a flute"
   highball: "a highball"
   hurricane: "a hurricane glass"
+  julep cup: "a julep cup"
   margarita: "a margarita glass"
   martini: "a martini glass"
   martini glass: "a martini glass"   # kept, Helen 2026-09-25 (#1186): no drink uses it yet

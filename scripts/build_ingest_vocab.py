@@ -272,6 +272,26 @@ def _sources() -> str:
     return "\n".join(f"- {r}" for r in rows)
 
 
+def _food_source_rulings() -> str:
+    """Helen's rulings per book or magazine, from `_data/food/sources.yml`.
+
+    One bullet per ruling under the source's name and the text its citation
+    contains, with her words where the entry records them. A web Claude
+    reads this before asking anything a ruling here already answers.
+    """
+    from test_food_sources import _food_sources
+
+    rows = []
+    for entry in _food_sources():
+        rows.append(f"**{entry['name']}** — a `source:` containing "
+                    f"\"{entry['match']}\":")
+        for ruling in entry["rulings"]:
+            said = f" Helen: *\"{ruling['helen']}\"*" if ruling.get("helen") else ""
+            rows.append(f"- {ruling['rule']}{said}")
+        rows.append("")
+    return "\n".join(rows).rstrip()
+
+
 def _generics() -> str:
     """Every declared generic, grouped by the list that declares it.
 
@@ -319,6 +339,7 @@ def renderers() -> dict:
         "serve_ice": _serve_ice,
         "to_serve": _to_serve,
         "sources": _sources,
+        "food_sources": _food_source_rulings,
     }
     for group in _food_taxonomy()["tags"]:
         out[f"tags:{group}"] = (lambda g: lambda: _tags(g))(group)
@@ -334,7 +355,8 @@ def required_blocks() -> dict:
     """
     tags = {f"tags:{group}" for group in _food_taxonomy()["tags"]}
     return {
-        FOOD_DOC: tags | {"stars", "source_types", "accents", "no_accent"},
+        FOOD_DOC: tags | {"stars", "source_types", "accents", "no_accent",
+                          "food_sources"},
         COCKTAIL_DOC: {
             "glass", "glass_corrections", "garnish", "method", "measures",
             "accents", "generics", "serve_ice", "to_serve", "sources",

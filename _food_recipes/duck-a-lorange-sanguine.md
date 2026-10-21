@@ -9,7 +9,7 @@ cook_time: "1 hr 20 mins, plus 20 mins resting"
 main_ingredients: ["whole duck", "blood orange", "cavolo nero", "star anise", "white wine", "fresh thyme"]
 star_ingredient: "duck"
 internal_temp_ref: poultry.duck
-tags: ["showstopper", "main"]
+tags: ["showstopper", "main", "knife and fork"]
 ingredient_groups:
   - name: "duck"
     items:

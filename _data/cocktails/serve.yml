@@ -24,6 +24,9 @@ ice:
     Crushed or pebble ice. Every swizzle, and it is the technique as much as
     the serve — a swizzle is stirred against the crushed ice, so the method
     keeps its "Fill with crushed ice" step and this field does not replace it.
+  cracked: >-
+    Cracked ice: cubes broken into large pieces, coarser than crushed. Its own
+    value on Helen's word, 2026-10-19, for the IBA Mint Julep.
   large cube: >-
     One big rock. Helen, 2026-09-04: "I really do want 'giant ice cube' for
     e.g. strong brown drinks over ice." Deliberately NOT a disqualifier for
@@ -47,6 +50,7 @@ ice:
 in_the_glass:
   cubed: " filled with ice"
   crushed: " filled with crushed ice"
+  cracked: " filled with cracked ice"
   large cube: ", over a large ice cube"
   block: ", over a large block of ice"
 
@@ -88,6 +92,7 @@ to_serve:
     - "paper umbrella"
     - "teeny flamingos"
     - "zero umbrellas"
+    - "british flag"
   fire:
     - "more fire"
     - "more cinnamon sparkles"

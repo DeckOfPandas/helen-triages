@@ -93,7 +93,7 @@ bottles:
     origin: "multi-country origin"
   "Havana Club 7 year old":
     generic: "moderately aged rum"
-    aliases: ["Havana Club 7", "Havana 7", "Havana Club 7yo"]
+    aliases: ["Havana Club 7", "Havana 7", "Havana Club 7yo", "Havana Club Añejo 7 Años Cuban Rum"]
     origin: "Cuba"
   "Planteray 5 Year Old Barbados":
     generic: "moderately aged rum"
@@ -543,7 +543,8 @@ bottles:
   # here. A second Luxardo product is a second entry, and the alias comes off.
   "Luxardo Maraschino":
     generic: "maraschino liqueur"
-    aliases: ["Luxardo"]
+    # IBA prints it backwards (Martinez).
+    aliases: ["Luxardo", "Maraschino Luxardo", "Luxardo Maraschino liqueur"]
 
   # --- Gabriel Boudier: declared by product, whether or not a drink names it ---
   "Gabriel Boudier Crème de Banane":
@@ -575,7 +576,7 @@ bottles:
     aliases: ["Roots"]
   "Pierre Ferrand Dry Curaçao":
     generic: "dry orange Curaçao"
-    aliases: ["Pierre Ferrand dry"]
+    aliases: ["Pierre Ferrand dry", "Ferrand Dry Curaçao liqueur"]
   # Its generic is its own brand: a rhum-based orange liqueur, not a rum.
   "Rhum Clément Créole Shrubb":
     generic: "Créole Shrubb"
@@ -590,7 +591,7 @@ bottles:
     aliases: ["Bitter Truth Aromatic bitters", "The Bitter Truth Aromatic"]
   "Angostura":
     generic: "aromatic bitters"
-    aliases: ["Angostura bitters"]
+    aliases: ["Angostura bitters", "Angostura Aromatic Bitters"]
   # A different product from "Angostura" above, so it has its own fully
   # spelled key (#984).
   "Angostura orange bitters":
@@ -627,6 +628,13 @@ bottles:
     generic: "absinthe"
     aliases: ["Pernod"]
     note: "Pernod Anise, the 40% yellow one, is a different bottle and a pastis."
+  "La Fée Parisienne":
+    generic: "absinthe"
+    aliases: ["La Fée Parisienne absinthe"]
+  # --- rosé vermouth ---
+  "Lustau Vermut Rosé":
+    generic: "rosé vermouth"
+    aliases: ["Vermut Lustau Rosé"]
 
   # --- syrups, juices and the rest ---
   # Monin is a house: each syrup is declared by product.
@@ -634,8 +642,10 @@ bottles:
     generic: "ginger syrup"
   "Monin Cinnamon":
     generic: "cinnamon syrup"
+    aliases: ["Monin Cinnamon Syrup"]
   "Monin Passion Fruit":
     generic: "passion fruit syrup"
+    aliases: ["Monin Passion Fruit Syrup"]
   "Monin Orgeat":
     generic: "orgeat"
   # Monin's 2:1 cane sugar syrup.

@@ -41,5 +41,5 @@ meta:
   ship: "IOU"
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 ---

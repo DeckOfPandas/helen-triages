@@ -64,16 +64,18 @@ All in `model_instructions/` unless a path is given.
 python3 scripts/verify.py    # every check below, in one command -- prefer this
 pytest                       # content and structure; one session at a time
 node --test                  # the JS suite, discovered from the root (§10)
-jekyll-local                 # port 4001, drafts visible          Helen starts it
-jekyll-prod                  # port 4002, exactly what deploys    Helen starts it
+jekyll-local                 # port 4001, drafts visible
+jekyll-prod                  # port 4002, exactly what deploys
 ```
 
-Local URL: `http://localhost:4001/helen-triages/`, then `/food/` or
-`/cocktails/`.
+Inside the container these serve on 4001 and 4002; `.devcontainer/run.sh`
+publishes them to the host as 5998 and 5999, so Helen's browser opens
+`http://localhost:5998/helen-triages/`, then `/food/` or `/cocktails/`.
 
-**The two servers are Helen's to start.** Say which URL needs looking at and
-stop; never start or offer to start one. `scripts/browser/serve.sh` is a
-different thing: a short-lived server the screenshot tooling owns (below).
+**A session starts one when Helen asks**, from its own worktree, in the
+background, and gives her the host URL. `scripts/browser/serve.sh` is a
+different thing: a short-lived server the screenshot tooling owns (below), on
+a port the host cannot reach.
 
 #### `scripts/verify.py`
 
@@ -1023,7 +1025,9 @@ gets wrong.
 **Star ingredient** (optional) is the one thing the recipe is about; a good
 share of the collection correctly leaves it blank. Egg as a binder or
 leavening is not `eggs`; a dish literally about the egg is. Squash is
-`root veg`. `retired_star_ingredients` makes a retired value fail with its
+`root veg`. `greens` is leaves and brassicas only; a tomato, courgette,
+pepper or leek dish whose vegetable is the point has no star, and a bean,
+lentil or chickpea one is `legumes`. `retired_star_ingredients` makes a retired value fail with its
 reason rather than blend into "not declared".
 
 **Tags are two groups, different in kind.** Mood is what you feel like
@@ -1037,9 +1041,13 @@ regardless.
   chocolate is prep, so a fridge cake is `no-cook`.
   `test_no_cook_tag_implies_no_cook_time` ties the tag to `cook_time`.
 - `virtuous` is narrow: lean protein, or genuinely veg-forward with a wine or
-  citrus sauce doing the work.
-- `ice cream` is the one tag with co-tags: it implies `dessert` and
-  `make-ahead` (`co_tags`, `test_co_tag_rules`).
+  citrus sauce doing the work. `herbivore-ish` is the wide one: a main where
+  the vegetable is the point, whatever else is on the plate, and a dish can be
+  both. It is for mains only and implies `main` (`co_tags`).
+- `knife and fork` is about how it is eaten, not what is on the plate; a
+  whole roast cauliflower takes it as readily as a saddle of lamb.
+- Two tags have co-tags: `ice cream` implies `dessert` and `make-ahead`, and
+  `herbivore-ish` implies `main` (`co_tags`, `test_co_tag_rules`).
 
 **Meanings you would not guess** (the file has each in full):
 
@@ -1061,9 +1069,10 @@ regardless.
 proposal.** Never with `dessert`, `sweet snack`, `ice cream`, `drinks` or
 `nibbles`. A recipe with none of those and none of `bakes`, `extras`,
 `starter`, `breakfast`, `hot snack` is a main. With one of that second five
-it is a question to Helen — except that eggs and fritters are breakfast or a
-snack, never dinner (omelette, frittata, baked eggs, savoury pancakes, griddle
-cakes, fritters). `INGEST_ONE_RECIPE.md` §4 asks a new recipe the same thing.
+it is a question to Helen — except that egg dishes and savoury pancakes are
+breakfast or a snack, never dinner (omelette, frittata, baked eggs, savoury
+pancakes). A vegetable fritter or griddle cake may be a main, and is asked.
+`INGEST_ONE_RECIPE.md` §4 asks a new recipe the same thing.
 It is a proposal for her yes or no, never a deriver.
 
 **Co-tags: the test for adding another.** Sound when the implied tag is a
@@ -2544,7 +2553,8 @@ DECISIONS §9.4.1.
 ### 9.5 `meta.ship` and `meta.made_before`
 
 **`meta.ship` is a closed, ordered vocabulary**: `ship_scale` in
-`_data/cocktails/taxonomy.yml`, lowest rung first. Two values are deliberately
+`_data/cocktails/taxonomy.yml`, lowest rung first: `meh`, `sure`, `yes`, `oh
+gods yes` (shown as `yes²`). Two values are deliberately
 off the scale, in `ship_off_scale` with the word each renders as: `who knows`
 (`???`), never made; and `IOU` (`IOU`), made and liked but never rated. `QQ`
 is not a ship value. `test_meta_ship_is_a_rung_or_off_scale` holds the
@@ -2553,8 +2563,9 @@ exactly the drinks with `made_before: false`.
 
 `_includes/cocktails/ship.html` draws the mark on the card and on the drink
 page. It asks `ship_scale` whether a value is a rung and never names a
-vocabulary value itself. The card passes `short=true` to print the
-`ship_card_names` spelling.
+vocabulary value itself. A rung is shown as its `ship_words` word where it
+has one, on the card and the drink page alike; filters and `?ship=` URLs
+match the stored value.
 
 **`meta.made_before` is a boolean and gates nothing.** It is first in `meta:`.
 An unmade cocktail may publish (§9.1.1). Nothing on the index reads it: the
@@ -3099,8 +3110,8 @@ Five named questions, in Helen's order:
 - **`open` applies no filter at all.** The button for "I'll try anything" must
   never narrow.
 - **`no chaos please` and `chaos only` each keep one list in taxonomy.yml's
-  `chaos`**, read off `meta.ship`: `yes` and `oh gods yes`; `not really`,
-  `meh` and `who knows`. The index stamps each card `good`, `chaos` or
+  `chaos`**, read off `meta.ship`: `yes` and `oh gods yes`; `meh` and `who
+  knows`. The index stamps each card `good`, `chaos` or
   `middle`, and `middle` (`sure`, `IOU`) shows only under `open`.
 - **A card's ship mark is a sixth control with no section** (#1412): a
   `<button>` that sets `state.ship` to its exact `data-ship`, ANDed with

@@ -8,8 +8,8 @@
 
 Run it through `/ingest-inbox`, which is the procedure; this file is the
 engine. `model_instructions/INGEST_INBOX_DESIGN.md` §6 describes the envelope
-and §8 argues for the issue route; `parse_envelope` is the authority on the
-envelope.
+and §8 argues for the issue route; `parse_envelope` in `envelope.py` is the
+authority on the envelope.
 
 Flags:
 
@@ -18,11 +18,14 @@ Flags:
     --dry-run              the default, accepted so it can be said out loud;
                            contradicts --write
     --issue N              read that one issue, whatever its label or state
-    --from-file PATH       parse a local envelope file instead of fetching
+    --from-file PATH       parse a local envelope file, batch file or folder
+                           instead of fetching
     --comment              post each outcome back on its issue; ignored with
                            --from-file
     --drafts-dir DIR       use DIR as the drafts folder, to prove a run on a
                            copy
+    --every-bullet         print the hand-back bullets a standing ruling
+                           settles (FOLDS), which are otherwise only counted
 
 It reads the open issues labelled `ingest` on the site's private repo, through
 the GitHub API with `AGENT_GH_TOKEN`, and every `.md` under the drafts folder,
@@ -64,17 +67,14 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tests"))
+sys.path.insert(0, str(ROOT / "scripts"))
 
-from test_taxonomy import _fold  # noqa: E402
-
-# The envelope versions this script implements. §0 of each INGEST_ONE_*.md
-# tells a browser which one to write, and
-# tests/test_ingest_inbox.py::test_both_documents_name_a_supported_version
-# holds the two ends together: a document teaching a version this file does
-# not implement is the one failure that would otherwise be silent.
-SUPPORTED_VERSIONS = frozenset({1})
-
-SITES = ("food", "cocktail")
+# The parser lives in envelope.py, which imports nothing from this repository
+# so that a web Claude can run it on its own output (CLAUDE_WEB_INGEST.md §2).
+from envelope import (  # noqa: E402
+    FRONT_MATTER, SITES, SLUG_OK, SUPPORTED_VERSIONS, Envelope, Rejected,
+    fingerprint, parse_envelope, slug_for, split_batch,
+)
 
 # The PRIVATE repos, never the public one: an envelope carries source text that
 # may be copyright, and these two are private for exactly that reason.
@@ -88,259 +88,14 @@ DRAFT_ROOTS = {
     "cocktail": ROOT / "_cocktail_drafts",
 }
 
+# Read too: a duplicate of a published recipe is as much a duplicate, and a
+# slug taken there collides at promotion.
+PUBLISHED_ROOTS = {
+    "food": ROOT / "_food_recipes",
+    "cocktail": ROOT / "_cocktail_recipes",
+}
+
 LABEL = "ingest"
-
-MARKER = re.compile(r"^<!--\s*ingest\s+v(\d+)\s+([a-z]+)\s*-->$")
-FENCE = re.compile(r"^```(.*)$")
-FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
-BATCH_HEADING = re.compile(r"^#\s+ingest:\s*(\S+)\s*$")
-SEPARATOR = re.compile(r"^(-{3,}|\*{3,}|_{3,})$")
-HAND_BACK_HEADING = "## What I could not know"
-FINGERPRINT_HEADING = "## Fingerprint"
-SLUG_OK = re.compile(r"^[a-z0-9-]+$")
-
-
-class Rejected(Exception):
-    """A malformed envelope, with the one line that says which rule it broke."""
-
-
-# --- The envelope ---
-
-@dataclass
-class Envelope:
-    version: int
-    site: str
-    block: str          # the fenced block VERBATIM, which is what gets written
-    fm: dict
-    hand_back: list
-    fingerprint: str
-
-
-def _fenced_blocks(body: str):
-    """Every fenced block as (info string, verbatim contents including its
-    trailing newline). Counted rather than searched-for: `two fenced blocks` is
-    a rejection, so the parser has to see the second one."""
-    out, info, buf, inside = [], None, [], False
-    for line in body.splitlines(keepends=True):
-        match = FENCE.match(line.rstrip("\n"))
-        if match and not inside:
-            inside, info, buf = True, match.group(1).strip(), []
-        elif match and inside:
-            out.append((info, "".join(buf)))
-            inside = False
-        elif inside:
-            buf.append(line)
-    if inside:
-        raise Rejected("a fenced code block is never closed")
-    return out
-
-
-def _strip_fences(body: str) -> str:
-    """The prose half. Headings are looked for HERE so that a `##` line inside
-    the file being carried can never be mistaken for the envelope's own."""
-    out, inside = [], False
-    for line in body.splitlines():
-        if FENCE.match(line):
-            inside = not inside
-            continue
-        if not inside:
-            out.append(line)
-    return "\n".join(out)
-
-
-def _section(prose: str, heading: str) -> list:
-    """The non-blank lines under one `## ` heading, up to the next one."""
-    lines = prose.splitlines()
-    try:
-        start = next(i for i, line in enumerate(lines) if line.strip() == heading)
-    except StopIteration:
-        raise Rejected(f"no `{heading}` section") from None
-    out = []
-    for line in lines[start + 1:]:
-        if line.startswith("## "):
-            break
-        if line.strip():
-            out.append(re.sub(r"^[-*]\s+", "", line.strip()))
-    return out
-
-
-QQ_LABEL = re.compile(r"^QQ( \S.*)?$")
-
-
-def _reject_unlabelled_notes(fm: dict) -> None:
-    """Every note an ingest adds is labelled `QQ` or `QQ <topic>`, with text
-    beginning `QQ`.
-
-    The page titles a note with no label "note", which looks finished, so an
-    unread note would publish under a heading that says nothing is wrong
-    (#1120). A topic after the `QQ` still reads unfinished, and leaves Helen
-    the heading to keep (DECISIONS §4). Demanded of every entry but the empty
-    pair, since an envelope carries no note of hers.
-    """
-    notes = fm.get("notes")
-    if not isinstance(notes, list):
-        return
-    for number, note in enumerate(notes, start=1):
-        if isinstance(note, str):
-            problem = "is a bare string"
-        elif not isinstance(note, dict):
-            problem = f"is a {type(note).__name__}, not a `{{label, text}}` pair"
-        elif note == {"label": "", "text": ""}:
-            continue    # the empty pair: a slot for Helen, not a note (#1258)
-        elif not (isinstance(note.get("label"), str)
-                  and QQ_LABEL.match(note["label"])):
-            problem = f"is labelled {note.get('label')!r}, not 'QQ' or 'QQ <topic>'"
-        elif not (isinstance(note.get("text"), str)
-                  and note["text"].lstrip().startswith("QQ")):
-            problem = "has text that does not begin `QQ`"
-        else:
-            continue
-        raise Rejected(
-            f"note {number} {problem}; every note an ingest adds is "
-            f'`label: "QQ"` or `"QQ <topic>"` with text beginning `QQ`, because a note with no '
-            f'label is titled "note" on the page and looks finished (#1120)'
-        )
-
-
-def split_batch(body: str) -> list:
-    """(heading slug or None, envelope text) for each envelope in one body.
-
-    A batch is several envelopes, each under its own `# ingest: <slug>` line
-    (CLAUDE_WEB_INGEST.md §2). Text before the first heading is the batch's
-    index and is dropped; a horizontal rule ending a section is a separator.
-    Headings inside a fence never split. A body with no heading is one
-    envelope, so a single-envelope file or issue reads exactly as before.
-    """
-    sections, current, inside = [], None, False
-    for line in body.replace("\r\n", "\n").splitlines(keepends=True):
-        bare = line.rstrip("\n")
-        if FENCE.match(bare):
-            inside = not inside
-        heading = None if inside else BATCH_HEADING.match(bare.strip())
-        if heading:
-            current = [heading.group(1), []]
-            sections.append(current)
-        elif current is not None:
-            current[1].append(line)
-    if not sections:
-        return [(None, body)]
-    out = []
-    for slug, lines in sections:
-        while lines and (not lines[-1].strip() or SEPARATOR.match(lines[-1].strip())):
-            lines.pop()
-        out.append((slug, "".join(lines) + "\n"))
-    return out
-
-
-def parse_envelope(body: str, site: str) -> Envelope:
-    """INGEST_INBOX_DESIGN.md §6, rule for rule. Raises `Rejected` with one line."""
-    lines = [line.rstrip() for line in body.replace("\r\n", "\n").split("\n")]
-    first = next((line for line in lines if line.strip()), "")
-    match = MARKER.match(first.strip())
-    if not match:
-        raise Rejected(
-            f"first non-blank line is not an `<!-- ingest v<N> <site> -->` "
-            f"marker: {first.strip()[:60]!r}"
-        )
-    version, named_site = int(match.group(1)), match.group(2)
-    if named_site not in SITES:
-        raise Rejected(
-            f"marker names site {named_site!r}, which is not one of "
-            f"{', '.join(SITES)}"
-        )
-    if version not in SUPPORTED_VERSIONS:
-        raise Rejected(
-            f"envelope is v{version} and this script implements "
-            f"v{'/v'.join(str(v) for v in sorted(SUPPORTED_VERSIONS))}"
-        )
-    if named_site != site:
-        raise Rejected(f"marker says site {named_site!r} but --site is {site!r}")
-
-    blocks = _fenced_blocks(body)
-    if len(blocks) != 1:
-        raise Rejected(
-            f"{len(blocks)} fenced code blocks; the envelope carries exactly "
-            f"one, holding the whole file"
-        )
-    info, block = blocks[0]
-    if info not in ("", "yaml"):
-        raise Rejected(
-            f"the fenced block's info string is {info!r}; it must be `yaml` or "
-            f"empty"
-        )
-    if not block.startswith("---\n"):
-        raise Rejected(
-            "the fenced block does not begin with `---`; it must be the whole "
-            "file, front matter and all"
-        )
-    fm_match = FRONT_MATTER.match(block)
-    if not fm_match:
-        raise Rejected("the fenced block's front matter is never closed with `---`")
-    try:
-        fm = yaml.safe_load(fm_match.group(1))
-    except yaml.YAMLError as exc:
-        raise Rejected(
-            f"the fenced block is not valid YAML: "
-            f"{str(exc).splitlines()[0][:80]}"
-        ) from None
-    if not isinstance(fm, dict):
-        raise Rejected(
-            f"the fenced block's YAML is a {type(fm).__name__}, not a mapping"
-        )
-    title = fm.get("title")
-    if not isinstance(title, str) or not title.strip():
-        raise Rejected("the fenced block has no `title:`")
-    _reject_unlabelled_notes(fm)
-
-    prose = _strip_fences(body)
-    hand_back = _section(prose, HAND_BACK_HEADING)
-    printed = _section(prose, FINGERPRINT_HEADING)
-    if len(printed) != 1:
-        raise Rejected(
-            f"the `{FINGERPRINT_HEADING}` section has {len(printed)} non-blank "
-            f"lines; it carries exactly one"
-        )
-
-    envelope = Envelope(version, named_site, block, fm, hand_back, printed[0])
-    rebuilt = fingerprint(fm, named_site)
-    if rebuilt != envelope.fingerprint:
-        raise Rejected(
-            f"fingerprint does not match the file it sits under: envelope says "
-            f"{envelope.fingerprint!r}, the file gives {rebuilt!r}"
-        )
-    return envelope
-
-
-def fingerprint(fm: dict, site: str) -> str:
-    """The title lowercased, then every amount in the file's own order.
-
-    It compares formulas, never titles: two different drinks can share a name
-    (the Sazerac case). An entry with no amount contributes nothing.
-    """
-    amounts = []
-    if site == "food":
-        for group in (fm.get("ingredient_groups") or []):
-            if not isinstance(group, dict):
-                continue
-            for item in (group.get("items") or []):
-                if isinstance(item, dict) and item.get("amount") not in (None, ""):
-                    amounts.append(str(item["amount"]).strip())
-    else:
-        for item in (fm.get("ingredients") or []):
-            if isinstance(item, dict) and item.get("amount") not in (None, ""):
-                amounts.append(str(item["amount"]).strip())
-    title = str(fm.get("title") or "").strip().lower()
-    return " | ".join([title] + amounts)
-
-
-def slug_for(title: str) -> str:
-    """The whole title, folded and hyphenated, not its head clause.
-
-    Two "with" dishes that share a head clause get distinct slugs
-    (DECISIONS §4).
-    """
-    text = _fold(title.replace("’", "").replace("'", ""))
-    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", text)).strip("-")
 
 
 # --- The drafts already here ---
@@ -350,6 +105,15 @@ class Existing:
     slug: str
     title: str
     fingerprint: str
+    where: str = ""     # "" a draft, "published", or "planned" earlier this run
+
+    @property
+    def label(self) -> str:
+        if self.where == "published":
+            return f"published {self.slug}"
+        if self.where == "planned":
+            return f"{self.slug} (earlier in this run)"
+        return self.slug
 
 
 def drafts_root(site: str, override=None) -> Path:
@@ -366,13 +130,16 @@ def require_drafts(root: Path, site: str):
         )
 
 
-def scan_drafts(root: Path, site: str) -> list:
-    """Every draft already on disk, with its fingerprint.
+def scan_drafts(root: Path, site: str, where: str = "") -> list:
+    """Every draft (or, with `where="published"`, every recipe) on disk, with
+    its fingerprint.
 
     `rglob`, not `glob`: `_food_drafts/` has staging subfolders and the files
     closest to promotion live in them.
     """
     out = []
+    if not root.is_dir():
+        return out
     for path in sorted(root.rglob("*.md")):
         match = FRONT_MATTER.match(path.read_text(encoding="utf-8"))
         if not match:
@@ -384,8 +151,105 @@ def scan_drafts(root: Path, site: str) -> list:
         if not isinstance(fm, dict):
             continue
         out.append(Existing(path.stem, str(fm.get("title") or ""),
-                            fingerprint(fm, site)))
+                            fingerprint(fm, site), where))
     return out
+
+
+# --- Hand-back bullets a standing ruling already settles ---
+# Each is (summary label, pattern on the bullet). Only a bullet the ruling
+# settles whatever the recipe is folded, and never one that ASKS, since a fold
+# drops its text: the two exceptions are page checks, which Helen takes at
+# rewrite, and tags, which the review table carries in full. Every entry is a
+# ruling of hers (DECISIONS §4 and §5, MANUAL §5).
+ASKS = re.compile(r"\?|\bplease\b|\bsay (if|which|how)\b|\btell me\b|\bconfirm\b|"
+                  r"\bcheck\b|\bconsider\b", re.I)
+TAGS_LABEL = "tags and star proposed (in the review table)"
+PHOTO_LABEL = "a photo or page check (Helen picks these up at rewrite)"
+# Its only question ("tell me if this batch should differ") is what it settles.
+IBA_LABEL = "IBA's empty source, by the standing ruling"
+FOLDS = [
+    ("an unprinted time, written as `Estimated N mins`", r"^\*\*Times not printed"),
+    ("printed times used as written", r"^\*\*Times (and serving )?are printed"),
+    ("an uncooked dish, `cook_time: \"None\"`", r"^\*\*`cook_time` is \"None\""),
+    ("a time phrase kept whole (\"plus chilling\")",
+     r"^\*\*`prep_time` keeps the source's whole phrase.*bare number\.$"),
+    ("`QQ butter`: the source does not say which", r"^\*\*Butter is unspecified"),
+    ("salt or pepper with no amount", r"has no amount in the source's list"),
+    ("an amount printed as a word or with no number",
+     r"word amounts|has no (weight|number|volume)\b|have no number"),
+    ("a tin or pan fat flagged `incidental: true`", r"^\*\*[^*]*is `incidental: true`[^*]*\*\*$"),
+    ("the issue date read from the page footer", r"^\*\*Issue date is from the page footer"),
+    ("no issue date in frame, so the date Helen gave", r"^\*\*No issue date in frame"),
+    ("a labelled oven pair rewritten to its fan figure", r"rewrites? gives? the labelled fan figures?"),
+    ("no intro, so the tagline is a bare `QQ`", r"^\*\*No intro, so the tagline is a bare"),
+    ("source text kept in a `QQ` note", r"^\*\*The source's [^*]*(is|are) in (a|one) `QQ` note"),
+    ("a page reference into the same book, kept",
+     r"not in frame\.?\*\*\.? I kept (the|both) references?( in both halves)?\.$"),
+    ("one source step, one pair", r"^\*\*The method is [^*]*, so (one|two) pairs?\.\*\*$"),
+    ("groups named and split as the source heads them",
+     r"^\*\*The source's list has an unheaded first block|"
+     r"^\*\*(Method and ingredients|Ingredients and method) are both split"),
+    ("quantities lifted from the method: the source prints no list",
+     r"^\*\*(I lifted the ingredients|There is no ingredient list, so I lifted|"
+     r"The source has no ingredient list)"),
+    ("a sidebar box: no body, by the 2026-10-18 ruling",
+     r"^\*\*This is a sidebar|^\*\*Helen's chat ruling: (sections like this|this will become)"),
+    # Cocktails. The typing ones are settled by resolve_pours.py, which lists
+    # what it leaves; the name ones by the inbox's own same-name check.
+    ("a drink's standing values: mood [], made_before false, ship who knows",
+     r"^\*\*`mood: \[\]`, `made_before: false` and `ship: \"who knows\"`"),
+    ("the glass from the pre-chill line, not the photo caption",
+     r"^\*\*The \"Photographed in a"),
+    ("Difford's as the source, read off the page", r"^\*\*`source` is `Difford's`"),
+    (IBA_LABEL, r"^\*\*`source` and `source_url` are both empty"),
+    ("a strained drink's `serve.ice: none`", r"^\*\*`serve\.ice` is `none`\*\*"),
+    ("a name that may already exist: the inbox compares formulas itself",
+     r"compare the formula, not the name"),
+    ("which pours were typed (resolve_pours.py lists what is left)",
+     r"^\*\*(Only `[^`]+` is typed|Typed:|Every ingredient is typed|No ingredient is typed)"),
+    (TAGS_LABEL, r"^\*\*Tags are"),
+    # The bold opening, and a word about the picture's quality: "the
+    # photograph points to James Martin" is a credit question, not a check.
+    (PHOTO_LABEL,
+     r"^\*\*[^*]*\b(angled|blurred|clips?|clipped|cropped|show-through|page curve|"
+     r"old-style face|hidden by a finger|dark photo|frame opened|in the photo)\b"),
+]
+# Settled only for a source with that ruling in _data/food/sources.yml.
+SOURCE_FOLDS = {
+    ("oven", "conventional"): ("a single oven figure its source's ruling converts to fan",
+                               r"with no fan figure"),
+    ("units", "metric"): ("imperial dropped, as its source's ruling says",
+                          r"metric only|imperial"),
+}
+
+
+def fold_hand_back(bullets: list, fm: dict) -> tuple:
+    """(bullets still for Helen, [(summary label, bullet)] settled already)."""
+    from test_food_sources import source_for
+
+    entry = source_for(str((fm or {}).get("source") or "")) or {}
+    rules = [(label, pat) for (key, value), (label, pat) in SOURCE_FOLDS.items()
+             if entry.get(key) == value] + FOLDS
+    kept, folded = [], []
+    for bullet in bullets:
+        hit = next((label for label, pat in rules if re.search(pat, bullet, re.I)), None)
+        if hit and ASKS.search(bullet) and hit not in (TAGS_LABEL, PHOTO_LABEL, IBA_LABEL):
+            hit = None
+        if hit:
+            folded.append((hit, bullet))
+        else:
+            kept.append(bullet)
+    return kept, folded
+
+
+def fold_summary(plans: list) -> list:
+    """One line per fold label: how many bullets, and which recipes."""
+    by_label = {}
+    for plan in plans:
+        for label, _ in plan.folded:
+            by_label.setdefault(label, []).append(plan.slug or plan.origin)
+    return [f"{label}: {len(slugs)} ({', '.join(sorted(set(slugs)))})"
+            for label, slugs in sorted(by_label.items(), key=lambda kv: -len(kv[1]))]
 
 
 # --- One envelope -> one plan ---
@@ -406,11 +270,24 @@ class Plan:
     def ok(self) -> bool:
         return not self.reason and not self.duplicate_of
 
+    @property
+    def kept(self) -> list:
+        """The hand-back bullets no standing ruling settles."""
+        if not self.envelope:
+            return []
+        return fold_hand_back(self.envelope.hand_back, self.envelope.fm)[0]
+
+    @property
+    def folded(self) -> list:
+        if not self.envelope:
+            return []
+        return fold_hand_back(self.envelope.hand_back, self.envelope.fm)[1]
+
     def one_line(self) -> str:
         if self.reason:
             return f"REJECTED: {self.reason}"
         if self.duplicate_of:
-            return (f"PROBABLE DUPLICATE of {self.duplicate_of}.md -- same "
+            return (f"PROBABLE DUPLICATE of {self.duplicate_of} -- same "
                     f"fingerprint, nothing written")
         verb = "wrote" if self.written else "would write"
         return f"{verb} {self.path.name}"
@@ -423,11 +300,15 @@ class Plan:
         lines = [self.one_line()]
         for note in self.notes:
             lines.append(f"- {note}")
-        if self.envelope and self.envelope.hand_back:
+        if self.kept:
             lines.append("")
             lines.append("What the browser could not know:")
-            for item in self.envelope.hand_back:
+            for item in self.kept:
                 lines.append(f"- {item}")
+        if self.folded:
+            lines.append("")
+            lines.append(f"And {len(self.folded)} bullet(s) a standing ruling "
+                         f"already settles.")
         return "\n".join(lines)
 
 
@@ -454,14 +335,14 @@ def plan_for(body: str, site: str, existing: list, root: Path, number=None,
         (e for e in existing if e.fingerprint == envelope.fingerprint), None)
     if same_formula:
         plan.slug = slug
-        plan.duplicate_of = same_formula.slug
+        plan.duplicate_of = same_formula.label
         return plan
 
     same_title = [e for e in existing
                   if e.title.strip().lower() == envelope.fm["title"].strip().lower()]
     if same_title:
         plan.notes.append(
-            f"THE SAZERAC CASE: {', '.join(e.slug for e in same_title)} "
+            f"THE SAZERAC CASE: {', '.join(e.label for e in same_title)} "
             f"share(s) this title and has a DIFFERENT fingerprint, so this is "
             f"a different recipe under the same name. Written separately; "
             f"Helen names it."
@@ -587,7 +468,9 @@ def _envelopes(args) -> list:
     return out
 
 
-def render(plans: list, site: str, wrote: bool) -> str:
+def render(plans: list, site: str, wrote: bool, every: bool = False) -> str:
+    """The plan, one block per envelope. A bullet a standing ruling settles is
+    counted in one summary at the end rather than printed, unless `every`."""
     if not plans:
         return (f"No open `{LABEL}` issues on {REPOS[site]}. Nothing to do -- "
                 f"which is a fact about the inbox, not a failure.")
@@ -596,8 +479,15 @@ def render(plans: list, site: str, wrote: bool) -> str:
         out.append(f"{plan.origin}: {plan.one_line()}")
         for note in plan.notes:
             out.append(f"    {note}")
-        for item in (plan.envelope.hand_back if plan.envelope else []):
+        shown = (plan.envelope.hand_back if plan.envelope else []) if every else plan.kept
+        for item in shown:
             out.append(f"    hand-back: {item}")
+        out.append("")
+    if not every and any(p.folded for p in plans):
+        settled = sum(len(p.folded) for p in plans)
+        out.append(f"Settled by a standing ruling, so not shown ({settled} "
+                   f"bullets; --every-bullet prints them):")
+        out.extend(f"    {line}" for line in fold_summary(plans))
         out.append("")
     ok = sum(1 for p in plans if p.ok)
     out.append(f"{ok} writable, {sum(1 for p in plans if p.reason)} rejected, "
@@ -625,6 +515,11 @@ def main(argv=None) -> int:
                     help="operate on a different directory. Exists so this can "
                          "be proved against a COPY before it is ever pointed "
                          "at Helen's real drafts.")
+    ap.add_argument("--recipes-dir", default=None,
+                    help="the published collection to check for duplicates; "
+                         "the real one by default, none with --drafts-dir")
+    ap.add_argument("--every-bullet", action="store_true",
+                    help="print the hand-back bullets a standing ruling settles too")
     args = ap.parse_args(argv)
 
     if args.write and args.dry_run:
@@ -633,17 +528,26 @@ def main(argv=None) -> int:
     root = drafts_root(args.site, args.drafts_dir)
     require_drafts(root, args.site)
     existing = scan_drafts(root, args.site)
+    # A run on a copy (--drafts-dir) reads published recipes only if told where.
+    published = (Path(args.recipes_dir) if args.recipes_dir
+                 else None if args.drafts_dir else PUBLISHED_ROOTS[args.site])
+    if published:
+        existing += scan_drafts(published, args.site, "published")
 
     plans = []
     for number, origin, heading, body in _envelopes(args):
         plan = plan_for(body, args.site, existing, root, number, origin, heading)
         if args.write and plan.ok:
             write(plan)
+        # Every envelope counts for the ones after it, written or not, so a
+        # dry run shows the same -2 and the same duplicate a --write would.
+        if plan.ok:
             existing.append(Existing(plan.slug, plan.envelope.fm["title"],
-                                     plan.envelope.fingerprint))
+                                     plan.envelope.fingerprint,
+                                     "" if plan.written else "planned"))
         plans.append(plan)
 
-    print(render(plans, args.site, args.write))
+    print(render(plans, args.site, args.write, args.every_bullet))
 
     if args.comment and not args.from_file:
         for plan in plans:

@@ -7,7 +7,7 @@ garnish:
   - "lemon twist"
 meta:
   made_before: true
-  ship: "not really"
+  ship: "meh"
   rewritten: true
   awaiting_fix: false
   proofread: true

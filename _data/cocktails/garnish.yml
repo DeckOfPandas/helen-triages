@@ -61,6 +61,8 @@ canonical:
     - "lemon wheel"
     - "lemon slice"
     - "orange slice"
+    # Maker's choice, one string.
+    - "orange slice or orange twist"
     - "orange wheel"
     - "grapefruit crescents"
     - "citrus wheel"
@@ -78,10 +80,14 @@ canonical:
     - "pineapple wedge (cut to resemble a bird's plumage)"
     # `on rim` says where to put it.
     - "pineapple wedge on rim"
+    # Maker's choice, one string.
+    - "pineapple wedge on rim or edible flower"
     - "apricot wedge on rim"
     # A quarter of a wheel in its source; the quarter is not recorded.
     - "pineapple wheel"
     - "blackberry"
+    - "blackberries"
+    - "dried cranberries"
     - "dried apple slice"
     # Not a second spelling of the dried one.
     - "apple slice"
@@ -120,6 +126,8 @@ canonical:
     - "mint sprig"
     - "mint bouquet"
     - "rosemary sprig"
+    # Maker's choice, one string: the cranberries are spiked on the sprig.
+    - "rosemary sprig with dried cranberries, or orange slice"
     - "pineapple frond"
     - "kaffir lime leaves"
     - "cucumber wheels"
@@ -160,6 +168,12 @@ canonical:
     - "small stuffed dead Norwegian Blue"
     # The count is the spec: three coffee beans is the Espresso Martini.
     - "three coffee beans"
+    # Dusted on by the method's "Dust with the <X>." step; mass nouns, so in
+    # `no_article` below.
+    - "cocoa powder"
+    - "icing sugar"
+    # The straw runs through it (Navy Grog's method says so).
+    - "ice cone"
 
 # LEFT: the string exactly as a drink says it today. RIGHT: what it might
 # become, or `QQ` where a judgement is needed. A row is resolved by deleting
@@ -181,6 +195,8 @@ no_article:
   - grated chocolate
   - whipped cream                       # a mass noun
   - desiccated coconut                  # a mass noun
+  - cocoa powder                        # a mass noun
+  - icing sugar                         # a mass noun
   - three coffee beans
   - three skewered maraschino cherries and a pineapple frond
   - orange peel over the rim (cut to look like a beak)

@@ -9,7 +9,7 @@ cook_time: "1 hr 30 mins plus 15 mins resting"
 main_ingredients: ["duck legs", "five-spice powder", "bay leaves", "fresh thyme"]
 star_ingredient: "duck"
 internal_temp_ref: poultry.duck
-tags: ["showstopper", "main"]
+tags: ["showstopper", "main", "knife and fork"]
 ingredient_groups:
   - name: "duck"
     items:
