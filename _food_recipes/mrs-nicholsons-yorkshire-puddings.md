@@ -9,7 +9,7 @@ prep_time: "10 mins"
 cook_time: "20 mins"
 main_ingredients: ["self-raising flour", "eggs", "whole milk", "groundnut oil"]
 star_ingredient:
-tags: ["extras"]
+tags: ["side"]
 ingredient_groups:
   - items:
     - amount: "550 ml"
