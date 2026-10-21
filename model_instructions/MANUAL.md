@@ -1041,12 +1041,13 @@ regardless.
   chocolate is prep, so a fridge cake is `no-cook`.
   `test_no_cook_tag_implies_no_cook_time` ties the tag to `cook_time`.
 - `virtuous` is narrow: lean protein, or genuinely veg-forward with a wine or
-  citrus sauce doing the work. `herbivore-ish` is the wide one: the vegetable
-  is the point, whatever else is on the plate, and a dish can be both.
+  citrus sauce doing the work. `herbivore-ish` is the wide one: a main where
+  the vegetable is the point, whatever else is on the plate, and a dish can be
+  both. It is for mains only and implies `main` (`co_tags`).
 - `knife and fork` is about how it is eaten, not what is on the plate; a
   whole roast cauliflower takes it as readily as a saddle of lamb.
-- `ice cream` is the one tag with co-tags: it implies `dessert` and
-  `make-ahead` (`co_tags`, `test_co_tag_rules`).
+- Two tags have co-tags: `ice cream` implies `dessert` and `make-ahead`, and
+  `herbivore-ish` implies `main` (`co_tags`, `test_co_tag_rules`).
 
 **Meanings you would not guess** (the file has each in full):
 

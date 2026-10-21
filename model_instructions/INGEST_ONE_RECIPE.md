@@ -456,15 +456,17 @@ Meanings you would not guess:
   chocolate, a frappé.
 - **`virtuous`** is narrow: lean protein, or genuinely veg-forward with a wine
   or citrus sauce doing the work. Not "contains a vegetable".
-- **`herbivore-ish`** — a vegetable, a pulse or a mushroom is the point of the
-  dish and the reason to cook it: a whole roast celeriac, chargrilled
-  radicchio, a leek tart. Not a promise of vegetarian: anchovy, bacon or
-  chorizo in a supporting role is fine. Wider than `virtuous`; a dish can be
-  both.
+- **`herbivore-ish`** — a main where a vegetable, a pulse or a mushroom is the
+  point of the dish and the reason to cook it: a whole roast celeriac,
+  chargrilled radicchio, a leek tart. **Mains only: it is never on a side or
+  an `extras` dish, and it requires `main`.** Not a promise of vegetarian:
+  anchovy, bacon or chorizo in a supporting role is fine. Wider than
+  `virtuous`; a dish can be both.
 - **`knife and fork`** — a sit-down dinner eaten with a knife and fork and
   cooked properly: a roast, a braise, a whole fish, a vegetable centrepiece.
   About how it is eaten, not what is on the plate: it needs no animal.
 - **`ice cream`** implies `dessert` and `make-ahead` — write all three.
+  `herbivore-ish` implies `main`.
 
 And the plainer ones, as Helen means them:
 

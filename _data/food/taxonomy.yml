@@ -71,10 +71,11 @@ tags:
     # some precision. Slow is not fiddly, nor is threading skewers, and the
     # fiddle has to be one a cook would really do. May sit with `showstopper`.
     - fiddly and fun
-    # A vegetable, a pulse or a mushroom is the point of the dish and the
-    # reason to cook it: a whole roast celeriac, chargrilled radicchio, a leek
-    # tart. Not a promise of vegetarian: anchovy, bacon or chorizo in a
-    # supporting role is fine. Wider than `virtuous`, which is about lightness.
+    # A main where a vegetable, a pulse or a mushroom is the point of the dish
+    # and the reason to cook it: a whole roast celeriac, chargrilled radicchio,
+    # a leek tart. Never a side (`co_tags`). Not a promise of vegetarian:
+    # anchovy, bacon or chorizo in a supporting role is fine. Wider than
+    # `virtuous`, which is about lightness.
     - herbivore-ish
     # Small, hot and eaten between meals: toasties, fritters, things on toast.
     - hot snack
@@ -135,6 +136,9 @@ co_tags:
   ice cream:
     - dessert
     - make-ahead
+  # Helen's ruling, not an inference: the mood is for mains only.
+  herbivore-ish:
+    - main
 
 # What scripts/check_food_tags.py reads: a report, never a rule. Nothing here
 # writes a tag and no test fails a recipe on one; a hint that fires says "worth

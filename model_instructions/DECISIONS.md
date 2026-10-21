@@ -872,8 +872,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   moods.** Helen's calls. The first two are guessable from the recipe, and
   one-pot would honestly cover 57%; the four are dictated by an external
   structure, not a craving; `freezable` is the one genuinely unguessable tag.
-  `virtuous` was added, narrow. Co-tags: only `ice cream → dessert,
-  make-ahead`.
+  `virtuous` was added, narrow. Co-tags: `ice cream → dessert, make-ahead`
+  (and, from 2026-10-21, `herbivore-ish → main`).
 - **2026-08-09 — `something unusual` is retired.** Culturally relative, not a
   real craving, and barely used. `retired_star_ingredients` makes a retired
   value fail with its reason.
@@ -891,7 +891,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   on the plate"*, and chose `knife and fork`: the eating, not the plate. On
   the second, `herbivore-ish` over `plant-o-rama`, `veg VIPs` and renaming
   `carbs party`: the "-ish" says a supporting anchovy or chorizo is fine,
-  where "plant" reads to a visitor as vegetarian.
+  where "plant" reads to a visitor as vegetarian. Then: *"Herbivoreish is only
+  for mains"*, so it is a co-tag rule, `herbivore-ish → main`, and a sprout
+  salad or a cauliflower cheese does not take it.
 - **2026-08-09, #72 — per-recipe tag calls stand and are not "fixed" for
   consistency.** `chicken-cider-stew` and `chicken-sorrel-potato-stew` are
   `freezable`, `pancetta-white-bean-stew` is not: case by case, never added to
