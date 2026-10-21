@@ -8,7 +8,8 @@
 
 # The one thing a recipe is about. Declared, not derived, so a typo fails a
 # test and does not create a new value. `star_ingredient` is optional: a plain
-# sponge, a spice blend or a dressing has no hero and stays blank.
+# sponge, a spice blend or a dressing has no hero and stays blank, and so does
+# a dish with two leads, such as chicken and prawns, or chickpeas and kale.
 star_ingredients:
   - beef
   - chocolate
@@ -16,6 +17,8 @@ star_ingredients:
   # Only where the dish is about the egg. Blank where egg is technique or
   # structure: a quiche, a soufflé, pancakes, a fritter's binder (#187).
   - eggs
+  # Where the fruit is the point, a cake included: apricot polenta cake,
+  # banoffee. Not a sponge that is only flavoured with citrus.
   - fruit
   - game
   # Leaves and brassicas: kale, cavolo nero, cabbage, sprouts, broccoli,
@@ -104,7 +107,8 @@ tags:
   practicalities:
     # Eaten in the morning.
     - breakfast
-    # Not a dish by itself: sides, sauces, stocks, pickles, doughs.
+    # Not a dish by itself: sauces, stocks, pickles, doughs, spice mixes. A
+    # dish served beside a main is `side`.
     - extras
     # Christmas or another named feast, and the dish has to be the feast's
     # own: using up the Seder horseradish does not make a chicken festive.
@@ -113,9 +117,9 @@ tags:
     # `make-ahead` and never a co-tag of it.
     - freezable
     # This could be dinner. Never with dessert, sweet snack, ice cream, drinks
-    # or nibbles; asked about with bakes, extras, starter, breakfast or hot
-    # snack. Egg dishes and savoury pancakes are breakfast or a snack, never a
-    # main; a vegetable fritter or griddle cake may be one.
+    # or nibbles; asked about with bakes, extras, side, starter, breakfast or
+    # hot snack. Savoury pancakes are breakfast or a snack, never a main; a
+    # frittata, baked eggs, a vegetable fritter or a griddle cake may be one.
     - main
     # A substantial part of the dish, or all of it, is prepared well before
     # serving without losing quality, and what is left for the day is trivial
@@ -125,6 +129,9 @@ tags:
     # `cook_time: "None"`, which test_no_cook_tag_implies_no_cook_time holds
     # to the tag. Melting chocolate is prep, not cooking.
     - no-cook
+    # Served beside a main: mash, a gratin, rice, roast or braised veg, a slaw,
+    # a side salad.
+    - side
     # Works as a first course at a dinner party.
     - starter
 

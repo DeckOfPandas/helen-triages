@@ -951,15 +951,24 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `breakfast`, `hot snack`. A derived "dinner" button was the alternative: it
   is wrong at the edges, which are the dishes she scrolls for. Reading "we
   derive" as a proposal, not a deriver, is a session's.
-- **2026-10-21 — egg dishes and savoury pancakes are breakfast or a snack,
-  never a `main`; a vegetable fritter or griddle cake may be one.** The
-  2026-10-11 rule (*"Your observation about eggs and fritters is sound --
-  please add as a rule."*) covered fritters and griddle cakes too, until
-  Helen, about to add several veg fritters: *"I'm about to add a few
-  veg-based fritters, which are just griddle cakes in another hat, right?
-  Let's allow those to be mains, including the one I already have."* Still
-  never: omelette, frittata, baked eggs, savoury pancakes. A veg fritter or
-  griddle cake is a `main` question like `starter` or `hot snack`.
+- **2026-10-21 — a frittata, baked eggs, a vegetable fritter or a griddle
+  cake may be a `main`; savoury pancakes are breakfast or a snack, never a
+  `main`.** Fritters first: *"veg-based fritters, which are just griddle cakes
+  in another hat, right? Let's allow those to be mains."* Then, the same day,
+  shown that the rule took `main` off the kale frittata and kept
+  `herbivore-ish` off green baked eggs, she ruled that both are mains.
+  Each is a `main` question like `starter` or `hot snack`.
+- **2026-10-21 — `side` is a practicality, split out of `extras`.** Helen,
+  retagging Jansson's temptation and a gratin: *"-extras +side -- let's
+  discuss this, there are lots of these"*, then yes to splitting it out.
+  `side` is a dish served beside a main; `extras` keeps what is not a dish at
+  all: sauces, stocks, pickles, doughs, spice mixes.
+- **2026-10-21 — a dish with two leads has no star.** Helen, on a chicken and
+  prawn pad thai: *"recipes with multiple leads have no star"*. Kale with
+  chana loses `greens` on the same ground (*"legumes vs greens"*).
+- **2026-10-21 — `fruit` is a cake's star only where the fruit is the
+  point.** Helen chose it over "never for a cake" and "any fruit cake". The
+  old-fashioned cherry cake keeps it; a lemon drizzle does not take it.
 - **2026-10-11 — no soup is `one-handed food`.** Helen: *"soup is never called
   one-handed food"*. Thick spoonable soups carried it until then.
 - **2026-10-11 — melting chocolate is prep, so a fridge cake is `no-cook`.**

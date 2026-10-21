@@ -426,7 +426,7 @@ term.
 **Practicalities** — *what the occasion demands of you, regardless:*
 <!-- vocab:tags:practicalities start -->
 `breakfast`, `extras`, `festive`, `freezable`, `main`, `make-ahead`, `no-cook`,
-`starter`
+`side`, `starter`
 <!-- vocab:tags:practicalities end -->
 
 Meanings you would not guess:
@@ -434,14 +434,19 @@ Meanings you would not guess:
 - **`main`** — this could be dinner. **Work it out by subtraction, last, once
   the other tags are chosen.** With any of `dessert`, `sweet snack`,
   `ice cream`, `drinks` or `nibbles`: never. With none of those and none of
-  `bakes`, `extras`, `starter`, `breakfast` or `hot snack`: add `main`. With
-  one of that second five, it depends on the dish (a quiche is a bake and
-  dinner; a starter for two may be a main; a sauce is not), so decide and say
-  which way you went in the hand-back list. **Egg dishes are breakfast or a
-  snack, not dinner**: an omelette, a frittata, baked eggs and savoury
-  pancakes are never `main`, even where the source says "for lunch or
-  dinner". A vegetable fritter or griddle cake may be a `main`: decide, and
-  say which way you went.
+  `bakes`, `extras`, `side`, `starter`, `breakfast` or `hot snack`: add
+  `main`. With one of that second six, it depends on the dish (a quiche is a
+  bake and dinner; a starter for two may be a main; a sauce is not), so decide
+  and say which way you went in the hand-back list. **Savoury pancakes are
+  breakfast or a snack, never `main`.** A frittata, baked eggs, a vegetable
+  fritter or a griddle cake may be a `main`: decide, and say which way you
+  went.
+- **`side`** is a dish served beside a main: mash, a gratin, rice, roast veg,
+  a slaw. **`extras`** is what is not a dish at all: a sauce, a stock, a
+  pickle, a dough.
+- **A star stays blank where the dish has two leads** (chicken and prawns).
+  **`fruit` goes on a cake only where the fruit is the point**, never on a
+  sponge that is only flavoured with lemon or orange.
 - **`one-handed food`** — eat it curled on the sofa. Anything that rolls, spills
   or has to be chased is out. A soup never takes it, however thick.
 - **`no-cook`** answers "can I put this on the table without cooking?" A spice

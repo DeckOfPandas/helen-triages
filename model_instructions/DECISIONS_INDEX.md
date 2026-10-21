@@ -151,7 +151,10 @@ argument and the rules each field is read by.
 - 2026-10-10 · §7 · sweets is renamed sweet snack — Helen: "what if we rename 'sweets' to 'sweet snacks', or something else with the word 'sweet' in it?
 - 2026-10-10 · §7 · fiddly and fun is a mood for the PROCESS, and showstopper is narrowed to the RESULT.
 - 2026-10-11 · §7 · main is a real practicality tag, seeded by subtraction, and the same rule is the proposal at ingest.
-- 2026-10-21 · §7 · egg dishes and savoury pancakes are breakfast or a snack, never a main; a vegetable fritter or griddle cake may be one.
+- 2026-10-21 · §7 · a frittata, baked eggs, a vegetable fritter or a griddle cake may be a main; savoury pancakes are breakfast or a snack, never a main.
+- 2026-10-21 · §7 · side is a practicality, split out of extras.
+- 2026-10-21 · §7 · a dish with two leads has no star — Helen, on a chicken and prawn pad thai: "recipes with multiple leads have no star".
+- 2026-10-21 · §7 · fruit is a cake's star only where the fruit is the point.
 - 2026-10-11 · §7 · no soup is one-handed food — Helen: "soup is never called one-handed food".
 - 2026-10-11 · §7 · melting chocolate is prep, so a fridge cake is no-cook.
 - 2026-10-11 · §7 · a sweet snack is named for the piece — A brownie or a bar is one; a cake cut up to serve is not.
