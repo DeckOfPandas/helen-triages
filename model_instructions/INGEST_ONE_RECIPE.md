@@ -437,10 +437,11 @@ Meanings you would not guess:
   `bakes`, `extras`, `starter`, `breakfast` or `hot snack`: add `main`. With
   one of that second five, it depends on the dish (a quiche is a bake and
   dinner; a starter for two may be a main; a sauce is not), so decide and say
-  which way you went in the hand-back list. **Eggs and fritters are breakfast
-  or a snack, not dinner**: an omelette, a frittata, baked eggs, savoury
-  pancakes, griddle cakes and fritters are never `main`, even where the source
-  says "for lunch or dinner".
+  which way you went in the hand-back list. **Egg dishes are breakfast or a
+  snack, not dinner**: an omelette, a frittata, baked eggs and savoury
+  pancakes are never `main`, even where the source says "for lunch or
+  dinner". A vegetable fritter or griddle cake may be a `main`: decide, and
+  say which way you went.
 - **`one-handed food`** — eat it curled on the sofa. Anything that rolls, spills
   or has to be chased is out. A soup never takes it, however thick.
 - **`no-cook`** answers "can I put this on the table without cooking?" A spice

@@ -951,11 +951,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `breakfast`, `hot snack`. A derived "dinner" button was the alternative: it
   is wrong at the edges, which are the dishes she scrolls for. Reading "we
   derive" as a proposal, not a deriver, is a session's.
-- **2026-10-11 — eggs and fritters are breakfast or a snack, never a `main`.**
-  Helen, when eight separate noes were put to her as one rule: *"Your
-  observation about eggs and fritters is sound -- please add as a rule."*
-  Omelette, frittata, baked eggs, savoury pancakes, griddle cakes, fritters.
-  (Taken from `_data/food/taxonomy.yml`; the old journal had no entry.)
+- **2026-10-21 — egg dishes and savoury pancakes are breakfast or a snack,
+  never a `main`; a vegetable fritter or griddle cake may be one.** The
+  2026-10-11 rule (*"Your observation about eggs and fritters is sound --
+  please add as a rule."*) covered fritters and griddle cakes too, until
+  Helen, about to add several veg fritters: *"I'm about to add a few
+  veg-based fritters, which are just griddle cakes in another hat, right?
+  Let's allow those to be mains, including the one I already have."* Still
+  never: omelette, frittata, baked eggs, savoury pancakes. A veg fritter or
+  griddle cake is a `main` question like `starter` or `hot snack`.
 - **2026-10-11 — no soup is `one-handed food`.** Helen: *"soup is never called
   one-handed food"*. Thick spoonable soups carried it until then.
 - **2026-10-11 — melting chocolate is prep, so a fridge cake is `no-cook`.**

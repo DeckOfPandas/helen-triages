@@ -1069,9 +1069,10 @@ regardless.
 proposal.** Never with `dessert`, `sweet snack`, `ice cream`, `drinks` or
 `nibbles`. A recipe with none of those and none of `bakes`, `extras`,
 `starter`, `breakfast`, `hot snack` is a main. With one of that second five
-it is a question to Helen — except that eggs and fritters are breakfast or a
-snack, never dinner (omelette, frittata, baked eggs, savoury pancakes, griddle
-cakes, fritters). `INGEST_ONE_RECIPE.md` §4 asks a new recipe the same thing.
+it is a question to Helen — except that egg dishes and savoury pancakes are
+breakfast or a snack, never dinner (omelette, frittata, baked eggs, savoury
+pancakes). A vegetable fritter or griddle cake may be a main, and is asked.
+`INGEST_ONE_RECIPE.md` §4 asks a new recipe the same thing.
 It is a proposal for her yes or no, never a deriver.
 
 **Co-tags: the test for adding another.** Sound when the implied tag is a

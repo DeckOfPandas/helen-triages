@@ -114,7 +114,8 @@ tags:
     - freezable
     # This could be dinner. Never with dessert, sweet snack, ice cream, drinks
     # or nibbles; asked about with bakes, extras, starter, breakfast or hot
-    # snack. Eggs and fritters are breakfast or a snack, never a main.
+    # snack. Egg dishes and savoury pancakes are breakfast or a snack, never a
+    # main; a vegetable fritter or griddle cake may be one.
     - main
     # A substantial part of the dish, or all of it, is prepared well before
     # serving without losing quality, and what is left for the day is trivial
