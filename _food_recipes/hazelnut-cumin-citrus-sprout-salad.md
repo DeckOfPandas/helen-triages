@@ -8,7 +8,7 @@ prep_time: "10 mins plus chilling"
 cook_time: "10 mins"
 main_ingredients: ["Brussels sprouts", "pomegranate seeds", "hazelnuts", "orange", "cumin seeds", "lemon", "wholegrain mustard"]
 star_ingredient: "greens"
-tags: ["festive", "salad", "virtuous", "extras", "herbivore-ish"]
+tags: ["festive", "salad", "virtuous", "extras"]
 ingredient_groups:
   - name: "salad"
     items:
