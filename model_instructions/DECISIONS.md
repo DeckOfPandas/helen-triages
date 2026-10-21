@@ -867,10 +867,24 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   structure, not a craving; `freezable` is the one genuinely unguessable tag.
   `virtuous` was added, narrow. Co-tags: only `ice cream → dessert,
   make-ahead`.
-- **2026-08-09 — `something unusual` is retired, and `legumes` was considered
-  and not added.** The first is culturally relative, not a real craving and
-  was barely used; the second had two candidates, both already covered.
-  `retired_star_ingredients` makes a retired value fail with its reason.
+- **2026-08-09 — `something unusual` is retired.** Culturally relative, not a
+  real craving, and barely used. `retired_star_ingredients` makes a retired
+  value fail with its reason.
+- **2026-10-21 — `legumes` and `mushrooms` are star ingredients, and `greens`
+  means leaves and brassicas.** From a tag audit once the veg-forward books
+  arrived: `legumes` had been declined in August with two candidates, and now
+  had about ten drafts where the pulse is the point and the star was blank;
+  three mushroom dishes and the leek dishes had nowhere to go; `greens` held
+  tomatoes, peppers, courgettes and beans. Helen: *"Yes"* to each. Tomatoes,
+  courgettes, peppers and alliums stay blank: scattered, and rarely the point.
+- **2026-10-21 — `knife and fork` and `herbivore-ish` are moods.** The audit
+  found 39 draft mains with no mood: plainly cooked centrepieces, and
+  vegetables as the main event. On the first Helen ruled out "proper dinner"
+  (*"a bit Jamie Oliver"*) for fear of it meaning *"there has to be an animal
+  on the plate"*, and chose `knife and fork`: the eating, not the plate. On
+  the second, `herbivore-ish` over `plant-o-rama`, `veg VIPs` and renaming
+  `carbs party`: the "-ish" says a supporting anchovy or chorizo is fine,
+  where "plant" reads to a visitor as vegetarian.
 - **2026-08-09, #72 — per-recipe tag calls stand and are not "fixed" for
   consistency.** `chicken-cider-stew` and `chicken-sorrel-potato-stew` are
   `freezable`, `pancetta-white-bean-stew` is not: case by case, never added to

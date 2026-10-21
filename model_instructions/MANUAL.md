@@ -1023,7 +1023,9 @@ gets wrong.
 **Star ingredient** (optional) is the one thing the recipe is about; a good
 share of the collection correctly leaves it blank. Egg as a binder or
 leavening is not `eggs`; a dish literally about the egg is. Squash is
-`root veg`. `retired_star_ingredients` makes a retired value fail with its
+`root veg`. `greens` is leaves and brassicas only; a tomato, courgette,
+pepper or leek dish whose vegetable is the point has no star, and a bean,
+lentil or chickpea one is `legumes`. `retired_star_ingredients` makes a retired value fail with its
 reason rather than blend into "not declared".
 
 **Tags are two groups, different in kind.** Mood is what you feel like
@@ -1037,7 +1039,10 @@ regardless.
   chocolate is prep, so a fridge cake is `no-cook`.
   `test_no_cook_tag_implies_no_cook_time` ties the tag to `cook_time`.
 - `virtuous` is narrow: lean protein, or genuinely veg-forward with a wine or
-  citrus sauce doing the work.
+  citrus sauce doing the work. `herbivore-ish` is the wide one: the vegetable
+  is the point, whatever else is on the plate, and a dish can be both.
+- `knife and fork` is about how it is eaten, not what is on the plate; a
+  whole roast cauliflower takes it as readily as a saddle of lamb.
 - `ice cream` is the one tag with co-tags: it implies `dessert` and
   `make-ahead` (`co_tags`, `test_co_tag_rules`).
 

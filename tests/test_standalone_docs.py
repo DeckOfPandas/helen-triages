@@ -286,7 +286,7 @@ def test_every_tag_and_star_the_food_doc_prints_is_still_declared():
         f"declares: {stale}"
     )
 
-    star_section = flat.split("one of these 14, or omit")[1].split("It is the one thing")[0]
+    star_section = flat.split("one of these, or omit")[1].split("It is the one thing")[0]
     printed_stars = {s.strip(" `*") for s in re.findall(r"`([^`]+)`", star_section)}
     printed_stars = {s for s in printed_stars if s}
     assert len(printed_stars) >= 12, (

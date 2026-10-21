@@ -9,7 +9,6 @@
 # The one thing a recipe is about. Declared, not derived, so a typo fails a
 # test and does not create a new value. `star_ingredient` is optional: a plain
 # sponge, a spice blend or a dressing has no hero and stays blank.
-# `legumes` was considered and not added; do not re-raise it.
 star_ingredients:
   - beef
   - chocolate
@@ -19,8 +18,14 @@ star_ingredients:
   - eggs
   - fruit
   - game
+  # Leaves and brassicas: kale, cavolo nero, cabbage, sprouts, broccoli,
+  # cauliflower, chard, spinach, lettuce, radicchio. Not tomatoes, courgettes,
+  # peppers or beans.
   - greens
   - lamb
+  # Lentils, chickpeas and beans, fresh or dried, edamame included.
+  - legumes
+  - mushrooms
   - oily fish
   - pork
   - poultry
@@ -66,9 +71,19 @@ tags:
     # some precision. Slow is not fiddly, nor is threading skewers, and the
     # fiddle has to be one a cook would really do. May sit with `showstopper`.
     - fiddly and fun
+    # A vegetable, a pulse or a mushroom is the point of the dish and the
+    # reason to cook it: a whole roast celeriac, chargrilled radicchio, a leek
+    # tart. Not a promise of vegetarian: anchovy, bacon or chorizo in a
+    # supporting role is fine. Wider than `virtuous`, which is about lightness.
+    - herbivore-ish
     # Small, hot and eaten between meals: toasties, fritters, things on toast.
     - hot snack
     - ice cream
+    # A sit-down dinner eaten with a knife and fork and cooked properly: a
+    # roast, a braise, a whole fish, a vegetable centrepiece. About how it is
+    # eaten, not what is on the plate, so it needs no animal. The counterpart
+    # of `one-handed food`.
+    - knife and fork
     # Finger food to pass round with drinks.
     - nibbles
     # Food you can eat curled on the sofa: nothing that rolls, spills or has to
@@ -161,6 +176,10 @@ tag_hints:
     oily fish:  { title: [salmon, mackerel] }
     white fish: { title: [cod, haddock] }
     shellfish:  { title: [prawn] }
+    # Not `bean`: it fires on pork chops with butter beans, where the pork is
+    # the point.
+    legumes:    { title: [lentil, chickpea] }
+    mushrooms:  { title: [mushroom] }
 
 # Words that may open an ingredient tip or note with a capital (#71); every
 # other first word must be lower case. Whether a word is a proper noun is

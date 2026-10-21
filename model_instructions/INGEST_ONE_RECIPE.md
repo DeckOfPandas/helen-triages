@@ -418,8 +418,9 @@ term.
 **Mood** — *what you feel like eating, a craving:*
 <!-- vocab:tags:mood start -->
 `bakes`, `carbs party`, `cheese-tastic`, `dessert`, `drinks`, `fakeaway`,
-`fiddly and fun`, `hot snack`, `ice cream`, `nibbles`, `one-handed food`,
-`salad`, `showstopper`, `soup`, `sweet snack`, `virtuous`
+`fiddly and fun`, `herbivore-ish`, `hot snack`, `ice cream`, `knife and fork`,
+`nibbles`, `one-handed food`, `salad`, `showstopper`, `soup`, `sweet snack`,
+`virtuous`
 <!-- vocab:tags:mood end -->
 
 **Practicalities** — *what the occasion demands of you, regardless:*
@@ -455,6 +456,14 @@ Meanings you would not guess:
   chocolate, a frappé.
 - **`virtuous`** is narrow: lean protein, or genuinely veg-forward with a wine
   or citrus sauce doing the work. Not "contains a vegetable".
+- **`herbivore-ish`** — a vegetable, a pulse or a mushroom is the point of the
+  dish and the reason to cook it: a whole roast celeriac, chargrilled
+  radicchio, a leek tart. Not a promise of vegetarian: anchovy, bacon or
+  chorizo in a supporting role is fine. Wider than `virtuous`; a dish can be
+  both.
+- **`knife and fork`** — a sit-down dinner eaten with a knife and fork and
+  cooked properly: a roast, a braise, a whole fish, a vegetable centrepiece.
+  About how it is eaten, not what is on the plate: it needs no animal.
 - **`ice cream`** implies `dessert` and `make-ahead` — write all three.
 
 And the plainer ones, as Helen means them:
@@ -494,17 +503,21 @@ And the plainer ones, as Helen means them:
 **Two or three tags is normal. None is legitimate.** Being wrong here is cheap
 for her to fix, so propose rather than agonise — but propose only from the list.
 
-### `star_ingredient` — one of these 14, or omit
+### `star_ingredient` — one of these, or omit
 
 <!-- vocab:stars start -->
 `beef`, `chocolate`, `duck`, `eggs`, `fruit`, `game`, `greens`, `lamb`,
-`oily fish`, `pork`, `poultry`, `root veg`, `shellfish`, `white fish`
+`legumes`, `mushrooms`, `oily fish`, `pork`, `poultry`, `root veg`, `shellfish`,
+`white fish`
 <!-- vocab:stars end -->
 
 **It is the one thing the recipe is ABOUT, and about a quarter of her collection
 correctly leaves it blank.** A plain sponge, a dressing, a spice blend has no
 hero. Egg as a binder or a leavening mechanism is not `eggs`; a dish that is
-literally about the egg is. Squash counts as `root veg`. **If you find yourself
+literally about the egg is. Squash counts as `root veg`. `greens` is leaves
+and brassicas only (kale, cabbage, sprouts, broccoli, cauliflower, chard,
+spinach); a tomato, courgette, pepper or leek dish has no star, and a bean,
+lentil or chickpea one is `legumes`. **If you find yourself
 arguing for one, that is the signal to omit it.**
 
 ### `main_ingredients`

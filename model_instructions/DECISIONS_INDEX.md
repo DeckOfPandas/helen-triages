@@ -139,7 +139,9 @@ argument and the rules each field is read by.
 - 2026-09-22 · §6 · main_ingredients drops a size word and keeps a kind; egg size lives in the ingredient list.
 - 2026-08-01 · §7 · "declared" and "filterable" are the same thing: a tag shown on the page with no filter button was proposed and rejected.
 - 2026-08-02 · §7 · one-pot and scalable are retired, freezable is kept, and breakfast, extras, festive and starter are practicalities, not moods.
-- 2026-08-09 · §7 · something unusual is retired, and legumes was considered and not added.
+- 2026-08-09 · §7 · something unusual is retired — Culturally relative, not a real craving, and barely used.
+- 2026-10-21 · §7 · legumes and mushrooms are star ingredients, and greens means leaves and brassicas.
+- 2026-10-21 · §7 · knife and fork and herbivore-ish are moods.
 - 2026-08-09 · §7 · #72 · per-recipe tag calls stand and are not "fixed" for consistency.
 - 2026-08-12 · §7 · #187 · eggs is a star ingredient only where the dish is about the egg.
 - 2026-10-08 · §7 · food gets no tag deriver; it gets a report.
