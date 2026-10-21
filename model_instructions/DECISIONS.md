@@ -600,6 +600,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   opening are two different moments: the recipe sits in `_food_recipes/`, off
   the live site, until she reads the built page and flips the flag herself.
   Mechanical suite failures on the copy are fixed and said afterwards.
+- **2026-10-21 — a tag or star change Helen has agreed with a session row by
+  row needs no flip.** Helen: *"No need to flip the proofread flag for tag
+  changes agreed interactively -- new official ruling."* Her row-by-row answer
+  is the review. The mechanism is the existing one: the tag commit leaves
+  `proofread` alone and `BASELINE_COMMIT` moves to it in the next commit,
+  quoting her rows and proved with the old value. A tag change she has not
+  answered for, or any change to another key in the same commit, still flips.
 - **2026-09-20 — there is no per-recipe exemption list: `HELEN_CLEARED` is
   deleted and is not rebuilt in that shape.** Helen: *"I don't want a
   permanent exemption list. If I change one of those files again, the flag
@@ -4186,10 +4193,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   same shape had closed an issue through a PR Helen opened. PR #1113, with a
   `Closes #N` per line, closed all 22. Keep the trailers for the history, and
   read the issue list after the merge.
-- **2026-09-18 — Helen starts her own dev servers; a session never offers to
-  and never starts one for her.** Helen: *"As a greater point, I start my own
-  local servers, so don't do that."* A session's job is to say which pages
-  need reading and at what URLs, then stop.
+- **2026-10-21 — dev servers are shared work: a session starts one when
+  Helen asks, from its own worktree, and says the URL she can open.** Helen:
+  *"I'm trying a new model where I interact with git at the command line as
+  little as possible, so I don't keep getting tangled up... Let's work
+  together on dev servers from now on."* It replaces 2026-09-18's *"I start
+  my own local servers, so don't do that."* A server on a port the container
+  does not publish (`scripts/browser/serve.sh`'s 4010 and up) is for a
+  session's screenshots, not for her: say the host port, not the inside one.
 - **2026-09-21 — the file tools may read `/workspace/.node-runtime`, and
   nothing may write there.** Helen: *"Reading /workspace/.node-runtime is
   fine, please modify your settings to allow it."* A `Read(...)` allow rule

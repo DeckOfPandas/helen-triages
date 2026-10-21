@@ -64,16 +64,18 @@ All in `model_instructions/` unless a path is given.
 python3 scripts/verify.py    # every check below, in one command -- prefer this
 pytest                       # content and structure; one session at a time
 node --test                  # the JS suite, discovered from the root (§10)
-jekyll-local                 # port 4001, drafts visible          Helen starts it
-jekyll-prod                  # port 4002, exactly what deploys    Helen starts it
+jekyll-local                 # port 4001, drafts visible
+jekyll-prod                  # port 4002, exactly what deploys
 ```
 
-Local URL: `http://localhost:4001/helen-triages/`, then `/food/` or
-`/cocktails/`.
+Inside the container these serve on 4001 and 4002; `.devcontainer/run.sh`
+publishes them to the host as 5998 and 5999, so Helen's browser opens
+`http://localhost:5998/helen-triages/`, then `/food/` or `/cocktails/`.
 
-**The two servers are Helen's to start.** Say which URL needs looking at and
-stop; never start or offer to start one. `scripts/browser/serve.sh` is a
-different thing: a short-lived server the screenshot tooling owns (below).
+**A session starts one when Helen asks**, from its own worktree, in the
+background, and gives her the host URL. `scripts/browser/serve.sh` is a
+different thing: a short-lived server the screenshot tooling owns (below), on
+a port the host cannot reach.
 
 #### `scripts/verify.py`
 

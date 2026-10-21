@@ -101,6 +101,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §4.0 · #1008 · after an agent touches a published file, what happens next comes in three sizes, and the choice is Helen's.
 - 2026-09-14 · §4.0 · #1008 · a flip to proofread: false on a published file raises an issue labelled blocked-on-helen.
 - 2026-09-14 · §4.0 · an agent asked to promote a food draft copies it and never sets rewritten or proofread.
+- 2026-10-21 · §4.0 · a tag or star change Helen has agreed with a session row by row needs no flip.
 - 2026-09-20 · §4.0 · there is no per-recipe exemption list: HELEN_CLEARED is deleted and is not rebuilt in that shape.
 - 2026-10-08 · §4.0 · #1089 · if Helen reads the rendered pages on the branch and says so, the flags go back in a second commit and the baseline moves in a third.
 - 2026-10-10 · §4.0 · a grant to edit live files without the flip is Helen's, is given per batch, and covers only what she named.
@@ -629,7 +630,7 @@ argument and the rules each field is read by.
 - 2026-09-15 · §11 · a leading NAME=value before a command is refused by the hook, and committed wrappers make it unnecessary.
 - 2026-09-15 · §11 · an unquoted ( or ) in a Bash command is refused by the hook.
 - 2026-09-15 · §11 · #1112 · on a PR the agent account opened, the PR description closes the issues, not the commit trailers: one closing keyword per issue per line, never a comma list.
-- 2026-09-18 · §11 · Helen starts her own dev servers; a session never offers to and never starts one for her.
+- 2026-10-21 · §11 · dev servers are shared work: a session starts one when Helen asks, from its own worktree, and says the URL she can open.
 - 2026-09-21 · §11 · the file tools may read /workspace/.node-runtime, and nothing may write there.
 - 2026-09-21 · §11 · Read(//dev/null) and Edit(//dev/null) stay in the settings.
 - 2026-09-21 · §11 · git -C <path> is refused wherever it appears; write the bare command.
