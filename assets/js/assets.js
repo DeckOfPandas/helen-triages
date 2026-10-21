@@ -23,7 +23,7 @@ window.HTF = window.HTF || {};
     );
   }
 
-  /** URL for a root-relative path, e.g. '/assets/img/favicon.svg'. */
+  /** URL for a root-relative path, e.g. '/assets/img/social/food.png'. */
   HTF.asset = function (path) {
     return HTF.base + path;
   };

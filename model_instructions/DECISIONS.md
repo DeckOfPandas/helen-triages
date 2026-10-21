@@ -189,7 +189,20 @@ stated. Italics in quotation marks are Helen's own words.
   food. `scripts/render_social_images.py` renders them from the built site, so
   a changed wordmark means re-running it; the PNGs are committed and wear one
   fixed tape, because random-per-load (#779) is a ruling about a live page.
-  (Replaces the [ ?? ] card for neither site, 2026-09-15.)
+  (Replaces the [ ?? ] card for neither site, 2026-09-15.) The card is the
+  one-line wordmark sized to the card's middle square, so an app's square
+  crop keeps all of it. Helen: *"let's leave as one line. It's one wordmark,
+  then a favicon."*
+- **2026-10-21 — the icons step down by size: the wordmark, then HT over
+  `[ ]`, then `[ ]` alone; each site has its own, told apart by colour.**
+  Helen: *"I think I'm saying words over tape, then letters over brackets,
+  then just brackets."* The wordmark is the 180px home-screen icon; HT over
+  `[ ]` is the 32 and 48px favicon (*"32 and 48: HT over [], that was the
+  realisation"*); `[ ]` alone is the 16px. Cocktails is white on black. Food
+  is *"HT black on white, with [] white on black"*, and its `[ ]` alone stays
+  black on white so the two sites still differ at 16px. Each tab icon keeps a
+  hairline edge, so a white half holds its shape on a light tab strip.
+  (Replaces the black H on magenta shared by both sites, #219.)
 - **Undated — the about link in the header is a bare `??` in the body face: no
   circle, no border, no heading font.** Helen: *"much more minimalist... a
   naked ? in body font and style"*. `.site-about-link` in

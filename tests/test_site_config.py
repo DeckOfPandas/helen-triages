@@ -1545,6 +1545,32 @@ def test_every_link_preview_image_exists_at_the_size_the_layout_claims():
     assert not problems, "\n".join(problems)
 
 
+def test_every_site_has_each_favicon_the_layout_links():
+    """The tab and home-screen icons: _layouts/default.html links
+    assets/img/favicon/<site_key>-<size>.png at the sizes its `sizes=`
+    attributes state. Every site in sites.yml has every one of those files,
+    each a PNG of exactly that size, and no SVG icon is linked, because a
+    browser would take it at every size over the PNGs.
+    """
+    layout = read("_layouts", "default.html")
+    linked = re.findall(r'sizes="(\d+)x\1" href="\{\{ icon_base \| append: \'-(\d+)\.png\'', layout)
+    assert linked, "_layouts/default.html no longer links the per-site favicons"
+    assert all(a == b for a, b in linked), f"a favicon's sizes= and file name disagree: {linked}"
+    assert 'type="image/svg+xml"' not in layout, "an SVG icon is linked again; see the comment above the favicon links"
+
+    sites = yaml.safe_load(read("_data", "sites.yml"))
+    problems = []
+    for key in sites:
+        for size, _ in linked:
+            file = ROOT / "assets" / "img" / "favicon" / f"{key}-{size}.png"
+            if not file.is_file():
+                problems.append(f"{file.relative_to(ROOT)} is missing -- run scripts/render_favicons.py "
+                                f"(or render_social_images.py for the 180)")
+            elif _png_size(file) != (int(size), int(size)):
+                problems.append(f"{file.relative_to(ROOT)} is {_png_size(file)}, the layout claims {size}x{size}")
+    assert not problems, "\n".join(problems)
+
+
 # --- accessibility of the interactive layer ----------------------------------
 
 def test_search_inputs_have_a_label():

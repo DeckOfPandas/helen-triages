@@ -311,7 +311,8 @@ loop to mark.
   key from the page (§3). That is a claim about logic, not file names:
   `cocktail-index.js`, `cocktail-search.js` and `cocktail-make.js` load on
   cocktails pages only. `assets/js/assets.js` loads first on every page.
-- `assets/img/favicon.svg`, `assets/img/chrome/`, `about.html`.
+- `assets/img/favicon/` (one set per site, named by `site_key`),
+  `assets/img/chrome/`, `about.html`.
 
 **Every stylesheet in `assets/css/` imports from `shared/`, and a partial may
 too.** `food.scss` and `cocktails.scss` are the two sites;
@@ -359,6 +360,17 @@ site's vocabulary. `social_image` is the site's link-preview card, a PNG of
 its own wordmark rendered by `scripts/render_social_images.py` from the built
 site. A site-neutral page (about, 404) carries `site_key: food`, so it takes
 food's card and food's description.
+
+The tab and home-screen icons are `assets/img/favicon/<site_key>-<size>.png`,
+linked by `site_key` in `default.html`: `[ ]` alone at 16px, HT over `[ ]` at
+32 and 48, and the wordmark at 180 for a phone's home screen. Food's HT over
+`[ ]` splits black-on-white over white-on-black; cocktails is white on black
+throughout, so the two sites differ by colour at every size. A favicon cannot
+load a web font, so `scripts/render_favicons.py` draws the small ones in a
+browser that has Courier Prime, and `scripts/render_social_images.py` shoots
+the 180 with the cards. Both are run by hand and their PNGs committed; give
+them the headless shell from `/opt/playwright` as `--chrome`, because the full
+Chrome build does not exit in the devcontainer.
 
 **A root-level page must declare `site_key` in its own front matter**, because
 the defaults assign it by directory and there are only two. A page with no
