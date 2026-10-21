@@ -860,6 +860,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `baby gem` are KINDS and stay. This field is the browse axis and the
   ingredient list is the shop-and-cook one; sizes here would give the index
   three buttons for one ingredient.
+- **2026-10-21 — a bake lists its flour, butter, eggs and sugar, and a
+  savoury dish lists the herbs, citrus, cream or wine it tastes of.** The
+  completeness test for bakes was put to Helen against leaving staples out so
+  a search for "eggs" is not buried in cakes: *"If you search for eggs wanting
+  e.g. turkish eggs and see loads of cake, you then hit the filters for
+  breakfast and main or whatever, right??? I think everything goes in main.
+  Cakes look super odd in index page rows without those kinds of
+  ingredients."* On herbs: *"I know herbs shouldn't be a showstopper but I
+  also think people skip the herbs and are confused about why their food
+  doesn't taste of anything."*
 
 ## §7 Taxonomy (food)
 

@@ -533,11 +533,12 @@ arguing for one, that is the signal to omit it.**
 The findability index, and the one field where **generosity is right**.
 
 - **Sweet and baking — the completeness test.** Everything whose absence breaks
-  the recipe. No cap.
+  the recipe. No cap. Flour, butter, eggs and sugar go in.
 - **Savoury — the substitution test.** Not "would this fail without it" but
   "would I improvise around a gap here": the protein, the fat or liquid that
   defines the character, anything you would have to go out and buy, the
-  vegetable that is the point.
+  vegetable that is the point. **Herbs, citrus, cream or wine that the dish
+  tastes of go in too**, however small the amount: they are what people skip.
 
 **Be generous.** Helen's own recipes run to fourteen entries; ingested ones
 average five, and she then adds to them by hand, which she has called "plainly

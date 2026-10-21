@@ -138,6 +138,7 @@ argument and the rules each field is read by.
 - 2026-09-06 · §6 · #762 · where two spellings of one ingredient exist the majority wins, and it is fixed in the data: cornflour, beansprouts.
 - 2026-09-22 · §6 · derive_main_ingredients.py reorders a list and never changes its members, and never writes to _food_recipes/.
 - 2026-09-22 · §6 · main_ingredients drops a size word and keeps a kind; egg size lives in the ingredient list.
+- 2026-10-21 · §6 · a bake lists its flour, butter, eggs and sugar, and a savoury dish lists the herbs, citrus, cream or wine it tastes of.
 - 2026-08-01 · §7 · "declared" and "filterable" are the same thing: a tag shown on the page with no filter button was proposed and rejected.
 - 2026-08-02 · §7 · one-pot and scalable are retired, freezable is kept, and breakfast, extras, festive and starter are practicalities, not moods.
 - 2026-08-09 · §7 · something unusual is retired — Culturally relative, not a real craving, and barely used.

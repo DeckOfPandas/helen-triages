@@ -998,10 +998,13 @@ An unordered set in the data; ordering is presentation.
 end and dimmed, by exact lowercase match.
 
 - **Sweet and baking — the completeness test**: everything whose absence
-  breaks the recipe, no cap.
+  breaks the recipe, no cap. Flour, butter, eggs and sugar included: a cake
+  row without them looks odd, and a search for "eggs" is narrowed by the
+  filters, not by leaving them out.
 - **Savoury — the substitution test**: would I improvise around a gap here?
   The protein, the fat or liquid that defines the character, anything you
-  would have to go and buy, the vegetable that is the point.
+  would have to go and buy, the vegetable that is the point. Herbs, citrus,
+  cream or wine that the dish tastes of go in too: they are what people skip.
 
 **Be generous.** Eight is a first-pass guide that has been read as a budget;
 Helen's own recipes run to fourteen. The number is an output of the test,
