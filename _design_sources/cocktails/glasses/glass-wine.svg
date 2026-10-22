@@ -41,19 +41,19 @@
      transform="translate(18.520834,-164.30625)">
     <path
        id="path3"
-       d="m -11.818052,165.71737 h 28.22222"
+       d="M -11.818052,165.71737 L 16.404168,165.71737"
        style="fill:none;stroke:#4c4c4e;stroke-width:2.82223;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
     <path
        id="path4"
-       d="m -11.818052,165.71737 -4.903613,26.07027 c -0.246944,1.27 -0.388054,2.5753 -0.388054,3.91584 0,10.72446 8.6783335,19.40279 19.4027769,19.40279 10.7244431,0 19.4027771,-8.67833 19.4027771,-19.40279 0,-1.34054 -0.141111,-2.64584 -0.388057,-3.91584 l -4.90361,-26.07027"
+       d="M -11.818052,165.71737 L -16.721665,191.78764 C -16.968609,193.05764 -17.109719,194.36294 -17.109719,195.70348 C -17.109719,206.42794 -8.431386,215.10627 2.293058,215.10627 C 13.017501,215.10627 21.695835,206.42794 21.695835,195.70348 C 21.695835,194.36294 21.554724,193.05764 21.307778,191.78764 L 16.404168,165.71737"
        style="fill:none;stroke:#4c4c4e;stroke-width:2.82223;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
     <path
        id="path5"
-       d="m 2.2930579,243.99877 c 0,7.86694 5.4680537,14.64027 13.1233331,16.36887 l 2.751667,0.59973 h -31.75 l 2.751667,-0.59973 c 7.6552765,-1.7286 13.1233329,-8.50193 13.1233329,-16.36887 z"
+       d="M 2.293058,233.911477 C 2.293058,241.778417 7.761112,248.551747 15.416391,250.280347 L 18.168058,250.880077 L -13.581942,250.880077 L -10.830275,250.280347 C -3.174998,248.551747 2.293058,241.778417 2.293058,233.911477 Z"
        style="fill:none;stroke:#4c4c4e;stroke-width:2.82223;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
     <path
        id="path6"
-       d="m 2.2930579,243.99877 v -28.8925"
+       d="M 2.293058,233.911477 L 2.293058,215.10627"
        style="fill:none;stroke:#4c4c4e;stroke-width:2.82223;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>
