@@ -1,9 +1,16 @@
 # Glass icon sources
 
 Helen's raw Inkscape drawings for the cocktail glass icon set, committed here
-**in their current, unmodified form** — untouched by the normalisation pass
-that produces `_includes/icons/glasses/*.svg` (stripped metadata, bare
-`viewBox`, `.glass-icon-line`/`.glass-icon-solid` classes, no inline styles).
+**in their current form** — untouched by the normalisation pass that produces
+`_includes/icons/glasses/*.svg` (stripped metadata, bare `viewBox`,
+`.glass-icon-line`/`.glass-icon-solid` classes, no inline styles).
+
+Eleven have had their **stem length** changed by script and nothing else, at
+Helen's request (DECISIONS §9.11, #299): absinthe, coupe, flute, goblet,
+margarita, martini, nick-and-nora, pina-colada, sherry, sour and wine. Every
+point below a cut through the stem moved straight down or up; the bowl and the
+foot keep their exact shapes, and their path data is rewritten in absolute
+commands. A redraw from Inkscape replaces a file whole, as before.
 
 This directory is a backup, not a build input: nothing in Jekyll reads it, the
 leading underscore keeps it out of `_site/`, and nobody should point a template
