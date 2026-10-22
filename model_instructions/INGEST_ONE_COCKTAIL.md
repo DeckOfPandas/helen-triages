@@ -270,9 +270,10 @@ test rather than rendering:
 
 <!-- vocab:measures start -->
 `dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
-`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `sprigs` · `strip` ·
-`wedge` · `wedges` · `disc` · `cm log` · `thick coin` · `g` · `half` · `whole` ·
-`(top)` · `(rinse)` · `(splash)` · `(float)` · `(sprinkle)` · `to taste`
+`small pinch` · `each` · `large` · `leaf` · `leaves` · `sprig` · `sprigs` ·
+`strip` · `wedge` · `wedges` · `disc` · `cm log` · `thick coin` · `g` · `half` ·
+`whole` · `(top)` · `(rinse)` · `(splash)` · `(float)` · `(sprinkle)` ·
+`to taste`
 <!-- vocab:measures end -->
 
 Things a source prints as if they were units, and what to do instead (Helen's
@@ -470,8 +471,9 @@ does not give one you cannot pick: that is a `QQ`.
 `Amaro Ciociaro`
 
 **Fortified and aromatised:** `sweet vermouth` · `dry vermouth` ·
-`blanc vermouth` · `rosé vermouth` · `quinquina` · `americano` ·
-`amontillado sherry` · `oloroso sherry` · `tawny port` · `ruby port`
+`blanc vermouth` · `rosé vermouth` · `amber vermouth` · `quinquina` ·
+`americano` · `fino sherry` · `amontillado sherry` · `oloroso sherry` ·
+`tawny port` · `ruby port`
 
 **Wine and sparkling:** `champagne` · `prosecco` · `red wine` · `white wine` ·
 `sake` · `cider`

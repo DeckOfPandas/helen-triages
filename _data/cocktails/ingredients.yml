@@ -41,6 +41,8 @@ measures:
     # A two-word unit: the amount is the only field that can say "small".
     - small pinch
     - each
+    # An egg by its size: `1 large` egg white. The drink's note gives the volume.
+    - large
     - leaf
     - leaves
     - sprig
@@ -730,10 +732,13 @@ fortified_and_aromatised:
   - "dry vermouth"
   - "blanc vermouth"
   - "rosé vermouth"
+  # Martini Riserva Ambrato is one; no bottle declared.
+  - "amber vermouth"
   # Lillet Blanc, Dubonnet, Byrrh.
   - "quinquina"
   # Cocchi Americano Bianco.
   - "americano"
+  - "fino sherry"
   - "amontillado sherry"
   - "oloroso sherry"
   - "tawny port"
@@ -995,8 +1000,10 @@ family_of:
   "dry vermouth": fortified
   "blanc vermouth": fortified
   "rosé vermouth": fortified
+  "amber vermouth": fortified
   "quinquina": fortified
   "americano": fortified
+  "fino sherry": fortified
   "amontillado sherry": fortified
   "oloroso sherry": fortified
   "tawny port": fortified
@@ -1092,11 +1099,13 @@ shelf_of:
   vodka: spirits
   # fortified
   americano: fortified
+  amber vermouth: fortified
   amontillado sherry: fortified
   blanc vermouth: fortified
   rosé vermouth: fortified
   cider: fortified
   dry vermouth: fortified
+  fino sherry: fortified
   oloroso sherry: fortified
   quinquina: fortified
   red wine: fortified

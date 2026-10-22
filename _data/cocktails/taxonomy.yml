@@ -523,6 +523,14 @@ mood_ingredients:
 # deleted. A mood in `moods_by_hand` needs no entry in either map: Helen adds
 # and removes it in the drink file.
 mood_include:
+  queens-park-swizzle:
+    moods: [sharp]
+    why: >-
+      Helen, 2026-10-22: sharp, like 6th-street-swizzle. It is swizzled, so the rule's `slushy` clause excludes it.
+  viking-gimlet:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
   18th-century-cocktail:
     moods: [sharp]
     why: >-
@@ -543,6 +551,18 @@ mood_include:
     moods: [pudding in a glass]
     why: >-
       she calls it one; its crème de cacao is not in the `rich` set, which is cream, whole egg and coconut cream.
+  dr-rieux:
+    moods: [warming]
+    why: >-
+      she calls it warming and it carries no declared warm spice.
+  eeyores-requiem:
+    moods: [strong brown drink]
+    why: >-
+      she calls it one; Campari leads it by volume and is not a base spirit.
+  forbidden-fruit:
+    moods: [warming]
+    why: >-
+      she calls it warming; its ginger is a ginger beer top, which the `warming` set does not hold.
   lemongrass-gimlet:
     moods: [sharp]
     why: >-
@@ -677,6 +697,22 @@ mood_include:
       derivation already gives Rosita that one on its own.
 
 mood_exclude:
+  brandy-alexander:
+    moods: [strong brown drink]
+    why: >-
+      Helen, 2026-10-22: not one. Cognac leads with no citrus, which is the rule; the cream makes it a pudding instead.
+  marigny:
+    moods: [fruity]
+    why: >-
+      Helen, 2026-10-22: not fruity. Its calvados is on the fruit list, but here it sits under cognac and green Chartreuse.
+  pink-lady:
+    moods: [sharp]
+    why: >-
+      Helen, 2026-10-22: not sharp. Gin, lemon and grenadine meet the rule; the egg white softens it. The Gin Sour has the same build and she does call that one sharp, so this is not a rule.
+  peach-me:
+    moods: [strong brown drink]
+    why: >-
+      Helen, 2026-10-22: not one. Bourbon leads with no citrus, which is the rule; muddled cherry, orange and peach schnapps make it a brunch drink instead.
   mastiha-mojito:
     moods: [ice ice baby]
     why: >-
