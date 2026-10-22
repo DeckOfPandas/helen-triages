@@ -3390,6 +3390,16 @@ recipes, ranked by the same star ingredient, then more shared mood tags, then
 more shared other tags plus main ingredients, then shared non-larder
 ingredients, larder staples, and title.
 
+Above it, a food recipe page lists **the published recipes that link to it
+in their own words** (#1104): "Used in…" for a link in an ingredient line,
+"Goes with…" for one anywhere else (tagline, method, notes). Nothing is
+stored: the layout searches every published recipe for `](../<slug>/)`, so a
+promoted draft's links appear by themselves, and a pairing no recipe states
+needs another source when it comes. The two headings are placeholder copy.
+The rows are `_includes/food/recipe-row.html`, the related row's own markup;
+`test_every_link_between_recipes_shows_on_the_page_it_points_at` holds every
+link to its row.
+
 ### 9.14 `heights_mm` sizes the canvas
 
 An icon renders at the height `heights_mm` gives its **viewBox**. A drawing

@@ -317,6 +317,48 @@ layout: default
   </div>
   {% endif %}
 
+  {% comment %} ── Used in … / Goes with … (#1104) ──
+     Every published recipe that links to this one in its own words. A link in
+     an ingredient line means this recipe is used in that one; a link anywhere
+     else (tagline, method, notes) means it goes with it. Links are written
+     `](../<slug>/)` throughout, and `site.food_recipes` is the published set,
+     so a promoted draft's links appear by themselves. Headings are placeholder
+     copy, Helen's to word. tests/test_rendered_pages.py holds every link to
+     its row. {% endcomment %}
+  {% capture _link_to_me %}](../{{ page.slug }}/){% endcapture %}
+  {% assign _used_in_keys = "" %}
+  {% assign _goes_with_keys = "" %}
+  {% for _other in site.food_recipes %}
+    {% unless _other.url == page.url %}
+      {% assign _in_ingredients = _other.ingredient_groups | jsonify %}
+      {% capture _elsewhere %}{{ _other.tagline }}{{ _other.method | jsonify }}{{ _other.method_groups | jsonify }}{{ _other.notes | jsonify }}{% endcapture %}
+      {% if _in_ingredients contains _link_to_me %}
+        {% capture _used_in_keys %}{{ _used_in_keys }}{{ _other.title }}~{{ _other.url }};{% endcapture %}
+      {% elsif _elsewhere contains _link_to_me %}
+        {% capture _goes_with_keys %}{{ _goes_with_keys }}{{ _other.title }}~{{ _other.url }};{% endcapture %}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+  {% assign _linked_lists = "used-in|Used in&hellip;|" | append: _used_in_keys | append: "^goes-with|Goes with&hellip;|" | append: _goes_with_keys | split: "^" %}
+  {% for _list in _linked_lists %}
+    {% assign _bits = _list | split: "|" %}
+    {% assign _entries = _bits[2] | split: ";" | sort_natural %}
+    {% if _entries.size > 0 %}
+    <section class="recipe-related-section recipe-linked-section recipe-linked-section--{{ _bits[0] }}">
+      <h2 class="recipe-section-heading">
+        <span class="section-heading-text">{{ _bits[1] }}</span>
+      </h2>
+      <ul class="recipe-list recipe-related recipe-linked">
+        {% for _entry in _entries %}
+          {% assign _parts = _entry | split: "~" %}
+          {% assign _rel = site.food_recipes | where: "url", _parts[1] | first %}
+          {% include food/recipe-row.html recipe=_rel %}
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  {% endfor %}
+
   {% comment %} ── If you liked this, how about … (#1090; heading final, #1088) ──
      Ranked by: the same star ingredient, then more shared mood tags, then more
      shared other tags plus main ingredients, then more shared non-larder
@@ -382,44 +424,7 @@ layout: default
         {% for _entry in _related_sorted limit: 3 %}
           {% assign _parts = _entry | split: "~" %}
           {% assign _rel = site.food_recipes | where: "url", _parts[6] | first %}
-          <li data-url="{{ _rel.url }}">
-            <div class="recipe-row-content">
-              <a class="recipe-title-link" href="{{ _rel.url | relative_url }}">{{ _rel.title }}</a>
-              {% if _rel.main_ingredients and _rel.main_ingredients.size > 0 %}
-                {% assign _pantry = site.data.food.pantry %}
-                {% assign _lead = "" %}
-                {% assign _tail = "" %}
-                {% for _ing in _rel.main_ingredients %}
-                  {% assign _key = _ing | downcase %}
-                  {% if _pantry contains _key %}
-                    {% assign _tail = _tail | append: _ing | append: "|" %}
-                  {% else %}
-                    {% assign _lead = _lead | append: _ing | append: "|" %}
-                  {% endif %}
-                {% endfor %}
-                {% assign _lead_count = _lead | split: "|" | size %}
-                {% assign _ordered = _lead | append: _tail | split: "|" %}
-                <div class="ingredient-list">
-                  {% for _ing in _ordered %}
-                    {% if forloop.index0 < _lead_count %}<span class="ingredient-pill">{{ _ing }}</span>{% else %}<span class="ingredient-pill ingredient-pill--pantry">{{ _ing }}</span>{% endif %}{% unless forloop.last %}<span class="ingredient-sep">,</span>{% endunless %}
-                  {% endfor %}
-                </div>
-              {% endif %}
-              <div class="badge-group">
-                <div class="badge-group-content">
-                  {% include recipe_badges.html recipe=_rel %}
-                </div>
-              </div>
-            </div>
-            {% comment %} The index row's button, exactly: same class, same key, same `hidden`.
-               shortlist.js finds every `.btn-shortlist` on the document. {% endcomment %}
-            <button type="button"
-                    class="btn-shortlist"
-                    data-shortlist-key="{{ _rel.url }}"
-                    aria-label="shortlist {{ _rel.title }}"
-                    aria-pressed="false"
-                    hidden>shortlist</button>
-          </li>
+          {% include food/recipe-row.html recipe=_rel %}
         {% endfor %}
       </ul>
     </section>
