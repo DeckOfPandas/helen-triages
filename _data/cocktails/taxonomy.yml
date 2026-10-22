@@ -523,6 +523,14 @@ mood_ingredients:
 # deleted. A mood in `moods_by_hand` needs no entry in either map: Helen adds
 # and removes it in the drink file.
 mood_include:
+  queens-park-swizzle:
+    moods: [sharp]
+    why: >-
+      Helen, 2026-10-22: sharp, like 6th-street-swizzle. It is swizzled, so the rule's `slushy` clause excludes it.
+  viking-gimlet:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; the rule's five-poured-ingredient cap excludes it.
   18th-century-cocktail:
     moods: [sharp]
     why: >-
