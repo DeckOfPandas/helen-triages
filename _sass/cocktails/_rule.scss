@@ -1,9 +1,12 @@
+@use "cocktails/palette" as *;
+@use "shared/rule" as *;
+
 // =============================================================================
 // COCKTAILS — the lettering values this site chooses for itself
 // =============================================================================
 // Mirrors _sass/food/_rule.scss. The heading outline is derived from
 // $color-label-stroke, which is not one of the names the shared palette
-// contract guarantees, so it cannot live in shared/_rule.scss. Imported after
+// contract guarantees, so it cannot live in shared/_rule.scss. Loaded after
 // shared/rule and shared/base (see assets/css/cocktails.scss), so this wins.
 //
 // shared/_rule.scss's defaults are solved for dark type on a light ground and
@@ -11,53 +14,49 @@
 // this, headings take a full-strength outline that drowns the highlight copy,
 // and a "shadow" computed from near-white $color-text that reads as a second
 // letterform.
-$emboss-cocktails-vars-emitted: false !default;
-@if not $emboss-cocktails-vars-emitted {
-  :root {
-    // This site's one stroke width, read by `lettering()` for every tier. Down
-    // from the shared value: a stroke on light-on-dark type reads heavier,
-    // because the glyph already blooms into its surround.
-    --emboss-stroke-w: 0.010em;
+:root {
+  // This site's one stroke width, read by `lettering()` for every tier. Down
+  // from the shared value: a stroke on light-on-dark type reads heavier,
+  // because the glyph already blooms into its surround.
+  --emboss-stroke-w: 0.010em;
 
-    // The heading tier. The shadow is almost nothing: a shadow copy only shows
-    // where it extends past the glyph onto the ground, and dark on dark shows
-    // nothing. The white highlight does all the work.
-    --lettering-heading-stroke-c: #{$color-label-stroke};
-    --lettering-heading-light:    #{$color-white};
-    --lettering-heading-shadow:   #{rgba($color-paper, 0.06)};
+  // The heading tier. The shadow is almost nothing: a shadow copy only shows
+  // where it extends past the glyph onto the ground, and dark on dark shows
+  // nothing. The white highlight does all the work.
+  --lettering-heading-stroke-c: #{$color-label-stroke};
+  --lettering-heading-light:    #{$color-white};
+  --lettering-heading-shadow:   #{rgba($color-paper, 0.06)};
 
-    // No rule on this site takes the label tier. Set so a future one falls back
-    // to something chosen rather than to shared's dark-on-light default.
-    --lettering-label-stroke-c: #{$color-label-stroke};
+  // No rule on this site takes the label tier. Set so a future one falls back
+  // to something chosen rather than to shared's dark-on-light default.
+  --lettering-label-stroke-c: #{$color-label-stroke};
 
-    // The display tier: HELEN TRIAGES (`.site-logo-top` in shared/_layout.scss).
-    // Two near-whites, one tight pair, no softening: the same values as
-    // `.drink-card-tape-word` in _cards.scss.
-    --lettering-display-stroke-c: #{$color-label-stroke};
-    --lettering-display-light:    #fdfbfe;
-    --lettering-display-shadow:   rgba(5, 5, 5, 0.9);
+  // The display tier: HELEN TRIAGES (`.site-logo-top` in shared/_layout.scss).
+  // Two near-whites, one tight pair, no softening: the same values as
+  // `.drink-card-tape-word` in _cards.scss.
+  --lettering-display-stroke-c: #{$color-label-stroke};
+  --lettering-display-light:    #fdfbfe;
+  --lettering-display-shadow:   rgba(5, 5, 5, 0.9);
 
-    // `[ COCKTAILS ]` (`.site-logo-word`) is treated as `[ FOOD ]` is: it takes
-    // no tier and falls through to shared's own four-copy shadow, so nothing
-    // here sets `--wordmark-word-stroke` or `--wordmark-word-shadow`. Only the
-    // two fills are set. The card tapes keep their own two-copy pair (MANUAL
-    // §9.13).
-    --wordmark-top-color:   #ECE9EA;
-    --wordmark-word-color:  #ECE9EA;
-  }
-  $emboss-cocktails-vars-emitted: true !global;
+  // `[ COCKTAILS ]` (`.site-logo-word`) is treated as `[ FOOD ]` is: it takes
+  // no tier and falls through to shared's own four-copy shadow, so nothing
+  // here sets `--wordmark-word-stroke` or `--wordmark-word-shadow`. Only the
+  // two fills are set. The card tapes keep their own two-copy pair (MANUAL
+  // §9.13).
+  --wordmark-top-color:   #ECE9EA;
+  --wordmark-word-color:  #ECE9EA;
 }
 
 // There is no h1/h2/h3 rule here: shared/_base.scss's reads
 // `lettering(heading)`, which resolves the properties above. If this site ever
-// needs a heading stroke of its own, an `h1, h2, h3` rule here wins by import
+// needs a heading stroke of its own, an `h1, h2, h3` rule here wins by load
 // order.
 
 // =============================================================================
 // @mixin heading-rule($colour) — the one-bar mark under the index's headings
 // =============================================================================
 // One bar in the section's own colour (`$color-heading-*`). Here because this
-// file is imported before every cocktails partial that could want it. The
+// file is loaded before every cocktails partial that could want it. The
 // geometry is the top bar of `overlapping-rule-double`, not
 // `overlapping-rule-single`'s thin lower bar, and it names the shared $rule-*
 // variables, so if the mark moves on food it moves here.

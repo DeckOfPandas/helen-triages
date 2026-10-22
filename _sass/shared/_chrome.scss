@@ -1,3 +1,6 @@
+@use "shared/theme" as *;
+@use "shared/tokens" as *;
+
 // SITE CHROME, THE COLOURS: the header row's hover, the site icons' fills, the
 // footer's link hovers and the back arrow. The structure of the header and
 // footer is in shared/_layout.scss.

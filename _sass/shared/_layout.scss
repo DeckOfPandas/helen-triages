@@ -1,3 +1,8 @@
+@use "sass:color";
+@use "shared/rule" as *;
+@use "shared/theme" as *;
+@use "shared/tokens" as *;
+
 // SHARED LAYOUT: the CSS for _layouts/default.html and nothing else -- the
 // content column, the header, the wordmark and the footer. If default.html
 // emits a class, its rule belongs here or in shared/_chrome.scss; a site with
@@ -369,7 +374,7 @@ $header-door-gap: 0.1rem;
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: mix($color-clear-text, $color-bg, 82%);
+  color: color.mix($color-clear-text, $color-bg, 82%);
 }
 
 // The SVG is injected by assets/js/decorations.js.
@@ -456,8 +461,8 @@ $tape-protrusion: 0.2rem;
 // The wordmark's sizes, named so the phone block can derive from them (#1086).
 // Here and not in shared/_tokens.scss because they are facts about this one
 // lockup. The ratio is the decision: change the factor and all three move.
-// 0.6667, not 2/3: `/` as division is deprecated in Dart Sass, and this file
-// is loaded through @import so it cannot `@use "sass:math"`.
+// 0.6667, not math.div(2, 3): the phone sizes were tuned at 0.6667, and the
+// exact third moves each of them by a fraction of a pixel.
 $wordmark-top-size:    2rem;     // HELEN TRIAGES
 $wordmark-word-size:   2.5rem;   // the ceiling for [ FOOD ] / [ COCKTAILS ]
 $wordmark-tape-height: 70px;     // the black tape behind the word

@@ -1,10 +1,15 @@
+@use "food/palette" as *;
+@use "shared/lightness";
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
 // =============================================================================
 // HELEN TRIAGES FOOD - RECIPE PAGE: HEADER
 // =============================================================================
 // Everything above the ingredients/method content: the article frame, links,
 // title, tagline, meta grid, the section-heading treatment, the method toggle
 // and the badges row. It also defines %heading-base and the box-tint
-// variables, which later food partials read, so it is imported before them.
+// variables, which later food partials read, so it is loaded before them.
 
 // --- Shared heading base -----------------------------------------------------
 // Every uppercase Courier heading extends this and overrides only what
@@ -144,7 +149,7 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 .recipe-tagline {
   font-size: 0.95rem;
   font-style: italic;
-  color: lighten($color-text, 20%);
+  color: lightness.shift($color-text, 20%);
   // No margins of its own. The gap above comes from .recipe-title and the gap
   // below from .recipe-meta, so a recipe with no tagline keeps the same
   // title-to-meta distance as one with a tagline.

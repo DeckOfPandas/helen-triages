@@ -1,3 +1,7 @@
+@use "sass:color";
+@use "cocktails/palette" as *;
+@use "shared/tokens" as *;
+
 // =============================================================================
 // COCKTAIL CARDS — the index's card, reused for the related drinks on a drink page
 // =============================================================================
@@ -338,7 +342,7 @@ $card-name-step: 0.86;
   margin: 0.5rem 0 0;
 }
 
-.drink-card-sep { color: mix($color-text, $color-surface, 25%); }
+.drink-card-sep { color: color.mix($color-text, $color-surface, 25%); }
 
 // --- the tagline takes the card (#1292) --------------------------------------
 // A resting card has no tagline. Pointing at one, the ingredient line and the

@@ -1,20 +1,22 @@
+@use "sass:color";
+@use "shared/lightness";
+
 // =============================================================================
 // HELEN TRIAGES FOOD - CORE DESIGN PARAMETERS
 // =============================================================================
-
 // --- Raw palette (the swatches everything else is chosen from) ---------------
 // Comments across _sass/food/ call these by their plain colour words: lime
 // (wasabi), violet (blackberry), cerulean (spirulina), aureolin or yellow
 // (banana), orange (tangerine), magenta (dragonfruit), spring green (mint).
 // A swatch nothing chooses from does not belong here.
-$color-wild-wasabi:          #8AE800;
+$color-wild-wasabi:         #8AE800;
 $color-blinging-blackberry:  #7734EA;
 $color-sparkling-spirulina:  #00A7EA;
 $color-blazing-banana:       #FAF100;
 $color-torrid-tangerine:     #FF6B00;
 $color-dazzling-dragonfruit: #FF00C8;
 $color-marauding-mint:       #00FF9F;
-$color-dazzling-dragonfruit-dark: darken($color-dazzling-dragonfruit, 12);   // ~#c4009a
+$color-dazzling-dragonfruit-dark: lightness.shift($color-dazzling-dragonfruit, -12%);   // ~#c4009a
 
 // --- Core Application Canvas -------------------------------------------------
 $color-bg:      #faf7f8;  // Soft chalk white with a minute pink/cool undertone
@@ -55,14 +57,14 @@ $color-name-search-root:    $color-blazing-banana;       // 5. I KNOW WHAT I WAN
 // yellow need deeper steps than the shared one, so if the roots are ever
 // reassigned, $darken-active-lime moves with lime and $darken-active-extra
 // with yellow. Re-measure with scripts/palette_measure.py rather than guess.
-$darken-active:       20;
-$darken-active-extra: 30;
-$darken-active-lime:  22;
-$color-star-active:           darken($color-star-root,           $darken-active);
-$color-mood-active:           darken($color-mood-root,           $darken-active-lime);
-$color-practicalities-active: darken($color-practicalities-root, $darken-active);
-$color-ingredient-active:     darken($color-ingredient-root,     $darken-active);
-$color-name-search-active:    darken($color-name-search-root,    $darken-active-extra);
+$darken-active:       20%;
+$darken-active-extra: 30%;
+$darken-active-lime:  22%;
+$color-star-active:           lightness.shift($color-star-root,           -$darken-active);
+$color-mood-active:           lightness.shift($color-mood-root,           -$darken-active-lime);
+$color-practicalities-active: lightness.shift($color-practicalities-root, -$darken-active);
+$color-ingredient-active:     lightness.shift($color-ingredient-root,     -$darken-active);
+$color-name-search-active:    lightness.shift($color-name-search-root,    -$darken-active-extra);
 
 // The quiet grey: secondary text on both pages and in the shared chrome,
 // which names it as part of the palette contract.
@@ -87,7 +89,7 @@ $faux-bold-stroke: 0.05em;
 $color-white:                #ffffff;
 // The label tier's stroke colour (food/_rule.scss). Derived from the text it
 // outlines rather than a standalone grey, so the two stay related.
-$color-label-stroke:         lighten($color-text, 30%);   // 20% -> 30%, Helen, 2026-08-24
+$color-label-stroke:         lightness.shift($color-text, 30%);   // 20% -> 30%, Helen, 2026-08-24
 
 // --- Cross-recipe links --------------------------------------------------
 // Links, the short-method toggle and the other link-like controls on the
@@ -109,7 +111,7 @@ $color-accent: $color-dazzling-dragonfruit;
 // --- Reusable Structural Accents ---------------------------------------------
 // Nested bullets in the short method: a pale echo of the section rule's
 // spring green, not a hue of its own.
-$color-marker-accent: mix($color-marauding-mint, $color-bg, 35%);
+$color-marker-accent: color.mix($color-marauding-mint, $color-bg, 35%);
 
 // --- The recipe page's colour budget -----------------------------------------
 // The recipe page spends four hues, and the count is the design (MANUAL

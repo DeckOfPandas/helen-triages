@@ -1,8 +1,8 @@
 // SHARED PRINT: the page shell, on paper (#86).
 //
-// Imported by both stylesheets, after every screen partial. `@media print`
+// Loaded by both stylesheets, after every screen partial. `@media print`
 // adds no specificity, so a `display: none` here and a component's own
-// `display` are the same weight and source order decides: import this
+// `display` are the same weight and source order decides: load this
 // earlier and it silently stops working. Both stylesheets, because this
 // styles chrome every site renders.
 //
@@ -42,11 +42,13 @@
     display: none;
   }
 
-  // The shortlist's controls cannot be pressed on paper (#546). Both classes
-  // exist on both sites, which is why the rule is here and not in a site's
-  // print partial.
+  // The shortlist's controls cannot be pressed on paper (#546). All three
+  // classes exist on both sites, which is why the rule is here and not in a
+  // site's print partial. The drafts toggle is named, not reached by its
+  // @extend of .btn-shortlist-only, which cannot cross into shared/.
   .btn-shortlist,
-  .btn-shortlist-only {
+  .btn-shortlist-only,
+  .btn-drafts-toggle {
     display: none;
   }
 

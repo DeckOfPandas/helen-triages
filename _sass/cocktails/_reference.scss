@@ -1,8 +1,12 @@
+@use "cocktails/palette" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
 // =============================================================================
 // COCKTAILS — THE REFERENCE PAGES. #529, cocktails/reference/*.
 // =============================================================================
 // `.ref-*` is this site's own small anatomy for a prose page. Food's reference
-// classes live in _sass/food/, which this site does not import, and
+// classes live in _sass/food/, which this site does not load, and
 // `.cocktail-*` is a drink's anatomy: a title block that reserves a column for
 // a glass, an ingredients grid built round an amount column.
 //
@@ -233,7 +237,7 @@ $ref-col-card:    minmax(6rem, 9rem);
 // =============================================================================
 // One per line with a mark in the gutter, the about page's list idiom (#920),
 // re-drawn because that page's classes are in _sass/food/, which this site
-// does not import. The mark is $color-clear-text, not a hue: this page's one
+// does not load. The mark is $color-clear-text, not a hue: this page's one
 // colour means "bottle" (see the header).
 $ref-list-gutter: 1.3rem;
 

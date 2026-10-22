@@ -1,10 +1,12 @@
+@use "food/palette" as *;
+
 // =============================================================================
 // HELEN TRIAGES FOOD - RECIPE PAGE: PRINT (#86)
 // =============================================================================
 // The recipe page's half of the print stylesheet; the chrome, the paper size
 // and the colour-adjust override are in shared/_print.scss.
 //
-// Imported last, after every other food partial: `@media print` adds no
+// Loaded last, after every other food partial: `@media print` adds no
 // specificity, so source order is what lets a rule here beat its screen rule.
 //
 // The printout looks like the site: no smaller type, no reflow, no monochrome

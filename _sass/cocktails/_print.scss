@@ -1,3 +1,6 @@
+@use "cocktails/palette" as *;
+@use "shared/lightness";
+
 // =============================================================================
 // COCKTAILS — PRINT (#482)
 // =============================================================================
@@ -49,12 +52,12 @@
   // The name tape is untouched: it paints its own black band (MANUAL §9.13).
   $print-ink:        #211f20;  // = food's $color-text
   $print-ink-quiet:  #4f4e4a;  // = food's $color-clear-text
-  $print-mood:        darken($color-banging-bellini, 22%);
-  $print-hassle:      darken($color-charismatic-cosmopolitan, 20%);
-  $print-ship:        darken($color-raucous-reposado, 18%);
-  $print-suggestion:  darken($color-wicked-woowoo, 8%);
-  $print-notes:       darken($color-luminous-lagoon, 24%);
-  $print-glass:       darken($color-electric-absinthe, 26%);
+  $print-mood:        lightness.shift($color-banging-bellini, -22%);
+  $print-hassle:      lightness.shift($color-charismatic-cosmopolitan, -20%);
+  $print-ship:        lightness.shift($color-raucous-reposado, -18%);
+  $print-suggestion:  lightness.shift($color-wicked-woowoo, -8%);
+  $print-notes:       lightness.shift($color-luminous-lagoon, -24%);
+  $print-glass:       lightness.shift($color-electric-absinthe, -26%);
 
   .cocktail {
     color: $print-ink;
@@ -118,8 +121,8 @@
     // run against $print-ink. Scoped to the section heading so the name tape's
     // lettering is untouched.
     .cocktail-section-heading {
-      --lettering-heading-stroke-c: #{darken($print-ink, 5%)};
-      --lettering-heading-light:    #{lighten($print-ink, 65%)};
+      --lettering-heading-stroke-c: #{lightness.shift($print-ink, -5%)};
+      --lettering-heading-light:    #{lightness.shift($print-ink, 65%)};
       --lettering-heading-shadow:   #{rgba($print-ink, 0.16)};
     }
   }

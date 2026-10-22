@@ -1,3 +1,10 @@
+@use "sass:color";
+@use "cocktails/palette" as *;
+@use "cocktails/rule" as *;
+@use "shared/lightness";
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
 // =============================================================================
 // COCKTAILS INDEX — THE CONTROLS
 // =============================================================================
@@ -68,7 +75,7 @@
 // asks for less attention at the top of the page. A mark, not text, so the
 // contrast bar is 3:1. It still goes to the accent under the cursor
 // (shared/_furniture.scss).
-.page-search-go { color: darken($color-clear-text, 15%); }
+.page-search-go { color: lightness.shift($color-clear-text, -15%); }
 
 // No placeholder override here, on purpose (#1123): `$page-search-quiet` in
 // shared/_furniture.scss mixes towards each site's own ground, and a rule in
@@ -185,7 +192,7 @@
   background: none;
   padding: $space-xs $space-md;
   margin: 0.2rem 0.45rem 0.2rem 0;
-  color: lighten($color-text, 22%);
+  color: lightness.shift($color-text, 22%);
   cursor: pointer;
   line-height: 1.3;
 
@@ -277,15 +284,15 @@
 // most of the way to the page's ground.
 .drink-filter--chaos {
   --drink-btn-hover: #{$color-heading-yolo};
-  --drink-btn-hover-word: #{mix($color-heading-yolo, $color-bg, 20%)};
+  --drink-btn-hover-word: #{color.mix($color-heading-yolo, $color-bg, 20%)};
 }
 .drink-filter--mood {
   --drink-btn-hover: #{$color-heading-mood};
-  --drink-btn-hover-word: #{mix($color-heading-mood, $color-bg, 20%)};
+  --drink-btn-hover-word: #{color.mix($color-heading-mood, $color-bg, 20%)};
 }
 .drink-filter--hassle {
   --drink-btn-hover: #{$color-heading-hassle};
-  --drink-btn-hover-word: #{mix($color-heading-hassle, $color-bg, 20%)};
+  --drink-btn-hover-word: #{color.mix($color-heading-hassle, $color-bg, 20%)};
 }
 
 // --- the two ingredient fields -----------------------------------------------
@@ -311,13 +318,13 @@
   color: $color-text;
   // Neutral, not the section's hue (Helen's ruling), and derived the way food
   // derives its own so it follows this palette's grey.
-  border-bottom: 1.5px solid lighten($color-clear-text, 25%);
+  border-bottom: 1.5px solid lightness.shift($color-clear-text, 25%);
   background: transparent;
   margin-bottom: $space-md;
 
   &:focus {
     outline: none;
-    border-bottom-color: lighten($color-clear-text, 5%);
+    border-bottom-color: lightness.shift($color-clear-text, 5%);
   }
 
   &::placeholder { @include index-search-placeholder; }
@@ -360,7 +367,7 @@
 // only this site's colours. Rest is the text colour taken 27% towards the
 // ground; a HAS TO HAVE hit is the hue itself, where food's is the dark of
 // its hue, because this ground is dark.
-$pool-chip-rest: mix($color-text, $color-bg, 73%);
+$pool-chip-rest: color.mix($color-text, $color-bg, 73%);
 
 .btn-pool {
   @include index-chip($pool-chip-rest);

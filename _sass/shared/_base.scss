@@ -1,4 +1,7 @@
-// BASE: element defaults for both sites. Imported after shared/rule, whose
+@use "shared/rule" as *;
+@use "shared/theme" as *;
+
+// BASE: element defaults for both sites. Loaded after shared/rule, whose
 // lettering() mixin the heading rule includes.
 
 * {

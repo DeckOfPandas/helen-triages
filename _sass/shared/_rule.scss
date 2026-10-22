@@ -1,6 +1,10 @@
+@use "shared/lightness";
+@use "shared/theme" as *;
+@use "shared/tokens" as *;
+
 // SHARED RULE: the punched-tape lettering, the blocky rule under headings, and
 // the mixins both indexes' filter panels are built from. Variables and mixins,
-// plus one `:root` block. Imported after the palette and shared/tokens, and
+// plus one `:root` block. Loaded after the palette and shared/tokens, and
 // before shared/base and shared/layout, which both @include lettering().
 //
 // It names only palette-contract variables (MANUAL §2.3); every other colour
@@ -34,12 +38,12 @@ $emboss-offset-large: 1px;                      // was 2px -- see above
 // Only $color-text feeds them, since shared/ may name nothing a palette does
 // not guarantee. The formulas suit dark ink on a light page; cocktails, the
 // other way round, re-points the custom properties in its own _rule.scss.
-$lettering-display-stroke-c: darken($color-text, 12%);   // ~#000 on food
-$lettering-display-light:    lighten($color-text, 53%);  // ~#aaa4a7 on food
+$lettering-display-stroke-c: lightness.shift($color-text, -12%);  // ~#000 on food
+$lettering-display-light:    lightness.shift($color-text, 53%);   // ~#aaa4a7 on food
 $lettering-display-shadow:   rgba($color-text, 0.24);
 
-$lettering-heading-stroke-c: darken($color-text, 5%);    // ~#141213 on food
-$lettering-heading-light:    lighten($color-text, 65%);  // ~#c9c4c7 on food
+$lettering-heading-stroke-c: lightness.shift($color-text, -5%);   // ~#141213 on food
+$lettering-heading-light:    lightness.shift($color-text, 65%);   // ~#c9c4c7 on food
 $lettering-heading-shadow:   rgba($color-text, 0.16);
 
 // Each site re-points this to its own $color-label-stroke in its _rule.scss.
@@ -48,30 +52,21 @@ $lettering-label-stroke-c: $color-text;
 // Custom properties, not Sass variables, so a site or a print block re-points
 // a value once and every rule reading it follows, at any depth, with no
 // specificity fight. The Sass variables above are only the defaults.
-//
-// Guarded because this file is imported more than once into one stylesheet
-// (food/_timings.scss imports it again for the mixins), and without the
-// guard the block is emitted each time.
-$emboss-vars-emitted: false !default;
-@if not $emboss-vars-emitted {
-  :root {
-    // Tier-independent: one stroke width and one offset for every tier.
-    --emboss-stroke-w:    #{$emboss-stroke};
-    --emboss-offset:      #{$emboss-offset};
-    --emboss-offset-lg:   #{$emboss-offset-large};
+:root {
+  // Tier-independent: one stroke width and one offset for every tier.
+  --emboss-stroke-w:    #{$emboss-stroke};
+  --emboss-offset:      #{$emboss-offset};
+  --emboss-offset-lg:   #{$emboss-offset-large};
 
-    --lettering-display-stroke-c: #{$lettering-display-stroke-c};
-    --lettering-display-light:    #{$lettering-display-light};
-    --lettering-display-shadow:   #{$lettering-display-shadow};
+  --lettering-display-stroke-c: #{$lettering-display-stroke-c};
+  --lettering-display-light:    #{$lettering-display-light};
+  --lettering-display-shadow:   #{$lettering-display-shadow};
 
-    --lettering-heading-stroke-c: #{$lettering-heading-stroke-c};
-    --lettering-heading-light:    #{$lettering-heading-light};
-    --lettering-heading-shadow:   #{$lettering-heading-shadow};
+  --lettering-heading-stroke-c: #{$lettering-heading-stroke-c};
+  --lettering-heading-light:    #{$lettering-heading-light};
+  --lettering-heading-shadow:   #{$lettering-heading-shadow};
 
-    --lettering-label-stroke-c:   #{$lettering-label-stroke-c};
-  }
-
-  $emboss-vars-emitted: true !global;
+  --lettering-label-stroke-c:   #{$lettering-label-stroke-c};
 }
 
 // @mixin lettering($tier, $offset): the only way to draw a punched element.
@@ -388,11 +383,11 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 }
 
 // Separate from the type above so each site can place it beside its own
-// nested selectors (`&:focus`, `&::placeholder`). `lighten()` moves a grey
+// nested selectors (`&:focus`, `&::placeholder`). Lightening moves a grey
 // towards white, which on a dark page is away from the ground:
 // shared/_furniture.scss overrides the colour for that reason.
 @mixin index-search-placeholder {
-  color: lighten($color-clear-text, 30%);
+  color: lightness.shift($color-clear-text, 30%);
   font-weight: 300;
 }
 

@@ -1,3 +1,8 @@
+@use "sass:color";
+@use "food/palette" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
 // ============================================================================
 // FILTER LABELS AND CATEGORIES
 // ============================================================================
@@ -84,7 +89,7 @@
     color: $color-text;
     text-shadow: none;
     -webkit-text-stroke: $faux-bold-stroke $color-text;
-    .tag-shape { color: mix($color-star-root, $color-white, 82%); }
+    .tag-shape { color: color.mix($color-star-root, $color-white, 82%); }
   }
 
   &.category--mood .btn-tag.active {
@@ -92,7 +97,7 @@
     color: $color-text;
     text-shadow: none;
     -webkit-text-stroke: $faux-bold-stroke $color-text;
-    .tag-shape { color: mix($color-mood-root, $color-white, 82%); }
+    .tag-shape { color: color.mix($color-mood-root, $color-white, 82%); }
   }
 
   &.category--practicalities .btn-tag.active {
@@ -100,7 +105,7 @@
     color: $color-text;
     text-shadow: none;
     -webkit-text-stroke: $faux-bold-stroke $color-text;
-    .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
+    .tag-shape { color: color.mix($color-practicalities-root, $color-white, 82%); }
   }
 
   // Focus rings (#1086). .btn-tag's base in _buttons.scss gives every chip a
@@ -144,15 +149,15 @@
 
   &.category--star {
     --chip-hover: #{$color-star-active};
-    --chip-tape: #{mix($color-star-root, $color-white, 82%)};
+    --chip-tape: #{color.mix($color-star-root, $color-white, 82%)};
   }
   &.category--mood {
     --chip-hover: #{$color-mood-active};
-    --chip-tape: #{mix($color-mood-root, $color-white, 82%)};
+    --chip-tape: #{color.mix($color-mood-root, $color-white, 82%)};
   }
   &.category--practicalities {
     --chip-hover: #{$color-practicalities-active};
-    --chip-tape: #{mix($color-practicalities-root, $color-white, 82%)};
+    --chip-tape: #{color.mix($color-practicalities-root, $color-white, 82%)};
   }
 
   .category-buttons {

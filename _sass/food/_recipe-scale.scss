@@ -1,3 +1,8 @@
+@use "food/palette" as *;
+@use "food/shopping-list" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
 // =============================================================================
 // THE SCALER ON A RECIPE PAGE (#1005). Portions, under the list.
 // =============================================================================
@@ -7,7 +12,7 @@
 // multiple.
 //
 // The box @extends `%food-number-input` from _shopping-list.scss, so this file
-// must be imported after food/shopping-list. If another file wants the
+// must be loaded after food/shopping-list. If another file wants the
 // placeholder, move it to a partial of its own.
 //
 // `.ingredients li` carries $space-md below each row, so the control sits one

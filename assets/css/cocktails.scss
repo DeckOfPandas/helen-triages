@@ -3,51 +3,64 @@
 // Helen Triages COCKTAILS — compiled stylesheet. Linked only by pages whose
 // site_key is `cocktails` (see _data/sites.yml → cocktails.css).
 //
-// The same shape as food.scss: palette, then the shared structural layer, then
-// this site's own partials.
-@import "cocktails/palette";
-@import "shared/fonts";
-@import "shared/tokens";
+// The same shape as food.scss: palette and the theme the shared layer reads
+// it through, then the shared structural layer, then this site's own
+// partials. Load order is CSS order.
+@use "cocktails/palette";
+@use "shared/theme" with (
+  $color-accent: palette.$color-accent,
+  $color-bg: palette.$color-bg,
+  $color-border: palette.$color-border,
+  $color-clear-text: palette.$color-clear-text,
+  $color-mood-root: palette.$color-mood-root,
+  $color-surface: palette.$color-surface,
+  $color-text: palette.$color-text,
+  $font-body: palette.$font-body,
+  $font-headings: palette.$font-headings,
+  $font-label: palette.$font-label
+);
+@use "shared/fonts";
+@use "shared/tokens";
 // Before shared/base and shared/layout: both @include its lettering() mixin.
-@import "shared/rule";
-@import "shared/base";
+@use "shared/rule";
+@use "shared/base";
 // After shared/rule: it re-points that file's custom properties from a `:root`
 // block of the same specificity, so the later one wins.
-@import "cocktails/rule";
-@import "shared/layout";
+@use "cocktails/rule" as cocktails-rule;
+@use "shared/layout";
 // The chrome's colours (#374). After shared/layout, whose structure it
 // overrides.
-@import "shared/chrome";
+@use "shared/chrome";
 // The page furniture. After chrome, and before cocktails/shortlist, which
 // re-points its hovers.
-@import "shared/furniture";
+@use "shared/furniture";
 // Its one rule that competes with a cocktails rule (`.results-bar .btn-clear`)
 // is two classes deep, so it can sit before the site partials.
-@import "shared/results-bar";
-@import "cocktails/decoration";
+@use "shared/results-bar";
+@use "cocktails/decoration";
 // The leopard on the page ground (#733). After shared/base, whose
 // `body { background }` shorthand would otherwise reset the image.
-@import "cocktails/leopard";
-@import "cocktails/cocktail";
-@import "cocktails/cards";
+@use "cocktails/leopard";
+@use "cocktails/cocktail";
+@use "cocktails/cards";
 // The tape slot both sites' chips wear (#1219); cocktails/filters colours it.
-@import "shared/tag-shape";
-@import "cocktails/filters";
+@use "shared/tag-shape";
+@use "cocktails/filters";
 // The shortlist (#546). After cocktails/cocktail and cocktails/filters: it
 // @extends %cocktail-heading-face and %cocktail-number-input from the first
 // and %drink-btn-base from the second.
-@import "cocktails/shortlist";
+@use "cocktails/shortlist";
 // The export panel (#849), shared because it is identical on both indexes.
-@import "shared/shortlist-export";
+@use "shared/shortlist-export";
 // After cocktails/cards: the parts it clones from a card (.drink-card-name
 // and its siblings) are styled by rules cards defines.
-@import "cocktails/universe";
+@use "cocktails/universe";
 // The reference layer (#529).
-@import "cocktails/reference";
+@use "cocktails/reference";
 // Print last: see shared/_print.scss's header (#86).
 //
 // cocktails/print after shared/print: it overrides rules of equal
 // specificity, and at equal specificity the later one wins. Swapping the two
 // lines would make the drink page print its `make it` state (#482).
-@import "shared/print";
-@import "cocktails/print";
+@use "shared/print";
+@use "cocktails/print" as cocktails-print;

@@ -1,3 +1,5 @@
+@use "shared/lightness";
+
 // =============================================================================
 // HELEN TRIAGES COCKTAILS — PALETTE
 // =============================================================================
@@ -114,9 +116,9 @@ $color-mood-root:  $color-electric-absinthe-deep;
 $color-accent:     $color-electric-absinthe-deep;
 
 // The heading outline: the text colour moved toward the ground, so it stays
-// related to the letters it outlines. On a dark ground that is `darken`;
+// related to the letters it outlines. On a dark ground that is darkening;
 // lightening a near-white ink gives no outline at all.
-$color-label-stroke: darken($color-ink, 30%);
+$color-label-stroke: lightness.shift($color-ink, -30%);
 
 // --- Typography --------------------------------------------------------------
 // $font-headings and $font-body are the family resemblance between the two

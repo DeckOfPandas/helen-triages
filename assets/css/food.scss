@@ -3,64 +3,78 @@
 // Helen Triages FOOD — compiled stylesheet. Linked only by pages whose
 // site_key is `food` (see _data/sites.yml → food.css).
 //
-// Import order matters: palette first, then tokens and the shared layer (which
-// read palette variables), then the index partials, then the recipe page.
+// Load order is CSS order: each module's rules land where it is first
+// loaded. Palette first, then the theme the shared layer reads it through,
+// then tokens and the shared layer, then the index partials, then the recipe
+// page.
 //
-// shared/ is imported by both sites and may not name either. Nothing in
-// shared/ imports anything from food/.
-@import "food/palette";
-@import "shared/fonts";
-@import "shared/tokens";
+// shared/ is loaded by both sites and may not name either. Nothing in
+// shared/ loads anything from food/.
+@use "food/palette";
+@use "shared/theme" with (
+  $color-accent: palette.$color-accent,
+  $color-bg: palette.$color-bg,
+  $color-border: palette.$color-border,
+  $color-clear-text: palette.$color-clear-text,
+  $color-mood-root: palette.$color-mood-root,
+  $color-surface: palette.$color-surface,
+  $color-text: palette.$color-text,
+  $font-body: palette.$font-body,
+  $font-headings: palette.$font-headings,
+  $font-label: palette.$font-label
+);
+@use "shared/fonts";
+@use "shared/tokens";
 // Before shared/base and shared/layout: both @include its lettering() mixin.
-@import "shared/rule";
-@import "shared/base";
-@import "shared/layout";
+@use "shared/rule";
+@use "shared/base";
+@use "shared/layout";
 // The chrome's colours (#374). After shared/layout, whose structure it
 // overrides.
-@import "shared/chrome";
+@use "shared/chrome";
 // The page furniture. After chrome, and before the food partials so a site's
 // own file can re-point a hover.
-@import "shared/furniture";
+@use "shared/furniture";
 // Before the food partials: food/recipe-list reads its $results-bar-height.
 // Its one rule that competes with a food rule (`.results-bar .btn-clear`) is
-// two classes deep, so import order does not decide it.
-@import "shared/results-bar";
+// two classes deep, so load order does not decide it.
+@use "shared/results-bar";
 // After shared/rule: it re-points one of that file's custom properties.
-@import "food/rule";
-@import "food/recipe-list";
+@use "food/rule" as food-rule;
+@use "food/recipe-list";
 // The tape slot both sites' chips wear (#1219); its food colours are in the
 // partials below.
-@import "shared/tag-shape";
-@import "food/badges";
-@import "food/buttons";
-@import "food/category-labels";
-@import "food/search";
-@import "food/active-filter-states";
+@use "shared/tag-shape";
+@use "food/badges";
+@use "food/buttons";
+@use "food/category-labels";
+@use "food/search";
+@use "food/active-filter-states";
 // recipe-header must stay first of the recipe partials: %heading-base and the
 // box-tint variables are defined there and used by the files after it.
-@import "food/recipe-header";
-@import "food/recipe-ingredients-method";
-@import "food/recipe-notes-body";
-@import "food/recipe-annotations";
+@use "food/recipe-header";
+@use "food/recipe-ingredients-method";
+@use "food/recipe-notes-body";
+@use "food/recipe-annotations";
 // The shortlist (#546). After recipe-list: it reads that file's
 // $recipe-title-size and $recipe-title-line-height.
-@import "food/shortlist";
+@use "food/shortlist";
 // The export panel (#849), shared because it is identical on both indexes.
-@import "shared/shortlist-export";
+@use "shared/shortlist-export";
 // The shopping list (#801). Defines %food-number-input.
-@import "food/shopping-list";
+@use "food/shopping-list";
 // After shopping-list: it @extends %food-number-input and overrides its
 // width, and the override has to come later in the source to win.
-@import "food/recipe-scale";
+@use "food/recipe-scale";
 // After recipe-notes-body: the about page sits on .recipe-body-content and
 // overrides parts of it.
-@import "food/about";
+@use "food/about";
 // Both after recipe-header: they @extend %heading-base and override parts of
 // it, which only works from later in the source.
-@import "food/temperature-chart";
-@import "food/timings";
+@use "food/temperature-chart";
+@use "food/timings";
 // Print last, both of them: `@media print` adds no specificity, so a print
 // rule and the screen rule it overrides are the same weight and source order
 // decides (#86). shared/print before food/print, shell then page.
-@import "shared/print";
-@import "food/print";
+@use "shared/print";
+@use "food/print" as food-print;

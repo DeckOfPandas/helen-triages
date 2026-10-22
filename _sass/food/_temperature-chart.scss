@@ -1,3 +1,10 @@
+@use "sass:color";
+@use "sass:list";
+@use "food/palette" as *;
+@use "food/recipe-header" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
 // =============================================================================
 // HELEN TRIAGES FOOD - THE TEMPERATURE CHART
 // =============================================================================
@@ -87,19 +94,23 @@ $tc-threshold-height: 1.35rem;
 // position the ticks and the bars compute for the same figure, so they cannot
 // disagree. The line at $tc-max is drawn one pixel inside the edge, where a
 // line at the edge would be clipped; the left edge ($tc-min) carries none.
-$tc-gridline-minor: mix($color-border, $color-bg, 50%);
+$tc-gridline-minor: color.mix($color-border, $color-bg, 50%);
 $tc-gridlines: ();
 @for $fives from 0 through 60 {
   $deg: $fives * 5;
   @if $deg > $tc-min and $deg <= $tc-max {
-    $at: if($deg == $tc-max,
-             "100% - 1px",
-             "100% * #{$deg - $tc-min} / #{$tc-max - $tc-min}");
-    $line: if($deg % 10 == 0, $color-border, $tc-gridline-minor);
-    $tc-gridlines: append($tc-gridlines, transparent calc(#{$at}), comma);
-    $tc-gridlines: append($tc-gridlines, $line calc(#{$at}), comma);
-    $tc-gridlines: append($tc-gridlines, $line calc(#{$at} + 1px), comma);
-    $tc-gridlines: append($tc-gridlines, transparent calc(#{$at} + 1px), comma);
+    $at: "100% * #{$deg - $tc-min} / #{$tc-max - $tc-min}";
+    @if $deg == $tc-max {
+      $at: "100% - 1px";
+    }
+    $line: $tc-gridline-minor;
+    @if $deg % 10 == 0 {
+      $line: $color-border;
+    }
+    $tc-gridlines: list.append($tc-gridlines, transparent calc(#{$at}), comma);
+    $tc-gridlines: list.append($tc-gridlines, $line calc(#{$at}), comma);
+    $tc-gridlines: list.append($tc-gridlines, $line calc(#{$at} + 1px), comma);
+    $tc-gridlines: list.append($tc-gridlines, transparent calc(#{$at} + 1px), comma);
   }
 }
 
