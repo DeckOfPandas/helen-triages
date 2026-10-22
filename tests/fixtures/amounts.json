@@ -75,6 +75,16 @@
   }
  },
  {
+  "amount": "1 drop",
+  "number": 1.0,
+  "unit": "drop",
+  "ml": null,
+  "js": {
+   "quantity": 1,
+   "unit": "drop"
+  }
+ },
+ {
   "amount": "1 heaping oz",
   "number": 1.0,
   "unit": "oz",
@@ -82,6 +92,16 @@
   "js": {
    "quantity": 1,
    "unit": "heaping oz"
+  }
+ },
+ {
+  "amount": "1 large",
+  "number": 1.0,
+  "unit": "large",
+  "ml": null,
+  "js": {
+   "quantity": 1,
+   "unit": "large"
   }
  },
  {
@@ -492,6 +512,16 @@
   "js": {
    "quantity": 6,
    "unit": "dash"
+  }
+ },
+ {
+  "amount": "6 drops",
+  "number": 6.0,
+  "unit": "drops",
+  "ml": null,
+  "js": {
+   "quantity": 6,
+   "unit": "drop"
   }
  },
  {
