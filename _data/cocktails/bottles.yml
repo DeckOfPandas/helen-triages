@@ -288,7 +288,7 @@ bottles:
   # --- gin ---
   # Opihr, not Ophir; the misspellings stay as aliases (#701).
   "Opihr":
-    generic: "speciality"
+    generic: "London dry gin"
     aliases: ["Ophir", "Ophir spiced London dry gin", "Ophir Spiced Gin",
               "Opihr Oriental Spiced", "Opihr Oriental Spiced London Dry Gin"]
   "Beefeater":
@@ -411,6 +411,9 @@ bottles:
     generic: "calvados"
 
   # --- sherry, vermouth and aromatised wine ---
+  "Lustau Fino del Puerto":
+    generic: "fino sherry"
+    aliases: ["Lustau Fino Del Puerto Solera Familiar", "Lustau Fino del Puerto Solera Familiar"]
   "Lustau Amontillado":
     generic: "amontillado sherry"
     aliases: ["Lustau Amontillado sherry", "Lustau Los Arcos Amontillado"]
@@ -551,6 +554,8 @@ bottles:
     generic: "crème de banane"
   "Gabriel Boudier Curaçao Orange":
     generic: "orange Curaçao"
+  "Gabriel Boudier Triple Sec":
+    generic: "triple sec"
   "Gabriel Boudier Crème de Menthe":
     generic: "crème de menthe"
   "Gabriel Boudier Liqueur de Gingembre":

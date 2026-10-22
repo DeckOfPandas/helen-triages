@@ -31,6 +31,7 @@ excluded_units:
   - pinch
   - small pinch
   - each
+  - large
   - leaf
   - leaves
   - sprig
@@ -426,6 +427,11 @@ bottles:
     size_ml: 700
     gbp: 17
     confidence: medium
+  # Helen's figure.
+  "Gabriel Boudier Triple Sec":
+    size_ml: 500
+    gbp: 24
+    confidence: high
   "Briottet Curaçao Bleu":
     size_ml: 700
     gbp: 18
@@ -599,6 +605,11 @@ bottles:
   "Dolin Blanc":
     size_ml: 750
     gbp: 14
+    confidence: high
+  # Helen's figure.
+  "Lustau Fino del Puerto":
+    size_ml: 750
+    gbp: 18
     confidence: high
   "Lustau Amontillado":
     size_ml: 750
@@ -780,6 +791,10 @@ default_bottles:
   # each a recipe's `suggestion`, not the category's price (DECISIONS §9.3.5).
   moderately aged rum: ["Planteray 5 Year Old Barbados", "Havana Club 7 year old"]
 
+  # Gabriel Boudier's is a 50cl bottle at nearly half as much again per
+  # litre, and a drink that wants it names it.
+  triple sec: ["Cointreau", "L'Original Combier Triple Sec"]
+
   reposado tequila: ["Rooster Rojo Tequila Reposado", "Patrón Reposado"]
   añejo tequila: ["Rooster Rojo Tequila Añejo", "Patrón Añejo"]
 
@@ -851,6 +866,9 @@ generics:
   # No bottle is declared (bottles.yml `not_reached_for`), so this row is the
   # whole price.
   tawny port:         { gbp_per_litre_min: 20.00, gbp_per_litre_max: 40.00, basis: "GBP 15-30 / 75cl", confidence: low }
+  # No bottle: a friend made the Bamboo with one. Martini Riserva Ambrato is
+  # the usual supermarket one.
+  amber vermouth:     { gbp_per_litre_min: 17.14, gbp_per_litre_max: 28.57, basis: "GBP 12-20 / 70cl, not shop-checked", confidence: low }
   # Helen's figure (#1351), the flaggpunsch shape: the bottle is in the basis
   # and is not declared.
   ruby port:          { gbp_per_litre_min: 22.67, gbp_per_litre_max: 22.67, basis: "Taylor's Fine Ruby, GBP 17 / 75cl", confidence: high }
@@ -866,6 +884,8 @@ generics:
   pisco:              { gbp_per_litre_min: 34.29, gbp_per_litre_max: 45.71, basis: "GBP 24-32 / 70cl", confidence: medium }
   apple brandy:       { gbp_per_litre_min: 40.00, gbp_per_litre_max: 57.14, basis: "GBP 28-40 / 70cl", confidence: medium }
   navy strength gin:  { gbp_per_litre_min: 42.86, gbp_per_litre_max: 57.14, basis: "GBP 30-40 / 70cl", confidence: medium }
+  # No bottle declared since Opihr turned out to be a London dry.
+  speciality:         { gbp_per_litre_min: 35.71, gbp_per_litre_max: 57.14, basis: "GBP 25-40 / 70cl, the craft-gin range, not shop-checked", confidence: low }
   apple schnapps:     { gbp_per_litre_min: 22.86, gbp_per_litre_max: 31.43, basis: "GBP 16-22 / 70cl", confidence: low }
   # Helen's figure (#1013); 70cl assumed.
   peach schnapps:     { gbp_per_litre_min: 17.14, gbp_per_litre_max: 17.14, basis: "GBP 12 / 70cl", confidence: high }

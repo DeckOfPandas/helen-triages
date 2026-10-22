@@ -166,6 +166,8 @@ bottles:
   "Lillet Blanc":                     { abv: 17,   confidence: high }
   # Helen confirmed the 16.5 (#1351).
   "Cocchi Americano":                 { abv: 16.5, confidence: medium }
+  # Helen's figure.
+  "Lustau Fino del Puerto":           { abv: 15,   confidence: high }
   "Lustau Amontillado":               { abv: 18.5, confidence: medium }
   "Barbadillo Principe":              { abv: 19,   confidence: medium }
   "Lustau Don Nuño Oloroso":          { abv: 20,   confidence: medium }
@@ -178,6 +180,8 @@ bottles:
   "Pierre Ferrand Dry Curaçao":       { abv: 40,   confidence: high }
   "Briottet Curaçao Orange":          { abv: 25,   confidence: medium }
   "Gabriel Boudier Curaçao Orange":   { abv: 25,   confidence: medium }
+  # Helen's figure.
+  "Gabriel Boudier Triple Sec":       { abv: 38.5, confidence: high }
   "Briottet Curaçao Bleu":            { abv: 25,   confidence: medium }
 
   # --- other liqueurs ----------------------------------------------------
@@ -298,6 +302,11 @@ generics:
   tawny port:             { abv: 20,   confidence: high }
   # Helen's figure (#1351).
   ruby port:              { abv: 20,   confidence: high }
+  # Martini Riserva Ambrato's figure; the drink's bottle is unknown.
+  amber vermouth:         { abv: 16,   confidence: medium }
+  # A gin led by a botanical other than juniper; no bottle is declared since
+  # Opihr turned out to be a London dry.
+  speciality:             { abv: 40,   confidence: medium }
   # Helen's figure (#1351).
   Japanese whisky:        { abv: 43,   confidence: high }
   # Bottled-in-bond is 100 US proof by definition.
