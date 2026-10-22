@@ -543,6 +543,18 @@ mood_include:
     moods: [pudding in a glass]
     why: >-
       she calls it one; its crème de cacao is not in the `rich` set, which is cream, whole egg and coconut cream.
+  dr-rieux:
+    moods: [warming]
+    why: >-
+      she calls it warming and it carries no declared warm spice.
+  eeyores-requiem:
+    moods: [strong brown drink]
+    why: >-
+      she calls it one; Campari leads it by volume and is not a base spirit.
+  forbidden-fruit:
+    moods: [warming]
+    why: >-
+      she calls it warming; its ginger is a ginger beer top, which the `warming` set does not hold.
   lemongrass-gimlet:
     moods: [sharp]
     why: >-
@@ -677,6 +689,10 @@ mood_include:
       derivation already gives Rosita that one on its own.
 
 mood_exclude:
+  brandy-alexander:
+    moods: [strong brown drink]
+    why: >-
+      Helen, 2026-10-22: not one. Cognac leads with no citrus, which is the rule; the cream makes it a pudding instead.
   mastiha-mojito:
     moods: [ice ice baby]
     why: >-
