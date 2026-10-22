@@ -2692,8 +2692,8 @@ LINKED_SECTION = re.compile(
 def test_every_link_between_recipes_shows_on_the_page_it_points_at(prod_site):
     """#1104. When a published recipe links to another outside its ingredient
     lines (tagline, method, notes), each appears under the other's "goes
-    with". A link in an ingredient line names a component and never counts.
-    Nothing else appears in the list.
+    with" -- unless either links the other in an ingredient line, which names
+    a component, not a pairing. Nothing else appears in the list.
 
     Published is whatever the production build made a page for, so the gate
     decides, not this test.
@@ -2701,7 +2701,7 @@ def test_every_link_between_recipes_shows_on_the_page_it_points_at(prod_site):
     built = {p.parent.name for p in _recipe_pages(prod_site)}
     assert len(built) > 20, f"only {len(built)} recipe pages built"
 
-    expected = {}
+    pairings, components = set(), set()
     for path in sorted((ROOT / "_food_recipes").glob("*.md")):
         if path.stem not in built:
             continue
@@ -2709,9 +2709,12 @@ def test_every_link_between_recipes_shows_on_the_page_it_points_at(prod_site):
         in_ings = set(CROSS_RECIPE_LINK.findall(yaml.safe_dump(fm.get("ingredient_groups") or [])))
         elsewhere = set(CROSS_RECIPE_LINK.findall(yaml.safe_dump(
             [fm.get("tagline"), fm.get("method"), fm.get("method_groups"), fm.get("notes")])))
-        for target in (elsewhere - in_ings) & built:
-            expected.setdefault(target, set()).add(path.stem)
-            expected.setdefault(path.stem, set()).add(target)
+        pairings |= {frozenset((path.stem, t)) for t in elsewhere & built}
+        components |= {frozenset((path.stem, t)) for t in in_ings & built}
+    expected = {}
+    for pair in pairings - components:
+        for one in pair:
+            expected.setdefault(one, set()).update(pair - {one})
     assert expected, (
         "No published recipe links to another, so this test checks nothing. "
         "Either the links' `](../<slug>/)` form changed or the corpus walk did."
