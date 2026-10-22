@@ -792,6 +792,51 @@ def test_github_public_status_asks_for_a_status_and_nothing_else(url):
                    for line in lines), f"a logged-out status check sent more: {lines!r}"
 
 
+# --- check-link.sh: does a link resolve? -------------------------------------
+
+@pytest.mark.parametrize("args", [
+    [],
+    ["http://example.com/"],
+    ["ftp://example.com/"],
+    ["file:///etc/passwd"],
+    ["https://example.com/", "--output", "tmp/x"],
+    ["-o", "tmp/x", "https://example.com/"],
+    ["-K", "tmp/config"],
+    ["https://user@example.com/"],
+    ["https://example.com/../x"],
+    ["https://example.com/a b"],
+    ["https://example.com/;id"],
+    ["https://example.com/$HOME"],
+    ["http://localhost/"],
+    ["http://localhost:4001"],
+    ["http://localhost:4001.example.com/"],
+    ["http://localhost:4001@example.com/"],
+    ["http://127.0.0.1:4001/"],
+])
+def test_check_link_refuses_other_urls_and_options(args):
+    _assert_refused("check-link.sh", args)
+
+
+@pytest.mark.parametrize("url", [
+    "https://www.diffordsguide.com/cocktails/recipe/3502/el-mediterraneo",
+    "https://www.deathandcompanymarket.com/blogs/recipes/flor-de-jerez?x=1&y=2",
+    "http://localhost:4001/helen-triages/cocktails/drafts/5-final-proofread/bamboo/",
+])
+def test_check_link_writes_nothing_and_sends_no_credential(url):
+    lines = _accepted_lines("check-link.sh", [url])
+    assert lines[0] == "curl"
+    assert lines[-1] == url
+    assert lines[lines.index("--output") + 1] == "/dev/null"
+    assert lines.count("--output") == 1 and "-o" not in lines
+    assert not any(line in ("-H", "--header", "-u", "--user", "-K", "--config")
+                   for line in lines), lines
+    if url.startswith("http://"):
+        assert "--location" not in lines, "a localhost check follows no redirect"
+        assert lines[lines.index("--proto") + 1] == "=http"
+    else:
+        assert lines[lines.index("--proto-redir") + 1] == "=https"
+
+
 # --- main-ci-status.sh: is the site deploying? ------------------------------
 #
 # A red `main` is a deploy outage: the suite gates the deploy, so one red merge
@@ -1035,6 +1080,10 @@ REVIEWED_OPEN_RULES = {
     "Bash(sh scripts/gh-read.sh *)",
     "Bash(sh scripts/gh-write.sh *)",
     "Bash(sh scripts/github-public-status.sh *)",
+    # One https URL, or one http://localhost:<port>/ URL, checked character
+    # by character; the body always goes to /dev/null and no option passes
+    # through, so `-o`, `-K` and `--config` never reach curl.
+    "Bash(sh scripts/check-link.sh *)",
     "Bash(sh scripts/git-push-agent.sh *)",
     "Bash(sh scripts/git-fetch-agent.sh *)",
     "Bash(sh scripts/git-clone-agent.sh *)",

@@ -4212,7 +4212,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   visibility with `curl -o`; the `@` read and the `-o` write are invisible to
   the checker, and `api` is also the door to a merge, so no allow rule could
   cover them. Hence `gh-write.sh` (three writes, a body under `tmp/`, base
-  `main`, the three repos) and `github-public-status.sh`.
+  `main`, the three repos), `github-public-status.sh` and `check-link.sh`
+  (#1431: one https URL or one localhost one, body to `/dev/null`).
 - **2026-09-15 — never `awk` (nor `gawk`, `mawk`, `nawk`); `guard-awk.py`
   refuses them as command words.** Helen's README draft listed "Never `awk`
   (same)" under "Never `sed`" and nothing enforced it. Asked whether she
