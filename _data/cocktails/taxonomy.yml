@@ -697,6 +697,10 @@ mood_exclude:
     moods: [fruity]
     why: >-
       Helen, 2026-10-22: not fruity. Its calvados is on the fruit list, but here it sits under cognac and green Chartreuse.
+  pink-lady:
+    moods: [sharp]
+    why: >-
+      Helen, 2026-10-22: not sharp. Gin, lemon and grenadine meet the rule; the egg white softens it. The Gin Sour has the same build and she does call that one sharp, so this is not a rule.
   peach-me:
     moods: [strong brown drink]
     why: >-
