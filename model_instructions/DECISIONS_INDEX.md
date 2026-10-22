@@ -421,7 +421,7 @@ argument and the rules each field is read by.
 - 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the drink page draws the FIRST listed glass that has artwork.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · on the drink page the glass is compressed and drawn as a fraction of the title block.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #347 · old fashioned is the canonical glass name and rocks fails a test.
-- 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #299 · the glasses' stem and base proportions stay as drawn.
+- 2026-10-22 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #299 · a stemmed glass's stem is one of three lengths: short 15%, medium 36% or long 57% of the drawing's height.
 - 2026-08-27 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #491 · any is not a glass — Helen: "when someone tells me to use an old fashioned glass I always automatically assume I can use any glass I like, so there's no need to have 'any' as a …
 - 2026-08-31 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #355 · a session does not redraw Helen's glasses.
 - 2026-08-31 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #601 · a card's glass has its own curve: ratio × 0.5 + 0.5, plus headroom.
