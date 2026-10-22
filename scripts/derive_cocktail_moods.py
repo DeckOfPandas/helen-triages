@@ -98,7 +98,33 @@ MAX_POURS = 8
 BARSPOON_ML = 5
 
 
-def spirit_volumes(entries, measures, family_of, whisky):
+QQ_HINT = re.compile(r"^\s*QQ\b\s*(.*?)\s*$")
+
+
+def qq_hint(name, sets):
+    """What a `QQ <hint>` generic is, read through the QQ: `("generic", g)`,
+    `("family", f)` or None.
+
+    A QQ is Helen's question about which bottle, not about whether the drink
+    has gin in it, so it must not withhold a mood (DECISIONS §9.1.1). Only a
+    hint that is exactly a declared spirit generic or a family name (or its
+    alias) counts, ignoring case; anything else reads as nothing, as an
+    untyped line always has.
+    """
+    match = QQ_HINT.match(name)
+    if not match or not match.group(1):
+        return None
+    hint = match.group(1).lower()
+    for generic in sets["_family_of"]:
+        if generic.lower() == hint:
+            return ("generic", generic)
+    family = sets["_family_aliases"].get(hint, hint)
+    if family in sets["_families"]:
+        return ("family", family)
+    return None
+
+
+def spirit_volumes(entries, measures, family_of, whisky, sets=None):
     """Millilitres per spirit family, not per ingredient.
 
     Single ingredients tie (the Sazerac takes equal cognac, rye and bourbon),
@@ -114,7 +140,12 @@ def spirit_volumes(entries, measures, family_of, whisky):
             name = str(generic)
             if name in NOT_A_POUR:
                 continue
-            family = "whisky" if name in whisky else family_of.get(name)
+            hint = qq_hint(name, sets) if sets else None
+            if hint and hint[0] == "family":
+                family = hint[1]
+            else:
+                name = hint[1] if hint else name
+                family = "whisky" if name in whisky else family_of.get(name)
             if family:
                 out[family] = out.get(family, 0) + millilitres_
     return out
@@ -189,9 +220,16 @@ def derive(drink, sets, step_words, families):
 
     # Generics and characters together: a mood set may name a character, as
     # `blackstrap` is (#314).
+    # A `QQ <hint>` joins as the generic it names; a family hint has no
+    # generic to join as, so it is kept apart and stands in for a base spirit.
     present = set()
+    qq_families = set()
     for entry in entries:
-        present |= {str(g) for g in listed(entry.get("generic"))}
+        for g in listed(entry.get("generic")):
+            hint = qq_hint(str(g), sets)
+            if hint and hint[0] == "family":
+                qq_families.add(hint[1])
+            present.add(hint[1] if hint else str(g))
         present |= {str(c) for c in listed(entry.get("character"))}
 
     def has(name):
@@ -219,7 +257,7 @@ def derive(drink, sets, step_words, families):
     # `strong brown drink`: whisky leads, or another aged base spirit leads
     # and the drink is not a sour. taxonomy.yml says why each clause is here.
     by_family = spirit_volumes(entries, sets["_measures"],
-                               sets["_family_of"], sets["_whisky"])
+                               sets["_family_of"], sets["_whisky"], sets)
     lengthened = has("lengthener")
     # `churned` disqualifies a strong brown drink. It is narrower than
     # `mood_serve_ice` on purpose: a big block of ice is how a strong brown
@@ -257,7 +295,8 @@ def derive(drink, sets, step_words, families):
     poured = sum(1 for e in entries
                  if e.get("as") != "shell"
                  and millilitres(e.get("amount", ""), sets["_measures"]) is not None)
-    if has("citrus") and has("sweet") and (present & families) and poured <= 5 \
+    if has("citrus") and has("sweet") and ((present & families) or qq_families) \
+            and poured <= 5 \
             and not slushy:
         out.append("sharp")
 
@@ -354,6 +393,9 @@ def load_sets(taxonomy, vocab):
     sets["_measures"] = vocab.get("measures") or {}
     sets["_family_of"] = vocab.get("family_of") or {}
     sets["_whisky"] = set(vocab.get("whisky_styles") or [])
+    # What a `QQ <hint>` may name and still count (`qq_hint`).
+    sets["_families"] = set(vocab.get("families") or [])
+    sets["_family_aliases"] = vocab.get("family_aliases") or {}
     # The `serve.ice` values that earn `ice ice baby`. serve.yml declares what
     # the field may say, and `test_every_icy_serve_value_is_a_real_one` keeps
     # the two in step.

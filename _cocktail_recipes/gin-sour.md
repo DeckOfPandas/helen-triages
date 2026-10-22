@@ -38,7 +38,7 @@ source_url: ""
 meta:
   made_before: true
   ship: "yes"
-  rewritten: false
+  rewritten: true
   awaiting_fix: false
   proofread: true
 ---

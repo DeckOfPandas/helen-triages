@@ -1473,6 +1473,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   tea', and b) comes over lots and lots of ice"* against *"Gunmetal Blue
   doesn't have ice..."*. `serve.ice` cannot carry QUANTITY: lots of cubed ice
   and one cube are both spelled `cubed`, so the rule cannot tell them apart.
+- **2026-10-22 — a `QQ` before an ingredient does not withhold a mood.**
+  Helen: *"QQ before an ingredient shouldn't block tagging. It's circular,
+  isn't it."* A `QQ Gin` asks which gin, not whether there is any. The
+  deriver reads a hint that names a spirit family or a spirit generic; a hint
+  it cannot place still reads as nothing, and she may name the bottle or
+  confirm the generic to unblock it.
 
 **Garnish, method and serve, ruled on while promoting.**
 
