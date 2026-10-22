@@ -426,7 +426,7 @@ term.
 **Practicalities** — *what the occasion demands of you, regardless:*
 <!-- vocab:tags:practicalities start -->
 `breakfast`, `extras`, `festive`, `freezable`, `main`, `make-ahead`, `no-cook`,
-`starter`
+`side`, `starter`
 <!-- vocab:tags:practicalities end -->
 
 Meanings you would not guess:
@@ -434,14 +434,19 @@ Meanings you would not guess:
 - **`main`** — this could be dinner. **Work it out by subtraction, last, once
   the other tags are chosen.** With any of `dessert`, `sweet snack`,
   `ice cream`, `drinks` or `nibbles`: never. With none of those and none of
-  `bakes`, `extras`, `starter`, `breakfast` or `hot snack`: add `main`. With
-  one of that second five, it depends on the dish (a quiche is a bake and
-  dinner; a starter for two may be a main; a sauce is not), so decide and say
-  which way you went in the hand-back list. **Egg dishes are breakfast or a
-  snack, not dinner**: an omelette, a frittata, baked eggs and savoury
-  pancakes are never `main`, even where the source says "for lunch or
-  dinner". A vegetable fritter or griddle cake may be a `main`: decide, and
-  say which way you went.
+  `bakes`, `extras`, `side`, `starter`, `breakfast` or `hot snack`: add
+  `main`. With one of that second six, it depends on the dish (a quiche is a
+  bake and dinner; a starter for two may be a main; a sauce is not), so decide
+  and say which way you went in the hand-back list. **Savoury pancakes are
+  breakfast or a snack, never `main`.** A frittata, baked eggs, a vegetable
+  fritter or a griddle cake may be a `main`: decide, and say which way you
+  went.
+- **`side`** is a dish served beside a main: mash, a gratin, rice, roast veg,
+  a slaw. **`extras`** is what is not a dish at all: a sauce, a stock, a
+  pickle, a dough.
+- **A star stays blank where the dish has two leads** (chicken and prawns).
+  **`fruit` goes on a cake only where the fruit is the point**, never on a
+  sponge that is only flavoured with lemon or orange.
 - **`one-handed food`** — eat it curled on the sofa. Anything that rolls, spills
   or has to be chased is out. A soup never takes it, however thick.
 - **`no-cook`** answers "can I put this on the table without cooking?" A spice
@@ -528,11 +533,12 @@ arguing for one, that is the signal to omit it.**
 The findability index, and the one field where **generosity is right**.
 
 - **Sweet and baking — the completeness test.** Everything whose absence breaks
-  the recipe. No cap.
+  the recipe. No cap. Flour, butter, eggs and sugar go in.
 - **Savoury — the substitution test.** Not "would this fail without it" but
   "would I improvise around a gap here": the protein, the fat or liquid that
   defines the character, anything you would have to go out and buy, the
-  vegetable that is the point.
+  vegetable that is the point. **Herbs, citrus, cream or wine that the dish
+  tastes of go in too**, however small the amount: they are what people skip.
 
 **Be generous.** Helen's own recipes run to fourteen entries; ingested ones
 average five, and she then adds to them by hand, which she has called "plainly
@@ -540,7 +546,9 @@ silly". A long spice list that defines a curry belongs in full.
 
 Lowercase throughout. Cheeses use the bare name — `cheddar`, `feta`, `comté` —
 keeping "cheese" only where the qualifier means nothing without it (`blue
-cheese`, `cream cheese`). Leave out frying and greasing oil.
+cheese`, `cream cheese`). Butter is `butter`, never salted or unsalted (the
+kind is settled at promotion), and a `QQ butter` line still earns it. Leave
+out frying and greasing oil.
 
 ---
 

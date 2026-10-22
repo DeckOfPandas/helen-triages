@@ -9,7 +9,7 @@ prep_time: "10 mins"
 cook_time: "20 mins"
 main_ingredients: ["brown rice", "cashews", "sultanas", "dark soy sauce", "ginger paste", "lemon", "garlic purée"]
 star_ingredient:
-tags: ["salad", "make-ahead", "extras"]
+tags: ["salad", "make-ahead", "side"]
 ingredient_groups:
   - items:
     - amount: "150 g"

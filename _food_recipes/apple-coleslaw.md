@@ -8,7 +8,7 @@ prep_time: "10 mins"
 cook_time: "None"
 main_ingredients: ["apple", "cabbage", "fennel", "carrot", "crème fraîche", "lemon", "wholegrain mustard"]
 star_ingredient:
-tags: ["salad", "no-cook", "extras", "make-ahead"]
+tags: ["salad", "no-cook", "make-ahead", "side"]
 ingredient_groups:
   - items:
     - amount: "100 ml"

@@ -1010,10 +1010,13 @@ An unordered set in the data; ordering is presentation.
 end and dimmed, by exact lowercase match.
 
 - **Sweet and baking — the completeness test**: everything whose absence
-  breaks the recipe, no cap.
+  breaks the recipe, no cap. Flour, butter, eggs and sugar included: a cake
+  row without them looks odd, and a search for "eggs" is narrowed by the
+  filters, not by leaving them out.
 - **Savoury — the substitution test**: would I improvise around a gap here?
   The protein, the fat or liquid that defines the character, anything you
-  would have to go and buy, the vegetable that is the point.
+  would have to go and buy, the vegetable that is the point. Herbs, citrus,
+  cream or wine that the dish tastes of go in too: they are what people skip.
 
 **Be generous.** Eight is a first-pass guide that has been read as a budget;
 Helen's own recipes run to fourteen. The number is an output of the test,
@@ -1021,7 +1024,8 @@ never an input, and is deliberately not enforced.
 
 Cheeses use the bare name where it stands alone (cheddar, feta, comté); keep
 "cheese" only where the qualifier means nothing without it (blue cheese,
-cream cheese). Lowercase; `test_no_main_ingredient_spelling_collisions`
+cream cheese). Butter is `butter` in a draft, where a `QQ butter` line still
+earns it, and `salted butter` or `unsalted butter` in a published recipe. Lowercase; `test_no_main_ingredient_spelling_collisions`
 enforces consistent spelling across recipes and drafts.
 
 ---
@@ -1069,6 +1073,10 @@ regardless.
   merely keeps is not; an overnight marinade is not. `freezable` and
   `make-ahead` are separate axes.
 - `drinks` is anything drinkable that is not a cocktail.
+- `side` is a dish served beside a main (mash, a gratin, roast veg, a slaw);
+  `extras` is what is not a dish at all (sauces, stocks, pickles, doughs).
+- A star is blank where a dish has two leads (chicken and prawns). `fruit`
+  goes on a cake only where the fruit is the point, not a citrus sponge.
 - `fiddly and fun` and `showstopper` are a pair: the first is about the
   process (you make it because you want to potter), the second about the
   result (it makes people gasp at the table). Either, both or neither. Slow
@@ -1079,11 +1087,11 @@ regardless.
 
 **`main` — this could be dinner — is the one tag with a rule behind its
 proposal.** Never with `dessert`, `sweet snack`, `ice cream`, `drinks` or
-`nibbles`. A recipe with none of those and none of `bakes`, `extras`,
-`starter`, `breakfast`, `hot snack` is a main. With one of that second five
-it is a question to Helen — except that egg dishes and savoury pancakes are
-breakfast or a snack, never dinner (omelette, frittata, baked eggs, savoury
-pancakes). A vegetable fritter or griddle cake may be a main, and is asked.
+`nibbles`. A recipe with none of those and none of `bakes`, `extras`, `side`,
+`starter`, `breakfast`, `hot snack` is a main. With one of that second six
+it is a question to Helen — except that savoury pancakes are breakfast or a
+snack, never dinner. A frittata, baked eggs, a vegetable fritter or a griddle
+cake may be a main, and is asked.
 `INGEST_ONE_RECIPE.md` §4 asks a new recipe the same thing.
 It is a proposal for her yes or no, never a deriver.
 
