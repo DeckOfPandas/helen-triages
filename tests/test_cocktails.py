@@ -3139,6 +3139,36 @@ def test_every_mood_step_word_list_is_actually_read():
     )
 
 
+def test_a_qq_spirit_still_earns_its_moods():
+    """`QQ Gin` is a question about the bottle, not about whether there is gin.
+
+    The rules read through the QQ when the hint is exactly a family or a
+    declared spirit generic, and through nothing else (DECISIONS §9.1.1).
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import derive_cocktail_moods as deriver
+
+    taxonomy, vocab = _taxonomy(), _vocab()
+    sets = deriver.load_sets(taxonomy, vocab)
+    families = set(vocab.get("family_of") or {})
+
+    def moods(base):
+        drink = {"ingredients": [
+            {"amount": "40 ml", "generic": base},
+            {"amount": "30 ml", "generic": "triple sec"},
+            {"amount": "20 ml", "generic": "lemon juice"},
+        ], "method": ["Shake all ingredients with ice.", "Strain."]}
+        return deriver.derive(drink, sets, taxonomy.get("mood_step_words") or {},
+                              families)
+
+    assert "sharp" in moods("London dry gin")
+    assert "sharp" in moods("QQ Gin")
+    assert "sharp" in moods("QQ London dry gin")
+    assert "sharp" not in moods("QQ")
+    assert "sharp" not in moods("QQ something the vocabulary never heard of")
+    assert deriver.qq_hint("QQ whiskey", sets) == ("family", "whisky")
+
+
 def test_source_names_a_source_and_source_url_holds_the_url():
     """`source` is who, `source_url` is where -- #454. A shape rule only.
 

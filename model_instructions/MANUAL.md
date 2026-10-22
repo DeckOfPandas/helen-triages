@@ -2057,6 +2057,11 @@ hand-edited mood cannot outlive the rule.
   many published cocktails it takes off the site.
 - **A `water` line is invisible to every rule** (`NOT_A_POUR`); the deriver
   drops it before anything is counted.
+- **A `QQ <hint>` generic counts as what its hint names** (`qq_hint`), when
+  the hint is exactly a spirit family, a family alias or a spirit generic in
+  `family_of`, ignoring case. `QQ Gin` stands in for a base spirit, so a gin
+  sour derives `sharp` before Helen names the gin. Any other hint, and a bare
+  `QQ`, reads as nothing.
 - **`no measuring` is the one rule that reads amounts**: every measured amount
   a whole-number multiple of the smallest, in `MAX_POURS` of that measure or
   fewer. The cap is what makes it a filter. A `(top)` falls out of it for

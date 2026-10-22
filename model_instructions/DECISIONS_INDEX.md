@@ -219,6 +219,7 @@ argument and the rules each field is read by.
 - 2026-09-17 · §9.1.1 · Hurricane gets I want to faff from a mood_include, not a rule change.
 - 2026-09-18 · §9.1.1 · warming from cinnamon alone stays a rule; Gunmetal Blue loses it by a correction.
 - 2026-09-18 · §9.1.1 · Fish House Punch keeps ice ice baby by a mood_include; Gunmetal Blue's was withdrawn.
+- 2026-10-22 · §9.1.1 · a QQ before an ingredient does not withhold a mood.
 - 2026-09-17 · §9.1.1 · ginger is two garnishes, ginger wheel and stem ginger slice.
 - 2026-09-17 · §9.1.1 · fruit wedges is declared, the one garnish that does not name its fruit.
 - 2026-09-17 · §9.1.1 · Ti' Punch keeps a method — Her idea was no method, only a Serve line reading "Assemblage au choix." test_method_is_a_non_empty_list refuses that: a drink with no method renders as …
