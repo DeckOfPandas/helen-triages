@@ -96,7 +96,11 @@ def _scan():
                 prev = n
                 continue
             if start is not None:
-                header = start <= 3
+                # A Sass file's @use lines must come first, so a header
+                # comment below them is still the file's head (#129).
+                header = start <= 3 or all(
+                    not l.strip() or l.startswith(("@use ", "@forward "))
+                    for l in lines[:start - 1])
                 limit = HEADER_LINES if header else BLOCK_LINES
                 if prev - start + 1 > limit and not (header and path.suffix == ".sh"):
                     long_blocks.append(start)

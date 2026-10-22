@@ -1881,14 +1881,15 @@ def test_shared_scss_never_imports_a_site_partial():
     """The dependency arrow points one way: sites import shared, never back.
 
     A shared partial reaching into _sass/food/ compiles on the food stylesheet
-    and fails on the cocktails one.
+    and fails on the cocktails one. Sass's own `sass:` modules belong to no
+    site, so a shared partial may use them.
     """
     offenders = []
     for path in sorted((SASS_DIR / "shared").glob("*.scss")):
         for i, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
             code = line.split("//")[0]
-            match = re.search(r"""@(?:import|use)\s+['"]([^'"]+)""", code)
-            if match and not match.group(1).startswith("shared/"):
+            match = re.search(r"""@(?:import|use|forward)\s+['"]([^'"]+)""", code)
+            if match and not match.group(1).startswith(("shared/", "sass:")):
                 offenders.append(f"shared/{path.name}:{i} imports {match.group(1)}")
     assert not offenders, (
         "A shared partial imports something outside shared/:\n  "

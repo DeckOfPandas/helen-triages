@@ -1,3 +1,5 @@
+@use "shared/lightness";
+
 // =============================================================================
 // HELEN TRIAGES FOOD - RECIPE PAGE: NOTES, BODY CONTENT, GROUP HEADINGS
 // =============================================================================
@@ -100,7 +102,7 @@ article.recipe .recipe-body-content {
   .recipe-section-subtitle {
     font-size: 0.9rem;
     font-style: italic;
-    color: lighten($color-text, 20%);
+    color: lightness.shift($color-text, 20%);
     margin: -0.75rem 0 $space-xl 0;
   }
 
@@ -111,7 +113,7 @@ article.recipe .recipe-body-content {
     @extend %heading-base;
     font-size: 0.78rem;
     letter-spacing: 0.08em;
-    color: lighten($color-clear-text, 10%);
+    color: lightness.shift($color-clear-text, 10%);
     @include lettering(label);
     margin: $space-xl 0 $space-sm 0;
   }
@@ -147,7 +149,7 @@ article.recipe .recipe-body-content {
         content: "—";
         position: absolute;
         left: 0;
-        color: lighten($color-text, 35%);
+        color: lightness.shift($color-text, 35%);
       }
     }
   }
@@ -225,7 +227,7 @@ article.recipe .recipe-body-content {
       > em:first-of-type {
         display: block;
         font-style: italic;
-        color: lighten($color-text, 22%);
+        color: lightness.shift($color-text, 22%);
         margin: 0.7rem 0 $space-lg 0;
       }
 

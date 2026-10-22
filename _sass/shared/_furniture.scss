@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // PAGE FURNITURE: the back arrow's line, the shortlist pair and the search
 // box, the same objects on both sites and so styled once (#1005, #1210;
 // MANUAL §13.13). The markup is _includes/back-to-index.html (the arrow and,
@@ -95,9 +97,9 @@ $page-search-quiet: 45%;
   text-align: right;
   background: transparent;
   border: none;
-  // Mixed towards the page's ground, never `lighten()`ed: on cocktails' dark
-  // page a lightened grey is a brighter line, not a quieter one (#1099).
-  border-bottom: 1px solid mix($color-clear-text, $color-bg, $page-search-quiet);
+  // Mixed towards the page's ground, never lightened: on cocktails' dark page
+  // a lightened grey is a brighter line, not a quieter one (#1099).
+  border-bottom: 1px solid color.mix($color-clear-text, $color-bg, $page-search-quiet);
   border-radius: 0;
   padding: 0 0 3px 0;
   margin: 0;
@@ -116,13 +118,13 @@ $page-search-quiet: 45%;
     border-bottom-color: $color-accent;
     box-shadow: inset 0 -1px 0 $color-accent;
   }
-  // The lettering takes the line's own tone (#1123). The mixin's
-  // `lighten()` is wrong on a dark ground, so the colour is overridden here
+  // The lettering takes the line's own tone (#1123). The mixin lightens,
+  // which is wrong on a dark ground, so the colour is overridden here
   // and not in the mixin, which also dresses each index's own search boxes.
   // The mixin is still included for its `font-weight`.
   &::placeholder {
     @include index-search-placeholder;
-    color: mix($color-clear-text, $color-bg, $page-search-quiet);
+    color: color.mix($color-clear-text, $color-bg, $page-search-quiet);
   }
   // The placeholder goes on focus, not on the first keystroke (Helen's
   // ruling, both sites). `color: transparent`, not an emptied attribute, so
@@ -201,7 +203,7 @@ $page-search-quiet: 45%;
   &:hover,
   &:focus-visible,
   &.is-active {
-    background: mix($color-accent, $color-surface, 14%);
+    background: color.mix($color-accent, $color-surface, 14%);
     color: $color-text;
     outline: none;
   }

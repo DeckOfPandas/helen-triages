@@ -1,0 +1,13 @@
+@use "sass:color";
+
+// =============================================================================
+// shift() — lighten or darken a colour, clamped as lighten() and darken() were
+// =============================================================================
+// A positive $amount lightens, a negative one darkens, in HSL percentage points.
+// color.adjust alone does not clamp: lightening cocktails' near-white ink by
+// 53% gives an out-of-gamut colour, not white. The clip makes every result
+// what the old functions produced, byte for byte, on both sites (#129).
+// Emits no CSS, so any partial may @use it.
+@function shift($color, $amount) {
+  @return color.to-gamut(color.adjust($color, $lightness: $amount), $method: clip);
+}

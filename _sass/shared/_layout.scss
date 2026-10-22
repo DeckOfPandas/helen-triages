@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // SHARED LAYOUT: the CSS for _layouts/default.html and nothing else -- the
 // content column, the header, the wordmark and the footer. If default.html
 // emits a class, its rule belongs here or in shared/_chrome.scss; a site with
@@ -369,7 +371,7 @@ $header-door-gap: 0.1rem;
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: mix($color-clear-text, $color-bg, 82%);
+  color: color.mix($color-clear-text, $color-bg, 82%);
 }
 
 // The SVG is injected by assets/js/decorations.js.

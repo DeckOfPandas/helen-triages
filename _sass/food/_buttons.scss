@@ -1,3 +1,5 @@
+@use "shared/lightness";
+
 // ============================================================================
 // BUTTONS
 // ============================================================================
@@ -9,7 +11,7 @@
 // chip and every unmatched candidate wears. A resting chip's tape is a
 // translucent neutral; the category colour appears only once a filter is
 // chosen (_category-labels.scss).
-$chip-rest: lighten($color-text, 22%);
+$chip-rest: lightness.shift($color-text, 22%);
 
 .btn-tag,
 .btn-star {

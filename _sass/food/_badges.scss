@@ -1,3 +1,6 @@
+@use "sass:color";
+@use "shared/lightness";
+
 // ============================================================================
 // BADGES
 // ============================================================================
@@ -65,7 +68,7 @@
 
   &-draft, &-magic-bag {
     background-color: rgba($color-text, 0.05);
-    color: lighten($color-clear-text, 12%);
+    color: lightness.shift($color-clear-text, 12%);
   }
 
   // Tape shape, no clip-path and no background: the SVG is the fill.
@@ -81,22 +84,22 @@
   // Three rungs, and the badges rest on the quietest so a row's title is
   // read first: rest is a hint of the hue in the tape with grey text, matched
   // a stronger mix (_active-filter-states.scss), hover the lightened
-  // full-strength hue below. mix() with $color-border, not opacity: a
+  // full-strength hue below. color.mix() with $color-border, not opacity: a
   // transparent hue over the page only lightens it, where a mix desaturates
   // it. Only the badge's own hover lights it, never the row's.
   &-star {
     color: $color-clear-text;
-    .tag-shape { color: mix($color-star-root, $color-border, 14%); }
+    .tag-shape { color: color.mix($color-star-root, $color-border, 14%); }
   }
 
   &-mood {
     color: $color-clear-text;
-    .tag-shape { color: mix($color-mood-root, $color-border, 14%); }
+    .tag-shape { color: color.mix($color-mood-root, $color-border, 14%); }
   }
 
   &-practicalities {
     color: $color-clear-text;
-    .tag-shape { color: mix($color-practicalities-root, $color-border, 14%); }
+    .tag-shape { color: color.mix($color-practicalities-root, $color-border, 14%); }
   }
 }
 
@@ -109,17 +112,17 @@
 // MOOD's colour on hover.
 a.badge-star:hover {
   color: $color-star-active;
-  .tag-shape { color: mix($color-star-root, $color-white, 82%); }
+  .tag-shape { color: color.mix($color-star-root, $color-white, 82%); }
 }
 
 a.badge-mood:hover {
   color: $color-mood-active;
-  .tag-shape { color: mix($color-mood-root, $color-white, 82%); }
+  .tag-shape { color: color.mix($color-mood-root, $color-white, 82%); }
 }
 
 a.badge-practicalities:hover {
   color: $color-practicalities-active;
-  .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
+  .tag-shape { color: color.mix($color-practicalities-root, $color-white, 82%); }
 }
 
 // The `.tag-shape` slot itself is in _sass/shared/_tag-shape.scss (#1219); its

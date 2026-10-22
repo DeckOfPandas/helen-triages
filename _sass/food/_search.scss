@@ -1,3 +1,6 @@
+@use "sass:color";
+@use "shared/lightness";
+
 // SEARCH -- ingredient search, name search, and their result pools.
 .search {
   margin: $space-xl 0;
@@ -36,13 +39,13 @@
     margin: 0;
     height: auto;
     border: none;
-    border-bottom: 1px solid lighten($color-clear-text, 25%);
-    color: lighten($color-text, 12%);
+    border-bottom: 1px solid lightness.shift($color-clear-text, 25%);
+    color: lightness.shift($color-text, 12%);
     @include index-search-row-input;
 
     &:focus {
       outline: none;
-      border-bottom-color: lighten($color-clear-text, 5%);
+      border-bottom-color: lightness.shift($color-clear-text, 5%);
     }
 
     &::placeholder { @include index-search-placeholder; }
@@ -98,13 +101,13 @@
     margin: 0;
     height: auto;
     border: none;
-    border-bottom: 1px solid lighten($color-clear-text, 25%);
-    color: lighten($color-text, 12%);
+    border-bottom: 1px solid lightness.shift($color-clear-text, 25%);
+    color: lightness.shift($color-text, 12%);
     @include index-search-row-input;
 
     &:focus {
       outline: none;
-      border-bottom-color: lighten($color-clear-text, 5%);
+      border-bottom-color: lightness.shift($color-clear-text, 5%);
     }
 
     &::placeholder { @include index-search-placeholder; }
@@ -208,7 +211,7 @@
     font-family: $font-body;
     font-size: 0.78rem;
     font-weight: 400;
-    color: lighten($color-clear-text, 10%);
+    color: lightness.shift($color-clear-text, 10%);
   }
 
   // A chosen exclusion carries its own × and comes off with one click. It is
@@ -248,7 +251,7 @@
 .search .btn-tag.btn-ingredient.active {
   @include index-chip-chosen($color-text);
   background: none;
-  .tag-shape { color: mix($color-ingredient-root, $color-white, 82%); }
+  .tag-shape { color: color.mix($color-ingredient-root, $color-white, 82%); }
 }
 
 // Focus ring in HAS TO HAVE's own hue (#1086), not the $color-accent fallback

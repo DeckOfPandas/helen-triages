@@ -1,3 +1,5 @@
+@use "shared/lightness";
+
 // =============================================================================
 // HELEN TRIAGES FOOD - RECIPE PAGE: HEADER
 // =============================================================================
@@ -144,7 +146,7 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 .recipe-tagline {
   font-size: 0.95rem;
   font-style: italic;
-  color: lighten($color-text, 20%);
+  color: lightness.shift($color-text, 20%);
   // No margins of its own. The gap above comes from .recipe-title and the gap
   // below from .recipe-meta, so a recipe with no tagline keeps the same
   // title-to-meta distance as one with a tagline.
