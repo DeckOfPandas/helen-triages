@@ -3788,6 +3788,15 @@ them; a number missing from both the issue and the pull-request listings is a
 hidden issue. Pace any sweep by number and stop at the first 403: the rate
 limit is shared with every other session.
 
+**`scripts/check-link.sh <url>`** prints one line, the HTTP status after
+redirects and the final address: `200 https://where/it/ended`. It takes one
+`https://` URL, or one `http://localhost:<port>/` URL for a page on the dev
+server, and nothing else: no option reaches curl, the body goes to
+`/dev/null`, and no credential is sent. An https check follows redirects over
+https only, with a browser's user agent because several recipe sources refuse
+curl's; a localhost check follows none. Use it for a `source_url` or a served
+page, never a bare `curl`, which prompts.
+
 ### 11.0 The destructive-git hook
 
 `guard-destructive-git.py` strips quoted spans and heredoc bodies, then looks
