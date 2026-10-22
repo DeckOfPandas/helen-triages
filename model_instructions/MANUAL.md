@@ -3390,13 +3390,14 @@ recipes, ranked by the same star ingredient, then more shared mood tags, then
 more shared other tags plus main ingredients, then shared non-larder
 ingredients, larder staples, and title.
 
-Above it, a food recipe page lists **the published recipes that link to it
-in their own words** (#1104): "Used in…" for a link in an ingredient line,
-"Goes with…" for one anywhere else (tagline, method, notes). Nothing is
-stored: the layout searches every published recipe for `](../<slug>/)`, so a
-promoted draft's links appear by themselves, and a pairing no recipe states
-needs another source when it comes. The two headings are placeholder copy.
-The rows are `_includes/food/recipe-row.html`, the related row's own markup;
+Above it, a food recipe page has **"Goes with…"** (#1104): every published
+recipe it links to, or that links to it, outside the ingredient lines
+(tagline, method, notes), so a dish shows its sides and a side its dishes. A
+link in an ingredient line names a component, not a pairing, and never
+counts: five-spice powder lists nothing it is used in. Nothing is stored: the
+layout searches the recipes for `](../<slug>/)`, so a promoted draft's links
+appear by themselves, and a pairing no recipe states needs another source
+when it comes. The rows are `_includes/food/recipe-row.html`, the related row's own markup;
 `test_every_link_between_recipes_shows_on_the_page_it_points_at` holds every
 link to its row.
 

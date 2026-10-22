@@ -2686,15 +2686,14 @@ def test_every_published_recipe_page_offers_three_other_published_recipes(prod_s
 
 CROSS_RECIPE_LINK = re.compile(r"\]\(\.\./([a-z0-9-]+)/\)")
 LINKED_SECTION = re.compile(
-    r'<section class="recipe-related-section recipe-linked-section '
-    r'recipe-linked-section--([a-z-]+)">(.*?)</section>', re.S)
+    r'<section class="recipe-related-section recipe-linked-section">(.*?)</section>', re.S)
 
 
 def test_every_link_between_recipes_shows_on_the_page_it_points_at(prod_site):
-    """#1104. A published recipe that links to another in its own words
-    appears on that recipe's page: under "used in" when the link is in an
-    ingredient line, under "goes with" when it is anywhere else (tagline,
-    method, notes). Nothing else appears in either list.
+    """#1104. When a published recipe links to another outside its ingredient
+    lines (tagline, method, notes), each appears under the other's "goes
+    with". A link in an ingredient line names a component and never counts.
+    Nothing else appears in the list.
 
     Published is whatever the production build made a page for, so the gate
     decides, not this test.
@@ -2710,10 +2709,9 @@ def test_every_link_between_recipes_shows_on_the_page_it_points_at(prod_site):
         in_ings = set(CROSS_RECIPE_LINK.findall(yaml.safe_dump(fm.get("ingredient_groups") or [])))
         elsewhere = set(CROSS_RECIPE_LINK.findall(yaml.safe_dump(
             [fm.get("tagline"), fm.get("method"), fm.get("method_groups"), fm.get("notes")])))
-        for target in in_ings:
-            expected.setdefault(target, set()).add(("used-in", path.stem))
-        for target in elsewhere - in_ings:
-            expected.setdefault(target, set()).add(("goes-with", path.stem))
+        for target in (elsewhere - in_ings) & built:
+            expected.setdefault(target, set()).add(path.stem)
+            expected.setdefault(path.stem, set()).add(target)
     assert expected, (
         "No published recipe links to another, so this test checks nothing. "
         "Either the links' `](../<slug>/)` form changed or the corpus walk did."
@@ -2723,14 +2721,14 @@ def test_every_link_between_recipes_shows_on_the_page_it_points_at(prod_site):
     for page in _recipe_pages(prod_site):
         slug = page.parent.name
         shown = set()
-        for kind, body in LINKED_SECTION.findall(page.read_text(encoding="utf-8")):
+        for body in LINKED_SECTION.findall(page.read_text(encoding="utf-8")):
             for href in RELATED_RECIPE_LINK.findall(body):
-                shown.add((kind, href.rstrip("/").rsplit("/", 1)[-1]))
-        want = {(k, s) for k, s in expected.get(slug, set()) if s != slug}
+                shown.add(href.rstrip("/").rsplit("/", 1)[-1])
+        want = expected.get(slug, set()) - {slug}
         if shown != want:
             problems.append(f"{slug}: shows {sorted(shown)}, its links say {sorted(want)}")
     assert not problems, (
-        "the used-in / goes-with lists (#1104) disagree with the recipes' own "
+        "the goes-with lists (#1104) disagree with the recipes' own "
         "links:\n  " + "\n  ".join(problems[:20])
     )
 

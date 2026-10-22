@@ -317,36 +317,36 @@ layout: default
   </div>
   {% endif %}
 
-  {% comment %} ── Used in … / Goes with … (#1104) ──
-     Every published recipe that links to this one in its own words. A link in
-     an ingredient line means this recipe is used in that one; a link anywhere
-     else (tagline, method, notes) means it goes with it. Links are written
+  {% comment %} ── Goes with … (#1104) ──
+     Every published recipe that this one links to, or that links to this one,
+     outside its ingredient lines (tagline, method, notes): a dish shows its
+     sides and a side shows its dishes. A link in an ingredient line names a
+     component, not a pairing, so it never counts. Links are written
      `](../<slug>/)` throughout, and `site.food_recipes` is the published set,
-     so a promoted draft's links appear by themselves. Headings are placeholder
-     copy, Helen's to word. tests/test_rendered_pages.py holds every link to
-     its row. {% endcomment %}
+     so a promoted draft's links appear by themselves. tests/test_rendered_pages.py
+     holds every link to its row. {% endcomment %}
   {% capture _link_to_me %}](../{{ page.slug }}/){% endcapture %}
-  {% assign _used_in_keys = "" %}
+  {% assign _my_ingredients = page.ingredient_groups | jsonify %}
+  {% capture _my_elsewhere %}{{ page.tagline }}{{ page.method | jsonify }}{{ page.method_groups | jsonify }}{{ page.notes | jsonify }}{% endcapture %}
   {% assign _goes_with_keys = "" %}
   {% for _other in site.food_recipes %}
     {% unless _other.url == page.url %}
+      {% capture _link_to_other %}](../{{ _other.slug }}/){% endcapture %}
       {% assign _in_ingredients = _other.ingredient_groups | jsonify %}
       {% capture _elsewhere %}{{ _other.tagline }}{{ _other.method | jsonify }}{{ _other.method_groups | jsonify }}{{ _other.notes | jsonify }}{% endcapture %}
-      {% if _in_ingredients contains _link_to_me %}
-        {% capture _used_in_keys %}{{ _used_in_keys }}{{ _other.title }}~{{ _other.url }};{% endcapture %}
-      {% elsif _elsewhere contains _link_to_me %}
+      {% assign _pairs = false %}
+      {% if _elsewhere contains _link_to_me %}{% unless _in_ingredients contains _link_to_me %}{% assign _pairs = true %}{% endunless %}{% endif %}
+      {% if _my_elsewhere contains _link_to_other %}{% unless _my_ingredients contains _link_to_other %}{% assign _pairs = true %}{% endunless %}{% endif %}
+      {% if _pairs %}
         {% capture _goes_with_keys %}{{ _goes_with_keys }}{{ _other.title }}~{{ _other.url }};{% endcapture %}
       {% endif %}
     {% endunless %}
   {% endfor %}
-  {% assign _linked_lists = "used-in|Used in&hellip;|" | append: _used_in_keys | append: "^goes-with|Goes with&hellip;|" | append: _goes_with_keys | split: "^" %}
-  {% for _list in _linked_lists %}
-    {% assign _bits = _list | split: "|" %}
-    {% assign _entries = _bits[2] | split: ";" | sort_natural %}
-    {% if _entries.size > 0 %}
-    <section class="recipe-related-section recipe-linked-section recipe-linked-section--{{ _bits[0] }}">
+  {% assign _entries = _goes_with_keys | split: ";" | sort_natural %}
+  {% if _entries.size > 0 %}
+    <section class="recipe-related-section recipe-linked-section">
       <h2 class="recipe-section-heading">
-        <span class="section-heading-text">{{ _bits[1] }}</span>
+        <span class="section-heading-text">Goes with&hellip;</span>
       </h2>
       <ul class="recipe-list recipe-related recipe-linked">
         {% for _entry in _entries %}
@@ -356,8 +356,7 @@ layout: default
         {% endfor %}
       </ul>
     </section>
-    {% endif %}
-  {% endfor %}
+  {% endif %}
 
   {% comment %} ── If you liked this, how about … (#1090; heading final, #1088) ──
      Ranked by: the same star ingredient, then more shared mood tags, then more
