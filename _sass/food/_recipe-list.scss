@@ -1,5 +1,9 @@
 @use "sass:color";
+@use "food/palette" as *;
 @use "shared/lightness";
+@use "shared/results-bar" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
 
 // INDEX -- the filter panel and the recipe list it filters.
 
@@ -60,7 +64,7 @@
   }
 }
 
-// The title's type, as variables: food/_shortlist.scss, imported after this
+// The title's type, as variables: food/_shortlist.scss, loaded after this
 // file, sizes the row's shortlist button from the title's line box (#961).
 $recipe-title-size: 1.2rem;
 $recipe-title-line-height: 1.3;

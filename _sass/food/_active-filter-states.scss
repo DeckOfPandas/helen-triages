@@ -1,4 +1,7 @@
 @use "sass:color";
+@use "food/palette" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
 
 // ============================================================================
 // ACTIVE-FILTER STATES

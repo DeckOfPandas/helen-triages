@@ -1,4 +1,6 @@
 @use "sass:color";
+@use "cocktails/palette" as *;
+@use "shared/tokens" as *;
 
 // =============================================================================
 // COCKTAIL CARDS — the index's card, reused for the related drinks on a drink page

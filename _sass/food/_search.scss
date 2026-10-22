@@ -1,5 +1,8 @@
 @use "sass:color";
+@use "food/palette" as *;
 @use "shared/lightness";
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
 
 // SEARCH -- ingredient search, name search, and their result pools.
 .search {

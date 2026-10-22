@@ -1,5 +1,7 @@
 @use "sass:color";
+@use "food/palette" as *;
 @use "shared/lightness";
+@use "shared/tokens" as *;
 
 // ============================================================================
 // BADGES

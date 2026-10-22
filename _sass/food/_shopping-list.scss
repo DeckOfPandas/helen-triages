@@ -1,3 +1,6 @@
+@use "food/palette" as *;
+@use "shared/tokens" as *;
+
 // =============================================================================
 // THE SHOPPING LIST — what a shortlist of recipes adds up to (#801)
 // =============================================================================
@@ -40,7 +43,7 @@
 }
 
 // --- the typed numbers -------------------------------------------------------
-// Also @extended by food/_recipe-scale.scss, which is imported after this file
+// Also @extended by food/_recipe-scale.scss, which is loaded after this file
 // for that reason. Plex, because it is a number you act on (_palette.scss,
 // $font-label).
 %food-number-input {

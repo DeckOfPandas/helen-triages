@@ -1,3 +1,9 @@
+@use "cocktails/cards" as *;
+@use "cocktails/cocktail" as *;
+@use "cocktails/filters" as *;
+@use "cocktails/palette" as *;
+@use "shared/tokens" as *;
+
 // =============================================================================
 // THE SHORTLIST — #546, the drinks side
 // =============================================================================
@@ -128,7 +134,7 @@ $card-shortlist-size: 1.15rem;
   // Above the card's click overlay (#971). The whole card is the drink's
   // link, drawn as a pseudo-element over it, and a stretched link covers
   // every control that is not lifted past it. The scale is named in
-  // _cards.scss, which is imported before this file.
+  // _cards.scss, which is loaded before this file.
   z-index: $card-z-controls;
 
   // Bigger than the drink page's: a lone mark with no word beside it reads as

@@ -1,11 +1,14 @@
 @use "sass:color";
+@use "shared/rule" as *;
+@use "shared/theme" as *;
+@use "shared/tokens" as *;
 
 // PAGE FURNITURE: the back arrow's line, the shortlist pair and the search
 // box, the same objects on both sites and so styled once (#1005, #1210;
 // MANUAL §13.13). The markup is _includes/back-to-index.html (the arrow and,
 // through page-print.html, print · pdf), _includes/page-actions.html (the
 // shortlist pair) and _includes/page-search.html (the box, in the header, on
-// a local build only). Imported after shared/chrome; names only
+// a local build only). Loaded after shared/chrome; names only
 // palette-contract variables.
 //
 // Per site: the shortlist button's colours and states (food/_shortlist.scss,

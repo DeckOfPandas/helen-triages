@@ -1,3 +1,6 @@
+@use "shared/theme" as *;
+@use "shared/tokens" as *;
+
 // THE RESULTS COUNT'S DIGITS, AND THE BAR THAT FOLLOWS THEM DOWN THE PAGE, on
 // both indexes. One partial because the bar mirrors the count line and the
 // digits are set the same way in each.
@@ -5,7 +8,7 @@
 // Beyond shared/_tokens.scss and the palette contract it names $font-label,
 // which both palettes declare under that name with the same role.
 //
-// Imported before the site partials: a site's own list rule reads
+// Loaded before the site partials: a site's own list rule reads
 // $results-bar-height, and a Sass variable has to exist before the line that
 // names it. The one rule here that competes with a site's is two classes
 // deep for that reason (`.results-bar .btn-clear`).

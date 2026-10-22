@@ -1,4 +1,7 @@
+@use "food/palette" as *;
 @use "shared/lightness";
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
 
 // =============================================================================
 // HELEN TRIAGES FOOD - RECIPE PAGE: HEADER
@@ -6,7 +9,7 @@
 // Everything above the ingredients/method content: the article frame, links,
 // title, tagline, meta grid, the section-heading treatment, the method toggle
 // and the badges row. It also defines %heading-base and the box-tint
-// variables, which later food partials read, so it is imported before them.
+// variables, which later food partials read, so it is loaded before them.
 
 // --- Shared heading base -----------------------------------------------------
 // Every uppercase Courier heading extends this and overrides only what

@@ -1,0 +1,30 @@
+// =============================================================================
+// THE THEME: what a shared partial may read from the site's palette (#374)
+// =============================================================================
+// A shared partial reads these and nothing else of a palette. Each site's
+// stylesheet sets every one, from its own palette, as it first loads this
+// module (`@use "shared/theme" with (...)` in assets/css/<site>.scss), so it
+// must be loaded there before any shared partial. A value left unset stops
+// the build here, not as a silently missing declaration further on.
+// tests/test_site_config.py holds both palettes to this list.
+$color-accent: null !default;
+$color-bg: null !default;
+$color-border: null !default;
+$color-clear-text: null !default;
+$color-mood-root: null !default;
+$color-surface: null !default;
+$color-text: null !default;
+$font-body: null !default;
+$font-headings: null !default;
+$font-label: null !default;
+
+@each $name, $value in (
+  "color-accent": $color-accent, "color-bg": $color-bg, "color-border": $color-border,
+  "color-clear-text": $color-clear-text, "color-mood-root": $color-mood-root,
+  "color-surface": $color-surface, "color-text": $color-text,
+  "font-body": $font-body, "font-headings": $font-headings, "font-label": $font-label
+) {
+  @if $value == null {
+    @error "shared/theme: $#{$name} is not set. assets/css/<site>.scss must pass it from the site's palette.";
+  }
+}

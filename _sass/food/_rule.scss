@@ -1,3 +1,5 @@
+@use "food/palette" as *;
+
 // =============================================================================
 // HELEN TRIAGES FOOD — THE ONE LETTERING VALUE THIS SITE CHOOSES FOR ITSELF
 // =============================================================================
@@ -8,15 +10,8 @@
 // $color-text. model_instructions/LETTERING.md describes the tiers.
 //
 // It lives here because $color-label-stroke is food's own and not a
-// palette-contract variable, so shared/ may not name it. It must be imported
+// palette-contract variable, so shared/ may not name it. It must be loaded
 // after shared/rule (assets/css/food.scss) so that this value wins.
-//
-// Guarded because food/_timings.scss imports this file a second time, and
-// without the guard the block is emitted twice.
-$emboss-food-vars-emitted: false !default;
-@if not $emboss-food-vars-emitted {
-  :root {
-    --lettering-label-stroke-c: #{$color-label-stroke};
-  }
-  $emboss-food-vars-emitted: true !global;
+:root {
+  --lettering-label-stroke-c: #{$color-label-stroke};
 }

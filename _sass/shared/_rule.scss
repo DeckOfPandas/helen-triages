@@ -1,8 +1,10 @@
 @use "shared/lightness";
+@use "shared/theme" as *;
+@use "shared/tokens" as *;
 
 // SHARED RULE: the punched-tape lettering, the blocky rule under headings, and
 // the mixins both indexes' filter panels are built from. Variables and mixins,
-// plus one `:root` block. Imported after the palette and shared/tokens, and
+// plus one `:root` block. Loaded after the palette and shared/tokens, and
 // before shared/base and shared/layout, which both @include lettering().
 //
 // It names only palette-contract variables (MANUAL §2.3); every other colour
@@ -50,30 +52,21 @@ $lettering-label-stroke-c: $color-text;
 // Custom properties, not Sass variables, so a site or a print block re-points
 // a value once and every rule reading it follows, at any depth, with no
 // specificity fight. The Sass variables above are only the defaults.
-//
-// Guarded because this file is imported more than once into one stylesheet
-// (food/_timings.scss imports it again for the mixins), and without the
-// guard the block is emitted each time.
-$emboss-vars-emitted: false !default;
-@if not $emboss-vars-emitted {
-  :root {
-    // Tier-independent: one stroke width and one offset for every tier.
-    --emboss-stroke-w:    #{$emboss-stroke};
-    --emboss-offset:      #{$emboss-offset};
-    --emboss-offset-lg:   #{$emboss-offset-large};
+:root {
+  // Tier-independent: one stroke width and one offset for every tier.
+  --emboss-stroke-w:    #{$emboss-stroke};
+  --emboss-offset:      #{$emboss-offset};
+  --emboss-offset-lg:   #{$emboss-offset-large};
 
-    --lettering-display-stroke-c: #{$lettering-display-stroke-c};
-    --lettering-display-light:    #{$lettering-display-light};
-    --lettering-display-shadow:   #{$lettering-display-shadow};
+  --lettering-display-stroke-c: #{$lettering-display-stroke-c};
+  --lettering-display-light:    #{$lettering-display-light};
+  --lettering-display-shadow:   #{$lettering-display-shadow};
 
-    --lettering-heading-stroke-c: #{$lettering-heading-stroke-c};
-    --lettering-heading-light:    #{$lettering-heading-light};
-    --lettering-heading-shadow:   #{$lettering-heading-shadow};
+  --lettering-heading-stroke-c: #{$lettering-heading-stroke-c};
+  --lettering-heading-light:    #{$lettering-heading-light};
+  --lettering-heading-shadow:   #{$lettering-heading-shadow};
 
-    --lettering-label-stroke-c:   #{$lettering-label-stroke-c};
-  }
-
-  $emboss-vars-emitted: true !global;
+  --lettering-label-stroke-c:   #{$lettering-label-stroke-c};
 }
 
 // @mixin lettering($tier, $offset): the only way to draw a punched element.

@@ -503,8 +503,8 @@ def test_the_results_bar_loads_after_the_index_script_on_both_indexes():
             f"`.results-count-number`. That class is what gives the digits the "
             f"label face on both indexes (shared/_results-bar.scss)."
         )
-        assert '@import "shared/results-bar";' in read("assets", "css", f"{page}.scss"), (
-            f"assets/css/{page}.scss does not import shared/results-bar, so "
+        assert '@use "shared/results-bar";' in read("assets", "css", f"{page}.scss"), (
+            f"assets/css/{page}.scss does not load shared/results-bar, so "
             f"`.results-count-number` and `.results-bar` have no rule on {page}."
         )
 
@@ -1802,14 +1802,11 @@ def _top_level_blocks(text: str):
 
 # --- the shared/forked SCSS boundary -----------------------------------------
 
-# Variables the shared partials use but do not define. Each site palette owes
-# all of them (#374).
-SHARED_PALETTE_CONTRACT = [
-    "color-accent",
-    "color-bg", "color-border", "color-clear-text", "color-mood-root",
-    "color-surface", "color-text", "color-white",
-    "font-body", "font-headings",
-]
+# The palette variables a shared partial may read: everything
+# _sass/shared/_theme.scss declares (#374, #129).
+SHARED_PALETTE_CONTRACT = re.findall(
+    r"^\$([\w-]+):\s*null !default;",
+    (SASS_DIR / "shared" / "_theme.scss").read_text(encoding="utf-8"), re.M)
 
 # Directories holding a _palette.scss: the two sites.
 PALETTE_OWNERS = ["food", "cocktails"]
@@ -1817,26 +1814,32 @@ PALETTE_OWNERS = ["food", "cocktails"]
 
 @pytest.mark.parametrize("owner", PALETTE_OWNERS)
 def test_every_palette_satisfies_the_shared_contract(owner):
-    """Every palette declares each variable the shared partials name.
+    """Every palette declares each variable shared/_theme.scss lists, and the
+    site's entry stylesheet passes each one into the theme.
 
-    A palette that omits one fails at build time with an "Undefined variable"
-    pointing into _sass/shared/, and only on the site whose palette is short.
-    Checked here so the failure names the file and the variable.
+    The theme stops the build when a value is unset; checked here too so the
+    failure names the file and the variable.
     """
+    assert SHARED_PALETTE_CONTRACT, "_sass/shared/_theme.scss declares no variables"
     path = SASS_DIR / owner / "_palette.scss"
     assert path.exists(), (
         f"_sass/{owner}/_palette.scss is missing. assets/css/{owner}.scss "
-        f"imports it before the shared partials, which need the variables it "
-        f"declares."
+        f"loads it first and fills the shared theme from it."
     )
     text = path.read_text(encoding="utf-8")
     missing = [v for v in SHARED_PALETTE_CONTRACT
                if not re.search(rf"^\${re.escape(v)}\s*:", text, re.M)]
     assert not missing, (
-        f"_sass/{owner}/_palette.scss does not declare {missing}.\n"
-        f"_sass/shared/_base.scss and _sass/shared/_layout.scss use these by "
-        f"name. Without them the build fails with an error pointing at the "
-        f"shared file rather than at this one."
+        f"_sass/{owner}/_palette.scss does not declare {missing}, which "
+        f"_sass/shared/_theme.scss says every palette owes the shared partials."
+    )
+    entry = (ROOT / "assets" / "css" / f"{owner}.scss").read_text(encoding="utf-8")
+    unpassed = [v for v in SHARED_PALETTE_CONTRACT
+                if not re.search(rf"\${re.escape(v)}:\s*palette\.\${re.escape(v)}\b", entry)]
+    assert not unpassed, (
+        f"assets/css/{owner}.scss does not pass {unpassed} into "
+        f"`@use \"shared/theme\" with (...)`. Pass each as "
+        f"`$name: palette.$name`."
     )
 
 
@@ -1878,7 +1881,7 @@ def test_the_two_palettes_declare_the_SAME_font_stack(variable):
 
 
 def test_shared_scss_never_imports_a_site_partial():
-    """The dependency arrow points one way: sites import shared, never back.
+    """The dependency arrow points one way: sites load shared, never back.
 
     A shared partial reaching into _sass/food/ compiles on the food stylesheet
     and fails on the cocktails one. Sass's own `sass:` modules belong to no
@@ -1896,6 +1899,28 @@ def test_shared_scss_never_imports_a_site_partial():
         + "\n  ".join(offenders)
         + "\n\nshared/ may not depend on any one site. Move the shared thing "
           "into shared/, or the site-specific thing out of it."
+    )
+
+
+def test_no_stylesheet_uses_a_deprecated_sass_feature():
+    """No `@import`, and none of the global functions Dart Sass 3 removes (#129).
+
+    Each one prints a deprecation warning on every build, and a build log full
+    of them is where a real error goes unseen. `@use` a module instead:
+    `lightness.shift()` (shared/_lightness.scss) for darken()/lighten(),
+    `color.mix()`, `list.append()`, an `@if` block for `if()`.
+    """
+    banned = re.compile(r"@import\b|(?<![\w.$-])(darken|lighten|mix|append|"
+                        r"transparentize|opacify|saturate|desaturate|if|percentage|"
+                        r"map-get|map-merge|nth|unquote)\(")
+    offenders = []
+    for path in sorted(list(SASS_DIR.rglob("*.scss")) + list((ROOT / "assets" / "css").glob("*.scss"))):
+        for i, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+            code = re.sub(r"//.*$", "", line)
+            if banned.search(code):
+                offenders.append(f"{path.relative_to(ROOT)}:{i}: {line.strip()}")
+    assert not offenders, (
+        "Deprecated Sass in use; each warns on every build:\n  " + "\n  ".join(offenders)
     )
 
 
@@ -1951,7 +1976,7 @@ def test_a_print_partial_declares_nothing_outside_media_print():
 
     A rule that forgets the wrapper compiles to top level and styles the
     screen, with a clean build. Only blocks are checked: a print partial may
-    hold variables, an `@import` or comments.
+    hold variables, `@use` lines or comments.
     """
     partials = [p for p in sass_files() if p.name.startswith("_print")]
     assert partials, (
@@ -2791,8 +2816,8 @@ def test_both_indexes_filter_chips_wear_the_shared_tape():
     assert not stray_attr, f"data-tag-shape names a shape that is not in POOL: {stray_attr}"
 
     for entry in ("food.scss", "cocktails.scss"):
-        assert '@import "shared/tag-shape";' in (ROOT / "assets" / "css" / entry).read_text(encoding="utf-8"), (
-            f"assets/css/{entry} does not import the tape slot.")
+        assert '@use "shared/tag-shape";' in (ROOT / "assets" / "css" / entry).read_text(encoding="utf-8"), (
+            f"assets/css/{entry} does not load the tape slot.")
 
 
 # --- the cocktail index (#579) ------------------------------------------------

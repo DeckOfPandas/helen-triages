@@ -314,12 +314,17 @@ loop to mark.
 - `assets/img/favicon/` (one set per site, named by `site_key`),
   `assets/img/chrome/`, `about.html`.
 
-**Every stylesheet in `assets/css/` imports from `shared/`, and a partial may
-too.** `food.scss` and `cocktails.scss` are the two sites;
-`_sass/food/_timings.scss` re-imports `shared/tokens` and `shared/rule` itself.
-Grep for `@import "shared/` across `assets/css/` and `_sass/` before
-renaming or splitting a shared partial: the importer you forget is the one
-that fails at the next build of a page you never visit.
+**The stylesheets are Sass modules: every file names what it reads with
+`@use`, at its very top, and there is no `@import`.** `food.scss` and
+`cocktails.scss` are the two sites, and their `@use` order is the CSS order,
+since a module's rules land where it is first loaded. A shared partial reads a
+palette only through `shared/theme`, which each entry stylesheet fills from
+its own palette with `@use "shared/theme" with (...)`; a site partial `@use`s
+its own palette. Grep for `"shared/<name>"` across `assets/css/` and `_sass/`
+before renaming or splitting a shared partial: every user names it. An
+`@extend` reaches only modules the extending file loads, so a shared rule a
+site class should join names that class itself (`shared/_print.scss`'s
+`.btn-drafts-toggle`).
 
 **A site's own partial loads after the shared one it follows, so a per-site
 rule at equal specificity silently undoes a shared change on that site only.**
@@ -334,14 +339,16 @@ vs `assets/img/cocktails/`; `assets/css/food.scss` vs `cocktails.scss`.
 
 ### 2.3 The palette contract
 
-Shared partials use palette variables by name and never define them. Every
-site palette owes the variables listed in `SHARED_PALETTE_CONTRACT` in
-`tests/test_site_config.py`: the colours `$color-accent`, `$color-bg`,
-`$color-border`, `$color-clear-text`, `$color-mood-root`, `$color-surface`,
-`$color-text`, `$color-white`, and the fonts `$font-body`, `$font-headings`.
-Omit one and the build fails with "Undefined variable" pointing at
-`_sass/shared/`, and only the site that omitted it breaks.
-`test_every_palette_satisfies_the_shared_contract` checks the list by name;
+Shared partials read a palette only through `_sass/shared/_theme.scss`, which
+declares the variables they may use and nothing else: the colours
+`$color-accent`, `$color-bg`, `$color-border`, `$color-clear-text`,
+`$color-mood-root`, `$color-surface`, `$color-text`, and the fonts
+`$font-body`, `$font-headings`, `$font-label`. Each entry stylesheet passes
+every one from its own palette (`@use "shared/theme" with (...)`); one left
+out stops the build with an error naming it. A shared partial that reaches
+for any other palette variable fails as "Undefined variable", on both sites.
+`test_every_palette_satisfies_the_shared_contract` reads the theme's list and
+holds both palettes and both entry stylesheets to it;
 `test_the_two_palettes_declare_the_SAME_font_stack` keeps the two font stacks
 equal without lifting them into `shared/`.
 
@@ -4082,9 +4089,15 @@ every page with no error while a fixture that still supplies the element
 stays green. When removing markup, grep the scripts and the test fixtures for
 its class.
 
-**`/` is deprecated division in Dart Sass, and a partial loaded by `@import`
-cannot `@use "sass:math"`.** That is why `$wordmark-phone-scale` is the
-literal `0.6667`. Do not tidy it into a fraction.
+**`$wordmark-phone-scale` is the literal `0.6667`, not `math.div(2, 3)`.**
+The phone sizes were tuned at it, and the exact third moves each of them by a
+fraction of a pixel. `/` as division is deprecated in Dart Sass, so a ratio
+that is new goes through `math.div`.
+
+**`lightness.shift()` (shared/_lightness.scss) is how a colour is lightened or
+darkened, never `color.adjust` on lightness alone.** It clamps as `lighten()`
+and `darken()` did; plain `color.adjust` lets cocktails' near-white ink
+overshoot into an out-of-gamut colour where it should be white (#129).
 
 **CSS: the cascade**
 

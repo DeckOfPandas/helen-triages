@@ -2,7 +2,7 @@
 // spacing, widths, the type scale, breakpoints.
 //
 // Nothing in this file may reference a palette variable; that is what makes
-// it shareable. Imported after the site's palette, because a later partial
+// it shareable. Loaded after the site's palette, because a later partial
 // may reference both.
 
 // --- Spacing scale -----------------------------------------------------------

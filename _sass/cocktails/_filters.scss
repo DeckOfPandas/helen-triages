@@ -1,5 +1,9 @@
 @use "sass:color";
+@use "cocktails/palette" as *;
+@use "cocktails/rule" as *;
 @use "shared/lightness";
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
 
 // =============================================================================
 // COCKTAILS INDEX — THE CONTROLS

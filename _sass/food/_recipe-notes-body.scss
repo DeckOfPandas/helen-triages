@@ -1,10 +1,14 @@
+@use "food/palette" as *;
+@use "food/recipe-header" as *;
 @use "shared/lightness";
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
 
 // =============================================================================
 // HELEN TRIAGES FOOD - RECIPE PAGE: NOTES, BODY CONTENT, GROUP HEADINGS
 // =============================================================================
 // Uses %heading-base and the box-tint variables, both defined in
-// food/_recipe-header.scss, so it must stay imported after that file.
+// food/_recipe-header.scss, so it must stay loaded after that file.
 
 // --- Notes (plural: the grid) -------------------------------------------------
 // Exactly two columns, not auto-fit, so a wide screen cannot make it three.

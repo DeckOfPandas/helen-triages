@@ -1,3 +1,7 @@
+@use "cocktails/palette" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
 // Cocktails: the drink page (_layouts/cocktail.html).
 //
 // Two states on one page. It reads editorially by default; `is-making`, set by
@@ -21,7 +25,7 @@
 }
 
 // Every typed number on this site wears the same box. Defined here because
-// cocktails.scss imports this file before `cocktails/shortlist`, which extends
+// cocktails.scss loads this file before `cocktails/shortlist`, which extends
 // it too.
 %cocktail-number-input {
   @extend %cocktail-heading-face;

@@ -1,10 +1,14 @@
+@use "food/palette" as *;
+@use "food/recipe-header" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
 // =============================================================================
 // HELEN TRIAGES FOOD - THE TIMINGS AND METHODS PAGE
 // =============================================================================
 // The timings calculator (.ct-*) and the fish lists on
 // /food/reference/cooking-methods-and-timings/, loaded via food.scss. The
-// doneness charts are in _sass/food/_temperature-chart.scss. The palette,
-// tokens and rule partials it uses come from food.scss's own imports.
+// doneness charts are in _sass/food/_temperature-chart.scss.
 
 // --- The timing calculator ---------------------------------------------------
 

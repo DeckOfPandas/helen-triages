@@ -1,3 +1,6 @@
+@use "shared/theme" as *;
+@use "shared/tokens" as *;
+
 // THE SHORTLIST EXPORT PANEL (#849), on both indexes.
 //
 // In shared/ although each site's _shortlist.scss is forked on purpose: the

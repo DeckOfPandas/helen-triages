@@ -1,5 +1,9 @@
 @use "sass:color";
 @use "sass:list";
+@use "food/palette" as *;
+@use "food/recipe-header" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
 
 // =============================================================================
 // HELEN TRIAGES FOOD - THE TEMPERATURE CHART
