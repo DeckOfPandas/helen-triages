@@ -539,6 +539,14 @@ mood_include:
     moods: [strong brown drink, warming]
     why: >-
       she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
+  ace-of-clubs-daiquiri:
+    moods: [pudding in a glass]
+    why: >-
+      she calls it one; its crème de cacao is not in the `rich` set, which is cream, whole egg and coconut cream.
+  lemongrass-gimlet:
+    moods: [sharp]
+    why: >-
+      she calls it sharp; its sweetener is a `QQ lemongrass syrup` that names no declared syrup.
   caribbean-sazerac:
     moods: [strong brown drink, warming]
     why: >-

@@ -2064,6 +2064,11 @@ hand-edited mood cannot outlive the rule.
   many published cocktails it takes off the site.
 - **A `water` line is invisible to every rule** (`NOT_A_POUR`); the deriver
   drops it before anything is counted.
+- **A `QQ <hint>` generic counts as what its hint names** (`qq_hint`), when
+  the hint is exactly a spirit family, a family alias or a spirit generic in
+  `family_of`, ignoring case. `QQ Gin` stands in for a base spirit, so a gin
+  sour derives `sharp` before Helen names the gin. Any other hint, and a bare
+  `QQ`, reads as nothing.
 - **`no measuring` is the one rule that reads amounts**: every measured amount
   a whole-number multiple of the smallest, in `MAX_POURS` of that measure or
   fewer. The cap is what makes it a filter. A `(top)` falls out of it for
@@ -3384,6 +3389,17 @@ Food's row of the same name is its own markup and scoring in
 recipes, ranked by the same star ingredient, then more shared mood tags, then
 more shared other tags plus main ingredients, then shared non-larder
 ingredients, larder staples, and title.
+
+Above it, a food recipe page has **"Goes with…"** (#1104): every published
+recipe it links to, or that links to it, outside the ingredient lines
+(tagline, method, notes), so a dish shows its sides and a side its dishes. A
+link in an ingredient line names a component, not a pairing, and never
+counts: five-spice powder lists nothing it is used in. Nothing is stored: the
+layout searches the recipes for `](../<slug>/)`, so a promoted draft's links
+appear by themselves, and a pairing no recipe states needs another source
+when it comes. The rows are `_includes/food/recipe-row.html`, the related row's own markup;
+`test_every_link_between_recipes_shows_on_the_page_it_points_at` holds every
+link to its row.
 
 ### 9.14 `heights_mm` sizes the canvas
 

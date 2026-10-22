@@ -1473,6 +1473,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   tea', and b) comes over lots and lots of ice"* against *"Gunmetal Blue
   doesn't have ice..."*. `serve.ice` cannot carry QUANTITY: lots of cubed ice
   and one cube are both spelled `cubed`, so the rule cannot tell them apart.
+- **2026-10-22 — a `QQ` before an ingredient does not withhold a mood.**
+  Helen: *"QQ before an ingredient shouldn't block tagging. It's circular,
+  isn't it."* A `QQ Gin` asks which gin, not whether there is any. The
+  deriver reads a hint that names a spirit family or a spirit generic; a hint
+  it cannot place still reads as nothing, and she may name the bottle or
+  confirm the generic to unblock it.
 
 **Garnish, method and serve, ruled on while promoting.**
 
@@ -2787,10 +2793,18 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   rocks as the canonical name, so recipes that still have rocks are fine to
   break a test."* `rocks` remains only as an alias onto the one drawing.
   `todo` and `long` became `highball`, and every swizzle is a highball.
-- **2026-08-26, #299 — the glasses' stem and base proportions stay as drawn.**
-  Offered a proportion pass, Helen: *"these graphics are the thing on the site
-  that the least serves function over form... let's leave things as they
-  are."*
+- **2026-10-22, #299 — a stemmed glass's stem is one of three lengths: short
+  15%, medium 36% or long 57% of the drawing's height.** Shown every stemmed
+  glass at one height beside a candidate with only its stem changed, Helen:
+  *"I like 'every stemmed glass, same height', except for Hurricane, Sling and
+  Pilsner"*, and told it only alters stem length, *"If the 15 are literally
+  just altering the stem length, then thanks for doing those!"* The targets
+  are the medians of the three groups the measured stems fell into. Applied by
+  script to eleven sources, bowl and foot untouched; brandy was already on
+  target and is unchanged. Hurricane, sling and pilsner stay as drawn (she may
+  redraw them), as do the punch bowl (a pedestal, not a stem) and every glass
+  without a stem. This is her grant under #355 for these stems and nothing
+  else. (Replaces "proportions stay as drawn", 2026-08-26.)
 - **2026-08-27, #491 — `any` is not a glass.** Helen: *"when someone tells me
   to use an old fashioned glass I always automatically assume I can use any
   glass I like, so there's no need to have 'any' as a glass type."*

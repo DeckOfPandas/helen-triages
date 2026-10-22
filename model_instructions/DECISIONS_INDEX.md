@@ -219,6 +219,7 @@ argument and the rules each field is read by.
 - 2026-09-17 · §9.1.1 · Hurricane gets I want to faff from a mood_include, not a rule change.
 - 2026-09-18 · §9.1.1 · warming from cinnamon alone stays a rule; Gunmetal Blue loses it by a correction.
 - 2026-09-18 · §9.1.1 · Fish House Punch keeps ice ice baby by a mood_include; Gunmetal Blue's was withdrawn.
+- 2026-10-22 · §9.1.1 · a QQ before an ingredient does not withhold a mood.
 - 2026-09-17 · §9.1.1 · ginger is two garnishes, ginger wheel and stem ginger slice.
 - 2026-09-17 · §9.1.1 · fruit wedges is declared, the one garnish that does not name its fruit.
 - 2026-09-17 · §9.1.1 · Ti' Punch keeps a method — Her idea was no method, only a Serve line reading "Assemblage au choix." test_method_is_a_non_empty_list refuses that: a drink with no method renders as …
@@ -420,7 +421,7 @@ argument and the rules each field is read by.
 - 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the drink page draws the FIRST listed glass that has artwork.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · on the drink page the glass is compressed and drawn as a fraction of the title block.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #347 · old fashioned is the canonical glass name and rocks fails a test.
-- 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #299 · the glasses' stem and base proportions stay as drawn.
+- 2026-10-22 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #299 · a stemmed glass's stem is one of three lengths: short 15%, medium 36% or long 57% of the drawing's height.
 - 2026-08-27 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #491 · any is not a glass — Helen: "when someone tells me to use an old fashioned glass I always automatically assume I can use any glass I like, so there's no need to have 'any' as a …
 - 2026-08-31 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #355 · a session does not redraw Helen's glasses.
 - 2026-08-31 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #601 · a card's glass has its own curve: ratio × 0.5 + 0.5, plus headroom.

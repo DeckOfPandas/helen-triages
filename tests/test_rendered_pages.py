@@ -29,6 +29,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # tests/test_browser_smoke.py reads the same production build (#1200).
 from conftest import _require_bundler  # noqa: E402  (used by built_with_fixtures)
 from conftest import _absent_drafts  # noqa: E402  (the notes floor, below)
+from conftest import FRONT_MATTER  # noqa: E402  (the cross-recipe links, below)
 
 
 # --- building with throwaway fixtures ----------------------------------------
@@ -2680,6 +2681,55 @@ def test_every_published_recipe_page_offers_three_other_published_recipes(prod_s
     assert not problems, (
         "the related-recipes row (#1005) is wrong on these pages:\n  "
         + "\n  ".join(problems[:20])
+    )
+
+
+CROSS_RECIPE_LINK = re.compile(r"\]\(\.\./([a-z0-9-]+)/\)")
+LINKED_SECTION = re.compile(
+    r'<section class="recipe-related-section recipe-linked-section">(.*?)</section>', re.S)
+
+
+def test_every_link_between_recipes_shows_on_the_page_it_points_at(prod_site):
+    """#1104. When a published recipe links to another outside its ingredient
+    lines (tagline, method, notes), each appears under the other's "goes
+    with". A link in an ingredient line names a component and never counts.
+    Nothing else appears in the list.
+
+    Published is whatever the production build made a page for, so the gate
+    decides, not this test.
+    """
+    built = {p.parent.name for p in _recipe_pages(prod_site)}
+    assert len(built) > 20, f"only {len(built)} recipe pages built"
+
+    expected = {}
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        if path.stem not in built:
+            continue
+        fm = yaml.safe_load(FRONT_MATTER.match(path.read_text(encoding="utf-8")).group(1)) or {}
+        in_ings = set(CROSS_RECIPE_LINK.findall(yaml.safe_dump(fm.get("ingredient_groups") or [])))
+        elsewhere = set(CROSS_RECIPE_LINK.findall(yaml.safe_dump(
+            [fm.get("tagline"), fm.get("method"), fm.get("method_groups"), fm.get("notes")])))
+        for target in (elsewhere - in_ings) & built:
+            expected.setdefault(target, set()).add(path.stem)
+            expected.setdefault(path.stem, set()).add(target)
+    assert expected, (
+        "No published recipe links to another, so this test checks nothing. "
+        "Either the links' `](../<slug>/)` form changed or the corpus walk did."
+    )
+
+    problems = []
+    for page in _recipe_pages(prod_site):
+        slug = page.parent.name
+        shown = set()
+        for body in LINKED_SECTION.findall(page.read_text(encoding="utf-8")):
+            for href in RELATED_RECIPE_LINK.findall(body):
+                shown.add(href.rstrip("/").rsplit("/", 1)[-1])
+        want = expected.get(slug, set()) - {slug}
+        if shown != want:
+            problems.append(f"{slug}: shows {sorted(shown)}, its links say {sorted(want)}")
+    assert not problems, (
+        "the goes-with lists (#1104) disagree with the recipes' own "
+        "links:\n  " + "\n  ".join(problems[:20])
     )
 
 
