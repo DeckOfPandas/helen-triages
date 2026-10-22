@@ -3392,9 +3392,11 @@ ingredients, larder staples, and title.
 
 Above it, a food recipe page has **"Goes with…"** (#1104): every published
 recipe it links to, or that links to it, outside the ingredient lines
-(tagline, method, notes), so a dish shows its sides and a side its dishes. A
-link in an ingredient line names a component, not a pairing, and never
-counts: five-spice powder lists nothing it is used in. Nothing is stored: the
+(tagline, method, notes), so a dish shows its sides and a side its dishes.
+When either recipe links the other in an ingredient line, that is a
+component, not a pairing, and the pair never shows: five-spice powder lists
+nothing it is used in, and the chai tea and its spice powder skip each other
+although the powder's tagline links the tea. Nothing is stored: the
 layout searches the recipes for `](../<slug>/)`, so a promoted draft's links
 appear by themselves, and a pairing no recipe states needs another source
 when it comes. The rows are `_includes/food/recipe-row.html`, the related row's own markup;

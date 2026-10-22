@@ -1,6 +1,6 @@
 ---
 title: "Indian Mutton Raan Roast"
-tagline: "Prep happens over days, but it's totally worth it. Uses [garam masala powder](../garam-masala-powder/)."
+tagline: "Prep happens over days, but it's totally worth it."
 source: "Adapted from kitchenofdebjani.com, recipe Debjani Chatterjee Alam"
 source_type: website
 serves: "10"
@@ -59,7 +59,7 @@ ingredient_groups:
     - amount: "1 tsp"
       item: turmeric powder
     - amount: "½ tsp"
-      item: garam masala powder
+      item: "[garam masala powder](../garam-masala-powder/)"
     - amount: "1 tsp"
       item: demerara sugar
     - amount: "½ tsp"

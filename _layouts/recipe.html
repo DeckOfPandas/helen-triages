@@ -320,11 +320,11 @@ layout: default
   {% comment %} ── Goes with … (#1104) ──
      Every published recipe that this one links to, or that links to this one,
      outside its ingredient lines (tagline, method, notes): a dish shows its
-     sides and a side shows its dishes. A link in an ingredient line names a
-     component, not a pairing, so it never counts. Links are written
-     `](../<slug>/)` throughout, and `site.food_recipes` is the published set,
-     so a promoted draft's links appear by themselves. tests/test_rendered_pages.py
-     holds every link to its row. {% endcomment %}
+     sides and a side shows its dishes. When either one links the other in an
+     ingredient line, it is a component, not a pairing, and never shows. Links
+     are written `](../<slug>/)`, and `site.food_recipes` is the published set,
+     so a promoted draft's links appear by themselves.
+     tests/test_rendered_pages.py holds every link to its row. {% endcomment %}
   {% capture _link_to_me %}](../{{ page.slug }}/){% endcapture %}
   {% assign _my_ingredients = page.ingredient_groups | jsonify %}
   {% capture _my_elsewhere %}{{ page.tagline }}{{ page.method | jsonify }}{{ page.method_groups | jsonify }}{{ page.notes | jsonify }}{% endcapture %}
@@ -335,8 +335,8 @@ layout: default
       {% assign _in_ingredients = _other.ingredient_groups | jsonify %}
       {% capture _elsewhere %}{{ _other.tagline }}{{ _other.method | jsonify }}{{ _other.method_groups | jsonify }}{{ _other.notes | jsonify }}{% endcapture %}
       {% assign _pairs = false %}
-      {% if _elsewhere contains _link_to_me %}{% unless _in_ingredients contains _link_to_me %}{% assign _pairs = true %}{% endunless %}{% endif %}
-      {% if _my_elsewhere contains _link_to_other %}{% unless _my_ingredients contains _link_to_other %}{% assign _pairs = true %}{% endunless %}{% endif %}
+      {% if _elsewhere contains _link_to_me or _my_elsewhere contains _link_to_other %}{% assign _pairs = true %}{% endif %}
+      {% if _in_ingredients contains _link_to_me or _my_ingredients contains _link_to_other %}{% assign _pairs = false %}{% endif %}
       {% if _pairs %}
         {% capture _goes_with_keys %}{{ _goes_with_keys }}{{ _other.title }}~{{ _other.url }};{% endcapture %}
       {% endif %}
