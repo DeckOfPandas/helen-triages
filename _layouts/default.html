@@ -38,13 +38,12 @@
 
   {% comment %} ── Link previews ───────────────────────────────────────────────
      The image is the site's own wordmark card (#1086): `social_image` in
-     _data/sites.yml per site, and the repo-level one in _config.yml for a
-     site_neutral page. scripts/render_social_images.py makes them; re-run it
-     when the wordmark changes. The width and height below are what that script
+     _data/sites.yml. A site_neutral page takes its site_key's card, which is
+     food's. scripts/render_social_images.py makes them; re-run it when the
+     wordmark changes. The width and height below are what that script
      writes, and tests/test_site_config.py holds the PNG headers to them.
   {% endcomment %}
-  {% assign social_image = this_site.social_image | default: site.social_image %}
-  {% if page.site_neutral %}{% assign social_image = site.social_image | default: social_image %}{% endif %}
+  {% assign social_image = this_site.social_image %}
   <meta property="og:type" content="{% if page.collection %}article{% else %}website{% endif %}">
   <meta property="og:site_name" content="{{ site_title | escape }}">
   <meta property="og:title" content="{{ page.title | default: site_title | escape }}">
@@ -59,7 +58,19 @@
   <meta name="twitter:card" content="summary">
   {% endif %}
 
-  <link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
+  {% comment %} One icon per size, so the browser picks the one that matches
+     the screen: [ ] at 16px, HT over [ ] at 32 and 48, the wordmark on a
+     phone's home screen. PNGs and no SVG, which a browser would prefer at
+     every size. scripts/render_favicons.py and render_social_images.py make
+     them; tests/test_site_config.py holds each file to its size.
+  {% endcomment %}
+  {% if page.site_key %}
+  {% assign icon_base = '/assets/img/favicon/' | append: page.site_key %}
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ icon_base | append: '-16.png' | relative_url }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ icon_base | append: '-32.png' | relative_url }}">
+  <link rel="icon" type="image/png" sizes="48x48" href="{{ icon_base | append: '-48.png' | relative_url }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ icon_base | append: '-180.png' | relative_url }}">
+  {% endif %}
   {% comment %} Each site links only its own compiled stylesheet, so the two
      never share a class name they could fight over. There is no fallback: a
      page rendered through this layout with no site_key gets no stylesheet at

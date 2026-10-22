@@ -1503,23 +1503,19 @@ def _png_size(path: Path) -> tuple[int, int]:
 
 
 def test_every_link_preview_image_exists_at_the_size_the_layout_claims():
-    """The og:image cards (#1086): one per site in sites.yml, one in
-    _config.yml for the site-neutral pages, all rendered by
-    scripts/render_social_images.py.
+    """The og:image cards (#1086): one per site in sites.yml, rendered by
+    scripts/render_social_images.py. A site-neutral page takes its site_key's.
 
     Every named card exists, its PNG header matches the og:image:width/height
     the layout states, and the layout's numbers match the script's constants.
     """
     sites = yaml.safe_load(read("_data", "sites.yml"))
-    config = yaml.safe_load(read("_config.yml"))
     cards = {f"sites.yml {key}": s.get("social_image") for key, s in sites.items()}
-    cards["_config.yml"] = config.get("social_image")
     missing_key = [where for where, path in cards.items() if not path]
     assert not missing_key, (
         f"No social_image declared for: {missing_key}. Every site names its own "
-        f"card and _config.yml names the [ ?? ] one; _layouts/default.html falls "
-        f"back to text-only for a page with none, which is the state this test "
-        f"exists to end."
+        f"card; _layouts/default.html falls back to text-only for a page with "
+        f"none, which is the state this test exists to end."
     )
 
     layout = read("_layouts", "default.html")
@@ -1546,6 +1542,32 @@ def test_every_link_preview_image_exists_at_the_size_the_layout_claims():
         size = _png_size(file)
         if size != claimed:
             problems.append(f"{where}: {path} is {size}, the layout claims {claimed}")
+    assert not problems, "\n".join(problems)
+
+
+def test_every_site_has_each_favicon_the_layout_links():
+    """The tab and home-screen icons: _layouts/default.html links
+    assets/img/favicon/<site_key>-<size>.png at the sizes its `sizes=`
+    attributes state. Every site in sites.yml has every one of those files,
+    each a PNG of exactly that size, and no SVG icon is linked, because a
+    browser would take it at every size over the PNGs.
+    """
+    layout = read("_layouts", "default.html")
+    linked = re.findall(r'sizes="(\d+)x\1" href="\{\{ icon_base \| append: \'-(\d+)\.png\'', layout)
+    assert linked, "_layouts/default.html no longer links the per-site favicons"
+    assert all(a == b for a, b in linked), f"a favicon's sizes= and file name disagree: {linked}"
+    assert 'type="image/svg+xml"' not in layout, "an SVG icon is linked again; see the comment above the favicon links"
+
+    sites = yaml.safe_load(read("_data", "sites.yml"))
+    problems = []
+    for key in sites:
+        for size, _ in linked:
+            file = ROOT / "assets" / "img" / "favicon" / f"{key}-{size}.png"
+            if not file.is_file():
+                problems.append(f"{file.relative_to(ROOT)} is missing -- run scripts/render_favicons.py "
+                                f"(or render_social_images.py for the 180)")
+            elif _png_size(file) != (int(size), int(size)):
+                problems.append(f"{file.relative_to(ROOT)} is {_png_size(file)}, the layout claims {size}x{size}")
     assert not problems, "\n".join(problems)
 
 

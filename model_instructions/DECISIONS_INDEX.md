@@ -34,7 +34,8 @@ argument and the rules each field is read by.
 - 2026-09-10 · §2 · no words under the wordmark — Helen, declining a one-line question there ("What shall we cook?"): "No words under the wordmark section please."
 - 2026-09-11 · §2 · #965 · the other-site row sits at the right-hand end of the header's second row and ?? at its left end, both on the cards' edges, at every width.
 - 2026-09-11 · §2 · #969 · the footer's centre column reads about / GitHub mark / copyright / licences / hearts.
-- 2026-09-15 · §2 · #1086 · the link-preview image is the wordmark: one card per site and one for neither.
+- 2026-10-21 · §2 · #1086 · the link-preview image is the wordmark, one card per site; the about page takes food's.
+- 2026-10-21 · §2 · the icons step down by size: the wordmark, then HT over [ ], then [ ] alone; each site has its own, told apart by colour.
 - undated · §2 · Undated — the about link in the header is a bare ?? in the body face: no circle, no border, no heading font.
 - 2026-08-16 · §2 · the footer is three tracks with the hearts page-centred, whether one reference column renders or two.
 - 2026-08-16 · §2 · a footer link rests in the footer's own colour and takes the accent on hover, focus and click.
