@@ -488,7 +488,8 @@ does not give one you cannot pick: that is a `QQ`.
 `demerara sugar syrup 2:1` · `turbinado sugar syrup 2:1` · `grenadine` ·
 `ginger syrup` · `passion fruit syrup` · `cinnamon syrup` · `pineapple syrup` ·
 `hazelnut syrup` · `agave syrup` · `vanilla syrup` · `raspberry syrup` ·
-`orgeat` · `falernum` · `lime cordial` · `ginger and lemongrass cordial`
+`lemongrass syrup` · `orgeat` · `falernum` · `lime cordial` ·
+`ginger and lemongrass cordial`
 
 **Honeys:** `honey` · `honey water` · `honey water 1:1` · `honey water 2:1` ·
 `honey water 3:1`
