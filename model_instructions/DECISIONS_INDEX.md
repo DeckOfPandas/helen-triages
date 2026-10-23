@@ -312,6 +312,7 @@ argument and the rules each field is read by.
 - 2026-10-11 · §9.3.1 · a made ingredient is named plainly, and how to make it or what stands in for it is a note.
 - 2026-10-19 · §9.3.1 · a list of source wordings, approved as a list.
 - 2026-10-19 · §9.3.1 · four new generics: raspberry syrup, orange flower water, vanilla extract, powdered sugar.
+- 2026-10-23 · §9.3.1 · a batch syrup a drink makes is a note; the ingredient list is one glass.
 - 2026-08-30 · §9.3.2 · every bottle a drink names is declared in bottles.yml and classified; never derive a bottle's category from the ingredient beside it.
 - 2026-08-30 · §9.3.2 · #534 · a suggested bottle may sit outside the generic's category, and then the ingredient must carry a note; QQ counts.
 - 2026-09-02 · §9.3.2 · #585 · a bare brand is not a bottle and is never added as an alias.
