@@ -978,7 +978,7 @@ generics:
   salt:               { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   ground cinnamon:    { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   lemongrass syrup:   { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "homemade; excluded by Helen's ruling", confidence: high }
-  pear and rosemary syrup: { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "homemade; excluded by Helen's ruling", confidence: high }
+  "pear, apricot and rosemary syrup": { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "homemade; excluded by Helen's ruling", confidence: high }
 
   # --- squeezed: priced from `fruit_prices` and `juice_yields` ---
   # `from_fruit` names the `juice_yields` entry to divide the fruit price by.
