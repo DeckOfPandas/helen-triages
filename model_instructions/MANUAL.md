@@ -2519,11 +2519,13 @@ so. The page carries which it did as `data-top-from="glass|range"` beside
 `data-top-ml`, unprinted.
 
 **It withholds where a figure would be wrong rather than rough.** `volume_for`
-returns nothing when the excluded pours are the drink — the same judgement and
-the same constant as `cost.complete` (`CocktailCosts::SUBSTANTIAL`): a
-Caipirinha is cachaça, half a lime and palm sugar, and its millilitres are the
-cachaça's, not the drink's. It also returns nothing for an amount nothing can
-read or a topper with no declared range.
+returns nothing when the excluded pours are the drink — the constant
+`cost.complete` uses (`CocktailCosts::SUBSTANTIAL`), except that a counted
+sugar (a generic in `ingredients.yml`'s `sugars`) never counts, because it
+dissolves into what it sweetens: the Old Fashioned's sugar cube leaves it
+45 ml. A Caipirinha is cachaça, half a lime and palm sugar, and its
+millilitres are the cachaça's, not the drink's. It also returns nothing for an
+amount nothing can read or a topper with no declared range.
 `test_the_drinks_that_state_no_volume_are_exactly_the_ones_that_cannot` in
 `tests/test_rendered_pages.py` pins the set by name in both directions.
 

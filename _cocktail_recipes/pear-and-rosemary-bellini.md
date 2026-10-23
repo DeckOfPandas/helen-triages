@@ -8,29 +8,12 @@ garnish:
 serve:
   ice: "none"
 ingredients:
-  - amount: "1 whole"
-    note: "Sliced."
-    generic: "pear"
-  - amount: "4 whole"
-    generic: "dried apricots"
-  - amount: "75 g"
-    generic: "golden caster sugar"
-  - amount: "25 g"
-    generic: "honey"
-  - amount: "1 sprig"
-    generic: "rosemary"
-  - amount: "1 strip"
-    generic: "lemon zest"
-  - amount: "10 ml"
-    generic: "cider vinegar"
+  - amount: "25 ml"
+    generic: "pear, apricot and rosemary syrup"
+    note: "See below for the recipe."
   - amount: "(top)"
     generic: "soda water"
 method:
-  - "Heat everything except the soda water and vinegar with 100 ml water."
-  - "Heat for 10 mins, or until soft."
-  - "Leave to cool completely."
-  - "Strain the syrup and add the vinegar."
-  - "Chill in the fridge for 30 mins."
   - "Add 25 ml syrup to a champagne flute."
   - "Top with soda water."
 mood:
@@ -44,8 +27,8 @@ mood:
   - "no juicing"
   - "no measuring"
 notes:
-  - label: "portioning"
-    text: "1 pear makes 3–4 orders."
+  - label: "Pear, apricot and rosemary syrup"
+    text: "Makes four portions. Heat 1 sliced pear, 4 dried apricots, 75 g golden caster sugar, 25 g honey, 1 rosemary sprig and 1 strip of lemon zest with 100 ml water for 10 mins, or until soft. Leave to cool completely, strain, and add 10 ml cider vinegar. Chill in the fridge for 30 mins."
 source: ""
 source_url: ""
 meta:

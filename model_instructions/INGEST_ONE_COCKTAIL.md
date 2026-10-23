@@ -488,7 +488,8 @@ does not give one you cannot pick: that is a `QQ`.
 `demerara sugar syrup 2:1` · `turbinado sugar syrup 2:1` · `grenadine` ·
 `ginger syrup` · `passion fruit syrup` · `cinnamon syrup` · `pineapple syrup` ·
 `hazelnut syrup` · `agave syrup` · `vanilla syrup` · `raspberry syrup` ·
-`orgeat` · `falernum` · `lime cordial` · `ginger and lemongrass cordial`
+`lemongrass syrup` · `pear, apricot and rosemary syrup` · `orgeat` ·
+`falernum` · `lime cordial` · `ginger and lemongrass cordial`
 
 **Honeys:** `honey` · `honey water` · `honey water 1:1` · `honey water 2:1` ·
 `honey water 3:1`
@@ -868,6 +869,25 @@ cocktail recipe pours "jalapeño-infused blanco tequila" and the infusion recipe
 frame, the drink cannot be made from what you have. Say so — steeping time and
 chilli count decide whether it is pleasant or inedible, and neither is
 inferable.
+
+**A SYRUP THE RECIPE MAKES ITSELF IS A NOTE, AND THE INGREDIENT LIST IS ONE
+GLASS.** Some recipes list a whole batch — a pear, four apricots, 75 g sugar,
+100 ml water — and only the method says how much goes in each glass: "Add
+25 ml syrup to a flute." Helen's ruling: the batch is a note, and the
+ingredient list holds what one glass gets.
+
+- **The ingredient** is the per-glass amount of the syrup, named as the source
+  names it behind a `QQ` — `amount: "25 ml"`, `generic: "QQ pear syrup"` — with
+  `note: "See below for the recipe."`, exactly that.
+- **The note** is labelled `"QQ"` and the syrup's name (`"QQ pear syrup"`), and
+  its text is `QQ - `, then how many portions the batch makes, then the batch
+  recipe in the source's own amounts and steps: "QQ - Makes four portions.
+  Heat 1 sliced pear, ...". Helen gives it its real title at rewrite.
+- **The method** keeps only the per-glass steps: the syrup into the glass, the
+  rest of the build.
+- **If the source never says how much goes in a glass**, do not divide the
+  batch yourself: transcribe the ingredient list as the source prints it, and
+  say in your list that the portion is missing, so Helen can split it.
 
 ---
 

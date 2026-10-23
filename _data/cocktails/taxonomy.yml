@@ -373,6 +373,7 @@ mood_ingredients:
     - fruit purée
     - passion fruit syrup
     - pineapple syrup
+    - "pear, apricot and rosemary syrup"
     - crème de mûre
     - crème de myrtille
     - black raspberry liqueur
@@ -434,6 +435,8 @@ mood_ingredients:
     - ginger syrup
     - pineapple syrup
     - hazelnut syrup
+    - lemongrass syrup
+    - "pear, apricot and rosemary syrup"
     - triple sec
     - orange Curaçao
     - maraschino liqueur
@@ -564,9 +567,9 @@ mood_include:
     why: >-
       she calls it warming; its ginger is a ginger beer top, which the `warming` set does not hold.
   lemongrass-gimlet:
-    moods: [sharp]
+    moods: [I want to faff]
     why: >-
-      she calls it sharp; its sweetener is a `QQ lemongrass syrup` that names no declared syrup.
+      she calls it a faff; it boils its own syrup, which the rule does not count.
   caribbean-sazerac:
     moods: [strong brown drink, warming]
     why: >-

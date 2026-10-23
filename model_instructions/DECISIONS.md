@@ -2042,6 +2042,7 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 
 - **2026-10-19 — a list of source wordings, approved as a list.** Helen approved four groups, so `source_wordings.yml` gained twelve (Rye Whiskey, Sweet Red Vermouth, Plain Water, Vodka Citron, Becherovka liqueur, Créole Shrubb liqueur, Apple Schnapps liqueur, Pimento dram/Allspice liqueur, Clear apple juice (not cloudy), Orange flower/blossom water, and more); eleven were there already. IBA's ratio-less "Sugar Syrup" is `cane sugar syrup 1:1`. A bare IBA "Gin" is NOT mapped: *"Not all IBA gin is London Dry, so QQ every time please unless you happen to know which it is!"*
 - **2026-10-19 — four new generics: raspberry syrup, orange flower water, vanilla extract, powdered sugar.** Each Helen's yes. "Bourbon or Rye Whiskey" is the OR list `[bourbon, rye]`; navy rum with no bottle stays `QQ`.
+- **2026-10-23 — a batch syrup a drink makes is a note; the ingredient list is one glass.** On the Pear and Rosemary Bellini, whose list was the whole batch: *"put the syrup recipe in a note, then add 25 ml syrup to the ingredient line"*, the note titled with the syrup's name (*"Pear, apricot and rosemary syrup"*) and saying how many portions it makes, and the ingredient carrying *"See below for the recipe."* A homemade syrup is declared with no strength or price: *"Declare, but it's homemade, so no ABV or price"* (lemongrass syrup): `non_alcoholic` in `abv.yml`, 0 in `costs.yml`.
 
 ### §9.3.2 The bottle dictionary
 
@@ -2357,9 +2358,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   built 2026-09-24. A count or weight with no row is still a flourish (the
   sugar cube). Asked on 2026-10-11 (#1371) about three things a session had
   guessed: *"Sugar should be £0 here. It just doesn't matter at this scale!"*
-  (its `weight_prices` rows are zero); the pear Bellini as batch syrup plus one
-  top, *"yes"*; and the estimated prices, *"rough is more than fine. The
-  expensive part of cocktails is absolutely not the fruit..."*
+  (its `weight_prices` rows are zero); and the estimated prices, *"rough is
+  more than fine. The expensive part of cocktails is absolutely not the
+  fruit..."* A homemade syrup is priced 0 (§9.3.1).
 - **2026-09-05, #547 — a `(top)` is costed as a declared range, `top_up_ml` in
   `costs.yml`.** Helen: *"We can calculate top volumes, well, slightly, can't
   we — I'd like that to be captured actually so it can be added into the
@@ -2488,13 +2489,14 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   midpoint is now what a top falls back to where its glass cannot size it. No
   topped drink may declare `serves:` (`test_no_topped_drink_is_also_a_punch`),
   because `serve_ml` would share one top between the glasses.
-- **2026-09-17, #1121 — a drink whose uncounted ingredients ARE the drink
-  states no volume.** A session's call, not Helen's ruling. The Caipirinha is
-  45 ml of cachaça, half a lime and 20 g of palm sugar; "45 ml" would be wrong,
-  not rough, so the units line ends "in a serving." The pear Bellini is the
-  other: its list is a batch syrup that only its method portions. The test is
-  `CocktailCosts::SUBSTANTIAL` itself, not a copy; a dozen sugar cubes in a
-  punch is a flourish and spoils nothing.
+- **2026-10-23, #1121 — a drink whose uncounted ingredients ARE the drink
+  states no volume, and a counted sugar is never one of them.** Helen, asked
+  whether the Old Fashioned (45 ml whiskey, one sugar cube) should stay silent
+  or print: *"Print ~45 ml"*. A sugar dissolves into what it sweetens, so a
+  figure without it is rough, not wrong. The Caipirinha (half a lime) stays
+  silent: it fills its glass, so the cachaça alone undercounts what matters.
+  The test is `CocktailCosts::SUBSTANTIAL` minus any generic in
+  `ingredients.yml`'s `sugars`; `cost.complete` still counts sugars as before.
 - **2026-09-17, #1121 — the note under the scaler carries the bitters caveat
   and no totals.** Helen: *"I like the line. But the cost and units line below
   has come back and I don't want it to be there."* #713's batch note had
