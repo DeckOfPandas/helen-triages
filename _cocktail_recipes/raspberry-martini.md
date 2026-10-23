@@ -1,6 +1,6 @@
 ---
 title: "Raspberry Martini"
-tagline: "Shouldn't a drink contain more than just vodka to qualify as a martini? Oh, right, raspberries, coolio."
+tagline: "Shouldn't a drink contain more than just vodka to qualify as a martini? Oooh, raspberries, coolio."
 glass:
   - "martini"
 garnish:
@@ -10,7 +10,7 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 mood:
   - "fruity"
   - "no juicing"

@@ -1,6 +1,6 @@
 ---
 title: "South Sider"
-tagline: "Velvet smoking jacket, sequinned dress."
+tagline: "Velvet smoking jacket, check. Sequinned dress, check."
 glass:
   - "coupe"
 garnish:
@@ -43,5 +43,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

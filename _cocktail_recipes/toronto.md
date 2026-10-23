@@ -1,6 +1,6 @@
 ---
 title: "Toronto"
-tagline: "Politely bitter."
+tagline: "A Manhattan / Old Fashioned for bartenders. I don't gatekeep your pleasure, call it whatever you want."
 glass:
   - "nick and nora"
 garnish:
@@ -10,7 +10,7 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 mood:
   - "strong brown drink"
   - "nightcap"

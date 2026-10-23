@@ -1,6 +1,6 @@
 ---
 title: "Californian Margarita"
-tagline: "Drink it in a hilly seaside town."
+tagline: "Drink it in a hilly seaside town, while doing AI-assisted yoga."
 glass:
   - "old fashioned"
 garnish:
@@ -10,7 +10,7 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 mood:
   - "sharp"
   - "sunny terrace"

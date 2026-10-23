@@ -1,6 +1,6 @@
 ---
 title: "Caipirinha"
-tagline: "Palm sugar or bust."
+tagline: "Palm sugar or go home."
 glass:
   - "highball"
 garnish:
@@ -50,5 +50,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

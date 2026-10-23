@@ -1,6 +1,6 @@
 ---
 title: "Christmas Punch"
-tagline: "I always want to drink this face-first out of a Scorpion Bowl, but family Christmas hasn't yet been the time."
+tagline: "I always want to drink this face-first from a Scorpion Bowl, but family Christmas hasn't yet been the time."
 glass:
   - "flute"
 garnish:
@@ -41,5 +41,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

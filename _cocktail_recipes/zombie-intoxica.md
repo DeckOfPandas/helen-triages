@@ -1,6 +1,6 @@
 ---
 title: "Zombie Intoxica"
-tagline: "You totally need more than one on-fire Zombie recipe! Look!!!!"
+tagline: "See, I told you, you DO need more than one on-fire Zombie recipe!"
 glass:
   - "tiki mug"
 garnish: ["mint sprig", "fruit wedges", "maraschino cherry", "half an empty passion fruit shell"]
@@ -59,5 +59,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

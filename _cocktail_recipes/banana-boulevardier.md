@@ -1,6 +1,6 @@
 ---
 title: "Banana Boulevardier"
-tagline: "A little unhinged, but who isn't."
+tagline: "Swanking down Bourbon Street with your new yellow handbag like yeah who cares."
 glass:
   - "double old fashioned"
   - "coupe"
@@ -42,5 +42,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -1,6 +1,6 @@
 ---
 title: "18th Century Cocktail"
-tagline: "Read the ingredients list — it's a ride."
+tagline: "Sugarcane, chocolate, wine...the unanticipated breakout girlband."
 glass:
   - "coupe"
 garnish:
@@ -36,5 +36,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Voodoo That You Do"
-tagline: "Who do? You do. Do what? Remind me of an evening class in a Hackney bar where we made love potions, then heard a lecture on schizophrenia and witchcraft."
+tagline: "Who do? You do. Do what? Remind me of a Hackney bar, brewing love potions to a talk on psychosis and witchcraft."
 glass:
   - "coupe"
 garnish:
@@ -10,7 +10,7 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 mood:
   - "sharp"
   - "aperitivo"

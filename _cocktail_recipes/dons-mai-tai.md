@@ -1,6 +1,6 @@
 ---
 title: "Don's Mai Tai"
-tagline: "Grapefruit and absinthe to keep us on our toes."
+tagline: "Grapefruit and absinthe all like, yeah didn't you know, we've been friends since primary school."
 glass:
   - "double old fashioned"
 garnish:
@@ -12,7 +12,7 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 mood:
   - "sharp"
   - "fruity"

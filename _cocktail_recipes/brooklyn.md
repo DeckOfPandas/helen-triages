@@ -1,6 +1,6 @@
 ---
 title: "Brooklyn"
-tagline: "Achingly cool. You're either this or PBR."
+tagline: "You're either this or PBR."
 glass:
   - "old fashioned"
 garnish:
@@ -35,5 +35,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

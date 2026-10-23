@@ -1,6 +1,6 @@
 ---
 title: "Man O' War"
-tagline: "Naming a cocktail after a racehorse could be a reach, but it isn't."
+tagline: "Naming a cocktail after a racehorse could be a reach, but at least it's not named after a jellyfish."
 glass:
   - "coupe"
 garnish:
@@ -38,5 +38,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

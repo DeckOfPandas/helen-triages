@@ -1,6 +1,6 @@
 ---
 title: "Carta Switchel"
-tagline: "Far more than \"some stuff in a glass\"."
+tagline: "Cider vinegar is too cool for any rum you choose, but fernet and grapefruit will bitch about it anyway."
 glass:
   - "highball"
 garnish:
@@ -11,7 +11,7 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 mood:
   - "sharp"
   - "aperitivo"

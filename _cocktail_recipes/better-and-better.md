@@ -1,6 +1,6 @@
 ---
 title: "Better and Better"
-tagline: "A funky tiki drink, except someone confiscated the fruit."
+tagline: "A funky tiki drink, except, hang on, is mezcal a fruit?"
 glass:
   - "old fashioned"
 garnish:
@@ -39,5 +39,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
