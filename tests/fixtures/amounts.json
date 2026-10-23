@@ -145,6 +145,16 @@
   }
  },
  {
+  "amount": "1 tsp",
+  "number": 1.0,
+  "unit": "tsp",
+  "ml": 5.0,
+  "js": {
+   "quantity": 1,
+   "unit": "tsp"
+  }
+ },
+ {
   "amount": "1 whole",
   "number": 1.0,
   "unit": "whole",
@@ -412,6 +422,16 @@
   "js": {
    "quantity": 4,
    "unit": "drop"
+  }
+ },
+ {
+  "amount": "4 sprigs",
+  "number": 4.0,
+  "unit": "sprigs",
+  "ml": null,
+  "js": {
+   "quantity": 4,
+   "unit": "sprig"
   }
  },
  {
