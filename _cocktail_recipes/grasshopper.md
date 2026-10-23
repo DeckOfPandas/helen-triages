@@ -10,7 +10,7 @@ garnish:
 meta:
   made_before: true
   ship: "yes"
-  rewritten: yes
+  rewritten: true
   awaiting_fix: false
   proofread: false
 mood:
