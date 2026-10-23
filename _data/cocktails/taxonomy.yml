@@ -564,6 +564,10 @@ mood_include:
     moods: [warming]
     why: >-
       she calls it warming; its ginger is a ginger beer top, which the `warming` set does not hold.
+  lemongrass-gimlet:
+    moods: [I want to faff]
+    why: >-
+      she calls it a faff; it boils its own syrup, which the rule does not count.
   caribbean-sazerac:
     moods: [strong brown drink, warming]
     why: >-
