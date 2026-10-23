@@ -434,6 +434,7 @@ mood_ingredients:
     - ginger syrup
     - pineapple syrup
     - hazelnut syrup
+    - lemongrass syrup
     - triple sec
     - orange Curaçao
     - maraschino liqueur
@@ -563,10 +564,6 @@ mood_include:
     moods: [warming]
     why: >-
       she calls it warming; its ginger is a ginger beer top, which the `warming` set does not hold.
-  lemongrass-gimlet:
-    moods: [sharp]
-    why: >-
-      she calls it sharp; its sweetener is a `QQ lemongrass syrup` that names no declared syrup.
   caribbean-sazerac:
     moods: [strong brown drink, warming]
     why: >-

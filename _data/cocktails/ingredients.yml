@@ -797,6 +797,7 @@ syrups:
   - "agave syrup"
   - "vanilla syrup"
   - "raspberry syrup"
+  - "lemongrass syrup"
   - "orgeat"
   - "falernum"
   - "lime cordial"
@@ -1232,6 +1233,7 @@ shelf_of:
   "honey water 2:1": sugar syrup
   "honey water 3:1": sugar syrup
   hazelnut syrup: sugar syrup
+  lemongrass syrup: sugar syrup
   pineapple syrup: sugar syrup
   molasses sugar: sugar syrup
   orgeat: sugar syrup
