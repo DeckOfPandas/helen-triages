@@ -10,7 +10,7 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 mood:
   - "strong brown drink"
   - "nightcap"

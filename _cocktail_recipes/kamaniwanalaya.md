@@ -46,5 +46,5 @@ meta:
   ship: "meh"
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 ---

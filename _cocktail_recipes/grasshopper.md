@@ -12,7 +12,7 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 mood:
   - "pudding in a glass"
   - "nightcap"
