@@ -375,7 +375,7 @@ argument and the rules each field is read by.
 - 2026-10-10 · §9.3.5 · #1351 · a category may be priced and given its strength from a named default bottle that is not declared in bottles.yml.
 - 2026-09-17 · §9.3.6 · #1121 · the units line also states the serving's volume.
 - 2026-09-17 · §9.3.6 · #1121 · a topped drink's volume takes the midpoint of top_up_ml.
-- 2026-09-17 · §9.3.6 · #1121 · a drink whose uncounted ingredients ARE the drink states no volume.
+- 2026-10-23 · §9.3.6 · #1121 · a drink whose uncounted ingredients ARE the drink states no volume, and a counted sugar is never one of them.
 - 2026-09-17 · §9.3.6 · #1121 · the note under the scaler carries the bitters caveat and no totals.
 - 2026-10-02 · §9.3.6 · #1257 · nothing under the scaler prints a volume; the "Approximately X ml" line is removed.
 - 2026-10-04 · §9.3.6 · #1179 #1116 · a (top) is sized from its glass — Helen: "Can we add to that data, and find typical capacities?

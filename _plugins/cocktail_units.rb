@@ -52,6 +52,8 @@ module HelenTriages
 
       @non_alcoholic = (@abv["non_alcoholic"] || []).to_set
       @bitters = (@ing["bitters"] || []).to_set
+      # A counted sugar dissolves, so `volume_for` never lets it be the drink.
+      @sugars = (@ing["sugars"] || []).to_set
 
       # Units declared not to be a volume. A different list from `excluded_units`
       # above, which is costing's: this one answers "is this pour deliberately
@@ -345,12 +347,11 @@ module HelenTriages
 
     # How much liquid is in a drink (#1121). `total_ml` is the recipe as written
     # and the scaler multiplies it; `serve_ml` is one glass. Computed here, where
-    # every amount is already parsed, so the browser does no volume arithmetic of
-    # its own. A unit in `measures.non_volumetric` is skipped. A `(top)` takes
-    # `top_up_ml`. Returns nil, because the figure would be wrong and not merely
-    # rough, when the excluded pours are the drink (the test cocktail_costs.rb
-    # applies for `cost.complete`), when an amount cannot be read, or when a
-    # topper has no declared range.
+    # every amount is already parsed, so the browser does no volume arithmetic.
+    # A unit in `measures.non_volumetric` is skipped; a `(top)` takes
+    # `top_up_ml`. Returns nil, the figure being wrong rather than rough, when
+    # the excluded pours are the drink (`cost.complete`'s test, less any counted
+    # sugar), when an amount cannot be read, or when a topper has no range.
 
     # `serve_ml` divides the whole total by `serves:`, top included, which is
     # wrong for a topped punch: a top fills one glass. No topped drink declares
@@ -387,8 +388,10 @@ module HelenTriages
         end
 
         if @non_volumetric.include?(unit)
-          # An ingredient-sized exclusion; see `substantial < pours` below.
-          substantial += 1 if CocktailCosts::SUBSTANTIAL.match?(amount)
+          # An ingredient-sized exclusion; see `substantial < pours` below. A
+          # sugar is not one: it dissolves into the pours it sweetens.
+          sugar = Array(ing["generic"]).all? { |g| @sugars.include?(g.to_s) }
+          substantial += 1 if CocktailCosts::SUBSTANTIAL.match?(amount) && !sugar
           next
         end
 

@@ -2488,13 +2488,14 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   midpoint is now what a top falls back to where its glass cannot size it. No
   topped drink may declare `serves:` (`test_no_topped_drink_is_also_a_punch`),
   because `serve_ml` would share one top between the glasses.
-- **2026-09-17, #1121 — a drink whose uncounted ingredients ARE the drink
-  states no volume.** A session's call, not Helen's ruling. The Caipirinha is
-  45 ml of cachaça, half a lime and 20 g of palm sugar; "45 ml" would be wrong,
-  not rough, so the units line ends "in a serving." The pear Bellini is the
-  other: its list is a batch syrup that only its method portions. The test is
-  `CocktailCosts::SUBSTANTIAL` itself, not a copy; a dozen sugar cubes in a
-  punch is a flourish and spoils nothing.
+- **2026-10-23, #1121 — a drink whose uncounted ingredients ARE the drink
+  states no volume, and a counted sugar is never one of them.** Helen, asked
+  whether the Old Fashioned (45 ml whiskey, one sugar cube) should stay silent
+  or print: *"Print ~45 ml"*. A sugar dissolves into what it sweetens, so a
+  figure without it is rough, not wrong. The Caipirinha (half a lime) and the
+  pear Bellini (a batch syrup only its method portions) stay silent. The test
+  is `CocktailCosts::SUBSTANTIAL` minus any generic in `ingredients.yml`'s
+  `sugars`; `cost.complete` still counts sugars as before.
 - **2026-09-17, #1121 — the note under the scaler carries the bitters caveat
   and no totals.** Helen: *"I like the line. But the cost and units line below
   has come back and I don't want it to be there."* #713's batch note had
