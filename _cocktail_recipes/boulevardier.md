@@ -1,6 +1,6 @@
 ---
 title: "Boulevardier"
-tagline: "A Negroni that moved to Kentucky, then took up pipe-smoking and jazz."
+tagline: "Miss Negroni moved to Kentucky, then took up pipe-smoking and jazz."
 glass:
   - "old fashioned"
   - "coupe"

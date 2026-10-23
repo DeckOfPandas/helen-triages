@@ -1,6 +1,6 @@
 ---
 title: "Blue Hawaiian"
-tagline: "No further questions."
+tagline: "Look, it's blue, coconut-y and rum-y, what more do you want from me."
 glass:
   - "hurricane"
 garnish:

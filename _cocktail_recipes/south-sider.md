@@ -1,6 +1,6 @@
 ---
 title: "South Sider"
-tagline: "Velvet smoking jacket, sequinned dress."
+tagline: "Velvet smoking jacket, check. Sequinned dress, check."
 glass:
   - "coupe"
 garnish:

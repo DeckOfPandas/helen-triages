@@ -1,6 +1,6 @@
 ---
 title: "Nuclear Daiquiri"
-tagline: "My primary school PE teacher often told us, \"Ladies don't sweat, they glow.\" After one of these I certainly do."
+tagline: "My primary school PE teacher told us, \"Ladies don't sweat, they glow.\" Maybe she drinks rum with chartreuse."
 glass:
   - "coupe"
 garnish:

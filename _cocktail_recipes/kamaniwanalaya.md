@@ -1,6 +1,6 @@
 ---
 title: "Kamaniwanalaya"
-tagline: "Say that a few times quickly in an American accent."
+tagline: "Say that a few times quickly in an American accent, or just splash more prosecco in your tiki mug."
 glass:
   - "collins"
 garnish:

@@ -1,6 +1,6 @@
 ---
 title: "Dapper Sap"
-tagline: "Like a scented candle in a Christmas tree farm on a forested mountain."
+tagline: "Like a scented candle in a wood workshop on a Christmas tree farm on a forested mountain."
 glass:
   - "coupe"
 garnish:

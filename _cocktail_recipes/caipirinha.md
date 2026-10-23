@@ -1,6 +1,6 @@
 ---
 title: "Caipirinha"
-tagline: "Palm sugar or bust."
+tagline: "Palm sugar or go home."
 glass:
   - "highball"
 garnish:

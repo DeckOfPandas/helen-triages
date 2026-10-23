@@ -1,6 +1,6 @@
 ---
 title: "Gunmetal Blue"
-tagline: "No idea how this drink works, but it totally does."
+tagline: "Mezcal and peach go together beautifully, like a toddler and finger paint. Fine, I don't know, ask a parent."
 glass:
   - "coupe"
 garnish:

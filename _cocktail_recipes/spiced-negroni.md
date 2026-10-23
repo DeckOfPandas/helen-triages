@@ -1,6 +1,6 @@
 ---
 title: "Spiced Negroni"
-tagline: "Your friend who went on a gap yah to south India and won't stop talking about it."
+tagline: "Your friend who went on a gap yah to south India and don't you know it."
 glass:
   - "old fashioned"
 garnish:

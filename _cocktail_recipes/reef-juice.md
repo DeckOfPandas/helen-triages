@@ -1,6 +1,6 @@
 ---
 title: "Reef Juice"
-tagline: "That bar we used to go to, the one where you could order \"a pint of fun\", yeah, that."
+tagline: "That bar we used to go to, you know, the one where you could order \"a pint of fun\", yeah, that."
 glass:
   - "tiki mug"
 garnish:

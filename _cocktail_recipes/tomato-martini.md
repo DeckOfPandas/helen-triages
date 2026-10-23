@@ -1,6 +1,6 @@
 ---
 title: "Tomato Martini"
-tagline: "What the Bloody Mary is atoning for."
+tagline: "Atone for this with a Bloody Mary tomorrow."
 glass:
   - "martini"
 garnish: []

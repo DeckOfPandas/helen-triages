@@ -1,6 +1,6 @@
 ---
 title: "Caribbean Sazerac"
-tagline: "How many rums? Three, you say? I'm listening."
+tagline: "How many rums? Three, you say? B+, room for improvement."
 glass:
   - "old fashioned"
 garnish:

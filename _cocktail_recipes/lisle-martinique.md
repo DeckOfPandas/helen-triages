@@ -1,6 +1,6 @@
 ---
 title: "L'Isle Martinique"
-tagline: "On first-name terms with every tiki drink."
+tagline: "She's on first-name terms with every tiki drink."
 glass:
   - "coupe"
 garnish:

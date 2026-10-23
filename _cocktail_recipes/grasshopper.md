@@ -1,6 +1,6 @@
 ---
 title: "Grasshopper"
-tagline: "Mint choc chip is my favourite ice cream flavour, so this drink had an easy in with me."
+tagline: "My favourite ice cream flavour is mint choc chip, so this drink had an easy in with me."
 glass:
   - "coupe"
 garnish:
@@ -10,7 +10,7 @@ garnish:
 meta:
   made_before: true
   ship: "yes"
-  rewritten: yes
+  rewritten: true
   awaiting_fix: false
   proofread: true
 mood:

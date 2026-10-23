@@ -1,6 +1,6 @@
 ---
 title: "Bee’s Knees"
-tagline: "You might think you can get away with adding straight honey if you're in a rush. You cannot."
+tagline: "No, you can't just add straight honey. No, not even if you're \"really in a rush\"."
 glass:
   - "coupe"
 garnish:
