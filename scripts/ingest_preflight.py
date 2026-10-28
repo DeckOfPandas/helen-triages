@@ -296,9 +296,23 @@ def check_food(path, fm, rep, ctx):
     claudes = [s for s in steps if s.startswith("QQ Claude")]
     plain = [s for s in steps if s.startswith("QQ PLACEHOLDER")]
 
-    if originals and len(originals) != len(claudes):
-        rep.add("INTERLEAVED REWRITE IS UNBALANCED",
-                f"{len(originals)} `QQ original` vs {len(claudes)} `QQ Claude`", slug)
+    # One `QQ original` per source step, then one or more `QQ Claude` lines
+    # (DECISIONS §4). Read per group, since a run never crosses a group.
+    runs = [steps] + [
+        [s.get("step") if isinstance(s, dict) else s for s in (g.get("steps") or [])]
+        for g in (fm.get("method_groups") or []) if isinstance(g, dict)]
+    for run in runs:
+        run = [s for s in run if isinstance(s, str)]
+        if not any(s.startswith("QQ original") for s in run):
+            continue
+        for i, s in enumerate(run):
+            nxt = run[i + 1] if i + 1 < len(run) else ""
+            if s.startswith("QQ original") and not nxt.startswith("QQ Claude"):
+                rep.add("A `QQ original` WITH NO `QQ Claude` UNDER IT",
+                        repr(s[:60]), slug)
+            if s.startswith("QQ Claude") and i == 0:
+                rep.add("A `QQ Claude` BEFORE ANY `QQ original`",
+                        repr(s[:60]), slug)
     if plain and not originals:
         rep.add("METHOD USES BARE `QQ PLACEHOLDER` RATHER THAN THE INTERLEAVED PAIR",
                 f"{len(plain)} step(s)", slug,
