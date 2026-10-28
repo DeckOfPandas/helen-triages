@@ -557,7 +557,8 @@ source: "Adapted from Good Food, January 2026"
 source_type: publication         # required; SOURCE_ATTRIBUTION_SPEC.md
 serves: "4"                      # xor makes: -- never both. Quoted
 serves_estimate: 6               # required unless serves: opens with a
-                                 # number. An integer, people, unquoted
+                                 # number or makes: is a count food_yield.rb
+                                 # reads. An integer, people, unquoted
 prep_time: "20 mins"
 cook_time: "1 hr 30 mins"
 main_ingredients: ["cavolo nero", "butter beans", "lemon"]
@@ -653,9 +654,11 @@ takes `proofread` down with it.
 - **`serves` / `makes` values may be prose in Helen's voice** ("Depends on
   appetite"); never tidy one into a number. That is why `serves_estimate:`
   exists: the scaler needs an integer and her words must not be touched. It
-  is required wherever `serves:` does not open with a number, which includes
-  every `makes:` recipe. `makes:` is never read as people however numeric it
-  looks: 950 ml is not 950 portions. It is an unquoted integer — a quoted
+  is required unless `serves:` opens with a number or `makes:` opens with a
+  count `_plugins/food_yield.rb` can read ("16 slices", "one 8-inch cake",
+  "950 ml"), which the page and the shopping list count by themselves (§8.2).
+  `makes:` is never read as people however numeric it looks: 950 ml is not
+  950 portions. It is an unquoted integer — a quoted
   `"6"` is a string and the plugin will not read it. It is produced at
   ingest; ask Helen rather than guess when the source does not support one.
 - **A range takes its lower end.** The scale is portions wanted over portions
@@ -1276,9 +1279,11 @@ dependency at module scope; `tests/test_site_config.py` guards it.
   Such a recipe scales in whole recipes; a `serves:` recipe scales a portion
   at a time.
 
-A recipe with neither figure has `portions` nil. The build carries on;
-`tests/test_food_shopping.py` fails
-(`test_every_published_recipe_states_how_many_it_feeds`, and the draft twin).
+A recipe with neither figure has `portions` nil, which is fine where
+`page.made` is set and nowhere else. `tests/test_food_shopping.py` fails a
+recipe with no `portions` and no readable `makes:`
+(`test_every_published_recipe_states_how_many_it_feeds`, and the draft twin),
+asking `scripts/food_yield.rb` rather than copying its rule.
 
 #### What the index is handed
 

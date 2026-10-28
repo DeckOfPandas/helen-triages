@@ -2246,12 +2246,14 @@ def _shopping_blob(site, page="index.html"):
 
 
 def test_every_recipe_reaches_the_page_with_a_portion_count(site):
-    """Every recipe in the blob has a portion count and names its yield's key.
+    """Every recipe in the blob has something to count and names its yield's key.
 
-    tests/test_food_shopping.py proves each recipe resolves to a number from
-    the data files; this proves the number reached the page, which fails if
-    the plugin stops running or returns early. Drafts are not let off (#815).
-    `k` keeps a `makes:` from printing behind the word "serves".
+    That is a portion count `p`, or `m`, what a `makes:` line counts, on a
+    recipe the list scales in batches (#1286, #1297). tests/test_food_shopping.py
+    proves each recipe resolves to one from the data files; this proves it
+    reached the page, which fails if the plugin stops running or returns early.
+    Drafts are not let off (#815). `k` keeps a `makes:` from printing behind
+    the word "serves".
     """
     blob = _shopping_blob(site)
     assert len(blob) > 80, (
@@ -2259,11 +2261,12 @@ def test_every_recipe_reaches_the_page_with_a_portion_count(site):
         "86 plus the magic bag. The plugin or the row gate has changed."
     )
 
-    unscalable = sorted(u for u, r in blob.items() if not r.get("p"))
+    unscalable = sorted(u for u, r in blob.items()
+                        if not r.get("p") and not (r.get("w") and r.get("m")))
     assert not unscalable, (
-        "these recipes reached the page with no portion count, so the shopping "
-        f"list can draw no box for them: {unscalable}. Add `serves_estimate:` "
-        "to the recipe."
+        "these recipes reached the page with nothing to count, so the shopping "
+        f"list can draw no box for them: {unscalable}. Write `makes:` as a "
+        "count of a named thing, or add `serves_estimate:`."
     )
 
     empty = sorted(u for u, r in blob.items() if not r.get("i"))

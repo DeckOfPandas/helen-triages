@@ -143,7 +143,7 @@ name you give is a courtesy rather than a contract.
 | `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
-| `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **Where the source gives little to go on, estimate anyway and say so in your list**: the session with her repository confirms every estimate with her when the file lands — her rule: "Claudes can check with me if unsure." |
+| `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number or `makes:` opens with a count of a named thing.** A `makes:` like "16 slices", "2 loaf cakes", "one 8-inch cake" or "950 ml" scales by itself and needs none: write the line that way where the source allows. "Depends on appetite", "Some" and a bare "12–16" or "9 or 16" name nothing countable and need one. **One figure, not an alternative:** "9 large or 16 small biscuits" reads as nine of something called "large", so write the one the source leads with ("9 biscuits"). Estimate from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each). **`makes` is never read as people** however numeric it looks. **Where the source gives little to go on, estimate anyway and say so in your list**: the session with her repository confirms every estimate with her when the file lands — her rule: "Claudes can check with me if unsure." |
 | `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. **Not in the source? Estimate it, as `"Estimated 20 mins"`, and say so in your list** — Helen: *"I would like "Estimated 10 mins" to be written, then our tidying scripts block promotion for recipes with estimated times."* Her repository refuses to promote a recipe whose time still says `Estimated`, so a guess never publishes. Write `"QQ"` only where you cannot estimate at all. `cook_time: "None"` for a genuinely uncooked dish. |
 | `main_ingredients` | Section 4. Lowercase, a flat list. |
 | `star_ingredient` | Section 4. **Optional** — leave it out rather than force one. |
@@ -309,23 +309,25 @@ remedy for a problem the instruction already prevents.
 
 A step may be two short sentences. It is often better as two.
 
-### One source step, one pair — never split a step
+### One `QQ original` per source step; split the rewrite where it is dense
 
-**A source step is one pair, however many actions it holds.** Helen's ruling:
-a file whose steps have been split is harder for her to read, not easier. So a
-step that makes a dough, proves it and lines a tin is one `QQ original` line
-holding the whole step, verbatim, and one `QQ Claude` line rewriting all of it.
+**A source step is one `QQ original` line, however many actions it holds, and
+as many `QQ Claude` lines under it as it needs.** Helen: *"I would like Claude
+to split out method lines where the written method is unhelpfully dense, so
+multiple QQ CLAUDE lines will be very helpful."* So a step that makes a dough,
+proves it and lines a tin is one `QQ original` line holding the whole step,
+verbatim, then a `QQ Claude` line for each thing a cook would stop and do.
 
 - **The `QQ original` line is the source's whole step**, exactly as printed,
-  however long.
-- **The `QQ Claude` line may run to several short sentences**, one per action.
-  That is where a long step is made readable: in the rewrite, not by cutting
-  the original.
+  however long. Never cut it.
+- **Split the `QQ Claude` rewrite only where the step is dense.** A short step
+  keeps one `QQ Claude` line; a step holding three stages gets three. Break at
+  the points a cook would pause, not at every clause.
 - **Never the other direction, and never a new order.** Two source steps are
-  never merged into one pair, and nothing moves ahead of what the source put
-  before it.
-- **`method_groups` is grouping, not splitting.** A step sits whole inside the
-  group it belongs to.
+  never merged under one `QQ original`, and nothing moves ahead of what the
+  source put before it.
+- **`method_groups` is grouping, not splitting.** A source step sits whole,
+  with all its `QQ Claude` lines, inside the group it belongs to.
 
 ### `method_groups` — split the phases here, or nobody ever will
 

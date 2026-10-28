@@ -418,9 +418,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
   rulings from two claude.ai chats that Helen confirmed as standing, each a
   yes. Its `QQ original` keeps everything the source printed.
-- **2026-10-08 — a `makes:` recipe always has a `serves_estimate`.** Confirmed
-  as standing the same day; two each for biscuits. The shopping list divides
-  by it.
+- **2026-10-28 — a `makes:` line the yield reader can count needs no
+  `serves_estimate`.** Helen: *"Make the test suite support our current
+  design. 16 slices, 2 X-in cakes, 9 biscuits."* The recipe page counts the
+  thing made and the shopping list counts batches (§8.2), so the estimate is
+  needed only where `serves:` has no number or `makes:` names nothing the
+  reader can count. Write `makes:` as a count of a named thing.
 - **2026-10-08 — Helen's own recipes are `source: "Henry"`, `source_type:
   person`.** Confirmed as standing the same day, as the old journal recorded
   it.
@@ -440,13 +443,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `tmp/inbox/` for `ingest_inbox.py --from-file`. What does not happen is a
   session filing a batch of issues: the first chat wrote a prompt asking for
   39.
-- **2026-10-10, #1356 — one source step is one pair, however many actions it
-  holds.** Helen ruled it in a claude.ai chat after a second batch and
-  confirmed it here ("Please go ahead"); her words for the change did not
-  reach the repository. She had found split files harder to read. The `QQ
-  Claude` line carries the readability instead. (Replaces 2026-10-08's *"The
-  split steps has been easier for me"*, which had itself replaced one-pair:
-  three answers in three weeks, so do not propose splitting again.)
+- **2026-10-28 — one `QQ original` per source step, and as many `QQ Claude`
+  lines under it as a dense step needs.** Helen: *"I would like Claude to
+  split out method lines where the written method is unhelpfully dense, so
+  multiple QQ CLAUDE lines will be very helpful."* The original stays whole and
+  verbatim; the rewrite splits at the points a cook would pause. Two source
+  steps are still never merged and nothing is reordered. (Replaces 2026-10-10's
+  one-pair rule, the fourth answer to this question: do not propose another.)
 - **2026-10-10, #1356 — the ingredient list is the source's own list; nothing
   joins it from the method.** Helen: *"We shouldn't list incidentals. We can
   trust the cook."* The one exception is a source with no ingredient list at

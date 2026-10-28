@@ -73,12 +73,12 @@ argument and the rules each field is read by.
 - 2026-10-08 · §4 · a food tagline at ingest is the method's pair on one line, where the source has an intro.
 - 2026-10-08 · §4 · unspecified butter is QQ butter — Helen: "Write QQ butter in the ingredients list where it isn't specified." Replaces a chat's "salted, or plain in precise bakes".
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
-- 2026-10-08 · §4 · a makes: recipe always has a serves_estimate.
+- 2026-10-28 · §4 · a makes: line the yield reader can count needs no serves_estimate.
 - 2026-10-08 · §4 · Helen's own recipes are source: "Henry", source_type: person.
 - 2026-10-08 · §4 · four ingest rulings apply to Difford's alone.
 - 2026-10-08 · §4 · three things a chat did are NOT ingest rules: one question per recipe, hand-assigned moods, and alternative paths as method groups.
 - 2026-10-08 · §4 · the issue route for ingests stays, beside the bulk route of envelope files.
-- 2026-10-10 · §4 · #1356 · one source step is one pair, however many actions it holds.
+- 2026-10-28 · §4 · one QQ original per source step, and as many QQ Claude lines under it as a dense step needs.
 - 2026-10-10 · §4 · #1356 · the ingredient list is the source's own list; nothing joins it from the method.
 - 2026-10-10 · §4 · #1356 · a fat or flour the source lists only for the tin or the pan is kept and flagged incidental: true, at every ingest.
 - 2026-10-16 · §4 · #1356 · on a real fat or flour line, ", plus extra for the tin" and its kin are trimmed, at tidy.

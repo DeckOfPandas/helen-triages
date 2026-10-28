@@ -65,7 +65,8 @@ private drafts repos, so it cannot check for duplicates.
   ingredient's `note:` as "Originally X." Every `ship` is `"who knows"`. `mood` is `[]`
   unless you named one of your hand-assigned moods for that drink.
 - **Every food method step arrives as a pair** (`QQ original` verbatim, then
-  `QQ Claude`), one pair per source step. Nothing the method alone names is
+  `QQ Claude`), one `QQ original` per source step and, under a dense one,
+  several `QQ Claude` lines. Nothing the method alone names is
   added to the ingredient list.
 - **A food tagline is the same pair on one line** where the source had an
   intro, and a bare `QQ` where it had none. **A cocktail's tagline is a bare

@@ -13,7 +13,11 @@ wrong.
 """
 from __future__ import annotations
 
+import json
+import os
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -70,29 +74,59 @@ def states_people(fm: dict) -> bool:
     return bool(fm.get("serves") and LEADING_NUMBER.match(str(fm["serves"])))
 
 
+def unscalable(paths) -> list[str]:
+    """Recipes neither scaler can count: no number in `serves:`, no
+    `serves_estimate:`, and no `makes:` that `_plugins/food_yield.rb` reads.
+
+    A `makes:` the yield reader counts needs no estimate: the recipe page
+    counts the thing made and the shopping list counts batches (#1286, #1297).
+    One that it cannot read falls back to the portions box, which divides by
+    the estimate. The reader is asked, never copied, through
+    `scripts/food_yield.rb`, as `tests/test_food_yield.py` does.
+    """
+    lacking = []
+    for path in paths:
+        fm = front_matter(path)
+        if not fm or states_people(fm) or isinstance(fm.get("serves_estimate"), int):
+            continue
+        lacking.append((path, fm))
+
+    makes = sorted({str(fm["makes"]) for _, fm in lacking if fm.get("makes")})
+    read = {}
+    if makes:
+        if shutil.which("ruby") is None:
+            if os.environ.get("CI"):
+                pytest.fail("No ruby in CI, so no `makes:` line can be read and "
+                            "every one would be reported as unscalable.")
+            pytest.skip("no ruby on this machine; the yield reader is Ruby")
+        result = subprocess.run(
+            ["ruby", "scripts/food_yield.rb", *makes],
+            cwd=ROOT, capture_output=True, text=True, timeout=120,
+        )
+        assert result.returncode == 0, (
+            "scripts/food_yield.rb failed:\n" + result.stdout[-2000:] + result.stderr[-2000:]
+        )
+        read = json.loads(result.stdout)
+
+    return [f"{path.name}  serves={fm.get('serves')!r} makes={fm.get('makes')!r}"
+            for path, fm in lacking if not read.get(str(fm.get("makes")))]
+
+
 # --- how many people ----------------------------------------------------------
 
 @pytest.mark.parametrize("folder", PUBLISHED_DIRS)
 def test_every_published_recipe_states_how_many_it_feeds(folder):
-    """The scaler divides by this number, so every recipe needs one (#815).
+    """Every recipe gives a scaler something to count (#815, #1286).
 
-    Either `serves:` opens with a number, or `serves_estimate:` carries an
-    integer. `makes:` is never read as people however numeric it looks:
-    950 ml is not 950 portions.
+    `serves:` opens with a number, `serves_estimate:` carries an integer, or
+    `makes:` opens with a count of something named. `makes:` is never read as
+    people however numeric it looks: 950 ml is not 950 portions.
     """
-    missing = []
-    for path in published_paths(folder):
-        fm = front_matter(path)
-        if states_people(fm):
-            continue
-        if isinstance(fm.get("serves_estimate"), int):
-            continue
-        missing.append(f"{path.name}  serves={fm.get('serves')!r} "
-                       f"makes={fm.get('makes')!r}")
+    missing = unscalable(published_paths(folder))
     assert not missing, (
-        "these recipes say nothing about how many people they feed, so the "
-        "shopping list cannot scale them. Add `serves_estimate:` — an integer, "
-        "people — beside the `makes:` it is read from:\n  " + "\n  ".join(missing)
+        "these recipes give neither scaler a number. Write `makes:` as a count "
+        "of a named thing (\"16 slices\", \"one 8-inch cake\"), or add "
+        "`serves_estimate:` — an integer, people:\n  " + "\n  ".join(missing)
     )
 
 
@@ -108,18 +142,9 @@ def test_every_draft_states_how_many_it_feeds():
                     "check: sh scripts/git-clone-agent.sh "
                     "helen-triages-food-private _food_drafts")
 
-    missing = []
-    for path in recipe_paths(["_food_drafts"]):
-        fm = front_matter(path)
-        if not fm:
-            continue        # README.md and anything without front matter
-        if states_people(fm) or isinstance(fm.get("serves_estimate"), int):
-            continue
-        missing.append(f"{path.name}  serves={fm.get('serves')!r} "
-                       f"makes={fm.get('makes')!r}")
+    missing = unscalable(recipe_paths(["_food_drafts"]))
     assert not missing, (
-        "these drafts say nothing about how many people they feed:\n  "
-        + "\n  ".join(missing)
+        "these drafts give neither scaler a number:\n  " + "\n  ".join(missing)
     )
 
 
