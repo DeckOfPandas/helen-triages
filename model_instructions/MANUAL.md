@@ -4779,8 +4779,10 @@ focus. The pure half is `HTF.pageSearch` (`tests/js/page-search.test.js`).
   food or mood and hassle on cocktails, then the ingredients. Every heading
   is the index section a result lands on: the names group's `items_label` is
   I KNOW WHAT I WANT, the others the panel's own labels, each filled with
-  its section's hue. The headings wear the section headings' face and weight
-  (each site's own); a name wears the index's title type, lowercase on food
+  its section's hue. Headings and names are heavy on both sites: Courier 700
+  plus the chosen chip's faux-bold stroke (`$page-search-faux-bold`, 0.05em
+  in `currentColor`), because 700 alone reads as regular beside the index's
+  stroked headings. A name wears the index's title type, lowercase on food
   and the card's capitals on cocktails.
 - **A capped group says "+N more", and it can be pressed.** Under the names
   it is a link to the index's name search for what was typed (`moreHref`,

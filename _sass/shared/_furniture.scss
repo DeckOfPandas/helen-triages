@@ -176,18 +176,31 @@ $page-search-quiet: 45%;
   border-top: 1px solid $color-border;
 }
 
-// The kind, in the face and weight of the index's own section headings
-// (STAR INGREDIENT, MOOD): the same mixin at a dropdown's size, so a heading
-// here is the heading it lands on. Cocktails passes its headings' lighter
-// weight and wider tracking (cocktails/_filters.scss). `inline-block` so the
-// background each site paints on it hugs the words and does not run the
-// dropdown's width (#1136).
+// Bold is not enough to look heavy beside the index's own headings, which
+// add a stroke, so the dropdown's headings and names add the chosen chip's
+// faux bold: a stroke in the letter's own colour. food's $faux-bold-stroke
+// and cocktails' chosen chip both use 0.05em; restated here because shared/
+// cannot see a palette. `currentColor`, so hover and the matched run follow.
+$page-search-faux-bold: 0.05em currentColor;
+
+// The kind, in the face of the index's own section headings (STAR
+// INGREDIENT, MOOD) at a dropdown's size, heavy on both sites. Cocktails
+// keeps its headings' wider tracking (cocktails/_filters.scss).
+// `inline-block` so the background each site paints on it hugs the words and
+// does not run the dropdown's width (#1136).
 .page-search-group-label {
   @include index-section-label($size: 0.78rem);
+  -webkit-text-stroke: $page-search-faux-bold;
   line-height: 1;
   display: inline-block;
   color: $color-clear-text;
   padding: $space-xs $space-md $space-xs;
+}
+
+// A page in the dropdown, as heavy as the headings over it. Each site sets
+// the rest of its title type (food/_search.scss, cocktails/_filters.scss).
+.page-search-group--name .page-search-option {
+  -webkit-text-stroke: $page-search-faux-bold;
 }
 
 // One result, one line: a real link, in the lowercase Courier the box itself
