@@ -178,7 +178,7 @@ permalink: /cocktails/
     <strong class="results-count-number" id="drink-count-n">{{ all_drinks.size }}</strong>
     <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
   </p>
-  <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?<span class="drink-count-legend-value" data-ship-legend-value hidden>= <span data-ship-legend-word></span></span></span>
+  <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?<span class="drink-count-legend-value" data-ship-legend-value hidden>= <span data-ship-legend-word></span></span>{% include cocktails/ship-key.html part="button" %}</span>
 
   {% comment %} The shortlisted-only view (#546) is a filter on this index, not
      a page of its own and not a sixth filter section. It ships `hidden` and
@@ -193,6 +193,7 @@ permalink: /cocktails/
   </p>
   <button type="button" class="btn-clear-filter drink-count-clear-ship" id="clear-ship" hidden>&times; clear ship</button>
   </div>
+  {% include cocktails/ship-key.html part="dialog" %}
 
   {% comment %} The sticky results bar: a mirror of the count above and of the
      top `× clear all`, revealed by assets/js/results-bar.js once `#results` has
@@ -536,6 +537,7 @@ permalink: /cocktails/
   {% comment %} Order does not matter for this one (#849): it reads
      HTF.shortlist at run time and subscribes to an event. {% endcomment %}
   <script src="{{ '/assets/js/shortlist-export.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/ship-key.js' | relative_url }}"></script>
 
 {% else %}
   <p class="cocktails-empty" align="center">

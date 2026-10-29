@@ -36,9 +36,11 @@ const PAGE_SCRIPTS = [
   'results-bar.js',
   // #849. Nobody's dependency; here because cocktail-index-startup.test.js
   // asserts this list is the template's. It loads after universe.js on the
-  // page, and universe.js is filtered out of that comparison, so this sits
-  // last in both.
-  'shortlist-export.js'
+  // page, and universe.js is filtered out of that comparison.
+  'shortlist-export.js',
+  // #1440. Nobody's dependency either. The stub page has no `#ship-key`, so
+  // here it returns at its first line.
+  'ship-key.js'
 ];
 
 // The two card measurement passes, from the shared layout (#1107).

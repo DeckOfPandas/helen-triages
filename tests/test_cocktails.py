@@ -4737,6 +4737,28 @@ def test_every_off_scale_ship_has_a_word():
         )
 
 
+def test_every_ship_value_has_a_key_line():
+    """`ship_key` gives every rung and off-scale value a line, and no other key
+    (#1440).
+
+    `_includes/cocktails/ship-key.html` lists `ship_key`'s rows, so a value
+    missing from it is missing from the key with no error, and a key that is
+    not a ship value prints a row for a word no drink carries. The lines are
+    Helen's.
+    """
+    taxonomy = _taxonomy()
+    known = set(taxonomy.get("ship_scale") or []) | set(taxonomy.get("ship_off_scale") or {})
+    key = taxonomy.get("ship_key")
+    assert isinstance(key, dict), f"taxonomy.yml needs a `ship_key` map (got {key!r})."
+    missing = sorted(v for v in known if not (isinstance(key.get(v), str) and key[v].strip()))
+    assert not missing, (
+        f"`ship_key` gives no line for {missing}, so the ship key shows the word "
+        "with nothing beside it. Ask Helen what it means."
+    )
+    stray = sorted(set(key) - known)
+    assert not stray, f"`ship_key` names values that are not ship values: {stray}"
+
+
 def test_the_chaos_lists_name_only_real_ship_values():
     """taxonomy.yml's `chaos` lists name rungs or off-scale values, and share none.
 

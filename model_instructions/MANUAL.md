@@ -2600,6 +2600,14 @@ vocabulary value itself. A rung is shown as its `ship_words` word where it
 has one, on the card and the drink page alike; filters and `?ship=` URLs
 match the stored value.
 
+**The ship key** (#1440) is a small ringed `i` beside the index's ship legend
+and the drink page's SHIP IT? that opens a `<dialog>` listing every value's
+word and Helen's line for it. `_includes/cocktails/ship-key.html` emits both
+halves (`part="button"`, `part="dialog"`), and `assets/js/ship-key.js` reveals
+the button and opens the box with `showModal`; with no script the button stays
+`hidden`. The rows are `ship_key` in `taxonomy.yml`, in its order, and
+`test_every_ship_value_has_a_key_line` holds it to exactly the ship values.
+
 **`meta.made_before` is a boolean and gates nothing.** It is first in `meta:`.
 An unmade cocktail may publish (§9.1.1). Nothing on the index reads it: the
 YOLO filters read `ship` (§9.13), which agrees with it by test.
@@ -3285,7 +3293,8 @@ units, cost), and the related cards.
   word's `nowrap` cannot set the head's minimum width and defeat the fit
   script. At 600px and under it is `display: contents` and its children sit on
   `.cocktail-title-block`'s grid.
-- **The name is alone on its line. No control goes in the head or the meta.**
+- **The name is alone on its line. No control goes in the head or the meta**,
+  except SHIP IT?'s ship key (§9.5), which says what the word means.
 - The meta is a `<dl>` of three facts: GLASS, GARNISH, SHIP IT?. The mood chips
   under it are links to the index with `?mood=`, alphabetical, not packed.
 

@@ -534,6 +534,7 @@ argument and the rules each field is read by.
 - 2026-09-10 · §9.13 · #760 · a chip is never shown cut off mid-word by the ship mark.
 - 2026-09-05 · §9.13 · a card's mood words rest in their section's colour and hover in magenta.
 - 2026-09-02 · §9.13 · the drink page's meta is three facts and nothing else: glass, garnish, SHIP IT?.
+- 2026-10-29 · §9.13 · #1440 #1423 · (dupe of #1423) — a ship key: a tiny (i) beside the index's ship legend and the drink page's SHIP IT? opens a box saying what each word means.
 - 2026-09-05 · §9.13 · the drink page's glass sits inline at the head's left, centred, not out in the margin.
 - 2026-09-05 · §9.13 · the drink page's title is 2.6rem on tape padded 1.6em each side.
 - 2026-09-05 · §9.13 · #710 · the drink page's mood chips are links to the filtered index, in alphabetical order.

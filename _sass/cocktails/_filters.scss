@@ -513,6 +513,18 @@ $pool-chip-rest: color.mix($color-text, $color-bg, 73%);
   }
 }
 
+// On a phone the legend's three marks hang from one top line (#1440): the
+// ship, the words and the ship key's (i). `line-height: 1` brings the words'
+// box up to their ink so the top edges meet.
+@media (max-width: 600px) {
+  .drink-count-legend {
+    align-items: flex-start;
+    line-height: 1;
+  }
+
+  .drink-count-legend-icon { align-self: flex-start; }
+}
+
 // Food's `.recipe-list-empty`, value for value (#481, #1093): an empty list is
 // not part of either site's personality, so the two converge. If food's line
 // moves with its titles (_sass/food/_active-filter-states.scss), move this.

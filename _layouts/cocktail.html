@@ -79,11 +79,11 @@ layout: default
         <p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>
       {% endif %}
 
-      {% comment %} The meta is three facts and nothing else: glass, garnish,
-         SHIP IT?. No control goes in this row. Glass reads "A, B or C", no
-         Oxford comma. SHIP IT? is the index card's own include, unconditional
-         (an unrated drink says `???`), and hidden in `make it` by the
-         stylesheet. MANUAL §9.13. {% endcomment %}
+      {% comment %} The meta is three facts: glass, garnish, SHIP IT?. The one
+         control in it is SHIP IT?'s (i), which says what the word means (#1440).
+         Glass reads "A, B or C", no Oxford comma. SHIP IT? is the index card's
+         own include, unconditional (an unrated drink says `???`), and hidden in
+         `make it` by the stylesheet. MANUAL §9.13. {% endcomment %}
       <dl class="cocktail-meta">
         {% if page.glass.size > 0 %}
           <div><dt>Glass</dt><dd>
@@ -102,7 +102,7 @@ layout: default
         {% comment %} A link to the index filtered to this exact ship value
            (#1412), as the mood chips below link to theirs. {% endcomment %}
         {% assign page_ship = page.meta.ship | default: "who knows" %}
-        <div class="cocktail-meta-ship"><dt>Ship it?</dt><dd class="cocktail-ship"><a class="cocktail-ship-link" href="{{ index_home | relative_url }}?ship={{ page_ship | url_encode }}#results">{% include cocktails/ship.html ship=page.meta.ship %}</a></dd></div>
+        <div class="cocktail-meta-ship"><dt>Ship it?</dt><dd class="cocktail-ship"><a class="cocktail-ship-link" href="{{ index_home | relative_url }}?ship={{ page_ship | url_encode }}#results">{% include cocktails/ship.html ship=page.meta.ship %}</a>{% include cocktails/ship-key.html part="button" %}</dd></div>
       </dl>
 
       {% comment %} Mood chips: the card's chips, as links to the index filtered
@@ -725,6 +725,7 @@ layout: default
   {% endif %}
 
 </article>
+{% include cocktails/ship-key.html part="dialog" %}
 
 {% comment %} The back arrow's progressive enhancement. Loaded here, not in
    default.html: the arrow is page furniture, so a page with no arrow loads no
@@ -735,6 +736,7 @@ layout: default
 {% comment %} The print button's reveal and wiring (#1005; food's #86). {% endcomment %}
 <script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/ship-key.js' | relative_url }}"></script>
 {% comment %} The scaler, in dependency order (#545): shopping-list.js (the
    amount parser, shared with the index's shopping list), then scale.js, then
    cocktail-scale.js. Each reads the one before off `HTF` at parse time, so the

@@ -2259,9 +2259,14 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
     ".drink-count-block": (
         "`1fr auto` (#1412): the count or the shortlisted pill, beside the ship "
         "legend or `× clear ship`. The widest right cell is `SHIP IT? = ` plus "
-        "one card word (`ship_words` keeps every rung to one short word), "
-        "about 150px; measured at 390px with room to spare, so it is believed "
-        "to fit 360px."
+        "one card word (`ship_words` keeps every rung to one short word) and "
+        "the ship key's (i), about 175px; measured at 360px with no overflow."
+    ),
+    ".ship-key-list": (
+        "`max-content 1fr` (#1440): a ship word beside Helen's line for it. "
+        "The first track is the icon and the widest card word (`YES²`), about "
+        "75px; the second is wrapping prose inside a dialog capped at the "
+        "viewport less 2rem. Measured at 360px with no overflow."
     ),
     ".recipe-pagination": (
         "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "

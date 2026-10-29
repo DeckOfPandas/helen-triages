@@ -892,5 +892,17 @@ ship_off_scale:
   "who knows": "???"
   "IOU": "IOU"
 
+# What each `meta.ship` value means, for the (i) key beside the index's ship
+# legend and the drink page's SHIP IT? (#1440). Keyed by stored value, and the
+# key lists them in this order. A ship value missing here is missing from the
+# key (`test_every_ship_value_has_a_key_line`). The lines are Helen's.
+ship_key:
+  "oh gods yes": "Oh Gods yes. Just works."
+  "yes": "Works very well."
+  "sure": "Some attention required."
+  "meh": "Haven't nailed this yet."
+  "IOU": "Liked, rating to follow."
+  "who knows": "Never made."
+
 # Deliberately absent: `star_ingredients` (there is no star axis) and `co_tags`
 # (no cocktail mood has met food's test for one).
