@@ -6,28 +6,28 @@
 // THE SHIP KEY — what each SHIP IT? word means (#1440)
 // =============================================================================
 // _includes/cocktails/ship-key.html emits the (i) and the box. The rows reuse
-// the card's `.drink-card-ship-icon` and `-word` (_cards.scss), so a word in
-// the key looks exactly as it does on a card; only the face and size are
-// restated here, because the box has no `.drink-card-ship` container.
+// the card's `-word` (_cards.scss), so a word in the key looks as it does on a
+// card; only the face and size are restated here, because the box has no
+// `.drink-card-ship` container. The one ship is the heading's.
 
-// A small ringed letter in the reposado of the mark it explains. Both parents
-// are flex rows, whose gap spaces it; `align-self: center` keeps it level with
-// the icon rather than the words' baseline.
+// A small ringed letter in the reposado of the mark it explains, set as a
+// superscript: both parents are flex rows, so `flex-start` lifts it to the
+// top of the row and their gap spaces it.
 .ship-key-open {
   @extend %cocktail-heading-face;
   flex: none;
-  align-self: center;
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 0.75rem;
+  height: 0.75rem;
   padding: 0;
-  border: 1.5px solid currentColor;
+  border: 1px solid currentColor;
   border-radius: 50%;
   background: none;
   color: $color-raucous-reposado-deep;
-  font-size: 0.68rem;
+  font-size: 0.5rem;
   line-height: 1;
   text-transform: lowercase;
   cursor: pointer;
@@ -97,12 +97,6 @@
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
   align-items: baseline;
-
-  dt {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-  }
 
   dd {
     margin: 0;
