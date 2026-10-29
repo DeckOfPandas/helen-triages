@@ -73,6 +73,7 @@ argument and the rules each field is read by.
 - 2026-10-08 · §4 · a food tagline at ingest is the method's pair on one line, where the source has an intro.
 - 2026-10-08 · §4 · unspecified butter is QQ butter — Helen: "Write QQ butter in the ingredients list where it isn't specified." Replaces a chat's "salted, or plain in precise bakes".
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
+- 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
 - 2026-10-28 · §4 · a makes: line the yield reader can count needs no serves_estimate.
 - 2026-10-08 · §4 · Helen's own recipes are source: "Henry", source_type: person.
 - 2026-10-08 · §4 · four ingest rulings apply to Difford's alone.

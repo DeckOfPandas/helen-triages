@@ -418,6 +418,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
   rulings from two claude.ai chats that Helen confirmed as standing, each a
   yes. Its `QQ original` keeps everything the source printed.
+- **2026-10-29 — an unheaded first ingredient group is named for the dish or
+  its main component, unasked.** Helen: *"hopefully this would be obvious,
+  like "for the beef", or "for the pie"?"* The name is read after "For the".
 - **2026-10-28 — a `makes:` line the yield reader can count needs no
   `serves_estimate`.** Helen: *"Make the test suite support our current
   design. 16 slices, 2 X-in cakes, 9 biscuits."* The recipe page counts the

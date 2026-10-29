@@ -342,7 +342,9 @@ else has already done (MANUAL §9.1).
     finish`, `to decorate`, `to garnish` read "To finish:" with no "For the".
     So keep the source's "To finish" as `to finish`, lowercase, and never
     nounify it. A bare verb is the other trap: `assemble` prints "For the
-    assemble:", so a block the source heads that way is `to assemble`. A method
+    assemble:", so a block the source heads that way is `to assemble`. A first
+    block the source leaves unheaded is named for the dish or its main
+    component (`beef`, `pie`), unasked (DECISIONS §4). A method
     group prints its name bare, with no prefix at all, which is why a narrative
     phase is fine there.
   - **Quote every group name, on both sides**: `- name: "dressing"`,

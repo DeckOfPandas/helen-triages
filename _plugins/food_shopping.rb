@@ -57,10 +57,10 @@ module HelenTriages
       COLLECTIONS.each do |key|
         next unless site.collections[key]
         site.collections[key].docs.each do |doc|
-          portions, estimated = portions_for(doc)
+          doc.data["made"] = made_for(doc, yields)
+          portions, estimated = portions_for(doc, doc.data["made"])
           doc.data["portions"] = portions
           doc.data["portions_estimated"] = estimated
-          doc.data["made"] = made_for(doc, yields)
           doc.data["whole_recipes"] = whole_recipes?(doc)
           doc.data["half_recipe"] = doc.data["whole_recipes"] &&
             HelenTriages::HalfRecipe.judge(
@@ -87,13 +87,15 @@ module HelenTriages
     end
 
     # [portions, estimated] (#815). `serves:` first, because a number Helen wrote
-    # beats an estimate; then `serves_estimate:`, flagged so the page prints its
-    # `~`. `makes:` is never read as people: 950 ml is not 950 portions. A recipe
-    # with neither returns nil and the page offers no scaling;
-    # tests/test_food_shopping.py requires every recipe to state one.
-    def portions_for(doc)
+    # beats an estimate. A `makes:` that FoodYield counts (`made`) is the
+    # recipe's own number, so an estimate beside it is never read: the page and
+    # the shopping list count the thing made. Otherwise `serves_estimate:`,
+    # flagged so the page prints its `~`. A recipe with none returns nil and
+    # gets no scaler; tests/test_food_shopping.py requires every recipe to state one.
+    def portions_for(doc, made)
       stated = doc.data["serves"].to_s[LEADING_NUMBER, 1]
       return [stated.to_i, false] if stated
+      return [nil, false] if made
 
       estimate = doc.data["serves_estimate"]
       return [estimate.to_i, true] if estimate.is_a?(Numeric) && estimate.to_i > 0

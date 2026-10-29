@@ -1270,7 +1270,8 @@ dependency at module scope; `tests/test_site_config.py` guards it.
 `serves` and `makes` are exclusive (§4). The plugin resolves three things:
 
 - **`page.portions`** — the leading number of `serves:` (the lower end of a
-  range, so the multiplier errs toward more food), otherwise
+  range, so the multiplier errs toward more food); nil where `page.made` is
+  set, so an estimate beside a countable `makes:` is never read; otherwise
   `serves_estimate:`, which sets `page.portions_estimated` and is printed with
   a `~`. `makes:` is never read as people, however numeric it looks.
 - **`page.made`** — `food_yield.rb`'s reading of `makes:`, or nil. Never set

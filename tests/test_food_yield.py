@@ -190,11 +190,11 @@ def test_makes_is_never_read_as_people():
 
     `portions_for` in _plugins/food_shopping.rb decides how many a recipe
     feeds, from `serves:` and then `serves_estimate:`, and must not look at
-    `makes:` at all; `made_for` is a second and separate answer. Checked in
-    the source because the alternative is a build.
+    `makes:` at all. It is handed `made_for`'s answer only to stand aside when
+    there is one. Checked in the source because the alternative is a build.
     """
     source = (ROOT / "_plugins" / "food_shopping.rb").read_text(encoding="utf-8")
-    start = source.index("def portions_for(doc)")
+    start = source.index("def portions_for(doc, made)")
     body = source[start:source.index("\n    end\n", start)]
     code = "\n".join(line.split("#", 1)[0] for line in body.splitlines())
     assert "makes" not in code, (

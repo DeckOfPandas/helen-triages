@@ -193,8 +193,9 @@ What to get right, in descending order of how much it costs if wrong:
   one phase — use `name: ""` or omit `name`. **With more than one group,
   EVERY group needs a name, the first included**: a main block left unnamed
   above a `to serve` prints as an unlabelled list followed by labelled ones,
-  and her suite refuses it. Name the main block for the dish: `curry`, `pie`,
-  `salad`.
+  and her suite refuses it. **An unheaded first block is named for the dish or
+  its main component**, so it reads "For the beef:", "For the pie:": `curry`,
+  `pie`, `salad`, `beef`, `cake`. It is not a question for your list.
 
 **How a group's `name` is printed, which is what decides how to write it.**
 The page puts "For the " in front and a colon after, so `name: dressing` reads
