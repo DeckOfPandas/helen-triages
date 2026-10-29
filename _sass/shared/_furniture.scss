@@ -7,8 +7,8 @@
 // box, the same objects on both sites and so styled once (#1005, #1210;
 // MANUAL §13.13). The markup is _includes/back-to-index.html (the arrow and,
 // through page-print.html, print · pdf), _includes/page-actions.html (the
-// shortlist pair) and _includes/page-search.html (the box, in the header, on
-// a local build only). Loaded after shared/chrome; names only
+// shortlist pair) and _includes/page-search.html (the box, at the top right
+// of the page body). Loaded after shared/chrome; names only
 // palette-contract variables.
 //
 // Per site: the shortlist button's colours and states (food/_shortlist.scss,
@@ -42,14 +42,23 @@
 
 .btn-print[hidden] + .page-print-sep { display: none; }
 
+// The search box holds the line's right-hand end (shared/_layout.scss), so
+// print · pdf starts under it. Below $index-stack-width the box is a line of
+// its own above this one, and print · pdf keeps its place.
+@media (min-width: $index-stack-width + 1px) {
+  .page-furniture .page-print-actions {
+    align-self: flex-start;
+    margin-top: $page-search-room;
+  }
+}
+
 // --- The search box -----------------------------------------------------------
 // The index's own box (type mixin, hairline and placeholder from
-// shared/_rule.scss); its place in the header's grid is shared/_layout.scss's.
-// `letter-spacing: normal` resets the tracking `.site-header` carries for the
-// wordmark. `position: relative` anchors the dropdown. The glass is on the
-// right by DOM order, and the input is right-aligned so a word grows
-// leftwards from the glass and a long one scrolls its beginning off the left
-// (#1099).
+// shared/_rule.scss); its place on the page is shared/_layout.scss's, which
+// keeps it positioned at every width because the box anchors the dropdown.
+// The glass is on the right by DOM order, and the input is right-aligned so a
+// word grows leftwards from the glass and a long one scrolls its beginning
+// off the left (#1099).
 .page-search {
   position: relative;
   margin: 0;
@@ -58,7 +67,6 @@
   gap: $space-sm;
   flex: 0 0 auto;
   min-width: 0;
-  letter-spacing: normal;
 }
 
 .page-search-go {
@@ -78,8 +86,8 @@
 
 .page-search-mark {
   display: block;
-  width: 1.15rem;
-  height: 1.15rem;
+  width: $page-search-mark-size;
+  height: $page-search-mark-size;
 }
 
 // How quiet the resting box is: the share of $color-clear-text mixed towards
@@ -139,7 +147,7 @@ $page-search-quiet: 45%;
 
 // --- The dropdown: everything the word could mean here, grouped by kind ------
 // Hangs from the box's right edge, under the glass (#1050). The box is on the
-// header's right edge at every width, so the panel's left edge is the one
+// column's right edge at every width, so the panel's left edge is the one
 // that has to stay on screen: `max-width` against the viewport does that, and
 // the options ellipsise so the panel keeps one row per result. The group
 // headings take each site's section hues, which only a site's stylesheet may
@@ -168,17 +176,14 @@ $page-search-quiet: 45%;
   border-top: 1px solid $color-border;
 }
 
-// The kind. The body face at 700, because Courier Prime ships nothing
-// heavier than the Bold it would otherwise wear (#1053). `inline-block` so
-// the background each site paints on it hugs the words and does not run the
-// dropdown's width (#1136). The shape is this one rule; only the hue is per
-// site.
+// The kind, in the face and weight of the index's own section headings
+// (STAR INGREDIENT, MOOD): the same mixin at a dropdown's size, so a heading
+// here is the heading it lands on. Cocktails passes its headings' lighter
+// weight and wider tracking (cocktails/_filters.scss). `inline-block` so the
+// background each site paints on it hugs the words and does not run the
+// dropdown's width (#1136).
 .page-search-group-label {
-  font-family: $font-body;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  @include index-section-label($size: 0.78rem);
   line-height: 1;
   display: inline-block;
   color: $color-clear-text;
@@ -226,6 +231,31 @@ $page-search-quiet: 45%;
   font-family: $font-body;
   font-size: 0.74rem;
   color: $color-clear-text;
+}
+
+// "+N more" does something: under the names it is a link to the index's own
+// name search, under a group of words a button that shows the rest of the
+// group (page-search.js). Still a remark in type, so only the cursor, the
+// accent under it and the keyboard's wash say it can be pressed.
+.page-search-more {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding-bottom: $space-xs;
+  text-align: left;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  letter-spacing: normal;
+
+  &:hover,
+  &:focus-visible,
+  &.is-active {
+    color: $color-accent;
+    background: color.mix($color-accent, $color-surface, 14%);
+    outline: none;
+  }
 }
 
 // --- The shortlist pair: [ + SHORTLIST ]  SEE SHORTLIST (N) ------------------

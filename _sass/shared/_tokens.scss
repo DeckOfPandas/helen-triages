@@ -65,6 +65,14 @@ $index-search-max-width: 620px;
 // stacked and the other has not.
 $index-stack-width: 720px;
 
+// The search box at the top right of the page body (shared/_layout.scss).
+// The glass is the tallest thing in it, so the box is the glass's height, and
+// whatever starts under the box clears it by $space-md. Below
+// $index-stack-width the box takes a line of its own instead: food's STAR
+// INGREDIENT heading and the box no longer fit on one line on a phone.
+$page-search-mark-size: 1.15rem;
+$page-search-room: $page-search-mark-size + $space-md;
+
 // Where the header stops putting the nav beside the wordmark. Derived, not
 // picked: the widest wordmark (`[ COCKTAILS ]`), the nav row and the header's
 // padding have to fit on one line with air between them. It is not about one

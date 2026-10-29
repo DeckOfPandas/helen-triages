@@ -7,7 +7,7 @@ sitemap: false
   #1050, 2026-09-15. The drinks' half of food/search.json; read that file's
   comment for the shape and the reasoning, which are the same. Fetched by
   assets/js/page-search.js from the box _includes/page-search.html renders
-  (the header, local builds only, since #1210).
+  at the top right of every drink page.
 
   THE SAME LIST THE INDEX SHOWS. `all_drinks` is assembled exactly as
   cocktails/index.html assembles it -- the gated public collection, plus the
@@ -54,17 +54,9 @@ sitemap: false
   stale server that is exactly the pre-#1051 behaviour, which is imperfect,
   rather than an empty list, which is broken.
 
-  `items_label` IS "cocktails" HERE AND "food" ON THE OTHER SITE -- Helen on
-  #1088, 2026-09-20: 'Search dropdown group labels: "food" and "cocktails"'.
-  It said "drinks" as placeholder copy, then "recipes" on both sites from
-  #1097 (2026-09-15).
-
-  #1097 STILL STANDS: "'Recipes' means recipes across both sites" is the word
-  for CONTENT, and a drink is a recipe under it. This label does a different
-  job -- it heads the group of PAGES in a dropdown whose other groups are
-  kinds of word (Mood, Hassle, Has to have), so it says which pile the results
-  came from rather than what kind of thing they are. food/search.json carries
-  the same note.
+  `items_label` IS THE NAME SEARCH'S OWN HEADING, I KNOW WHAT I WANT, as
+  cocktails/index.html words it: each heading in the dropdown is the index
+  section a result lands on (DECISIONS §13). food/search.json says the same.
 {%- endcomment -%}
 {%- assign this_site = site.data.sites[page.site_key] -%}
 {%- assign groups = site.data.cocktails.taxonomy.mood_groups -%}
@@ -76,7 +68,7 @@ sitemap: false
 {
   "site": {{ page.site_key | jsonify }},
   "home": {{ this_site.home | relative_url | jsonify }},
-  "items_label": "cocktails",
+  "items_label": "I know what I want",
   "groups": [
     {"kind": "mood", "label": "Mood", "param": "mood", "field": "moods", "values": {{ groups.mood | jsonify }}},
     {"kind": "hassle", "label": "Hassle", "param": "mood", "field": "moods", "values": {{ groups.hassle | jsonify }}},

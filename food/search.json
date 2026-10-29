@@ -5,12 +5,9 @@ sitemap: false
 {%- comment -%}
   WHAT THE "SEARCH FOR ANYTHING" BOX SEARCHES -- GitHub issue #1050, 2026-09-15.
   Fetched by assets/js/page-search.js the first time the box takes focus
-  (_includes/page-search.html -- in the header of every food page on a local
-  build since #1210, 2026-09-30; a recipe page's furniture line before that).
+  (_includes/page-search.html, at the top right of every food page).
   One file per site, because the search is per site: this is food's, and
-  cocktails/search.json is the drinks'. STILL BUILT ON THE DEPLOYED SITE,
-  where nothing fetches it: it is a page, not a switch, and
-  test_the_search_box_searches_for_anything_on_a_local_build expects it.
+  cocktails/search.json is the drinks'.
 
   THE SAME LIST THE INDEX SHOWS, BY CONSTRUCTION. `site.food_recipes` has
   already been through _plugins/publish_gate.rb at :post_read, so a held-back
@@ -45,25 +42,10 @@ sitemap: false
   cocktails/search.json has neither: its words are already the card's
   declared labels.
 
-  `items_label` IS "food" HERE AND "cocktails" ON THE OTHER SITE -- Helen on
-  #1088, 2026-09-20: 'Search dropdown group labels: "food" and "cocktails"'.
-  It was "recipes" on both from #1097 (2026-09-15) and placeholder copy before
-  that.
-
-  THIS IS NOT A REVERSAL OF #1097, and the distinction is the reason the two
-  rulings sit together rather than fighting. #1097 fixes the word for CONTENT
-  -- "'Recipes' means recipes across both sites", so a drink is a recipe too.
-  This label does a different job: it heads the group of PAGES in a dropdown
-  whose other groups are kinds of word (Mood, Hassle, Has to have), so what it
-  has to say is which pile these results came from, not what kind of thing they
-  are. "food" and "cocktails" are #1097's own site adjectives, from its "Food
-  recipes / Cocktail recipes".
-
-  THE CASE HERE NEVER SHOWS. `.page-search-group-label` is `text-transform:
-  uppercase` (shared/_furniture.scss), so this renders as FOOD either way;
-  Helen's lowercase is kept as written rather than tidied to match the
-  capitalised labels beside it, which are the index panel's own and come from
-  _data/food/filter_sections.yml.
+  `items_label` IS THE NAME SEARCH'S OWN HEADING, I KNOW WHAT I WANT, like
+  every other group's label: each heading in the dropdown is the index
+  section a result lands on, so it introduces no word of its own (DECISIONS
+  §13). cocktails/search.json says the same words.
 {%- endcomment -%}
 {%- assign this_site = site.data.sites[page.site_key] -%}
 {%- assign sections = site.data.food.filter_sections -%}
@@ -79,7 +61,7 @@ sitemap: false
 {
   "site": {{ page.site_key | jsonify }},
   "home": {{ this_site.home | relative_url | jsonify }},
-  "items_label": "food",
+  "items_label": {{ sections.name_search.label | jsonify }},
   "groups": [
     {"kind": "star", "label": {{ sections.star.label | jsonify }}, "param": "star", "field": "star", "values": {{ taxonomy.star_ingredients | jsonify }}},
     {%- for group in sections.tag_groups %}

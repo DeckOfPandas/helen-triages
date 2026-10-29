@@ -6,10 +6,9 @@
 # The last two type <text> into the element <type-into-selector> before the
 # shot, for a control that only shows itself once somebody has typed, such as
 # the search box's dropdown (#1050):
-#   sh scripts/browser/crop.sh /food/recipes/caramel/ .page-search dropdown 1280 .page-search-input ch
-# That box is local-build only (#1210) and build.sh builds what deploys, which
-# has none: to look at it, build with `--config _config.yml,_config_local.yml`
-# into tmp/site instead (MANUAL §13.11), then serve and crop as usual.
+#   sh scripts/browser/crop.sh /food/recipes/caramel/ .page-search-results dropdown 1280 .page-search-input ch
+# The dropdown hangs outside the box, so crop `.page-search-results` itself;
+# `.page-search` is the box alone.
 #
 # The port comes from tmp/browser/port, written by this worktree's serve.sh;
 # see shoot.sh. 4010 only when no server is running here.
