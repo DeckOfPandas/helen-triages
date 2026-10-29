@@ -2245,6 +2245,42 @@ def _shopping_blob(site, page="index.html"):
     return json.loads(match.group(1))
 
 
+# --- star_also: a pod-bean greens dish answers the legumes filter too ---------
+# Two fixtures, so a build that stamps every greens row, or none, fails.
+STAR_ALSO_FIXTURE = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nsource_type: unknown\nserves: "2"\n'
+    'main_ingredients: [{ing}]\nstar_ingredient: "greens"\ntags: []\n'
+    'ingredient_groups:\n  - items:\n    - item: "salt"\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: true\n---\n')
+STAR_ALSO_CASES = {
+    "zzz-star-also-beans": ('"Green Beans", "hazelnuts"', "legumes"),
+    "zzz-star-also-kale": ('"kale"', None),
+}
+_in_the_fixture_build({
+    f"_food_recipes/{slug}.md": STAR_ALSO_FIXTURE.format(t=slug, ing=ing)
+    for slug, (ing, _) in STAR_ALSO_CASES.items()})
+
+
+def test_a_pod_bean_greens_row_also_answers_legumes(fixture_site):
+    """`star_also` in _data/food/taxonomy.yml reaches the built index row as
+    `data-star-also`, matched case-blind on main_ingredients (DECISIONS §7).
+
+    filter-state.js reads the attribute; tests/js/filter-state.test.js holds
+    the matching. This holds the Liquid that writes it.
+    """
+    html = (fixture_site / "food" / "index.html").read_text(encoding="utf-8")
+    for slug, (_, wanted) in STAR_ALSO_CASES.items():
+        row = re.search(rf'<li data-url="[^"]*/{slug}/"[^>]*>', html)
+        assert row, f"the fixture {slug} has no row on the built food index"
+        got = re.search(r'data-star-also="([^"]*)"', row.group(0))
+        assert (got.group(1) if got else None) == wanted, (
+            f"{slug}: data-star-also is {got.group(1) if got else None!r}, "
+            f"wanted {wanted!r}. Row: {row.group(0)[:200]}"
+        )
+
+
 def test_every_recipe_reaches_the_page_with_a_portion_count(site):
     """Every recipe in the blob has something to count and names its yield's key.
 

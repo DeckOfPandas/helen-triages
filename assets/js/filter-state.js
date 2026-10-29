@@ -325,7 +325,9 @@
     }
     if (missing) return false;
 
-    if (s.star && (r.star || '') !== s.star) return false;
+    // A row answers its own star and any `starAlso` (taxonomy.yml `star_also`).
+    if (s.star && (r.star || '') !== s.star
+        && (r.starAlso || []).indexOf(s.star) === -1) return false;
 
     if (s.nameQuery && String(r.titleFolded || '').indexOf(s.nameQuery) === -1) return false;
 

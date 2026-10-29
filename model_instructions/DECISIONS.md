@@ -918,6 +918,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   three mushroom dishes and the leek dishes had nowhere to go; `greens` held
   tomatoes, peppers, courgettes and beans. Helen: *"Yes"* to each. Tomatoes,
   courgettes, peppers and alliums stay blank: scattered, and rarely the point.
+- **2026-10-29 — beans eaten whole in the pod are `greens`, and the `legumes`
+  filter finds them too; potatoes are `root veg`.** Helen: *"beans are
+  legumes, right, but while I know that I might still expect them to appear
+  under greens"*, then *"Can we show pod beans eaten whole under both greens
+  and legumes categories"*, choosing an automatic word list and the one
+  `greens` badge. `star_also` in `_data/food/taxonomy.yml` holds the list;
+  shelled beans stay `legumes`. And: *"Potatoes are root veg."*
 - **2026-10-21 — `knife and fork` and `herbivore-ish` are moods.** The audit
   found 39 draft mains with no mood: plainly cooked centrepieces, and
   vegetables as the main event. On the first Helen ruled out "proper dinner"
@@ -1021,7 +1028,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   it. Refined 2026-10-10: where the advance work is the real work the tag
   stays, as on a BBQ spatchcock duck rubbed a day ahead, *"keep make ahead --
   the rub is the thing here, and roasting on the day is trivial."* A Christmas
-  turkey buttered the day before is not.
+  turkey buttered the day before is not. Refined 2026-10-29: what is left may
+  be plain cooking of any length, if nothing else is. Helen, on roast potatoes
+  boiled and coated the day before: *"given they can be assembled the day
+  before, with zero extra steps, the roast lasting 5 mins or 1 hour doesn't
+  really matter."* In her words the tag is a convenience: *"all or most of
+  this can be made in advance of when you want to eat it."*
 - **2026-10-10 — feta does not count for `cheese-tastic`, even a whole baked
   block; burrata does.** Helen: *"oooh, yeah, feta doesn't count for
   cheese-tastic"*. The tag is for cheese as the pleasure of the dish, and the

@@ -38,6 +38,25 @@ def test_star_ingredient_is_declared(recipe, taxonomy):
     )
 
 
+def test_star_also_names_declared_stars_and_real_ingredients(taxonomy):
+    """`star_also` lets a row answer a second star filter (DECISIONS §7).
+
+    Both stars must be declared, or the rule points at a button that does not
+    exist; each ingredient must be lowercase, because food/index.html matches it
+    against a downcased main_ingredient and a capital would never match.
+    """
+    declared = set(taxonomy.get("star_ingredients") or [])
+    for rule in taxonomy.get("star_also") or []:
+        assert rule.get("star") in declared and rule.get("from") in declared, (
+            f"star_also rule {rule!r} names a star not in star_ingredients"
+        )
+        assert rule.get("star") != rule.get("from"), f"star_also rule {rule!r} points at itself"
+        words = rule.get("main_ingredients") or []
+        assert words, f"star_also rule {rule!r} lists no main_ingredients"
+        upper = [w for w in words if w != w.lower()]
+        assert not upper, f"star_also rule {rule!r} has non-lowercase entries {upper}"
+
+
 def test_tags_are_declared(recipe, taxonomy):
     declared = set()
     for group in (taxonomy.get("tags") or {}).values():

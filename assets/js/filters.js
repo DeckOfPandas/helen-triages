@@ -690,6 +690,7 @@ function renderResultsPool() {
       var row = {
         tags: (li.dataset.tags || '').split(',').filter(Boolean),
         star: li.dataset.star || '',
+        starAlso: (li.dataset.starAlso || '').split(',').filter(Boolean),
         ingredients: (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); }),
         shortlisted: state.shortlisted
           ? (sharedKeys

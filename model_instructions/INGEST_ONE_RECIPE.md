@@ -455,10 +455,13 @@ Meanings you would not guess:
 - **`no-cook`** answers "can I put this on the table without cooking?" A spice
   blend is uncooked and a useless answer to that question, so it stays untagged.
   Melting chocolate is prep, not cooking: a fridge cake is `no-cook`.
-- **`make-ahead`** — a substantial part of the dish is genuinely finished ahead.
-  **A bake that merely keeps is not make-ahead** ("will keep three days in a
-  tin" describes leftovers), and **an overnight marinade is not make-ahead**
-  (real advance work, but the whole dish is still cooked at serving time).
+- **`make-ahead`** — all or most of the dish can be made in advance of when
+  you eat it: a convenience. **What is left on the day may be cooking, if it
+  is no more than cooking**: roast potatoes boiled and coated the day before
+  are make-ahead however long they roast. **A bake that merely keeps is not
+  make-ahead** ("will keep three days in a tin" describes leftovers), and
+  **an overnight marinade is not make-ahead** (the dish still has to be made
+  at serving time).
 - **`freezable`** and **`make-ahead`** are separate axes. Neither implies the
   other.
 - **`drinks`** is anything drinkable that is not a cocktail — a cordial, a hot
@@ -528,10 +531,12 @@ for her to fix, so propose rather than agonise — but propose only from the lis
 **It is the one thing the recipe is ABOUT, and about a quarter of her collection
 correctly leaves it blank.** A plain sponge, a dressing, a spice blend has no
 hero. Egg as a binder or a leavening mechanism is not `eggs`; a dish that is
-literally about the egg is. Squash counts as `root veg`. `greens` is leaves
-and brassicas only (kale, cabbage, sprouts, broccoli, cauliflower, chard,
-spinach); a tomato, courgette, pepper or leek dish has no star, and a bean,
-lentil or chickpea one is `legumes`. **If you find yourself
+literally about the egg is. Squash and potatoes count as `root veg`. `greens`
+is leaves, brassicas and beans eaten whole in the pod (kale, cabbage, sprouts,
+broccoli, cauliflower, chard, spinach; green, fine and runner beans,
+mangetout, sugar snaps); a tomato, courgette, pepper or leek dish has no star,
+and a shelled bean, lentil or chickpea one is `legumes`. A pod-bean dish is
+starred `greens` and the legumes filter finds it too, by itself. **If you find yourself
 arguing for one, that is the signal to omit it.**
 
 ### `main_ingredients`

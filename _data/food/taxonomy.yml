@@ -22,8 +22,9 @@ star_ingredients:
   - fruit
   - game
   # Leaves and brassicas: kale, cavolo nero, cabbage, sprouts, broccoli,
-  # cauliflower, chard, spinach, lettuce, radicchio. Not tomatoes, courgettes,
-  # peppers or beans.
+  # cauliflower, chard, spinach, lettuce, radicchio. Beans eaten whole in the
+  # pod too, which `star_also` below also files under legumes. Not tomatoes,
+  # courgettes, peppers or shelled beans.
   - greens
   - lamb
   # Lentils, chickpeas and beans, fresh or dried, edamame included.
@@ -32,9 +33,23 @@ star_ingredients:
   - oily fish
   - pork
   - poultry
+  # Squash and potatoes count.
   - root veg
   - shellfish
   - white fish
+
+# A recipe starred `from` whose main_ingredients include one of these also
+# answers the `star` filter. Its badge still names only its own star. Pod
+# beans are eaten as greens and are still beans (DECISIONS §7).
+star_also:
+  - star: legumes
+    from: greens
+    main_ingredients:
+      - green beans
+      - fine beans
+      - runner beans
+      - mangetout
+      - sugar snap peas
 
 # Retired values, each with its reason. test_star_ingredient_is_declared reads
 # this first, so a file still carrying one fails with the reason and not just
@@ -123,7 +138,7 @@ tags:
     - main
     # A substantial part of the dish, or all of it, is prepared well before
     # serving without losing quality, and what is left for the day is trivial
-    # (#216). Not a bake that merely keeps, not an overnight marinade whose
+    # or plain cooking (#216). Not a bake that merely keeps, not an overnight marinade whose
     # dish is still cooked at serving time, not a base recipe or condiment.
     - make-ahead
     # `cook_time: "None"`, which test_no_cook_tag_implies_no_cook_time holds
