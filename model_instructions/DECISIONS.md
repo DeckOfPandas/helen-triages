@@ -5277,8 +5277,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   title type.** Helen: *"I'm hoping the search dropdown subtitles have the same
   font and weight as the filter titles like STAR"*, and for the names,
   *"Styling them as we do in the index list would make them stand out better
-  in the search dropdown."* Courier at 0.78rem: bold on food, regular and
-  wider tracked on cocktails, as each site's headings are. A food name is
+  in the search dropdown."* Then, on the live site in desktop Chrome: *"I'm
+  really not seeing any bold ... to me the cocktail filter headings are
+  bold/heavy in some way, and that's still what I want"*. So heavy is how
+  the headings look, not a CSS weight. Headings and names are Courier 700
+  plus the chosen chip's 0.05em stroke in the letter's own colour, on both
+  sites. Headings are 0.78rem, wider tracked on cocktails. A food name is
   lowercase at 1rem; a drink name is the card's capitals at 0.95rem, without
   the tape. Replaces Selawik 700 (#1053), and its fill is still #1136's.
 - **2026-09-15, #1096 — the box and the index's own searches both stay as they
