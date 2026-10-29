@@ -4882,12 +4882,13 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   on both, because it drops the door's row 6px and that gap is hers. The row is
   the anchor; the `??` is the mark that moves.
 - **2026-10-16, #1386 #1322 — the door's row hangs close under the tape:
-  0.1rem over the door and the `??`, 0.1rem over the local search box under
-  the door, 0.2rem from the row to the header's border, at every width.**
+  0.1rem over the door and the `??`, 0.2rem from the row to the header's
+  border, at every width.**
   Helen, shown candidates at 0.5, 0.25 and 0: *"I'd like 0.1rem margin top for
   each of the ?? and the door, then 0.1rem top for the search box. ... bottom
   edge padding of the header section ... I suspect 0.2rem would do it."* One
-  variable, `$header-door-gap`, carries the 0.1rem for all three. Replaces
+  variable, `$header-door-gap`, carries the 0.1rem for both. The search box
+  has since left the header (2026-10-28). Replaces
   *"15 over, 15 under"* of 2026-10-08. The stacked grid has no gap and there is
   no phone variant; /about/, having no `??`, carries 0.4rem under its doors so
   they sit as far from the border as a door beside a `??`.
@@ -5066,11 +5067,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   *"The if you like this text isn't a placeholder. Final version."* The words
   were hers from #927's title. A placeholder marker means she has not ruled,
   not that the words are wrong.
-- **2026-09-20, #1088 — the search dropdown's page groups are labelled "food"
-  and "cocktails".** This does not reverse #1097: that fixes the word for
-  content; this label says which pile the results came from, beside groups
-  that are kinds of word (Mood, Hassle, Has to have). Both `search.json` files
-  carry the argument.
+- **2026-10-28, #1288 — the search dropdown's page group is headed I KNOW
+  WHAT I WANT, on both sites.** Helen: *"Please relabel the subtitle "FOOD" to
+  "I KNOW WHAT I WANT" in the search return dropdown so it's not a new design
+  idea."* Every heading in the dropdown is now the index section a result
+  lands on. Replaces "food" and "cocktails" (#1088).
 - **2026-09-20, #1088 — a filtered index with no matches says "Blank canvas."
   on both sites; "Nothing to see here yet." is cocktails' empty-collection
   line.** Helen: *'Both "blank canvas."'* and *"'Nothing to see here yet' is
@@ -5092,6 +5093,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   took the same line on 2026-10-11 (#1219).
 - **2026-10-07, #1088 — a capped list says "+3 more" and stops.** Helen:
   *'"+3 more" is fine, then that's it.'* The "— keep typing" came off.
+- **2026-10-28, #1288 — the dropdown's "+N more" can be pressed: under the
+  names it goes to the index's name search, under words it shows the rest in
+  place.** Helen asked *"Can we make "and X more" clickable?"* and, asked what
+  it should do, chose *"Names go to index, words expand"*. The index already
+  lists every matching title; no page lists a group's words. The words stay
+  "+N more".
 - **2026-10-07, #1088 — the food index with nothing chosen says "(select
   something)"; the estimated-portions tooltip is "(estimated)"; "copy link" /
   "copied" are fine.** Her words at the second sitting, which listed every
@@ -5279,14 +5286,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   never a substring, and a card label joining two ingredients ("X or Y") is not
   offered.** Helen's issues. Every typed word must begin a word of the
   candidate, in any order.
-- **2026-09-15, #1050 / #1053 — food's dropdown group titles are Selawik 700
-  at 0.7rem; the five `-bright` tones no longer colour them (#1136).** Helen:
-  *"food site: group headings need to be brighter, closer to core colours
-  although obviously we're limited by contrast"*. A `-bright` was its root
-  darkened by exactly what 4.5:1 costs; the palette no longer carries them,
-  because the headings are filled with the section's root hue and lettered
-  dark (§13.13). #1053: *"Switch font to the other one
-  if you have to"*.
+- **2026-10-28, #1288 — the dropdown's group headings wear the face and weight
+  of the index's own section headings, and its recipe names the index list's
+  title type.** Helen: *"I'm hoping the search dropdown subtitles have the same
+  font and weight as the filter titles like STAR"*, and for the names,
+  *"Styling them as we do in the index list would make them stand out better
+  in the search dropdown."* Courier at 0.78rem: bold on food, regular and
+  wider tracked on cocktails, as each site's headings are. A food name is
+  lowercase at 1rem; a drink name is the card's capitals at 0.95rem, without
+  the tape. Replaces Selawik 700 (#1053), and its fill is still #1136's.
 - **2026-09-15, #1096 — the box and the index's own searches both stay as they
   are; the box's placeholder is "I know what I want..." with no label, only
   the magnifying glass.** Helen: *"Retain current behaviour for both."* The
@@ -5304,14 +5312,19 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   less obtrusive, which is what I actually want, please step its colour (border
   and font) closer to the background."* Typed text stays `$color-text`. Mix
   towards the ground, never `lighten()`. 40% was rejected as disappearing.
-- **2026-10-08, #1288 — the search box is on local builds only, in the header
-  under the door, behind `show_header_search`.** Helen (#1210): *"this is key
-  for me during testing so I'm not clicking about all over the place."* On
-  #1288, after a full live build (PR #1310, unmerged): *"I've decided not to
-  have this feature on the live site -- I'll keep it on the local build. The
-  live filtering from the IKWIW fields is cuter. ... I will return to this if I
-  miss it."* An always-there box costs every phone a third header line. A
-  closed grey glass was also tried. Read PR #1310's closing comment first.
+- **2026-10-28, #1288 — the search box is live on both sites, at the top
+  right of the page body under the door, not in the header; it takes the
+  right-hand end of the page's first line.** Helen: *"Let's do it live! BUT
+  not in the header bar -- this is the key. Let's put it top right in the page
+  body, directly below the door to the other site. My hope is that this makes
+  the search clearly be part of one site or the other rather than shared."*
+  From three candidates (own line, hung close under the border, sharing the
+  first line) she picked the last: *"option C please!"* So print · pdf starts
+  under the box, and cocktails' universe line starts below it. Below
+  `$index-stack-width` the box is a line of its own, because food's STAR
+  INGREDIENT heading and the box do not fit one phone line. `show_header_search`
+  is retired. It replaces her local-only ruling of 2026-10-08 (PR #1310's
+  closing comment has the header attempts).
 - **2026-09-17, #1136 — the search dropdown's group headings are filled with
   their section's root hue and lettered dark, on both sites.** Helen:
   *"omnisearch dropdown result group headings should take their section's

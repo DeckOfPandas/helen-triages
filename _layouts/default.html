@@ -150,10 +150,6 @@
 {%- unless page.site_neutral %}
     <a href="{{ '/about/' | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
     {%- endunless %}
-    {% comment %} The search box, on a local build only (#1210): the include
-       renders nothing unless `show_header_search` is true, which only
-       _config_local.yml sets. {% endcomment %}
-    {% include page-search.html %}
   <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">
     <div class="site-logo">
       <div class="site-logo-top">HELEN TRIAGES</div>
@@ -183,6 +179,11 @@
   </header>
 
   <main>
+    {% comment %} The search box, at the top right of the page body under the
+       door, not in the header: it belongs to this site, not to the chrome
+       both sites share. The include renders nothing on a site_neutral page.
+       {% endcomment %}
+    {% include page-search.html %}
     {{ content }}
   </main>
 

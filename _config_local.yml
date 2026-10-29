@@ -17,11 +17,6 @@ show_source_wording: true
 # (that needs a Chrome or Chromium on PATH -- see the script's --chrome flag).
 pdf_downloads: false
 
-# The search-for-anything box in the header of every page (#1210). Local
-# only: production declares no such key, so _includes/page-search.html
-# renders nothing there. Must stay out of _config.yml.
-show_header_search: true
-
 # Build every page whatever its `meta` flags say: this switches off
 # _plugins/publish_gate.rb, because the held-back pages are the ones being
 # worked on.
