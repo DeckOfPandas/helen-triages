@@ -1,9 +1,10 @@
 @use "shared/theme" as *;
 @use "shared/tokens" as *;
 
-// THE RESULTS COUNT'S DIGITS, AND THE BAR THAT FOLLOWS THEM DOWN THE PAGE, on
-// both indexes. One partial because the bar mirrors the count line and the
-// digits are set the same way in each.
+// THE RESULTS COUNT'S DIGITS, THE BAR THAT FOLLOWS THEM DOWN THE PAGE, AND THE
+// PILL THAT POINTS DOWN TO THEM, on both indexes. One partial because the bar
+// and the pill mirror the count line and the digits are set the same way in
+// each.
 //
 // Beyond shared/_tokens.scss and the palette contract it names $font-label,
 // which both palettes declare under that name with the same role.
@@ -94,9 +95,71 @@ $results-bar-height: 2.75rem;
   to   { transform: translateY(0); }
 }
 
+// --- 3. The jump pill (#1441) --------------------------------------------------
+// "N survivors ↓", fixed at the foot of the screen, centred, while `#results`
+// is still below the viewport; the bar above takes over once it is past.
+// results-bar.js reveals it, so it never shares the screen with the bar, and
+// it is gone before the footer comes into view. 44px tall: a touch target.
+// The count's own digits and word, as in the bar.
+.results-jump {
+  position: fixed;
+  left: 50%;
+  bottom: calc(#{$space-md} + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  // The bar's layer: above the panel's clear-all and the search dropdown.
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xs;
+  min-height: 2.75rem;
+  max-width: calc(100vw - 2 * #{$space-md});
+  padding: 0 $space-lg;
+  border: 0;
+  border-radius: 999px;
+  background: $color-text;
+  color: $color-bg;
+  font-family: $font-body;
+  font-size: 1rem;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  animation: results-jump-in 0.15s ease;
+
+  // Hover moves colour, never geometry (DECISIONS §9.13): the words
+  // underline, as on the pill this one is taken from.
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+    outline-offset: 2px;
+  }
+}
+
+// Stated outright, as for the bar.
+.results-jump[hidden] { display: none; }
+
+// The site's right arrow, turned to point down.
+.results-jump-arrow {
+  width: 1.1em;
+  height: 0.66em;
+  flex: none;
+  transform: rotate(90deg);
+}
+
+@keyframes results-jump-in {
+  from { transform: translate(-50%, 150%); }
+  to   { transform: translate(-50%, 0); }
+}
+
 // shared/_base.scss already cuts every animation for a reader who asks for
-// less motion; this says it in the bar's own words, so the rule survives if
-// that blanket ever narrows.
+// less motion; this says it in the bar's and pill's own words, so the rule
+// survives if that blanket ever narrows.
 @media (prefers-reduced-motion: reduce) {
-  .results-bar { animation: none; }
+  .results-bar,
+  .results-jump { animation: none; }
 }

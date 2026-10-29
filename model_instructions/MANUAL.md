@@ -4487,10 +4487,23 @@ to the body default on purpose. The digits alone take `$font-label`
 (`.results-count-number` in `_sass/shared/_results-bar.scss`, on
 `#recipe-count-n` and `#drink-count-n`); the word stays bare.
 
-**The sticky bar** is `.results-bar`, driven by `assets/js/results-bar.js`.
-It ships `hidden` and is shown only while an `IntersectionObserver` reports
-`#results` above the viewport. It mirrors the count spans and the top
-`× clear all`; it never recomputes. It must load after the index script
+**The sticky bar and the jump pill** are two floating copies of the count,
+both driven by `assets/js/results-bar.js` and styled in
+`_sass/shared/_results-bar.scss`. Both ship `hidden`, and at most one shows:
+
+- `.results-bar`, fixed to the top, while `#results` has wholly left the
+  top of the viewport. It also mirrors the top `× clear all`.
+- `.results-jump` (#1441), "N survivors ↓" in a pill fixed at the foot of
+  the screen, centred, while `#results` is not yet wholly on screen. Pressing
+  it scrolls `#results` to the top (smoothly, unless reduced motion is
+  asked for) and focuses it. No back-to-top twin, and no hiding while a
+  search box has focus (DECISIONS §13.7).
+
+Neither recomputes the count; both mirror the count spans. Where they show
+is read from `#results`'s box on every `IntersectionObserver` report AND on
+scroll, once a frame: the observer reports only a crossing, and a jump from
+the foot of the page to the top crosses nothing. The script must load after
+the index script
 (`test_the_results_bar_loads_after_the_index_script_on_both_indexes`).
 
 **Pagination:** `PAGE_SIZE` per page, prev and next, a status label,

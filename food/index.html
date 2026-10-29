@@ -180,6 +180,14 @@ permalink: /food/
   </div>
 </div>
 
+{% comment %} The jump pill (#1441): "N survivors ↓" at the foot of the screen while the
+   count line above is still below it, so a reader knows the results are down
+   there. The bar's other half, in the same script, the same mirror and the
+   same block on cocktails/index.html. Ships `hidden`. {% endcomment %}
+<button type="button" class="results-jump" data-results-jump hidden>
+  <span class="results-count-number" data-results-jump-n></span> <span data-results-jump-word></span>{% include icons/arrow-right.svg class="results-jump-arrow" %}
+</button>
+
 <div class="results-count-row">
   <button type="button"
           class="btn-shortlist-only"

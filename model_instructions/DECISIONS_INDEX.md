@@ -729,6 +729,8 @@ argument and the rules each field is read by.
 - 2026-08-03 · §13 · an ingredient that matches the search wears the active-tag treatment in the ingredient green, on the search button and on the row.
 - 2026-08-03 · §13 · the results heading is left-aligned — Right-aligned it "read as stray rather than placed".
 - 2026-08-12 · §13 · the word in "N survivors" is bare body text, no emboss.
+- 2026-10-29 · §13 · #1441 · the jump pill points down to the count and has no back-to-top twin.
+- 2026-10-29 · §13 · #1441 · the jump pill shows whatever has focus — Asked whether it should step aside while a search box has focus on a phone, Helen picked "Always show".
 - 2026-09-14 · §13 · #1007 · the header's door to the other site is the bracketed word and an arrow, no icon.
 - 2026-09-15 · §13 · #1086 · below 600px the wordmark lockup is two thirds size ($wordmark-phone-scale: 0.6667).
 - 2026-09-15 · §13 · #1086 · /about/ shows both doors on one line and no ??.

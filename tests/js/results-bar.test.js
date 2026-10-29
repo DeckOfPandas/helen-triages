@@ -1,11 +1,11 @@
-// Tests for assets/js/results-bar.js: the sticky "N survivors" bar on both
-// indexes.
+// Tests for assets/js/results-bar.js: the sticky "N survivors" bar and the
+// "N survivors ↓" jump pill (#1441) on both indexes.
 //
 //   node --test tests/js/*.test.js
 //
-// The bar is a mirror: it shows the count the index script painted and the
-// clear-all's own visibility, and its button presses the index's button.
-// Nothing here checks a count, because the bar does not compute one.
+// Both are mirrors: they show the count the index script painted, the bar
+// shows the clear-all's own visibility, and its button presses the index's
+// button. Nothing here checks a count, because neither computes one.
 //
 // IntersectionObserver and MutationObserver are stubbed here, not in
 // tests/js/dom-stub.js, which must not invent geometry: each records what it
@@ -71,20 +71,40 @@ function boot(options) {
     return node;
   };
 
-  const bar = el('div', 'results-bar', { 'data-results-bar': '' });
-  bar.hidden = true;
-  const inner = el('div', 'results-bar-inner');
-  const barCount = el('span', 'results-bar-count');
-  const barN = el('span', 'results-count-number', { 'data-results-bar-n': '' });
-  const barWord = el('span', '', { 'data-results-bar-word': '' });
-  barCount.appendChild(barN);
-  barCount.appendChild(doc.createTextNode(' '));
-  barCount.appendChild(barWord);
-  inner.appendChild(barCount);
-  const barClear = el('button', 'btn-clear results-bar-clear', { 'data-results-bar-clear': '' });
-  inner.appendChild(barClear);
-  bar.appendChild(inner);
-  doc.body.appendChild(bar);
+  let bar = null;
+  let barN = null;
+  let barWord = null;
+  let barClear = null;
+  if (!options.noBar) {
+    bar = el('div', 'results-bar', { 'data-results-bar': '' });
+    bar.hidden = true;
+    const inner = el('div', 'results-bar-inner');
+    const barCount = el('span', 'results-bar-count');
+    barN = el('span', 'results-count-number', { 'data-results-bar-n': '' });
+    barWord = el('span', '', { 'data-results-bar-word': '' });
+    barCount.appendChild(barN);
+    barCount.appendChild(doc.createTextNode(' '));
+    barCount.appendChild(barWord);
+    inner.appendChild(barCount);
+    barClear = el('button', 'btn-clear results-bar-clear', { 'data-results-bar-clear': '' });
+    inner.appendChild(barClear);
+    bar.appendChild(inner);
+    doc.body.appendChild(bar);
+  }
+
+  let jump = null;
+  let jumpN = null;
+  let jumpWord = null;
+  if (!options.noJump) {
+    jump = el('button', 'results-jump', { 'data-results-jump': '', type: 'button' });
+    jump.hidden = true;
+    jumpN = el('span', 'results-count-number', { 'data-results-jump-n': '' });
+    jumpWord = el('span', '', { 'data-results-jump-word': '' });
+    jump.appendChild(jumpN);
+    jump.appendChild(doc.createTextNode(' '));
+    jump.appendChild(jumpWord);
+    doc.body.appendChild(jump);
+  }
 
   const panel = el('div', 'controls');
   const topClear = el('button', 'btn-clear');
@@ -99,6 +119,9 @@ function boot(options) {
   doc.body.appendChild(panel);
 
   const heading = el('div', 'results-heading', { id: 'results' });
+  // The stub has no focus; record what the pill asks of it.
+  heading._focusCalls = [];
+  heading.focus = (opts) => { heading._focusCalls.push(opts); };
   // `ids: null` is a page with no count spans at all; absent means food's.
   const ids = 'ids' in options ? options.ids : FOOD_IDS;
   let n = null;
@@ -117,6 +140,18 @@ function boot(options) {
   const sandbox = { document: doc, console: { warn() {}, error() {}, log() {} } };
   if (!options.noIntersectionObserver) sandbox.IntersectionObserver = StubIntersectionObserver;
   if (!options.noMutationObserver) sandbox.MutationObserver = StubMutationObserver;
+  if ('reduceMotion' in options) {
+    sandbox.matchMedia = (query) => ({
+      matches: query === '(prefers-reduced-motion: reduce)' && options.reduceMotion
+    });
+  }
+  // A phone's screen; the entries below are placed against it.
+  sandbox.innerHeight = VIEWPORT_HEIGHT;
+  const scrollHandlers = [];
+  sandbox.addEventListener = (type, fn) => { if (type === 'scroll') scrollHandlers.push(fn); };
+  // Frames run when the test says so, as the browser runs them after a scroll.
+  const frames = [];
+  sandbox.requestAnimationFrame = (fn) => { frames.push(fn); };
   sandbox.window = sandbox;
   vm.runInContext(SRC, vm.createContext(sandbox), { filename: 'results-bar.js' });
 
@@ -126,12 +161,29 @@ function boot(options) {
 
   const io = StubIntersectionObserver.instances[0] || null;
   const mo = StubMutationObserver.instances[0] || null;
-  return { doc, bar, barN, barWord, barClear, topClear, bottomClear, heading, n, w, io, mo };
+  /** Put the count line at `box` and scroll: every handler, then one frame. */
+  const scrollTo = (box) => {
+    heading.__box = box;
+    scrollHandlers.forEach((fn) => fn());
+    frames.splice(0).forEach((fn) => fn());
+  };
+
+  return {
+    doc, bar, barN, barWord, barClear, jump, jumpN, jumpWord,
+    topClear, bottomClear, heading, n, w, io, mo, scrollTo, scrollHandlers
+  };
 }
 
-const ABOVE = { isIntersecting: false, boundingClientRect: { top: -120 } };
-const IN_VIEW = { isIntersecting: true, boundingClientRect: { top: 200 } };
-const BELOW = { isIntersecting: false, boundingClientRect: { top: 1400 } };
+// The script builds its option objects inside the vm sandbox, another realm,
+// so deepStrictEqual would fail them on prototype alone.
+const plain = (value) => JSON.stringify(value);
+
+const VIEWPORT_HEIGHT = 844;
+const ABOVE = { isIntersecting: false, boundingClientRect: { top: -120, bottom: -90 } };
+const IN_VIEW = { isIntersecting: true, boundingClientRect: { top: 200, bottom: 230 } };
+const BELOW = { isIntersecting: false, boundingClientRect: { top: 1400, bottom: 1430 } };
+// The top few pixels over the bottom edge: intersecting, but not yet seen.
+const PEEKING = { isIntersecting: true, boundingClientRect: { top: 830, bottom: 860 } };
 
 // --- when it shows -------------------------------------------------------------
 
@@ -275,4 +327,154 @@ test('a page with a heading but no count spans wires nothing', () => {
   const r = boot({ ids: null });
   assert.strictEqual(r.io, null);
   assert.strictEqual(r.bar.hidden, true);
+  assert.strictEqual(r.jump.hidden, true);
+});
+
+// --- the jump pill (#1441) ------------------------------------------------------
+
+test('the pill stays hidden until the observer has spoken', () => {
+  const r = boot();
+  assert.strictEqual(r.jump.hidden, true,
+    'the pill must not appear on its own: only an observer report reveals it.');
+});
+
+test('the count line below the fold shows the pill and not the bar', () => {
+  // The arrival state on a phone: the count line is under the filters.
+  const r = boot();
+  r.io.fire(BELOW);
+  assert.strictEqual(r.jump.hidden, false);
+  assert.strictEqual(r.bar.hidden, true);
+});
+
+test('the count line in view hides the pill', () => {
+  const r = boot();
+  r.io.fire(BELOW);
+  r.io.fire(IN_VIEW);
+  assert.strictEqual(r.jump.hidden, true,
+    'with the count on screen there is nothing to jump to.');
+});
+
+test('the count line above the viewport hides the pill and shows the bar', () => {
+  // Only one floating copy of the count at a time: past the count the bar
+  // stands in for it.
+  const r = boot();
+  r.io.fire(BELOW);
+  r.io.fire(ABOVE);
+  assert.strictEqual(r.jump.hidden, true);
+  assert.strictEqual(r.bar.hidden, false);
+});
+
+test('the pill mirrors the number and the word, and follows them', () => {
+  const r = boot();
+  r.io.fire(BELOW);
+  assert.strictEqual(r.jumpN.textContent, '42');
+  assert.strictEqual(r.jumpWord.textContent, 'survivors');
+
+  r.n.textContent = '1';
+  r.w.textContent = 'survivor';
+  r.mo.fire();
+  assert.strictEqual(r.jumpN.textContent, '1');
+  assert.strictEqual(r.jumpWord.textContent, 'survivor');
+});
+
+test('the pill shows "0 survivors" too, since the empty state is where it leads', () => {
+  const r = boot();
+  r.n.textContent = '0';
+  r.io.fire(BELOW);
+  assert.strictEqual(r.jump.hidden, false);
+  assert.strictEqual(r.jumpN.textContent, '0');
+});
+
+test('pressing the pill scrolls the count line to the top, smoothly, and focuses it', () => {
+  const r = boot({ reduceMotion: false });
+  r.io.fire(BELOW);
+  r.jump.dispatch('click');
+  assert.strictEqual(plain(r.heading._scrollCalls), plain([{ behavior: 'smooth', block: 'start' }]));
+  assert.strictEqual(r.heading.getAttribute('tabindex'), '-1',
+    'a div or p takes focus only with a tabindex.');
+  assert.strictEqual(plain(r.heading._focusCalls), plain([{ preventScroll: true }]),
+    'focus must not scroll again, or it cancels the smooth scroll.');
+});
+
+test('with reduced motion asked for, the pill jumps at once', () => {
+  const r = boot({ reduceMotion: true });
+  r.io.fire(BELOW);
+  r.jump.dispatch('click');
+  assert.strictEqual(plain(r.heading._scrollCalls), plain([{ behavior: 'auto', block: 'start' }]));
+});
+
+test('the pill leaves a tabindex the count line already has alone', () => {
+  const r = boot();
+  r.heading.setAttribute('tabindex', '0');
+  r.jump.dispatch('click');
+  assert.strictEqual(r.heading.getAttribute('tabindex'), '0');
+});
+
+test('no IntersectionObserver: the pill stays hidden and has no live click', () => {
+  const r = boot({ noIntersectionObserver: true });
+  assert.strictEqual(r.jump.hidden, true);
+  r.jump.dispatch('click');
+  assert.strictEqual(r.heading._scrollCalls, undefined);
+});
+
+test('a page with the pill and no bar still wires the pill', () => {
+  const r = boot({ noBar: true });
+  r.io.fire(BELOW);
+  assert.strictEqual(r.jump.hidden, false);
+  assert.strictEqual(r.jumpN.textContent, '42');
+});
+
+test('a count line peeking over the bottom edge still shows the pill', () => {
+  // A sliver of the line at the screen's foot is not something a reader has
+  // seen; the pill goes once the whole line is on screen.
+  const r = boot();
+  r.io.fire(PEEKING);
+  assert.strictEqual(r.jump.hidden, false);
+  assert.strictEqual(r.bar.hidden, true);
+});
+
+test('a jump from the foot of the page to the top puts the pill back and the bar away', () => {
+  // No observer report arrives for this: the line goes from above to below
+  // without crossing the screen. The scroll listener is what notices.
+  const r = boot();
+  r.io.fire(ABOVE);
+  assert.strictEqual(r.bar.hidden, false);
+  r.scrollTo({ top: 1400, bottom: 1430 });
+  assert.strictEqual(r.bar.hidden, true,
+    'the bar left up after a jump to the top would sit over the header.');
+  assert.strictEqual(r.jump.hidden, false);
+});
+
+test('a jump from the top to the foot of the page swaps them the other way', () => {
+  const r = boot();
+  r.io.fire(BELOW);
+  r.scrollTo({ top: -3000, bottom: -2970 });
+  assert.strictEqual(r.jump.hidden, true);
+  assert.strictEqual(r.bar.hidden, false);
+});
+
+test('scrolling re-reads the line at most once a frame', () => {
+  const r = boot();
+  let reads = 0;
+  const real = r.heading.getBoundingClientRect.bind(r.heading);
+  r.heading.getBoundingClientRect = () => { reads += 1; return real(); };
+  r.heading.__box = { top: 1400, bottom: 1430 };
+  r.scrollHandlers.forEach((fn) => fn());
+  r.scrollHandlers.forEach((fn) => fn());
+  r.scrollHandlers.forEach((fn) => fn());
+  r.scrollTo({ top: 1400, bottom: 1430 });
+  assert.strictEqual(reads, 1, 'three scroll events before a frame are one read.');
+});
+
+test('no IntersectionObserver: no scroll listener either', () => {
+  const r = boot({ noIntersectionObserver: true });
+  assert.strictEqual(r.scrollHandlers.length, 0);
+});
+
+test('a page with the bar and no pill behaves as before', () => {
+  const r = boot({ noJump: true });
+  r.io.fire(BELOW);
+  assert.strictEqual(r.bar.hidden, true);
+  r.io.fire(ABOVE);
+  assert.strictEqual(r.bar.hidden, false);
 });

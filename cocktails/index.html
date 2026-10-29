@@ -205,6 +205,13 @@ permalink: /cocktails/
     </div>
   </div>
 
+  {% comment %} The jump pill (#1441): "N survivors ↓" at the foot of the screen
+     while `#results` is still below it. food/index.html carries the identical
+     block. {% endcomment %}
+  <button type="button" class="results-jump" data-results-jump hidden>
+    <span class="results-count-number" data-results-jump-n></span> <span data-results-jump-word></span>{% include icons/arrow-right.svg class="results-jump-arrow" %}
+  </button>
+
   {% comment %} Hide / show drafts, local builds only (#1358): inside the gate
      that lets a draft into `all_drinks`, so the deployed index has no such
      element. Ships `hidden`; cocktail-index.js reveals and wires it.

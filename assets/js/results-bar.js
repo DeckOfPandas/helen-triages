@@ -1,13 +1,12 @@
 // results-bar.js
-// The sticky results bar: "N survivors" and `× clear all`, following the
-// reader down the page, on both indexes.
+// The two floating copies of "N survivors" on both indexes: the sticky bar,
+// with `× clear all`, once the count line has scrolled off above; the jump
+// pill (#1441) while it is still below. MANUAL §13.7.
 //
 // A mirror: nothing here counts anything. It copies the count spans the index
-// script paints and the top `× clear all`'s visibility, and its own button
-// clicks that one, so it cannot disagree with the line it stands in for.
-//
-// Shown only while `#results` is not intersecting AND above the viewport.
-// Without IntersectionObserver the markup stays `hidden`.
+// script paints and the top `× clear all`'s visibility, and the bar's button
+// clicks that one, so neither copy can disagree with the line it stands in for.
+// Without IntersectionObserver both stay `hidden`.
 //
 // Wired on DOMContentLoaded and loaded after the index script: filters.js
 // builds its clear-all buttons in its own DOMContentLoaded handler, and
@@ -38,7 +37,7 @@
 
   /* The top `× clear all`: the first `.btn-clear` in document order that is
      not the bar's own. Looked up each time, because a script builds it. */
-  function topClear(bar) {
+  function topClear() {
     var buttons = all('.btn-clear');
     for (var i = 0; i < buttons.length; i++) {
       if (!buttons[i].closest('[data-results-bar]')) return buttons[i];
@@ -46,24 +45,40 @@
     return null;
   }
 
+  function reduceMotion() {
+    return typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
   function wire() {
     var bar = document.querySelector('[data-results-bar]');
+    var jump = document.querySelector('[data-results-jump]');
     var heading = document.getElementById('results');
-    if (!bar || !heading) return;
+    if (!(bar || jump) || !heading) return;
     if (typeof window.IntersectionObserver !== 'function') return;
 
     var count = findCount();
     if (!count) return;
 
-    var barN = bar.querySelector('[data-results-bar-n]');
-    var barWord = bar.querySelector('[data-results-bar-word]');
-    var barClear = bar.querySelector('[data-results-bar-clear]');
+    /* Each copy's number and word, from whichever of the two is on the page. */
+    var copies = [];
+    if (bar) {
+      copies.push([bar.querySelector('[data-results-bar-n]'),
+                   bar.querySelector('[data-results-bar-word]')]);
+    }
+    if (jump) {
+      copies.push([jump.querySelector('[data-results-jump-n]'),
+                   jump.querySelector('[data-results-jump-word]')]);
+    }
+    var barClear = bar ? bar.querySelector('[data-results-bar-clear]') : null;
 
     function sync() {
-      if (barN) barN.textContent = count.n.textContent;
-      if (barWord) barWord.textContent = count.w.textContent;
+      copies.forEach(function (copy) {
+        if (copy[0]) copy[0].textContent = count.n.textContent;
+        if (copy[1]) copy[1].textContent = count.w.textContent;
+      });
       if (barClear) {
-        var top = topClear(bar);
+        var top = topClear();
         /* Read off the inline `style.visibility` the index scripts write.
            Anything but an explicit `visible` is hidden, the resting state. */
         barClear.style.visibility =
@@ -73,10 +88,21 @@
 
     if (barClear) {
       barClear.addEventListener('click', function () {
-        var top = topClear(bar);
+        var top = topClear();
         if (top) top.click();
         /* The index script repaints synchronously, so the count is current. */
         sync();
+      });
+    }
+
+    if (jump) {
+      jump.addEventListener('click', function () {
+        /* `scroll-margin-top` on the count line sets where it lands, as for a
+           search result arriving at `#results`. Focus follows, so a keyboard
+           reader carries on from the count rather than from the pill. */
+        heading.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+        if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
+        heading.focus({ preventScroll: true });
       });
     }
 
@@ -85,19 +111,41 @@
       var textChanges = { childList: true, characterData: true, subtree: true };
       watcher.observe(count.n, textChanges);
       watcher.observe(count.w, textChanges);
-      var top = topClear(bar);
+      var top = topClear();
       if (top) watcher.observe(top, { attributes: true, attributeFilter: ['style'] });
+    }
+
+    /* Above: the count line has wholly left the top, so the bar stands in for
+       it. Below: it is not yet wholly on screen, so the pill points to it. A
+       line peeking a few pixels over the bottom edge has not been seen. */
+    function place(rect) {
+      var above = rect.bottom <= 0;
+      var below = !above && rect.bottom > window.innerHeight;
+      if (above || below) sync();
+      if (bar) bar.hidden = !above;
+      if (jump) jump.hidden = !below;
     }
 
     var observer = new IntersectionObserver(function (entries) {
       /* The last entry is the current state; earlier ones are history. */
       var entry = entries[entries.length - 1];
-      if (!entry) return;
-      var above = !entry.isIntersecting && entry.boundingClientRect.top < 0;
-      if (above) sync();
-      bar.hidden = !above;
-    });
+      if (entry) place(entry.boundingClientRect);
+    }, { threshold: [0, 1] });
     observer.observe(heading);
+
+    /* The observer reports only a crossing, and a jump from the foot of the
+       page to the top (Home, a tap on a phone's status bar, reduced motion)
+       crosses nothing, which would leave the bar up over the header. So a
+       scroll re-reads the line's box, once a frame. */
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () {
+        queued = false;
+        place(heading.getBoundingClientRect());
+      });
+    }, { passive: true });
   }
 
   document.addEventListener('DOMContentLoaded', wire);

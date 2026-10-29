@@ -4840,6 +4840,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   (`_sass/shared/_results-bar.scss`, `assets/js/results-bar.js`), which
   repeats the count and clear-all on both indexes once the count line has
   scrolled away; both indexes took both the same day.
+- **2026-10-29, #1441 — the jump pill points down to the count and has no
+  back-to-top twin.** Taken from `is-it-rhubarb-yet`'s `.tt-jump`, which
+  pairs its pill with "Back to top ↑". Asked, Helen picked *"No, the bar
+  covers it"*: once the count has scrolled off, the sticky bar stands in for
+  it, so only one floating copy of the count is ever on screen.
+- **2026-10-29, #1441 — the jump pill shows whatever has focus.** Asked
+  whether it should step aside while a search box has focus on a phone,
+  Helen picked *"Always show"*.
 
 **§13.8 The wordmark and the header.**
 
