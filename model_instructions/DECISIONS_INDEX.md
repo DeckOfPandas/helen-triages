@@ -733,7 +733,7 @@ argument and the rules each field is read by.
 - 2026-09-15 · §13 · #1086 · below 600px the wordmark lockup is two thirds size ($wordmark-phone-scale: 0.6667).
 - 2026-09-15 · §13 · #1086 · /about/ shows both doors on one line and no ??.
 - 2026-09-21 · §13 · #1148 · the ?? is nudged top: -0.12em so its ink sits level with the door's.
-- 2026-10-16 · §13 · #1386 #1322 · the door's row hangs close under the tape: 0.1rem over the door and the ??, 0.1rem over the local search box under the door, 0.2rem from the row to the header's border, at every …
+- 2026-10-16 · §13 · #1386 #1322 · the door's row hangs close under the tape: 0.1rem over the door and the ??, 0.2rem from the row to the header's border, at every width.
 - 2026-10-08 · §13 · #1288 #965 · the door stays at the right-hand end of the header (#965).
 - 2026-10-10 · §13 · #1328 · below the header's stack width /about/'s two doors take an edge each, and the first one's arrow points outwards.
 - undated · §13 · #395 · Undated, #395 — the about page belongs to no site, and wherever its title would appear it reads ??.
@@ -764,12 +764,13 @@ argument and the rules each field is read by.
 - 2026-09-15 · §13 · #1086 · the cocktail scaler reads − [1] drinks +, the word after the box.
 - 2026-09-15 · §13 · #1100 · PR #1100 — the shortlist panel is a share link and nothing else.
 - 2026-09-20 · §13 · #1088 · "If you liked this, how about…" is final.
-- 2026-09-20 · §13 · #1088 · the search dropdown's page groups are labelled "food" and "cocktails".
+- 2026-10-28 · §13 · #1288 · the search dropdown's page group is headed I KNOW WHAT I WANT, on both sites.
 - 2026-09-20 · §13 · #1088 · a filtered index with no matches says "Blank canvas." on both sites; "Nothing to see here yet." is cocktails' empty-collection line.
 - 2026-09-20 · §13 · #1088 · the recipe scaler's note reads (Not scaled: salt, black pepper, olive oil).
 - 2026-09-20 · §13 · #1088 · the 404 says "You know the drill." over two doors with the arrow AFTER the word, reusing the header's door.
 - 2026-10-07 · §13 · #1088 · the LEAVE OUT line reads "hiding peas", on both indexes.
 - 2026-10-07 · §13 · #1088 · a capped list says "+3 more" and stops — Helen: '"+3 more" is fine, then that's it.' The "— keep typing" came off.
+- 2026-10-28 · §13 · #1288 · the dropdown's "+N more" can be pressed: under the names it goes to the index's name search, under words it shows the rest in place.
 - 2026-10-07 · §13 · #1088 · the food index with nothing chosen says "(select something)"; the estimated-portions tooltip is "(estimated)"; "copy link" / "copied" are fine.
 - 2026-09-25 · §13 · #1097 · the cocktails site's description is exactly "What to drink.", full stop included.
 - 2026-09-07 · §13 · #783 · the footer's columns sit under the sides of the main page container.
@@ -805,11 +806,11 @@ argument and the rules each field is read by.
 - undated · §13 · Undated — an FAQ question's title is held to the same measure as its answer.
 - 2026-09-15 · §13 · #1050 · the box searches everything on ONE site, with results in a dropdown grouped by type.
 - 2026-09-15 · §13 · #1052 #1051 · / #1051 — a search match is a prefix of a whole word, never a substring, and a card label joining two ingredients ("X or Y") is not offered.
-- 2026-09-15 · §13 · #1050 #1053 #1136 · / #1053 — food's dropdown group titles are Selawik 700 at 0.7rem; the five -bright tones no longer colour them (#1136).
+- 2026-10-28 · §13 · #1288 · the dropdown's group headings wear the face and weight of the index's own section headings, and its recipe names the index list's title type.
 - 2026-09-15 · §13 · #1096 · the box and the index's own searches both stay as they are; the box's placeholder is "I know what I want..." with no label, only the magnifying glass.
 - 2026-09-15 · §13 · #1099 · the glass is at the right, and typing grows the word leftwards from it.
 - 2026-09-16 · §13 · #1123 · the box is 22ch, the length of its own placeholder, and its line and placeholder are $page-search-quiet (45% of $color-clear-text mixed towards the site's ground).
-- 2026-10-08 · §13 · #1288 · the search box is on local builds only, in the header under the door, behind show_header_search.
+- 2026-10-28 · §13 · #1288 · the search box is live on both sites, at the top right of the page body under the door, not in the header; it takes the right-hand end of the page's first line.
 - 2026-09-17 · §13 · #1136 · the search dropdown's group headings are filled with their section's root hue and lettered dark, on both sites.
 - 2026-09-07 · §13 · #704 · a drink's glass options read "A, B or C", no Oxford comma.
 - 2026-09-07 · §13 · #776 · a card's name, ingredient lines and chips share one height budget.
