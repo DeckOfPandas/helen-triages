@@ -4495,10 +4495,29 @@ to the body default on purpose. The digits alone take `$font-label`
 (`.results-count-number` in `_sass/shared/_results-bar.scss`, on
 `#recipe-count-n` and `#drink-count-n`); the word stays bare.
 
-**The sticky bar** is `.results-bar`, driven by `assets/js/results-bar.js`.
-It ships `hidden` and is shown only while an `IntersectionObserver` reports
-`#results` above the viewport. It mirrors the count spans and the top
-`× clear all`; it never recomputes. It must load after the index script
+**The sticky bar and the two pills** float on both indexes, all driven by
+`assets/js/results-bar.js`, styled in `_sass/shared/_results-bar.scss`, and
+placed by where `#results` is. All ship `hidden`.
+
+- While `#results` has wholly left the top of the viewport: `.results-bar`,
+  fixed to the top, mirroring the count and the top `× clear all`; and
+  "top ↑" (`[data-results-top]`), which returns to the section whose id it
+  names (`filter-star` on food, `filter-chaos` on cocktails). A pill naming
+  an id the page lacks never shows.
+- While `#results` is not yet wholly on screen: "N survivors ↓"
+  (`[data-results-jump]`), mirroring the count, which goes to `#results`.
+
+The two pills (#1441) share one place, centred at the foot of the screen, in
+the site's accent, 28px tall, and never show together. Each press scrolls its
+target to the top (smoothly, unless reduced motion is asked for) and focuses
+it. Each word is trimmed with `text-box` (to cap height for the count, to
+x-height for "top") so that centring the box centres the letters. DECISIONS
+§13.7 has the rulings.
+
+Nothing here recomputes the count. Placement is read from `#results`'s box on
+every `IntersectionObserver` report AND on scroll, once a frame: the observer
+reports only a crossing, and a jump from the foot of the page to the top
+crosses nothing. The script must load after the index script
 (`test_the_results_bar_loads_after_the_index_script_on_both_indexes`).
 
 **Pagination:** `PAGE_SIZE` per page, prev and next, a status label,
