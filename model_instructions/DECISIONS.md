@@ -3524,8 +3524,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   means."* Asked whether the drink page's (i) broke the no-control rule
   above: *"the justification is that this is just more metadata."* The lines
   are hers, in her order: yes² *"Oh Gods yes. Just works."*, yes *"Works very
-  well."*, sure *"Attention required."*, meh *"Haven't nailed this."*, IOU
-  *"Liked, not rated."*, ??? *"Never made."*
+  well."*, sure *"Some attention required."*, meh *"Haven't nailed this
+  yet."*, IOU *"Liked, rating to follow."*, ??? *"Never made."*
 - **2026-09-05 — the drink page's glass sits inline at the head's left,
   centred, not out in the margin.** Helen: *"Inline glass please. I don't care
   if this is changing my mind!"* She had only ever seen the inline branch: the

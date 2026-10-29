@@ -899,9 +899,9 @@ ship_off_scale:
 ship_key:
   "oh gods yes": "Oh Gods yes. Just works."
   "yes": "Works very well."
-  "sure": "Attention required."
-  "meh": "Haven't nailed this."
-  "IOU": "Liked, not rated."
+  "sure": "Some attention required."
+  "meh": "Haven't nailed this yet."
+  "IOU": "Liked, rating to follow."
   "who knows": "Never made."
 
 # Deliberately absent: `star_ingredients` (there is no star axis) and `co_tags`
