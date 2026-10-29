@@ -1037,10 +1037,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   call that one-handed food if I didn't also have to deal with e.g. spaghetti,
   or fish the meatballs out of a soup."* The tag's meaning says nothing that
   has to be chased; this is her exception to it, and it stops at the meatball.
-- **2026-10-10 — `festive` needs the dish to be the feast's own.** A chicken
-  that uses up the Seder horseradish is not festive; a Rosh Hashanah honey
-  cake is. From the review of every draft's tags, with no words of hers
-  recorded.
+- **2026-10-29 — `festive` needs the dish to be the feast's own, whatever the
+  page it came from.** Helen: *"'festive' doesn't automatically follow from
+  'came from a Christmas feature', and is applied at other times too."* A
+  chicken that uses up the Seder horseradish is not festive; a Rosh Hashanah
+  honey cake is. (Restates 2026-10-10's ruling, which recorded none of her
+  words, with the source-page point added.)
+- **2026-10-29 — dietary restrictions are not marked.** Helen: *"I don't mark
+  dietary restrictions."* No tag, note, field or question for vegan,
+  gluten-free and the like, at ingest or after; a claim in a verbatim intro
+  stays in its `QQ original` until she rewrites the tagline.
 - **2026-10-11 — a quiche, a tarte tatin, a soufflé and a salad that is the
   meal are a `main`; a plain cauliflower cheese and a sprout salad are
   `extras`.** Helen's answers to the "perhaps" rows. Mains: a quiche, moules

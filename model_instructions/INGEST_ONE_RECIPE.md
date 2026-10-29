@@ -154,6 +154,7 @@ name you give is a courtesy rather than a contract.
 | `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen: "It's annoying for me to remember how to type YAML every time." The label is `"QQ"`, or `"QQ"`, a space and a short topic (`"QQ nutrition"`, `"QQ freezing"`); nothing else. She finds the `QQ`s, replaces the label with a real heading and the text with her own words, and never has to recall the shape. **A bare string note is not legal**: her suite refuses one. An empty pair (`label: ""`, `text: ""`) is the placeholder for a note you have nothing to put in yet, and the page does not print it. **If you have no note to add, write exactly that one empty pair — never `notes: []`**: it leaves Helen somewhere to type without recalling the shape. Three at most; more than that and the material wants to be prose. |
 | a tip printed under the source's own label | **Transcribe the tip; drop the label.** Good Food runs its asides under a standing `gf tip` rubric, which on her page is an abbreviation nobody can expand, or one that reads as *gluten-free*: a false allergen claim. `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence (*"the magazine likes Kallo"* stays). **Never carry an unexplained abbreviation across**: expand it while the source is in front of you, or drop it. |
 | a nutrition box, or badges | **Ignore them entirely**: kcal, fat, carbs, "per serving", and badges such as "gluten free", "iron", "2 of 5-a-day", "V". Not a note, not a line in your list. Helen: *"Drop them and add clear instructions for ingestion to ignore these."* |
+| a dietary claim — vegan, vegetarian, gluten-free, dairy-free | **Helen does not mark dietary restrictions.** Helen: *"I don't mark dietary restrictions."* Never add a tag, a note or a field for one, and never ask her to: there is no such filter and none is planned. A claim inside an intro you are quoting verbatim stays in that `QQ original`; it is not a question for your list. |
 | a "you will need" list | **Ignore it.** Cake rings, thermometers, palette knives and foil are never an ingredient group or a note. Helen: *"the rule is "trust the cook"."* |
 | page furniture | **Drop anything that sells something**: a show appearance, a ticket line or phone number, a book plug, a TV listing, a "next month" teaser, a web pointer, a "what to drink" box with bottles and prices. **Keep writing about the dish**: an essay, a bio of the cook, a boxed aside, which go in the body below the front matter. Helen: *"Drop ads, keep essays."* |
 | a sidebar box with no list | A box such as "Kale crisps" or "Mastering perfect mash" becomes a file in the usual shape (quantities lifted from its text, per §2) and **has no body**: its words are already in the `QQ original` lines, and a body repeating them would publish the book's text unmarked. |
@@ -507,7 +508,10 @@ And the plainer ones, as Helen means them:
 - **`nibbles`** — finger food to pass round with drinks.
 - **`breakfast`** — eaten in the morning.
 - **`extras`** — not a dish by itself: sides, sauces, stocks, pickles, doughs.
-- **`festive`** — Christmas, or another named feast.
+- **`festive`** — Christmas, or another named feast, where the dish is the
+  feast's own. **A Christmas feature or a December issue does not make a dish
+  festive**, and the tag is used outside Christmas too: judge the dish, never
+  the page it was printed on.
 - **`starter`** — works as a first course at a dinner party.
 
 **Two or three tags is normal. None is legitimate.** Being wrong here is cheap

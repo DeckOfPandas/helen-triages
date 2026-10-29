@@ -165,7 +165,8 @@ argument and the rules each field is read by.
 - 2026-10-10 · §7 · feta does not count for cheese-tastic, even a whole baked block; burrata does.
 - 2026-10-10 · §7 · fiddly and fun needs a fiddle a cook would really do, and threading skewers is not one.
 - 2026-10-10 · §7 · a meatball on its own is one-handed food; on spaghetti or in a broth it is not.
-- 2026-10-10 · §7 · festive needs the dish to be the feast's own.
+- 2026-10-29 · §7 · festive needs the dish to be the feast's own, whatever the page it came from.
+- 2026-10-29 · §7 · dietary restrictions are not marked — Helen: "I don't mark dietary restrictions." No tag, note, field or question for vegan, gluten-free and the like, at ingest or after; a claim …
 - 2026-10-11 · §7 · a quiche, a tarte tatin, a soufflé and a salad that is the meal are a main; a plain cauliflower cheese and a sprout salad are extras.
 - 2026-08-01 · §8 · the ingredient picker stays, and so does title search.
 - 2026-08-16 · §8 · #281 · a bad candidate in the exclude (LEAVE OUT) picker is fixed for what ships, not for the drafts.

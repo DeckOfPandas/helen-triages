@@ -277,6 +277,11 @@ else has already done (MANUAL §9.1).
   "next month", a web pointer, a wine box (*"Drop ads, keep essays"*). An essay
   or a bio about the dish is kept, in the body. **A sidebar box with no list
   has no body**: its words are already its `QQ original` lines.
+- **No dietary marking, ever.** Helen: *"I don't mark dietary restrictions."*
+  Vegan, gluten-free and their kin get no tag, note or question; a claim in a
+  verbatim intro stays in its `QQ original`.
+- **`festive` is judged on the dish, not the page.** A Christmas feature does
+  not make a dish festive, and the tag is used at other feasts too.
 - **The ingredient list is the source's own list; never add to it from the
   method.** Helen: *"We shouldn't list incidentals. We can trust the cook."*
   "Pour over 75 ml boiling water", "a pinch of salt", flour for dusting: none
