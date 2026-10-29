@@ -29,6 +29,9 @@
   // So is the universe pick.
   .universe { display: none; }
 
+  // And the ship key's (i) (#1440): the word it explains still prints.
+  .ship-key-open { display: none; }
+
   // And the related drinks (#927). The opposite direction from the block
   // above: `make it` hides them and print does not put them back, because they
   // are navigation, not a fact about this drink.

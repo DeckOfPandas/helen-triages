@@ -1,0 +1,117 @@
+@use "cocktails/cocktail" as *;
+@use "cocktails/palette" as *;
+@use "shared/tokens" as *;
+
+// =============================================================================
+// THE SHIP KEY — what each SHIP IT? word means (#1440)
+// =============================================================================
+// _includes/cocktails/ship-key.html emits the (i) and the box. The rows reuse
+// the card's `.drink-card-ship-icon` and `-word` (_cards.scss), so a word in
+// the key looks exactly as it does on a card; only the face and size are
+// restated here, because the box has no `.drink-card-ship` container.
+
+// A small ringed letter in the reposado of the mark it explains. Both parents
+// are flex rows, whose gap spaces it; `align-self: center` keeps it level with
+// the icon rather than the words' baseline.
+.ship-key-open {
+  @extend %cocktail-heading-face;
+  flex: none;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  padding: 0;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  background: none;
+  color: $color-raucous-reposado-deep;
+  font-size: 0.68rem;
+  line-height: 1;
+  text-transform: lowercase;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: $color-wicked-woowoo; }
+}
+
+// No padding on the dialog itself: ship-key.js reads a click whose target is
+// the dialog as a click on the backdrop.
+.ship-key {
+  padding: 0;
+  max-width: min(22rem, calc(100vw - 2rem));
+  border: 2px solid $color-raucous-reposado;
+  background: $color-surface;
+  color: $color-text;
+
+  &::backdrop { background: rgba($color-paper, 0.72); }
+}
+
+.ship-key-body {
+  position: relative;
+  padding: $space-lg $space-xl $space-xl;
+}
+
+.ship-key-close-form {
+  position: absolute;
+  top: $space-xs;
+  right: $space-xs;
+  margin: 0;
+}
+
+.ship-key-close {
+  padding: $space-xs $space-sm;
+  border: 0;
+  background: none;
+  color: $color-clear-text;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: $color-wicked-woowoo; }
+}
+
+.ship-key-title {
+  @extend %cocktail-heading-face;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 $space-md;
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
+}
+
+// Two tracks through subgrid, so every line starts at the widest word's edge.
+.ship-key-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: $space-md;
+  row-gap: $space-sm;
+  margin: 0;
+}
+
+.ship-key-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+
+  dt {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .drink-card-ship-word {
+    @extend %cocktail-heading-face;
+    font-size: 0.88rem;
+    letter-spacing: 0.06em;
+  }
+}

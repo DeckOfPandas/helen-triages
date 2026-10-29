@@ -55,6 +55,9 @@
 // After cocktails/cards: the parts it clones from a card (.drink-card-name
 // and its siblings) are styled by rules cards defines.
 @use "cocktails/universe";
+// The ship key (#1440). After cocktails/cards: its rows wear the card's ship
+// icon and word, and restate only the face.
+@use "cocktails/ship-key";
 // The reference layer (#529).
 @use "cocktails/reference";
 // Print last: see shared/_print.scss's header (#86).
