@@ -3516,7 +3516,16 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   *"ice pedantry will be more likely to be seen at the point in the make where
   it happens."* Garnish is a list joined whole. SHIP IT? reads the card's own
   include and is unconditional (an unrated drink prints `???`, #722). No
-  control goes in this row: it would claim to be a fourth thing the drink IS.
+  control goes in this row, which would claim to be a fourth thing the drink
+  IS, except the ship key below.
+- **2026-10-29, #1440 (dupe of #1423) — a ship key: a tiny (i) beside the
+  index's ship legend and the drink page's SHIP IT? opens a box saying what
+  each word means.** Helen, in #1423: *"I keep forgetting what everything
+  means."* Asked whether the drink page's (i) broke the no-control rule
+  above: *"the justification is that this is just more metadata."* The lines
+  are hers, in her order: yes² *"Oh Gods yes. Just works."*, yes *"Works very
+  well."*, sure *"Attention required."*, meh *"Haven't nailed this."*, IOU
+  *"Liked, not rated."*, ??? *"Never made."*
 - **2026-09-05 — the drink page's glass sits inline at the head's left,
   centred, not out in the margin.** Helen: *"Inline glass please. I don't care
   if this is changing my mind!"* She had only ever seen the inline branch: the
