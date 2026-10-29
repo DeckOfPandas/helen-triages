@@ -3,8 +3,7 @@ title: "The One True Chocolate Brownies"
 tagline: "Buy an Edge Brownie tin and never look back."
 source: "Adapted from Green & Black's recipe book"
 source_type: book
-makes: "enough for that edge-brownie tin I made James buy me"
-serves_estimate: 8
+makes: "1 edge-brownie tin, the one I made James buy me"
 prep_time: "10 mins"
 cook_time: "20–25 mins"
 main_ingredients: ["dark chocolate", "unsalted butter", "eggs", "golden granulated sugar", "plain flour"]
@@ -47,6 +46,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

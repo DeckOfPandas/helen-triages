@@ -3,8 +3,7 @@ title: "Caramel"
 tagline: "For filling, topping, Millionaire's shortbread, or ...#WheresMySpoon."
 source: "Mrs Nicholson"
 source_type: person
-makes: "I mean, who cares, make double anyway"
-serves_estimate: 6
+makes: "1 batch — I mean, who cares, make double anyway"
 prep_time: "5 mins"
 cook_time: "10 mins"
 main_ingredients: ["light brown soft sugar", "salted butter", "double cream", "condensed milk"]
@@ -41,6 +40,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

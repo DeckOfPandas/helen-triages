@@ -3,8 +3,7 @@ title: "Smoked Mackerel Pâté"
 tagline: "Once impressed Grandma Pam's WI."
 source: "Sue"
 source_type: person
-serves: "Depends on appetite"
-serves_estimate: 4
+serves: "4, depending on appetite"
 prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["smoked mackerel fillets", "cream cheese", "lemon juice"]
@@ -28,6 +27,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

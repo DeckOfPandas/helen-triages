@@ -3,8 +3,7 @@ title: "Goat's Cheese, Squash and Rosemary Griddle Cakes"
 tagline: "Thick, savoury pancakes full of butternut squash and goat's cheese. Defensibly tagged with 'virtuous', having not specified a garnish #butter."
 source: "Adapted from Mollie Katzen's Sunlight Café"
 source_type: book
-makes: "Plenty for two people"
-serves_estimate: 2
+serves: "2 — plenty for two"
 prep_time: "20 mins"
 cook_time: "25 mins"
 main_ingredients: ["butternut squash", "goat's cheese", "self-raising flour", "fresh rosemary", "egg", "whole milk"]
@@ -41,6 +40,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---
