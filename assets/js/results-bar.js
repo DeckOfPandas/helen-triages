@@ -1,7 +1,8 @@
 // results-bar.js
-// The two floating copies of "N survivors" on both indexes: the sticky bar,
-// with `× clear all`, once the count line has scrolled off above; the jump
-// pill (#1441) while it is still below. MANUAL §13.7.
+// What floats on both indexes, all placed by where the count line is: the
+// sticky bar, with `× clear all`, and the "top ↑" pill once the count line has
+// scrolled off above; the "N survivors ↓" pill while it is still below
+// (#1441). MANUAL §13.7.
 //
 // A mirror: nothing here counts anything. It copies the count spans the index
 // script paints and the top `× clear all`'s visibility, and the bar's button
@@ -50,11 +51,25 @@
       && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
+  /* Scroll `target` to the top (its `scroll-margin-top` sets where it lands)
+     and move focus there, so a keyboard reader carries on from it rather than
+     from the pill they pressed. */
+  function goTo(target) {
+    target.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+  }
+
   function wire() {
     var bar = document.querySelector('[data-results-bar]');
     var jump = document.querySelector('[data-results-jump]');
+    /* The top pill names the id it returns to; without that element it never
+       shows, rather than scrolling nowhere. */
+    var up = document.querySelector('[data-results-top]');
+    var upTarget = up ? document.getElementById(up.getAttribute('data-results-top')) : null;
+    if (!upTarget) up = null;
     var heading = document.getElementById('results');
-    if (!(bar || jump) || !heading) return;
+    if (!(bar || jump || up) || !heading) return;
     if (typeof window.IntersectionObserver !== 'function') return;
 
     var count = findCount();
@@ -95,16 +110,8 @@
       });
     }
 
-    if (jump) {
-      jump.addEventListener('click', function () {
-        /* `scroll-margin-top` on the count line sets where it lands, as for a
-           search result arriving at `#results`. Focus follows, so a keyboard
-           reader carries on from the count rather than from the pill. */
-        heading.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
-        if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
-        heading.focus({ preventScroll: true });
-      });
-    }
+    if (jump) jump.addEventListener('click', function () { goTo(heading); });
+    if (up) up.addEventListener('click', function () { goTo(upTarget); });
 
     if (typeof window.MutationObserver === 'function') {
       var watcher = new MutationObserver(sync);
@@ -116,13 +123,15 @@
     }
 
     /* Above: the count line has wholly left the top, so the bar stands in for
-       it. Below: it is not yet wholly on screen, so the pill points to it. A
-       line peeking a few pixels over the bottom edge has not been seen. */
+       it and the top pill offers the way back. Below: it is not yet wholly on
+       screen, so the down pill points to it. A line peeking a few pixels over
+       the bottom edge has not been seen. */
     function place(rect) {
       var above = rect.bottom <= 0;
       var below = !above && rect.bottom > window.innerHeight;
       if (above || below) sync();
       if (bar) bar.hidden = !above;
+      if (up) up.hidden = !above;
       if (jump) jump.hidden = !below;
     }
 

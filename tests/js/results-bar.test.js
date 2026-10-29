@@ -106,6 +106,21 @@ function boot(options) {
     doc.body.appendChild(jump);
   }
 
+  // The STAR section the top pill returns to; `noTopTarget` names an id the
+  // page does not have.
+  const star = el('div', 'filter-group', { id: 'filter-star' });
+  star._focusCalls = [];
+  star.focus = (opts) => { star._focusCalls.push(opts); };
+  doc.body.appendChild(star);
+  let up = null;
+  if (!options.noTop) {
+    up = el('button', 'results-jump results-jump--top', {
+      'data-results-top': options.noTopTarget ? 'filter-nowhere' : 'filter-star', type: 'button'
+    });
+    up.hidden = true;
+    doc.body.appendChild(up);
+  }
+
   const panel = el('div', 'controls');
   const topClear = el('button', 'btn-clear');
   topClear.style.visibility = options.clearVisibility || 'visible';
@@ -169,7 +184,7 @@ function boot(options) {
   };
 
   return {
-    doc, bar, barN, barWord, barClear, jump, jumpN, jumpWord,
+    doc, bar, barN, barWord, barClear, jump, jumpN, jumpWord, up, star,
     topClear, bottomClear, heading, n, w, io, mo, scrollTo, scrollHandlers
   };
 }
@@ -471,8 +486,53 @@ test('no IntersectionObserver: no scroll listener either', () => {
   assert.strictEqual(r.scrollHandlers.length, 0);
 });
 
+// --- the top pill (#1441) -------------------------------------------------------
+
+test('the top pill shows only once the count line is above the screen', () => {
+  const r = boot();
+  assert.strictEqual(r.up.hidden, true, 'hidden until the observer has spoken.');
+  r.io.fire(BELOW);
+  assert.strictEqual(r.up.hidden, true, 'on arrival the down pill has that place.');
+  r.io.fire(IN_VIEW);
+  assert.strictEqual(r.up.hidden, true);
+  r.io.fire(ABOVE);
+  assert.strictEqual(r.up.hidden, false);
+  assert.strictEqual(r.jump.hidden, true, 'the two pills share one place and never show together.');
+});
+
+test('pressing the top pill scrolls to the section it names and focuses it', () => {
+  const r = boot({ reduceMotion: false });
+  r.io.fire(ABOVE);
+  r.up.dispatch('click');
+  assert.strictEqual(plain(r.star._scrollCalls), plain([{ behavior: 'smooth', block: 'start' }]));
+  assert.strictEqual(r.star.getAttribute('tabindex'), '-1');
+  assert.strictEqual(plain(r.star._focusCalls), plain([{ preventScroll: true }]));
+  assert.strictEqual(r.heading._scrollCalls, undefined, 'it goes to the section, not the count.');
+});
+
+test('a top pill naming an id the page lacks never shows', () => {
+  const r = boot({ noTopTarget: true });
+  r.io.fire(ABOVE);
+  assert.strictEqual(r.up.hidden, true, 'a pill that scrolls nowhere must not be offered.');
+  assert.strictEqual(r.bar.hidden, false, 'the rest still works.');
+});
+
+test('a jump from the foot of the page to the top puts the top pill away', () => {
+  const r = boot();
+  r.io.fire(ABOVE);
+  r.scrollTo({ top: 1400, bottom: 1430 });
+  assert.strictEqual(r.up.hidden, true);
+  assert.strictEqual(r.jump.hidden, false);
+});
+
+test('a page with only the top pill still wires it', () => {
+  const r = boot({ noBar: true, noJump: true });
+  r.io.fire(ABOVE);
+  assert.strictEqual(r.up.hidden, false);
+});
+
 test('a page with the bar and no pill behaves as before', () => {
-  const r = boot({ noJump: true });
+  const r = boot({ noJump: true, noTop: true });
   r.io.fire(BELOW);
   assert.strictEqual(r.bar.hidden, true);
   r.io.fire(ABOVE);

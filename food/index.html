@@ -180,12 +180,17 @@ permalink: /food/
   </div>
 </div>
 
-{% comment %} The jump pill (#1441): "N survivors ↓" at the foot of the screen while the
-   count line above is still below it, so a reader knows the results are down
-   there. The bar's other half, in the same script, the same mirror and the
-   same block on cocktails/index.html. Ships `hidden`. {% endcomment %}
+{% comment %} The two pills (#1441), in the same place at the foot of the screen and
+   never both at once: "N survivors ↓" while the count line above is still
+   below the screen, so a reader knows the results are down there; "top ↑"
+   once it has scrolled off above, back to the STAR section (`filter-star`).
+   Placed by results-bar.js with the bar; the same block is on
+   cocktails/index.html. Both ship `hidden`. {% endcomment %}
 <button type="button" class="results-jump" data-results-jump hidden>
   <span class="results-count-number" data-results-jump-n></span> <span data-results-jump-word></span>{% include icons/arrow-right.svg class="results-jump-arrow" %}
+</button>
+<button type="button" class="results-jump results-jump--top" data-results-top="filter-star" hidden>
+  <span>top</span>{% include icons/arrow-right.svg class="results-jump-arrow results-jump-arrow--up" %}
 </button>
 
 <div class="results-count-row">

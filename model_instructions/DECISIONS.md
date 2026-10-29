@@ -4840,14 +4840,20 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   (`_sass/shared/_results-bar.scss`, `assets/js/results-bar.js`), which
   repeats the count and clear-all on both indexes once the count line has
   scrolled away; both indexes took both the same day.
-- **2026-10-29, #1441 — the jump pill points down to the count and has no
-  back-to-top twin.** Taken from `is-it-rhubarb-yet`'s `.tt-jump`, which
-  pairs its pill with "Back to top ↑". Asked, Helen picked *"No, the bar
-  covers it"*: once the count has scrolled off, the sticky bar stands in for
-  it, so only one floating copy of the count is ever on screen.
-- **2026-10-29, #1441 — the jump pill shows whatever has focus.** Asked
-  whether it should step aside while a search box has focus on a phone,
-  Helen picked *"Always show"*.
+- **2026-10-29, #1441 — two pills share one place at the foot of the
+  screen: "N survivors ↓" down to the count, and "top ↑" back to the STAR
+  section.** Taken from `is-it-rhubarb-yet`'s `.tt-jump`. Helen first ruled
+  out the back-to-top twin, then: *"I'd also like to change my mind --
+  please give me a return to top pill "top" with an upward arrow, target the
+  STAR section."* Cocktails has no STAR section; its pill returns to the
+  first one, YOLO? (`filter-chaos`).
+- **2026-10-29, #1441 — the pills are the site's accent, small and short,
+  with the lettering centred.** Picked from three on a candidates page:
+  *"2 please, but please make the pill smaller, shorter (line height), and
+  make its content line vertically centred."*
+- **2026-10-29, #1441 — the pills show whatever has focus.** Asked whether
+  they should step aside while a search box has focus on a phone, Helen
+  picked *"Always show"*.
 
 **§13.8 The wordmark and the header.**
 
