@@ -2602,8 +2602,8 @@ filters and `?ship=` URLs match the stored value.
 
 **The ship key** (#1440) is a small superscript ringed `i` after the index's
 YOLO? and its `ship it?` legend, and after the drink page's SHIP IT? word. It
-opens a `<dialog>`: every value's word and Helen's line for it, banded by the
-YOLO buttons. `_includes/cocktails/ship-key.html` emits both halves
+opens a `<dialog>`: every value's word and Helen's line for it, grouped by
+the YOLO buttons. `_includes/cocktails/ship-key.html` emits both halves
 (`part="button"`, `part="dialog"`), and `assets/js/ship-key.js` reveals the
 buttons and opens the box with `showModal`; with no script they stay `hidden`.
 
@@ -2616,6 +2616,9 @@ buttons and opens the box with `showModal`; with no script they stay `hidden`.
   are `chaos_labels`, the same words the buttons print.
 - The two bars are shades of reposado, in the key only; the YOLO buttons keep
   their one colour.
+- **A new ship value needs Helen's `ship_key` line** (the test fails without
+  one) and her ruling on whether it joins a `chaos` list. In neither list it
+  shows only under `open`, and sits in the key's unbarred rows.
 
 **`meta.made_before` is a boolean and gates nothing.** It is first in `meta:`.
 An unmade cocktail may publish (§9.1.1). Nothing on the index reads it: the
@@ -3175,7 +3178,8 @@ Five named questions, in Helen's order:
 - **The count row's legend names the ship values showing**: `ship it? = <card
   word>` while a mark is chosen, or else a narrowing YOLO button's words
   (`= yes², yes`), from its `data-ship-words` (#1440). At 600px and under the
-  value takes its own line.
+  ship, `ship it?` and the (i) share one top line, and the value takes its own
+  line under them, set right.
 - **Mood and Hassle share one `state.moods` set, and it is ORed**: a drink
   carrying any chosen word from either section survives. The order then ranks
   them: drinks answering both sections first, then more chosen words matched,
