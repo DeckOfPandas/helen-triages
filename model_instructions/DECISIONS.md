@@ -3535,14 +3535,17 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   well."*, sure *"Some attention required."*, meh *"Haven't nailed this
   yet."*, IOU *"Liked, rating to follow."*, ??? *"Never made."*
 - **2026-10-30, #1440 — the ship key shows which YOLO button shows each line,
-  as labelled vertical bars, and a narrowing YOLO button's words go in the
-  ship legend.** Helen asked to *"map chaos to ship explicitly somehow, and
-  offer the info from the YOLO filter section"*, so YOLO? carries the same
-  (i). In the key: *"vertical bars to show which lines are covered by each
-  yolo filter"*, `I'm open to chaos` round all six. The bars are shades of
-  reposado in the key only: *"I don't think shades of reposado is right for
-  the index page -- if only on the info modal then yes, do it."* The bands
-  put IOU above meh; `ship_key` keeps her order and the template groups.
+  as a bar and the button's name to the right of its rows, and a narrowing
+  YOLO button's words go in the ship legend.** Helen asked to *"map chaos to
+  ship explicitly somehow, and offer the info from the YOLO filter section"*,
+  so YOLO? carries the same (i). Bars first went on the left with `open` round
+  all six; *"That info box is very busy though."* From five layouts on the
+  dev server she chose the quietest: no `open` bar, the two narrowing bars on
+  the right, and the line *"i'm open to chaos: everything"* under the rows.
+  *"Visually, quietest is best by far."* The bars are shades of reposado in
+  the key only: *"I don't think shades of reposado is right for the index
+  page -- if only on the info modal then yes, do it."* The groups put IOU
+  above meh; `ship_key` keeps her order and the template groups.
 - **2026-09-05 — the drink page's glass sits inline at the head's left,
   centred, not out in the margin.** Helen: *"Inline glass please. I don't care
   if this is changing my mind!"* She had only ever seen the inline branch: the

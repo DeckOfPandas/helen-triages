@@ -2265,11 +2265,16 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "`no chaos please` on and no overflow."
     ),
     ".ship-key-list": (
-        "`auto 1fr` (#1440): a ship word beside Helen's line for it, inside "
-        "the key's YOLO bands. The first track is at least four characters of "
-        "the word's face, about 40px; the second is wrapping prose inside a "
-        "dialog capped at the viewport less 2rem. Measured at 360px with no "
-        "overflow."
+        "`auto 1fr` (#1440): a ship word beside Helen's line for it. The first "
+        "track is at least four characters of the word's face, about 40px; "
+        "the second is wrapping prose inside a dialog capped at the viewport "
+        "less 1rem. Measured at 360px with every line on one row."
+    ),
+    ".ship-key-band": (
+        "`1fr auto` (#1440): a YOLO button's rows, then its bar and name. The "
+        "name is capped at 5.2rem and wraps, so the second track is about "
+        "80px; the first is the list above. Measured at 360px with every line "
+        "on one row."
     ),
     ".recipe-pagination": (
         "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "

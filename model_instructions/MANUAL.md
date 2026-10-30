@@ -2609,12 +2609,13 @@ buttons and opens the box with `showModal`; with no script they stay `hidden`.
 
 - The lines are `ship_key` in `taxonomy.yml`, and
   `test_every_ship_value_has_a_key_line` holds it to exactly the ship values.
-- The bands are the `chaos` lists: a bar labelled `I’m open to chaos` runs
-  down every row, and bars for `no chaos please` and `chaos only` run down
-  theirs inside it. Rows keep `ship_key`'s order within a band. The labels are
-  `chaos_labels`, the same words the buttons print.
-- The bars are three shades of reposado, in the key only; the YOLO buttons
-  keep their one colour.
+- The rows are grouped by the `chaos` lists, keeping `ship_key`'s order
+  within a group. `no chaos please`'s rows and `chaos only`'s each have a bar
+  to their right with the button's name beside it; the rows between have
+  none. One line under them reads `i’m open to chaos: everything`. The names
+  are `chaos_labels`, the same words the buttons print.
+- The two bars are shades of reposado, in the key only; the YOLO buttons keep
+  their one colour.
 
 **`meta.made_before` is a boolean and gates nothing.** It is first in `meta:`.
 An unmade cocktail may publish (§9.1.1). Nothing on the index reads it: the

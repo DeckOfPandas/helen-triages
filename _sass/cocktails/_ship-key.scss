@@ -48,7 +48,7 @@
 // the dialog as a click on the backdrop.
 .ship-key {
   padding: 0;
-  max-width: min(22rem, calc(100vw - 2rem));
+  max-width: min(24rem, calc(100vw - 1rem));
   border: 2px solid $color-raucous-reposado;
   background: $color-surface;
   color: $color-text;
@@ -91,38 +91,51 @@
   letter-spacing: 0.06em;
 }
 
-// The bands: each YOLO button's reach as a bar down the rows it shows, `open`
-// round all of them and the two narrowing buttons inside it. Shades of the
-// YOLO hue tell the bars apart here only; the buttons on the index keep their
-// one colour. Every bar is the same width and gap, so `$ship-key-bar-step`
-// is how far in an inner band's rows start.
-$ship-key-bar: 3px;
-$ship-key-bar-step: $ship-key-bar + 8px;
-
+// A narrowing YOLO button's rows, with a bar and its name to their right.
+// `open` has no bar: the line under the rows says it shows everything. The
+// label comes first in the markup, so it is read before the rows, and the grid
+// moves it right. Shades of the YOLO hue tell the two bars apart here only;
+// the buttons on the index keep their one colour.
 .ship-key-band {
-  border-left: $ship-key-bar solid $color-raucous-reposado;
-  padding-left: $ship-key-bar-step - $ship-key-bar;
-}
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: $space-sm;
 
-.ship-key-band--open  { border-left-color: color.mix($color-raucous-reposado, $color-surface, 40%); }
-.ship-key-band--good  { border-left-color: color.mix($color-raucous-reposado, $color-surface, 70%); }
-.ship-key-band--chaos { border-left-color: $color-raucous-reposado; }
+  > .ship-key-list { grid-column: 1; grid-row: 1; }
+}
 
 .ship-key-band-label {
   @extend %cocktail-heading-face;
-  margin: 0 0 $space-sm;
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  max-width: 5.2rem;
+  margin: 0;
+  padding-left: 0.45rem;
+  border-left: 3px solid $color-raucous-reposado;
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: lowercase;
   color: $color-clear-text;
 }
 
-// Space between the bands, and the middle rows set in by one bar so their
-// words line up with the inner bands'.
-.ship-key-band .ship-key-band,
-.ship-key-list--middle { margin-top: $space-md; }
+.ship-key-band--good  .ship-key-band-label { border-left-color: color.mix($color-raucous-reposado, $color-surface, 70%); }
+.ship-key-band--chaos .ship-key-band-label { border-left-color: $color-raucous-reposado; }
 
-.ship-key-list--middle { padding-left: $ship-key-bar-step; }
+// The groups follow one another; the space between them is the step that
+// separates one button's rows from the next.
+.ship-key-band + .ship-key-list,
+.ship-key-list + .ship-key-band { margin-top: $space-md; }
+
+.ship-key-open-note {
+  @extend %cocktail-heading-face;
+  margin: $space-lg 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: $color-clear-text;
+}
 
 // Each band is its own list, so the word track is a fixed width rather than
 // its own widest word, and the lines start at one edge in every band: four
@@ -157,4 +170,13 @@ $ship-key-bar-step: $ship-key-bar + 8px;
     font-size: 1em;
     letter-spacing: 0.06em;
   }
+}
+
+// The bars and their names take a column on the right, so on a phone the
+// sides and gaps give room back and Helen's lines keep to one row where they
+// can. Last in the file, so it beats the rules above.
+@media (max-width: 400px) {
+  .ship-key-body { padding-left: $space-lg; padding-right: $space-lg; }
+  .ship-key-band { column-gap: $space-xs; }
+  .ship-key-list { column-gap: $space-sm; }
 }

@@ -8,10 +8,10 @@
    element. The button ships `hidden` and assets/js/ship-key.js reveals it,
    because `showModal` needs a script.
 
-   The rows are `ship_key`'s, banded by taxonomy.yml's `chaos` lists and kept
-   in `ship_key`'s order inside each band. Each band is a bar labelled with its
-   button's `chaos_labels` word: `open` round everything, `good` and `chaos`
-   inside it. The aria-labels are placeholders. {% endcomment %}
+   The rows are `ship_key`'s, grouped by taxonomy.yml's `chaos` lists and kept
+   in `ship_key`'s order inside each group. The two narrowing buttons' groups
+   carry a bar and their `chaos_labels` word; one line under the rows says what
+   `open` shows, in Helen's words. The aria-labels are placeholders. {% endcomment %}
 {%- if include.part == "button" -%}
 <button type="button" class="ship-key-open" aria-haspopup="dialog" aria-controls="ship-key" aria-label="ship it? key" hidden>i</button>
 {%- else %}
@@ -21,23 +21,21 @@
   <div class="ship-key-body">
   <form method="dialog" class="ship-key-close-form"><button class="ship-key-close" aria-label="close">&times;</button></form>
   <h2 class="ship-key-title" id="ship-key-title"><span class="drink-card-ship-icon">{% include icons/ship.svg %}</span>ship it?</h2>
-  <div class="ship-key-band ship-key-band--open">
-    <p class="ship-key-band-label">{{ taxonomy.chaos_labels.open }}</p>
-    {% for band in key_bands %}
-      {% if band != "middle" %}<div class="ship-key-band ship-key-band--{{ band }}"><p class="ship-key-band-label">{{ taxonomy.chaos_labels[band] }}</p>{% endif %}
-      <dl class="ship-key-list ship-key-list--{{ band }}">
-        {% for pair in taxonomy.ship_key %}
-          {% assign key_band = "middle" %}
-          {% if taxonomy.chaos.good contains pair[0] %}{% assign key_band = "good" %}{% elsif taxonomy.chaos.chaos contains pair[0] %}{% assign key_band = "chaos" %}{% endif %}
-          {% if key_band == band %}
-            {% assign key_value = pair[0] %}
-            <div class="ship-key-row"><dt>{% include cocktails/ship.html ship=key_value word_only=true %}</dt><dd>{{ pair[1] }}</dd></div>
-          {% endif %}
-        {% endfor %}
-      </dl>
-      {% if band != "middle" %}</div>{% endif %}
-    {% endfor %}
-  </div>
+  {% for band in key_bands %}
+    {% if band != "middle" %}<div class="ship-key-band ship-key-band--{{ band }}"><p class="ship-key-band-label">{{ taxonomy.chaos_labels[band] }}</p>{% endif %}
+    <dl class="ship-key-list">
+      {% for pair in taxonomy.ship_key %}
+        {% assign key_band = "middle" %}
+        {% if taxonomy.chaos.good contains pair[0] %}{% assign key_band = "good" %}{% elsif taxonomy.chaos.chaos contains pair[0] %}{% assign key_band = "chaos" %}{% endif %}
+        {% if key_band == band %}
+          {% assign key_value = pair[0] %}
+          <div class="ship-key-row"><dt>{% include cocktails/ship.html ship=key_value word_only=true %}</dt><dd>{{ pair[1] }}</dd></div>
+        {% endif %}
+      {% endfor %}
+    </dl>
+    {% if band != "middle" %}</div>{% endif %}
+  {% endfor %}
+  <p class="ship-key-open-note">{{ taxonomy.chaos_labels.open }}: everything</p>
   </div>
 </dialog>
 {% endif %}
