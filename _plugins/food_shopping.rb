@@ -1,5 +1,5 @@
 # What a food recipe contributes to a shopping list, and how many it feeds
-# (#801). Data: _data/food/aisles.yml and each recipe's `serves_estimate:`.
+# (#801). Data: _data/food/aisles.yml and each recipe's `serves:`/`makes:`.
 #
 # The browser is handed `{amount, name, aisle}` and never sees aisles.yml, so
 # there is one implementation of the matching rule. No arithmetic here: every
@@ -53,14 +53,12 @@ module HelenTriages
       @fruit = fruit_vocabulary(site.data.dig("food", "scaling", "whole_fruit"))
 
       counted = 0
-      guessed = 0
       COLLECTIONS.each do |key|
         next unless site.collections[key]
         site.collections[key].docs.each do |doc|
           doc.data["made"] = made_for(doc, yields)
-          portions, estimated = portions_for(doc, doc.data["made"])
+          portions = portions_for(doc)
           doc.data["portions"] = portions
-          doc.data["portions_estimated"] = estimated
           doc.data["whole_recipes"] = whole_recipes?(doc)
           doc.data["half_recipe"] = doc.data["whole_recipes"] &&
             HelenTriages::HalfRecipe.judge(
@@ -70,12 +68,10 @@ module HelenTriages
             )["ok"]
           doc.data["shopping"] = shopping_for(doc)
           counted += 1
-          guessed += 1 if estimated
         end
       end
 
-      Jekyll.logger.info "Shopping:", "read #{counted} food recipes " \
-        "(#{guessed} portion counts from serves_estimate:)"
+      Jekyll.logger.info "Shopping:", "read #{counted} food recipes"
     end
 
     private
@@ -86,21 +82,13 @@ module HelenTriages
       text.to_s.gsub("’", "'").strip.downcase.gsub(/\s+/, " ")
     end
 
-    # [portions, estimated] (#815). `serves:` first, because a number Helen wrote
-    # beats an estimate. A `makes:` that FoodYield counts (`made`) is the
-    # recipe's own number, so an estimate beside it is never read: the page and
-    # the shopping list count the thing made. Otherwise `serves_estimate:`,
-    # flagged so the page prints its `~`. A recipe with none returns nil and
-    # gets no scaler; tests/test_food_shopping.py requires every recipe to state one.
-    def portions_for(doc, made)
+    # How many it feeds (#815): the number opening `serves:`, or nil. A
+    # `makes:` recipe is counted by `made_for` instead, never as people. A
+    # recipe with neither gets no scaler, which tests/test_food_shopping.py
+    # allows only on a draft whose yield is still `QQ`.
+    def portions_for(doc)
       stated = doc.data["serves"].to_s[LEADING_NUMBER, 1]
-      return [stated.to_i, false] if stated
-      return [nil, false] if made
-
-      estimate = doc.data["serves_estimate"]
-      return [estimate.to_i, true] if estimate.is_a?(Numeric) && estimate.to_i > 0
-
-      [nil, false]
+      stated ? stated.to_i : nil
     end
 
     # What the recipe makes, for the recipe page's scaler (#1286): `page.made` is

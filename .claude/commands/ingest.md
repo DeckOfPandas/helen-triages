@@ -304,22 +304,18 @@ else has already done (MANUAL §9.1).
   wrong field renders unstyled with no error anywhere.
 - **Size words with the count** -- `amount: "2 large"`, not `item: "large
   onions"`.
-- **A FOOD recipe gives a scaler something to count**: `serves:` opening with
-  a number, a `makes:` opening with a count of a named thing, or else
-  `serves_estimate:` -- an integer, PEOPLE, unquoted, under the line it
-  estimates from. `makes: "16 slices"`, `"2 loaf cakes"`, `"one 8-inch cake"`
-  and `"About 750 ml"` scale by themselves, so write a `makes:` that way where
-  the source allows (DECISIONS §4). `serves: "Depends on appetite"`,
-  `makes: "Some"` and a bare `"12–16"` need the estimate. **One figure, never
-  an alternative**: "9 large or 16 small biscuits" reads as nine "large", so
-  it is `"9 biscuits"`. `ruby scripts/food_yield.rb "<line>"` says how a line
-  reads. **`makes:` is never read as people** however numeric it looks.
-  Estimate off the recipe: a round cake 12, a loaf 10, 18 cookies 9 (two
-  each), 12 Yorkshire puddings 6. **Where the source gives
-  little to go on -- `serves: QQ`, "Some", "however many you make" -- estimate
-  anyway and put the figure on her list**; a web Claude may do the same, and
-  the next local pass confirms it with her. Helen: *"Claudes can check with me
-  if unsure."*
+- **A FOOD recipe's yield opens with its number**: `serves:` with a number
+  of people, or `makes:` with a count of a named thing -- `"16 slices"`,
+  `"2 loaf cakes"`, `"one 8-inch cake"`, `"About 750 ml"`, `"1 batch"` for a
+  sauce or a spice blend. Any words the source adds follow the figure
+  (`"4, depending on appetite"`). **One figure, never an alternative**: "9
+  large or 16 small biscuits" reads as nine "large", so it is `"9 biscuits"`.
+  `ruby scripts/food_yield.rb "<line>"` says how a line reads. **`makes:` is
+  never read as people** however numeric it looks. **Where the source gives
+  no figure, the yield is `"QQ"`**, with a suggested figure on her list (a
+  round cake 12, a loaf 10, 18 cookies 9): never a guessed number in the
+  file. A `QQ` yield has no scaler until she answers it. There is no
+  `serves_estimate:`; it is retired (DECISIONS §4).
 - **Split `ingredient_groups` and `method_groups`** -- once, here, and never
   again afterwards. Phases are usually obvious from the source and re-reading
   the recipe later to find them is the expensive way.

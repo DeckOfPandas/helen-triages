@@ -421,12 +421,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-29 — an unheaded first ingredient group is named for the dish or
   its main component, unasked.** Helen: *"hopefully this would be obvious,
   like "for the beef", or "for the pie"?"* The name is read after "For the".
-- **2026-10-28 — a `makes:` line the yield reader can count needs no
-  `serves_estimate`.** Helen: *"Make the test suite support our current
-  design. 16 slices, 2 X-in cakes, 9 biscuits."* The recipe page counts the
-  thing made and the shopping list counts batches (§8.2), so the estimate is
-  needed only where `serves:` has no number or `makes:` names nothing the
-  reader can count. Write `makes:` as a count of a named thing.
+- **2026-10-28 — `makes:` is written as a count of a named thing.** Helen:
+  *"Make the test suite support our current design. 16 slices, 2 X-in cakes,
+  9 biscuits."* The recipe page counts the thing made and the shopping list
+  counts batches (§8.2). One figure, never an alternative: "9 large or 16
+  small biscuits" reads as nine of something called "large".
 - **2026-10-08 — Helen's own recipes are `source: "Henry"`, `source_type:
   person`.** Confirmed as standing the same day, as the old journal recorded
   it.
@@ -1181,19 +1180,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `shopping-list.js` refuses. That rule is about units with no defined
   relationship (nobody can say how many ml a dash is), and each of the
   untouched units would need one invented.
-- **2026-09-07, #815 — a recipe that states no number of people carries
-  `serves_estimate:` in its own front matter, estimated at ingest and printed
-  with a `~`.** Helen: *"We need estimate the number of people served by 750
-  ml, then add that to the front matter somehow. [...] all of these will need
-  to be estimated at ingest. Claudes can check with me if unsure."* Its own
-  key and not a second `serves:`, her choice: `makes:` opens with a number 66
-  times and `serves:` gives none 20 times. The `~` is her ruling in the same
-  message. A side file that held the estimates outside the recipes was deleted
-  the same day: one home, beside the words it estimates from. A `QQ` in
-  `serves:` stays untouched beside the new key. On 2026-10-18 she widened who
-  estimates: a web Claude may write one *"if they want to, then for Claude
-  Code to tidy at the next round"*, so an unsure figure is written and put to
-  her, never left out.
+- **2026-10-29 — `serves_estimate` is retired: every yield line opens with
+  its own number, and Helen's words follow it.** Helen: *"I would like to
+  remove reliance on it"*, then *"for step 2, let's rewrite the yield lines"*,
+  approving each published line ("Yes, all as proposed"): "1 batch — I mean,
+  who cares, make double anyway", "4, depending on appetite". A sauce or a
+  spice blend makes "1 batch". A draft whose yield is still `QQ` has no
+  scaler until she answers it (*"No scaler until answered"*), and an ingest
+  that finds no figure writes `QQ` and suggests one on her list. The key is in
+  `RETIRED` and `INVISIBLE_KEYS` (`tests/test_front_matter.py`). (Replaces
+  2026-09-07, #815, which put a guessed head count beside a yield with no
+  number and printed it with a `~`; the shopping list's figure still has one
+  home, the recipe.)
 - **2026-09-07 — the shopping list never prints a recipe's yield after its
   name.** Helen, on a row reading `7  Moules Marinière serves 4`: *"please
   don't say 'serves X' after the recipe name at the top of the scaler. This
@@ -1351,13 +1349,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   index row titles.** Helen: *"render the name of the recipe in this shopping
   list feature the same way we do in the recipe list row titles, just smaller
   of course, and make them links"*. The class is `.shopping-list-recipe-link`.
-- **2026-09-07, #815 — a component recipe's `serves_estimate` takes its
-  commonest use and a note on the recipe carries the rest; no schema is
-  invented for it.** Helen: *"I have no idea how to model this. Please add all
-  this as a note on the recipe and I will tidy up later."* A ganache glazes one
-  cake, fills another, ices 12 cupcakes or makes 16 truffles; a caramel is a
-  sauce or a tin's filling. `chocolate-ganache` and `caramel` each carry one
-  number and the note. A schema for several yields is hers to ask for.
+- **2026-09-07, #815 — a component recipe makes one thing and a note on the
+  recipe carries its uses; no schema is invented for it.** Helen: *"I have no
+  idea how to model this. Please add all this as a note on the recipe and I
+  will tidy up later."* A ganache glazes one cake, fills another, ices 12
+  cupcakes or makes 16 truffles; a caramel is a sauce or a tin's filling.
+  Since 2026-10-29 `chocolate-ganache` and `caramel` each make "1 batch", and
+  the note stands. A schema for several yields is hers to ask for.
+- **2026-10-29 — a batch halves.** Helen, on six "1 batch" recipes losing
+  their ½: *"Yes, half a batch is fine"*. A batch is mixture, not an object,
+  so `halvable_yields` in `_data/food/scaling.yml` lets "1 batch" halve where
+  "one cake" and "1 jar" still refuse; every ingredient line must still halve.
 - **Undated, #1118 — the food scaler's box is as wide as the drink scaler's:
   two characters and the caret.** Helen: *"the same number of characters as
   the cocktail recipe scaler (just over 2)"*. `calc(2ch + 1.6ch)` in

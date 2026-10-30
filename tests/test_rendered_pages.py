@@ -1016,24 +1016,16 @@ def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
         + "\n  ".join(problems)
     )
 
-    some = _scale_control(prod_site, "cherry-glaze") or ""
-    assert "data-portions=" in some and "portions</span>" in some and "data-made" not in some, (
-        "cherry-glaze (`makes: Some`) should keep the portions box, word and "
-        f"`~` -- Helen: 'retain the previous guess':\n{some}"
-    )
-    assert "data-whole-recipes" in some, (
-        "cherry-glaze should step in WHOLE RECIPES -- Helen: 'if \"some\" is "
-        "originally guessed to be 4 portions, 2x should be 8 portions' -- "
-        f"and its input no longer says so:\n{some}"
-    )
     served = _scale_control(prod_site, "moules-mariniere") or ""
     assert 'data-portions="4"' in served and "data-made" not in served, (
         f"a `serves:` recipe's scaler should be untouched:\n{served}"
     )
-    assert "data-whole-recipes" not in served, (
-        "a `serves:` recipe steps a portion at a time (#1005); moules "
-        f"marinière has been marked for whole-recipe steps:\n{served}"
-    )
+    # A portions box is a `serves:` recipe's alone: no page carries the old
+    # whole-recipe portions mode or the `~` of a guessed count.
+    stale = sorted(str(p.relative_to(prod_site)) for p in (prod_site / "food").rglob("index.html")
+                   if "data-whole-recipes" in (t := p.read_text(encoding="utf-8"))
+                   or "recipe-scale-approx" in t)
+    assert not stale, f"pages still carrying the estimate's markup: {stale}"
 
 
 # --- the garnish step reads as English (#1138, #1143) ------------------------
@@ -2288,8 +2280,9 @@ def test_every_recipe_reaches_the_page_with_a_portion_count(site):
     recipe the list scales in batches (#1286, #1297). tests/test_food_shopping.py
     proves each recipe resolves to one from the data files; this proves it
     reached the page, which fails if the plugin stops running or returns early.
-    Drafts are not let off (#815). `k` keeps a `makes:` from printing behind
-    the word "serves".
+    Drafts are let off only where the yield is still Helen's `QQ`, which has no
+    scaler until she answers it (DECISIONS §4). `k` keeps a `makes:` from
+    printing behind the word "serves".
     """
     blob = _shopping_blob(site)
     assert len(blob) > 80, (
@@ -2298,11 +2291,12 @@ def test_every_recipe_reaches_the_page_with_a_portion_count(site):
     )
 
     unscalable = sorted(u for u, r in blob.items()
-                        if not r.get("p") and not (r.get("w") and r.get("m")))
+                        if not r.get("p") and not (r.get("w") and r.get("m"))
+                        and not ("/drafts/" in u and str(r.get("y")).strip() == "QQ"))
     assert not unscalable, (
         "these recipes reached the page with nothing to count, so the shopping "
-        f"list can draw no box for them: {unscalable}. Write `makes:` as a "
-        "count of a named thing, or add `serves_estimate:`."
+        f"list can draw no box for them: {unscalable}. Open `serves:` with a "
+        "number, or `makes:` with a count of a named thing."
     )
 
     empty = sorted(u for u, r in blob.items() if not r.get("i"))

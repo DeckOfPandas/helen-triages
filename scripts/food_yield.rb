@@ -12,8 +12,7 @@
 #
 #   ruby scripts/food_yield.rb --half tmp/recipes.json
 #
-# Takes a JSON list of {"key", "makes", "serves", "serves_estimate",
-# "ingredient_groups"} and prints per key {"made": ..., "half": {"ok": ...,
+# Takes a JSON list of {"key", "makes", "serves", "ingredient_groups"} and prints per key {"made": ..., "half": {"ok": ...,
 # "why": "..."}}: _plugins/food_half_recipe.rb's verdict on a half step.
 
 require "json"
@@ -35,8 +34,7 @@ if ARGV[0] == "--half"
     stated = recipe["serves"].to_s[/\A\s*(\d+)/, 1]
     makes = recipe["makes"].to_s
     made = stated || makes.strip.empty? ? nil : HelenTriages::FoodYield.parse(makes, vocab)
-    estimate = recipe["serves_estimate"]
-    portions = stated ? stated.to_i : (estimate.is_a?(Numeric) ? estimate.to_i : nil)
+    portions = stated ? stated.to_i : nil
     out[recipe["key"]] = {
       "made" => made,
       "half" => HelenTriages::HalfRecipe.judge(

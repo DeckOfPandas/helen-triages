@@ -555,10 +555,8 @@ title: "Lemony Cavolo Nero and Butter Bean Soup"
 tagline: "It's fun to have a one-pot stew that is bright and acidic..."
 source: "Adapted from Good Food, January 2026"
 source_type: publication         # required; SOURCE_ATTRIBUTION_SPEC.md
-serves: "4"                      # xor makes: -- never both. Quoted
-serves_estimate: 6               # required unless serves: opens with a
-                                 # number or makes: is a count food_yield.rb
-                                 # reads. An integer, people, unquoted
+serves: "4"                      # xor makes: -- never both. Quoted. Opens
+                                 # with a number; makes: with a count
 prep_time: "20 mins"
 cook_time: "1 hr 30 mins"
 main_ingredients: ["cavolo nero", "butter beans", "lemon"]
@@ -601,7 +599,7 @@ checked.
 | Members of `main_ingredients` and `tags` are quoted | `test_main_ingredients_entries_are_quoted`, `test_tags_entries_are_quoted` (`tests/test_taxonomy.py`, and again over drafts) |
 | `meta:` is `rewritten`, `awaiting_fix`, `proofread`, in that order, real booleans, nothing else | `test_meta_block_is_exactly_the_three_flags_in_order` |
 | Retired keys stay retired | `RETIRED`, which says what replaced each |
-| `serves_estimate` present where needed, a positive integer | `tests/test_food_shopping.py` |
+| `serves:` opens with a number, or `makes:` with a count `food_yield.rb` reads (a draft's `QQ` excepted) | `tests/test_food_shopping.py` |
 
 `meta.claude_rewritten` (optional) may sit alongside the three on a draft
 only: it records that Claude took a tidy-up pass, not that the recipe is
@@ -651,25 +649,24 @@ takes `proofread` down with it.
   text.** The highlighter is driven by `{% if item.amount %}` and never scans
   text, so `item: "~1 tbsp tamarind paste"` renders unstyled with no error.
   No test catches this.
-- **`serves` / `makes` values may be prose in Helen's voice** ("Depends on
-  appetite"); never tidy one into a number. That is why `serves_estimate:`
-  exists: the scaler needs an integer and her words must not be touched. It
-  is required unless `serves:` opens with a number or `makes:` opens with a
-  count `_plugins/food_yield.rb` can read ("16 slices", "one 8-inch cake",
-  "950 ml"), which the page and the shopping list count by themselves (§8.2).
-  `makes:` is never read as people however numeric it looks: 950 ml is not
-  950 portions. It is an unquoted integer — a quoted
-  `"6"` is a string and the plugin will not read it. It is produced at
-  ingest; ask Helen rather than guess when the source does not support one.
+- **`serves:` opens with a number and `makes:` with a count; Helen's words
+  follow it** ("4, depending on appetite", "1 batch — I mean, who cares, make
+  double anyway"). The scaler reads the figure and the page quotes the rest.
+  A `makes:` must open with a count `_plugins/food_yield.rb` reads ("16
+  slices", "one 8-inch cake", "about 300 ml", "1 batch");
+  `ruby scripts/food_yield.rb "<line>"` says how one reads. `makes:` is never
+  read as people however numeric it looks: 950 ml is not 950 portions. A
+  draft's yield may be `QQ`, Helen's question, and has no scaler until she
+  answers it. Never reword her words to fit a number; propose the line and
+  let her approve it.
 - **A range takes its lower end.** The scale is portions wanted over portions
   made, so a smaller base gives a bigger multiplier and more food, and
   over-catering is the safe direction. This governs `serves: "4–6"` (the
-  plugin takes 4), any `serves_estimate:` written from a range, and a
-  `makes:` range on the recipe page's box (§8.2).
+  plugin takes 4) and a `makes:` range on the recipe page's box (§8.2).
 - **A component recipe cannot always be one number, and the truth goes in a
-  note.** A ganache glazes one cake, fills another or makes truffles.
-  `serves_estimate:` takes the commonest use and a note carries the rest. Do
-  not invent a schema for this without Helen (DECISIONS §8.2).
+  note.** A ganache glazes one cake, fills another or makes truffles. It
+  makes "1 batch", and a note carries the uses. Do not invent a schema for
+  this without Helen (DECISIONS §8.2).
 - **`method` xor `method_groups`**; with both present the second is silently
   dropped. A `method_groups` entry needs `name` and `steps`.
 - **Group names.** Ingredient group names are bare nouns; the template adds
@@ -1250,8 +1247,8 @@ The rulings behind every rule here are in DECISIONS §8.2.
 |---|---|
 | `_data/food/aisles.yml` | the aisles in shop order (`order`), a keyword table (`keywords`), and `never` (things that are not shopping) |
 | `_data/food/scaling.yml` | every word list the scalers and the judge read: stepped measures, `yields`, `half_recipe`, `count_nouns`, `whole_fruit` |
-| `serves:` / `serves_estimate:` / `makes:` in each recipe | the yield (§4) |
-| `_plugins/food_shopping.rb` | at build: assigns each ingredient its aisle, resolves the portion count, and hangs `shopping`, `portions`, `portions_estimated`, `made`, `whole_recipes`, `half_recipe` on every document. No arithmetic on amounts |
+| `serves:` / `makes:` in each recipe | the yield (§4) |
+| `_plugins/food_shopping.rb` | at build: assigns each ingredient its aisle, resolves the portion count, and hangs `shopping`, `portions`, `made`, `whole_recipes`, `half_recipe` on every document. No arithmetic on amounts |
 | `_plugins/food_yield.rb` | reads a `makes:` line into what it counts (`page.made`) |
 | `_plugins/food_half_recipe.rb` | judges whether ×½ is offered (`page.half_recipe`) |
 | `assets/js/shopping-list.js` | the amount parser (`parseAmount`, `splitParenthetical`), `foldKey`, `foldUnit`, `unitLabel`, `fractionText`. Shared with cocktails (§9.13) |
@@ -1270,21 +1267,19 @@ dependency at module scope; `tests/test_site_config.py` guards it.
 `serves` and `makes` are exclusive (§4). The plugin resolves three things:
 
 - **`page.portions`** — the leading number of `serves:` (the lower end of a
-  range, so the multiplier errs toward more food); nil where `page.made` is
-  set, so an estimate beside a countable `makes:` is never read; otherwise
-  `serves_estimate:`, which sets `page.portions_estimated` and is printed with
-  a `~`. `makes:` is never read as people, however numeric it looks.
+  range, so the multiplier errs toward more food), or nil. `makes:` is never
+  read as people, however numeric it looks.
 - **`page.made`** — `food_yield.rb`'s reading of `makes:`, or nil. Never set
   where `serves:` states a number.
 - **`page.whole_recipes`** — true for every recipe whose yield is `makes:`.
   Such a recipe scales in whole recipes; a `serves:` recipe scales a portion
   at a time.
 
-A recipe with neither figure has `portions` nil, which is fine where
-`page.made` is set and nowhere else. `tests/test_food_shopping.py` fails a
-recipe with no `portions` and no readable `makes:`
-(`test_every_published_recipe_states_how_many_it_feeds`, and the draft twin),
-asking `scripts/food_yield.rb` rather than copying its rule.
+A recipe with neither figure gets no scaler. `tests/test_food_shopping.py`
+fails one (`test_every_published_recipe_states_how_many_it_feeds`, and the
+draft twin, which lets a `QQ` yield through), asking `scripts/food_yield.rb`
+rather than copying its rule. `serves_estimate:` is retired (`RETIRED` in
+`tests/test_front_matter.py`).
 
 #### What the index is handed
 
@@ -1528,9 +1523,9 @@ word with no plural.
 
 | recipe | box | steps |
 |---|---|---|
-| `serves:` with a number, or a `serves_estimate` without `makes:` | portions | one portion at a time, floor 1 |
+| `serves:` with a number | portions | one portion at a time, floor 1 |
 | `makes:` that `food_yield.rb` can read (`data-made`) | the thing made; the word "portions" is not printed | whole recipes |
-| `makes:` it cannot read (`data-whole-recipes`) | `~N` portions, the `serves_estimate` | whole recipes |
+| anything else (a draft's `QQ`) | no box | |
 
 **Whole recipes** (`wholeRecipes`): plus and minus multiply the recipe by 1,
 2, 3 and the box shows what that many make. The box is an input showing a
@@ -1547,13 +1542,14 @@ word from `yields.approx_words`:
 | `one 8-inch cake` — a number word | `1` × 8-inch cake | `2` × 8-inch cakes |
 | `1 dozen mince pies` | `1` dozen mince pies | `2` dozen mince pies |
 | `950 ml`, `approx. 75 g` — a measure | `950` ml | `1900` ml |
-| `Some`, `Plenty for two people`, `about 8`, `9 or 16` | not read: the portions box | |
+| `1 batch — <Helen's words>` | `1` batch | `2` batches; ×½ reads `½` batch |
+| `Some`, `Plenty for two people`, `about 8`, `9 or 16` | not read: no box | |
 
 The noun agrees with the number (`thingText`): it is the last word before any
 " of ", and its plural is `unitLabel`'s. A `group_words` yield (`dozen …`)
 never changes. A thing that opens with a digit gets a `×`. A count of nothing
-named (`about 8`) keeps the portions box because there is no word to put
-after the number.
+named (`about 8`) is not read, because there is no word to put after the
+number.
 
 #### Half a recipe
 
@@ -1574,16 +1570,18 @@ line that will not halve refuses the recipe. Its lists are `half_recipe:` in
 | no number, or no amount | cannot object: it does not scale |
 
 And the yield must halve to at least one of itself: `one 8-inch cake`,
-`1 jar`, `1 dozen` and `1 litre` refuse. An odd count halves to a range of one
-(`yieldBox`: 5 is `2–3`, `125 ml` is `62–63 ml`, `64+` is `32+`). A portions
-box halves only an even number.
+`1 jar`, `1 dozen` and `1 litre` refuse. The exception is a thing on
+`halvable_yields`, which is `batch`: a batch is mixture, not an object, so
+`1 batch` halves to `½ batch` (`yieldBox` prints `½`). An odd count halves to
+a range of one (`yieldBox`: 5 is `2–3`, `125 ml` is `62–63 ml`, `64+` is
+`32+`). A `serves:` portions box is never offered ×½.
 
 - `egg` is off `halvable` on purpose, and that one word decides most refusals.
 - `halvable` is about ingredients: a yield of `1 jar` still does not halve.
 - A sprig, a bunch, and every `half_step_counts` word are counts to the judge.
 - A recipe loses its half step through a rule, never by being named.
-- `tests/test_food_yield.py` names the published recipes that keep the
-  portions box and the ones offered a half step.
+- `tests/test_food_yield.py` names the published recipes offered a half
+  step, and fails a published `makes:` it cannot read.
 
 #### Storage
 

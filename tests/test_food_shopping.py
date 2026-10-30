@@ -1,12 +1,11 @@
 """The shopping list's data — GitHub issues #801 and #815.
 
-`_data/food/aisles.yml` says where an ingredient is found in a shop. How many
-people a recipe feeds is in the RECIPE, in `serves:` or, where that does not
-state a number, in `serves_estimate:`. `_plugins/food_shopping.rb` reads both.
+`_data/food/aisles.yml` says where an ingredient is found in a shop. How much
+a recipe makes is in the RECIPE: a number opening `serves:`, or a count
+opening `makes:`. `_plugins/food_shopping.rb` reads both.
 
-These check the files: every recipe states how many it feeds, an estimate is
-present only where it is needed, the aisles are well-formed and no keyword is
-claimed twice. They do not check the aisle matching, which is Ruby and runs
+These check the files: every recipe gives a scaler a number, the aisles are
+well-formed and no keyword is claimed twice. They do not check the aisle matching, which is Ruby and runs
 inside Jekyll: tests/test_rendered_pages.py does, against the real build. A
 second matcher written in Python to test here would pass while the site was
 wrong.
@@ -74,20 +73,22 @@ def states_people(fm: dict) -> bool:
     return bool(fm.get("serves") and LEADING_NUMBER.match(str(fm["serves"])))
 
 
-def unscalable(paths) -> list[str]:
-    """Recipes neither scaler can count: no number in `serves:`, no
-    `serves_estimate:`, and no `makes:` that `_plugins/food_yield.rb` reads.
+def unscalable(paths, allow_qq=False) -> list[str]:
+    """Recipes neither scaler can count: no number opening `serves:` and no
+    `makes:` that `_plugins/food_yield.rb` reads.
 
-    A `makes:` the yield reader counts needs no estimate: the recipe page
-    counts the thing made and the shopping list counts batches (#1286, #1297).
-    One that it cannot read falls back to the portions box, which divides by
-    the estimate. The reader is asked, never copied, through
-    `scripts/food_yield.rb`, as `tests/test_food_yield.py` does.
+    The recipe page counts the thing made and the shopping list counts batches
+    (#1286, #1297); `serves:` counts portions. The reader is asked, never
+    copied, through `scripts/food_yield.rb`, as `tests/test_food_yield.py`
+    does. `allow_qq` lets a draft whose yield is still Helen's `QQ` through:
+    it has no scaler until she answers it (DECISIONS §4).
     """
     lacking = []
     for path in paths:
         fm = front_matter(path)
-        if not fm or states_people(fm) or isinstance(fm.get("serves_estimate"), int):
+        if not fm or states_people(fm):
+            continue
+        if allow_qq and str(fm.get("serves", fm.get("makes"))).strip() == "QQ":
             continue
         lacking.append((path, fm))
 
@@ -118,21 +119,21 @@ def unscalable(paths) -> list[str]:
 def test_every_published_recipe_states_how_many_it_feeds(folder):
     """Every recipe gives a scaler something to count (#815, #1286).
 
-    `serves:` opens with a number, `serves_estimate:` carries an integer, or
-    `makes:` opens with a count of something named. `makes:` is never read as
+    `serves:` opens with a number, or `makes:` opens with a count of something
+    named ("16 slices", "1 batch", "about 300 ml"). `makes:` is never read as
     people however numeric it looks: 950 ml is not 950 portions.
     """
     missing = unscalable(published_paths(folder))
     assert not missing, (
-        "these recipes give neither scaler a number. Write `makes:` as a count "
-        "of a named thing (\"16 slices\", \"one 8-inch cake\"), or add "
-        "`serves_estimate:` — an integer, people:\n  " + "\n  ".join(missing)
+        "these recipes give neither scaler a number. Open `serves:` with a "
+        "number, or `makes:` with a count of a named thing (\"16 slices\", "
+        "\"1 batch — <your words>\"):\n  " + "\n  ".join(missing)
     )
 
 
 def test_every_draft_states_how_many_it_feeds():
-    """The same rule on drafts, which Helen browses locally: a draft with no
-    figure is a recipe the shopping list cannot scale.
+    """The same rule on drafts, which Helen browses locally, except that a
+    yield still saying `QQ` passes: it is her question, not a fault.
 
     Skipped where the private repo is not cloned (CI, a fresh worktree).
     """
@@ -142,58 +143,22 @@ def test_every_draft_states_how_many_it_feeds():
                     "check: sh scripts/git-clone-agent.sh "
                     "helen-triages-food-private _food_drafts")
 
-    missing = unscalable(recipe_paths(["_food_drafts"]))
+    missing = unscalable(recipe_paths(["_food_drafts"]), allow_qq=True)
     assert not missing, (
         "these drafts give neither scaler a number:\n  " + "\n  ".join(missing)
     )
 
 
-@pytest.mark.parametrize("folder", PUBLISHED_DIRS)
-def test_serves_estimate_is_a_positive_whole_number_of_people(folder):
-    bad = []
-    for path in published_paths(folder):
-        value = front_matter(path).get("serves_estimate")
-        if value is None:
-            continue
-        if not isinstance(value, int) or isinstance(value, bool) or value < 1:
-            bad.append(f"{path.name}: {value!r}")
-    assert not bad, (
-        "`serves_estimate:` is a whole number of people, one or more, and "
-        "unquoted — a quoted `\"6\"` is the string and the plugin will not read "
-        "it: " + ", ".join(bad)
-    )
-
-
-@pytest.mark.parametrize("folder", PUBLISHED_DIRS)
-def test_no_estimate_contradicts_a_serving_size_helen_wrote(folder):
-    """The recipe wins. The estimate fills a gap and never argues with one.
-
-    A `serves_estimate:` on a recipe whose `serves:` already states a number is
-    dead weight at best — the plugin reads `serves:` first — and a lie about
-    where the figure came from at worst, because an estimate is printed with a
-    `~` and a stated one is not.
-    """
-    shadowed = []
-    for path in published_paths(folder):
-        fm = front_matter(path)
-        if states_people(fm) and "serves_estimate" in fm:
-            shadowed.append(f"{path.name} (serves: {fm['serves']!r})")
-    assert not shadowed, (
-        "these recipes state their own serving size and carry an estimate too: "
-        + ", ".join(shadowed)
-    )
-
-
 def test_the_deleted_servings_file_stays_deleted():
-    """The estimate has one home, the recipe's front matter (#815).
+    """How much a recipe makes has one home, its own `serves:`/`makes:` (#815).
 
     A `_data/food/servings.yml` would be a second home for the figure, which
     is how the page and the file come to disagree about how many a recipe
     feeds.
     """
     assert not (DATA / "servings.yml").exists(), (
-        "_data/food/servings.yml is back. `serves_estimate:` in the recipe is "
-        "the single source since #815; see this module's docstring."
+        "_data/food/servings.yml is back. A recipe's own `serves:` or `makes:` "
+        "is the single source; see this module's docstring."
     )
 
 

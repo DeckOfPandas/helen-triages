@@ -189,17 +189,17 @@ def test_makes_is_never_read_as_people():
     """The rule #1286 must not weaken: 950 ml is not 950 portions.
 
     `portions_for` in _plugins/food_shopping.rb decides how many a recipe
-    feeds, from `serves:` and then `serves_estimate:`, and must not look at
-    `makes:` at all. It is handed `made_for`'s answer only to stand aside when
-    there is one. Checked in the source because the alternative is a build.
+    feeds, from `serves:` alone, and must not look at `makes:` at all;
+    `made_for` is a second and separate answer. Checked in the source because
+    the alternative is a build.
     """
     source = (ROOT / "_plugins" / "food_shopping.rb").read_text(encoding="utf-8")
-    start = source.index("def portions_for(doc, made)")
+    start = source.index("def portions_for(doc)")
     body = source[start:source.index("\n    end\n", start)]
     code = "\n".join(line.split("#", 1)[0] for line in body.splitlines())
     assert "makes" not in code, (
         "`portions_for` in _plugins/food_shopping.rb now reads `makes:`. A "
-        "yield is never a head count -- that is what `serves_estimate:` is for."
+        "yield is never a head count -- `made_for` counts the thing made."
     )
     assert 'doc.data["made"] = made_for(doc, yields)' in source, (
         "_plugins/food_shopping.rb no longer hangs `made` on each recipe, so "
@@ -207,37 +207,15 @@ def test_makes_is_never_read_as_people():
     )
 
 
-# The published recipes whose `makes:` has no count of a named thing at its
-# start. These keep the portions box, "~" and all. Named one by one because a
-# recipe joining or leaving the list is a change to what Helen's page says.
-KEEPS_PORTIONS = {
-    "caramel": "I mean, who cares, make double anyway",
-    "cherry-glaze": "Some",
-    "chocolate-ganache": "N/A, bring a spoon",
-    "five-spice-powder": "some",
-    "gluten-free-crumble-topping":
-        "Enough to top my 1.5-l Pyrex dish (22 x 17 cm) — about one food processor bowl full",
-    "goats-cheese-squash-rosemary-griddle-cakes": "Plenty for two people",
-    "grandmas-lemon-curd": "Enough for one normal lemon meringue pie",
-    "mixed-spice-powder":
-        "slightly more than half as much as my spice blender will fit, hmph",
-    "slow-cooked-duck-legs-confit": "however many you make",
-    "the-one-true-chocolate-brownies":
-        "enough for that edge-brownie tin I made James buy me",
-}
-
-
-def test_the_published_recipes_that_keep_the_portions_box_are_the_listed_ones(readings):
-    unread = {slug: text for slug, text in PUBLISHED.items() if readings[text] is None}
-    assert unread == KEEPS_PORTIONS, (
-        "The published `makes:` recipes with no reading -- the ones whose "
-        "scaler still says portions -- are not the listed set.\n"
-        f"  now unread, not listed: {sorted(set(unread) - set(KEEPS_PORTIONS))}\n"
-        f"  listed, now read:       {sorted(set(KEEPS_PORTIONS) - set(unread))}\n"
-        f"  text changed:           "
-        f"{sorted(s for s in set(unread) & set(KEEPS_PORTIONS) if unread[s] != KEEPS_PORTIONS[s])}\n"
-        "If that is intended, move the recipe in KEEPS_PORTIONS and tell Helen "
-        "which page changed what it counts."
+def test_every_published_makes_line_is_read(readings):
+    """A published `makes:` that the reader cannot count has no scaler at all,
+    since there is no estimate to fall back on (DECISIONS §4). Write it as a
+    count of a named thing: "1 batch — <her words>"."""
+    unread = sorted(f"{slug}: {text!r}" for slug, text in PUBLISHED.items()
+                    if readings[text] is None)
+    assert not unread, (
+        "these published `makes:` lines open with no count, so the page offers "
+        "no scaler:\n  " + "\n  ".join(unread)
     )
 
 
@@ -268,8 +246,8 @@ def test_every_reading_starts_from_a_whole_number_or_a_range_of_one(readings):
 # _plugins/food_half_recipe.rb judges it at build time. As above, the real
 # judge is asked, through scripts/food_yield.rb --half, once.
 
-def _recipe(makes, items, estimate=4, serves=None):
-    return {"makes": makes, "serves": serves, "serves_estimate": estimate,
+def _recipe(makes, items, serves=None):
+    return {"makes": makes, "serves": serves,
             "ingredient_groups": [{"items": [
                 {"amount": a, "item": i} if a is not None else {"item": i}
                 for a, i in items]}]}
@@ -326,9 +304,12 @@ HALF_CASES = {
     "four waffles": (_recipe("4–6 waffles", [("2 large", "eggs")]), True, None),
     "two burgers": (_recipe("2 burgers", [("200 g", "mince")]), True, None),
     "odd ml": (_recipe("125 ml", [("50 ml", "soy sauce")]), True, None),
-    # --- the portions box: even halves, odd does not -------------------------
-    "some, four": (_recipe("Some", [("200 g", "sugar")], estimate=4), True, "4 portions"),
-    "some, five": (_recipe("Some", [("200 g", "sugar")], estimate=5), False, "odd"),
+    # A batch is mixture, not an object: ½ batch is offered (scaling.yml
+    # `halvable_yields`), and a line that will not halve still refuses it.
+    "one batch": (_recipe("1 batch — your words", [("200 g", "sugar")]), True, "half a batch"),
+    "one batch, one egg": (_recipe("1 batch", [("1", "egg yolk")]), False, "does not halve"),
+    # --- nothing countable: no yield, so no half -----------------------------
+    "some": (_recipe("Some", [("200 g", "sugar")]), False, "no yield"),
 }
 
 # The published `makes:` recipes that are offered a half step; the rest are
@@ -338,15 +319,14 @@ HALF_CASES = {
 GETS_A_HALF_STEP = {
     "ajitsuke-tamago", "ben-jerrys-sweet-cream-base-1", "ben-jerrys-sweet-cream-base-2",
     "ben-jerrys-sweet-cream-base-3", "bens-chocolate-ice-cream",
-    # caramel has no count, so its estimate decides: six halves, an odd one
-    # is refused (#1089).
+    # "1 batch": half a batch is offered where every line halves (#1089).
     "caramel", "cherry-glaze",
     "chocolate-ganache", "delias-classic-pancakes", "five-spice-powder",
     "gluten-free-crumble-topping", "grandmas-fairy-cakes",
     "henrys-dark-chocolate-almond-truffles",
     "jerrys-chocolate-ice-cream", "macarons", "mixed-spice-powder",
     "mrs-nicholsons-creme-patissiere",
-    "mrs-nicholsons-yorkshire-puddings", "slow-cooked-duck-legs-confit",
+    "mrs-nicholsons-yorkshire-puddings",
     "sweet-potato-chocolate-brownies", "teriyaki-sauce", "wagamama-teriyaki-sauce",
     "wagamama-yakitori-sauce",
 }
@@ -365,7 +345,6 @@ def verdicts():
             continue
         recipes.append({"key": "published:" + path.stem, "makes": str(fm["makes"]),
                         "serves": fm.get("serves"),
-                        "serves_estimate": fm.get("serves_estimate"),
                         "ingredient_groups": fm.get("ingredient_groups")})
     scratch = ROOT / "tmp"
     scratch.mkdir(exist_ok=True)

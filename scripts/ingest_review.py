@@ -53,9 +53,7 @@ def _draft_fm(root: Path, slug: str):
 
 
 def _serves(fm: dict) -> str:
-    said = fm.get("serves") or fm.get("makes") or ""
-    est = fm.get("serves_estimate")
-    return f"{said} (~{est})" if est is not None and said else (said or (f"~{est}" if est else ""))
+    return str(fm.get("serves") or fm.get("makes") or "")
 
 
 def _times(fm: dict) -> str:

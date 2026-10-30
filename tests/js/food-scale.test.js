@@ -609,20 +609,6 @@ test('#1286: a `serves:` recipe steps a portion at a time, as it always did', ()
   assert.strictEqual(mode.word(7), null);
 });
 
-test('#1286: guessed portions on a `makes:` recipe step in whole recipes -- 4, 8, 12', () => {
-  // A `makes: "Some"` recipe with `serves_estimate: 4`: the guess doubles with
-  // the recipe.
-  const mode = portionsMode(4, true);
-  assert.strictEqual(mode.box(mode.base), '4');
-  assert.strictEqual(press(mode, 4, 1), 8);
-  assert.strictEqual(press(mode, 4, 1, 2), 12);
-  assert.strictEqual(press(mode, 4, 1) / mode.base, 2);
-  assert.strictEqual(mode.clamp(6), 8);
-  assert.strictEqual(mode.clamp(5), 4);
-  // It still says portions: the markup's word is left alone.
-  assert.strictEqual(mode.word(8), null);
-});
-
 // --- the one step below a whole recipe ----------------------------------------
 // A half is offered below one whole recipe and never between two. The build
 // decides which recipes get it (tests/test_food_yield.py); the second argument
@@ -690,18 +676,13 @@ test('#1286: what half a recipe makes, by shape', () => {
   // 950 ml -> 475 ml; an odd measure is a range of one.
   assert.strictEqual(half(yieldMode({ kind: 'measure', base: 950, unit: 'ml' }, true)), '475 ml');
   assert.strictEqual(half(yieldMode({ kind: 'measure', base: 125, unit: 'ml' }, true)), '62–63 ml');
-  // Guessed portions: 4 -> 2, and still the markup's word.
-  const some = portionsMode(4, true, true);
-  assert.strictEqual(some.box(press(some, 4, -1)), '2');
-  assert.strictEqual(press(some, 4, -1) / some.base, 0.5);
-  assert.strictEqual(press(portionsMode(5, true, false), 5, -1), 5);
-});
-
-test('#1286: a `serves:` recipe is never given whole-recipe or half steps', () => {
-  // The half verdict means nothing without whole-recipe stepping.
-  const mode = portionsMode(6, false, true);
-  assert.strictEqual(press(mode, 6, -1), 5);
-  assert.strictEqual(press(mode, 6, 1), 7);
+  // "1 batch" halves to "½ batch" where the build offers it (scaling.yml
+  // `halvable_yields`), and stays at one where it does not.
+  const batch = { kind: 'count', base: 1, stem: 'batch', rest: '',
+    invariable: false, singular: true, times: false, plus: false };
+  assert.strictEqual(half(yieldMode(batch, true)), '½ batch');
+  assert.strictEqual(press(yieldMode(batch, false), 1, -1), 1);
+  assert.strictEqual(yieldMode(batch, true).word(2), 'batches');
 });
 
 // --- "1 large egg", not "1 large eggs" -----------------------------------------

@@ -34,6 +34,9 @@ RETIRED = {
                      "under meta: and was read by nothing",
     "date_last_edited": "removed from the schema, GitHub issue #429 -- a "
                         "hand-maintained date that git already knows exactly",
+    "serves_estimate": "removed from the schema 2026-10-29 -- open `serves:` "
+                       "with a number, or `makes:` with a count (\"1 batch — "
+                       "<your words>\"); a QQ yield waits for Helen",
 }
 
 # Fields that belong under `meta:` and are silently ignored at the top level.
@@ -470,6 +473,13 @@ INVISIBLE_KEYS = {
         "Retired 2026-08-21, issue #429. A hand-maintained date that git "
         "already knows exactly and nothing rendered -- see meta.cooked_before "
         "above for why the entry outlives the key."
+    ),
+    "serves_estimate": (
+        "Retired 2026-10-29. A guessed head count the scaler read where a "
+        "recipe's own serves:/makes: had no number; every yield line now opens "
+        "with one, and nothing reads the key, so removing it from the recipes "
+        "that still carried it does not invalidate their proofreads. See "
+        "meta.cooked_before above for why the entry outlives the key."
     ),
 }
 

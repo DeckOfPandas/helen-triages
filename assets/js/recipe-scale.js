@@ -45,13 +45,7 @@
     }
   } else {
     var people = parseInt(input.getAttribute('data-portions'), 10);
-    /* `data-whole-recipes`: a `makes:` recipe with no count to show keeps the
-       word "portions" and steps in whole recipes. */
-    if (people > 0) {
-      mode = HTF.foodScale.portionsMode(people,
-        input.hasAttribute('data-whole-recipes'),
-        input.hasAttribute('data-half-recipe'));
-    }
+    if (people > 0) mode = HTF.foodScale.portionsMode(people);
   }
   if (!mode) return;
   var base = mode.base;

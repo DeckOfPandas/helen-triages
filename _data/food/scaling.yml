@@ -110,6 +110,11 @@ half_recipe:
   # are deliberately absent: they are counts to the judge.
   by_eye_also:
     - handful
+  # A yield of one of these halves below one: a batch is an amount of mixture,
+  # not an object, so "½ batch" is a real thing to make where "½ cake" is not.
+  # Every ingredient line must still halve (DECISIONS §8.2).
+  halvable_yields:
+    - batch
   # Always halves, whatever the number.
   divisible_units:
     - g
