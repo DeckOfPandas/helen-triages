@@ -56,7 +56,7 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 
 ---
 
