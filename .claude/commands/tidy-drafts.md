@@ -1,5 +1,5 @@
 ---
-description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block, a size word stranded in item: (#577), tin-and-pan incidentals (#1356), a cocktail's key order (#1213) and Title Case (#1089) -- and report everything that needs Helen instead.
+description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block, a size word stranded in item: (#577), tin-and-pan incidentals (#1356), a cocktail's key order (#1213), a food draft's meta under its title, and Title Case (#1089) -- and report everything that needs Helen instead.
 ---
 
 Helen has asked for a drafts tidy-up. Run `scripts/tidy_drafts.py`, which is the
@@ -51,7 +51,7 @@ script; `--help` prints them):
 | `size` | food | `amount: "2"` / `item: "large onions"` → `amount: "2 large"` / `item: "onions"`, only where `test_size_word_is_with_the_count_not_the_item` would fire |
 | `incidentals` | food | a fat or flour only for the tin or the pan (`"butter, for greasing"`) gains `incidental: true`; `", plus extra for the tin"` and its kin are trimmed off a real line; deep-frying oil loses its amount and reads `"<oil>, for deep frying"`. All by `incidental_verdict` in `tests/test_taxonomy.py`, over the words in `_data/food/incidentals.yml` (#1356). A `QQ` line gains the flag but is never trimmed |
 | `titles` | cocktails | Title Case by the suite's `title_cased`: it only raises a letter, and leaves anything in brackets as written |
-| `order` | cocktails | top-level keys into `TOP_LEVEL_KEYS_IN_ORDER` (`tests/test_cocktails.py`); moves whole blocks and edits no line |
+| `order` | both | a cocktail's top-level keys into `TOP_LEVEL_KEYS_IN_ORDER` (`tests/test_cocktails.py`); a food draft's `meta:` block to directly under `title:`, so the flags are the first thing Helen sees. Moves whole blocks and edits no line |
 
 Two of them are run alone, each as its own commit in the drafts repo:
 
@@ -65,7 +65,7 @@ Two of them are run alone, each as its own commit in the drafts repo:
   you want more, a run on a copy first: `--drafts-dir <copy> --site cocktails
   --only order --apply`. It refuses and names an undeclared key, a key written
   twice, and a column-0 comment. Drafts only: never reorder a file in
-  `_cocktail_recipes/`.
+  `_cocktail_recipes/` or `_food_recipes/`.
 
 ## A cocktail's boundary is narrower
 

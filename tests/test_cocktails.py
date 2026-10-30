@@ -1155,7 +1155,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # test with the old value, which must name only the granted files, then move
 # it in a commit of its own quoting her grant (DECISIONS §4.0). A grant covers
 # that commit and nothing after; parallel grants need the merge behind both.
-COCKTAIL_BASELINE_COMMIT = "50bf1fcb"   # the Pear and Rosemary Bellini's re-read, on Helen's word; 8d17962a and every earlier grant behind it
+COCKTAIL_BASELINE_COMMIT = "f0df1672"   # the Christmas Margarita and Cosmopolitan's promotion, on Helen's word; 50bf1fcb and every earlier grant behind it
 
 
 def _newest_commit_per_published_drink():

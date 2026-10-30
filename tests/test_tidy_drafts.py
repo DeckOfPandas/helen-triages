@@ -1123,14 +1123,45 @@ def test_key_order_refuses_what_needs_an_eye_and_says_so(drinks, before, why):
     assert path.read_text(encoding="utf-8") == before
 
 
-def test_key_order_never_runs_on_food(food):
-    """`--only order` on the food site changes nothing: the rule is for
-    cocktail drafts (#1213)."""
+def _meta_first(text):
+    """`text` with its `meta:` block cut from the end and put under `title:`."""
+    meta = "meta:\n  rewritten: false\n  awaiting_fix: false\n  proofread: false\n"
+    assert meta + "---\n" in text, "the fixture's meta block is not where it was"
+    title = text.split("\n")[1] + "\n"
+    return text.replace(meta + "---\n", "---\n").replace(title, title + meta, 1)
+
+
+def test_food_order_moves_meta_under_the_title_and_nothing_else(food):
+    """On food, `order` moves the `meta:` block whole and no other key.
+
+    Byte for byte against the fixture with the block cut and pasted by hand,
+    so a rule that also dealt the other keys into some order fails here.
+    """
     path = food / "test-recipe.md"
     path.write_text(FOOD_BEFORE, encoding="utf-8")
+    out = run_food(food, "--only", "order")
+    assert "[order] meta moved under the title, no line edited" in out, out
+    assert path.read_text(encoding="utf-8") == FOOD_BEFORE, "report mode wrote"
+
+    run_food(food, "--only", "order", "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert got == _meta_first(FOOD_BEFORE)
+    assert _front_matter(got) == _front_matter(FOOD_BEFORE)
+    assert list(_front_matter(got))[:2] == ["title", "meta"]
+
     out = run_food(food, "--only", "order", "--apply")
-    assert "applied 0 mechanical change(s)" in out, out
-    assert path.read_text(encoding="utf-8") == FOOD_BEFORE
+    assert "applied 0 mechanical change(s)" in out, "not idempotent: " + out
+    assert path.read_text(encoding="utf-8") == got
+
+
+def test_food_order_refuses_a_column_0_comment_and_says_so(food):
+    before = FOOD_BEFORE.replace("meta:\n", "# flags\nmeta:\n")
+    assert before != FOOD_BEFORE, "the fixture edit did not land"
+    path = food / "test-recipe.md"
+    path.write_text(before, encoding="utf-8")
+    out = run_food(food, "--only", "order", "--apply")
+    assert "[order] SKIPPED: a column-0 line that is not a key" in out, out
+    assert path.read_text(encoding="utf-8") == before
 
 
 def test_food_only_rules_do_not_run_on_a_drink(drinks):

@@ -199,7 +199,10 @@ without its flag, so run it dry first if you want to see what it will do.
 5. **Tidy.** A cocktail always gets `python3 scripts/tidy_drafts.py --site
    cocktails --only order --apply`, which puts its keys in page order by moving
    whole blocks and editing no line;
-   `test_a_draft_drinks_keys_are_in_page_order` fails until it has. Then
+   `test_a_draft_drinks_keys_are_in_page_order` fails until it has. A food
+   file always gets `--site food --only order --apply`, which moves its
+   `meta:` block to directly under `title:`;
+   `test_meta_sits_directly_under_the_title` fails until it has. Then
    `/tidy-drafts`, either collection, if the quoting or typography needs it. On
    food it formats a `QQ` line's dashes, unit spaces and accents and changes no
    other word; on a drink it never touches one.

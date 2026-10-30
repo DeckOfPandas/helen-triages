@@ -46,6 +46,7 @@ argument and the rules each field is read by.
 - 2026-08-09 · §4 · #75 · incidental: true hides a cooking fluid the cook will use as they like.
 - 2026-08-20 · §4 · staged drafts are read by the draft suite and are expected to be suite-clean.
 - 2026-08-21 · §4 · #429 · meta: is exactly three flags in order, and promotion is never a step where "has it been cooked?" is open.
+- 2026-10-30 · §4 · a food DRAFT's meta: block sits directly under title:.
 - 2026-08-29 · §4 · the ingest contract is one question: is the answer in the source document, or in Helen's head?
 - 2026-08-29 · §4 · ingredient and method groups are split at ingest, once, and not again afterwards.
 - 2026-09-01 · §4 · Helen keeps the rewrite staging folder, and no agent deletes a QQ original line or moves a file between staging folders unasked.
@@ -122,6 +123,7 @@ argument and the rules each field is read by.
 - 2026-08-26 · §4.3 · a magic-bag entry always has a tagline: line, and its value may be empty.
 - undated · §4.3 · Undated — a magic-bag entry's minimum is an ingredients list.
 - 2026-08-21 · §5 · #413 · en dashes are scoped by what a reader SEES.
+- 2026-10-30 · §5 · citrus is never "a squeeze": it is "¼ lemon, juiced".
 - 2026-10-18 · §5 · on food, the formatter reaches a QQ line; it still never rewords one.
 - 2026-09-07 · §5 · #800 · a tip printed under a source's own rubric is transcribed without the label; gf tip: is Good Food, the magazine, not gluten-free.
 - 2026-10-08 · §5 · #1089 · cocktail titles are Title Case, and a qualifier in brackets is not.
@@ -148,6 +150,7 @@ argument and the rules each field is read by.
 - 2026-09-22 · §6 · main_ingredients drops a size word and keeps a kind; egg size lives in the ingredient list.
 - 2026-10-21 · §6 · a bake lists its flour, butter, eggs and sugar, and a savoury dish lists the herbs, citrus, cream or wine it tastes of.
 - 2026-10-22 · §6 · a draft's main_ingredients says butter, and a QQ butter line still earns it; a published recipe's says salted butter or unsalted butter.
+- 2026-10-30 · §6 · bay leaves are a herb, and every citrus line is listed, a quarter lemon in a glaze included; a draft test holds §6.
 - 2026-08-01 · §7 · "declared" and "filterable" are the same thing: a tag shown on the page with no filter button was proposed and rejected.
 - 2026-08-02 · §7 · one-pot and scalable are retired, freezable is kept, and breakfast, extras, festive and starter are practicalities, not moods.
 - 2026-08-09 · §7 · something unusual is retired — Culturally relative, not a real craving, and barely used.

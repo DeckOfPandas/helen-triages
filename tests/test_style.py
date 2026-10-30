@@ -274,6 +274,22 @@ def test_temperatures_use_degree_c(recipe):
     )
 
 
+# "A squeeze" of citrus is written as a fraction of the fruit (DECISIONS §5).
+# The verb is fine ("squeeze out the gelatine"), and so is "freshly squeezed".
+_SQUEEZE_MEASURE = re.compile(
+    r"\bsqueeze of\b|^\s*-?\s*(?:item|amount):.*\bsqueeze\b", re.I | re.M)
+
+
+def test_citrus_is_measured_not_squeezed(recipe):
+    hits = [m.group(0).strip() for m in
+            _SQUEEZE_MEASURE.finditer(checkable_raw(recipe))]
+    assert not hits, (
+        f"{where(recipe)} measures citrus as a squeeze: {hits[:3]}. Write "
+        f"the fruit, e.g. amount \"¼\", item \"lemon, juiced\", or in a step "
+        f"\"¼ lemon, juiced\"."
+    )
+
+
 # --- butter, sugar, flour: closed list of qualifiers ------------------------
 # #74. Each is a closed list of allowed names, not merely "isn't bare":
 # "caster sugar" and "muscovado sugar" are qualified and still wrong.

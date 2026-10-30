@@ -276,6 +276,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   to publish anything I haven't tested."* No test enforces it on food: it is
   hers to decide at promotion. The made-and-liked state short of a rewrite is
   now the drafts folder `3-keep/`, not a flag.
+- **2026-10-30 — a food DRAFT's `meta:` block sits directly under `title:`.**
+  Helen: *"I'd like metadata (e.g. rewritten: false) to sit near the top of
+  recipe files, to help me when I'm rewriting so I don't keep opening the same
+  files over and over again"*; scope *"Drafts only, because there's no point
+  risking live work."* No other key moves. `tidy_drafts.py --site food --only
+  order` makes the move, and the ingest's finishing pass runs it.
 - **2026-08-29 — the ingest contract is one question: is the answer in the
   source document, or in Helen's head?** In the source, the ingest does it; in
   her head, it is a `QQ`. Measured that day, 266 of 342 drafts carried a gap
@@ -741,6 +747,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `cook_time: "20-25 mins"`: *"These still render to the user, so correct to
   en dash please."* So house style reaches front matter that renders, the
   prose pages and the reference data, not only recipe prose.
+- **2026-10-30 — citrus is never "a squeeze": it is "¼ lemon, juiced".**
+  Helen: *"I hate the word "squeeze"! Let's always use "1/4 lemon, juiced"."*
+  She chose ingredient lines and every method line of ours where a squeeze
+  measures citrus; a `QQ original` stays verbatim, and the verb ("squeeze
+  out the gelatine") and "freshly squeezed" are fine.
+  `test_citrus_is_measured_not_squeezed` holds it on both collections.
 - **2026-10-18 — on food, the formatter reaches a `QQ` line; it still never
   rewords one.** Helen, asked whether the accents test or the skip should give
   way over a printed "ragu": *"Perform mechanical formatting on QQ lines so
@@ -919,6 +931,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   butter for their main ingredients, but drafts don't. But drafts still need
   the butter in their main ingredients so I can discover and cook from
   them."* The kind is settled at promotion, with the rest of the proofread.
+- **2026-10-30 — bay leaves are a herb, and every citrus line is listed, a
+  quarter lemon in a glaze included; a draft test holds §6.** Helen chose
+  *"Yes, bay goes in"* and, for citrus in one part of a dish, *"Yes, list
+  it"*. `test_main_ingredients_name_what_the_dish_tastes_of` exempts a
+  garnish or wash, an optional line, one of two alternatives, a serving
+  group, and a savoury dish's flour, butter, eggs and sugar: the lines the
+  2026-10-21 sweep left out on purpose. Drafts only.
 
 ## §7 Taxonomy (food)
 

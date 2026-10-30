@@ -95,6 +95,10 @@ ended.
 ```yaml
 ---
 title: "Lemony Cavolo Nero and Butter Bean Soup"
+meta:
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
 tagline: "QQ original If you love a one-pot stew, this bright and acidic number is a fun one to have up your sleeve. QQ Claude A one-pot stew that is bright and acidic."
 source: "Adapted from Good Food, January 2026"
 source_type: publication
@@ -120,10 +124,6 @@ method_short:
 notes:
   - label: "QQ"
     text: "QQ - anything worth saying that is not a step."
-meta:
-  rewritten: false
-  awaiting_fix: false
-  proofread: false
 ---
 ```
 
@@ -158,10 +158,11 @@ name you give is a courtesy rather than a contract.
 | a "you will need" list | **Ignore it.** Cake rings, thermometers, palette knives and foil are never an ingredient group or a note. Helen: *"the rule is "trust the cook"."* |
 | page furniture | **Drop anything that sells something**: a show appearance, a ticket line or phone number, a book plug, a TV listing, a "next month" teaser, a web pointer, a "what to drink" box with bottles and prices. **Keep writing about the dish**: an essay, a bio of the cook, a boxed aside, which go in the body below the front matter. Helen: *"Drop ads, keep essays."* |
 | a sidebar box with no list | A box such as "Kale crisps" or "Mastering perfect mash" becomes a file in the usual shape (quantities lifted from its text, per §2) and **has no body**: its words are already in the `QQ original` lines, and a body repeating them would publish the book's text unmarked. |
-| `meta` | Exactly these three keys, in this order, all `false`. See below. |
+| `meta` | Exactly these three keys, in this order, all `false`, **directly under `title:`**. See below. |
 
 **`meta:` is three flags, in that order, and on a new file all three are
-`false`.** `rewritten` and `proofread` are Helen's own claims about her own
+`false`. It is the second key, straight after `title:`**, because Helen
+checks the flags first whenever she opens a file. `rewritten` and `proofread` are Helen's own claims about her own
 work — you never set either `true`. `awaiting_fix: false` is what lets a page
 publish once it is finished, and `false` is the only value that works: a missing
 key, or `"false"` in quotes, holds the page back silently. Write
@@ -564,6 +565,12 @@ The findability index, and the one field where **generosity is right**.
   defines the character, anything you would have to go out and buy, the
   vegetable that is the point. **Herbs, citrus, cream or wine that the dish
   tastes of go in too**, however small the amount: they are what people skip.
+  Bay leaves are a herb, and a quarter of a lemon in one part of the dish is
+  citrus. On a sweet dish too.
+
+**What need not go in:** a garnish or a wash ("to serve", "for brushing"), an
+optional line, one of two alternatives ("dill or parsley"), anything in a
+"to serve" group, and on a savoury dish its flour, butter, eggs and sugar.
 
 **Be generous.** Helen's own recipes run to fourteen entries; ingested ones
 average five, and she then adds to them by hand, which she has called "plainly
@@ -651,6 +658,10 @@ batch comes from one of them, the index may say so once.
 - **En dash for a number range**: `3–4 mins`, `170–180°C`, `36–40% fat`. Not a
   hyphen. This one is by far the most common thing to get wrong.
 - **Unicode fractions**: `½`, `¼`, `¾`. Not `1/2`.
+- **Never "a squeeze" of citrus.** An ingredient line is `amount: "¼"`,
+  `item: "lemon, juiced"` (or lime, or orange); a `QQ Claude` step says
+  "¼ lemon, juiced". Helen: *"I hate the word "squeeze"! Let's always use
+  "1/4 lemon, juiced"."* The verb is fine: "squeeze out the gelatine".
 - **A space between a number and its unit**, imperial included: `15 ml`,
   `400 g`, `20 cm`, `9 in`, `2 tbsp`. Not `15ml`. A temperature takes none:
   `180°C`.
@@ -764,6 +775,10 @@ line above the envelope is its issue title:
 ```yaml
 ---
 title: "Crispy Sage Butter Gnocchi"
+meta:
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
 tagline: "QQ"
 source: "Adapted from RecipeTin Eats, recipe Nagi"
 source_type: website
@@ -798,10 +813,6 @@ method_short:
 notes:
   - label: "QQ"
     text: "QQ - the source stops after the garlic. Nothing tells you when the parmesan goes in, or how the gnocchi and the butter meet."
-meta:
-  rewritten: false
-  awaiting_fix: false
-  proofread: false
 ---
 ```
 

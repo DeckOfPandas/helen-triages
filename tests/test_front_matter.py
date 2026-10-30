@@ -750,6 +750,12 @@ ADJUDICATED_REWRITES = {
             "stays true -- but it was still the wrong hand on the switch, "
             "which is the whole of what this test is for."
         ),
+        "c41594b5": (
+            "1-rewrite/sesame-and-ginger-cold-noodle-salad.md, 2026-10-30. "
+            "Helen pasted her own rewrite, saying `rewritten: true`, and asked "
+            "for it to be added to the drafts PR; the agent commit copied her "
+            "value. Asked, she granted this entry."
+        ),
     },
 }
 

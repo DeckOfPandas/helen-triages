@@ -14,8 +14,8 @@ of its `fix_*` function.
     python3 scripts/tidy_drafts.py --drafts-dir <copy> --site food
 
 `--only` takes a comma-separated subset of RULE_NAMES: `notes`, `quoting`,
-`dashes`, `typography`, `units` and `accents` run on both collections, `meta`,
-`size` and `incidentals` on food alone, `titles` and `order` on cocktails alone.
+`dashes`, `typography`, `units`, `accents` and `order` run on both collections,
+`meta`, `size` and `incidentals` on food alone, `titles` on cocktails alone.
 
 It reads every `.md` with front matter under the two drafts folders (a file
 without front matter, such as a README, is named and skipped),
@@ -47,7 +47,8 @@ On food alone: `main_ingredients` and `tags` flow quoting, the quoting of a
 group's `- name:`, the #429 `meta:` block (retired keys dropped, flags in
 `META_ORDER`), the #577 size word (`2` / `large onions` -> `2 large` /
 `onions`), and the #1356 tin-and-pan incidentals ("butter, for greasing" gains
-`incidental: true`; ", plus extra for the tin" is trimmed off a real line).
+`incidental: true`; ", plus extra for the tin" is trimmed off a real line),
+and the `meta:` block moved whole to directly under `title:`.
 
 On cocktails alone: Title Case for `title` (#1089: capitals only, nothing is
 lowered, a qualifier in brackets is left as written) and top-level keys in
@@ -983,6 +984,54 @@ def fix_key_order(text, path):
              f"{' '.join(problem[0])} -> {' '.join(problem[1])}"])
 
 
+def fix_food_meta_first(text, path):
+    """Move a food draft's `meta:` block to directly under `title:` (DECISIONS §4).
+
+    Helen reads the flags as soon as she opens a file. The block moves whole
+    and is written back byte for byte, under the same three checks as
+    `fix_key_order`. No other key moves. A file with no `title` or no `meta`
+    is another test's to report and is left alone.
+
+    Refused, each named SKIPPED: `title` or `meta` twice, and a column-0 line
+    that is not a key.
+    """
+    parts = split_front_matter(text)
+    if not parts:
+        return text, []
+    open_, fm, close, body = parts
+    lines = fm.split("\n")[:-1]                  # as in fix_key_order
+    blocks = _top_level_blocks(lines)
+    if isinstance(blocks, str):
+        return text, [f"SKIPPED: {blocks}"]
+
+    keys = [k for k, _ in blocks]
+    if "title" not in keys or "meta" not in keys:
+        return text, []
+    if keys.count("title") > 1 or keys.count("meta") > 1:
+        return text, ["SKIPPED: `title` or `meta` appears twice"]
+    if keys.index("meta") == keys.index("title") + 1:
+        return text, []
+
+    meta = blocks.pop(keys.index("meta"))
+    blocks.insert([k for k, _ in blocks].index("title") + 1, meta)
+    new_lines = [l for _, block in blocks for l in block]
+    new_fm = "\n".join(new_lines) + "\n"
+
+    if sorted(new_lines) != sorted(lines):
+        raise AssertionError(f"fix_food_meta_first changed a line of {path}")
+    if yaml.safe_load(new_fm) != yaml.safe_load(fm):
+        raise AssertionError(
+            f"fix_food_meta_first changed what {path} parses to. Nothing was "
+            f"written. A block boundary has been drawn in the wrong place."
+        )
+    order = list(yaml.safe_load(new_fm))
+    if order[order.index("title") + 1] != "meta":
+        raise AssertionError(f"fix_food_meta_first did not put meta under "
+                             f"the title in {path}")
+    return (open_ + new_fm + close + body,
+            ["meta moved under the title, no line edited"])
+
+
 # --- Title case, cocktails only, #1089 ---
 TITLE_LINE = re.compile(r'^(?P<head>title:[ \t]*")(?P<title>[^"]*)(?P<tail>"[ \t]*)$')
 
@@ -1023,6 +1072,8 @@ FOOD_FIXERS = [
     ("meta", fix_meta_block),
     ("size", fix_size_words),
     ("incidentals", fix_incidentals),
+    # LAST, for the reason the drinks table gives.
+    ("order", fix_food_meta_first),
 ]
 
 # Two tables, not one with a site test inside each fixer. A drink has no
@@ -1178,7 +1229,7 @@ def main(argv=None):
                     help="write the fixes; without it nothing is changed")
     ap.add_argument("--only", default="",
                     help="comma-separated subset of: " + ",".join(RULE_NAMES)
-                         + " (meta and size are food's alone, order is "
+                         + " (meta and size are food's alone, titles is "
                            "cocktails' alone)")
     ap.add_argument("--site", choices=sorted(SITES), default=None,
                     help="one collection only; the default is both")
