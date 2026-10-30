@@ -663,6 +663,21 @@ test('the star is a single value, and a row with none is not a match for one', (
   assert.strictEqual(FS.rowMatchesFilters(ROW({ star: '' }), state, EXACT), false);
 });
 
+test('a row answers a star it carries in starAlso, and only that one', () => {
+  // taxonomy.yml `star_also`: a greens dish of pod beans is also legumes.
+  const state = EMPTY();
+  const beans = ROW({ star: 'greens', starAlso: ['legumes'] });
+  state.star = 'legumes';
+  assert.strictEqual(FS.rowMatchesFilters(beans, state, EXACT), true);
+  state.star = 'greens';
+  assert.strictEqual(FS.rowMatchesFilters(beans, state, EXACT), true);
+  state.star = 'lamb';
+  assert.strictEqual(FS.rowMatchesFilters(beans, state, EXACT), false);
+  state.star = 'legumes';
+  assert.strictEqual(FS.rowMatchesFilters(ROW({ star: 'greens' }), state, EXACT), false,
+    'a greens row with no starAlso answered the legumes filter');
+});
+
 test('a blank star on a row is fine while nothing is selected -- ~a quarter are', () => {
   assert.strictEqual(FS.rowMatchesFilters(ROW({ star: '' }), EMPTY(), EXACT), true);
 });

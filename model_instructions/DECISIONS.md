@@ -323,6 +323,23 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-18 — a sidebar box ingested as a recipe has no body.** Helen chose
   *"Delete the bodies"*: the body repeated the `QQ original` lines unmarked,
   and would have published the book's text.
+- **2026-10-30 — a magazine page's citation: the book shape plus "via" for an
+  extract, a credit only from the page itself, the cover month.** Helen chose
+  *"Book shape, then "via""*, *"Yes, but not (c)"* (an uncredited page in a
+  book feature is the magazine's, and a first-name tip credit is no author)
+  and *"The cover month"*. `SOURCE_ATTRIBUTION_SPEC.md` holds the shapes.
+- **2026-10-30 — header and method times that disagree: `cook_time` takes the
+  header's and a `QQ` note names the mismatch.** Helen chose *"Header, and
+  flag it"*.
+- **2026-10-30 — the method may add a phase no ingredient group matches, and a
+  step straddling two phases stays whole in the earlier one.** Helen chose
+  *"Yes"* and *"Whole, in the earlier group"*.
+- **2026-10-30 — a clear typo in the source's ingredient list is fixed in
+  `item:` and kept in the `QQ original`.** Helen chose *"Fix in item:,
+  verbatim in QQ original"*.
+- **2026-10-30 — a web chat asks in its reply and never waits; it holds the
+  envelopes only when told to.** Helen chose *"Ask in the reply, never wait"*
+  and, for holding, *"Yes, as an option"*. `CLAUDE_WEB_INGEST.md` says how.
 - **2026-09-05 — a `QQ Claude` rewrite follows four patterns taken from
   Helen's own rewrite of one.** From `sticky-squidge-ginger-loaf.md`, which
   she rewrote as a comparison: do not re-narrate what the ingredient list
@@ -418,9 +435,14 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
   rulings from two claude.ai chats that Helen confirmed as standing, each a
   yes. Its `QQ original` keeps everything the source printed.
-- **2026-10-08 — a `makes:` recipe always has a `serves_estimate`.** Confirmed
-  as standing the same day; two each for biscuits. The shopping list divides
-  by it.
+- **2026-10-29 — an unheaded first ingredient group is named for the dish or
+  its main component, unasked.** Helen: *"hopefully this would be obvious,
+  like "for the beef", or "for the pie"?"* The name is read after "For the".
+- **2026-10-28 — `makes:` is written as a count of a named thing.** Helen:
+  *"Make the test suite support our current design. 16 slices, 2 X-in cakes,
+  9 biscuits."* The recipe page counts the thing made and the shopping list
+  counts batches (§8.2). One figure, never an alternative: "9 large or 16
+  small biscuits" reads as nine of something called "large".
 - **2026-10-08 — Helen's own recipes are `source: "Henry"`, `source_type:
   person`.** Confirmed as standing the same day, as the old journal recorded
   it.
@@ -440,13 +462,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `tmp/inbox/` for `ingest_inbox.py --from-file`. What does not happen is a
   session filing a batch of issues: the first chat wrote a prompt asking for
   39.
-- **2026-10-10, #1356 — one source step is one pair, however many actions it
-  holds.** Helen ruled it in a claude.ai chat after a second batch and
-  confirmed it here ("Please go ahead"); her words for the change did not
-  reach the repository. She had found split files harder to read. The `QQ
-  Claude` line carries the readability instead. (Replaces 2026-10-08's *"The
-  split steps has been easier for me"*, which had itself replaced one-pair:
-  three answers in three weeks, so do not propose splitting again.)
+- **2026-10-28 — one `QQ original` per source step, and as many `QQ Claude`
+  lines under it as a dense step needs.** Helen: *"I would like Claude to
+  split out method lines where the written method is unhelpfully dense, so
+  multiple QQ CLAUDE lines will be very helpful."* The original stays whole and
+  verbatim; the rewrite splits at the points a cook would pause. Two source
+  steps are still never merged and nothing is reordered. (Replaces 2026-10-10's
+  one-pair rule, the fourth answer to this question: do not propose another.)
 - **2026-10-10, #1356 — the ingredient list is the source's own list; nothing
   joins it from the method.** Helen: *"We shouldn't list incidentals. We can
   trust the cook."* The one exception is a source with no ingredient list at
@@ -791,11 +813,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
   conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
   says "170°C fan"; the `QQ original` keeps the printed figure.
-- **2026-10-19 — Good Food prints both units; keep the metric, bakes
-  included.** Asked whether its "100g/4oz" should keep only the grams, Helen
-  chose *"Metric only, bakes too"*, over the general rule that baking keeps
-  its ounces. Per-source rulings like this and Riverford's live in
+- **2026-10-30 — where a source prints metric and imperial, keep the metric,
+  bakes included; ounces only where it gives nothing else.** Helen chose
+  *"Metric when both printed"*, making general what she ruled for Good Food on
+  2026-10-19 (*"Metric only, bakes too"*). (Replaces "old-style recipes and
+  baking keep their ounces".) Per-source rulings live in
   `_data/food/sources.yml`, which `INGEST_ONE_RECIPE.md` §5 prints.
+- **2026-10-30 — a single oven figure from an unruled source is kept as
+  printed and asked about once for the book; a labelled fan figure wins over a
+  gas mark that disagrees.** Helen chose *"Keep it and ask"* and *"The
+  labelled fan figure"*; her answer for a book goes in `sources.yml`, as
+  Riverford's did.
 - **2026-10-19 — an unlabelled oven pair 20 degrees apart is conventional and
   fan.** Helen: *"Oven pairings when one temp is 20 degrees lower than the
   other mean conventional / fan, I'm just so sure. Interpret that way
@@ -908,6 +936,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-08-09 — `something unusual` is retired.** Culturally relative, not a
   real craving, and barely used. `retired_star_ingredients` makes a retired
   value fail with its reason.
+- **2026-10-30 — cocoa powder alone earns `chocolate` where the dish tastes of
+  chocolate.** Helen chose *"Yes, if it tastes of chocolate"*; cocoa as a
+  colour or a background note does not.
 - **2026-10-21 — `legumes` and `mushrooms` are star ingredients, and `greens`
   means leaves and brassicas.** From a tag audit once the veg-forward books
   arrived: `legumes` had been declined in August with two candidates, and now
@@ -915,6 +946,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   three mushroom dishes and the leek dishes had nowhere to go; `greens` held
   tomatoes, peppers, courgettes and beans. Helen: *"Yes"* to each. Tomatoes,
   courgettes, peppers and alliums stay blank: scattered, and rarely the point.
+- **2026-10-29 — beans eaten whole in the pod are `greens`, and the `legumes`
+  filter finds them too; potatoes are `root veg`.** Helen: *"beans are
+  legumes, right, but while I know that I might still expect them to appear
+  under greens"*, then *"Can we show pod beans eaten whole under both greens
+  and legumes categories"*, choosing an automatic word list and the one
+  `greens` badge. `star_also` in `_data/food/taxonomy.yml` holds the list;
+  shelled beans stay `legumes`. And: *"Potatoes are root veg."*
 - **2026-10-21 — `knife and fork` and `herbivore-ish` are moods.** The audit
   found 39 draft mains with no mood: plainly cooked centrepieces, and
   vegetables as the main event. On the first Helen ruled out "proper dinner"
@@ -1018,7 +1056,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   it. Refined 2026-10-10: where the advance work is the real work the tag
   stays, as on a BBQ spatchcock duck rubbed a day ahead, *"keep make ahead --
   the rub is the thing here, and roasting on the day is trivial."* A Christmas
-  turkey buttered the day before is not.
+  turkey buttered the day before is not. Refined 2026-10-29: what is left may
+  be plain cooking of any length, if nothing else is. Helen, on roast potatoes
+  boiled and coated the day before: *"given they can be assembled the day
+  before, with zero extra steps, the roast lasting 5 mins or 1 hour doesn't
+  really matter."* In her words the tag is a convenience: *"all or most of
+  this can be made in advance of when you want to eat it."*
 - **2026-10-10 — feta does not count for `cheese-tastic`, even a whole baked
   block; burrata does.** Helen: *"oooh, yeah, feta doesn't count for
   cheese-tastic"*. The tag is for cheese as the pleasure of the dish, and the
@@ -1034,10 +1077,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   call that one-handed food if I didn't also have to deal with e.g. spaghetti,
   or fish the meatballs out of a soup."* The tag's meaning says nothing that
   has to be chased; this is her exception to it, and it stops at the meatball.
-- **2026-10-10 — `festive` needs the dish to be the feast's own.** A chicken
-  that uses up the Seder horseradish is not festive; a Rosh Hashanah honey
-  cake is. From the review of every draft's tags, with no words of hers
-  recorded.
+- **2026-10-29 — `festive` needs the dish to be the feast's own, whatever the
+  page it came from.** Helen: *"'festive' doesn't automatically follow from
+  'came from a Christmas feature', and is applied at other times too."* A
+  chicken that uses up the Seder horseradish is not festive; a Rosh Hashanah
+  honey cake is. (Restates 2026-10-10's ruling, which recorded none of her
+  words, with the source-page point added.)
+- **2026-10-29 — dietary restrictions are not marked.** Helen: *"I don't mark
+  dietary restrictions."* No tag, note, field or question for vegan,
+  gluten-free and the like, at ingest or after; a claim in a verbatim intro
+  stays in its `QQ original` until she rewrites the tagline.
 - **2026-10-11 — a quiche, a tarte tatin, a soufflé and a salad that is the
   meal are a `main`; a plain cauliflower cheese and a sprout salad are
   `extras`.** Helen's answers to the "perhaps" rows. Mains: a quiche, moules
@@ -1157,19 +1206,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `shopping-list.js` refuses. That rule is about units with no defined
   relationship (nobody can say how many ml a dash is), and each of the
   untouched units would need one invented.
-- **2026-09-07, #815 — a recipe that states no number of people carries
-  `serves_estimate:` in its own front matter, estimated at ingest and printed
-  with a `~`.** Helen: *"We need estimate the number of people served by 750
-  ml, then add that to the front matter somehow. [...] all of these will need
-  to be estimated at ingest. Claudes can check with me if unsure."* Its own
-  key and not a second `serves:`, her choice: `makes:` opens with a number 66
-  times and `serves:` gives none 20 times. The `~` is her ruling in the same
-  message. A side file that held the estimates outside the recipes was deleted
-  the same day: one home, beside the words it estimates from. A `QQ` in
-  `serves:` stays untouched beside the new key. On 2026-10-18 she widened who
-  estimates: a web Claude may write one *"if they want to, then for Claude
-  Code to tidy at the next round"*, so an unsure figure is written and put to
-  her, never left out.
+- **2026-10-29 — `serves_estimate` is retired: every yield line opens with
+  its own number, and Helen's words follow it.** Helen: *"I would like to
+  remove reliance on it"*, then *"for step 2, let's rewrite the yield lines"*,
+  approving each published line ("Yes, all as proposed"): "1 batch — I mean,
+  who cares, make double anyway", "4, depending on appetite". A sauce or a
+  spice blend makes "1 batch". A draft whose yield is still `QQ` has no
+  scaler until she answers it (*"No scaler until answered"*), and an ingest
+  that finds no figure writes `QQ` and suggests one on her list. The key is in
+  `RETIRED` and `INVISIBLE_KEYS` (`tests/test_front_matter.py`). (Replaces
+  2026-09-07, #815, which put a guessed head count beside a yield with no
+  number and printed it with a `~`; the shopping list's figure still has one
+  home, the recipe.)
 - **2026-09-07 — the shopping list never prints a recipe's yield after its
   name.** Helen, on a row reading `7  Moules Marinière serves 4`: *"please
   don't say 'serves X' after the recipe name at the top of the scaler. This
@@ -1327,13 +1375,24 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   index row titles.** Helen: *"render the name of the recipe in this shopping
   list feature the same way we do in the recipe list row titles, just smaller
   of course, and make them links"*. The class is `.shopping-list-recipe-link`.
-- **2026-09-07, #815 — a component recipe's `serves_estimate` takes its
-  commonest use and a note on the recipe carries the rest; no schema is
-  invented for it.** Helen: *"I have no idea how to model this. Please add all
-  this as a note on the recipe and I will tidy up later."* A ganache glazes one
-  cake, fills another, ices 12 cupcakes or makes 16 truffles; a caramel is a
-  sauce or a tin's filling. `chocolate-ganache` and `caramel` each carry one
-  number and the note. A schema for several yields is hers to ask for.
+- **2026-09-07, #815 — a component recipe makes one thing and a note on the
+  recipe carries its uses; no schema is invented for it.** Helen: *"I have no
+  idea how to model this. Please add all this as a note on the recipe and I
+  will tidy up later."* A ganache glazes one cake, fills another, ices 12
+  cupcakes or makes 16 truffles; a caramel is a sauce or a tin's filling.
+  Since 2026-10-29 `chocolate-ganache` and `caramel` each make "1 batch", and
+  the note stands. A schema for several yields is hers to ask for.
+- **2026-10-30 — the shopping list quotes a yield's figure, never Helen's
+  words after it; a measure after a count scales with it.** Helen, on "6,
+  depending on appetite": *"cute on the recipe but should not appear in the
+  shopping list scaler."* The list is handed the line up to its first
+  comma, dash or bracket. And on the curry paste, *"1 batch … about 100 g"
+  scaling appropriately*: "1 batch, about 100 g" doubles to "2 batches,
+  about 200 g" (`also` in `_plugins/food_yield.rb`).
+- **2026-10-29 — a batch halves.** Helen, on six "1 batch" recipes losing
+  their ½: *"Yes, half a batch is fine"*. A batch is mixture, not an object,
+  so `halvable_yields` in `_data/food/scaling.yml` lets "1 batch" halve where
+  "one cake" and "1 jar" still refuse; every ingredient line must still halve.
 - **Undated, #1118 — the food scaler's box is as wide as the drink scaler's:
   two characters and the caret.** Helen: *"the same number of characters as
   the cocktail recipe scaler (just over 2)"*. `calc(2ch + 1.6ch)` in

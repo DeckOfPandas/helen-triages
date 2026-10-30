@@ -3,8 +3,7 @@ title: "Five-Spice Powder"
 tagline: "No capsicum here."
 source: "Henry"
 source_type: person
-makes: "some"
-serves_estimate: 20
+makes: "1 batch"
 prep_time: "5 mins"
 cook_time: "2 mins"
 main_ingredients: ["cinnamon sticks", "star anise", "fennel seed", "Sichuan peppercorn", "whole cloves"]

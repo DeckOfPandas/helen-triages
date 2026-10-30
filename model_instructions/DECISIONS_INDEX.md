@@ -56,6 +56,11 @@ argument and the rules each field is read by.
 - 2026-10-18 · §4 · an ingest ignores a "you will need" equipment list.
 - 2026-10-18 · §4 · page furniture: drop what sells, keep what is written about the dish.
 - 2026-10-18 · §4 · a sidebar box ingested as a recipe has no body.
+- 2026-10-30 · §4 · a magazine page's citation: the book shape plus "via" for an extract, a credit only from the page itself, the cover month.
+- 2026-10-30 · §4 · header and method times that disagree: cook_time takes the header's and a QQ note names the mismatch.
+- 2026-10-30 · §4 · the method may add a phase no ingredient group matches, and a step straddling two phases stays whole in the earlier one.
+- 2026-10-30 · §4 · a clear typo in the source's ingredient list is fixed in item: and kept in the QQ original.
+- 2026-10-30 · §4 · a web chat asks in its reply and never waits; it holds the envelopes only when told to.
 - 2026-09-05 · §4 · a QQ Claude rewrite follows four patterns taken from Helen's own rewrite of one.
 - 2026-09-07 · §4 · #814 · a grouping an ingest left out is derived from the draft and reviewed by Helen: no proposals: block, no calibration round, no re-reading of sources.
 - 2026-10-01 · §4 · a note is always {label, text}; the bare-string form is retired on both sites.
@@ -73,12 +78,13 @@ argument and the rules each field is read by.
 - 2026-10-08 · §4 · a food tagline at ingest is the method's pair on one line, where the source has an intro.
 - 2026-10-08 · §4 · unspecified butter is QQ butter — Helen: "Write QQ butter in the ingredients list where it isn't specified." Replaces a chat's "salted, or plain in precise bakes".
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
-- 2026-10-08 · §4 · a makes: recipe always has a serves_estimate.
+- 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
+- 2026-10-28 · §4 · makes: is written as a count of a named thing.
 - 2026-10-08 · §4 · Helen's own recipes are source: "Henry", source_type: person.
 - 2026-10-08 · §4 · four ingest rulings apply to Difford's alone.
 - 2026-10-08 · §4 · three things a chat did are NOT ingest rules: one question per recipe, hand-assigned moods, and alternative paths as method groups.
 - 2026-10-08 · §4 · the issue route for ingests stays, beside the bulk route of envelope files.
-- 2026-10-10 · §4 · #1356 · one source step is one pair, however many actions it holds.
+- 2026-10-28 · §4 · one QQ original per source step, and as many QQ Claude lines under it as a dense step needs.
 - 2026-10-10 · §4 · #1356 · the ingredient list is the source's own list; nothing joins it from the method.
 - 2026-10-10 · §4 · #1356 · a fat or flour the source lists only for the tin or the pan is kept and flagged incidental: true, at every ingest.
 - 2026-10-16 · §4 · #1356 · on a real fat or flour line, ", plus extra for the tin" and its kin are trimmed, at tidy.
@@ -126,7 +132,8 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
-- 2026-10-19 · §5 · Good Food prints both units; keep the metric, bakes included.
+- 2026-10-30 · §5 · where a source prints metric and imperial, keep the metric, bakes included; ounces only where it gives nothing else.
+- 2026-10-30 · §5 · a single oven figure from an unruled source is kept as printed and asked about once for the book; a labelled fan figure wins over a gas mark that disagrees.
 - 2026-10-19 · §5 · an unlabelled oven pair 20 degrees apart is conventional and fan.
 - 2026-10-19 · §5 · a title keeps its accents, and gains any the house list declares.
 - 2026-08-10 · §5 · within one ingredient group the base spices run coriander, cumin, turmeric, fennel, and the warm spices follow in any order.
@@ -144,7 +151,9 @@ argument and the rules each field is read by.
 - 2026-08-01 · §7 · "declared" and "filterable" are the same thing: a tag shown on the page with no filter button was proposed and rejected.
 - 2026-08-02 · §7 · one-pot and scalable are retired, freezable is kept, and breakfast, extras, festive and starter are practicalities, not moods.
 - 2026-08-09 · §7 · something unusual is retired — Culturally relative, not a real craving, and barely used.
+- 2026-10-30 · §7 · cocoa powder alone earns chocolate where the dish tastes of chocolate.
 - 2026-10-21 · §7 · legumes and mushrooms are star ingredients, and greens means leaves and brassicas.
+- 2026-10-29 · §7 · beans eaten whole in the pod are greens, and the legumes filter finds them too; potatoes are root veg.
 - 2026-10-21 · §7 · knife and fork and herbivore-ish are moods.
 - 2026-08-09 · §7 · #72 · per-recipe tag calls stand and are not "fixed" for consistency.
 - 2026-08-12 · §7 · #187 · eggs is a star ingredient only where the dish is about the egg.
@@ -165,7 +174,8 @@ argument and the rules each field is read by.
 - 2026-10-10 · §7 · feta does not count for cheese-tastic, even a whole baked block; burrata does.
 - 2026-10-10 · §7 · fiddly and fun needs a fiddle a cook would really do, and threading skewers is not one.
 - 2026-10-10 · §7 · a meatball on its own is one-handed food; on spaghetti or in a broth it is not.
-- 2026-10-10 · §7 · festive needs the dish to be the feast's own.
+- 2026-10-29 · §7 · festive needs the dish to be the feast's own, whatever the page it came from.
+- 2026-10-29 · §7 · dietary restrictions are not marked — Helen: "I don't mark dietary restrictions." No tag, note, field or question for vegan, gluten-free and the like, at ingest or after; a claim …
 - 2026-10-11 · §7 · a quiche, a tarte tatin, a soufflé and a salad that is the meal are a main; a plain cauliflower cheese and a sprout salad are extras.
 - 2026-08-01 · §8 · the ingredient picker stays, and so does title search.
 - 2026-08-16 · §8 · #281 · a bad candidate in the exclude (LEAVE OUT) picker is fixed for what ships, not for the drafts.
@@ -181,7 +191,7 @@ argument and the rules each field is read by.
 - 2026-09-07 · §8.2 · the shopping list has ten aisles, in shop order: produce, meat, fish, dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks, other.
 - 2026-09-07 · §8.2 · within an aisle the shopping list is alphabetical.
 - 2026-09-07 · §8.2 · the shopping list totals in grams and millilitres only; kg, l and cl fold into them, and tbsp, oz and bare counts are never converted.
-- 2026-09-07 · §8.2 · #815 · a recipe that states no number of people carries serves_estimate: in its own front matter, estimated at ingest and printed with a ~.
+- 2026-10-29 · §8.2 · serves_estimate is retired: every yield line opens with its own number, and Helen's words follow it.
 - 2026-09-07 · §8.2 · the shopping list never prints a recipe's yield after its name.
 - 2026-10-04 · §8.2 · #1125 · a by-eye measure scales; it is never held still, and one written with no number counts as one.
 - 2026-10-04 · §8.2 · #1286 · on a makes: recipe the scaler counts the thing made, in whole recipes: ×1, ×2, ×3.
@@ -200,7 +210,9 @@ argument and the rules each field is read by.
 - 2026-10-11 · §8.2 · a batch row says the thing made once: after the title where the title does not name it, with the title's own noun made singular.
 - 2026-10-11 · §8.2 · a makes: that opens with a number must name the thing ("16 bars", never "16").
 - 2026-10-11 · §8.2 · recipe names in the shopping list are links, set like the index row titles.
-- 2026-09-07 · §8.2 · #815 · a component recipe's serves_estimate takes its commonest use and a note on the recipe carries the rest; no schema is invented for it.
+- 2026-09-07 · §8.2 · #815 · a component recipe makes one thing and a note on the recipe carries its uses; no schema is invented for it.
+- 2026-10-30 · §8.2 · the shopping list quotes a yield's figure, never Helen's words after it; a measure after a count scales with it.
+- 2026-10-29 · §8.2 · a batch halves — Helen, on six "1 batch" recipes losing their ½: "Yes, half a batch is fine".
 - 2026-09-07 · §8.2 · #1118 · Undated, #1118 — the food scaler's box is as wide as the drink scaler's: two characters and the caret.
 - 2026-09-10 · §8.3 · #918 · shortlisted is a view, not a filter: it never combines with another filter.
 - 2026-09-15 · §8.3 · #1093 · a shortlist link is shown, not saved, and "keep these" makes it yours.

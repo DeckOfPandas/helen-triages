@@ -67,14 +67,6 @@
   text-transform: lowercase;
 }
 
-// `~` for an estimate, the shopping list's own mark (#815). Ink, not grey, so
-// it reads as part of the figure.
-.recipe-scale-approx {
-  color: $color-text;
-  font-weight: 600;
-  letter-spacing: normal;
-}
-
 // The step buttons: the shared shape (shared/_rule.scss), the interactive
 // colour at rest, lighter on hover and focus. The recipe page's accent, since
 // no section hue applies there (MANUAL §13.5).

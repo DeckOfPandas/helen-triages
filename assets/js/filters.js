@@ -669,6 +669,7 @@ function renderResultsPool() {
       var row = {
         tags: (li.dataset.tags || '').split(',').filter(Boolean),
         star: li.dataset.star || '',
+        starAlso: (li.dataset.starAlso || '').split(',').filter(Boolean),
         ingredients: (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); }),
         shortlisted: state.shortlisted
           ? (sharedKeys
@@ -1061,8 +1062,7 @@ function renderResultsPool() {
   }
 
   /* --- A `serves:` recipe counts people (#815) -------------------------------
-     `p` is its portion count: from `serves:`, or else `serves_estimate:`,
-     which arrives flagged `e` so yieldText() can mark it `~`.
+     `p` is its portion count, the number opening `serves:`.
 
      Can this recipe be scaled? Asked of the recipe, never of the store: a
      stored number is a preference, not a capability. */
@@ -1245,10 +1245,7 @@ function renderResultsPool() {
      so a `makes:` value is never printed behind the word "serves". */
   function yieldText(url) {
     var recipe = RECIPES[url];
-    if (!recipe) return '';
-    // An estimate is marked `~` (#815); a stated yield is quoted as written.
-    if (recipe.e) return recipe.p ? '~' + recipe.p + ' portions' : '';
-    if (!recipe.y) return '';
+    if (!recipe || !recipe.y) return '';
     return (recipe.k || 'serves') + ' ' + recipe.y;
   }
 
@@ -1299,7 +1296,7 @@ function renderResultsPool() {
           return '<li class="shopping-list-recipe--unscalable">' +
             '<span>' + HTF.escapeHtml(title) +
             '<span class="shopping-list-yield-missing">' +
-            'no serving size — add <code>serves_estimate:</code></span>' +
+            'no serving size — open <code>serves:</code> with a number</span>' +
             '</span></li>';
         }
 

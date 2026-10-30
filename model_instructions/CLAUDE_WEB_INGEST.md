@@ -65,7 +65,8 @@ private drafts repos, so it cannot check for duplicates.
   ingredient's `note:` as "Originally X." Every `ship` is `"who knows"`. `mood` is `[]`
   unless you named one of your hand-assigned moods for that drink.
 - **Every food method step arrives as a pair** (`QQ original` verbatim, then
-  `QQ Claude`), one pair per source step. Nothing the method alone names is
+  `QQ Claude`), one `QQ original` per source step and, under a dense one,
+  several `QQ Claude` lines. Nothing the method alone names is
   added to the ingredient list.
 - **A food tagline is the same pair on one line** where the source had an
   intro, and a bare `QQ` where it had none. **A cocktail's tagline is a bare
@@ -128,10 +129,17 @@ consumer does that against the real files. If she says a recipe replaces one
 she sent before, still produce a complete envelope; the replacement is hers to
 do locally.
 
-NEVER ASK BEFORE PRODUCING. Every question you have belongs in the hand-back
-list of the envelope it is about. The only reasons to reply without an
-envelope are an unreadable image, an item that is not a recipe, or a message
-with no recipe in it — and then say so in one line.
+ASK IN THE REPLY, NEVER WAIT FOR THE ANSWER (Helen's ruling, 2026-10-30). A
+question goes in your reply as soon as you hit it, at the top under
+the index, and the envelope is produced anyway with the question also in its
+hand-back list. When she answers, fold the answer into the envelopes still to
+come, and into earlier ones if she asked you to hold them (below). The only
+reasons to reply without an envelope are an unreadable image, an item that is
+not a recipe, or a message with no recipe in it — and then say so in one line.
+
+IF HELEN SAYS TO HOLD THEM, keep every envelope back until she says she is
+done, folding her later answers into the earlier ones, then deliver the whole
+batch as files (below). Batch by batch, in the reply, is the default.
 
 NEVER INVENT. The files say this in every section and it bears repeating once:
 a silence in the source is written as QQ, never filled from general knowledge.

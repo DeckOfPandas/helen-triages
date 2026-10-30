@@ -143,7 +143,7 @@ name you give is a courtesy rather than a contract.
 | `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
-| `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **Where the source gives little to go on, estimate anyway and say so in your list**: the session with her repository confirms every estimate with her when the file lands — her rule: "Claudes can check with me if unsure." |
+| the yield's number | **`serves:` opens with a number of people; `makes:` opens with a count of a named thing**: "16 slices", "2 loaf cakes", "one 8-inch cake", "950 ml", "1 batch" for a sauce or spice blend. The source's other words follow the figure: "4, depending on appetite". **One figure, not an alternative:** "9 large or 16 small biscuits" reads as nine of something called "large", so write the one the source leads with ("9 biscuits"). **`makes` is never read as people** however numeric it looks. **Where the source prints no figure, write `"QQ"`** and put a suggested one in your list (a round cake 12, a loaf 10, 18 cookies 9); never a guessed number in the file. There is no `serves_estimate` field: it is retired, and the suite refuses it. |
 | `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. **Not in the source? Estimate it, as `"Estimated 20 mins"`, and say so in your list** — Helen: *"I would like "Estimated 10 mins" to be written, then our tidying scripts block promotion for recipes with estimated times."* Her repository refuses to promote a recipe whose time still says `Estimated`, so a guess never publishes. Write `"QQ"` only where you cannot estimate at all. `cook_time: "None"` for a genuinely uncooked dish. |
 | `main_ingredients` | Section 4. Lowercase, a flat list. |
 | `star_ingredient` | Section 4. **Optional** — leave it out rather than force one. |
@@ -154,6 +154,7 @@ name you give is a courtesy rather than a contract.
 | `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen: "It's annoying for me to remember how to type YAML every time." The label is `"QQ"`, or `"QQ"`, a space and a short topic (`"QQ nutrition"`, `"QQ freezing"`); nothing else. She finds the `QQ`s, replaces the label with a real heading and the text with her own words, and never has to recall the shape. **A bare string note is not legal**: her suite refuses one. An empty pair (`label: ""`, `text: ""`) is the placeholder for a note you have nothing to put in yet, and the page does not print it. **If you have no note to add, write exactly that one empty pair — never `notes: []`**: it leaves Helen somewhere to type without recalling the shape. Three at most; more than that and the material wants to be prose. |
 | a tip printed under the source's own label | **Transcribe the tip; drop the label.** Good Food runs its asides under a standing `gf tip` rubric, which on her page is an abbreviation nobody can expand, or one that reads as *gluten-free*: a false allergen claim. `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence (*"the magazine likes Kallo"* stays). **Never carry an unexplained abbreviation across**: expand it while the source is in front of you, or drop it. |
 | a nutrition box, or badges | **Ignore them entirely**: kcal, fat, carbs, "per serving", and badges such as "gluten free", "iron", "2 of 5-a-day", "V". Not a note, not a line in your list. Helen: *"Drop them and add clear instructions for ingestion to ignore these."* |
+| a dietary claim — vegan, vegetarian, gluten-free, dairy-free | **Helen does not mark dietary restrictions.** Helen: *"I don't mark dietary restrictions."* Never add a tag, a note or a field for one, and never ask her to: there is no such filter and none is planned. A claim inside an intro you are quoting verbatim stays in that `QQ original`; it is not a question for your list. |
 | a "you will need" list | **Ignore it.** Cake rings, thermometers, palette knives and foil are never an ingredient group or a note. Helen: *"the rule is "trust the cook"."* |
 | page furniture | **Drop anything that sells something**: a show appearance, a ticket line or phone number, a book plug, a TV listing, a "next month" teaser, a web pointer, a "what to drink" box with bottles and prices. **Keep writing about the dish**: an essay, a bio of the cook, a boxed aside, which go in the body below the front matter. Helen: *"Drop ads, keep essays."* |
 | a sidebar box with no list | A box such as "Kale crisps" or "Mastering perfect mash" becomes a file in the usual shape (quantities lifted from its text, per §2) and **has no body**: its words are already in the `QQ original` lines, and a body repeating them would publish the book's text unmarked. |
@@ -192,8 +193,9 @@ What to get right, in descending order of how much it costs if wrong:
   one phase — use `name: ""` or omit `name`. **With more than one group,
   EVERY group needs a name, the first included**: a main block left unnamed
   above a `to serve` prints as an unlabelled list followed by labelled ones,
-  and her suite refuses it. Name the main block for the dish: `curry`, `pie`,
-  `salad`.
+  and her suite refuses it. **An unheaded first block is named for the dish or
+  its main component**, so it reads "For the beef:", "For the pie:": `curry`,
+  `pie`, `salad`, `beef`, `cake`. It is not a question for your list.
 
 **How a group's `name` is printed, which is what decides how to write it.**
 The page puts "For the " in front and a colon after, so `name: dressing` reads
@@ -309,23 +311,25 @@ remedy for a problem the instruction already prevents.
 
 A step may be two short sentences. It is often better as two.
 
-### One source step, one pair — never split a step
+### One `QQ original` per source step; split the rewrite where it is dense
 
-**A source step is one pair, however many actions it holds.** Helen's ruling:
-a file whose steps have been split is harder for her to read, not easier. So a
-step that makes a dough, proves it and lines a tin is one `QQ original` line
-holding the whole step, verbatim, and one `QQ Claude` line rewriting all of it.
+**A source step is one `QQ original` line, however many actions it holds, and
+as many `QQ Claude` lines under it as it needs.** Helen: *"I would like Claude
+to split out method lines where the written method is unhelpfully dense, so
+multiple QQ CLAUDE lines will be very helpful."* So a step that makes a dough,
+proves it and lines a tin is one `QQ original` line holding the whole step,
+verbatim, then a `QQ Claude` line for each thing a cook would stop and do.
 
 - **The `QQ original` line is the source's whole step**, exactly as printed,
-  however long.
-- **The `QQ Claude` line may run to several short sentences**, one per action.
-  That is where a long step is made readable: in the rewrite, not by cutting
-  the original.
+  however long. Never cut it.
+- **Split the `QQ Claude` rewrite only where the step is dense.** A short step
+  keeps one `QQ Claude` line; a step holding three stages gets three. Break at
+  the points a cook would pause, not at every clause.
 - **Never the other direction, and never a new order.** Two source steps are
-  never merged into one pair, and nothing moves ahead of what the source put
-  before it.
-- **`method_groups` is grouping, not splitting.** A step sits whole inside the
-  group it belongs to.
+  never merged under one `QQ original`, and nothing moves ahead of what the
+  source put before it.
+- **`method_groups` is grouping, not splitting.** A source step sits whole,
+  with all its `QQ Claude` lines, inside the group it belongs to.
 
 ### `method_groups` — split the phases here, or nobody ever will
 
@@ -365,7 +369,9 @@ resistance writes grouped ingredients and a flat method every time.
 So: **if you wrote more than one named ingredient group, the method almost
 certainly has the same phases. Write `method_groups:` and give the groups the
 same names.** A recipe whose ingredients split into `ragù` and `white sauce`
-does not have a one-phase method.
+does not have a one-phase method. **The method may add a phase no ingredient
+group matches**, one that only uses what is already made: `Assemble`, `To
+decorate`. A method group prints its name bare.
 
 **One phase means flat `method:`.** Do not invent a second group to use the
 field, and do not split a recipe the source ran as one sequence — that is
@@ -385,15 +391,24 @@ is correct for plenty of recipes.
   unlabelled pair 20 degrees apart is conventional and fan**, whichever order
   it is printed in: "180C/160C/gas 4" becomes "160°C fan". Helen: *"Oven
   pairings when one temp is 20 degrees lower than the other mean conventional
-  / fan, I'm just so sure."* Any other unlabelled pair, a single figure, or
-  350°F: the rewrite keeps what the source has and your list says so.
-  **The exception is a source Helen has ruled on**: check §5's list first.
-- **Weights: old-style recipes and almost all baking keep their ounces.**
-  Helen's ruling. Do not convert a baking recipe to metric. **A source in §5's
-  list says which figure of a printed pair to keep**, and that wins, baking
-  included.
-- **Never merge, split or reorder steps.** A source step becomes exactly one
-  pair — never fewer, never more, and never out of order.
+  / fan, I'm just so sure."* **A labelled fan figure wins even where the gas
+  mark disagrees**: "220C/200C fan/gas 6" is "200°C fan". Any other
+  unlabelled pair, a single figure, or 350°F: the rewrite keeps what the
+  source has and your list says so, once per book, so Helen can rule for the
+  whole source. **The exception is a source Helen has ruled on**: check §5's
+  list first.
+- **Weights: where the source prints metric and imperial, keep the metric**,
+  bakes included; ounces only where the source gives nothing else. Never
+  convert. Helen's ruling, and a source in §5's list may say otherwise.
+- **Never merge or reorder steps, and never cut a `QQ original`.** A source
+  step is one `QQ original`, with one `QQ Claude` line or, where it is dense,
+  several (§3). A step that straddles two phases stays whole in the earlier
+  method group.
+- **Times that disagree: `cook_time` takes the header's**, the method keeps
+  its own, and a `QQ` note names the mismatch.
+- **A clear typo in the ingredient list is fixed in `item:`** ("oregano
+  springs" is sprigs) and kept as printed in the `QQ original`; `QQ Claude`
+  lines are spelt right.
 - **A step that is really a note stays a step.** Freezer guidance mid-method is
   arguably misfiled, but moving it is restructuring somebody else's recipe.
 
@@ -452,10 +467,13 @@ Meanings you would not guess:
 - **`no-cook`** answers "can I put this on the table without cooking?" A spice
   blend is uncooked and a useless answer to that question, so it stays untagged.
   Melting chocolate is prep, not cooking: a fridge cake is `no-cook`.
-- **`make-ahead`** — a substantial part of the dish is genuinely finished ahead.
-  **A bake that merely keeps is not make-ahead** ("will keep three days in a
-  tin" describes leftovers), and **an overnight marinade is not make-ahead**
-  (real advance work, but the whole dish is still cooked at serving time).
+- **`make-ahead`** — all or most of the dish can be made in advance of when
+  you eat it: a convenience. **What is left on the day may be cooking, if it
+  is no more than cooking**: roast potatoes boiled and coated the day before
+  are make-ahead however long they roast. **A bake that merely keeps is not
+  make-ahead** ("will keep three days in a tin" describes leftovers), and
+  **an overnight marinade is not make-ahead** (the dish still has to be made
+  at serving time).
 - **`freezable`** and **`make-ahead`** are separate axes. Neither implies the
   other.
 - **`drinks`** is anything drinkable that is not a cocktail — a cordial, a hot
@@ -505,7 +523,10 @@ And the plainer ones, as Helen means them:
 - **`nibbles`** — finger food to pass round with drinks.
 - **`breakfast`** — eaten in the morning.
 - **`extras`** — not a dish by itself: sides, sauces, stocks, pickles, doughs.
-- **`festive`** — Christmas, or another named feast.
+- **`festive`** — Christmas, or another named feast, where the dish is the
+  feast's own. **A Christmas feature or a December issue does not make a dish
+  festive**, and the tag is used outside Christmas too: judge the dish, never
+  the page it was printed on.
 - **`starter`** — works as a first course at a dinner party.
 
 **Two or three tags is normal. None is legitimate.** Being wrong here is cheap
@@ -522,10 +543,14 @@ for her to fix, so propose rather than agonise — but propose only from the lis
 **It is the one thing the recipe is ABOUT, and about a quarter of her collection
 correctly leaves it blank.** A plain sponge, a dressing, a spice blend has no
 hero. Egg as a binder or a leavening mechanism is not `eggs`; a dish that is
-literally about the egg is. Squash counts as `root veg`. `greens` is leaves
-and brassicas only (kale, cabbage, sprouts, broccoli, cauliflower, chard,
-spinach); a tomato, courgette, pepper or leek dish has no star, and a bean,
-lentil or chickpea one is `legumes`. **If you find yourself
+literally about the egg is. `chocolate` is a dish that tastes of chocolate,
+cocoa powder alone included; cocoa as a colour is not. Squash and potatoes
+count as `root veg`. `greens`
+is leaves, brassicas and beans eaten whole in the pod (kale, cabbage, sprouts,
+broccoli, cauliflower, chard, spinach; green, fine and runner beans,
+mangetout, sugar snaps); a tomato, courgette, pepper or leek dish has no star,
+and a shelled bean, lentil or chickpea one is `legumes`. A pod-bean dish is
+starred `greens` and the legumes filter finds it too, by itself. **If you find yourself
 arguing for one, that is the signal to omit it.**
 
 ### `main_ingredients`

@@ -1016,24 +1016,16 @@ def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
         + "\n  ".join(problems)
     )
 
-    some = _scale_control(prod_site, "cherry-glaze") or ""
-    assert "data-portions=" in some and "portions</span>" in some and "data-made" not in some, (
-        "cherry-glaze (`makes: Some`) should keep the portions box, word and "
-        f"`~` -- Helen: 'retain the previous guess':\n{some}"
-    )
-    assert "data-whole-recipes" in some, (
-        "cherry-glaze should step in WHOLE RECIPES -- Helen: 'if \"some\" is "
-        "originally guessed to be 4 portions, 2x should be 8 portions' -- "
-        f"and its input no longer says so:\n{some}"
-    )
     served = _scale_control(prod_site, "moules-mariniere") or ""
     assert 'data-portions="4"' in served and "data-made" not in served, (
         f"a `serves:` recipe's scaler should be untouched:\n{served}"
     )
-    assert "data-whole-recipes" not in served, (
-        "a `serves:` recipe steps a portion at a time (#1005); moules "
-        f"marinière has been marked for whole-recipe steps:\n{served}"
-    )
+    # A portions box is a `serves:` recipe's alone: no page carries the old
+    # whole-recipe portions mode or the `~` of a guessed count.
+    stale = sorted(str(p.relative_to(prod_site)) for p in (prod_site / "food").rglob("index.html")
+                   if "data-whole-recipes" in (t := p.read_text(encoding="utf-8"))
+                   or "recipe-scale-approx" in t)
+    assert not stale, f"pages still carrying the estimate's markup: {stale}"
 
 
 # --- the garnish step reads as English (#1138, #1143) ------------------------
@@ -2245,13 +2237,76 @@ def _shopping_blob(site, page="index.html"):
     return json.loads(match.group(1))
 
 
-def test_every_recipe_reaches_the_page_with_a_portion_count(site):
-    """Every recipe in the blob has a portion count and names its yield's key.
+# --- star_also: a pod-bean greens dish answers the legumes filter too ---------
+# Two fixtures, so a build that stamps every greens row, or none, fails.
+STAR_ALSO_FIXTURE = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nsource_type: unknown\nserves: "2"\n'
+    'main_ingredients: [{ing}]\nstar_ingredient: "greens"\ntags: []\n'
+    'ingredient_groups:\n  - items:\n    - item: "salt"\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: true\n---\n')
+STAR_ALSO_CASES = {
+    "zzz-star-also-beans": ('"Green Beans", "hazelnuts"', "legumes"),
+    "zzz-star-also-kale": ('"kale"', None),
+}
+_in_the_fixture_build({
+    f"_food_recipes/{slug}.md": STAR_ALSO_FIXTURE.format(t=slug, ing=ing)
+    for slug, (ing, _) in STAR_ALSO_CASES.items()})
 
-    tests/test_food_shopping.py proves each recipe resolves to a number from
-    the data files; this proves the number reached the page, which fails if
-    the plugin stops running or returns early. Drafts are not let off (#815).
-    `k` keeps a `makes:` from printing behind the word "serves".
+
+YIELD_ALSO_FIXTURE = (
+    '---\ntitle: "zzz-yield-also"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nsource_type: unknown\nmakes: "1 batch, about 100 g"\n'
+    'main_ingredients: ["salt"]\ntags: []\n'
+    'ingredient_groups:\n  - items:\n    - amount: "100 g"\n      item: "salt"\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: true\n---\n')
+_in_the_fixture_build({"_food_recipes/zzz-yield-also.md": YIELD_ALSO_FIXTURE})
+
+
+def test_a_measure_after_the_count_is_printed_with_it(fixture_site):
+    """"1 batch, about 100 g" builds a box of 1 and the word "batch, about 100
+    g"; assets/js/food-scale.js moves the grams with the box from there."""
+    page = fixture_site / "food" / "recipes" / "zzz-yield-also" / "index.html"
+    html = page.read_text(encoding="utf-8")
+    said = re.search(r'<span class="recipe-scale-word">(.*?)</span>', html, re.S)
+    assert said and " ".join(said.group(1).split()) == "batch, about 100 g", (
+        f"the built control says {said.group(1) if said else None!r}"
+    )
+    assert '"also":{"prefix":"about","base":100,"unit":"g"}' in html.replace("&quot;", '"'), (
+        "the input's data-made lost the measure that scales with the count"
+    )
+
+
+def test_a_pod_bean_greens_row_also_answers_legumes(fixture_site):
+    """`star_also` in _data/food/taxonomy.yml reaches the built index row as
+    `data-star-also`, matched case-blind on main_ingredients (DECISIONS §7).
+
+    filter-state.js reads the attribute; tests/js/filter-state.test.js holds
+    the matching. This holds the Liquid that writes it.
+    """
+    html = (fixture_site / "food" / "index.html").read_text(encoding="utf-8")
+    for slug, (_, wanted) in STAR_ALSO_CASES.items():
+        row = re.search(rf'<li data-url="[^"]*/{slug}/"[^>]*>', html)
+        assert row, f"the fixture {slug} has no row on the built food index"
+        got = re.search(r'data-star-also="([^"]*)"', row.group(0))
+        assert (got.group(1) if got else None) == wanted, (
+            f"{slug}: data-star-also is {got.group(1) if got else None!r}, "
+            f"wanted {wanted!r}. Row: {row.group(0)[:200]}"
+        )
+
+
+def test_every_recipe_reaches_the_page_with_a_portion_count(site):
+    """Every recipe in the blob has something to count and names its yield's key.
+
+    That is a portion count `p`, or `m`, what a `makes:` line counts, on a
+    recipe the list scales in batches (#1286, #1297). tests/test_food_shopping.py
+    proves each recipe resolves to one from the data files; this proves it
+    reached the page, which fails if the plugin stops running or returns early.
+    Drafts are let off only where the yield is still Helen's `QQ`, which has no
+    scaler until she answers it (DECISIONS §4). `k` keeps a `makes:` from
+    printing behind the word "serves".
     """
     blob = _shopping_blob(site)
     assert len(blob) > 80, (
@@ -2259,12 +2314,23 @@ def test_every_recipe_reaches_the_page_with_a_portion_count(site):
         "86 plus the magic bag. The plugin or the row gate has changed."
     )
 
-    unscalable = sorted(u for u, r in blob.items() if not r.get("p"))
+    unscalable = sorted(u for u, r in blob.items()
+                        if not r.get("p") and not (r.get("w") and r.get("m"))
+                        and not ("/drafts/" in u and str(r.get("y")).strip() == "QQ"))
     assert not unscalable, (
-        "these recipes reached the page with no portion count, so the shopping "
-        f"list can draw no box for them: {unscalable}. Add `serves_estimate:` "
-        "to the recipe."
+        "these recipes reached the page with nothing to count, so the shopping "
+        f"list can draw no box for them: {unscalable}. Open `serves:` with a "
+        "number, or `makes:` with a count of a named thing."
     )
+
+    # The list quotes the yield up to Helen's own words, which stay on the page:
+    # "4, depending on appetite" is "4" (`yield_lead`, _plugins/food_yield.rb).
+    leads = {"/food/recipes/smoked-mackerel-pate/": "4",
+             "/food/recipes/caramel/": "1 batch",
+             "/food/recipes/grandmas-scones/": "8 scones"}
+    wrong = {u: (blob.get(u, {}).get("y"), want) for u, want in leads.items()
+             if blob.get(u, {}).get("y") != want}
+    assert not wrong, f"the shopping list quotes more than the yield's figure: {wrong}"
 
     empty = sorted(u for u, r in blob.items() if not r.get("i"))
     assert not empty, (

@@ -3,8 +3,7 @@ title: "Cherry Glaze"
 tagline: "A sweet-sour reduction, excellent with [five-spice duck](../five-spice-crispy-duck-legs/)."
 source: "Adapted from Gordon Ramsay"
 source_type: author
-makes: "Some"
-serves_estimate: 4
+makes: "1 batch"
 prep_time: "5 mins"
 cook_time: "20 mins"
 main_ingredients: ["honey", "dark soy sauce", "red wine vinegar", "chicken stock", "cherries"]

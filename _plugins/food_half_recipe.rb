@@ -37,7 +37,7 @@ module HelenTriages
       # because there are two: _plugins/food_shopping.rb and
       # scripts/food_yield.rb.
       by_eye = Array(by_eye) + Array(vocab["by_eye_also"]).map(&:to_s)
-      verdict = yield_halves(made, portions)
+      verdict = yield_halves(made, portions, Array(vocab["halvable_yields"]).map(&:to_s))
       return verdict unless verdict["ok"]
 
       Array(groups).each do |group|
@@ -53,10 +53,14 @@ module HelenTriages
       { "ok" => true, "why" => verdict["why"] }
     end
 
-    def yield_halves(made, portions)
+    def yield_halves(made, portions, halvable = [])
       if made
         half = made["base"].to_f / 2
         thing = made["kind"] == "measure" ? made["unit"] : made["stem"]
+        noun = thing.to_s.split.last.to_s.downcase
+        if half < 1 && made["kind"] == "count" && halvable.include?(noun)
+          return { "ok" => true, "why" => "half a #{noun} is a real amount (#{made['box']} #{thing})" }
+        end
         if half < 1
           return { "ok" => false, "why" => "the yield is #{made['box']} #{thing}: half is less than one" }
         end

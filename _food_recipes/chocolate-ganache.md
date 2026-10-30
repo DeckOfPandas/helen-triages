@@ -3,8 +3,7 @@ title: "Chocolate Ganache"
 tagline: "Ganache sometimes fails, and [sometimes I am involved](#tips)."
 source: "A lifetime of grainy, oily, solid, inedible regret."
 source_type: joke
-makes: "N/A, bring a spoon"
-serves_estimate: 8
+makes: "1 batch — N/A, bring a spoon"
 prep_time: "5 mins"
 cook_time: "15 mins"
 main_ingredients: ["dark chocolate", "double cream", "unsalted butter"]

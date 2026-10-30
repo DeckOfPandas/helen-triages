@@ -49,7 +49,7 @@ module HelenTriages
       measure = leading_measure(rest, Array(vocab["measures"]))
       if measure
         # One figure, a whole one. A range of a volume or a decimal litre returns
-        # nil and keeps the portions box.
+        # nil and is not read.
         return nil unless low == high && low == low.to_i && low >= 1
         return {
           "kind" => "measure", "base" => low.to_i, "low" => low.to_i,
@@ -64,6 +64,7 @@ module HelenTriages
       return nil if rest.match?(/\Aor\b/i)
       thing = rest.split(THING_END, 2).first.to_s.strip
       return nil if thing.empty?
+      also = also_measure(rest, approx, Array(vocab["measures"]))
 
       # The noun that takes the plural is the one before "of": "2 large rounds
       # of 4" is rounds. Everything from " of " on is carried along unchanged.
@@ -89,8 +90,41 @@ module HelenTriages
         "times" => stem.match?(/\A\d/),
         # "64+": at least this many. The mark stays on the figure as it scales.
         "plus" => plus,
-        "box" => box(base) + (plus ? "+" : "")
+        "box" => box(base) + (plus ? "+" : ""),
+        # "1 batch, about 100 g": a measure straight after the thing, which
+        # scales with the count. nil when the line has none.
+        "also" => also
       }
+    end
+
+    # The words before the first THING_END: what a scaler quotes of a yield
+    # line. "6, depending on appetite" is "6"; Helen's words stay on the page.
+    def lead(text)
+      text.to_s.split(THING_END, 2).first.to_s.strip
+    end
+
+    # {"prefix", "base", "unit"} for ", [about] N unit" right after the thing,
+    # ending the line or at the next THING_END; else nil.
+    def also_measure(rest, approx, measures)
+      m = THING_END.match(rest)
+      return nil unless m && m[0].strip == ","
+      after = m.post_match.strip
+      prefix = ""
+      unless approx.empty?
+        pattern = /\A(#{approx.map { |w| Regexp.escape(w) }.join("|")})(?=\s)\s+/i
+        if (p = pattern.match(after))
+          prefix = p[1]
+          after = p.post_match
+        end
+      end
+      n = /\A(#{NUMBER})(?=\s)\s*/.match(after)
+      return nil unless n
+      unit = leading_measure(n.post_match, measures)
+      return nil unless unit
+      tail = n.post_match[unit.length..].to_s
+      return nil unless tail.strip.empty? || THING_END.match?(tail) && tail.index(THING_END).zero?
+      value = n[1].to_f
+      { "prefix" => prefix, "base" => (value == value.to_i ? value.to_i : value), "unit" => unit }
     end
 
     # The box is an integer or, where a figure lands on a half, a range of one:

@@ -277,6 +277,11 @@ else has already done (MANUAL §9.1).
   "next month", a web pointer, a wine box (*"Drop ads, keep essays"*). An essay
   or a bio about the dish is kept, in the body. **A sidebar box with no list
   has no body**: its words are already its `QQ original` lines.
+- **No dietary marking, ever.** Helen: *"I don't mark dietary restrictions."*
+  Vegan, gluten-free and their kin get no tag, note or question; a claim in a
+  verbatim intro stays in its `QQ original`.
+- **`festive` is judged on the dish, not the page.** A Christmas feature does
+  not make a dish festive, and the tag is used at other feasts too.
 - **The ingredient list is the source's own list; never add to it from the
   method.** Helen: *"We shouldn't list incidentals. We can trust the cook."*
   "Pour over 75 ml boiling water", "a pinch of salt", flour for dusting: none
@@ -299,18 +304,18 @@ else has already done (MANUAL §9.1).
   wrong field renders unstyled with no error anywhere.
 - **Size words with the count** -- `amount: "2 large"`, not `item: "large
   onions"`.
-- **`serves_estimate:` on any FOOD recipe whose `serves:` does not open with a
-  number** -- an integer, PEOPLE, unquoted, sitting under the
-  `serves:`/`makes:` line it estimates from. `makes: "About 750 ml"`,
-  `makes: "one 8-inch cake"` and `serves: "Depends on appetite"` all need one;
-  **`makes:` is never read as people** however numeric it looks. The shopping
-  list divides by this, and a recipe without one gets no scaler at all. Read it
-  off the recipe: a round cake 12, a loaf 10, a 950 ml tub of ice cream 8,
-  18 cookies 9 (two each), 12 Yorkshire puddings 6. **Where the source gives
-  little to go on -- `serves: QQ`, "Some", "however many you make" -- estimate
-  anyway and put the figure on her list**; a web Claude may do the same, and
-  the next local pass confirms it with her. Helen: *"Claudes can check with me
-  if unsure."*
+- **A FOOD recipe's yield opens with its number**: `serves:` with a number
+  of people, or `makes:` with a count of a named thing -- `"16 slices"`,
+  `"2 loaf cakes"`, `"one 8-inch cake"`, `"About 750 ml"`, `"1 batch"` for a
+  sauce or a spice blend. Any words the source adds follow the figure
+  (`"4, depending on appetite"`). **One figure, never an alternative**: "9
+  large or 16 small biscuits" reads as nine "large", so it is `"9 biscuits"`.
+  `ruby scripts/food_yield.rb "<line>"` says how a line reads. **`makes:` is
+  never read as people** however numeric it looks. **Where the source gives
+  no figure, the yield is `"QQ"`**, with a suggested figure on her list (a
+  round cake 12, a loaf 10, 18 cookies 9): never a guessed number in the
+  file. A `QQ` yield has no scaler until she answers it. There is no
+  `serves_estimate:`; it is retired (DECISIONS §4).
 - **Split `ingredient_groups` and `method_groups`** -- once, here, and never
   again afterwards. Phases are usually obvious from the source and re-reading
   the recipe later to find them is the expensive way.
@@ -323,7 +328,10 @@ else has already done (MANUAL §9.1).
   - **So use this trigger: if you wrote more than one NAMED ingredient group,
     the method almost certainly has the same phases.** Write `method_groups:`
     and **give the groups the same names**. A recipe whose ingredients split
-    into `ragù` and `white sauce` does not have a one-phase method.
+    into `ragù` and `white sauce` does not have a one-phase method. The
+    method may add a phase no ingredient group matches (`Assemble`, `To
+    decorate`), and a source step that straddles two phases stays whole in
+    the earlier one.
   - The converse still holds and is not a licence: one phase means one unnamed
     ingredient group and a flat `method:`. Do not split a sequence the source
     ran as one.
@@ -333,7 +341,9 @@ else has already done (MANUAL §9.1).
     finish`, `to decorate`, `to garnish` read "To finish:" with no "For the".
     So keep the source's "To finish" as `to finish`, lowercase, and never
     nounify it. A bare verb is the other trap: `assemble` prints "For the
-    assemble:", so a block the source heads that way is `to assemble`. A method
+    assemble:", so a block the source heads that way is `to assemble`. A first
+    block the source leaves unheaded is named for the dish or its main
+    component (`beef`, `pie`), unasked (DECISIONS §4). A method
     group prints its name bare, with no prefix at all, which is why a narrative
     phase is fine there.
   - **Quote every group name, on both sides**: `- name: "dressing"`,
@@ -370,10 +380,12 @@ else has already done (MANUAL §9.1).
 
   She keeps both so she can judge the rewrite rather than trust it blind.
 
-  **One source step is one pair, however many actions it holds.** The `QQ
-  original` line is the source's whole step, verbatim; the `QQ Claude` line
-  rewrites all of it, in several short sentences where it needs them. Never
-  split a step, never merge two, never reorder.
+  **One source step is one `QQ original`, however many actions it holds, and
+  a dense one gets several `QQ Claude` lines under it** (DECISIONS §4). Helen:
+  *"I would like Claude to split out method lines where the written method is
+  unhelpfully dense, so multiple QQ CLAUDE lines will be very helpful."* The
+  original is the source's whole step, verbatim; the rewrite breaks where a
+  cook would pause. Never cut an original, never merge two, never reorder.
 
   **WHAT HER OWN REWRITE LOOKS LIKE, once she's actually cooked from a `QQ
   Claude` line** (`sticky-squidge-ginger-loaf.md`). She asked for the
@@ -390,9 +402,9 @@ else has already done (MANUAL §9.1).
     into one continuous action, but split one of mine (cooling, then
     wrapping-and-storing) into two -- because those are two things you might
     actually stop and do separately. Not "fewer steps" or "more steps": one
-    step per thing you'd pause at. Inside a `QQ Claude` line that is a matter
-    of where the sentences break, since the pair itself follows the source's
-    step.
+    step per thing you'd pause at. That is where a dense source step's `QQ
+    Claude` lines divide; the `QQ original` above them still follows the
+    source's step.
   - **State the expected result plainly instead of hedging with a check.**
     Mine: "Check it early -- a skewer inserted into the centre should come out
     with a few sticky, wet crumbs attached. Don't overbake." Hers: "It will

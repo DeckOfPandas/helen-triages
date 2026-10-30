@@ -298,7 +298,23 @@ permalink: /food/
          changed. HTF.shortlist's comment in assets/js/assets.js has the argument. An
          attribute on the row because filters.js asks once per row per filter pass.
       {% endcomment %}
-      <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}">
+      {% comment %} `data-star-also`: the other stars this row answers, from
+         `star_also` in _data/food/taxonomy.yml. The badge names only `data-star`. {% endcomment %}
+      {% assign _star_also = "" %}
+      {% for _rule in site.data.food.taxonomy.star_also %}
+        {% if recipe.star_ingredient == _rule.from %}
+          {% for _ing in recipe.main_ingredients %}
+            {% assign _ing_key = _ing | downcase %}
+            {% if _rule.main_ingredients contains _ing_key %}
+              {% unless _star_also contains _rule.star %}
+                {% if _star_also != "" %}{% assign _star_also = _star_also | append: "," %}{% endif %}
+                {% assign _star_also = _star_also | append: _rule.star %}
+              {% endunless %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+      <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}"{% if _star_also != "" %} data-star-also="{{ _star_also }}"{% endif %} data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}">
 
         <div class="recipe-row-content">
         <a class="recipe-title-link" href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
@@ -387,8 +403,8 @@ permalink: /food/
 
 {% comment %} The shopping list (#801), copied from cocktails/index.html down to the
    class names, without costing. It appears only while the shortlisted filter
-   is on. A `serves:` recipe's box counts portions (people), resolved by
-   _plugins/food_shopping.rb from `serves:` or `serves_estimate:`; a `makes:`
+   is on. A `serves:` recipe's box counts portions (people), the number
+   _plugins/food_shopping.rb reads off `serves:`; a `makes:`
    recipe's box counts batches (#1297), which is why "set all to N portions"
    leaves those rows alone. `data-whole-measures` is the by-eye measures whose
    totals are bought in whole ones. {% endcomment %}
@@ -435,14 +451,13 @@ permalink: /food/
   </button>
 </details>
 
-{% comment %} What each recipe is made of, and how many it feeds (#801). Every recipe:
-   the shortlist lives in localStorage and the build cannot know it.
-   _plugins/food_shopping.rb computed `shopping`, `portions` and
-   `portions_estimated`; this copies them out. The row gate above is repeated
-   here, magic-bag exemption included, or a draft's ingredients ride into a
-   production build. `k` says which of `serves` and `makes` `y` came from;
-   `w`, `h` and `m` are a `makes:` recipe's batch figures (#1297). Each value
-   goes through `jsonify`, never hand-quoted. {% endcomment %}
+{% comment %} What each recipe is made of, and how many it feeds (#801), for every recipe:
+   the shortlist is in localStorage, which the build cannot see. The row gate
+   above is repeated, magic-bag exemption included, or a draft's ingredients
+   ride into a production build. `y` is the yield up to Helen's own words
+   (`yield_lead`: "6, depending on appetite" is "6"), `k` which key it came
+   from; `w`, `h` and `m` are a `makes:` recipe's batch figures (#1297). Each
+   value goes through `jsonify`, never hand-quoted. {% endcomment %}
 <script type="application/json" id="recipe-ingredients">
 {
 {%- assign _first_recipe = true -%}
@@ -451,7 +466,7 @@ permalink: /food/
 {%- if recipe.collection == "food_magic_bag" %}{% assign _mb = true %}{% endif -%}
 {%- if recipe.meta.rewritten or site.show_source_wording or _mb -%}
 {%- unless _first_recipe %},{% endunless %}{%- assign _first_recipe = false %}
-{{ recipe.url | jsonify }}:{"p":{% if recipe.portions %}{{ recipe.portions }}{% else %}null{% endif %},"e":{{ recipe.portions_estimated | default: false }},"y":{{ recipe.serves | default: recipe.makes | jsonify }},"k":{% if recipe.serves %}"serves"{% else %}"makes"{% endif %}{% if recipe.whole_recipes %},"w":true,"h":{% if recipe.half_recipe %}true{% else %}false{% endif %},"m":{% if recipe.made %}{{ recipe.made | jsonify }}{% else %}null{% endif %}{% endif %},"i":[
+{{ recipe.url | jsonify }}:{"p":{% if recipe.portions %}{{ recipe.portions }}{% else %}null{% endif %},"y":{{ recipe.yield_lead | jsonify }},"k":{% if recipe.serves %}"serves"{% else %}"makes"{% endif %}{% if recipe.whole_recipes %},"w":true,"h":{% if recipe.half_recipe %}true{% else %}false{% endif %},"m":{% if recipe.made %}{{ recipe.made | jsonify }}{% else %}null{% endif %}{% endif %},"i":[
 {%- for ing in recipe.shopping -%}
 {% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}{% if ing.parts %},"pt":{{ ing.parts | jsonify }}{% endif %}{% if ing.fruit %},"f":{{ ing.fruit | jsonify }},"c":{{ ing.count | jsonify }}{% endif %}{% if ing.pointer %},"x":true{% endif %}}
 {%- endfor -%}

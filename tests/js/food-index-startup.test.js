@@ -44,34 +44,34 @@ const SCRIPTS = [
   'shortlist-export.js'
 ];
 
-/* Hand-built, and small enough to read in one screen. `b` is the guessed one
-   (`e: true`): the tilde on a guessed serving size is the only thing on the
-   page saying a number is this repo's and not Helen's. */
+/* Hand-built, and small enough to read in one screen. `y` is what the build
+   hands over, the yield up to Helen's own words: `b`'s recipe says "6,
+   depending on appetite" and the list is given "6". */
 const RECIPES = {
   '/food/recipes/a/': {
-    p: 4, e: false, y: '4', k: 'serves',
+    p: 4, y: '4', k: 'serves',
     i: [{ a: '200 g', n: 'plain flour', s: 'cupboard' },
       { a: '2', n: 'onions', s: 'produce' },
       { a: '', n: 'olive oil', s: 'cupboard' }]
   },
   '/food/recipes/b/': {
-    p: 6, e: true, y: 'Depends on appetite', k: 'serves',
+    p: 6, y: '6', k: 'serves',
     i: [{ a: '300 g', n: 'plain flour', s: 'cupboard' },
       { a: '1', n: 'onion', s: 'produce' }]
   },
   /* The two `makes:` recipes, which count batches (#1297). `w` is
      page.whole_recipes, `h` page.half_recipe, `m` page.made: the figures the
      recipe page's own scaler reads (#1286). The gelato makes a measure and may
-     be halved; the cookies make a count and may not. Both carry `p`, the
-     `serves_estimate`, which the batch box never reads. */
+     be halved; the cookies make a count and may not. Neither has `p`: a
+     `makes:` recipe counts people nowhere. */
   '/food/recipes/gelato/': {
-    p: 6, e: true, y: 'About 750 ml', k: 'makes', w: true, h: true,
+    p: null, y: 'About 750 ml', k: 'makes', w: true, h: true,
     m: { kind: 'measure', base: 750, unit: 'ml', box: '750' },
     i: [{ a: '125 ml', n: 'whipping cream', s: 'dairy' },
       { a: '500 ml', n: 'whole milk', s: 'dairy' }]
   },
   '/food/recipes/cookies/': {
-    p: 9, e: true, y: '18 cookies', k: 'makes', w: true, h: false,
+    p: null, y: '18 cookies', k: 'makes', w: true, h: false,
     m: { kind: 'count', base: 18, stem: 'cookies', rest: '', box: '18' },
     i: [{ a: '100 g', n: 'peanut butter', s: 'cupboard' },
       { a: '1', n: 'egg', s: 'dairy' }]
@@ -101,19 +101,19 @@ const TITLES = {
    `options.recipes`, so the standing fixture is unchanged. */
 const SINGLE_THINGS = {
   '/food/recipes/cake/': {
-    p: 12, e: true, y: 'one 8-inch cake', k: 'makes', w: true, h: false,
+    p: null, y: 'one 8-inch cake', k: 'makes', w: true, h: false,
     m: { kind: 'count', base: 1, stem: '8-inch cake', rest: '', box: '1',
       singular: true, times: true, invariable: false },
     i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
   },
   '/food/recipes/sauce/': {
-    p: 4, e: true, y: '1 jar', k: 'makes', w: true, h: false,
+    p: null, y: '1 jar', k: 'makes', w: true, h: false,
     m: { kind: 'count', base: 1, stem: 'jar', rest: '', box: '1',
       singular: true, times: false, invariable: false },
     i: [{ a: '200 g', n: 'peanuts', s: 'cupboard' }]
   },
   '/food/recipes/pies/': {
-    p: 12, e: true, y: '1 dozen mince pies', k: 'makes', w: true, h: false,
+    p: null, y: '1 dozen mince pies', k: 'makes', w: true, h: false,
     m: { kind: 'count', base: 1, stem: 'dozen mince pies', rest: '', box: '1',
       singular: true, times: false, invariable: true },
     i: [{ a: '300 g', n: 'mincemeat', s: 'cupboard' }]
@@ -369,9 +369,7 @@ test('the yield is on the control, never printed beside the name', () => {
     + '_sass/food/_shopping-list.scss before putting it back.');
   // Still SAID, so it is there on hover and for a screen reader.
   assert.ok(html.includes('which serves 4'), 'the stated serving size, quoted');
-  assert.ok(html.includes('which ~6 portions') || html.includes('~6 portions'),
-    'a guessed serving size must still carry its tilde somewhere -- it is the '
-    + 'only thing saying the number came from _data/food/servings.yml.');
+  assert.ok(html.includes('which serves 6'), 'the figure is quoted');
   assert.ok(html.includes('title='), 'the yield is reachable on hover');
 });
 
@@ -590,7 +588,7 @@ test('one thing that IS the dish, and is not in its name, follows the name', () 
   // plural above one.
   const recipes = {
     '/food/recipes/cake/': {
-      p: 12, e: true, y: 'one traybake', k: 'makes', w: true, h: false,
+      p: null, y: 'one traybake', k: 'makes', w: true, h: false,
       m: { kind: 'count', base: 1, stem: 'traybake', rest: '', box: '1',
         singular: true, times: false, invariable: false },
       i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
@@ -625,13 +623,13 @@ test('a batch says what it is a batch OF when the title does not', () => {
   // title already says cookies; a dozen stays a dozen.
   const recipes = {
     '/food/recipes/cake/': {
-      p: 12, e: true, y: '24 squares', k: 'makes', w: true, h: false,
+      p: null, y: '24 squares', k: 'makes', w: true, h: false,
       m: { kind: 'count', base: 24, stem: 'squares', rest: '', box: '24' },
       i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
     },
     '/food/recipes/cookies/': RECIPES['/food/recipes/cookies/'],
     '/food/recipes/pies/': {
-      p: 12, e: true, y: 'about 3 dozen', k: 'makes', w: true, h: false,
+      p: null, y: 'about 3 dozen', k: 'makes', w: true, h: false,
       m: { kind: 'count', base: 3, stem: 'dozen', rest: '', box: '3', invariable: true },
       i: [{ a: '300 g', n: 'mincemeat', s: 'cupboard' }]
     }
@@ -787,18 +785,15 @@ test('a portions number left in the store is not read as batches', () => {
   assert.match(aislesHtml(panel), /125 ml/);
 });
 
-test('an estimate is marked with a ~ and a stated serving size is not', () => {
-  // #815: the tilde is the only thing saying a figure was estimated rather
-  // than written down.
+test('no figure is marked as a guess: every one is the recipe\'s own', () => {
+  // serves_estimate is retired, so nothing on the list prints a `~`.
   const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');   // serves: "4"
-  win.HTF.shortlist.toggle('/food/recipes/b/');   // serves_estimate: 6
+  ['/food/recipes/a/', '/food/recipes/b/', '/food/recipes/gelato/'].forEach(
+    (u) => win.HTF.shortlist.toggle(u));
   showTheList(doc);
-
-  const html = recipesHtml(panel);
-  assert.ok(html.includes('~6 portions'), 'the estimate carries its tilde');
-  assert.ok(html.includes('which serves 4'), 'the stated one is quoted');
-  assert.ok(!html.includes('~4'), 'a stated serving size is never marked');
+  assert.ok(!recipesHtml(panel).includes('~'), 'a figure is marked as estimated');
+  assert.ok(recipesHtml(panel).includes('which makes About 750 ml'),
+    'a makes: recipe quotes its own yield');
 });
 
 test('a by-eye measure is totalled to a whole one, from the panel\'s own list', () => {
@@ -807,7 +802,7 @@ test('a by-eye measure is totalled to a whole one, from the panel\'s own list', 
   const { win, doc, panel } = boot({
     recipes: {
       '/food/recipes/a/': {
-        p: 4, e: false, y: '4', k: 'serves',
+        p: 4, y: '4', k: 'serves',
         i: [{ a: '1 handful', n: 'parsley', s: 'produce' }]
       }
     }
@@ -823,7 +818,7 @@ test('the juice and the zest of one lemon is one lemon, on the real wiring', () 
   const { win, doc, panel } = boot({
     recipes: {
       '/food/recipes/a/': {
-        p: 4, e: false, y: '4', k: 'serves',
+        p: 4, y: '4', k: 'serves',
         i: [{ a: '', n: 'juice of 1 lemon', s: 'produce', pt: ['juice'], f: 'lemon', c: '1' },
           { a: '', n: 'zest of 1 lemon', s: 'produce', pt: ['zest'], f: 'lemon', c: '1' },
           { a: '85 ml', n: 'olive oil', s: 'cupboard' },
@@ -847,7 +842,7 @@ test('A STORED NUMBER CANNOT RESURRECT A BOX THE RECIPE CANNOT SUPPORT', () => {
   const { win, doc, panel } = boot({
     recipes: {
       '/food/recipes/a/': {
-        p: null, e: false, y: 'Depends on appetite', k: 'serves',
+        p: null, y: 'Depends on appetite', k: 'serves',
         i: [{ a: '125 ml', n: 'whipping cream', s: 'cupboard' }]
       }
     }
@@ -865,13 +860,12 @@ test('A STORED NUMBER CANNOT RESURRECT A BOX THE RECIPE CANNOT SUPPORT', () => {
 });
 
 test('a recipe with NO portion count gets no box, and says why', () => {
-  /* What a new recipe looks like between being written and being given its
-     `serves_estimate:`. It contributes at x1 and says what is missing, rather
-     than offering a control that does nothing. */
+  /* A draft whose yield is still Helen's `QQ`. It contributes at x1 and says
+     what is missing, rather than offering a control that does nothing. */
   const { win, doc, panel } = boot({
     recipes: {
       '/food/recipes/a/': {
-        p: null, e: false, y: 'A crowd', k: 'serves',
+        p: null, y: 'QQ', k: 'serves',
         i: [{ a: '200 g', n: 'plain flour', s: 'cupboard' }]
       }
     }
@@ -882,7 +876,7 @@ test('a recipe with NO portion count gets no box, and says why', () => {
   const html = recipesHtml(panel);
   assert.ok(!html.includes('<input'), 'no control that cannot work');
   assert.match(html, /no serving size/);
-  assert.match(html, /serves_estimate/, 'the note names the key to add');
+  assert.match(html, /open <code>serves:<\/code> with a number/, 'the note says what to write');
   // Its ingredients still count, at the recipe as written.
   assert.match(aislesHtml(panel), /200 g/);
 });
@@ -1276,7 +1270,7 @@ test('#1297: what was not scaled is named under the rows, in her format', () => 
   const { win, doc, panel } = boot({
     recipes: {
       '/food/recipes/a/': {
-        p: 4, e: false, y: '4', k: 'serves',
+        p: 4, y: '4', k: 'serves',
         i: [{ a: '200 g', n: 'plain flour', s: 'cupboard' },
           { a: '', n: 'olive oil', s: 'cupboard' },
           { a: 'some', n: 'salt', s: 'cupboard' },

@@ -326,17 +326,13 @@
   }
 
   /**
-   * The mode for a control that says "portions".
+   * The mode for a control that says "portions": a `serves:` recipe, one
+   * portion at a time (#1005). A `makes:` recipe always has a `yieldMode`.
    * @param {number} base - how many the recipe feeds
-   * @param {boolean} [whole] - true on a `makes:` recipe whose yield has no
-   *        count to show ("Some"): the box still says portions, and steps in
-   *        whole recipes -- 4, 8, 12
-   * @param {boolean} [half] - the build's verdict that x½ is offered
    */
-  function portionsMode(base, whole, half) {
+  function portionsMode(base) {
     var box = function (n) { return String(n); };
     var word = function () { return null; };       // the markup's word stands
-    if (whole) return wholeRecipes(base, box, word, half);
     return {
       base: base,
       clamp: function (n) { return Math.min(MAX_MULTIPLE, Math.max(1, Math.round(n))); },
@@ -348,9 +344,12 @@
 
   /* A figure on a half is shown as a range of one: 5.5 reads "5–6". The
      ingredients scale by the whole multiple, so the half never reaches them.
-     _plugins/food_yield.rb applies the same rule to the page as built. */
+     _plugins/food_yield.rb applies the same rule to the page as built. Half of
+     one is "½": only a `halvable_yields` thing (scaling.yml), "½ batch", gets
+     there. */
   function yieldBox(value) {
     if (value === Math.floor(value)) return String(value);
+    if (value === 0.5) return '½';
     return Math.floor(value) + '–' + Math.ceil(value);
   }
 
@@ -367,12 +366,23 @@
      thing that opens with a digit: "2 × 8-inch cakes". */
   function thingText(spec, value) {
     var stem = String(spec.stem || '');
-    if (!spec.invariable && spec.singular && value !== 1) {
+    if (!spec.invariable && spec.singular && value > 1) {
       stem = replaceLast(stem, function (w) { return unitLabel(w, 2); });
     } else if (!spec.invariable && !spec.singular && value === 1) {
       stem = replaceLast(stem, function (w) { return shoppingList.foldUnit(w); });
     }
-    return (spec.times ? '× ' : '') + stem + String(spec.rest || '');
+    return (spec.times ? '× ' : '') + stem + String(spec.rest || '') + alsoText(spec, value);
+  }
+
+  /* "1 batch, about 100 g": the measure after the thing moves with the count,
+     so two batches read "2 batches, about 200 g". `spec.also` is
+     _plugins/food_yield.rb's; absent, this adds nothing. */
+  function alsoText(spec, value) {
+    var also = spec.also;
+    if (!also || !(Number(also.base) > 0)) return '';
+    var n = Number(also.base) * value / Number(spec.base);
+    var unit = shoppingList.foldUnit(String(also.unit || ''));
+    return ', ' + (also.prefix ? also.prefix + ' ' : '') + yieldBox(n) + ' ' + unitLabel(unit, n);
   }
 
   /**
