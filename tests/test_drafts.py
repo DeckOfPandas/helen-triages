@@ -358,6 +358,111 @@ def test_meta_sits_directly_under_the_title(draft):
     )
 
 
+# --- main_ingredients name what the dish is made of and tastes of -----------
+# DECISIONS §6: a bake lists its flour, butter, eggs and sugar; every dish
+# lists the herbs (bay included), citrus, cream or wine in it. A line is
+# exempt when it is incidental, a garnish or a wash, optional, one of two
+# alternatives, or sits in a serving or optional group. Drafts only: a
+# published recipe's list is changed only through Helen's proofread.
+_MAIN_WORDS = {
+    "flour": "flour", "butter": "butter", "eggs": r"eggs?|yolks?",
+    "sugar": "sugar",
+    "cream": r"cream|crème fraîche|creme fraiche",
+    "citrus": r"lemons?|limes?|oranges?|clementines?|grapefruit|yuzu"
+              r"|satsumas?|tangerines?",
+    "herbs": r"parsley|coriander|mint|basil|dill|thyme|rosemary|sage"
+             r"|tarragon|chives|bay|oregano|chervil|marjoram|lemongrass"
+             r"|curry leaves",
+    "wine": r"wine|port|marsala|sherry|madeira|vermouth|sauternes|brandy"
+            r"|cognac|rum|cider|beer|stout|mirin|sake",
+}
+_BAKE_STAPLES = {"flour", "butter", "eggs", "sugar"}
+_BAKE_TAGS = {"bakes", "dessert", "sweet snack"}
+# Where the word names something else.
+_NOT_THE_WORD = re.compile(
+    r"\b(?:butter beans?|peanut butter|nut butter|almond butter|cocoa butter"
+    r"|all-butter|egg noodles|cream of tartar|ice cream|cream cheese"
+    r"|coconut cream|sugar snap|sugar-free|(?:\w+ ){0,2}vinegar|orange blossom"
+    r"|orange flower|coriander seeds?|ground coriander|coriander powder"
+    r"|lime leaves|bay leaf|rum extract|lemon thyme|loomi|dried limes?"
+    r"|dried black lemon)\b", re.I)
+_EXEMPT_LINE = re.compile(r"\bto (?:serve|garnish|fill)\b|\bfor (?:brushing|"
+                          r"garnish)|\boptional\b|\bor\b", re.I)
+_EXEMPT_GROUP = re.compile(r"serve|garnish|presentation|optional", re.I)
+
+
+def main_ingredient_gaps(fm):
+    """`[(category, item)]` for each line `main_ingredients` does not cover.
+
+    Covered: an entry names the same category word, or the line names the
+    entry ("vinho verde" covers "white vinho verde wine").
+    """
+    main = [str(m) for m in fm.get("main_ingredients") or []]
+    bake = bool(_BAKE_TAGS & set(fm.get("tags") or []))
+    gaps = []
+    for group in fm.get("ingredient_groups") or []:
+        if _EXEMPT_GROUP.search(str(group.get("name") or "")):
+            continue
+        for it in group.get("items") or []:
+            if not isinstance(it, dict) or it.get("incidental"):
+                continue
+            full = re.sub(r"^QQ\s+", "", str(it.get("item", "")))
+            if _EXEMPT_LINE.search(full) or _EXEMPT_LINE.search(
+                    str(it.get("note") or "")):
+                continue
+            name = _NOT_THE_WORD.sub(" ", re.sub(r"\([^)]*\)", " ", full)
+                                     .split(",")[0])
+            if any(m.lower() in name.lower() for m in main):
+                continue
+            for cat, words in _MAIN_WORDS.items():
+                if cat in _BAKE_STAPLES and not bake:
+                    continue
+                word = re.compile(rf"\b(?:{words})\b", re.I)
+                found = word.search(name)
+                stem = re.escape(re.sub(r"(?<=[^s])s$", "", found.group(0))) \
+                    if found else ""
+                if found and not any(
+                        re.search(rf"\b{stem}s?\b",
+                                  _NOT_THE_WORD.sub(" ", m), re.I)
+                        or (cat == "eggs" and word.search(m))
+                        for m in main):
+                    gaps.append((cat, it.get("item")))
+                    break
+    return gaps
+
+
+def test_main_ingredients_name_what_the_dish_tastes_of(draft):
+    gaps = main_ingredient_gaps(draft.fm)
+    assert not gaps, (
+        f"{where_draft(draft)} has ingredient line(s) its `main_ingredients` "
+        f"does not name (DECISIONS §6):\n    "
+        + "\n    ".join(f"{cat}: {item!r}" for cat, item in gaps)
+        + "\nAdd each, in the corpus's spelling (`bay leaves`, `lemon`, "
+          "`butter` for a QQ butter line)."
+    )
+
+
+@pytest.mark.parametrize("tags,items,main,want", [
+    (["dessert"], ["plain flour", "QQ butter", "egg yolks", "caster sugar"],
+     ["plain flour", "butter", "eggs", "caster sugar"], []),
+    (["dessert"], ["plain flour", "egg yolks"], ["plain flour"], ["eggs"]),
+    (["main"], ["plain flour", "pinch of caster sugar"], [], []),
+    (["main"], ["bay leaves", "lemon, juiced"], ["lemon"], ["herbs"]),
+    (["main"], ["white vinho verde wine"], ["vinho verde"], []),
+    (["main"], ["dill or parsley", "lime wedges, to serve",
+                "fresh herbs (sage, thyme)", "butter beans"], [], []),
+    (["main"], ["coconut cream", "rice wine vinegar"], [], []),
+], ids=["bake-complete", "bake-missing-eggs", "savoury-staples-exempt",
+        "bay-is-a-herb", "entry-named-by-the-line", "exempt-lines",
+        "not-the-word"])
+def test_main_ingredient_gaps_on_fixtures(tags, items, main, want):
+    """The matching, proved without the drafts, so it runs in CI."""
+    fm = {"tags": tags, "main_ingredients": main,
+          "ingredient_groups": [{"name": "x",
+                                 "items": [{"item": i} for i in items]}]}
+    assert [cat for cat, _ in main_ingredient_gaps(fm)] == want
+
+
 def test_claude_rewritten_is_a_real_boolean(draft):
     _fm.test_claude_rewritten_is_a_real_boolean(draft)
 
@@ -510,6 +615,10 @@ def test_no_ampersand_in_title(draft, taxonomy):
             f"add the exact phrase to ampersand_proper_nouns in "
             f"_data/food/taxonomy.yml."
         )
+
+
+def test_citrus_is_measured_not_squeezed(draft):
+    _st.test_citrus_is_measured_not_squeezed(draft)
 
 
 def test_spellings(draft):

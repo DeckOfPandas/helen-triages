@@ -123,6 +123,7 @@ argument and the rules each field is read by.
 - 2026-08-26 · §4.3 · a magic-bag entry always has a tagline: line, and its value may be empty.
 - undated · §4.3 · Undated — a magic-bag entry's minimum is an ingredients list.
 - 2026-08-21 · §5 · #413 · en dashes are scoped by what a reader SEES.
+- 2026-10-30 · §5 · citrus is never "a squeeze": it is "¼ lemon, juiced".
 - 2026-10-18 · §5 · on food, the formatter reaches a QQ line; it still never rewords one.
 - 2026-09-07 · §5 · #800 · a tip printed under a source's own rubric is transcribed without the label; gf tip: is Good Food, the magazine, not gluten-free.
 - 2026-10-08 · §5 · #1089 · cocktail titles are Title Case, and a qualifier in brackets is not.
@@ -149,6 +150,7 @@ argument and the rules each field is read by.
 - 2026-09-22 · §6 · main_ingredients drops a size word and keeps a kind; egg size lives in the ingredient list.
 - 2026-10-21 · §6 · a bake lists its flour, butter, eggs and sugar, and a savoury dish lists the herbs, citrus, cream or wine it tastes of.
 - 2026-10-22 · §6 · a draft's main_ingredients says butter, and a QQ butter line still earns it; a published recipe's says salted butter or unsalted butter.
+- 2026-10-30 · §6 · bay leaves are a herb, and every citrus line is listed, a quarter lemon in a glaze included; a draft test holds §6.
 - 2026-08-01 · §7 · "declared" and "filterable" are the same thing: a tag shown on the page with no filter button was proposed and rejected.
 - 2026-08-02 · §7 · one-pot and scalable are retired, freezable is kept, and breakfast, extras, festive and starter are practicalities, not moods.
 - 2026-08-09 · §7 · something unusual is retired — Culturally relative, not a real craving, and barely used.

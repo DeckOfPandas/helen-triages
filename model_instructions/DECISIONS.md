@@ -747,6 +747,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `cook_time: "20-25 mins"`: *"These still render to the user, so correct to
   en dash please."* So house style reaches front matter that renders, the
   prose pages and the reference data, not only recipe prose.
+- **2026-10-30 — citrus is never "a squeeze": it is "¼ lemon, juiced".**
+  Helen: *"I hate the word "squeeze"! Let's always use "1/4 lemon, juiced"."*
+  She chose ingredient lines and every method line of ours where a squeeze
+  measures citrus; a `QQ original` stays verbatim, and the verb ("squeeze
+  out the gelatine") and "freshly squeezed" are fine.
+  `test_citrus_is_measured_not_squeezed` holds it on both collections.
 - **2026-10-18 — on food, the formatter reaches a `QQ` line; it still never
   rewords one.** Helen, asked whether the accents test or the skip should give
   way over a printed "ragu": *"Perform mechanical formatting on QQ lines so
@@ -925,6 +931,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   butter for their main ingredients, but drafts don't. But drafts still need
   the butter in their main ingredients so I can discover and cook from
   them."* The kind is settled at promotion, with the rest of the proofread.
+- **2026-10-30 — bay leaves are a herb, and every citrus line is listed, a
+  quarter lemon in a glaze included; a draft test holds §6.** Helen chose
+  *"Yes, bay goes in"* and, for citrus in one part of a dish, *"Yes, list
+  it"*. `test_main_ingredients_name_what_the_dish_tastes_of` exempts a
+  garnish or wash, an optional line, one of two alternatives, a serving
+  group, and a savoury dish's flour, butter, eggs and sugar: the lines the
+  2026-10-21 sweep left out on purpose. Drafts only.
 
 ## §7 Taxonomy (food)
 

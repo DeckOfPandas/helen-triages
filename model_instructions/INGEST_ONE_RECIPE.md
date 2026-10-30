@@ -565,6 +565,12 @@ The findability index, and the one field where **generosity is right**.
   defines the character, anything you would have to go out and buy, the
   vegetable that is the point. **Herbs, citrus, cream or wine that the dish
   tastes of go in too**, however small the amount: they are what people skip.
+  Bay leaves are a herb, and a quarter of a lemon in one part of the dish is
+  citrus. On a sweet dish too.
+
+**What need not go in:** a garnish or a wash ("to serve", "for brushing"), an
+optional line, one of two alternatives ("dill or parsley"), anything in a
+"to serve" group, and on a savoury dish its flour, butter, eggs and sugar.
 
 **Be generous.** Helen's own recipes run to fourteen entries; ingested ones
 average five, and she then adds to them by hand, which she has called "plainly
@@ -652,6 +658,10 @@ batch comes from one of them, the index may say so once.
 - **En dash for a number range**: `3–4 mins`, `170–180°C`, `36–40% fat`. Not a
   hyphen. This one is by far the most common thing to get wrong.
 - **Unicode fractions**: `½`, `¼`, `¾`. Not `1/2`.
+- **Never "a squeeze" of citrus.** An ingredient line is `amount: "¼"`,
+  `item: "lemon, juiced"` (or lime, or orange); a `QQ Claude` step says
+  "¼ lemon, juiced". Helen: *"I hate the word "squeeze"! Let's always use
+  "1/4 lemon, juiced"."* The verb is fine: "squeeze out the gelatine".
 - **A space between a number and its unit**, imperial included: `15 ml`,
   `400 g`, `20 cm`, `9 in`, `2 tbsp`. Not `15ml`. A temperature takes none:
   `180°C`.

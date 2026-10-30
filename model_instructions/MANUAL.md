@@ -598,6 +598,8 @@ checked.
 | Members of `main_ingredients` and `tags` are quoted | `test_main_ingredients_entries_are_quoted`, `test_tags_entries_are_quoted` (`tests/test_taxonomy.py`, and again over drafts) |
 | `meta:` is `rewritten`, `awaiting_fix`, `proofread`, in that order, real booleans, nothing else | `test_meta_block_is_exactly_the_three_flags_in_order` |
 | A draft's `meta:` sits directly under `title:`; `tidy_drafts.py --site food --only order --apply` moves it | `test_meta_sits_directly_under_the_title` (`tests/test_drafts.py`) |
+| A draft's `main_ingredients` name its herbs (bay included), citrus, cream and wine, and a bake's flour, butter, eggs and sugar, bar garnishes, washes, options and alternatives (DECISIONS §6) | `test_main_ingredients_name_what_the_dish_tastes_of` (`tests/test_drafts.py`) |
+| Citrus is "¼ lemon, juiced", never "a squeeze" | `test_citrus_is_measured_not_squeezed` (`tests/test_style.py`) |
 | Retired keys stay retired | `RETIRED`, which says what replaced each |
 | `serves:` opens with a number, or `makes:` with a count `food_yield.rb` reads (a draft's `QQ` excepted) | `tests/test_food_shopping.py` |
 
