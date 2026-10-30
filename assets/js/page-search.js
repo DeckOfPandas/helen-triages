@@ -1,11 +1,11 @@
 // =============================================================================
-// PAGE SEARCH — the "search for anything" box in the page header, and its
-// dropdown (#1050). `create(data)` is pure and testable in Node; everything
-// under "DOM wiring" is the box, the dropdown and the keyboard (MANUAL §3).
+// PAGE SEARCH — the "search for anything" box at the top right of the page
+// body, and its dropdown (#1050). `create(data)` is pure and testable in Node;
+// "DOM wiring" is the box, the dropdown and the keyboard (MANUAL §3).
 //
-// _includes/page-search.html renders the box, under the `show_header_search`
-// gate, as a plain GET form to this site's index carrying `q=`, which works
-// with no JavaScript; this file upgrades it. Per site, never across sites.
+// _includes/page-search.html renders the box as a plain GET form to this
+// site's index carrying `q=`, which works with no JavaScript; this file
+// upgrades it. Per site, never across sites.
 // It searches a JSON file the build writes (food/search.json,
 // cocktails/search.json), fetched on first focus. The JSON comes from the
 // gated collections, so the dropdown only offers a page that is live.
@@ -224,6 +224,8 @@
         var tier = tierOf(entry.folded, query);
         if (tier) byTier[tier].push(entry);
       });
+      // The pages held back are not carried: "+N more" here is a link to the
+      // index's own name search (`moreHref`), which lists every one.
       var named = byTier[1].concat(byTier[2]);
       if (named.length) {
         out.push({
@@ -236,7 +238,8 @@
               hit: hitOf(entry.folded, query)
             };
           }),
-          hidden: Math.max(0, named.length - ITEM_CAP)
+          hidden: Math.max(0, named.length - ITEM_CAP),
+          moreHref: home + '?q=' + encode(typed) + RESULTS_FRAGMENT
         });
       }
 
@@ -259,19 +262,23 @@
         });
         var matched = bands[1].concat(bands[2]);
         if (!matched.length) return;
+        // Every match is built; `results` is what shows at first and `rest`
+        // what "+N more" adds in place, since no page lists a group's words.
+        var all = matched.map(function (v) {
+          return {
+            label: v.label,
+            href: hrefForWord(g, v.label),
+            // By its label when the label matched; otherwise it was found
+            // through its merged spelling, and the shared stem is marked.
+            hit: tierOf(v.key, query) ? hitOf(v.key, query) : stemHitOf(v.key, query),
+            count: v.count
+          };
+        });
         out.push({
           kind: g.kind,
           label: g.label,
-          results: matched.slice(0, WORD_CAP).map(function (v) {
-            return {
-              label: v.label,
-              href: hrefForWord(g, v.label),
-              // By its label when the label matched; otherwise it was found
-              // through its merged spelling, and the shared stem is marked.
-              hit: tierOf(v.key, query) ? hitOf(v.key, query) : stemHitOf(v.key, query),
-              count: v.count
-            };
-          }),
+          results: all.slice(0, WORD_CAP),
+          rest: all.slice(WORD_CAP),
           hidden: Math.max(0, matched.length - WORD_CAP)
         });
       });
@@ -319,6 +326,8 @@
   var waiting = [];
   var flat = [];          // every option on screen, top to bottom, for the keys
   var active = -1;        // which of `flat` the keyboard is on
+  var shownFound = null;  // the search on screen, repainted when a group opens
+  var expanded = {};      // kinds whose "+N more" was pressed, for this query
 
   // Fetched on first focus, once, through assets.js's fetchJson. A failed
   // fetch leaves `searcher` null and the box stays a plain form.
@@ -384,8 +393,18 @@
     panel.textContent = '';
     flat = [];
     active = -1;
+    shownFound = null;
+    expanded = {};
     input.setAttribute('aria-expanded', 'false');
     input.removeAttribute('aria-activedescendant');
+  }
+
+  // Every option and every "+N more" is in `flat`, so the arrow keys reach it.
+  function addOption(node, section) {
+    node.setAttribute('role', 'option');
+    node.id = 'page-search-option-' + flat.length;
+    section.appendChild(node);
+    flat.push(node);
   }
 
   function paint(found) {
@@ -394,6 +413,8 @@
     active = -1;
 
     if (!found) { close(); return; }
+    if (!shownFound || shownFound.query !== found.query) expanded = {};
+    shownFound = found;
 
     if (!found.groups.length) {
       // Helen's copy (#1055).
@@ -409,23 +430,31 @@
       heading.textContent = group.label;
       section.appendChild(heading);
 
-      group.results.forEach(function (result) {
+      var open = !!expanded[group.kind];
+      var shown = open ? group.results.concat(group.rest || []) : group.results;
+      shown.forEach(function (result) {
         // A real link, so middle-click, open in new tab and copy link address
         // all work.
         var a = el('a', 'page-search-option');
         a.href = result.href;
-        a.setAttribute('role', 'option');
-        a.id = 'page-search-option-' + flat.length;
         a.appendChild(labelNode(result));
-        section.appendChild(a);
-        flat.push(a);
+        addOption(a, section);
       });
 
-      if (group.hidden > 0) {
-        var more = el('p', 'page-search-more');
-        // "+N more" and nothing after it (#1088).
+      // "+N more" and nothing after it (#1088). Under the names, a link to
+      // the index's name search; under words, a button opening the group.
+      var more = null;
+      if (group.hidden > 0 && group.moreHref) {
+        more = el('a', 'page-search-more');
+        more.href = group.moreHref;
+      } else if (group.hidden > 0 && !open && group.rest && group.rest.length) {
+        more = el('button', 'page-search-more');
+        more.type = 'button';
+        more.setAttribute('data-kind', group.kind);
+      }
+      if (more) {
         more.textContent = '+' + group.hidden + ' more';
-        section.appendChild(more);
+        addOption(more, section);
       }
       panel.appendChild(section);
     });
@@ -450,6 +479,30 @@
     paint(searcher.search(input.value));
   }
 
+  // Shows the rest of one group. From the keyboard, the row the button stood
+  // on is the first word it brought in, so the arrow keys carry on from there.
+  function openGroup(kind, at) {
+    if (!shownFound) return;
+    expanded[kind] = true;
+    paint(shownFound);
+    if (at >= 0) setActive(Math.min(at, flat.length - 1));
+  }
+
+  // The button never takes focus from the box, so typing carries on after it.
+  panel.addEventListener('mousedown', function (event) {
+    if (event.target.closest && event.target.closest('button.page-search-more')) event.preventDefault();
+  });
+
+  // The repaint takes the pressed button out of the page, so the click must
+  // not go on to the document's handler, which would read it as a click
+  // outside the box and close the panel.
+  panel.addEventListener('click', function (event) {
+    var b = event.target.closest ? event.target.closest('button.page-search-more') : null;
+    if (!b) return;
+    event.stopPropagation();
+    openGroup(b.getAttribute('data-kind'), -1);
+  });
+
   function whenLoaded() {
     if (document.activeElement === input) refresh();
   }
@@ -472,10 +525,13 @@
       event.preventDefault();
       close();
     } else if (event.key === 'Enter' && active >= 0) {
-      // A chosen result goes where its link goes; Enter with nothing chosen
-      // falls through to the form, which is the name search on the index.
+      // A chosen result goes where its link goes, and a chosen "+N more"
+      // button opens its group; Enter with nothing chosen falls through to the
+      // form, which is the name search on the index.
       event.preventDefault();
-      window.location.href = flat[active].href;
+      var chosen = flat[active];
+      if (chosen.tagName === 'BUTTON') openGroup(chosen.getAttribute('data-kind'), active);
+      else window.location.href = chosen.href;
     }
   });
 

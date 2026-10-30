@@ -214,17 +214,28 @@ $header-door-gap: 0.1rem;
   top: -0.12em;
 }
 
-// The search box, on a local build only (#1210): _includes/page-search.html
-// renders it when `show_header_search` is set, which only _config_local.yml
-// does. A third, implicit row in the door's column, on its right edge; the
-// deployed header has no such element and so no such row. The box itself is
-// shared/_furniture.scss's. The margin is the door row's own gap, so the box
-// hangs under the door as the door hangs under the tape.
-.site-header .page-search {
-  grid-row: 3;
-  grid-column: 3;
-  justify-self: end;
-  margin-top: $header-door-gap;
+// The search box: the right-hand end of the page's first line, under the
+// door (DECISIONS §13). Out of the flow at the top right of main's content
+// box, so a first line with room on the right does not move. What else sits
+// there starts $page-search-room lower: print · pdf (shared/_furniture.scss)
+// and cocktails' universe line (cocktails/_universe.scss). Below
+// $index-stack-width it is a line of its own (the narrow block below). The
+// z-index keeps the open dropdown over the page, a card's link included.
+// The box itself is shared/_furniture.scss's.
+main > .page-search {
+  position: absolute;
+  top: $space-xxl;
+  right: $space-xl;
+  z-index: 30;
+}
+
+@media (max-width: $index-stack-width) {
+  // `relative`, never `static`: the box anchors its own dropdown.
+  main > .page-search {
+    position: relative;
+    width: fit-content;
+    margin: 0 0 $space-lg auto;
+  }
 }
 
 // As wide as the article, so the two reference columns sit under the content
@@ -615,12 +626,6 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
   }
 
   .site-about-link {
-    grid-column: 1;
-  }
-
-  // The base rule's `justify-self: end` beats the stacked grid's
-  // `justify-items: center`, so only the column is needed.
-  .site-header .page-search {
     grid-column: 1;
   }
 

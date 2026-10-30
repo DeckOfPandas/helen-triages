@@ -91,6 +91,15 @@
 .page-search-group--practicalities .page-search-group-label { background: $color-practicalities-root; }
 .page-search-group--ingredient     .page-search-group-label { background: $color-ingredient-root; }
 
+// A recipe in the dropdown wears the index list's title type
+// (`.recipe-title-link`, _recipe-list.scss): lowercase, its tracking, and a
+// step up from the words beside it, so a dish reads as a dish.
+.page-search-group--name .page-search-option {
+  font-size: 1rem;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+
 // --- Name search ------------------------------------------------------------
 // No margin-top here: adjacent .category siblings collapse their margins and
 // $index-section-gap always wins.

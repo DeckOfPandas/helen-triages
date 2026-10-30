@@ -1,9 +1,11 @@
+@use "sass:color";
 @use "shared/theme" as *;
 @use "shared/tokens" as *;
 
-// THE RESULTS COUNT'S DIGITS, AND THE BAR THAT FOLLOWS THEM DOWN THE PAGE, on
-// both indexes. One partial because the bar mirrors the count line and the
-// digits are set the same way in each.
+// THE RESULTS COUNT'S DIGITS, THE BAR THAT FOLLOWS THEM DOWN THE PAGE, AND THE
+// PILLS THAT POINT DOWN TO THEM AND BACK UP, on both indexes. One partial
+// because the bar and the pills are placed by the count line and the digits
+// are set the same way in each.
 //
 // Beyond shared/_tokens.scss and the palette contract it names $font-label,
 // which both palettes declare under that name with the same role.
@@ -94,9 +96,91 @@ $results-bar-height: 2.75rem;
   to   { transform: translateY(0); }
 }
 
+// --- 3. The pills (#1441) ------------------------------------------------------
+// One place at the foot of the screen, centred, two pills that never show
+// together: "N survivors ↓" while `#results` is still below the viewport, and
+// "top ↑" once it has scrolled off above (results-bar.js places both). The
+// count's own digits and word, as in the bar.
+//
+// The site's accent behind the darker of its two grounds: food's text colour,
+// cocktails' page ground (its palette is inverted).
+$results-jump-ink: $color-bg;
+@if color.channel($color-text, "lightness", $space: hsl) < color.channel($color-bg, "lightness", $space: hsl) {
+  $results-jump-ink: $color-text;
+}
+
+.results-jump {
+  position: fixed;
+  left: 50%;
+  bottom: calc(#{$space-md} + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  // The bar's layer: above the panel's clear-all and the search dropdown.
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xs;
+  max-width: calc(100vw - 2 * #{$space-md});
+  // One height for both, which swap in the same place.
+  height: 1.75rem;
+  padding: 0 $space-md;
+  border: 0;
+  border-radius: 999px;
+  background: $color-accent;
+  color: $results-jump-ink;
+  font-family: $font-body;
+  font-size: 0.875rem;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  animation: results-jump-in 0.15s ease;
+
+  // Hover moves colour, never geometry (DECISIONS §9.13): the words
+  // underline, as on the pill this one is taken from.
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+
+  // The accent is the pill's own fill, so the ring takes the words' colour.
+  &:focus-visible {
+    outline: 2px solid $results-jump-ink;
+    outline-offset: 2px;
+  }
+}
+
+// Stated outright, as for the bar.
+.results-jump[hidden] { display: none; }
+
+// Each word's box trimmed to its letters, so centring the box centres them,
+// whatever space the face leaves above and below: to cap height where the
+// count's figures set the height, to x-height for "top", which is all
+// lowercase. A browser without `text-box` centres the line box instead, a
+// pixel or two low.
+.results-jump > span { text-box: trim-both cap alphabetic; }
+.results-jump--top > span { text-box: trim-both ex alphabetic; }
+
+// The site's right arrow, turned to point down, or up on the top pill.
+.results-jump-arrow {
+  width: 1.1em;
+  height: 0.66em;
+  flex: none;
+  transform: rotate(90deg);
+}
+
+.results-jump-arrow--up { transform: rotate(-90deg); }
+
+@keyframes results-jump-in {
+  from { transform: translate(-50%, 150%); }
+  to   { transform: translate(-50%, 0); }
+}
+
 // shared/_base.scss already cuts every animation for a reader who asks for
-// less motion; this says it in the bar's own words, so the rule survives if
-// that blanket ever narrows.
+// less motion; this says it in the bar's and pill's own words, so the rule
+// survives if that blanket ever narrows.
 @media (prefers-reduced-motion: reduce) {
-  .results-bar { animation: none; }
+  .results-bar,
+  .results-jump { animation: none; }
 }

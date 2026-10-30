@@ -178,8 +178,8 @@ Read the PNGs with the Read tool. Traps:
 - **Mobile emulation grows the layout viewport to fit the widest element**, so
   `innerWidth` is the symptom, not the measure; `shoot.sh` compares against
   the width it asked for.
-- **A control that exists only on a local build** (the header search box,
-  §2.5) is not in `build.sh`'s output. Build with
+- **A control that exists only on a local build** (the drafts, the costs)
+  is not in `build.sh`'s output. Build with
   `--config _config.yml,_config_local.yml -d tmp/site` before cropping it.
 - **Headless Chromium snaps a monospace advance and a baseline to whole
   pixels**, so a screenshot's line breaks are not Helen's. Compute how many
@@ -212,7 +212,7 @@ mechanisms, and they are not the same:
 | `show_source_wording` | `false` | `true` |
 | `show_awaiting_fix` | `false` | `true` |
 | `pdf_downloads` | `true` | `false` |
-| `show_drafts`, `show_costs`, `show_header_search`, `show_local_reference_links`, `unpublished` | not declared | `true` |
+| `show_drafts`, `show_costs`, `show_local_reference_links`, `unpublished` | not declared | `true` |
 | `output` on the `dev`, `food_drafts` and `cocktail_drafts` collections | `false` | `true`, with a permalink |
 
 A key in the fourth row is safe because production does not declare it: the
@@ -429,8 +429,8 @@ second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
 - **Position.** The row sits at the right-hand end of the header's second
   row and the `??` about link (a literal `/about/`) at the left end, both on
   the cards' edges, at every width, hanging close under the tape:
-  `$header-door-gap` (0.1rem) of top margin on the row, on `??` and on the
-  local search box under the door, and 0.2rem of bottom padding on
+  `$header-door-gap` (0.1rem) of top margin on the row and on `??`, and
+  0.2rem of bottom padding on
   `.site-header` (DECISIONS §13).
 - **`.site-header-inner` is the cards' width**: `$width-content` minus
   `main`'s padding, because `main`'s width includes its padding. Below
@@ -443,9 +443,8 @@ second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
   Below `$header-stack-width` the two doors take an edge each, and the first
   is mirrored (arrow first, turned round) so both arrows point away from the
   wordmark.
-- **On a local build the header has a third row: the search box**
-  (`_includes/page-search.html`, row 3 column 3 of the same grid), gated on
-  `show_header_search`. The deployed header has none. §13.13 has the box.
+- **The search box is not in the header.** It is the page body's first
+  thing, at the top right under the door; §13.13 has it.
 
 #### The footer
 
@@ -4512,10 +4511,29 @@ to the body default on purpose. The digits alone take `$font-label`
 (`.results-count-number` in `_sass/shared/_results-bar.scss`, on
 `#recipe-count-n` and `#drink-count-n`); the word stays bare.
 
-**The sticky bar** is `.results-bar`, driven by `assets/js/results-bar.js`.
-It ships `hidden` and is shown only while an `IntersectionObserver` reports
-`#results` above the viewport. It mirrors the count spans and the top
-`× clear all`; it never recomputes. It must load after the index script
+**The sticky bar and the two pills** float on both indexes, all driven by
+`assets/js/results-bar.js`, styled in `_sass/shared/_results-bar.scss`, and
+placed by where `#results` is. All ship `hidden`.
+
+- While `#results` has wholly left the top of the viewport: `.results-bar`,
+  fixed to the top, mirroring the count and the top `× clear all`; and
+  "top ↑" (`[data-results-top]`), which returns to the section whose id it
+  names (`filter-star` on food, `filter-chaos` on cocktails). A pill naming
+  an id the page lacks never shows.
+- While `#results` is not yet wholly on screen: "N survivors ↓"
+  (`[data-results-jump]`), mirroring the count, which goes to `#results`.
+
+The two pills (#1441) share one place, centred at the foot of the screen, in
+the site's accent, 28px tall, and never show together. Each press scrolls its
+target to the top (smoothly, unless reduced motion is asked for) and focuses
+it. Each word is trimmed with `text-box` (to cap height for the count, to
+x-height for "top") so that centring the box centres the letters. DECISIONS
+§13.7 has the rulings.
+
+Nothing here recomputes the count. Placement is read from `#results`'s box on
+every `IntersectionObserver` report AND on scroll, once a frame: the observer
+reports only a crossing, and a jump from the foot of the page to the top
+crosses nothing. The script must load after the index script
 (`test_the_results_bar_loads_after_the_index_script_on_both_indexes`).
 
 **Pagination:** `PAGE_SIZE` per page, prev and next, a status label,
@@ -4766,13 +4784,20 @@ bare class loses to it silently, which is what `.not-found-ways` exists for.
 
 #### The search box: `_includes/page-search.html`
 
-**A local-build testing tool. The deployed site has no search box
-anywhere.** It renders in the shared header of every page of a site, under
-the door to the other site, only when `site.show_header_search` is true,
-which only `_config_local.yml` declares, and never on a `site_neutral`
-page. The include loads `assets/js/page-search.js` beside the form under
-the same gate. `scripts/browser/build.sh` builds what deploys, so to look at
-the box build with the local config (§13.11).
+**On every page of both sites, local and deployed, and never on a
+`site_neutral` page.** `_layouts/default.html` renders it as `<main>`'s first
+child, so it sits in the page body under the door to the other site, not in
+the header: it is this site's search, not the shared chrome's. No config key
+gates it. The include loads `assets/js/page-search.js` beside the form.
+
+*The place.* `main > .page-search` (shared/_layout.scss) is out of the flow
+at the top right of `<main>`'s content box, so it takes the right-hand end of
+the page's first line. A first line with room on the right (food's index)
+does not move. What else sits there starts `$page-search-room` lower: print ·
+pdf on the furniture line, and cocktails' universe line, which runs the full
+width. Below `$index-stack-width` the box is a line of its own at the column's
+right edge and nothing else moves. It stays positioned at every width because
+it anchors the dropdown.
 
 *The form.* A plain GET to this site's index with `q=`, which works with no
 JavaScript and submits a name search. `HTF.filterState.parseName` reads it
@@ -4795,9 +4820,20 @@ focus. The pure half is `HTF.pageSearch` (`tests/js/page-search.test.js`).
 
 - **Per site, never across sites**, grouped by kind in the index's own
   order: the pages by name first, then star, mood and practicalities on
-  food or mood and hassle on cocktails, then the ingredients. The names
-  group is headed by `items_label`, "food" or "cocktails"; the other
-  headings are the index panel's own labels, in each site's section hue.
+  food or mood and hassle on cocktails, then the ingredients. Every heading
+  is the index section a result lands on: the names group's `items_label` is
+  I KNOW WHAT I WANT, the others the panel's own labels, each filled with
+  its section's hue. Headings and names are heavy on both sites: Courier 700
+  plus the chosen chip's faux-bold stroke (`$page-search-faux-bold`, 0.05em
+  in `currentColor`), because 700 alone reads as regular beside the index's
+  stroked headings. A name wears the index's title type, lowercase on food
+  and the card's capitals on cocktails.
+- **A capped group says "+N more", and it can be pressed.** Under the names
+  it is a link to the index's name search for what was typed (`moreHref`,
+  `?q=…#results`), which lists every match. Under a group of words it is a
+  button that shows the rest of that group in place (`rest`), since no page
+  lists a group's words. Both are in the arrow keys' list, and the button
+  never takes focus from the box.
 - **Matching is prefix-only and whole-word:** a result matches only when
   every typed word is a prefix of a whole word in it, in any order. There
   is no substring match.
@@ -4823,8 +4859,7 @@ focus. The pure half is `HTF.pageSearch` (`tests/js/page-search.test.js`).
   pool on screen when none is exact; cocktails matches a pool chip whole
   and drops a miss in silence.
 
-`search.json` is generated from the same gated lists the two indexes render,
-and is built on the deployed site even though nothing fetches it there;
+`search.json` is generated from the same gated lists the two indexes render;
 `test_the_search_index_lists_exactly_the_published_pages` holds it to the
 built pages.
 

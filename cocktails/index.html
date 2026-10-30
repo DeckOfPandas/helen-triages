@@ -62,8 +62,9 @@ permalink: /cocktails/
 
     {% comment %} 1. CHAOS. A three-way switch whose resting position is `open`,
        which applies no filter: open to chaos includes every drink (#1440).
-       The (i) opens the ship key, which draws each button's reach. {% endcomment %}
-    <div class="drink-filter drink-filter--chaos">
+       The (i) opens the ship key, which draws each button's reach.
+       `id="filter-chaos"` is where the "top ↑" pill returns to (#1441). {% endcomment %}
+    <div class="drink-filter drink-filter--chaos" id="filter-chaos">
       <div class="drink-label-row">
         <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span>{% include cocktails/ship-key.html part="button" %}</h2>
         <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
@@ -218,6 +219,17 @@ permalink: /cocktails/
       <button type="button" class="btn-clear results-bar-clear" data-results-bar-clear>&times; clear all</button>
     </div>
   </div>
+
+  {% comment %} The two pills (#1441): "N survivors ↓" while `#results` is still
+     below the screen, "top ↑" once it is above, back to the first section
+     (`filter-chaos`, where food's goes to STAR). food/index.html carries the
+     same block. {% endcomment %}
+  <button type="button" class="results-jump" data-results-jump hidden>
+    <span class="results-count-number" data-results-jump-n></span> <span data-results-jump-word></span>{% include icons/arrow-right.svg class="results-jump-arrow" %}
+  </button>
+  <button type="button" class="results-jump results-jump--top" data-results-top="filter-chaos" hidden>
+    <span>top</span>{% include icons/arrow-right.svg class="results-jump-arrow results-jump-arrow--up" %}
+  </button>
 
   {% comment %} Hide / show drafts, local builds only (#1358): inside the gate
      that lets a draft into `all_drinks`, so the deployed index has no such

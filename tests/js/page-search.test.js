@@ -326,6 +326,30 @@ test('a long list is capped and the cap is stated', () => {
   assert.strictEqual(found.groups[0].hidden, 10 - PS.ITEM_CAP);
 });
 
+test("the names' \"+N more\" is the index's own name search for what was typed", () => {
+  const many = {
+    home: '/x/', items_label: 'I know what I want', groups: [],
+    items: Array.from({ length: 10 }, (_, i) => ({ t: 'Tart number ' + i, u: '/x/' + i + '/' }))
+  };
+  const found = PS.create(many).search('tart nu');
+  assert.strictEqual(found.groups[0].moreHref, '/x/?q=tart%20nu#results');
+  assert.deepStrictEqual(FS.parseName('?q=tart%20nu'), 'tart nu');
+});
+
+test('a group of words carries the words it holds back, for "+N more" to show', () => {
+  const words = Array.from({ length: PS.WORD_CAP + 3 }, (_, i) => 'sour ' + i);
+  const data = {
+    home: '/x/', items_label: 'x',
+    groups: [{ kind: 'mood', label: 'MOOD', param: 'tag', field: 'tags', values: words }],
+    items: [{ t: 'Anything', u: '/x/a/', tags: words }]
+  };
+  const mood = PS.create(data).search('sour').groups.find((g) => g.kind === 'mood');
+  assert.strictEqual(mood.results.length, PS.WORD_CAP);
+  assert.strictEqual(mood.hidden, 3);
+  assert.deepStrictEqual(mood.rest.map((r) => r.label), words.slice(PS.WORD_CAP));
+  assert.strictEqual(mood.moreHref, undefined);
+});
+
 // --- a drinks-shaped index works the same way ---------------------------------------
 
 test('the drinks index: one mood list, two groups, card ingredients', () => {

@@ -61,9 +61,20 @@
 // The search-for-anything dropdown's group headings (#1050, #1136). The shape
 // is shared/_furniture.scss's; here each kind of result is filled with the hue
 // of the index section it lands on, lettered in $color-bg like every other
-// inverted chip on this site. Names take I KNOW WHAT I WANT's hue.
+// inverted chip on this site, at this site's heading tracking
+// (`.drink-field-label` above). Names take I KNOW WHAT I WANT's hue.
 .page-search-group-label {
   color: $color-bg;
+  letter-spacing: 0.14em;
+}
+
+// A drink in the dropdown wears the card name's capitals and tracking
+// (`.drink-card-name`, _cards.scss), a step up from the words beside it, and
+// the shared bold and stroke. The tape stays on the card.
+.page-search-group--name .page-search-option {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .page-search-group--name       .page-search-group-label { background: $color-heading-name; }

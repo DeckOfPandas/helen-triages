@@ -1,20 +1,20 @@
-{% comment %} ── The search for anything, in the header, on a local build only (#1210) ──
-   Rendered only when `site.show_header_search` is true, and only
-   _config_local.yml declares that key: the deployed site has no search box. A
-   `site_neutral` page gets none either, having no index to search.
+{% comment %} ── The search for anything, at the top right of the page body ──
+   _layouts/default.html renders it as <main>'s first child on every page that
+   belongs to a site, on both the local and the deployed build. A
+   `site_neutral` page gets none, having no index to search. It is in the
+   page, not the header, so it reads as this site's search (DECISIONS §13).
    A plain form first, working with no JavaScript: a GET to the index with
    `q=`, which assets/js/filter-state.js's `parseName` reads.
-   assets/js/page-search.js, loaded here under the same gate, fills the
-   dropdown, rendered here empty and hidden, from the site's search.json
+   assets/js/page-search.js, loaded here with the form, fills the dropdown,
+   rendered here empty and hidden, from the site's search.json
    (`data-search-index`).
    The input is right-aligned, so a long word scrolls its start out of view,
    never the letters being typed (#1099). The placeholder is the only visible
    wording, the same on both sites (#1096), and the aria-label carries the
    same words. _includes/icons/search.svg carries no comment because
-   test_every_shipped_svg_actually_parses reads it as XML. To see the box in
-   the browser harness, build with the local config (MANUAL 13.11). {% endcomment %}
+   test_every_shipped_svg_actually_parses reads it as XML. {% endcomment %}
 {% assign search_site = site.data.sites[page.site_key] %}
-{% if site.show_header_search and search_site and page.site_neutral != true %}
+{% if search_site and page.site_neutral != true %}
   <form class="page-search" role="search" method="get" action="{{ search_site.home | relative_url }}"
         data-search-index="{{ search_site.home | append: 'search.json' | relative_url }}">
     <input type="search" name="q" class="page-search-input" autocomplete="off"
