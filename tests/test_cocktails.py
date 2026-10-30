@@ -4780,6 +4780,23 @@ def test_the_chaos_lists_name_only_real_ship_values():
     )
 
 
+def test_every_yolo_button_has_a_label():
+    """`chaos_labels` names exactly the three YOLO buttons, each non-empty (#1440).
+
+    cocktails/index.html prints the buttons from it and the ship key labels
+    its bars from it, so a missing label is a blank button AND a blank bar,
+    with no error. `open` is the resting position, not a `chaos` list.
+    """
+    taxonomy = _taxonomy()
+    labels = taxonomy.get("chaos_labels")
+    assert isinstance(labels, dict) and set(labels) == {"good", "open", "chaos"}, (
+        f"taxonomy.yml `chaos_labels` must map exactly good, open and chaos "
+        f"(got {labels!r})."
+    )
+    blank = sorted(k for k, v in labels.items() if not (isinstance(v, str) and v.strip()))
+    assert not blank, f"`chaos_labels` gives no words for {blank}."
+
+
 def test_suggestion_is_a_string_or_a_list_of_strings():
     """`suggestion` is a string or a list of strings (#499).
 

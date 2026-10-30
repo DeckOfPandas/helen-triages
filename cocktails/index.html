@@ -60,21 +60,34 @@ permalink: /cocktails/
        <button>s and start hidden; the script shows one the moment its own
        filter has something in it. {% endcomment %}
 
-    {% comment %} 1. CHAOS. `open` is a visible state that applies no filter,
-       not a second filter: open to chaos includes every drink. {% endcomment %}
+    {% comment %} 1. CHAOS. A three-way switch whose resting position is `open`,
+       which applies no filter: open to chaos includes every drink (#1440).
+       The (i) opens the ship key, which draws each button's reach. {% endcomment %}
     <div class="drink-filter drink-filter--chaos">
       <div class="drink-label-row">
-        <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
+        <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span>{% include cocktails/ship-key.html part="button" %}</h2>
         <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
       </div>
       {% comment %} `good` and `chaos` each keep one of taxonomy.yml's `chaos`
-         lists, read off `meta.ship` (#1413). The three labels are Helen's
-         names for the rungs of one scale, not descriptions of the mechanism;
-         the script reads `data-chaos`, not the words. {% endcomment %}
+         lists, read off `meta.ship` (#1413); the words are its `chaos_labels`.
+         `data-ship-words` is what the ship legend says while a narrowing
+         button is on, top rung first in `ship_key`'s order. The script reads
+         `data-chaos`, never the words. {% endcomment %}
+      {% assign chaos_kinds = "good,open,chaos" | split: "," %}
       <div class="drink-btns">
-        <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>no chaos please</button>
-        <button type="button" class="btn-chaos" data-chaos="open" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>I&rsquo;m open to chaos</button>
-        <button type="button" class="btn-chaos" data-chaos="chaos" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>chaos only</button>
+        {% for kind in chaos_kinds %}
+          {% assign band_words = "" %}
+          {% if kind != "open" %}
+            {% for pair in taxonomy.ship_key %}
+              {% if taxonomy.chaos[kind] contains pair[0] %}
+                {% assign band_value = pair[0] %}
+                {% capture band_word %}{% include cocktails/ship-word.html ship=band_value %}{% endcapture %}
+                {% if band_words == "" %}{% assign band_words = band_word %}{% else %}{% assign band_words = band_words | append: ", " | append: band_word %}{% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+          <button type="button" class="btn-chaos" data-chaos="{{ kind }}"{% if band_words != "" %} data-ship-words="{{ band_words }}"{% endif %} aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>{{ taxonomy.chaos_labels[kind] }}</button>
+        {% endfor %}
       </div>
     </div>
 
@@ -178,7 +191,7 @@ permalink: /cocktails/
     <strong class="results-count-number" id="drink-count-n">{{ all_drinks.size }}</strong>
     <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
   </p>
-  <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?<span class="drink-count-legend-value" data-ship-legend-value hidden>= <span data-ship-legend-word></span></span>{% include cocktails/ship-key.html part="button" %}</span>
+  <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?{% include cocktails/ship-key.html part="button" %}<span class="drink-count-legend-value" data-ship-legend-value hidden>= <span data-ship-legend-word></span></span></span>
 
   {% comment %} The shortlisted-only view (#546) is a filter on this index, not
      a page of its own and not a sixth filter section. It ships `hidden` and

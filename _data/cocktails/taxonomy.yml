@@ -867,6 +867,16 @@ chaos:
   good: ["yes", "oh gods yes"]
   chaos: ["meh", "who knows"]
 
+# The YOLO buttons' words, keyed as `chaos` is plus `open`, the resting
+# position (#1440). The buttons, the ship key's bars and the ship legend all
+# read them here. Helen's names on a scale, not descriptions (#732). The
+# apostrophe is U+2019: assets/js/decorations.js picks a chip's tape by its
+# words.
+chaos_labels:
+  good: "no chaos please"
+  open: "I’m open to chaos"
+  chaos: "chaos only"
+
 # Four rungs, lowest first (DECISIONS §9.4). Every value is quoted: YAML reads
 # a bare `yes` as the boolean true, which silently fails every comparison
 # against `meta.ship`.

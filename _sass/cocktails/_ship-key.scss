@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "cocktails/cocktail" as *;
 @use "cocktails/palette" as *;
 @use "shared/tokens" as *;
@@ -34,6 +35,13 @@
 
   &:hover,
   &:focus-visible { color: $color-wicked-woowoo; }
+}
+
+// Beside YOLO? the parent is a block heading, not a flex row, so the lift is
+// `vertical-align` and the space is a margin.
+.drink-field-label .ship-key-open {
+  vertical-align: top;
+  margin-left: 0.2em;
 }
 
 // No padding on the dialog itself: ship-key.js reads a click whose target is
@@ -83,13 +91,54 @@
   letter-spacing: 0.06em;
 }
 
-// Two tracks through subgrid, so every line starts at the widest word's edge.
+// The bands: each YOLO button's reach as a bar down the rows it shows, `open`
+// round all of them and the two narrowing buttons inside it. Shades of the
+// YOLO hue tell the bars apart here only; the buttons on the index keep their
+// one colour. Every bar is the same width and gap, so `$ship-key-bar-step`
+// is how far in an inner band's rows start.
+$ship-key-bar: 3px;
+$ship-key-bar-step: $ship-key-bar + 8px;
+
+.ship-key-band {
+  border-left: $ship-key-bar solid $color-raucous-reposado;
+  padding-left: $ship-key-bar-step - $ship-key-bar;
+}
+
+.ship-key-band--open  { border-left-color: color.mix($color-raucous-reposado, $color-surface, 40%); }
+.ship-key-band--good  { border-left-color: color.mix($color-raucous-reposado, $color-surface, 70%); }
+.ship-key-band--chaos { border-left-color: $color-raucous-reposado; }
+
+.ship-key-band-label {
+  @extend %cocktail-heading-face;
+  margin: 0 0 $space-sm;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: $color-clear-text;
+}
+
+// Space between the bands, and the middle rows set in by one bar so their
+// words line up with the inner bands'.
+.ship-key-band .ship-key-band,
+.ship-key-list--middle { margin-top: $space-md; }
+
+.ship-key-list--middle { padding-left: $ship-key-bar-step; }
+
+// Each band is its own list, so the word track is a fixed width rather than
+// its own widest word, and the lines start at one edge in every band: four
+// characters of the word's face, the widest being `YES²`. A longer word
+// pushes only its own band's lines.
 .ship-key-list {
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: auto 1fr;
   column-gap: $space-md;
   row-gap: $space-sm;
   margin: 0;
+
+  dt {
+    min-width: calc(4 * (0.6em + 0.06em));
+    font-size: 0.88rem;
+  }
 }
 
 .ship-key-row {
@@ -105,7 +154,7 @@
 
   .drink-card-ship-word {
     @extend %cocktail-heading-face;
-    font-size: 0.88rem;
+    font-size: 1em;
     letter-spacing: 0.06em;
   }
 }

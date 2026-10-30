@@ -472,6 +472,7 @@ $pool-chip-rest: color.mix($color-text, $color-bg, 73%);
   display: flex;
   align-items: baseline;
   gap: 0.45rem;
+  white-space: nowrap;
   justify-self: end;
   font-family: $font-headings;
   font-size: 0.72rem;
@@ -504,14 +505,24 @@ $pool-chip-rest: color.mix($color-text, $color-bg, 73%);
 
 // On a phone the legend's three marks hang from one top line (#1440): the
 // ship, the words and the ship key's (i). `line-height: 1` brings the words'
-// box up to their ink so the top edges meet.
+// box up to their ink so the top edges meet. The value takes a line of its
+// own under them, set right: a YOLO button's words (`= YES², YES`) beside
+// SHIP IT? would not fit beside the count on a phone.
 @media (max-width: 600px) {
   .drink-count-legend {
+    flex-wrap: wrap;
+    justify-content: flex-end;
     align-items: flex-start;
+    row-gap: $space-xs;
     line-height: 1;
   }
 
   .drink-count-legend-icon { align-self: flex-start; }
+
+  .drink-count-legend-value {
+    flex-basis: 100%;
+    text-align: right;
+  }
 }
 
 // Food's `.recipe-list-empty`, value for value (#481, #1093): an empty list is

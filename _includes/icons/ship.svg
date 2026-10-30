@@ -29,7 +29,7 @@
 
      AXE-CORE FLAGGED `role="img"` WITH NO ACCESSIBLE NAME, ISSUE #1086 (design
      review, 2026-09-15). The rating word this include emits right beside it
-     (_includes/cocktails/ship.html's `ship_word` — "yes", "sure",
+     (_includes/cocktails/ship-word.html's word — "yes", "sure",
      "oh gods yes", or "???" when off-scale) is what carries the meaning; the
      icon adds nothing a screen reader user needs repeated, on the card, the
      drink page's meta row, or the related-drinks card — checked all three

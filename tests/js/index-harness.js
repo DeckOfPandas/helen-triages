@@ -114,8 +114,12 @@ function buildPage(doc, options) {
   // YOLO
   const chaos = el('div', 'drink-filter drink-filter--chaos');
   filters.appendChild(chaos);
+  // `data-ship-words` as cocktails/index.html writes it from taxonomy.yml (#1440).
+  const shipWords = { good: 'yes², yes', chaos: 'meh, ???' };
   ['good', 'open', 'chaos'].forEach((v) => {
-    chaos.appendChild(el('button', 'btn-chaos', { 'data-chaos': v, type: 'button' }));
+    const attrs = { 'data-chaos': v, type: 'button' };
+    if (shipWords[v]) attrs['data-ship-words'] = shipWords[v];
+    chaos.appendChild(el('button', 'btn-chaos', attrs));
   });
   chaos.appendChild(el('button', 'btn-clear-filter', { id: 'clear-chaos' }));
 
