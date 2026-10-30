@@ -101,6 +101,34 @@ test('each narrowing YOLO button keeps only the cards stamped with its name', ()
   assert.strictEqual(visibleTitles(r.page).length, 4);
 });
 
+function chaosOn(page) {
+  return page.filters.querySelectorAll('.btn-chaos')
+    .filter(function (b) { return b.classList.contains('is-on'); })
+    .map(function (b) { return b.dataset.chaos; });
+}
+
+test('the YOLO switch rests on open: lit at load, and a second press returns to it', () => {
+  // #1440: `open` is the switch's resting position, held as no filter, so
+  // nothing offers to clear it.
+  const r = boot({ drinks: DRINKS });
+  const clearChaos = r.doc.getElementById('clear-chaos');
+  assert.deepStrictEqual(chaosOn(r.page), ['open']);
+  assert.strictEqual(clearChaos.hidden, true);
+
+  clickByData(r.page, 'data-chaos', 'good');
+  assert.deepStrictEqual(chaosOn(r.page), ['good']);
+  assert.strictEqual(clearChaos.hidden, false);
+
+  clickByData(r.page, 'data-chaos', 'good');
+  assert.deepStrictEqual(chaosOn(r.page), ['open']);
+  assert.strictEqual(clearChaos.hidden, true);
+
+  clickByData(r.page, 'data-chaos', 'chaos');
+  clickByData(r.page, 'data-chaos', 'open');
+  assert.deepStrictEqual(chaosOn(r.page), ['open']);
+  assert.strictEqual(clearChaos.hidden, true);
+});
+
 // --- the ship mark is a filter (#1412) ---------------------------------------
 
 const SHIPS = [
@@ -160,6 +188,24 @@ test('#1412: ?ship= from a drink page narrows the list; an unknown value is drop
   const bad = boot({ drinks: SHIPS, search: '?ship=nonsense' });
   assert.strictEqual(visibleTitles(bad.page).length, 3);
   assert.strictEqual(legendWord(bad), null);
+});
+
+test('#1440: a narrowing YOLO button puts its ship words in the legend; a chosen mark wins', () => {
+  const r = boot({ drinks: SHIPS });
+  clickByData(r.page, 'data-chaos', 'good');
+  assert.strictEqual(legendWord(r), 'yes², yes');
+  assert.strictEqual(r.doc.getElementById('clear-ship').hidden, true,
+    'the YOLO button is not a ship mark, so `× clear ship` stays hidden');
+
+  shipMark(r.page, 'C').dispatch('click');
+  assert.strictEqual(legendWord(r), 'yes²', 'the mark narrows further, so it names what shows');
+  shipMark(r.page, 'C').dispatch('click');
+  assert.strictEqual(legendWord(r), 'yes², yes');
+
+  clickByData(r.page, 'data-chaos', 'chaos');
+  assert.strictEqual(legendWord(r), 'meh, ???');
+  clickByData(r.page, 'data-chaos', 'open');
+  assert.strictEqual(legendWord(r), null, 'open narrows nothing, so the legend names nothing');
 });
 
 // --- the guard's own guard ---------------------------------------------------

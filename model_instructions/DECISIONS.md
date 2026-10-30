@@ -3163,6 +3163,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   not-known-to-be-definitely-good drinks."* The button had been backwards: "try
   anything" hid all 55 of the best drinks. It is a visible state, never a
   second narrowing.
+- **2026-10-30, #1440 — YOLO? is a three-way switch resting on `I'm open to
+  chaos`: lit at load, and a second press of a narrowing button returns to
+  it.** Helen saw that `open` showed exactly what pressing nothing showed:
+  *"If we drew a vertical bar over all six lines and labelled it 'open to
+  chaos' I would definitely immediately wonder why that button was there
+  other than being funny. Are these labels or categories simply wrong???"*
+  Offered two buttons, a resting `open`, or a risk dial, she chose the
+  resting `open`, which keeps the button, its joke and the ruling above.
 - **2026-08-29 — the drinks index shows drafts on a local build only.** Helen:
   *"for food, we build drafts locally only, so let's do the same."*
 - **2026-08-31, #595 — going back to the drinks index restores the list you
@@ -3526,6 +3534,18 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   are hers, in her order: yes² *"Oh Gods yes. Just works."*, yes *"Works very
   well."*, sure *"Some attention required."*, meh *"Haven't nailed this
   yet."*, IOU *"Liked, rating to follow."*, ??? *"Never made."*
+- **2026-10-30, #1440 — the ship key shows which YOLO button shows each line,
+  as a bar and the button's name to the right of its rows, and a narrowing
+  YOLO button's words go in the ship legend.** Helen asked to *"map chaos to
+  ship explicitly somehow, and offer the info from the YOLO filter section"*,
+  so YOLO? carries the same (i). Bars first went on the left with `open` round
+  all six; *"That info box is very busy though."* From five layouts on the
+  dev server she chose the quietest: no `open` bar, the two narrowing bars on
+  the right, and the line *"i'm open to chaos: everything"* under the rows.
+  *"Visually, quietest is best by far."* The bars are shades of reposado in
+  the key only: *"I don't think shades of reposado is right for the index
+  page -- if only on the info modal then yes, do it."* The groups put IOU
+  above meh; `ship_key` keeps her order and the template groups.
 - **2026-09-05 — the drink page's glass sits inline at the head's left,
   centred, not out in the margin.** Helen: *"Inline glass please. I don't care
   if this is changing my mind!"* She had only ever seen the inline branch: the

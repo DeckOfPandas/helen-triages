@@ -2595,18 +2595,27 @@ vocabulary, and `test_ship_agrees_with_made_before` holds `who knows` to
 exactly the drinks with `made_before: false`.
 
 `_includes/cocktails/ship.html` draws the mark on the card and on the drink
-page. It asks `ship_scale` whether a value is a rung and never names a
-vocabulary value itself. A rung is shown as its `ship_words` word where it
-has one, on the card and the drink page alike; filters and `?ship=` URLs
-match the stored value.
+page. Its word is `_includes/cocktails/ship-word.html`'s, which asks
+`ship_scale` whether a value is a rung and never names a vocabulary value
+itself. A rung is shown as its `ship_words` word where it has one, everywhere;
+filters and `?ship=` URLs match the stored value.
 
-**The ship key** (#1440) is a small ringed `i` beside the index's ship legend
-and the drink page's SHIP IT? that opens a `<dialog>` listing every value's
-word and Helen's line for it. `_includes/cocktails/ship-key.html` emits both
-halves (`part="button"`, `part="dialog"`), and `assets/js/ship-key.js` reveals
-the button and opens the box with `showModal`; with no script the button stays
-`hidden`. The rows are `ship_key` in `taxonomy.yml`, in its order, and
-`test_every_ship_value_has_a_key_line` holds it to exactly the ship values.
+**The ship key** (#1440) is a small superscript ringed `i` after the index's
+YOLO? and its `ship it?` legend, and after the drink page's SHIP IT? word. It
+opens a `<dialog>`: every value's word and Helen's line for it, banded by the
+YOLO buttons. `_includes/cocktails/ship-key.html` emits both halves
+(`part="button"`, `part="dialog"`), and `assets/js/ship-key.js` reveals the
+buttons and opens the box with `showModal`; with no script they stay `hidden`.
+
+- The lines are `ship_key` in `taxonomy.yml`, and
+  `test_every_ship_value_has_a_key_line` holds it to exactly the ship values.
+- The rows are grouped by the `chaos` lists, keeping `ship_key`'s order
+  within a group. `no chaos please`'s rows and `chaos only`'s each have a bar
+  to their right with the button's name beside it; the rows between have
+  none. One line under them reads `i’m open to chaos: everything`. The names
+  are `chaos_labels`, the same words the buttons print.
+- The two bars are shades of reposado, in the key only; the YOLO buttons keep
+  their one colour.
 
 **`meta.made_before` is a boolean and gates nothing.** It is first in `meta:`.
 An unmade cocktail may publish (§9.1.1). Nothing on the index reads it: the
@@ -3148,17 +3157,25 @@ Five named questions, in Helen's order:
 | Has to have / Leave out | a search box and a pool of chips each | `data-ingredients`, `data-ing` |
 | I know what I want | a search box | `data-name` |
 
-- **`open` applies no filter at all.** The button for "I'll try anything" must
-  never narrow.
+- **YOLO? is a three-way switch that rests on `open`, and `open` applies no
+  filter at all** (#1440). The resting position is `state.chaos === null`,
+  painted as the `open` button lit, so clear-all, the shortlist view and saved
+  state never count it as set. Pressing `open`, or the lit narrowing button
+  again, returns to rest; `× clear` shows only while a narrowing button is on.
 - **`no chaos please` and `chaos only` each keep one list in taxonomy.yml's
   `chaos`**, read off `meta.ship`: `yes` and `oh gods yes`; `meh` and `who
   knows`. The index stamps each card `good`, `chaos` or
-  `middle`, and `middle` (`sure`, `IOU`) shows only under `open`.
+  `middle`, and `middle` (`sure`, `IOU`) shows only under `open`. The three
+  buttons' words are `chaos_labels`.
 - **A card's ship mark is a sixth control with no section** (#1412): a
   `<button>` that sets `state.ship` to its exact `data-ship`, ANDed with
-  YOLO?. The count row's legend then reads `ship it? = <card word>` and
-  `× clear ship` (`#clear-ship`) appears under it. `?ship=` sets it from a
-  drink page's SHIP IT? link; a value no card carries is dropped.
+  YOLO?. `× clear ship` (`#clear-ship`) appears under the legend. `?ship=`
+  sets it from a drink page's SHIP IT? link; a value no card carries is
+  dropped.
+- **The count row's legend names the ship values showing**: `ship it? = <card
+  word>` while a mark is chosen, or else a narrowing YOLO button's words
+  (`= yes², yes`), from its `data-ship-words` (#1440). At 600px and under the
+  value takes its own line.
 - **Mood and Hassle share one `state.moods` set, and it is ORed**: a drink
   carrying any chosen word from either section survives. The order then ranks
   them: drinks answering both sections first, then more chosen words matched,

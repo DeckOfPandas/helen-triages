@@ -184,8 +184,8 @@
   // The cocktail index's fields (#579): a second table, not a second
   // mechanism. Everything below the tables takes a spec.
   //   moods      Set; MOOD and HASSLE together, one filter under two headings
-  //   chaos      string|null; `open` is a lit state that applies no filter
-  //              (#478) and is still clearable
+  //   chaos      string|null; null is the YOLO switch at rest, painted as
+  //              `open`, which applies no filter (#478, #1440)
   //   include    Set of pool entries, AND between them
   //   exclude    Set of pool entries, exact or through a declared family
   //   nameQuery  I KNOW WHAT I WANT, folded and lowercased by the wiring

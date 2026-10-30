@@ -2,22 +2,11 @@
    page so the two cannot disagree. Takes `ship`, the raw `meta.ship`, which may
    be absent.
 
-   A rung's own word if it is on `ship_scale`, and its `ship_off_scale` word in
-   taxonomy.yml if it is not (#722, #1413). The template names no vocabulary
-   value: "not a rung" is asked of `ship_scale`, never tested against a literal
-   (MANUAL §9.9).
-
-   A rung's shown word is `ship_words`' where it has one, on the card and the
-   drink page alike, so the two say the same thing (DECISIONS §9.4).
+   The word is ship-word.html's, which asks `ship_scale` whether a value is a
+   rung and never tests against a literal (MANUAL §9.9), so the card, the drink
+   page and the ship key say the same thing (DECISIONS §9.4).
 
    Emits the two inner spans only; the wrapper is each call site's own.
    `word_only=true` emits the word alone, for the ship key's rows (#1440),
    which carry one ship in their heading. {% endcomment %}
-{% assign taxonomy = site.data.cocktails.taxonomy %}
-{% assign ship = include.ship | default: "who knows" %}
-{% if taxonomy.ship_scale contains ship %}
-  {% assign ship_word = taxonomy.ship_words[ship] | default: ship %}
-{% else %}
-  {% assign ship_word = taxonomy.ship_off_scale[ship] %}
-{% endif %}
-{% unless include.word_only %}<span class="drink-card-ship-icon">{% include icons/ship.svg %}</span>{% endunless %}<span class="drink-card-ship-word">{{ ship_word }}</span>
+{% unless include.word_only %}<span class="drink-card-ship-icon">{% include icons/ship.svg %}</span>{% endunless %}<span class="drink-card-ship-word">{% include cocktails/ship-word.html ship=include.ship %}</span>

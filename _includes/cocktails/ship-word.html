@@ -1,0 +1,13 @@
+{% comment %} The word a `meta.ship` value is shown as, as plain text: its
+   `ship_words` word if it is a rung that has one, its own name if it is a rung
+   that has none, its `ship_off_scale` word if it is not a rung (#722, #1413).
+   ship.html prints it beside the mark, and the YOLO buttons capture it for the
+   ship legend (#1440), so a word is looked up in one place. Takes `ship`,
+   which may be absent. {% endcomment %}
+{%- assign word_taxonomy = site.data.cocktails.taxonomy -%}
+{%- assign word_ship = include.ship | default: "who knows" -%}
+{%- if word_taxonomy.ship_scale contains word_ship -%}
+  {{- word_taxonomy.ship_words[word_ship] | default: word_ship -}}
+{%- else -%}
+  {{- word_taxonomy.ship_off_scale[word_ship] -}}
+{%- endif -%}

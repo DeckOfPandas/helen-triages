@@ -661,6 +661,10 @@
      changed what the results are, so it goes back to page one. */
   function apply(preservePage) {
     if (!preservePage) { currentPage = 1; showAll = false; }
+    /* `open` is the YOLO switch's resting position, held as no filter (#1440),
+       so clear-all and the shortlist view never see it as set. A record saved
+       before that may still say `open`. */
+    if (state.chaos === 'open') state.chaos = null;
     /* The shortlist view gives way to any other filter (#918). Every handler
        ends in apply(), so this line is the whole of that rule here. */
     FilterState.reconcileShortlistView(state);
@@ -740,6 +744,7 @@
     showClear('clear-hassle', moodBtnsIn(true).some(function (b) { return state.moods.has(b.dataset.mood); }));
     showClear('clear-chaos', state.chaos !== null);
     showClear('clear-ship', state.ship !== null);
+    syncChaosButtons();
     syncShip();
     showClear('clear-name', state.nameQuery !== '');
     showClear('clear-include', state.include.size > 0 || state.isIncludeSearching);
@@ -853,9 +858,10 @@
     });
   }
 
-  /* The count row's legend says which ship value is chosen, in the card's own
-     word, and every card's mark says whether it is the chosen one (#1412).
-     Painted from state in apply(), as the mood chips are. */
+  /* The count row's legend says which ship values are showing: the chosen
+     mark's word (#1412), or else the words a narrowing YOLO button keeps, from
+     its `data-ship-words` (#1440). Every card's mark says whether it is the
+     chosen one. Painted from state in apply(), as the mood chips are. */
   var shipLegendValue = document.querySelector('[data-ship-legend-value]');
   var shipLegendWord = document.querySelector('[data-ship-legend-word]');
 
@@ -869,9 +875,18 @@
     return word || value;
   }
 
+  function chaosShipWords() {
+    var words = '';
+    chaosBtns.forEach(function (b) {
+      if (b.dataset.chaos === state.chaos) words = b.dataset.shipWords || '';
+    });
+    return words;
+  }
+
   function syncShip() {
-    if (shipLegendValue) shipLegendValue.hidden = state.ship === null;
-    if (shipLegendWord) shipLegendWord.textContent = state.ship === null ? '' : shipWord(state.ship);
+    var words = state.ship !== null ? shipWord(state.ship) : chaosShipWords();
+    if (shipLegendValue) shipLegendValue.hidden = words === '';
+    if (shipLegendWord) shipLegendWord.textContent = words;
     model.forEach(function (d) {
       if (!d.shipEl) return;
       var on = state.ship !== null && d.ship === state.ship;
@@ -880,19 +895,21 @@
     });
   }
 
+  /* With no YOLO filter the `open` button is the lit one (#1440). */
   function syncChaosButtons() {
     chaosBtns.forEach(function (b) {
-      var on = b.dataset.chaos === state.chaos;
+      var on = b.dataset.chaos === (state.chaos || 'open');
       b.classList.toggle('is-on', on);
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   }
 
+  /* Pressing `open`, or the lit narrowing button again, returns the switch to
+     rest. */
   chaosBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
       var want = btn.dataset.chaos;
-      state.chaos = (state.chaos === want) ? null : want;
-      syncChaosButtons();
+      state.chaos = (want === 'open' || state.chaos === want) ? null : want;
       apply();
     });
   });

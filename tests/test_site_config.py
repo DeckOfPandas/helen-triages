@@ -2258,15 +2258,23 @@ def test_no_element_can_force_horizontal_scroll():
 MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
     ".drink-count-block": (
         "`1fr auto` (#1412): the count or the shortlisted pill, beside the ship "
-        "legend or `× clear ship`. The widest right cell is `SHIP IT? = ` plus "
-        "one card word (`ship_words` keeps every rung to one short word) and "
-        "the ship key's (i), about 175px; measured at 360px with no overflow."
+        "legend or `× clear ship`. The legend is `SHIP IT?` and the ship key's "
+        "(i), then a value: one card word, or a YOLO button's two (`= YES², "
+        "YES`, #1440). At 600px and under the value takes its own line, so the "
+        "widest right cell there is about 120px; measured at 360px with "
+        "`no chaos please` on and no overflow."
     ),
     ".ship-key-list": (
-        "`max-content 1fr` (#1440): a ship word beside Helen's line for it. "
-        "The first track is the icon and the widest card word (`YES²`), about "
-        "75px; the second is wrapping prose inside a dialog capped at the "
-        "viewport less 2rem. Measured at 360px with no overflow."
+        "`auto 1fr` (#1440): a ship word beside Helen's line for it. The first "
+        "track is at least four characters of the word's face, about 40px; "
+        "the second is wrapping prose inside a dialog capped at the viewport "
+        "less 1rem. Measured at 360px with every line on one row."
+    ),
+    ".ship-key-band": (
+        "`1fr auto` (#1440): a YOLO button's rows, then its bar and name. The "
+        "name is capped at 5.2rem and wraps, so the second track is about "
+        "80px; the first is the list above. Measured at 360px with every line "
+        "on one row."
     ),
     ".recipe-pagination": (
         "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "
@@ -2811,6 +2819,8 @@ def test_both_indexes_filter_chips_wear_the_shared_tape():
                   for c in chips}
     moods = yaml.safe_load((ROOT / "_data" / "cocktails" / "taxonomy.yml").read_text(encoding="utf-8"))
     chip_texts |= {str(m).lower() for m in (moods.get("moods") or {})}
+    # The YOLO buttons print `chaos_labels` (#1440).
+    chip_texts |= {str(v).lower() for v in (moods.get("chaos_labels") or {}).values()}
     unknown = [k for k in chosen if k not in chip_texts]
     assert not unknown, f"CHOSEN keys that no filter chip says: {unknown}"
     named = re.findall(r'data-tag-shape="([^"]*)"', cocktails + group
@@ -3249,11 +3259,14 @@ def test_every_yolo_button_value_is_handled_by_the_index_script():
     html = read("cocktails", "index.html")
     script = (ROOT / "assets" / "js" / "cocktail-index.js").read_text(encoding="utf-8")
 
-    values = set(re.findall(r'class="btn-chaos"[^>]*data-chaos="([^"]+)"', html))
-    assert values, (
-        "cocktails/index.html emits no .btn-chaos buttons. The YOLO section is "
-        "gone or its markup has changed shape."
+    # The buttons are a loop over `chaos_kinds` (#1440), each printing its
+    # `data-chaos="{{ kind }}"`.
+    kinds = re.search(r'assign chaos_kinds = "([^"]+)" \| split: ","', html)
+    assert kinds and 'data-chaos="{{ kind }}"' in html, (
+        "cocktails/index.html no longer emits the .btn-chaos buttons from a "
+        "`chaos_kinds` loop. The YOLO section is gone or has changed shape."
     )
+    values = set(kinds.group(1).split(","))
 
     unhandled = sorted(
         v for v in values - CHAOS_NO_OP
