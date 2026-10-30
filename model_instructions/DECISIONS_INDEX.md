@@ -46,6 +46,7 @@ argument and the rules each field is read by.
 - 2026-08-09 · §4 · #75 · incidental: true hides a cooking fluid the cook will use as they like.
 - 2026-08-20 · §4 · staged drafts are read by the draft suite and are expected to be suite-clean.
 - 2026-08-21 · §4 · #429 · meta: is exactly three flags in order, and promotion is never a step where "has it been cooked?" is open.
+- 2026-10-30 · §4 · a food DRAFT's meta: block sits directly under title:.
 - 2026-08-29 · §4 · the ingest contract is one question: is the answer in the source document, or in Helen's head?
 - 2026-08-29 · §4 · ingredient and method groups are split at ingest, once, and not again afterwards.
 - 2026-09-01 · §4 · Helen keeps the rewrite staging folder, and no agent deletes a QQ original line or moves a file between staging folders unasked.

@@ -201,6 +201,9 @@ def test_the_food_docs_example_obeys_the_schema_it_describes():
 
     if list(fm.get("meta") or {}) != ["rewritten", "awaiting_fix", "proofread"]:
         problems.append(f"meta keys/order: {list(fm.get('meta') or {})}")
+    if list(fm)[1:2] != ["meta"]:
+        problems.append("meta is not the key directly under title "
+                        "(test_meta_sits_directly_under_the_title)")
     if not all(v is False for v in (fm.get("meta") or {}).values()):
         problems.append(f"meta values must all be False: {fm.get('meta')}")
     if ("serves" in fm) == ("makes" in fm):

@@ -551,6 +551,10 @@ code, so do not quote the banned call in a comment.
 
 ```yaml
 title: "Lemony Cavolo Nero and Butter Bean Soup"
+meta:                            # exactly these three, in this order -- §4.0.
+  rewritten: false               # A draft's second key; a published recipe
+  awaiting_fix: false            # keeps the order it was promoted in
+  proofread: false
 tagline: "It's fun to have a one-pot stew that is bright and acidic..."
 source: "Adapted from Good Food, January 2026"
 source_type: publication         # required; SOURCE_ATTRIBUTION_SPEC.md
@@ -580,10 +584,6 @@ method_short:
 notes:                           # optional; always a list, never a blob
   - label: "Sinking"             # both keys always
     text: "If it sinks, you added too much syrup."
-meta:                            # exactly these three, in this order -- §4.0
-  rewritten: false
-  awaiting_fix: false
-  proofread: false
 ```
 
 `tests/test_front_matter.py` is the schema's authority; keep this block in
@@ -597,6 +597,7 @@ checked.
 | Top-level scalar strings are double-quoted | `SCALAR_STRING_FIELDS`; `/tidy-drafts` fixes it mechanically |
 | Members of `main_ingredients` and `tags` are quoted | `test_main_ingredients_entries_are_quoted`, `test_tags_entries_are_quoted` (`tests/test_taxonomy.py`, and again over drafts) |
 | `meta:` is `rewritten`, `awaiting_fix`, `proofread`, in that order, real booleans, nothing else | `test_meta_block_is_exactly_the_three_flags_in_order` |
+| A draft's `meta:` sits directly under `title:`; `tidy_drafts.py --site food --only order --apply` moves it | `test_meta_sits_directly_under_the_title` (`tests/test_drafts.py`) |
 | Retired keys stay retired | `RETIRED`, which says what replaced each |
 | `serves:` opens with a number, or `makes:` with a count `food_yield.rb` reads (a draft's `QQ` excepted) | `tests/test_food_shopping.py` |
 

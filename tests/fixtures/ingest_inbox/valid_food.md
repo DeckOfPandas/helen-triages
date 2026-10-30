@@ -3,6 +3,10 @@
 ```yaml
 ---
 title: "Crispy Sage Butter Gnocchi"
+meta:
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
 tagline: "QQ"
 source: "Adapted from RecipeTin Eats, recipe Nagi"
 source_type: website
@@ -37,10 +41,6 @@ method_short:
 notes:
   - label: "QQ"
     text: "QQ - the source stops after the garlic. Nothing tells you when the parmesan goes in, or how the gnocchi and the butter meet."
-meta:
-  rewritten: false
-  awaiting_fix: false
-  proofread: false
 ---
 ```
 

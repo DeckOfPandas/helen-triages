@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # that requires it, and say why in the changelog below.
 REQUIRED = {
     "_cocktail_drafts": 3,
-    "_food_drafts": 1,
+    "_food_drafts": 2,
 }
 
 # What each version required of the data. One line per bump; never rewrite a
@@ -47,6 +47,10 @@ CHANGELOG = {
         1: "2026-09-05, #624 -- the state on the day the handshake was added. "
            "No migration; this is the baseline every later bump is measured "
            "from.",
+        2: "2026-10-30 -- every draft's `meta:` block sits directly under "
+           "`title:` (`test_meta_sits_directly_under_the_title` in "
+           "tests/test_drafts.py), written by `python3 scripts/tidy_drafts.py "
+           "--site food --only order --apply`.",
     },
 }
 

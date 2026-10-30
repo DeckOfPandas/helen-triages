@@ -341,6 +341,23 @@ def test_meta_block_complete(draft):
     assert not missing, f"{where_draft(draft)} `meta:` is missing {missing}."
 
 
+def test_meta_sits_directly_under_the_title(draft):
+    """A draft's `meta:` is the key straight after `title:` (DECISIONS §4).
+
+    Helen reads the flags the moment she opens a file. Drafts only: published
+    recipes keep the order they were promoted in.
+    """
+    keys = list(draft.fm)
+    if "title" not in keys or "meta" not in keys:
+        return                        # test_required_field_key_present's to say
+    assert keys.index("meta") == keys.index("title") + 1, (
+        f"{where_draft(draft)} has `meta:` at key {keys.index('meta') + 1} of "
+        f"{len(keys)}, not directly under `title:`.\n`python3 "
+        f"scripts/tidy_drafts.py --site food --only order --apply` moves the "
+        f"block whole and edits no line."
+    )
+
+
 def test_claude_rewritten_is_a_real_boolean(draft):
     _fm.test_claude_rewritten_is_a_real_boolean(draft)
 

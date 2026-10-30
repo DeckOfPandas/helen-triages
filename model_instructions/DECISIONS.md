@@ -276,6 +276,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   to publish anything I haven't tested."* No test enforces it on food: it is
   hers to decide at promotion. The made-and-liked state short of a rewrite is
   now the drafts folder `3-keep/`, not a flag.
+- **2026-10-30 — a food DRAFT's `meta:` block sits directly under `title:`.**
+  Helen: *"I'd like metadata (e.g. rewritten: false) to sit near the top of
+  recipe files, to help me when I'm rewriting so I don't keep opening the same
+  files over and over again"*; scope *"Drafts only, because there's no point
+  risking live work."* No other key moves. `tidy_drafts.py --site food --only
+  order` makes the move, and the ingest's finishing pass runs it.
 - **2026-08-29 — the ingest contract is one question: is the answer in the
   source document, or in Helen's head?** In the source, the ingest does it; in
   her head, it is a `QQ`. Measured that day, 266 of 342 drafts carried a gap
