@@ -4,7 +4,6 @@ tagline: "Crème pat + gelatine + whipped cream → robust but still fluffy swan
 source: "Simon's repeated demands over more than a decade"
 source_type: joke
 makes: "10–12 swans"
-serves_estimate: 10
 prep_time: "1 hr"
 cook_time: "1 hr 15 mins plus at least 1 hr cooling"
 main_ingredients: ["egg whites", "white caster sugar", "icing sugar", "whole milk", "egg yolks", "cornflour", "gelatine", "double cream", "vanilla pod"]

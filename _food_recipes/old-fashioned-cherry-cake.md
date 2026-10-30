@@ -4,7 +4,6 @@ tagline: "This cake always goes down well, and keeps for ages. Grandpa loves it.
 source: "Adapted from Delia Smith"
 source_type: author
 makes: "one 8-inch round cake"
-serves_estimate: 8
 prep_time: "10 mins"
 cook_time: "1 hr 30 mins"
 main_ingredients: ["glacé cherries", "ground almonds", "salted butter", "eggs", "plain flour", "golden caster sugar", "demerara sugar"]
