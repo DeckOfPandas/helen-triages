@@ -762,6 +762,7 @@ argument and the rules each field is read by.
 - 2026-09-30 · §13 · #1210 · when her answer to a candidates page is a brief rather than a pick, the next page builds that brief and nothing else.
 - 2026-10-06 · §13 · #733 · a candidate that differs from what will be built in any way is a different candidate; say so on the page, not after.
 - 2026-10-06 · §13 · #733 · anything that paints a lot goes to her phone before the merge, as an Artifact bundle of the real build.
+- 2026-10-30 · §13 · she sees a branch on a local server the session runs, never by pulling and building it herself.
 - 2026-10-08 · §13 · #733 · choices that interact go on one page side by side.
 - 2026-10-10 · §13 · a small job whose issue names its own fix may be built once with no candidates page, and every value in it is then the session's reading of her sentence, not a pick of hers.
 - 2026-10-15 · §13 · #1394 · the runner-up long-form design, C, is let go.

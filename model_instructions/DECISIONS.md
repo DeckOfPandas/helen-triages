@@ -5048,6 +5048,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   merge, as an Artifact bundle of the real build.** She had merged the leopard
   untested because *"that's the only way I can test on a phone"*, and it
   juddered. A headless desktop browser cannot show scroll cost.
+- **2026-10-30 — she sees a branch on a local server the session runs, never
+  by pulling and building it herself.** Helen: *"Please show me on a dev page
+  -- this is how I would like to work from now on. I used to pull locally and
+  build myself, but I kept getting tangled, so please update the rules to show
+  me changes on a local server. Pairs of ports will be bound via the
+  container."* The session serves its own worktree with the local config on a
+  free port of a bound pair and gives her the URL; today the pair is
+  4001/4002, and she is adding more. A candidates page still settles a choice
+  between treatments.
 - **2026-10-08, #733 — choices that interact go on one page side by side.**
   Helen asked for the fur strengths again once the base colours had dropped:
   *"it's different with the lower base"*. One switch at a time would have

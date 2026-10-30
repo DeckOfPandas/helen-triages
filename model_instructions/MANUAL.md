@@ -4640,6 +4640,24 @@ artwork, two to five treatments switchable from a bar at the top. Build the
 candidates, publish them, let her pick. Do not write a paragraph arguing for
 one.
 
+**What a branch actually does, she sees on a local server the session runs**,
+never by pulling and building it herself. Serve your own worktree in the
+background with the local config, on a port of a pair the container binds,
+and give her the URL:
+
+    bundle exec jekyll serve --config _config.yml,_config_local.yml \
+      --port <port> --host 0.0.0.0 --destination tmp/site-<port>
+
+`--host 0.0.0.0` is what lets the container's forwarding reach it, and
+`--destination` keeps the build in this worktree's `tmp/`. Today the bound
+pair is 4001 (local config) / 4002 (deploy config) inside the container; which
+port that is on her machine is the container's mapping
+(`.devcontainer/devcontainer.json` forwards 4001/4002, `.devcontainer/run.sh`
+publishes them as 5998/5999). More pairs are coming. `ss -ltn` shows what is
+taken; never stop a server another session or Helen started. The harness's
+`scripts/browser/serve.sh` (4010 and up, 127.0.0.1 only) is for screenshots
+and is not reachable from her browser.
+
 - **`scripts/mock_bundle.py`** bundles a page from a local build into one
   self-contained HTML file (CSS with fonts inlined, scripts inlined, every
   SVG embedded). Build first:
