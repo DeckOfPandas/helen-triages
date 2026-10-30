@@ -12,6 +12,8 @@
 # a dish with two leads, such as chicken and prawns, or chickpeas and kale.
 star_ingredients:
   - beef
+  # Where the dish tastes of chocolate, cocoa powder alone included. Not cocoa
+  # as a colour or a background note.
   - chocolate
   - duck
   # Only where the dish is about the egg. Blank where egg is technique or

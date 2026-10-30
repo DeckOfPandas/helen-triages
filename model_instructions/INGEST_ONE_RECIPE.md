@@ -369,7 +369,9 @@ resistance writes grouped ingredients and a flat method every time.
 So: **if you wrote more than one named ingredient group, the method almost
 certainly has the same phases. Write `method_groups:` and give the groups the
 same names.** A recipe whose ingredients split into `ragù` and `white sauce`
-does not have a one-phase method.
+does not have a one-phase method. **The method may add a phase no ingredient
+group matches**, one that only uses what is already made: `Assemble`, `To
+decorate`. A method group prints its name bare.
 
 **One phase means flat `method:`.** Do not invent a second group to use the
 field, and do not split a recipe the source ran as one sequence — that is
@@ -389,15 +391,24 @@ is correct for plenty of recipes.
   unlabelled pair 20 degrees apart is conventional and fan**, whichever order
   it is printed in: "180C/160C/gas 4" becomes "160°C fan". Helen: *"Oven
   pairings when one temp is 20 degrees lower than the other mean conventional
-  / fan, I'm just so sure."* Any other unlabelled pair, a single figure, or
-  350°F: the rewrite keeps what the source has and your list says so.
-  **The exception is a source Helen has ruled on**: check §5's list first.
-- **Weights: old-style recipes and almost all baking keep their ounces.**
-  Helen's ruling. Do not convert a baking recipe to metric. **A source in §5's
-  list says which figure of a printed pair to keep**, and that wins, baking
-  included.
-- **Never merge, split or reorder steps.** A source step becomes exactly one
-  pair — never fewer, never more, and never out of order.
+  / fan, I'm just so sure."* **A labelled fan figure wins even where the gas
+  mark disagrees**: "220C/200C fan/gas 6" is "200°C fan". Any other
+  unlabelled pair, a single figure, or 350°F: the rewrite keeps what the
+  source has and your list says so, once per book, so Helen can rule for the
+  whole source. **The exception is a source Helen has ruled on**: check §5's
+  list first.
+- **Weights: where the source prints metric and imperial, keep the metric**,
+  bakes included; ounces only where the source gives nothing else. Never
+  convert. Helen's ruling, and a source in §5's list may say otherwise.
+- **Never merge or reorder steps, and never cut a `QQ original`.** A source
+  step is one `QQ original`, with one `QQ Claude` line or, where it is dense,
+  several (§3). A step that straddles two phases stays whole in the earlier
+  method group.
+- **Times that disagree: `cook_time` takes the header's**, the method keeps
+  its own, and a `QQ` note names the mismatch.
+- **A clear typo in the ingredient list is fixed in `item:`** ("oregano
+  springs" is sprigs) and kept as printed in the `QQ original`; `QQ Claude`
+  lines are spelt right.
 - **A step that is really a note stays a step.** Freezer guidance mid-method is
   arguably misfiled, but moving it is restructuring somebody else's recipe.
 
@@ -532,7 +543,9 @@ for her to fix, so propose rather than agonise — but propose only from the lis
 **It is the one thing the recipe is ABOUT, and about a quarter of her collection
 correctly leaves it blank.** A plain sponge, a dressing, a spice blend has no
 hero. Egg as a binder or a leavening mechanism is not `eggs`; a dish that is
-literally about the egg is. Squash and potatoes count as `root veg`. `greens`
+literally about the egg is. `chocolate` is a dish that tastes of chocolate,
+cocoa powder alone included; cocoa as a colour is not. Squash and potatoes
+count as `root veg`. `greens`
 is leaves, brassicas and beans eaten whole in the pod (kale, cabbage, sprouts,
 broccoli, cauliflower, chard, spinach; green, fine and runner beans,
 mangetout, sugar snaps); a tomato, courgette, pepper or leek dish has no star,

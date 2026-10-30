@@ -328,7 +328,10 @@ else has already done (MANUAL §9.1).
   - **So use this trigger: if you wrote more than one NAMED ingredient group,
     the method almost certainly has the same phases.** Write `method_groups:`
     and **give the groups the same names**. A recipe whose ingredients split
-    into `ragù` and `white sauce` does not have a one-phase method.
+    into `ragù` and `white sauce` does not have a one-phase method. The
+    method may add a phase no ingredient group matches (`Assemble`, `To
+    decorate`), and a source step that straddles two phases stays whole in
+    the earlier one.
   - The converse still holds and is not a licence: one phase means one unnamed
     ingredient group and a flat `method:`. Do not split a sequence the source
     ran as one.

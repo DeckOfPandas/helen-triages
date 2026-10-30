@@ -56,6 +56,11 @@ argument and the rules each field is read by.
 - 2026-10-18 · §4 · an ingest ignores a "you will need" equipment list.
 - 2026-10-18 · §4 · page furniture: drop what sells, keep what is written about the dish.
 - 2026-10-18 · §4 · a sidebar box ingested as a recipe has no body.
+- 2026-10-30 · §4 · a magazine page's citation: the book shape plus "via" for an extract, a credit only from the page itself, the cover month.
+- 2026-10-30 · §4 · header and method times that disagree: cook_time takes the header's and a QQ note names the mismatch.
+- 2026-10-30 · §4 · the method may add a phase no ingredient group matches, and a step straddling two phases stays whole in the earlier one.
+- 2026-10-30 · §4 · a clear typo in the source's ingredient list is fixed in item: and kept in the QQ original.
+- 2026-10-30 · §4 · a web chat asks in its reply and never waits; it holds the envelopes only when told to.
 - 2026-09-05 · §4 · a QQ Claude rewrite follows four patterns taken from Helen's own rewrite of one.
 - 2026-09-07 · §4 · #814 · a grouping an ingest left out is derived from the draft and reviewed by Helen: no proposals: block, no calibration round, no re-reading of sources.
 - 2026-10-01 · §4 · a note is always {label, text}; the bare-string form is retired on both sites.
@@ -127,7 +132,8 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
-- 2026-10-19 · §5 · Good Food prints both units; keep the metric, bakes included.
+- 2026-10-30 · §5 · where a source prints metric and imperial, keep the metric, bakes included; ounces only where it gives nothing else.
+- 2026-10-30 · §5 · a single oven figure from an unruled source is kept as printed and asked about once for the book; a labelled fan figure wins over a gas mark that disagrees.
 - 2026-10-19 · §5 · an unlabelled oven pair 20 degrees apart is conventional and fan.
 - 2026-10-19 · §5 · a title keeps its accents, and gains any the house list declares.
 - 2026-08-10 · §5 · within one ingredient group the base spices run coriander, cumin, turmeric, fennel, and the warm spices follow in any order.
@@ -145,6 +151,7 @@ argument and the rules each field is read by.
 - 2026-08-01 · §7 · "declared" and "filterable" are the same thing: a tag shown on the page with no filter button was proposed and rejected.
 - 2026-08-02 · §7 · one-pot and scalable are retired, freezable is kept, and breakfast, extras, festive and starter are practicalities, not moods.
 - 2026-08-09 · §7 · something unusual is retired — Culturally relative, not a real craving, and barely used.
+- 2026-10-30 · §7 · cocoa powder alone earns chocolate where the dish tastes of chocolate.
 - 2026-10-21 · §7 · legumes and mushrooms are star ingredients, and greens means leaves and brassicas.
 - 2026-10-29 · §7 · beans eaten whole in the pod are greens, and the legumes filter finds them too; potatoes are root veg.
 - 2026-10-21 · §7 · knife and fork and herbivore-ish are moods.

@@ -129,10 +129,17 @@ consumer does that against the real files. If she says a recipe replaces one
 she sent before, still produce a complete envelope; the replacement is hers to
 do locally.
 
-NEVER ASK BEFORE PRODUCING. Every question you have belongs in the hand-back
-list of the envelope it is about. The only reasons to reply without an
-envelope are an unreadable image, an item that is not a recipe, or a message
-with no recipe in it — and then say so in one line.
+ASK IN THE REPLY, NEVER WAIT FOR THE ANSWER (Helen's ruling, 2026-10-30). A
+question goes in your reply as soon as you hit it, at the top under
+the index, and the envelope is produced anyway with the question also in its
+hand-back list. When she answers, fold the answer into the envelopes still to
+come, and into earlier ones if she asked you to hold them (below). The only
+reasons to reply without an envelope are an unreadable image, an item that is
+not a recipe, or a message with no recipe in it — and then say so in one line.
+
+IF HELEN SAYS TO HOLD THEM, keep every envelope back until she says she is
+done, folding her later answers into the earlier ones, then deliver the whole
+batch as files (below). Batch by batch, in the reply, is the default.
 
 NEVER INVENT. The files say this in every section and it bears repeating once:
 a silence in the source is written as QQ, never filled from general knowledge.

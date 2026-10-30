@@ -323,6 +323,23 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-18 — a sidebar box ingested as a recipe has no body.** Helen chose
   *"Delete the bodies"*: the body repeated the `QQ original` lines unmarked,
   and would have published the book's text.
+- **2026-10-30 — a magazine page's citation: the book shape plus "via" for an
+  extract, a credit only from the page itself, the cover month.** Helen chose
+  *"Book shape, then "via""*, *"Yes, but not (c)"* (an uncredited page in a
+  book feature is the magazine's, and a first-name tip credit is no author)
+  and *"The cover month"*. `SOURCE_ATTRIBUTION_SPEC.md` holds the shapes.
+- **2026-10-30 — header and method times that disagree: `cook_time` takes the
+  header's and a `QQ` note names the mismatch.** Helen chose *"Header, and
+  flag it"*.
+- **2026-10-30 — the method may add a phase no ingredient group matches, and a
+  step straddling two phases stays whole in the earlier one.** Helen chose
+  *"Yes"* and *"Whole, in the earlier group"*.
+- **2026-10-30 — a clear typo in the source's ingredient list is fixed in
+  `item:` and kept in the `QQ original`.** Helen chose *"Fix in item:,
+  verbatim in QQ original"*.
+- **2026-10-30 — a web chat asks in its reply and never waits; it holds the
+  envelopes only when told to.** Helen chose *"Ask in the reply, never wait"*
+  and, for holding, *"Yes, as an option"*. `CLAUDE_WEB_INGEST.md` says how.
 - **2026-09-05 — a `QQ Claude` rewrite follows four patterns taken from
   Helen's own rewrite of one.** From `sticky-squidge-ginger-loaf.md`, which
   she rewrote as a comparison: do not re-narrate what the ingredient list
@@ -796,11 +813,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
   conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
   says "170°C fan"; the `QQ original` keeps the printed figure.
-- **2026-10-19 — Good Food prints both units; keep the metric, bakes
-  included.** Asked whether its "100g/4oz" should keep only the grams, Helen
-  chose *"Metric only, bakes too"*, over the general rule that baking keeps
-  its ounces. Per-source rulings like this and Riverford's live in
+- **2026-10-30 — where a source prints metric and imperial, keep the metric,
+  bakes included; ounces only where it gives nothing else.** Helen chose
+  *"Metric when both printed"*, making general what she ruled for Good Food on
+  2026-10-19 (*"Metric only, bakes too"*). (Replaces "old-style recipes and
+  baking keep their ounces".) Per-source rulings live in
   `_data/food/sources.yml`, which `INGEST_ONE_RECIPE.md` §5 prints.
+- **2026-10-30 — a single oven figure from an unruled source is kept as
+  printed and asked about once for the book; a labelled fan figure wins over a
+  gas mark that disagrees.** Helen chose *"Keep it and ask"* and *"The
+  labelled fan figure"*; her answer for a book goes in `sources.yml`, as
+  Riverford's did.
 - **2026-10-19 — an unlabelled oven pair 20 degrees apart is conventional and
   fan.** Helen: *"Oven pairings when one temp is 20 degrees lower than the
   other mean conventional / fan, I'm just so sure. Interpret that way
@@ -913,6 +936,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-08-09 — `something unusual` is retired.** Culturally relative, not a
   real craving, and barely used. `retired_star_ingredients` makes a retired
   value fail with its reason.
+- **2026-10-30 — cocoa powder alone earns `chocolate` where the dish tastes of
+  chocolate.** Helen chose *"Yes, if it tastes of chocolate"*; cocoa as a
+  colour or a background note does not.
 - **2026-10-21 — `legumes` and `mushrooms` are star ingredients, and `greens`
   means leaves and brassicas.** From a tag audit once the veg-forward books
   arrived: `legumes` had been declined in August with two candidates, and now

@@ -32,6 +32,7 @@ near-miss: it is `publication`.
 | `publication` | …with a named author | `Adapted from <title>, <date>, <Firstname Lastname>` | `Adapted from Good Food, January 2026, Sarah Cook` |
 | `book` | A named book | `Adapted from <title>, <Firstname Lastname>` | `Adapted from French Provincial Cooking, Elizabeth David` |
 | `book` | …whose author owns the title | `Adapted from <Author>'s <title>` | `Adapted from Delia Smith's Book of Cakes` |
+| `book` | …read as an extract in a magazine | either book shape, then `, via <magazine>, <date>` | `Adapted from Chilli Notes, Thomasina Miers, via Good Food, March 2015` |
 | `website` | A site or blog, never dated | `Adapted from <site>, recipe <Firstname Lastname>` | `Adapted from RecipeTin Eats, recipe Nagi` |
 | `website` | …author not recorded | `Adapted from <site>` | `Adapted from indianhealthyrecipes.com` |
 | `author` | A published cook, work not recorded | `Adapted from <Name>` | `Adapted from Delia Smith` |
@@ -59,6 +60,21 @@ is a `website` (rule 2). Ask Helen before accommodating it.
 The test accepts a comma followed by text, or a possessive followed by text. A
 title that merely contains a possessive (`The Baker's Year`) satisfies it
 without naming anyone, so that case is yours to catch.
+
+### A magazine page: whose credit, and which month
+
+Helen's rulings, 2026-10-30:
+
+- **A book extract keeps the book's shape and adds where it was read**:
+  `Adapted from Mary Berry's Absolute Favourites, via Good Food, March 2015`.
+  It is a `book`.
+- **A credit has to be on the page.** A page with none is the magazine's
+  alone, `Adapted from Good Food, November 2026`, even inside a feature
+  extracted from a book: the box two pages on does not reach it.
+- **A first-name-only credit is not an author.** "Juliet's tip" leaves the
+  page the magazine's.
+- **The date is the issue's cover month**, even where the page footers name a
+  season or a feast ("Christmas 2026" in the November issue).
 
 ---
 
