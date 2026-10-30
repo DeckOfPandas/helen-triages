@@ -92,10 +92,9 @@
 .page-search-group--ingredient     .page-search-group-label { background: $color-ingredient-root; }
 
 // A recipe in the dropdown wears the index list's title type
-// (`.recipe-title-link`, _recipe-list.scss): lowercase, its tracking, and a
-// step up from the words beside it, so a dish reads as a dish.
+// (`.recipe-title-link`, _recipe-list.scss): lowercase and its tracking, at
+// the size of the words beside it. The bold says it is a dish.
 .page-search-group--name .page-search-option {
-  font-size: 1rem;
   text-transform: lowercase;
   letter-spacing: 0.04em;
 }
