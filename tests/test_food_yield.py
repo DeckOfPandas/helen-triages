@@ -52,6 +52,16 @@ CASES = {
     "3 batches (total around 2.2 kg)": dict(kind=COUNT, base=3, stem="batches"),
     # The noun that takes the plural is the one before "of".
     "2 large rounds of 4": dict(kind=COUNT, base=2, stem="large rounds", rest=" of 4"),
+    "1 batch of 18 buns": dict(kind=COUNT, base=1, stem="batch", rest=" of 18 buns", also=None),
+    # A measure straight after the thing scales with it: 2 batches, about 200 g.
+    "1 batch, about 100 g":
+        dict(kind=COUNT, base=1, stem="batch", also={"prefix": "about", "base": 100, "unit": "g"}),
+    "1 batch, about 100 g, for the curry":
+        dict(kind=COUNT, stem="batch", also={"prefix": "about", "base": 100, "unit": "g"}),
+    # Only a declared measure counts; "grand" is not grams.
+    "1 batch, about 100 grand": dict(kind=COUNT, stem="batch", also=None),
+    # Helen's words after a dash are never a measure.
+    "1 batch — I mean, who cares, make double anyway": dict(kind=COUNT, stem="batch", also=None),
 
     # --- the lower number never lands on a half, so no reading starts as a
     # range of one.

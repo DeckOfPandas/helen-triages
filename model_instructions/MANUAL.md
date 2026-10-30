@@ -1290,8 +1290,8 @@ of the aisle rule.
 
 | key | meaning |
 |---|---|
-| `p`, `e` | portions, and whether they are an estimate |
-| `y`, `k` | the yield in the recipe's own words, and which key it came from (`serves` or `makes`). Never print `y` behind a fixed word |
+| `p` | portions, the number opening `serves:` |
+| `y`, `k` | the yield up to Helen's own words (`yield_lead`, cut where `FoodYield::THING_END` cuts: "6, depending on appetite" is `6`; her words stay on the recipe page), and which key it came from (`serves` or `makes`). Never print `y` behind a fixed word |
 | `w`, `h`, `m` | `makes:` recipes only: `whole_recipes`, `half_recipe`, `made` |
 | `i` | the ingredients: `a` amount as written, `n` name, `s` aisle |
 | `pt`, `f`, `c`, `x` | on an ingredient: fruit parts, fruit, count, pointer (below) |
@@ -1543,6 +1543,7 @@ word from `yields.approx_words`:
 | `1 dozen mince pies` | `1` dozen mince pies | `2` dozen mince pies |
 | `950 ml`, `approx. 75 g` — a measure | `950` ml | `1900` ml |
 | `1 batch — <Helen's words>` | `1` batch | `2` batches; ×½ reads `½` batch |
+| `1 batch, about 100 g` — a measure after the thing (`also`) | `1` batch, about 100 g | `2` batches, about 200 g |
 | `Some`, `Plenty for two people`, `about 8`, `9 or 16` | not read: no box | |
 
 The noun agrees with the number (`thingText`): it is the last word before any

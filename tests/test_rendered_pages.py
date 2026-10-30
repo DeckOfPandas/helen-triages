@@ -2255,6 +2255,30 @@ _in_the_fixture_build({
     for slug, (ing, _) in STAR_ALSO_CASES.items()})
 
 
+YIELD_ALSO_FIXTURE = (
+    '---\ntitle: "zzz-yield-also"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nsource_type: unknown\nmakes: "1 batch, about 100 g"\n'
+    'main_ingredients: ["salt"]\ntags: []\n'
+    'ingredient_groups:\n  - items:\n    - amount: "100 g"\n      item: "salt"\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: true\n---\n')
+_in_the_fixture_build({"_food_recipes/zzz-yield-also.md": YIELD_ALSO_FIXTURE})
+
+
+def test_a_measure_after_the_count_is_printed_with_it(fixture_site):
+    """"1 batch, about 100 g" builds a box of 1 and the word "batch, about 100
+    g"; assets/js/food-scale.js moves the grams with the box from there."""
+    page = fixture_site / "food" / "recipes" / "zzz-yield-also" / "index.html"
+    html = page.read_text(encoding="utf-8")
+    said = re.search(r'<span class="recipe-scale-word">(.*?)</span>', html, re.S)
+    assert said and " ".join(said.group(1).split()) == "batch, about 100 g", (
+        f"the built control says {said.group(1) if said else None!r}"
+    )
+    assert '"also":{"prefix":"about","base":100,"unit":"g"}' in html.replace("&quot;", '"'), (
+        "the input's data-made lost the measure that scales with the count"
+    )
+
+
 def test_a_pod_bean_greens_row_also_answers_legumes(fixture_site):
     """`star_also` in _data/food/taxonomy.yml reaches the built index row as
     `data-star-also`, matched case-blind on main_ingredients (DECISIONS §7).
@@ -2298,6 +2322,15 @@ def test_every_recipe_reaches_the_page_with_a_portion_count(site):
         f"list can draw no box for them: {unscalable}. Open `serves:` with a "
         "number, or `makes:` with a count of a named thing."
     )
+
+    # The list quotes the yield up to Helen's own words, which stay on the page:
+    # "4, depending on appetite" is "4" (`yield_lead`, _plugins/food_yield.rb).
+    leads = {"/food/recipes/smoked-mackerel-pate/": "4",
+             "/food/recipes/caramel/": "1 batch",
+             "/food/recipes/grandmas-scones/": "8 scones"}
+    wrong = {u: (blob.get(u, {}).get("y"), want) for u, want in leads.items()
+             if blob.get(u, {}).get("y") != want}
+    assert not wrong, f"the shopping list quotes more than the yield's figure: {wrong}"
 
     empty = sorted(u for u, r in blob.items() if not r.get("i"))
     assert not empty, (

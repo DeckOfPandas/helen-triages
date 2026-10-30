@@ -1356,6 +1356,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   cupcakes or makes 16 truffles; a caramel is a sauce or a tin's filling.
   Since 2026-10-29 `chocolate-ganache` and `caramel` each make "1 batch", and
   the note stands. A schema for several yields is hers to ask for.
+- **2026-10-30 — the shopping list quotes a yield's figure, never Helen's
+  words after it; a measure after a count scales with it.** Helen, on "6,
+  depending on appetite": *"cute on the recipe but should not appear in the
+  shopping list scaler."* The list is handed the line up to its first
+  comma, dash or bracket. And on the curry paste, *"1 batch … about 100 g"
+  scaling appropriately*: "1 batch, about 100 g" doubles to "2 batches,
+  about 200 g" (`also` in `_plugins/food_yield.rb`).
 - **2026-10-29 — a batch halves.** Helen, on six "1 batch" recipes losing
   their ½: *"Yes, half a batch is fine"*. A batch is mixture, not an object,
   so `halvable_yields` in `_data/food/scaling.yml` lets "1 batch" halve where

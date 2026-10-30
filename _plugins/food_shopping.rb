@@ -57,6 +57,8 @@ module HelenTriages
         next unless site.collections[key]
         site.collections[key].docs.each do |doc|
           doc.data["made"] = made_for(doc, yields)
+          # What the shopping list quotes: the yield up to Helen's own words.
+          doc.data["yield_lead"] = HelenTriages::FoodYield.lead(doc.data["serves"] || doc.data["makes"])
           portions = portions_for(doc)
           doc.data["portions"] = portions
           doc.data["whole_recipes"] = whole_recipes?(doc)

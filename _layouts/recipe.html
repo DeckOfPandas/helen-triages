@@ -161,7 +161,7 @@ layout: default
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="make fewer">&minus;</button>
       <label class="recipe-scale recipe-scale--made">
         {% if page.made.prefix != "" %}<span class="recipe-scale-prefix">{{ page.made.prefix }}</span>{% endif %}
-        {% capture made_word %}{% if page.made.kind == "measure" %}{{ page.made.unit }}{% else %}{% if page.made.times %}× {% endif %}{{ page.made.stem }}{{ page.made.rest }}{% endif %}{% endcapture %}
+        {% capture made_word %}{% if page.made.kind == "measure" %}{{ page.made.unit }}{% else %}{% if page.made.times %}× {% endif %}{{ page.made.stem }}{{ page.made.rest }}{% if page.made.also %}, {% if page.made.also.prefix != "" %}{{ page.made.also.prefix }} {% endif %}{{ page.made.also.base }} {{ page.made.also.unit }}{% endif %}{% endif %}{% endcapture %}
         <input type="text" value="{{ page.made.box }}" inputmode="numeric" class="recipe-scale-portions" data-made="{{ page.made | jsonify | escape }}"{% if page.half_recipe %} data-half-recipe{% endif %} aria-label="{{ made_word | remove: '× ' | escape }} to make">
         <span class="recipe-scale-word">{{ made_word }}</span>
       </label>

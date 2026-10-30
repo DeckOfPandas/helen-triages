@@ -204,6 +204,7 @@ argument and the rules each field is read by.
 - 2026-10-11 · §8.2 · a makes: that opens with a number must name the thing ("16 bars", never "16").
 - 2026-10-11 · §8.2 · recipe names in the shopping list are links, set like the index row titles.
 - 2026-09-07 · §8.2 · #815 · a component recipe makes one thing and a note on the recipe carries its uses; no schema is invented for it.
+- 2026-10-30 · §8.2 · the shopping list quotes a yield's figure, never Helen's words after it; a measure after a count scales with it.
 - 2026-10-29 · §8.2 · a batch halves — Helen, on six "1 batch" recipes losing their ½: "Yes, half a batch is fine".
 - 2026-09-07 · §8.2 · #1118 · Undated, #1118 — the food scaler's box is as wide as the drink scaler's: two characters and the caret.
 - 2026-09-10 · §8.3 · #918 · shortlisted is a view, not a filter: it never combines with another filter.

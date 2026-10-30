@@ -44,8 +44,9 @@ const SCRIPTS = [
   'shortlist-export.js'
 ];
 
-/* Hand-built, and small enough to read in one screen. `b` keeps Helen's words
-   after its number, as a yield line does. */
+/* Hand-built, and small enough to read in one screen. `y` is what the build
+   hands over, the yield up to Helen's own words: `b`'s recipe says "6,
+   depending on appetite" and the list is given "6". */
 const RECIPES = {
   '/food/recipes/a/': {
     p: 4, y: '4', k: 'serves',
@@ -54,7 +55,7 @@ const RECIPES = {
       { a: '', n: 'olive oil', s: 'cupboard' }]
   },
   '/food/recipes/b/': {
-    p: 6, y: '6, depending on appetite', k: 'serves',
+    p: 6, y: '6', k: 'serves',
     i: [{ a: '300 g', n: 'plain flour', s: 'cupboard' },
       { a: '1', n: 'onion', s: 'produce' }]
   },
@@ -368,8 +369,7 @@ test('the yield is on the control, never printed beside the name', () => {
     + '_sass/food/_shopping-list.scss before putting it back.');
   // Still SAID, so it is there on hover and for a screen reader.
   assert.ok(html.includes('which serves 4'), 'the stated serving size, quoted');
-  assert.ok(html.includes('which serves 6, depending on appetite'),
-    'her words after the number are quoted with it');
+  assert.ok(html.includes('which serves 6'), 'the figure is quoted');
   assert.ok(html.includes('title='), 'the yield is reachable on hover');
 });
 

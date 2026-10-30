@@ -371,7 +371,18 @@
     } else if (!spec.invariable && !spec.singular && value === 1) {
       stem = replaceLast(stem, function (w) { return shoppingList.foldUnit(w); });
     }
-    return (spec.times ? '× ' : '') + stem + String(spec.rest || '');
+    return (spec.times ? '× ' : '') + stem + String(spec.rest || '') + alsoText(spec, value);
+  }
+
+  /* "1 batch, about 100 g": the measure after the thing moves with the count,
+     so two batches read "2 batches, about 200 g". `spec.also` is
+     _plugins/food_yield.rb's; absent, this adds nothing. */
+  function alsoText(spec, value) {
+    var also = spec.also;
+    if (!also || !(Number(also.base) > 0)) return '';
+    var n = Number(also.base) * value / Number(spec.base);
+    var unit = shoppingList.foldUnit(String(also.unit || ''));
+    return ', ' + (also.prefix ? also.prefix + ' ' : '') + yieldBox(n) + ' ' + unitLabel(unit, n);
   }
 
   /**

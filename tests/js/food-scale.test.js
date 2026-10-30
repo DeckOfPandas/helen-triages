@@ -683,6 +683,11 @@ test('#1286: what half a recipe makes, by shape', () => {
   assert.strictEqual(half(yieldMode(batch, true)), '½ batch');
   assert.strictEqual(press(yieldMode(batch, false), 1, -1), 1);
   assert.strictEqual(yieldMode(batch, true).word(2), 'batches');
+  // "1 batch, about 100 g": the grams move with the batches.
+  const paste = Object.assign({}, batch, { also: { prefix: 'about', base: 100, unit: 'g' } });
+  assert.strictEqual(reads(yieldMode(paste, true), 1), '1 batch, about 100 g');
+  assert.strictEqual(reads(yieldMode(paste, true), 2), '2 batches, about 200 g');
+  assert.strictEqual(half(yieldMode(paste, true)), '½ batch, about 50 g');
 });
 
 // --- "1 large egg", not "1 large eggs" -----------------------------------------
