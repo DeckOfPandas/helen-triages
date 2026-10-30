@@ -3171,6 +3171,30 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   other than being funny. Are these labels or categories simply wrong???"*
   Offered two buttons, a resting `open`, or a risk dial, she chose the
   resting `open`, which keeps the button, its joke and the ruling above.
+- **2026-10-29, #1440 (dupe of #1423) — a ship key: a small superscript (i)
+  opens a box saying what each ship word means.** It sits after the index's
+  YOLO? and its `ship it?` legend, and after the drink page's SHIP IT? word.
+  Helen, in #1423: *"I keep forgetting what everything means."* Asked whether
+  the drink page's (i) broke that row's no-control rule: *"the justification
+  is that this is just more metadata."* *"I icon: please make it smaller, and
+  superscript."* The lines are hers: yes² *"Oh Gods yes. Just works."*, yes
+  *"Works very well."*, sure *"Some attention required."*, meh *"Haven't
+  nailed this yet."*, IOU *"Liked, rating to follow."*, ??? *"Never made."*
+  *"Please don't repeat the ship on every line"*: the one ship is the box's
+  heading. On a phone the legend's ship, `ship it?` and (i) share one top
+  line: *"On mobile, please top-align the mark, SHIP IT? and new (i) icon."*
+- **2026-10-30, #1440 — the ship key shows which YOLO button shows each line,
+  as a bar and the button's name to the right of its rows, and a narrowing
+  YOLO button's words go in the ship legend.** Helen asked to *"map chaos to
+  ship explicitly somehow, and offer the info from the YOLO filter section"*,
+  so YOLO? carries the same (i). Bars first went on the left with `open` round
+  all six; *"That info box is very busy though."* From five layouts on the
+  dev server she chose the quietest: no `open` bar, the two narrowing bars on
+  the right, and the line *"i'm open to chaos: everything"* under the rows.
+  *"Visually, quietest is best by far."* The bars are shades of reposado in
+  the key only: *"I don't think shades of reposado is right for the index
+  page -- if only on the info modal then yes, do it."* The groups put IOU
+  above meh; `ship_key` keeps her order and the template groups.
 - **2026-08-29 — the drinks index shows drafts on a local build only.** Helen:
   *"for food, we build drafts locally only, so let's do the same."*
 - **2026-08-31, #595 — going back to the drinks index restores the list you
@@ -3255,7 +3279,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   survivors text and shortlist button on the left."* So `.drink-count-block`
   is two by two: count and legend, then shortlisted and the clear. The value
   is the card's word, and it ANDs with the YOLO buttons rather than replacing
-  them. The drink page's SHIP IT? word links to `?ship=`. This replaces
+  them; with no mark chosen, a narrowing YOLO button's words take its place
+  (2026-10-30, #1440). The drink page's SHIP IT? word links to `?ship=`. This replaces
   2026-09-05's legend on the shortlisted row (*"move the ship mark into the
   same row so it's not hovering above the cards"*): the clear now holds that
   row.
@@ -3525,27 +3550,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   it happens."* Garnish is a list joined whole. SHIP IT? reads the card's own
   include and is unconditional (an unrated drink prints `???`, #722). No
   control goes in this row, which would claim to be a fourth thing the drink
-  IS, except the ship key below.
-- **2026-10-29, #1440 (dupe of #1423) — a ship key: a tiny (i) beside the
-  index's ship legend and the drink page's SHIP IT? opens a box saying what
-  each word means.** Helen, in #1423: *"I keep forgetting what everything
-  means."* Asked whether the drink page's (i) broke the no-control rule
-  above: *"the justification is that this is just more metadata."* The lines
-  are hers, in her order: yes² *"Oh Gods yes. Just works."*, yes *"Works very
-  well."*, sure *"Some attention required."*, meh *"Haven't nailed this
-  yet."*, IOU *"Liked, rating to follow."*, ??? *"Never made."*
-- **2026-10-30, #1440 — the ship key shows which YOLO button shows each line,
-  as a bar and the button's name to the right of its rows, and a narrowing
-  YOLO button's words go in the ship legend.** Helen asked to *"map chaos to
-  ship explicitly somehow, and offer the info from the YOLO filter section"*,
-  so YOLO? carries the same (i). Bars first went on the left with `open` round
-  all six; *"That info box is very busy though."* From five layouts on the
-  dev server she chose the quietest: no `open` bar, the two narrowing bars on
-  the right, and the line *"i'm open to chaos: everything"* under the rows.
-  *"Visually, quietest is best by far."* The bars are shades of reposado in
-  the key only: *"I don't think shades of reposado is right for the index
-  page -- if only on the info modal then yes, do it."* The groups put IOU
-  above meh; `ship_key` keeps her order and the template groups.
+  IS, except SHIP IT?'s ship key (i): Helen, *"the justification is that this
+  is just more metadata"* (2026-10-29, #1440, under The index).
 - **2026-09-05 — the drink page's glass sits inline at the head's left,
   centred, not out in the margin.** Helen: *"Inline glass please. I don't care
   if this is changing my mind!"* She had only ever seen the inline branch: the

@@ -3244,8 +3244,8 @@ def test_no_yaml_mapping_has_a_duplicate_key(label, text):
 # inside cocktail-index.js's IIFE with no export (#633).
 
 CHAOS_NO_OP = {
-    # `open` is a state, not a filter: "I'm open to chaos" includes every
-    # drink, so it has no clause on purpose.
+    # `open` is the YOLO switch's resting position, not a filter: "I'm open
+    # to chaos" includes every drink, so it has no clause on purpose (#1440).
     "open",
 }
 

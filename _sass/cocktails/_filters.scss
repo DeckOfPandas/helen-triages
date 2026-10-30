@@ -471,9 +471,9 @@ $pool-chip-rest: color.mix($color-text, $color-bg, 73%);
 
 .drink-count-clear-ship { justify-self: end; }
 
-// The one line on the page that says what the ship on every card means, in
-// the card's own type (`.drink-card-ship`, _cards.scss), muted because it is
-// a caption.
+// The caption that names the ship on every card, in the card's own type
+// (`.drink-card-ship`, _cards.scss), muted because it is a caption. Its (i)
+// opens the ship key, which says what each word means (#1440).
 //
 // The words sit on the baseline and only the icon is centred (#934, #1412):
 // the icon's SVG is `display: block`, with no text baseline, so a baseline
@@ -492,7 +492,7 @@ $pool-chip-rest: color.mix($color-text, $color-bg, 73%);
   color: $color-clear-text;
 }
 
-// The chosen value, in full colour: it is the one word here that is state,
+// The ship values showing, in full colour: the one part here that is state,
 // not caption.
 .drink-count-legend-value { color: $color-text; }
 
