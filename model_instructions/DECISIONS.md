@@ -3352,12 +3352,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   an ellipsis then a closing round bracket."* The round brackets are generated
   content in `_sass/cocktails/_universe.scss`, and the closing one is placed
   where the ellipsis's clip cannot remove it.
-- **Undated, #541 — the drinks index has a clear-all at the top and at the
-  bottom of the filters, as food does, looking the same and in the same
-  place.** Helen: *"very much like food site"* and *"I'd expect the clear all
-  button to look the same and be in the same place too."* Both sites include
-  `index-clear-all` and `index-clear-all-bottom` from
-  `_sass/shared/_rule.scss`, so the two cannot drift.
+- **Undated, #541 — the drinks index clears all exactly as food does, with
+  the same control in the same place.** Helen: *"very much like food site"*
+  and *"I'd expect the clear all button to look the same and be in the same
+  place too."* Since 2026-10-30 (#1448) that control is the results pill's
+  ×, one include on both indexes.
 - **Undated, #548 — no coloured bar sits above the "N survivors" count.**
   Helen, of the bar: *"distracting."* The count is not one of the filter
   sections, so `.drink-count` borrows none of their colours and has no rule
@@ -4577,9 +4576,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   it was, half way, food's 4.5rem / 2rem): *"half way, BUT with a little extra
   space between the make it read it line and the rule above it."* The gap was
   re-checked in #1093's spacing review and left alone because it is ruled.
-- **2026-09-15, #1093 — on both indexes the gap from the bottom clear-all to
-  "N survivors" is cocktails' (about 60px).** Helen, given 24px on food and
-  about 60px on cocktails as numbers: *"Food matches cocktails"*.
+- **2026-09-15, #1093 — the gap from the filter panel to "N survivors" is the
+  same on both indexes.** Helen, given 24px on food and about 60px on
+  cocktails as numbers: *"Food matches cocktails"*. The panel's foot
+  clear-all that ended it went on 2026-10-30 (#1448), so the panel now ends
+  on its last section, on both.
 - **2026-09-15, #1093 — a page with no back arrow starts 32px down.** Helen,
   given 48px on the food reference pages and about against 32px on rum
   categories: *"All at 32px"*.
@@ -4704,8 +4705,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-10-11, #1219 — food's chosen LEAVE OUT pills sit above the
   candidates, as cocktails' do.** Helen: *"retains selected terms at the top of
   the list when further searches are made, which I prefer"*.
-- **2026-10-11, #1219 — every clear and clear-all, on both sites, is the text
-  colour and goes magenta under the pointer.** Helen: *"I'm fed up with the
+- **2026-10-11, #1219 — every clear, on both sites, is the text colour and
+  goes magenta under the pointer.** Helen: *"I'm fed up with the
   clear and clear all buttons! Please show each one in normal link colours, so
   not derived from the section colour. Normal base text, site colour on hover
   (both woo woo)."* One mixin, `index-clear-link`. Replaces food's per-section
@@ -4870,18 +4871,28 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-08-12 — the word in "N survivors" is bare body text, no emboss.**
   Helen: *"I liked it bare"* (it had been "fixed" once by accident). Refined
   2026-09-26 from a candidates page, *"both treatments"*: the number alone
-  takes the label face (`.results-count-number`), the word stays bare. The
-  other of the two treatments is the sticky results bar
-  (`_sass/shared/_results-bar.scss`, `assets/js/results-bar.js`), which
-  repeats the count and clear-all on both indexes once the count line has
-  scrolled away; both indexes took both the same day.
-- **2026-10-29, #1441 — two pills share one place at the foot of the
-  screen: "N survivors ↓" down to the count, and "top ↑" back to the STAR
-  section.** Taken from `is-it-rhubarb-yet`'s `.tt-jump`. Helen first ruled
-  out the back-to-top twin, then: *"I'd also like to change my mind --
-  please give me a return to top pill "top" with an upward arrow, target the
-  STAR section."* Cocktails has no STAR section; its pill returns to the
-  first one, YOLO? (`filter-chaos`).
+  takes the label face (`.results-count-number`), the word stays bare, in the
+  count line and in the results pill alike.
+- **2026-10-30, #1448 — one pill at the foot of the screen, one face at a
+  time: "top ↑" while the filter panel is above the screen, "N survivors ↓"
+  while the count line is below it, and, while any filter is on, "N
+  survivors" with no arrow in between; a × beside it whenever a filter is
+  on.** The reader landing on the results, from a search result or from
+  "N survivors ↓", had no way back: #1441's pills followed the count line,
+  which then sat neither below nor past the screen. Helen: *"top when filters
+  above, BUT show an x with the top button but not with the survivors
+  button. Currently your candidate shows all three together which is huge.
+  Then top should scroll back to the STAR heading, rather than cut it off"*;
+  of when survivors carries the ×, *"whenever a filter is on"*; asked about a
+  desktop view where neither face would show, *"Pill stays while filtered"*.
+  "top" lands on STAR (YOLO? on cocktails, `filter-chaos`) whole, with the
+  count line's step of air above it. The sticky top bar is gone. Replaces
+  #1441's two pills placed by the count line.
+- **2026-10-30, #1448 — the pill's × is each index's only clear-all.**
+  Helen: *"meaning we can delete all the clear buttons too, yes? Hurrah for
+  less things on the screen!!!!"*; asked which, she chose the "× clear all"s
+  (the panel's top and foot, and the one in "Blank canvas.") and kept each
+  section's "× clear", the typing boxes' and cocktails' "× clear ship".
 - **2026-10-29, #1441 — the pills are the site's accent, small and short,
   with the lettering centred.** Picked from three on a candidates page:
   *"2 please, but please make the pill smaller, shorter (line height), and
@@ -5063,6 +5074,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   merge, as an Artifact bundle of the real build.** She had merged the leopard
   untested because *"that's the only way I can test on a phone"*, and it
   juddered. A headless desktop browser cannot show scroll cost.
+- **2026-10-30 — she sees a branch on a local server the session runs, never
+  by pulling and building it herself.** Helen: *"Please show me on a dev page
+  -- this is how I would like to work from now on. I used to pull locally and
+  build myself, but I kept getting tangled, so please update the rules to show
+  me changes on a local server. Pairs of ports will be bound via the
+  container."* The session serves its own worktree with the local config on a
+  free port of a bound pair and gives her the URL; today the pair is
+  4001/4002, and she is adding more. A candidates page still settles a choice
+  between treatments.
 - **2026-10-08, #733 — choices that interact go on one page side by side.**
   Helen asked for the fur strengths again once the base colours had dropped:
   *"it's different with the lower base"*. One switch at a time would have
@@ -5207,10 +5227,17 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   of the redraw, *"I'm sold! No notes. Ship it please!!!!"* Six issues in two
   weeks had each rearranged the row (#1086, #1163, #1164, #1176, #1182).
   Replaces the `.recipe-controls` row and every grid of it.
-- **2026-09-30, #1210 — print and pdf sit at the right-hand end of the back
-  arrow's line.** They are things you do WITH the page. Helen: *"so where the
-  omnisearch currently is"*. `_includes/page-print.html`, only where a layout
-  passes `actions=true`.
+- **2026-10-30, #1447 — print and pdf sit at the right, directly above the
+  rule that ends a recipe's or drink's head.** They are things you do WITH
+  the page, and under the search box they read as the box's. Helen: *"the
+  PRINT and PDF buttons on recipe pages now look like they belong to the
+  omnisearch not the page itself. The only place I can think of to move it to
+  is in the same right-hand alignment but directly above the rule ending the
+  metadata."* Then: *"Build it, I agree with and trust you!"* The session's
+  reading: out of the flow, 0.3rem above the rule, in the room both heads
+  leave above it, which on a drink page grew from 1.4rem to food's 1.75rem so
+  a full row of mood chips has air above print · pdf.
+  `_includes/page-print.html`. Replaces #1210's back arrow's line.
 - **2026-09-30, #1210 — the shortlist pair sits at the right of the first line
   under the head's rule: the toggle's line on a drink page, INGREDIENTS' line
   on food.** Helen: *"on the same line as INGREDIENTS for Moules where it
@@ -5351,19 +5378,24 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   less obtrusive, which is what I actually want, please step its colour (border
   and font) closer to the background."* Typed text stays `$color-text`. Mix
   towards the ground, never `lighten()`. 40% was rejected as disappearing.
-- **2026-10-28, #1288 — the search box is live on both sites, at the top
-  right of the page body under the door, not in the header; it takes the
-  right-hand end of the page's first line.** Helen: *"Let's do it live! BUT
-  not in the header bar -- this is the key. Let's put it top right in the page
-  body, directly below the door to the other site. My hope is that this makes
-  the search clearly be part of one site or the other rather than shared."*
-  From three candidates (own line, hung close under the border, sharing the
-  first line) she picked the last: *"option C please!"* So print · pdf starts
-  under the box, and cocktails' universe line starts below it. Below
-  `$index-stack-width` the box is a line of its own, because food's STAR
-  INGREDIENT heading and the box do not fit one phone line. `show_header_search`
-  is retired. It replaces her local-only ruling of 2026-10-08 (PR #1310's
-  closing comment has the header attempts).
+- **2026-10-28, #1288 — the search box is live on both sites, in the page body
+  under the door, not in the header.** Helen: *"Let's do it live! BUT not in
+  the header bar -- this is the key. Let's put it top right in the page body,
+  directly below the door to the other site. My hope is that this makes the
+  search clearly be part of one site or the other rather than shared."*
+  `show_header_search` is retired. It replaces her local-only ruling of
+  2026-10-08 (PR #1310's closing comment has the header attempts).
+- **2026-10-30, #1447 — the box hangs 1.5rem under the header's border, on the
+  column's right edge, by one rule at every width on both sites; food's STAR
+  never moves for it.** Helen: *"Omnisearch closer to the header bar, both
+  sites, same code not just same-looking code"*; from 0.5rem and 1rem
+  candidates, *"I'd like a little more space. On food, the omnibox row
+  shouldn't push STAR downwards, whereas for cocktails extra space would push
+  deal again downwards a little"*; then *"We still need even more space than
+  1rem"*, and from 1.25, 1.5 and 1.75rem, *"1.5rem please. It looks
+  lovely."* Cocktails' universe line starts `$page-search-room` lower to
+  clear it. Replaces 2026-10-28's place on the page's first line, whose phone
+  variant drew the box over food's clear-all and cocktails' deal again.
 - **2026-09-17, #1136 — the search dropdown's group headings are filled with
   their section's root hue and lettered dark, on both sites.** Helen:
   *"omnisearch dropdown result group headings should take their section's

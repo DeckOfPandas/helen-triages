@@ -48,7 +48,9 @@
 $glass-col: 7rem;
 $glass-gap: $spacing-section-gap;
 $glass-min: 14rem;   // the drawing's floor -- see `.cocktail-glass-icon`'s min-height
-$head-pad-bottom: 1.4rem;
+// The room above the head's rule: food's, between its badges and its rule,
+// so print · pdf hangs in the same room on both sites (shared/_furniture.scss).
+$head-pad-bottom: $spacing-block-gap;
 
 // Where the glass starts. The block's top is the top of the title's line box,
 // which sits above the printed capitals, so the glass starts at the cap

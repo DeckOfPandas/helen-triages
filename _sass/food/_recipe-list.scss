@@ -1,15 +1,13 @@
 @use "sass:color";
 @use "food/palette" as *;
 @use "shared/lightness";
-@use "shared/results-bar" as *;
 @use "shared/rule" as *;
 @use "shared/tokens" as *;
 
 // INDEX -- the filter panel and the recipe list it filters.
 
 // @mixin index-panel (shared/_rule.scss) is shared with cocktails' filter
-// panel; its `position: relative` is what .btn-clear anchors to. The gap below
-// the panel is $spacing-section-gap plus `.results-heading`'s padding-top, the
+// panel. The gap below the panel is $spacing-section-gap plus `.results-heading`'s padding-top, the
 // same two pieces as cocktails' `.drink-filters` and `.drink-count` (#1093).
 .controls {
   @include index-panel;
@@ -44,11 +42,10 @@
   list-style: none;
   padding: 0;
   margin: 0 0 $space-xxl;
-  // filters.js scrolls this list's top into view on prev/next, exactly when
-  // shared/_results-bar.scss's fixed bar appears: the bar's height plus a step
-  // of air, so the first row lands below the bar. Cocktails' pager does not
+  // filters.js scrolls this list's top into view on prev/next; a step of air
+  // keeps the first row off the screen's edge. Cocktails' pager does not
   // scroll, so `.drink-cards` needs no twin.
-  scroll-margin-top: calc(#{$results-bar-height} + #{$space-sm});
+  scroll-margin-top: $space-sm;
   // Hidden until filters.js has shuffled the list and reveals it, so the
   // server-rendered alphabetical order is never painted first. Layout height
   // is unaffected.

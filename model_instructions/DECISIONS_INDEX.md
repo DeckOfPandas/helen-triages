@@ -506,7 +506,7 @@ argument and the rules each field is read by.
 - 2026-09-05 · §9.13 · #729 #730 · / #730 — the shortlisted-only control is a bordered pill in the row under the count, on both indexes.
 - 2026-09-05 · §9.13 · on a narrow screen the universe line stacks in two stages and hides nothing.
 - undated · §9.13 · Undated — the universe line has no square brackets round the tape, and ingredients that are cut off end with an ellipsis and a closing round bracket.
-- undated · §9.13 · #541 · Undated, #541 — the drinks index has a clear-all at the top and at the bottom of the filters, as food does, looking the same and in the same place.
+- 2026-10-30 · §9.13 · #541 · Undated, #541 — the drinks index clears all exactly as food does, with the same control in the same place.
 - undated · §9.13 · #548 · Undated, #548 — no coloured bar sits above the "N survivors" count.
 - 2026-09-04 · §9.13 · #546 · the drinks shopping list is ordered by descending volume.
 - 2026-08-26 · §9.13 · a drink card is horizontal, the glass in a fixed left column, and every anchor on it is fixed.
@@ -682,7 +682,7 @@ argument and the rules each field is read by.
 - undated · §13 · Undated — the short-method box's tint is deliberately stronger than the meta grid's and the notes' wash.
 - 2026-08-01 · §13 · every gap comes from a named scale — Sixteen distinct gaps collapsed to $spacing-block-gap (1.75rem), $spacing-section-gap (3rem) and $spacing-section-top (4.5rem) in …
 - 2026-09-14 · §13 · #1006 · a drink page's section headings sit 3rem / 1.25rem, half way to food's scale.
-- 2026-09-15 · §13 · #1093 · on both indexes the gap from the bottom clear-all to "N survivors" is cocktails' (about 60px).
+- 2026-09-15 · §13 · #1093 · the gap from the filter panel to "N survivors" is the same on both indexes.
 - 2026-09-15 · §13 · #1093 · a page with no back arrow starts 32px down.
 - 2026-10-10 · §13 · #1325 · INGREDIENTS on a food recipe sits $spacing-section-top under the head's hairline.
 - undated · §13 · #94 #55 · Undated, #94 / #55 — every method step takes the same indent whether or not the recipe has method groups, with real space before a group heading and after one.
@@ -704,7 +704,7 @@ argument and the rules each field is read by.
 - 2026-10-11 · §13 · #1219 · cocktails' HAS TO HAVE and LEAVE OUT pools take ALL their styling from food's, from the same code.
 - 2026-10-11 · §13 · #1219 · a LEAVE OUT hit is the base grey, heavier, on both sites.
 - 2026-10-11 · §13 · #1219 · food's chosen LEAVE OUT pills sit above the candidates, as cocktails' do.
-- 2026-10-11 · §13 · #1219 · every clear and clear-all, on both sites, is the text colour and goes magenta under the pointer.
+- 2026-10-11 · §13 · #1219 · every clear, on both sites, is the text colour and goes magenta under the pointer.
 - 2026-10-11 · §13 · #1219 · cocktails' ingredient pickers answer from the first character (min_query_chars: 1).
 - 2026-10-11 · §13 · #1219 · cocktails' pools are not capped and say no "+N more".
 - 2026-10-11 · §13 · #1219 · choosing a HAS TO HAVE candidate on food clears the search, and the chosen chip carries an ×, as on cocktails.
@@ -732,7 +732,8 @@ argument and the rules each field is read by.
 - 2026-08-03 · §13 · an ingredient that matches the search wears the active-tag treatment in the ingredient green, on the search button and on the row.
 - 2026-08-03 · §13 · the results heading is left-aligned — Right-aligned it "read as stray rather than placed".
 - 2026-08-12 · §13 · the word in "N survivors" is bare body text, no emboss.
-- 2026-10-29 · §13 · #1441 · two pills share one place at the foot of the screen: "N survivors ↓" down to the count, and "top ↑" back to the STAR section.
+- 2026-10-30 · §13 · #1448 · one pill at the foot of the screen, one face at a time: "top ↑" while the filter panel is above the screen, "N survivors ↓" while the count line is below it, and, while any filter …
+- 2026-10-30 · §13 · #1448 · the pill's × is each index's only clear-all.
 - 2026-10-29 · §13 · #1441 · the pills are the site's accent, small and short, with the lettering centred.
 - 2026-10-29 · §13 · #1441 · the pills show whatever has focus — Asked whether they should step aside while a search box has focus on a phone, Helen picked "Always show".
 - 2026-09-14 · §13 · #1007 · the header's door to the other site is the bracketed word and an arrow, no icon.
@@ -763,6 +764,7 @@ argument and the rules each field is read by.
 - 2026-09-30 · §13 · #1210 · when her answer to a candidates page is a brief rather than a pick, the next page builds that brief and nothing else.
 - 2026-10-06 · §13 · #733 · a candidate that differs from what will be built in any way is a different candidate; say so on the page, not after.
 - 2026-10-06 · §13 · #733 · anything that paints a lot goes to her phone before the merge, as an Artifact bundle of the real build.
+- 2026-10-30 · §13 · she sees a branch on a local server the session runs, never by pulling and building it herself.
 - 2026-10-08 · §13 · #733 · choices that interact go on one page side by side.
 - 2026-10-10 · §13 · a small job whose issue names its own fix may be built once with no candidates page, and every value in it is then the session's reading of her sentence, not a pick of hers.
 - 2026-10-15 · §13 · #1394 · the runner-up long-form design, C, is let go.
@@ -792,7 +794,7 @@ argument and the rules each field is read by.
 - 2026-09-20 · §13 · #1149 · a footer column's head is a link drawn like the header's door: no underline, quiet at rest, word and icon to $color-accent on hover.
 - 2026-09-24 · §13 · a drink page shows four related cards; a food recipe shows three.
 - 2026-09-30 · §13 · #1210 · the four page actions are not one row: they were four controls of three kinds drawn alike, and no arrangement of them could settle.
-- 2026-09-30 · §13 · #1210 · print and pdf sit at the right-hand end of the back arrow's line.
+- 2026-10-30 · §13 · #1447 · print and pdf sit at the right, directly above the rule that ends a recipe's or drink's head.
 - 2026-09-30 · §13 · #1210 · the shortlist pair sits at the right of the first line under the head's rule: the toggle's line on a drink page, INGREDIENTS' line on food.
 - 2026-09-30 · §13 · #1210 · the shortlist button and the see-shortlist link are deliberately unmatched: a bordered pill, and quiet caps SEE SHORTLIST (N) with no arrow, absent while N is 0.
 - 2026-10-10 · §13 · #1354 · once the footer stacks, a 2rem hairline sits over about.
@@ -816,7 +818,8 @@ argument and the rules each field is read by.
 - 2026-09-15 · §13 · #1096 · the box and the index's own searches both stay as they are; the box's placeholder is "I know what I want..." with no label, only the magnifying glass.
 - 2026-09-15 · §13 · #1099 · the glass is at the right, and typing grows the word leftwards from it.
 - 2026-09-16 · §13 · #1123 · the box is 22ch, the length of its own placeholder, and its line and placeholder are $page-search-quiet (45% of $color-clear-text mixed towards the site's ground).
-- 2026-10-28 · §13 · #1288 · the search box is live on both sites, at the top right of the page body under the door, not in the header; it takes the right-hand end of the page's first line.
+- 2026-10-28 · §13 · #1288 · the search box is live on both sites, in the page body under the door, not in the header.
+- 2026-10-30 · §13 · #1447 · the box hangs 1.5rem under the header's border, on the column's right edge, by one rule at every width on both sites; food's STAR never moves for it.
 - 2026-09-17 · §13 · #1136 · the search dropdown's group headings are filled with their section's root hue and lettered dark, on both sites.
 - 2026-09-07 · §13 · #704 · a drink's glass options read "A, B or C", no Oxford comma.
 - 2026-09-07 · §13 · #776 · a card's name, ingredient lines and chips share one height budget.

@@ -35,12 +35,10 @@
   border-bottom: 2px solid $color-electric-absinthe;
 }
 
-// The search box holds the top right of the page (shared/_layout.scss), and
-// this line runs the full width, so it starts under the box. Below
-// $index-stack-width the box is a line of its own and the base margin stands.
-@media (min-width: $index-stack-width + 1px) {
-  .universe { margin-top: $page-search-room; }
-}
+// The search box hangs at the top right of the page (shared/_layout.scss),
+// and this line runs the full width, so it starts $page-search-room down, at
+// every width.
+.universe { margin-top: $page-search-room; }
 
 // Empty until universe.js runs. The script returns before unhiding when its
 // row selector matches nothing.

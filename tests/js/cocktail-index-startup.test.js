@@ -175,7 +175,7 @@ test('#1412: `× clear ship` clears only the ship, and clear all clears it too',
   assert.strictEqual(visibleTitles(r.page).length, 3);
 
   shipMark(r.page, 'A').dispatch('click');
-  r.doc.querySelector('.btn-clear').dispatch('click');
+  r.doc.querySelector('[data-results-pill-clear]').dispatch('click');
   assert.strictEqual(visibleTitles(r.page).length, 3);
   assert.strictEqual(legendWord(r), null);
 });

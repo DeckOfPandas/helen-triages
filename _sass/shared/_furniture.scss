@@ -3,12 +3,12 @@
 @use "shared/theme" as *;
 @use "shared/tokens" as *;
 
-// PAGE FURNITURE: the back arrow's line, the shortlist pair and the search
-// box, the same objects on both sites and so styled once (#1005, #1210;
-// MANUAL §13.13). The markup is _includes/back-to-index.html (the arrow and,
-// through page-print.html, print · pdf), _includes/page-actions.html (the
-// shortlist pair) and _includes/page-search.html (the box, at the top right
-// of the page body). Loaded after shared/chrome; names only
+// PAGE FURNITURE: the back arrow's line, print · pdf, the shortlist pair and
+// the search box, the same objects on both sites and so styled once (#1005,
+// #1210; MANUAL §13.13). The markup is _includes/back-to-index.html (the
+// arrow), _includes/page-print.html (print · pdf), _includes/page-actions.html
+// (the shortlist pair) and _includes/page-search.html (the box, at the top
+// right of the page body). Loaded after shared/chrome; names only
 // palette-contract variables.
 //
 // Per site: the shortlist button's colours and states (food/_shortlist.scss,
@@ -16,24 +16,29 @@
 // (`.recipe-section-heading-row` on food, `.cocktail-controls` on a drink
 // page). This file styles what is inside that row, and the furniture line.
 
-// --- The furniture line: arrow left, print · pdf right -----------------------
+// --- The furniture line: the back arrow ---------------------------------------
 // The arrow keeps its own rule in shared/_chrome.scss; the row takes over
 // only its bottom margin, so both sites' title blocks start the same distance
-// under the line.
+// under the line. Its right-hand end is the search box's (shared/_layout.scss).
 .page-furniture {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: $space-xxl;
   margin-bottom: $space-lg;
 
   .back-to-index { margin-bottom: 0; }
 }
 
-// Print, a dot, pdf. The dot is markup (page-print.html), not a gap, and is
-// hidden while the print button still is, so a no-script page shows `pdf`
-// alone and never `· pdf`.
+// --- Print · pdf: at the right, directly above the head's rule ----------------
+// Out of the flow, so the head is no taller for it: it hangs $space-xs above
+// the bottom edge of the positioned box that ends on the rule (food's
+// `.recipe-head-end`, a drink's `.cocktail-title-block`), in the room both
+// heads already leave above their rule. The dot is markup (page-print.html),
+// not a gap, and is hidden while the print button still is, so a no-script
+// page shows `pdf` alone and never `· pdf`.
 .page-print-actions {
+  position: absolute;
+  right: 0;
+  bottom: $space-xs;
   display: inline-flex;
   align-items: center;
   gap: $space-sm;
@@ -41,16 +46,6 @@
 }
 
 .btn-print[hidden] + .page-print-sep { display: none; }
-
-// The search box holds the line's right-hand end (shared/_layout.scss), so
-// print · pdf starts under it. Below $index-stack-width the box is a line of
-// its own above this one, and print · pdf keeps its place.
-@media (min-width: $index-stack-width + 1px) {
-  .page-furniture .page-print-actions {
-    align-self: flex-start;
-    margin-top: $page-search-room;
-  }
-}
 
 // --- The search box -----------------------------------------------------------
 // The index's own box (type mixin, hairline and placeholder from

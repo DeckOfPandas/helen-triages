@@ -1144,31 +1144,12 @@
   wireClear('clear-include', function () { clearField('include', incInput); });
   wireClear('clear-exclude', function () { clearField('exclude', excInput); });
 
-  /* --- clear all, top and bottom — #541 ------------------------------------ */
-  /* Two buttons, one action, top and bottom. Built here, not in the template:
-     a control that only works with script must not render without it. */
-  if (filters) {
-    ['btn-clear', 'btn-clear btn-clear--bottom'].forEach(function (cls, i) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = cls;
-      btn.textContent = '× clear all';
-      if (i === 0) filters.insertBefore(btn, filters.firstChild);
-      else filters.appendChild(btn);
-      clearAllButtons.push(btn);
-    });
-  }
-
-  /* A third, inside the "nothing found" line (#1093), so it hides with it.
-     One more entry in clearAllButtons, so all three always agree. */
-  if (noneEl) {
-    var noneClear = document.createElement('button');
-    noneClear.type = 'button';
-    noneClear.className = 'btn-clear btn-clear--empty';
-    noneClear.textContent = '× clear all';
-    noneEl.appendChild(noneClear);
-    clearAllButtons.push(noneClear);
-  }
+  /* --- clear all: the results pill's × — #1448 ----------------------------- */
+  /* The one clear-all is the pill's × (_includes/results-pill.html): this
+     script sets its visibility and wires its click, and results-bar.js shows
+     it whenever that visibility says there is something to clear. */
+  var pillClear = document.querySelector('[data-results-pill-clear]');
+  if (filters && pillClear) clearAllButtons.push(pillClear);
 
   /* The boxes, pools and buttons that are not state. Shared by clear-all and
      by the shortlist view turning on (#918). */

@@ -95,7 +95,12 @@
 // @mixin index-section. The gap between sections is $index-section-gap
 // (shared/_tokens.scss), not the recipe page's $spacing-section-gap: an index
 // is a control panel, not a document.
-.drink-filter { @include index-section; }
+// The scroll margin is where the results pill's "top" and a `#filter-…` link
+// land: the heading whole, with the count line's step of air above it.
+.drink-filter {
+  @include index-section;
+  scroll-margin-top: $space-lg;
+}
 
 // Except inside the pair, where the grid's gap owns the spacing. Grid items do
 // not collapse margins, so a section margin here is added to the gap (#548).
@@ -602,17 +607,6 @@ $pool-chip-rest: color.mix($color-text, $color-bg, 73%);
   color: inherit;
   text-decoration: none;
 }
-
-// --- clear all, top and bottom — #541 ----------------------------------------
-// Two buttons, one action, so clearing does not mean scrolling back up past
-// every section. Shared with food's -- @mixin index-clear-all and its two
-// variants in shared/_rule.scss; only the hover colour is this site's.
-.btn-clear { @include index-clear-all($color-wicked-woowoo); }
-
-.btn-clear--bottom { @include index-clear-all-bottom; }
-
-// The one inside "Blank canvas." (#1093).
-.btn-clear--empty  { @include index-clear-all-empty; }
 
 @media (max-width: $index-stack-width) {
   .drink-searches { grid-template-columns: 1fr; gap: $index-section-gap; }

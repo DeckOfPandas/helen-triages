@@ -1,8 +1,8 @@
-{% comment %} ── The page's furniture line: the back arrow, and print · pdf ──
-   A row at the top of every recipe and drink page (#387, #1210): the arrow at
-   the left, and at the right print and pdf (page-print.html), rendered only
-   when the layout passes `actions=true`. The magic-bag layout does not: no PDF
-   is rendered for it.
+{% comment %} ── The page's furniture line: the back arrow ──
+   A row at the top of every recipe and drink page (#387), the arrow at the
+   left. Its right-hand end is the search box's, which hangs there from the
+   page body (_layouts/default.html); print and pdf sit above the head's rule
+   instead (page-print.html).
 
    The arrow is a real link first: its href is this site's own index, from
    _data/sites.yml, and works with no JavaScript. assets/js/back-link.js
@@ -24,6 +24,5 @@
        is not the navbar arrow's. {% endcomment %}
     {% include icons/arrow-right.svg class="back-to-index-mark" %}
   </a>
-  {% if include.actions %}{% include page-print.html %}{% endif %}
 </div>
 {% endif %}

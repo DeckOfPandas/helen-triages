@@ -1,15 +1,15 @@
-// Tests for assets/js/results-bar.js: the sticky "N survivors" bar and the
-// "N survivors ↓" jump pill (#1441) on both indexes.
+// Tests for assets/js/results-bar.js: the results pill (#1448) on both
+// indexes, from _includes/results-pill.html.
 //
 //   node --test tests/js/*.test.js
 //
-// Both are mirrors: they show the count the index script painted, the bar
-// shows the clear-all's own visibility, and its button presses the index's
-// button. Nothing here checks a count, because neither computes one.
+// The pill is a mirror: it shows the count the index script painted, and its
+// × is the index script's own clear-all, whose visibility that script sets.
+// Nothing here checks a count or a clearing, because the pill does neither.
 //
-// IntersectionObserver and MutationObserver are stubbed here, not in
-// tests/js/dom-stub.js, which must not invent geometry: each records what it
-// was asked to observe and lets a test fire its callback with a chosen entry.
+// MutationObserver is stubbed here, not in tests/js/dom-stub.js, which must not
+// invent geometry: each records what it was asked to observe and lets a test
+// fire its callback. Rects are set by hand with `__box`.
 'use strict';
 
 const test = require('node:test');
@@ -22,19 +22,6 @@ const { createDocument } = require('./dom-stub.js');
 
 const SRC = fs.readFileSync(
   path.join(__dirname, '..', '..', 'assets', 'js', 'results-bar.js'), 'utf8');
-
-class StubIntersectionObserver {
-  constructor(callback) {
-    this.callback = callback;
-    this.targets = [];
-    StubIntersectionObserver.instances.push(this);
-  }
-  observe(el) { this.targets.push(el); }
-  disconnect() {}
-  /** Report one entry for the observed heading, as the browser would. */
-  fire(entry) { this.callback([entry], this); }
-}
-StubIntersectionObserver.instances = [];
 
 class StubMutationObserver {
   constructor(callback) {
@@ -51,16 +38,22 @@ StubMutationObserver.instances = [];
 const FOOD_IDS = ['recipe-count-n', 'recipe-count-word'];
 const DRINK_IDS = ['drink-count-n', 'drink-count-word'];
 
+const VIEWPORT_HEIGHT = 844;
+// Where the filter panel and the count line are, against a phone's screen.
+const AT_FILTERS = { panel: { top: 120, bottom: 1300 }, line: { top: 1400, bottom: 1430 } };
+const BOTH_ON_SCREEN = { panel: { top: 120, bottom: 600 }, line: { top: 650, bottom: 680 } };
+const AT_RESULTS = { panel: { top: -1300, bottom: -60 }, line: { top: 16, bottom: 46 } };
+// The top few pixels of the line over the bottom edge: not yet seen.
+const PEEKING = { panel: { top: 120, bottom: 800 }, line: { top: 830, bottom: 860 } };
+
 /**
- * An index with the parts the script reaches for, and nothing else: the bar
- * (deliberately FIRST in the DOM, so a lookup for "the first `.btn-clear`"
- * that forgot to skip the bar's own would find the wrong one), the filter
- * panel with the top and bottom clear-alls the index script would have built,
- * and the count line.
+ * An index with the parts the script reaches for, and nothing else: the
+ * filter panel, the count line, the section "top" returns to, and the pill as
+ * _includes/results-pill.html renders it. `clear` is what the index script
+ * would have left on the ×: 'visible' while a filter is on.
  */
 function boot(options) {
   options = options || {};
-  StubIntersectionObserver.instances = [];
   StubMutationObserver.instances = [];
 
   const doc = createDocument();
@@ -71,73 +64,16 @@ function boot(options) {
     return node;
   };
 
-  let bar = null;
-  let barN = null;
-  let barWord = null;
-  let barClear = null;
-  if (!options.noBar) {
-    bar = el('div', 'results-bar', { 'data-results-bar': '' });
-    bar.hidden = true;
-    const inner = el('div', 'results-bar-inner');
-    const barCount = el('span', 'results-bar-count');
-    barN = el('span', 'results-count-number', { 'data-results-bar-n': '' });
-    barWord = el('span', '', { 'data-results-bar-word': '' });
-    barCount.appendChild(barN);
-    barCount.appendChild(doc.createTextNode(' '));
-    barCount.appendChild(barWord);
-    inner.appendChild(barCount);
-    barClear = el('button', 'btn-clear results-bar-clear', { 'data-results-bar-clear': '' });
-    inner.appendChild(barClear);
-    bar.appendChild(inner);
-    doc.body.appendChild(bar);
-  }
-
-  let jump = null;
-  let jumpN = null;
-  let jumpWord = null;
-  if (!options.noJump) {
-    jump = el('button', 'results-jump', { 'data-results-jump': '', type: 'button' });
-    jump.hidden = true;
-    jumpN = el('span', 'results-count-number', { 'data-results-jump-n': '' });
-    jumpWord = el('span', '', { 'data-results-jump-word': '' });
-    jump.appendChild(jumpN);
-    jump.appendChild(doc.createTextNode(' '));
-    jump.appendChild(jumpWord);
-    doc.body.appendChild(jump);
-  }
-
-  // The STAR section the top pill returns to; `noTopTarget` names an id the
-  // page does not have.
-  const star = el('div', 'filter-group', { id: 'filter-star' });
+  const panel = el('div', 'controls', options.noPanel ? {} : { 'data-filter-panel': '' });
+  const star = el('div', 'category', { id: 'filter-star' });
   star._focusCalls = [];
   star.focus = (opts) => { star._focusCalls.push(opts); };
-  doc.body.appendChild(star);
-  let up = null;
-  if (!options.noTop) {
-    up = el('button', 'results-jump results-jump--top', {
-      'data-results-top': options.noTopTarget ? 'filter-nowhere' : 'filter-star', type: 'button'
-    });
-    up.hidden = true;
-    doc.body.appendChild(up);
-  }
-
-  const panel = el('div', 'controls');
-  const topClear = el('button', 'btn-clear');
-  topClear.style.visibility = options.clearVisibility || 'visible';
-  topClear.clicks = 0;
-  topClear.addEventListener('click', () => { topClear.clicks += 1; });
-  panel.appendChild(topClear);
-  const bottomClear = el('button', 'btn-clear btn-clear--bottom');
-  bottomClear.clicks = 0;
-  bottomClear.addEventListener('click', () => { bottomClear.clicks += 1; });
-  panel.appendChild(bottomClear);
+  panel.appendChild(star);
   doc.body.appendChild(panel);
 
   const heading = el('div', 'results-heading', { id: 'results' });
-  // The stub has no focus; record what the pill asks of it.
   heading._focusCalls = [];
   heading.focus = (opts) => { heading._focusCalls.push(opts); };
-  // `ids: null` is a page with no count spans at all; absent means food's.
   const ids = 'ids' in options ? options.ids : FOOD_IDS;
   let n = null;
   let w = null;
@@ -152,258 +88,217 @@ function boot(options) {
   }
   doc.body.appendChild(heading);
 
+  let pill = null;
+  const parts = {};
+  if (!options.noPill) {
+    pill = el('div', 'results-pill', { 'data-results-pill': '' });
+    pill.hidden = true;
+    const copy = (parent) => {
+      const cn = el('span', 'results-count-number', { 'data-results-pill-n': '' });
+      const cw = el('span', '', { 'data-results-pill-word': '' });
+      parent.appendChild(cn);
+      parent.appendChild(cw);
+      return [cn, cw];
+    };
+    parts.plain = el('span', 'results-pill-part', { 'data-results-pill-count': '' });
+    parts.plainCopy = copy(parts.plain);
+    parts.down = el('button', 'results-pill-part', { 'data-results-pill-down': '', type: 'button' });
+    parts.downCopy = copy(parts.down);
+    parts.up = el('button', 'results-pill-part', {
+      'data-results-pill-up': options.noTopTarget ? 'filter-nowhere' : 'filter-star', type: 'button'
+    });
+    parts.clear = el('button', 'results-pill-part results-pill-clear', { 'data-results-pill-clear': '', type: 'button' });
+    parts.clear.style.visibility = options.clear || 'hidden';
+    [parts.plain, parts.down, parts.up, parts.clear].forEach((p) => pill.appendChild(p));
+    doc.body.appendChild(pill);
+  }
+
+  // The index script's own clear-all, registered first as it is on the page:
+  // it hides the × and repaints the count.
+  const indexClears = [];
+  if (pill) {
+    parts.clear.addEventListener('click', () => {
+      indexClears.push(1);
+      parts.clear.style.visibility = 'hidden';
+      if (n) n.textContent = '90';
+    });
+  }
+
+  const place = (where) => {
+    panel.__box = where.panel;
+    heading.__box = where.line;
+  };
+  place(options.at || AT_FILTERS);
+
   const sandbox = { document: doc, console: { warn() {}, error() {}, log() {} } };
-  if (!options.noIntersectionObserver) sandbox.IntersectionObserver = StubIntersectionObserver;
   if (!options.noMutationObserver) sandbox.MutationObserver = StubMutationObserver;
   if ('reduceMotion' in options) {
     sandbox.matchMedia = (query) => ({
       matches: query === '(prefers-reduced-motion: reduce)' && options.reduceMotion
     });
   }
-  // A phone's screen; the entries below are placed against it.
   sandbox.innerHeight = VIEWPORT_HEIGHT;
-  const scrollHandlers = [];
-  sandbox.addEventListener = (type, fn) => { if (type === 'scroll') scrollHandlers.push(fn); };
+  const handlers = { scroll: [], resize: [], load: [] };
+  sandbox.addEventListener = (type, fn) => { if (handlers[type]) handlers[type].push(fn); };
   // Frames run when the test says so, as the browser runs them after a scroll.
   const frames = [];
-  sandbox.requestAnimationFrame = (fn) => { frames.push(fn); };
+  if (!options.noAnimationFrame) sandbox.requestAnimationFrame = (fn) => { frames.push(fn); };
   sandbox.window = sandbox;
   vm.runInContext(SRC, vm.createContext(sandbox), { filename: 'results-bar.js' });
-
-  // The script waits for DOMContentLoaded, as filters.js does, so that the
-  // buttons that script builds exist by the time this one looks for them.
   doc.dispatch('DOMContentLoaded');
 
-  const io = StubIntersectionObserver.instances[0] || null;
   const mo = StubMutationObserver.instances[0] || null;
-  /** Put the count line at `box` and scroll: every handler, then one frame. */
-  const scrollTo = (box) => {
-    heading.__box = box;
-    scrollHandlers.forEach((fn) => fn());
+  /** Move the panel and the line, then scroll: every handler, then one frame. */
+  const scrollTo = (where) => {
+    place(where);
+    handlers.scroll.forEach((fn) => fn());
     frames.splice(0).forEach((fn) => fn());
   };
-
-  return {
-    doc, bar, barN, barWord, barClear, jump, jumpN, jumpWord, up, star,
-    topClear, bottomClear, heading, n, w, io, mo, scrollTo, scrollHandlers
+  /** What the pill shows, face by face, as a reader would list it. */
+  const shows = () => {
+    if (!pill || pill.hidden) return 'nothing';
+    const out = [];
+    if (!parts.up.hidden) out.push('top');
+    if (!parts.down.hidden) out.push('survivors ↓');
+    if (!parts.plain.hidden) out.push('survivors');
+    if (pill.classList.contains('results-pill--clear')) out.push('×');
+    return out.join(' ');
   };
+
+  return { doc, pill, parts, panel, heading, star, n, w, mo, handlers, frames, scrollTo, shows, indexClears };
 }
 
 // The script builds its option objects inside the vm sandbox, another realm,
 // so deepStrictEqual would fail them on prototype alone.
 const plain = (value) => JSON.stringify(value);
 
-const VIEWPORT_HEIGHT = 844;
-const ABOVE = { isIntersecting: false, boundingClientRect: { top: -120, bottom: -90 } };
-const IN_VIEW = { isIntersecting: true, boundingClientRect: { top: 200, bottom: 230 } };
-const BELOW = { isIntersecting: false, boundingClientRect: { top: 1400, bottom: 1430 } };
-// The top few pixels over the bottom edge: intersecting, but not yet seen.
-const PEEKING = { isIntersecting: true, boundingClientRect: { top: 830, bottom: 860 } };
+// --- which face, where --------------------------------------------------------
 
-// --- when it shows -------------------------------------------------------------
-
-test('it watches #results and stays hidden until the observer has spoken', () => {
+test('arriving at the filters with the results below: "N survivors ↓"', () => {
   const r = boot();
-  assert.ok(r.io, 'no IntersectionObserver was constructed.');
-  assert.deepStrictEqual(r.io.targets, [r.heading],
-    'the observer should watch the count line and nothing else.');
-  assert.strictEqual(r.bar.hidden, true,
-    'the bar must not appear on its own: only an observer report reveals it.');
+  assert.strictEqual(r.shows(), 'survivors ↓');
 });
 
-test('the heading above the viewport shows the bar', () => {
-  const r = boot();
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.bar.hidden, false);
+test('with a filter on, the same place adds the ×', () => {
+  const r = boot({ clear: 'visible' });
+  assert.strictEqual(r.shows(), 'survivors ↓ ×');
 });
 
-test('the heading in view hides it', () => {
-  const r = boot();
-  r.io.fire(ABOVE);
-  r.io.fire(IN_VIEW);
-  assert.strictEqual(r.bar.hidden, true,
-    'a heading in view is a bar hidden -- the bar never sits over the line it mirrors.');
+test('the filters above the screen: "top", with the × only when there is something to clear', () => {
+  assert.strictEqual(boot({ at: AT_RESULTS }).shows(), 'top');
+  assert.strictEqual(boot({ at: AT_RESULTS, clear: 'visible' }).shows(), 'top ×');
 });
 
-test('the heading below the fold does NOT show it', () => {
-  // Not intersecting is not enough: on arrival the count line is below the
-  // panel, and a bar then would sit over the header and the filters.
-  const r = boot();
-  r.io.fire(BELOW);
-  assert.strictEqual(r.bar.hidden, true,
-    'not intersecting with its top BELOW the viewport is the arrival state, '
-    + 'and the bar must not cover the panel there.');
+test('landing on the results shows "top" at once, with no scrolling first', () => {
+  // The stuck reader of #1448: a search result or "N survivors ↓" puts the
+  // count line at the top, which is neither below the screen nor past it.
+  const r = boot({ at: AT_RESULTS, clear: 'visible' });
+  assert.strictEqual(r.pill.hidden, false);
+  assert.strictEqual(r.parts.up.hidden, false);
 });
 
-// --- what it shows -------------------------------------------------------------
-
-test('it mirrors the number, the word and the clear-all\'s visibility', () => {
-  const r = boot();
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.barN.textContent, '42');
-  assert.strictEqual(r.barWord.textContent, 'survivors');
-  assert.strictEqual(r.barClear.style.visibility, 'visible');
+test('the panel and the line both on screen, nothing chosen: no pill', () => {
+  assert.strictEqual(boot({ at: BOTH_ON_SCREEN }).shows(), 'nothing');
 });
 
-test('with nothing to clear, its clear-all is hidden too', () => {
-  const r = boot({ clearVisibility: 'hidden' });
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.barClear.style.visibility, 'hidden',
-    'the bar only offers clearing when the index\'s own button does.');
+test('the panel and the line both on screen, a filter on: "N survivors ×", so a filtered page always has its ×', () => {
+  const r = boot({ at: BOTH_ON_SCREEN, clear: 'visible' });
+  assert.strictEqual(r.shows(), 'survivors ×');
+  assert.strictEqual(r.parts.down.hidden, true, 'no arrow: there is nowhere to go.');
 });
 
-test('it follows the count while it is up, through the mutation observer', () => {
+test('a count line peeking over the bottom edge still counts as below', () => {
+  assert.strictEqual(boot({ at: PEEKING }).shows(), 'survivors ↓');
+});
+
+test('one face at a time, never two of the three', () => {
+  [AT_FILTERS, BOTH_ON_SCREEN, AT_RESULTS, PEEKING].forEach((at) => {
+    const r = boot({ at, clear: 'visible' });
+    const faces = [r.parts.up, r.parts.down, r.parts.plain].filter((p) => !p.hidden);
+    assert.strictEqual(faces.length, 1, `${plain(at)} shows ${faces.length} faces.`);
+  });
+});
+
+// --- scrolling ------------------------------------------------------------------
+
+test('scrolling from the filters to the results swaps "survivors ↓" for "top"', () => {
+  const r = boot({ clear: 'visible' });
+  r.scrollTo(AT_RESULTS);
+  assert.strictEqual(r.shows(), 'top ×');
+  r.scrollTo(AT_FILTERS);
+  assert.strictEqual(r.shows(), 'survivors ↓ ×');
+});
+
+test('scrolling re-reads the boxes at most once a frame', () => {
   const r = boot();
-  r.io.fire(ABOVE);
+  let reads = 0;
+  const real = r.heading.getBoundingClientRect.bind(r.heading);
+  r.heading.getBoundingClientRect = () => { reads += 1; return real(); };
+  r.handlers.scroll.forEach((fn) => fn());
+  r.handlers.scroll.forEach((fn) => fn());
+  r.handlers.scroll.forEach((fn) => fn());
+  r.frames.splice(0).forEach((fn) => fn());
+  assert.strictEqual(reads, 1, 'three scroll events before a frame are one read.');
+});
+
+test('a resize and the page\'s load re-place it too', () => {
+  const r = boot();
+  assert.strictEqual(r.handlers.resize.length, 1);
+  assert.strictEqual(r.handlers.load.length, 1);
+  r.panel.__box = AT_RESULTS.panel;
+  r.heading.__box = AT_RESULTS.line;
+  r.handlers.resize.forEach((fn) => fn());
+  r.frames.splice(0).forEach((fn) => fn());
+  assert.strictEqual(r.shows(), 'top');
+});
+
+// --- what it shows ----------------------------------------------------------------
+
+test('every count copy mirrors the number and the word', () => {
+  const r = boot({ clear: 'visible', at: BOTH_ON_SCREEN });
+  [r.parts.plainCopy, r.parts.downCopy].forEach(([cn, cw]) => {
+    assert.strictEqual(cn.textContent, '42');
+    assert.strictEqual(cw.textContent, 'survivors');
+  });
+});
+
+test('it follows the count and the × through the mutation observer', () => {
+  const r = boot({ at: BOTH_ON_SCREEN, clear: 'visible' });
   assert.ok(r.mo, 'no MutationObserver was constructed.');
   const watched = r.mo.observed.map((o) => o.el);
-  assert.ok(watched.indexOf(r.n) !== -1, 'the number span is not observed.');
-  assert.ok(watched.indexOf(r.w) !== -1, 'the word span is not observed.');
-  assert.ok(watched.indexOf(r.topClear) !== -1,
-    'the top clear-all is not observed, so its visibility could not be followed.');
-
+  [r.n, r.w, r.parts.clear].forEach((node) => {
+    assert.ok(watched.indexOf(node) !== -1, 'a span or the × is not observed.');
+  });
   r.n.textContent = '1';
   r.w.textContent = 'survivor';
-  r.topClear.style.visibility = 'hidden';
   r.mo.fire();
-  assert.strictEqual(r.barN.textContent, '1');
-  assert.strictEqual(r.barWord.textContent, 'survivor');
-  assert.strictEqual(r.barClear.style.visibility, 'hidden');
+  assert.strictEqual(r.parts.plainCopy[0].textContent, '1');
+  assert.strictEqual(r.parts.plainCopy[1].textContent, 'survivor');
+
+  // The index script hides its clear-all when the last filter goes.
+  r.parts.clear.style.visibility = 'hidden';
+  r.mo.fire();
+  assert.strictEqual(r.shows(), 'nothing', 'the line on screen and nothing chosen: no pill.');
 });
-
-test('without a MutationObserver it still shows the right numbers when it appears', () => {
-  const r = boot({ noMutationObserver: true });
-  r.n.textContent = '7';
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.barN.textContent, '7',
-    'every observer report resyncs, so a browser without MutationObserver '
-    + 'still gets the current count each time the bar appears.');
-});
-
-// --- what its button does ------------------------------------------------------
-
-test('its clear-all presses the index\'s TOP clear-all, and only that one', () => {
-  const r = boot();
-  r.io.fire(ABOVE);
-  r.barClear.dispatch('click');
-  assert.strictEqual(r.topClear.clicks, 1,
-    'the bar\'s button must forward to the index\'s top button -- the bar has '
-    + 'no clearing of its own.');
-  assert.strictEqual(r.bottomClear.clicks, 0);
-});
-
-test('the lookup for the top button skips the bar\'s own `.btn-clear`', () => {
-  // The fixture puts the bar BEFORE the panel in the DOM, so "the first
-  // .btn-clear" is the bar's own. Forwarding to itself would loop forever.
-  const r = boot();
-  r.io.fire(ABOVE);
-  let barClicks = 0;
-  r.barClear.addEventListener('click', () => { barClicks += 1; });
-  r.barClear.dispatch('click');
-  assert.strictEqual(barClicks, 1, 'the bar\'s button clicked itself.');
-  assert.strictEqual(r.topClear.clicks, 1);
-});
-
-test('after its click the bar re-reads the count the index just repainted', () => {
-  const r = boot();
-  r.io.fire(ABOVE);
-  // What clearAll() on either index does synchronously: repaint the count
-  // and hide the clear-alls.
-  r.topClear.addEventListener('click', () => {
-    r.n.textContent = '99';
-    r.topClear.style.visibility = 'hidden';
-  });
-  r.barClear.dispatch('click');
-  assert.strictEqual(r.barN.textContent, '99');
-  assert.strictEqual(r.barClear.style.visibility, 'hidden');
-});
-
-// --- both indexes, and the pages without the pieces --------------------------
 
 test('it finds the cocktails index\'s count spans by their own ids', () => {
   const r = boot({ ids: DRINK_IDS });
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.bar.hidden, false);
-  assert.strictEqual(r.barN.textContent, '42');
-  assert.strictEqual(r.barWord.textContent, 'survivors');
-});
-
-test('no IntersectionObserver: the bar stays hidden and the page is unchanged', () => {
-  const r = boot({ noIntersectionObserver: true });
-  assert.strictEqual(r.bar.hidden, true);
-  assert.strictEqual(r.io, null);
-  assert.strictEqual(r.mo, null, 'nothing should be wired at all without the API that reveals the bar.');
-  r.barClear.dispatch('click');
-  assert.strictEqual(r.topClear.clicks, 0,
-    'a bar that can never show must not have a live button behind it.');
-});
-
-test('a page with a heading but no count spans wires nothing', () => {
-  const r = boot({ ids: null });
-  assert.strictEqual(r.io, null);
-  assert.strictEqual(r.bar.hidden, true);
-  assert.strictEqual(r.jump.hidden, true);
-});
-
-// --- the jump pill (#1441) ------------------------------------------------------
-
-test('the pill stays hidden until the observer has spoken', () => {
-  const r = boot();
-  assert.strictEqual(r.jump.hidden, true,
-    'the pill must not appear on its own: only an observer report reveals it.');
-});
-
-test('the count line below the fold shows the pill and not the bar', () => {
-  // The arrival state on a phone: the count line is under the filters.
-  const r = boot();
-  r.io.fire(BELOW);
-  assert.strictEqual(r.jump.hidden, false);
-  assert.strictEqual(r.bar.hidden, true);
-});
-
-test('the count line in view hides the pill', () => {
-  const r = boot();
-  r.io.fire(BELOW);
-  r.io.fire(IN_VIEW);
-  assert.strictEqual(r.jump.hidden, true,
-    'with the count on screen there is nothing to jump to.');
-});
-
-test('the count line above the viewport hides the pill and shows the bar', () => {
-  // Only one floating copy of the count at a time: past the count the bar
-  // stands in for it.
-  const r = boot();
-  r.io.fire(BELOW);
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.jump.hidden, true);
-  assert.strictEqual(r.bar.hidden, false);
-});
-
-test('the pill mirrors the number and the word, and follows them', () => {
-  const r = boot();
-  r.io.fire(BELOW);
-  assert.strictEqual(r.jumpN.textContent, '42');
-  assert.strictEqual(r.jumpWord.textContent, 'survivors');
-
-  r.n.textContent = '1';
-  r.w.textContent = 'survivor';
-  r.mo.fire();
-  assert.strictEqual(r.jumpN.textContent, '1');
-  assert.strictEqual(r.jumpWord.textContent, 'survivor');
+  assert.strictEqual(r.shows(), 'survivors ↓');
+  assert.strictEqual(r.parts.downCopy[0].textContent, '42');
 });
 
 test('the pill shows "0 survivors" too, since the empty state is where it leads', () => {
-  const r = boot();
+  const r = boot({ clear: 'visible' });
   r.n.textContent = '0';
-  r.io.fire(BELOW);
-  assert.strictEqual(r.jump.hidden, false);
-  assert.strictEqual(r.jumpN.textContent, '0');
+  r.mo.fire();
+  assert.strictEqual(r.parts.downCopy[0].textContent, '0');
 });
 
-test('pressing the pill scrolls the count line to the top, smoothly, and focuses it', () => {
+// --- what its parts do ------------------------------------------------------------
+
+test('"N survivors ↓" scrolls the count line to the top, smoothly, and focuses it', () => {
   const r = boot({ reduceMotion: false });
-  r.io.fire(BELOW);
-  r.jump.dispatch('click');
+  r.parts.down.dispatch('click');
   assert.strictEqual(plain(r.heading._scrollCalls), plain([{ behavior: 'smooth', block: 'start' }]));
   assert.strictEqual(r.heading.getAttribute('tabindex'), '-1',
     'a div or p takes focus only with a tabindex.');
@@ -411,130 +306,61 @@ test('pressing the pill scrolls the count line to the top, smoothly, and focuses
     'focus must not scroll again, or it cancels the smooth scroll.');
 });
 
-test('with reduced motion asked for, the pill jumps at once', () => {
+test('with reduced motion asked for, it jumps at once', () => {
   const r = boot({ reduceMotion: true });
-  r.io.fire(BELOW);
-  r.jump.dispatch('click');
+  r.parts.down.dispatch('click');
   assert.strictEqual(plain(r.heading._scrollCalls), plain([{ behavior: 'auto', block: 'start' }]));
 });
 
-test('the pill leaves a tabindex the count line already has alone', () => {
+test('it leaves a tabindex the count line already has alone', () => {
   const r = boot();
   r.heading.setAttribute('tabindex', '0');
-  r.jump.dispatch('click');
+  r.parts.down.dispatch('click');
   assert.strictEqual(r.heading.getAttribute('tabindex'), '0');
 });
 
-test('no IntersectionObserver: the pill stays hidden and has no live click', () => {
-  const r = boot({ noIntersectionObserver: true });
-  assert.strictEqual(r.jump.hidden, true);
-  r.jump.dispatch('click');
-  assert.strictEqual(r.heading._scrollCalls, undefined);
-});
-
-test('a page with the pill and no bar still wires the pill', () => {
-  const r = boot({ noBar: true });
-  r.io.fire(BELOW);
-  assert.strictEqual(r.jump.hidden, false);
-  assert.strictEqual(r.jumpN.textContent, '42');
-});
-
-test('a count line peeking over the bottom edge still shows the pill', () => {
-  // A sliver of the line at the screen's foot is not something a reader has
-  // seen; the pill goes once the whole line is on screen.
-  const r = boot();
-  r.io.fire(PEEKING);
-  assert.strictEqual(r.jump.hidden, false);
-  assert.strictEqual(r.bar.hidden, true);
-});
-
-test('a jump from the foot of the page to the top puts the pill back and the bar away', () => {
-  // No observer report arrives for this: the line goes from above to below
-  // without crossing the screen. The scroll listener is what notices.
-  const r = boot();
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.bar.hidden, false);
-  r.scrollTo({ top: 1400, bottom: 1430 });
-  assert.strictEqual(r.bar.hidden, true,
-    'the bar left up after a jump to the top would sit over the header.');
-  assert.strictEqual(r.jump.hidden, false);
-});
-
-test('a jump from the top to the foot of the page swaps them the other way', () => {
-  const r = boot();
-  r.io.fire(BELOW);
-  r.scrollTo({ top: -3000, bottom: -2970 });
-  assert.strictEqual(r.jump.hidden, true);
-  assert.strictEqual(r.bar.hidden, false);
-});
-
-test('scrolling re-reads the line at most once a frame', () => {
-  const r = boot();
-  let reads = 0;
-  const real = r.heading.getBoundingClientRect.bind(r.heading);
-  r.heading.getBoundingClientRect = () => { reads += 1; return real(); };
-  r.heading.__box = { top: 1400, bottom: 1430 };
-  r.scrollHandlers.forEach((fn) => fn());
-  r.scrollHandlers.forEach((fn) => fn());
-  r.scrollHandlers.forEach((fn) => fn());
-  r.scrollTo({ top: 1400, bottom: 1430 });
-  assert.strictEqual(reads, 1, 'three scroll events before a frame are one read.');
-});
-
-test('no IntersectionObserver: no scroll listener either', () => {
-  const r = boot({ noIntersectionObserver: true });
-  assert.strictEqual(r.scrollHandlers.length, 0);
-});
-
-// --- the top pill (#1441) -------------------------------------------------------
-
-test('the top pill shows only once the count line is above the screen', () => {
-  const r = boot();
-  assert.strictEqual(r.up.hidden, true, 'hidden until the observer has spoken.');
-  r.io.fire(BELOW);
-  assert.strictEqual(r.up.hidden, true, 'on arrival the down pill has that place.');
-  r.io.fire(IN_VIEW);
-  assert.strictEqual(r.up.hidden, true);
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.up.hidden, false);
-  assert.strictEqual(r.jump.hidden, true, 'the two pills share one place and never show together.');
-});
-
-test('pressing the top pill scrolls to the section it names and focuses it', () => {
-  const r = boot({ reduceMotion: false });
-  r.io.fire(ABOVE);
-  r.up.dispatch('click');
+test('"top" scrolls to the section it names and focuses it', () => {
+  const r = boot({ at: AT_RESULTS, reduceMotion: false });
+  r.parts.up.dispatch('click');
   assert.strictEqual(plain(r.star._scrollCalls), plain([{ behavior: 'smooth', block: 'start' }]));
   assert.strictEqual(r.star.getAttribute('tabindex'), '-1');
   assert.strictEqual(plain(r.star._focusCalls), plain([{ preventScroll: true }]));
   assert.strictEqual(r.heading._scrollCalls, undefined, 'it goes to the section, not the count.');
 });
 
-test('a top pill naming an id the page lacks never shows', () => {
-  const r = boot({ noTopTarget: true });
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.up.hidden, true, 'a pill that scrolls nowhere must not be offered.');
-  assert.strictEqual(r.bar.hidden, false, 'the rest still works.');
+test('a "top" naming an id the page lacks is never offered', () => {
+  const r = boot({ at: AT_RESULTS, noTopTarget: true, clear: 'visible' });
+  assert.strictEqual(r.parts.up.hidden, true, 'a part that scrolls nowhere must not be offered.');
+  assert.strictEqual(r.shows(), 'survivors ×', 'the × is still within reach.');
 });
 
-test('a jump from the foot of the page to the top puts the top pill away', () => {
-  const r = boot();
-  r.io.fire(ABOVE);
-  r.scrollTo({ top: 1400, bottom: 1430 });
-  assert.strictEqual(r.up.hidden, true);
-  assert.strictEqual(r.jump.hidden, false);
+test('the × is the index script\'s own button: after its click the pill re-reads what that script left', () => {
+  const r = boot({ at: BOTH_ON_SCREEN, clear: 'visible' });
+  r.parts.clear.dispatch('click');
+  assert.strictEqual(r.indexClears.length, 1, 'the index script\'s listener did not run.');
+  assert.strictEqual(r.shows(), 'nothing', 'nothing left to clear, the line on screen: no pill.');
+  assert.strictEqual(r.parts.plainCopy[0].textContent, '90', 'the repainted count.');
 });
 
-test('a page with only the top pill still wires it', () => {
-  const r = boot({ noBar: true, noJump: true });
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.up.hidden, false);
+// --- the pages without the pieces -----------------------------------------------
+
+test('a page with no pill, no filter panel or no count spans wires nothing', () => {
+  [{ noPill: true }, { noPanel: true }, { ids: null }].forEach((options) => {
+    const r = boot(options);
+    assert.strictEqual(r.handlers.scroll.length, 0, `${plain(options)} wired a scroll listener.`);
+    if (r.pill) assert.strictEqual(r.pill.hidden, true);
+  });
 });
 
-test('a page with the bar and no pill behaves as before', () => {
-  const r = boot({ noJump: true, noTop: true });
-  r.io.fire(BELOW);
-  assert.strictEqual(r.bar.hidden, true);
-  r.io.fire(ABOVE);
-  assert.strictEqual(r.bar.hidden, false);
+test('no requestAnimationFrame: the pill stays hidden and nothing is wired', () => {
+  const r = boot({ noAnimationFrame: true, clear: 'visible' });
+  assert.strictEqual(r.pill.hidden, true);
+  assert.strictEqual(r.handlers.scroll.length, 0);
+});
+
+test('without a MutationObserver it still shows the current count on the next scroll', () => {
+  const r = boot({ noMutationObserver: true });
+  r.n.textContent = '7';
+  r.scrollTo(AT_FILTERS);
+  assert.strictEqual(r.parts.downCopy[0].textContent, '7');
 });

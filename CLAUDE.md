@@ -94,9 +94,10 @@ Helen: *"Through this whole project I have begged to delete and replace rather t
 
 ## Working with Helen
 - **Ask her the decisions as you hit them, inline, not in a batch at the end**, and bring the fact that forces the decision, not options in the abstract. For anything visual, build candidates on the real page and let her look (MANUAL §13.11); do not argue for one.
+- **SHOW HER THE BRANCH ON A LOCAL SERVER; NEVER ASK HER TO PULL AND BUILD.** Helen: *"Please show me on a dev page -- this is how I would like to work from now on. I used to pull locally and build myself, but I kept getting tangled."* Serve your own worktree's branch in the background — `bundle exec jekyll serve --config _config.yml,_config_local.yml --port <port> --host 0.0.0.0 --destination tmp/site-<port>` — and give her the URL. The ports are the pairs the container binds (today only 4001/4002; she is adding more). Run `ss -ltn` first, take a free one, and **never stop a server you did not start**. MANUAL §13.11, DECISIONS §13.
 - **Do not trust a document over the code.** Verify anything you are about to act on; if they disagree, the code wins and the document gets fixed.
 - **Her hours are hers. Never suggest stopping.**
-- When you finish, say: what changed and where, what you verified and how, which issues the commits close or touch, which PRs are waiting on her to merge (in this repo and the private ones), and anything left undone and why.
+- When you finish, say: what changed and where, the local URL serving it, what you verified and how, which issues the commits close or touch, which PRs are waiting on her to merge (in this repo and the private ones), and anything left undone and why.
 
 ## Normal workflow
 - If you need a scratch temporary folder, create one in this project folder and add it to .gitignore.

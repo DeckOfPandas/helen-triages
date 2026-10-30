@@ -259,9 +259,8 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 // mark: a background positioned from the top of a box lands somewhere else
 // when the box differs. Mixins, not placeholders, because the two sites' class
 // names differ and `@extend` would merge their selector lists.
-// `position: relative` is load-bearing: the absolutely positioned clear-all
-// anchors to the panel. `padding-top`, not margin, so it adds to the first
-// section's top margin and does not collapse into it.
+// `padding-top`, not margin, so it adds to the first section's top margin and
+// does not collapse into it.
 @mixin index-panel {
   position: relative;
   width: 100%;
@@ -295,49 +294,6 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 
   &:hover,
   &:focus-visible { color: $hover; }
-}
-
-// The clear-all, pinned to the panel's top-right corner.
-@mixin index-clear-all($hover) {
-  visibility: hidden;
-  border: none;
-  cursor: pointer;
-  background: none;
-  padding: 0;
-  margin: 0;
-  transition: color 0.1s ease-in-out;
-
-  font-family: $font-body;
-  font-size: 0.88rem;
-  font-weight: 400;
-  text-transform: lowercase;
-  letter-spacing: 0.04em;
-  @include index-clear-link($hover);
-  text-decoration: underline;
-
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 20;
-}
-
-// The same button repeated after the last section, in normal flow. `width:
-// fit-content` gives it a definite box so `margin-left: auto` has spare width
-// to consume and pushes it to the same edge as the top copy, with no wrapper.
-@mixin index-clear-all-bottom {
-  position: static;
-  display: block;
-  width: fit-content;
-  margin: $spacing-block-gap 0 0 auto;
-}
-
-// And a third, inside the no-results line (#1093), centred under the words
-// because the line itself is centred.
-@mixin index-clear-all-empty {
-  position: static;
-  display: block;
-  width: fit-content;
-  margin: $space-md auto 0;
 }
 
 

@@ -15,7 +15,9 @@ permalink: /food/
    removed it): the panel of choices is the fold on a triage site. Recover it
    from git if the question is reopened; do not rebuild it from memory. {% endcomment %}
 
-<div class="controls">
+{% comment %} `data-filter-panel`: the results pill shows "top" once this has left the
+   screen above (_includes/results-pill.html). {% endcomment %}
+<div class="controls" data-filter-panel>
   {% assign star_data = site.data.food.filter_sections.star %}
   {% assign ingredients_data = site.data.food.filter_sections.ingredients %}
   {% assign tag_groups = site.data.food.filter_sections.tag_groups %}
@@ -166,32 +168,9 @@ permalink: /food/
      baseline it read as part of the sentence. {% endcomment %}
 </div>
 
-{% comment %} The sticky results bar: one line fixed to the top of the viewport once the
-   count line above has scrolled off. A mirror, never a second count:
-   assets/js/results-bar.js copies the two spans above and the top clear-all's
-   visibility, and its button clicks that one. Ships `hidden` and stays so
-   without JavaScript or IntersectionObserver. The identical block sits on
-   cocktails/index.html; _sass/shared/_results-bar.scss styles both. The spans
-   start empty and the script fills them before the bar is shown. {% endcomment %}
-<div class="results-bar" data-results-bar hidden>
-  <div class="results-bar-inner">
-    <span class="results-bar-count"><span class="results-count-number" data-results-bar-n></span> <span data-results-bar-word></span></span>
-    <button type="button" class="btn-clear results-bar-clear" data-results-bar-clear>&times; clear all</button>
-  </div>
-</div>
-
-{% comment %} The two pills (#1441), in the same place at the foot of the screen and
-   never both at once: "N survivors ↓" while the count line above is still
-   below the screen, so a reader knows the results are down there; "top ↑"
-   once it has scrolled off above, back to the STAR section (`filter-star`).
-   Placed by results-bar.js with the bar; the same block is on
-   cocktails/index.html. Both ship `hidden`. {% endcomment %}
-<button type="button" class="results-jump" data-results-jump hidden>
-  <span class="results-count-number" data-results-jump-n></span> <span data-results-jump-word></span>{% include icons/arrow-right.svg class="results-jump-arrow" %}
-</button>
-<button type="button" class="results-jump results-jump--top" data-results-top="filter-star" hidden>
-  <span>top</span>{% include icons/arrow-right.svg class="results-jump-arrow results-jump-arrow--up" %}
-</button>
+{% comment %} The results pill, the same include as cocktails/index.html's; "top" returns
+   to STAR. {% endcomment %}
+{% include results-pill.html top="filter-star" %}
 
 <div class="results-count-row">
   <button type="button"

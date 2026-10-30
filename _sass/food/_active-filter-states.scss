@@ -37,14 +37,6 @@
   &.badge-practicalities { .tag-shape { color: color.mix($color-practicalities-root, $color-border, 35%); } }
 }
 
-// --- Global clear-all button (JS-created, prepended to .controls) -----
-.btn-clear { @include index-clear-all($color-accent); }
-
-// The same button repeated after the last filter section (#67) and inside the
-// no-results line; both override the base rule's `position: absolute`.
-.btn-clear--bottom { @include index-clear-all-bottom; }
-.btn-clear--empty  { @include index-clear-all-empty; }
-
 // The two lines that stand where the list of titles would be. They do a row
 // title's job, so they take `.recipe-title-link`'s type (_recipe-list.scss),
 // font included: if the titles change, change these. Not its colour: a title

@@ -172,6 +172,9 @@ function buildPage(doc, options) {
   doc.body.appendChild(legend);
   doc.body.appendChild(el('button', 'btn-shortlist-only', { id: 'shortlist-only' }));
   doc.body.appendChild(el('button', 'btn-clear-filter', { id: 'clear-ship' }));
+  // The results pill's ×, the page's one clear-all (#1448), which
+  // cocktail-index.js adopts by this attribute.
+  doc.body.appendChild(el('button', 'results-pill-clear', { 'data-results-pill-clear': '' }));
 
   const list = el('ul', 'drink-cards');
   doc.body.appendChild(list);

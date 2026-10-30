@@ -52,20 +52,18 @@
     display: none;
   }
 
-  // The page furniture (shared/_furniture.scss): the back arrow's line, the
-  // shortlist pair and the search box, which is in the header on a local
-  // build only.
+  // The page furniture (shared/_furniture.scss): the back arrow's line,
+  // print · pdf above the head's rule, the shortlist pair and the search box.
   .page-furniture,
+  .page-print-actions,
   .page-actions,
   .page-search {
     display: none;
   }
 
-  // The sticky results bar (shared/_results-bar.scss) is `position: fixed`,
-  // and a fixed box prints on every sheet in most browsers. It is showing
-  // whenever the reader has scrolled past the count line, which is the state
-  // a long index is printed from.
-  .results-bar {
+  // The results pill (shared/_results-bar.scss) is `position: fixed`, and a
+  // fixed box prints on every sheet in most browsers.
+  .results-pill {
     display: none;
   }
 

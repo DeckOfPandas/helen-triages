@@ -61,8 +61,7 @@ article.recipe .method-short {
 // $color-mood-root) would otherwise win. The :not() list is load-bearing:
 // this rule is (0,2,1) and would repaint each excluded class's own (0,1,0)
 // rule: the taxonomy badges are links (#40), and so are two action controls
-// (#1058). .btn-pdf sits outside the article (#1210) and stays listed so a
-// control that moves back in is still excluded.
+// (#1058), the see-shortlist link and pdf above the head's rule.
 article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   color: $color-recipe-link;
   font-weight: 600;
@@ -324,6 +323,12 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   height: 0;
 }
 
+// The rule's box, positioned so print · pdf can hang just above it
+// (shared/_furniture.scss). Its bottom edge is the rule's.
+.recipe-head-end {
+  position: relative;
+}
+
 // The INGREDIENTS line: the heading at the left, the shortlist pair
 // (.page-actions) at the right, centred on each other (#1210). The heading's
 // margins live on the row, because a margin on a flex item would push the
@@ -340,7 +345,7 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 
 // The first heading sits $spacing-section-top under the hairline, the gap
 // every other section heading on this page has above it (#1325).
-.recipe-head-rule + .recipe-section-ingredients .recipe-section-heading-row {
+.recipe-head-end + .recipe-section-ingredients .recipe-section-heading-row {
   margin-top: $spacing-section-top;
 }
 
@@ -363,7 +368,7 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
     .page-actions { order: -1; }
   }
 
-  .recipe-head-rule + .recipe-section-ingredients .recipe-section-heading-row {
+  .recipe-head-end + .recipe-section-ingredients .recipe-section-heading-row {
     margin-top: $spacing-block-gap;
   }
 

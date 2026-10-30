@@ -11,7 +11,7 @@ layout: default
    truth test. Tag delimiters are parsed inside a comment block, so a comment
    describes a tag in words and never quotes one. MANUAL §9.7. {% endcomment %}
 
-{% include back-to-index.html actions=true %}
+{% include back-to-index.html %}
 
 <article class="cocktail">
 
@@ -118,12 +118,16 @@ layout: default
         </div>
       {% endif %}
     </div>
+    {% comment %} Print and pdf, at the right just above the head's rule: the
+       title block is the positioned box whose bottom border is the rule
+       (_includes/page-print.html). {% endcomment %}
+    {% include page-print.html %}
   </div>
 
   {% comment %} The controls row, under the head's rule: read it / make it at
      the left (both labels always visible), the shortlist pair at the right from
-     page-actions.html, the include a recipe page also uses. Print and pdf are
-     on the furniture line (#1210). MANUAL §9.13, §13.13. {% endcomment %}
+     page-actions.html, the include a recipe page also uses. MANUAL §9.13,
+     §13.13. {% endcomment %}
   <div class="cocktail-controls">
     <div class="cocktail-toggle" role="group" aria-label="read it or make it">
       <button type="button" class="cocktail-toggle-label is-active" data-mode="read" aria-pressed="true">read it</button>
