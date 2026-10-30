@@ -2,7 +2,7 @@
 layout: default
 ---
 
-{% include back-to-index.html actions=true %}
+{% include back-to-index.html %}
 
 <article class="recipe">
   <div class="recipe-title">
@@ -76,11 +76,16 @@ layout: default
     {% include recipe_badges.html recipe=page %}
   </div>
 
-  {% comment %} The head ends on a hairline, and the shortlist pair sits on the INGREDIENTS
+  {% comment %} The head ends on a hairline, with print and pdf at its right just above
+     it: `.recipe-head-end` is the positioned box whose bottom edge is the rule
+     (_includes/page-print.html). The shortlist pair sits on the INGREDIENTS
      heading's line (#1210), as on a drink page. The heading row is a flex row:
      heading at the left, the pair at the right; on a phone the pair takes the
      line above (_sass/food/_recipe-header.scss). {% endcomment %}
-  <hr class="recipe-head-rule">
+  <div class="recipe-head-end">
+    {% include page-print.html %}
+    <hr class="recipe-head-rule">
+  </div>
 
   {% comment %} `.size > 0`, as for NOTES below: an empty array is truthy in Liquid, so
      `ingredient_groups: []` would render an INGREDIENTS heading with nothing

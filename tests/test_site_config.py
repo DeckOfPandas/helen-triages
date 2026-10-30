@@ -470,17 +470,29 @@ def test_the_food_shopping_scripts_load_in_dependency_order():
     )
 
 
-def test_the_results_bar_loads_after_the_index_script_on_both_indexes():
-    """results-bar.js mirrors what the index script paints, so it loads after it.
+def test_the_results_pill_loads_after_the_index_script_on_both_indexes():
+    """results-bar.js places the results pill (#1448) from what the index
+    script paints, so it loads after it.
 
-    The bar mirrors the count spans and the top `× clear all`, and wires
-    itself on DOMContentLoaded. Listeners fire in registration order, so its
-    tag comes after the index script's or it finds nothing to mirror. Also
-    pinned: the bar ships `hidden`, the digits carry the shared class on both
-    indexes, and both stylesheets import the partial that styles it.
+    The index script adopts the pill's × as its one clear-all, and the pill
+    reads that ×'s visibility; both wire on DOMContentLoaded, and listeners
+    fire in registration order. Also pinned: both indexes render the pill from
+    one include, which ships `hidden`; each marks its filter panel, which the
+    pill reads for "top"; the digits carry the shared class on both indexes;
+    and both stylesheets import the partial that styles it.
     """
-    for page, index_script in (("food", "filters.js"),
-                               ("cocktails", "cocktail-index.js")):
+    pill = _strip_comments(read("_includes", "results-pill.html"), ".html")
+    assert re.search(r'<div class="results-pill"[^>]*\bhidden\b', pill), (
+        "_includes/results-pill.html's `.results-pill` no longer ships `hidden`. "
+        "The script reveals it; without JavaScript a pill that is not hidden is "
+        "an empty fixed lozenge at the foot of every visit."
+    )
+    assert "data-results-pill-clear" in pill, (
+        "_includes/results-pill.html has no `data-results-pill-clear`: that "
+        "button is each index's only clear-all."
+    )
+    for page, index_script, top in (("food", "filters.js", "filter-star"),
+                                    ("cocktails", "cocktail-index.js", "filter-chaos")):
         html = read(page, "index.html")
         index_tag = re.search(r"<script src=[^>]*/" + re.escape(index_script), html)
         bar_tag = re.search(r"<script src=[^>]*/results-bar\.js", html)
@@ -488,13 +500,17 @@ def test_the_results_bar_loads_after_the_index_script_on_both_indexes():
         assert bar_tag, f"{page}/index.html no longer loads assets/js/results-bar.js."
         assert index_tag.start() < bar_tag.start(), (
             f"results-bar.js must load AFTER {index_script} on {page}/index.html: "
-            f"it wires itself on DOMContentLoaded and mirrors the `× clear all` "
-            f"that script builds, so loaded first it has nothing to mirror."
+            f"it reads the visibility that script sets on the pill's ×, so loaded "
+            f"first it reads nothing."
         )
-        assert re.search(r'<div class="results-bar"[^>]*\bhidden\b', html), (
-            f"{page}/index.html's `.results-bar` no longer ships `hidden`. The "
-            f"script reveals it; without JavaScript a bar that is not hidden is "
-            f"an empty fixed strip across the top of every visit."
+        assert re.search(r"\{%\s*include\s+results-pill\.html\s+top=\"" + top + r"\"\s*%\}", html), (
+            f"{page}/index.html no longer renders the results pill with "
+            f'`top="{top}"`, the section its "top" returns to.'
+        )
+        assert re.search(r'<div class="[^"]*"[^>]*\bdata-filter-panel\b', html), (
+            f"{page}/index.html's filter panel no longer carries "
+            f"`data-filter-panel`, which the pill reads to know when to offer "
+            f'"top".'
         )
         assert re.search(r'class="results-count-number"[^>]*id="[a-z]+-count-n"', html), (
             f"{page}/index.html's count number no longer carries "
@@ -503,7 +519,7 @@ def test_the_results_bar_loads_after_the_index_script_on_both_indexes():
         )
         assert '@use "shared/results-bar";' in read("assets", "css", f"{page}.scss"), (
             f"assets/css/{page}.scss does not load shared/results-bar, so "
-            f"`.results-count-number` and `.results-bar` have no rule on {page}."
+            f"`.results-count-number` and `.results-pill` have no rule on {page}."
         )
 
 
@@ -2155,9 +2171,9 @@ def test_pdf_link_points_where_the_pdfs_are_written():
     expected = permalink.split(":")[0]
 
     # The link is the page's own URL with its trailing slash swapped for
-    # `.pdf` (#1005), built in _includes/page-print.html, which
-    # back-to-index.html renders only under `actions=true` (#1210). The
-    # magic-bag page has no PDF beside it, so its layout must not ask.
+    # `.pdf` (#1005), built in _includes/page-print.html, which the recipe and
+    # drink layouts include above their head's rule (#1447). The magic-bag
+    # page has no PDF beside it, so its layout must not include it.
     include = read("_includes", "page-print.html")
     assert re.search(
         r"page\.url\s*\|\s*append:\s*'\.pdf'\s*\|\s*replace:\s*'/\.pdf',\s*'\.pdf'",
@@ -2168,20 +2184,19 @@ def test_pdf_link_points_where_the_pdfs_are_written():
         "If it is built another way now, this check needs to follow it -- it "
         "is the only thing tying the link to where the files are written."
     )
-    furniture = read("_includes", "back-to-index.html")
-    assert re.search(r"\{%\s*if\s+include\.actions\s*%\}\s*\{%\s*include\s+page-print\.html", furniture), (
-        "_includes/back-to-index.html no longer renders page-print.html under "
-        "`include.actions`; the print and pdf controls have moved somewhere "
-        "this test does not read."
+    include_print = r"\{%\s*include\s+page-print\.html\s*%\}"
+    assert not re.search(include_print, _strip_comments(read("_includes", "back-to-index.html"), ".html")), (
+        "_includes/back-to-index.html renders page-print.html again; print and "
+        "pdf sit above the head's rule (#1447), not under the search box."
     )
     for layout_name in ("recipe.html", "cocktail.html"):
-        assert re.search(r"\{%\s*include\s+back-to-index\.html\s+actions=true\s*%\}", read("_layouts", layout_name)), (
-            f"_layouts/{layout_name} no longer includes back-to-index.html with "
-            f"actions=true, so its pages have no pdf link -- or have one built "
-            f"somewhere this test does not read."
+        assert re.search(include_print, _strip_comments(read("_layouts", layout_name), ".html")), (
+            f"_layouts/{layout_name} no longer includes page-print.html, so its "
+            f"pages have no pdf link -- or have one built somewhere this test "
+            f"does not read."
         )
-    assert not re.search(r"back-to-index\.html\s+actions=true", read("_layouts", "magic_bag.html")), (
-        "_layouts/magic_bag.html asks the furniture line for print and pdf, but "
+    assert not re.search(include_print, _strip_comments(read("_layouts", "magic_bag.html"), ".html")), (
+        "_layouts/magic_bag.html includes print and pdf, but "
         "scripts/generate_pdfs.py renders no PDF beside a magic-bag page, so the "
         "link would be #86's permanent 404."
     )

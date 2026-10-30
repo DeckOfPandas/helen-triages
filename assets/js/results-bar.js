@@ -1,18 +1,18 @@
 // results-bar.js
-// What floats on both indexes, all placed by where the count line is: the
-// sticky bar, with `× clear all`, and the "top ↑" pill once the count line has
-// scrolled off above; the "N survivors ↓" pill while it is still below
-// (#1441). MANUAL §13.7.
+// The results pill at the foot of the screen on both indexes
+// (_includes/results-pill.html, #1448). One face at a time, read off where the
+// filter panel and the count line are: "top ↑" while the panel is above the
+// screen; "N survivors ↓" while the count line is below it; and, while any
+// filter is on, "N survivors" with no arrow in between. The × beside it shows
+// whenever there is something to clear. MANUAL §13.7.
 //
-// A mirror: nothing here counts anything. It copies the count spans the index
-// script paints and the top `× clear all`'s visibility, and the bar's button
-// clicks that one, so neither copy can disagree with the line it stands in for.
-// Without IntersectionObserver both stay `hidden`.
+// A mirror: nothing here counts or clears. It copies the count spans the index
+// script paints, and the × is the index script's own clear-all, whose
+// visibility that script sets; this reads it.
 //
-// Wired on DOMContentLoaded and loaded after the index script: filters.js
-// builds its clear-all buttons in its own DOMContentLoaded handler, and
-// listeners fire in registration order (tests/test_site_config.py holds the
-// script order).
+// Wired on DOMContentLoaded and loaded after the index script, which adopts
+// the × in its own DOMContentLoaded handler; listeners fire in registration
+// order (tests/test_site_config.py holds the script order).
 
 (function () {
   'use strict';
@@ -21,10 +21,6 @@
     ['recipe-count-n', 'recipe-count-word'],
     ['drink-count-n', 'drink-count-word']
   ];
-
-  function all(selector) {
-    return Array.prototype.slice.call(document.querySelectorAll(selector));
-  }
 
   /* The count spans this page actually has. null on a page with neither. */
   function findCount() {
@@ -36,14 +32,8 @@
     return null;
   }
 
-  /* The top `× clear all`: the first `.btn-clear` in document order that is
-     not the bar's own. Looked up each time, because a script builds it. */
-  function topClear() {
-    var buttons = all('.btn-clear');
-    for (var i = 0; i < buttons.length; i++) {
-      if (!buttons[i].closest('[data-results-bar]')) return buttons[i];
-    }
-    return null;
+  function all(root, selector) {
+    return Array.prototype.slice.call(root.querySelectorAll(selector));
   }
 
   function reduceMotion() {
@@ -61,100 +51,79 @@
   }
 
   function wire() {
-    var bar = document.querySelector('[data-results-bar]');
-    var jump = document.querySelector('[data-results-jump]');
-    /* The top pill names the id it returns to; without that element it never
-       shows, rather than scrolling nowhere. */
-    var up = document.querySelector('[data-results-top]');
-    var upTarget = up ? document.getElementById(up.getAttribute('data-results-top')) : null;
-    if (!upTarget) up = null;
+    var pill = document.querySelector('[data-results-pill]');
     var heading = document.getElementById('results');
-    if (!(bar || jump || up) || !heading) return;
-    if (typeof window.IntersectionObserver !== 'function') return;
+    var panel = document.querySelector('[data-filter-panel]');
+    if (!pill || !heading || !panel) return;
+    if (typeof window.requestAnimationFrame !== 'function') return;
 
     var count = findCount();
     if (!count) return;
 
-    /* Each copy's number and word, from whichever of the two is on the page. */
-    var copies = [];
-    if (bar) {
-      copies.push([bar.querySelector('[data-results-bar-n]'),
-                   bar.querySelector('[data-results-bar-word]')]);
-    }
-    if (jump) {
-      copies.push([jump.querySelector('[data-results-jump-n]'),
-                   jump.querySelector('[data-results-jump-word]')]);
-    }
-    var barClear = bar ? bar.querySelector('[data-results-bar-clear]') : null;
+    var plain = pill.querySelector('[data-results-pill-count]');
+    var down = pill.querySelector('[data-results-pill-down]');
+    var up = pill.querySelector('[data-results-pill-up]');
+    var clear = pill.querySelector('[data-results-pill-clear]');
+    /* "top" names the id it returns to; without that element it is never
+       offered, rather than scrolling nowhere. */
+    var upTarget = up ? document.getElementById(up.getAttribute('data-results-pill-up')) : null;
 
     function sync() {
-      copies.forEach(function (copy) {
-        if (copy[0]) copy[0].textContent = count.n.textContent;
-        if (copy[1]) copy[1].textContent = count.w.textContent;
-      });
-      if (barClear) {
-        var top = topClear();
-        /* Read off the inline `style.visibility` the index scripts write.
-           Anything but an explicit `visible` is hidden, the resting state. */
-        barClear.style.visibility =
-          top && top.style.visibility === 'visible' ? 'visible' : 'hidden';
-      }
+      all(pill, '[data-results-pill-n]').forEach(function (el) { el.textContent = count.n.textContent; });
+      all(pill, '[data-results-pill-word]').forEach(function (el) { el.textContent = count.w.textContent; });
     }
 
-    if (barClear) {
-      barClear.addEventListener('click', function () {
-        var top = topClear();
-        if (top) top.click();
-        /* The index script repaints synchronously, so the count is current. */
-        sync();
-      });
+    /* Read off the inline `style.visibility` the index script writes on the
+       ×. Anything but an explicit `visible` is nothing to clear. */
+    function anyFilter() {
+      return !!clear && clear.style.visibility === 'visible';
     }
 
-    if (jump) jump.addEventListener('click', function () { goTo(heading); });
-    if (up) up.addEventListener('click', function () { goTo(upTarget); });
+    function place() {
+      var panelBox = panel.getBoundingClientRect();
+      var lineBox = heading.getBoundingClientRect();
+      var above = panelBox.bottom <= 0 && !!upTarget;
+      /* Not yet wholly on screen: a line peeking a few pixels over the bottom
+         edge has not been seen. */
+      var below = !above && lineBox.bottom > window.innerHeight;
+      var on = anyFilter();
+      sync();
+      if (up) up.hidden = !above;
+      if (down) down.hidden = !below;
+      if (plain) plain.hidden = above || below;
+      pill.classList.toggle('results-pill--clear', on);
+      pill.hidden = !(above || below || on);
+    }
+
+    if (down) down.addEventListener('click', function () { goTo(heading); });
+    if (up && upTarget) up.addEventListener('click', function () { goTo(upTarget); });
+    /* The index script's own listener clears and repaints synchronously;
+       this one, registered after it, re-places the pill on the result. */
+    if (clear) clear.addEventListener('click', place);
 
     if (typeof window.MutationObserver === 'function') {
-      var watcher = new MutationObserver(sync);
+      var watcher = new MutationObserver(place);
       var textChanges = { childList: true, characterData: true, subtree: true };
       watcher.observe(count.n, textChanges);
       watcher.observe(count.w, textChanges);
-      var top = topClear();
-      if (top) watcher.observe(top, { attributes: true, attributeFilter: ['style'] });
+      if (clear) watcher.observe(clear, { attributes: true, attributeFilter: ['style'] });
     }
 
-    /* Above: the count line has wholly left the top, so the bar stands in for
-       it and the top pill offers the way back. Below: it is not yet wholly on
-       screen, so the down pill points to it. A line peeking a few pixels over
-       the bottom edge has not been seen. */
-    function place(rect) {
-      var above = rect.bottom <= 0;
-      var below = !above && rect.bottom > window.innerHeight;
-      if (above || below) sync();
-      if (bar) bar.hidden = !above;
-      if (up) up.hidden = !above;
-      if (jump) jump.hidden = !below;
-    }
-
-    var observer = new IntersectionObserver(function (entries) {
-      /* The last entry is the current state; earlier ones are history. */
-      var entry = entries[entries.length - 1];
-      if (entry) place(entry.boundingClientRect);
-    }, { threshold: [0, 1] });
-    observer.observe(heading);
-
-    /* The observer reports only a crossing, and a jump from the foot of the
-       page to the top (Home, a tap on a phone's status bar, reduced motion)
-       crosses nothing, which would leave the bar up over the header. So a
-       scroll re-reads the line's box, once a frame. */
+    /* Where the panel and the line are changes on scroll, on resize, and when
+       a filter changes the panel's height; once a frame covers all three. */
     var queued = false;
-    window.addEventListener('scroll', function () {
+    function soon() {
       if (queued) return;
       queued = true;
       window.requestAnimationFrame(function () {
         queued = false;
-        place(heading.getBoundingClientRect());
+        place();
       });
-    }, { passive: true });
+    }
+    window.addEventListener('scroll', soon, { passive: true });
+    window.addEventListener('resize', soon);
+    window.addEventListener('load', soon);
+    place();
   }
 
   document.addEventListener('DOMContentLoaded', wire);

@@ -4495,30 +4495,35 @@ to the body default on purpose. The digits alone take `$font-label`
 (`.results-count-number` in `_sass/shared/_results-bar.scss`, on
 `#recipe-count-n` and `#drink-count-n`); the word stays bare.
 
-**The sticky bar and the two pills** float on both indexes, all driven by
-`assets/js/results-bar.js`, styled in `_sass/shared/_results-bar.scss`, and
-placed by where `#results` is. All ship `hidden`.
+**The results pill** (#1448) floats on both indexes, centred at the foot of
+the screen in the site's accent, 28px tall: `_includes/results-pill.html`,
+placed by `assets/js/results-bar.js` and styled in
+`_sass/shared/_results-bar.scss`. It ships `hidden` and shows one face at a
+time, read off where the filter panel (`[data-filter-panel]`) and `#results`
+are:
 
-- While `#results` has wholly left the top of the viewport: `.results-bar`,
-  fixed to the top, mirroring the count and the top `× clear all`; and
-  "top ↑" (`[data-results-top]`), which returns to the section whose id it
-  names (`filter-star` on food, `filter-chaos` on cocktails). A pill naming
-  an id the page lacks never shows.
-- While `#results` is not yet wholly on screen: "N survivors ↓"
-  (`[data-results-jump]`), mirroring the count, which goes to `#results`.
+- the panel wholly above the screen: "top ↑", which returns to the section
+  the include names (`filter-star` on food, `filter-chaos` on cocktails);
+  a name the page lacks is never offered;
+- `#results` not yet wholly on screen: "N survivors ↓", to `#results`;
+- otherwise, while any filter is on: "N survivors" with no arrow, so a
+  filtered page always has the pill; with nothing chosen, no pill.
 
-The two pills (#1441) share one place, centred at the foot of the screen, in
-the site's accent, 28px tall, and never show together. Each press scrolls its
-target to the top (smoothly, unless reduced motion is asked for) and focuses
-it. Each word is trimmed with `text-box` (to cap height for the count, to
-x-height for "top") so that centring the box centres the letters. DECISIONS
+Beside the face, while any filter is on, a × that is **each index's only
+clear-all**: `filters.js` and `cocktail-index.js` find it by
+`data-results-pill-clear`, set its `visibility` and wire its click, and the
+pill shows it (the `results-pill--clear` class) whenever that visibility is
+`visible`. Each section's own "× clear", the typing boxes' and cocktails'
+"× clear ship" are separate and stay. A press scrolls its target to the top
+(smoothly, unless reduced motion is asked for) and focuses it; each filter
+section's `scroll-margin-top` lands its heading whole. Each word is trimmed
+with `text-box` so that centring the box centres the letters. DECISIONS
 §13.7 has the rulings.
 
-Nothing here recomputes the count. Placement is read from `#results`'s box on
-every `IntersectionObserver` report AND on scroll, once a frame: the observer
-reports only a crossing, and a jump from the foot of the page to the top
-crosses nothing. The script must load after the index script
-(`test_the_results_bar_loads_after_the_index_script_on_both_indexes`).
+Nothing here recomputes the count or clears anything. Placement is re-read on
+scroll, resize and load, once a frame, and when the count or the ×'s
+visibility changes. The script must load after the index script
+(`test_the_results_pill_loads_after_the_index_script_on_both_indexes`).
 
 **Pagination:** `PAGE_SIZE` per page, prev and next, a status label,
 `(see all)`. The maths is in `assets/js/list-view.js`.
@@ -4528,10 +4533,8 @@ load. `.recipe-list` starts `visibility: hidden` and is revealed after the
 first render, trading a visible flip for a blank instant.
 
 **Two empty states, and they are different lines.** "Blank canvas." on both
-indexes says the search was too narrow; it carries a third `× clear all`
-inside the line, in the same list as the top and bottom buttons so the three
-cannot disagree about whether there is anything to clear. "Nothing to see
-here yet." (cocktails only) says the collection is empty.
+indexes says the search was too narrow; the pill's × is the way out of it.
+"Nothing to see here yet." (cocktails only) says the collection is empty.
 
 **Going back is the one arrival that does not shuffle.** It restores shuffle
 order, filters, page, see-all and scroll from `sessionStorage`, gated on
@@ -4717,22 +4720,31 @@ moving any of it; the shortlist button in particular has had several homes.
 
 #### The furniture line: `_includes/back-to-index.html`
 
-`.page-furniture`, at the top of every recipe and drink page.
+`.page-furniture`, at the top of every recipe and drink page: **the back
+arrow** at the left. A real link to this site's index (from `sites.yml`)
+that works with no JavaScript; `back-link.js` upgrades it to `history.back()`
+only when it can prove you arrived from that index (§13.7). The artwork is
+`icons/arrow-right.svg`, mirrored in CSS, the same file as the header's door
+to the other site. The line's right-hand end is the search box's, which
+hangs there from the page body.
 
-- **Left: the back arrow.** A real link to this site's index (from
-  `sites.yml`) that works with no JavaScript; `back-link.js` upgrades it to
-  `history.back()` only when it can prove you arrived from that index
-  (§13.7). The artwork is `icons/arrow-right.svg`, mirrored in CSS, the same
-  file as the header's door to the other site.
-- **Right: print · pdf**, `_includes/page-print.html`, rendered only when a
-  layout passes `actions=true`. The two page layouts do; the magic-bag
-  layout does not, because no PDF is rendered beside it. The print button
-  ships `hidden` and `print-link.js` reveals it. The pdf link is gated on
-  `site.pdf_downloads` (off in `_config_local.yml`, where nothing renders
-  the files) and is `page.url` with its trailing slash swapped for `.pdf`,
-  which is where `scripts/generate_pdfs.py` writes the file for both
-  collections. The dot between them is markup, `aria-hidden`, and hidden by
-  CSS while the print button still is.
+#### Print · pdf: `_includes/page-print.html`
+
+At the right, directly above the rule that ends the head: things you do with
+this page, so they sit at the end of its head. `_layouts/recipe.html`
+includes it inside `.recipe-head-end` (the box around
+`<hr class="recipe-head-rule">`), `_layouts/cocktail.html` as the last child
+of `.cocktail-title-block` (whose bottom border is the rule).
+`shared/_furniture.scss` places it out of the flow, `$space-xs` above that
+box's bottom edge, in the room both heads leave above their rule
+(`$spacing-block-gap`; on a drink page that is `$head-pad-bottom`). The
+magic-bag layout does not include it, because no PDF is rendered beside it.
+The print button ships `hidden` and `print-link.js` reveals it. The pdf link
+is gated on `site.pdf_downloads` (off in `_config_local.yml`, where nothing
+renders the files) and is `page.url` with its trailing slash swapped for
+`.pdf`, which is where `scripts/generate_pdfs.py` writes the file for both
+collections. The dot between them is markup, `aria-hidden`, and hidden by CSS
+while the print button still is.
 
 #### The shortlist pair: `_includes/page-actions.html`
 
@@ -4774,14 +4786,14 @@ child, so it sits in the page body under the door to the other site, not in
 the header: it is this site's search, not the shared chrome's. No config key
 gates it. The include loads `assets/js/page-search.js` beside the form.
 
-*The place.* `main > .page-search` (shared/_layout.scss) is out of the flow
-at the top right of `<main>`'s content box, so it takes the right-hand end of
-the page's first line. A first line with room on the right (food's index)
-does not move. What else sits there starts `$page-search-room` lower: print ·
-pdf on the furniture line, and cocktails' universe line, which runs the full
-width. Below `$index-stack-width` the box is a line of its own at the column's
-right edge and nothing else moves. It stays positioned at every width because
-it anchors the dropdown.
+*The place.* `main > .page-search` (shared/_layout.scss) hangs
+`$page-search-top` (1.5rem) under the header's border on the column's right
+edge: one rule at every width on both sites, with no width variant. It is out
+of the flow inside `<main>`'s top padding, so the page under it does not move;
+food's STAR heading never does. The one thing at the very top right that
+would touch it, cocktails' universe line, starts `$page-search-room` lower
+(`shared/_tokens.scss` derives it). It stays positioned because it anchors
+the dropdown.
 
 *The form.* A plain GET to this site's index with `q=`, which works with no
 JavaScript and submits a name search. `HTF.filterState.parseName` reads it

@@ -49,34 +49,13 @@ document.addEventListener('DOMContentLoaded', function () {
   var sharedKeys = null;
   var sharedUnmatched = [];
   var sharedNote = document.querySelector('[data-shared-shortlist]');
-  // Top and bottom of the matrix (#67), kept in step through clearButtons.
+  // The one clear-all is the results pill's × (_includes/results-pill.html,
+  // #1448): this script sets its visibility and wires its click, and
+  // results-bar.js shows it whenever that visibility says there is something
+  // to clear. A list, so the code below that walks it is unchanged.
   var clearButtons = [];
-  if (matrix) {
-    var clearBtnTop = document.createElement('button');
-    clearBtnTop.type = 'button';
-    clearBtnTop.className = 'btn-clear';
-    clearBtnTop.textContent = '× clear all';
-    matrix.insertBefore(clearBtnTop, matrix.firstChild);
-    clearButtons.push(clearBtnTop);
-
-    var clearBtnBottom = document.createElement('button');
-    clearBtnBottom.type = 'button';
-    clearBtnBottom.className = 'btn-clear btn-clear--bottom';
-    clearBtnBottom.textContent = '× clear all';
-    matrix.appendChild(clearBtnBottom);
-    clearButtons.push(clearBtnBottom);
-  }
-
-  // A third, inside the empty-list line (#1093), so it hides with it.
-  var emptyMessageEl = document.querySelector('.recipe-list-empty');
-  if (emptyMessageEl) {
-    var clearBtnEmpty = document.createElement('button');
-    clearBtnEmpty.type = 'button';
-    clearBtnEmpty.className = 'btn-clear btn-clear--empty';
-    clearBtnEmpty.textContent = '× clear all';
-    emptyMessageEl.appendChild(clearBtnEmpty);
-    clearButtons.push(clearBtnEmpty);
-  }
+  var pillClear = document.querySelector('[data-results-pill-clear]');
+  if (matrix && pillClear) clearButtons.push(pillClear);
 
   var searchBox = document.getElementById('ingredient-search-box');
   var resultsPool = document.getElementById('ingredient-results-pool');
@@ -792,9 +771,9 @@ function renderResultsPool() {
     if (clearButtons.length) {
       var clearVisibility = hasAnythingToClear() ? 'visible' : 'hidden';
       clearButtons.forEach(function (btn) { btn.style.visibility = clearVisibility; });
-      // visibility, not display -- same reasoning as ingredientClear above.
-      if (nameSearchClear) nameSearchClear.style.visibility = state.nameQuery ? 'visible' : 'hidden';
     }
+    // visibility, not display -- same reasoning as ingredientClear above.
+    if (matrix && nameSearchClear) nameSearchClear.style.visibility = state.nameQuery ? 'visible' : 'hidden';
 
     /* Number and word are two spans, so the digits can take the label face
        (`.results-count-number`); results-bar.js mirrors both. The fallback

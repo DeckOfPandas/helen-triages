@@ -214,28 +214,18 @@ $header-door-gap: 0.1rem;
   top: -0.12em;
 }
 
-// The search box: the right-hand end of the page's first line, under the
-// door (DECISIONS §13). Out of the flow at the top right of main's content
-// box, so a first line with room on the right does not move. What else sits
-// there starts $page-search-room lower: print · pdf (shared/_furniture.scss)
-// and cocktails' universe line (cocktails/_universe.scss). Below
-// $index-stack-width it is a line of its own (the narrow block below). The
-// z-index keeps the open dropdown over the page, a card's link included.
-// The box itself is shared/_furniture.scss's.
+// The search box, under the door (DECISIONS §13): $page-search-top under the
+// header's border, on the column's right edge, at every width on both sites.
+// One rule and no width variant. Out of the flow, inside main's top padding,
+// so the page under it does not move; the one thing at the very top right
+// that would touch it, cocktails' universe line, starts $page-search-room
+// lower (cocktails/_universe.scss). The z-index keeps the open dropdown over
+// the page, a card's link included. The box itself is shared/_furniture.scss's.
 main > .page-search {
   position: absolute;
-  top: $space-xxl;
+  top: $page-search-top;
   right: $space-xl;
   z-index: 30;
-}
-
-@media (max-width: $index-stack-width) {
-  // `relative`, never `static`: the box anchors its own dropdown.
-  main > .page-search {
-    position: relative;
-    width: fit-content;
-    margin: 0 0 $space-lg auto;
-  }
 }
 
 // As wide as the article, so the two reference columns sit under the content

@@ -1,0 +1,14 @@
+{% comment %} ── The results pill: one control at the foot of the screen, both indexes ──
+   assets/js/results-bar.js shows one face at a time: "top ↑" while the filter
+   panel (`data-filter-panel`) is above the screen, back to the section named
+   by `include.top`; "N survivors ↓" while the count line is below it; and,
+   while any filter is on, "N survivors" with no arrow in between, so a
+   filtered page always has it. The × beside it is the index's only clear-all:
+   filters.js and cocktail-index.js find it by `data-results-pill-clear`, set
+   its visibility and wire its click. Ships `hidden`. DECISIONS §13 (#1448). {% endcomment %}
+<div class="results-pill" data-results-pill hidden>
+  <span class="results-pill-part results-pill-count" data-results-pill-count><span class="results-count-number" data-results-pill-n></span>&nbsp;<span data-results-pill-word></span></span>
+  <button type="button" class="results-pill-part" data-results-pill-down><span><span class="results-count-number" data-results-pill-n></span> <span data-results-pill-word></span></span>{% include icons/arrow-right.svg class="results-pill-arrow" %}</button>
+  <button type="button" class="results-pill-part" data-results-pill-up="{{ include.top }}"><span class="results-pill-top">top</span>{% include icons/arrow-right.svg class="results-pill-arrow results-pill-arrow--up" %}</button>
+  <button type="button" class="results-pill-part results-pill-clear" data-results-pill-clear aria-label="Clear all filters" style="visibility: hidden;">&times;</button>
+</div>

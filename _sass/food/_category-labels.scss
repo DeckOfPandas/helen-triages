@@ -55,6 +55,9 @@
   // The mixin's gap spaces a label from its own buttons, so nothing inside
   // needs a margin.
   @include index-section;
+  // Where the results pill's "top" and a `#filter-…` link land: the heading
+  // whole, with the count line's step of air above it.
+  scroll-margin-top: $space-lg;
 
   .category-label-row { @include index-label-row; }
 

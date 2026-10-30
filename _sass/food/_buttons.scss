@@ -32,9 +32,8 @@ $chip-rest: lightness.shift($color-text, 22%);
 // width, border or padding, which
 // test_no_active_filter_button_changes_its_own_width guards.
 //
-// $color-accent is the fallback for a control with no section of its own:
-// .btn-clear is the global "clear all".
-.btn-tag, .btn-star, .btn-clear {
+// $color-accent is the fallback for a control with no section of its own.
+.btn-tag, .btn-star {
   &:focus-visible {
     outline: 2px solid $color-accent;
     outline-offset: 2px;

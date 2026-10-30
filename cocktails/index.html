@@ -54,7 +54,9 @@ permalink: /cocktails/
     <button type="button" class="btn-universe-again">deal again <span class="universe-again-icon" aria-hidden="true">&#8635;</span></button>
   </section>
 
-  <div class="drink-filters">
+  {% comment %} `data-filter-panel`: the results pill shows "top" once this has
+     left the screen above (_includes/results-pill.html). {% endcomment %}
+  <div class="drink-filters" data-filter-panel>
 
     {% comment %} Each section clears only itself (#488). The buttons are real
        <button>s and start hidden; the script shows one the moment its own
@@ -196,27 +198,9 @@ permalink: /cocktails/
   </div>
   {% include cocktails/ship-key.html part="dialog" %}
 
-  {% comment %} The sticky results bar: a mirror of the count above and of the
-     top `× clear all`, revealed by assets/js/results-bar.js once `#results` has
-     scrolled off and `hidden` otherwise, so the no-JS page is unchanged.
-     food/index.html carries the identical block. {% endcomment %}
-  <div class="results-bar" data-results-bar hidden>
-    <div class="results-bar-inner">
-      <span class="results-bar-count"><span class="results-count-number" data-results-bar-n></span> <span data-results-bar-word></span></span>
-      <button type="button" class="btn-clear results-bar-clear" data-results-bar-clear>&times; clear all</button>
-    </div>
-  </div>
-
-  {% comment %} The two pills (#1441): "N survivors ↓" while `#results` is still
-     below the screen, "top ↑" once it is above, back to the first section
-     (`filter-chaos`, where food's goes to STAR). food/index.html carries the
-     same block. {% endcomment %}
-  <button type="button" class="results-jump" data-results-jump hidden>
-    <span class="results-count-number" data-results-jump-n></span> <span data-results-jump-word></span>{% include icons/arrow-right.svg class="results-jump-arrow" %}
-  </button>
-  <button type="button" class="results-jump results-jump--top" data-results-top="filter-chaos" hidden>
-    <span>top</span>{% include icons/arrow-right.svg class="results-jump-arrow results-jump-arrow--up" %}
-  </button>
+  {% comment %} The results pill, the same include as food/index.html's; "top"
+     returns to the first section, YOLO?, as there is no STAR here. {% endcomment %}
+  {% include results-pill.html top="filter-chaos" %}
 
   {% comment %} Hide / show drafts, local builds only (#1358): inside the gate
      that lets a draft into `all_drinks`, so the deployed index has no such

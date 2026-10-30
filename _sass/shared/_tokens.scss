@@ -65,13 +65,16 @@ $index-search-max-width: 620px;
 // stacked and the other has not.
 $index-stack-width: 720px;
 
-// The search box at the top right of the page body (shared/_layout.scss).
-// The glass is the tallest thing in it, so the box is the glass's height, and
-// whatever starts under the box clears it by $space-md. Below
-// $index-stack-width the box takes a line of its own instead: food's STAR
-// INGREDIENT heading and the box no longer fit on one line on a phone.
+// The search box at the top right of the page body (shared/_layout.scss),
+// $page-search-top under the header's border at every width, inside main's
+// $space-xxl of top padding and out of the flow. The glass is the tallest
+// thing in it, so the box is the glass's height. $page-search-room is how far
+// something at the very top right of the page must start lower to clear it by
+// $space-sm: cocktails' universe line. Food's STAR heading sits at the left
+// and needs none.
+$page-search-top: 1.5rem;
 $page-search-mark-size: 1.15rem;
-$page-search-room: $page-search-mark-size + $space-md;
+$page-search-room: $page-search-top + $page-search-mark-size + $space-sm - $space-xxl;
 
 // Where the header stops putting the nav beside the wordmark. Derived, not
 // picked: the widest wordmark (`[ COCKTAILS ]`), the nav row and the header's

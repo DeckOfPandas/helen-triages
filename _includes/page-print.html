@@ -1,18 +1,15 @@
-{% comment %} ── Print and pdf: the top right of the page, on the back arrow's line
-   (#1210) ──
-   Rendered by back-to-index.html when a layout asks with `actions=true`. The
-   magic-bag layout does not: no PDF is rendered for it, and the link would
-   404 (#86).
-
+{% comment %} ── Print and pdf: at the right, directly above the head's rule ──
+   Things you do with this page, so they end its head (#1447). The recipe and
+   drink layouts include it inside a positioned box whose bottom edge is the
+   rule; shared/_furniture.scss hangs it there. The magic-bag layout does not:
+   no PDF is rendered for it, and the link would 404 (#86).
    The print button ships `hidden` and print-link.js reveals it. The pdf link
-   is a plain anchor to a real file: the page's own URL with the trailing slash
-   swapped for `.pdf`, which is where scripts/generate_pdfs.py writes it.
-   Gated on `site.pdf_downloads`, which _config_local.yml turns off because
-   nothing renders the files there. tests/test_site_config.py reads this
-   include for that expression.
-
-   The dot between them is text, `aria-hidden`, so a screen reader hears two
-   controls and no punctuation. {% endcomment %}
+   is the page's own URL with the trailing slash swapped for `.pdf`, where
+   scripts/generate_pdfs.py writes it, gated on `site.pdf_downloads`
+   (_config_local.yml turns it off: nothing renders the files there).
+   tests/test_site_config.py reads this include for that expression. The dot
+   between them is `aria-hidden` text, so a screen reader hears two controls
+   and no punctuation. {% endcomment %}
 <div class="page-print-actions">
   <button type="button" class="btn-print" hidden>print</button>
   {% if site.pdf_downloads %}
