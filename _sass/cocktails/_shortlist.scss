@@ -2,6 +2,7 @@
 @use "cocktails/cocktail" as *;
 @use "cocktails/filters" as *;
 @use "cocktails/palette" as *;
+@use "shared/rule" as *;
 @use "shared/tokens" as *;
 
 // =============================================================================
@@ -358,6 +359,43 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
     padding: $space-xs 0;
     border-bottom: 1px solid $color-border;
   }
+}
+
+// --- ticking a row off (#1457) -----------------------------------------------
+// The label wraps the box, the amount and the name so that tapping the words
+// ticks the row, and lays out as if it were not there: its children stay the
+// row's flex items. The price stays outside it.
+.shopping-list-line {
+  display: contents;
+  cursor: pointer;
+}
+
+// Woowoo, the shortlist's own "on" colour (above): a tick is the same act of
+// marking a thing. The tick is drawn in the ground's colour.
+.shopping-list-tick {
+  @include shopping-tick($color-clear-text, $color-wicked-woowoo, $color-bg, $color-bg);
+}
+
+// Under the rows, left, in the shortlist button's caps (#1005).
+.shopping-list-untick-row {
+  margin: $space-md 0 0;
+}
+
+.shopping-list-untick {
+  @extend %cocktail-heading-face;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: $color-clear-text;
+  transition: color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { color: $color-wicked-woowoo-deep; }
 }
 
 // Plex, in ink: the site's treatment for a number you act on, as

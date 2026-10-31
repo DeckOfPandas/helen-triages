@@ -661,19 +661,37 @@ test('every recipe named in the panel is a link to it, in the row title\'s class
 test('an item nobody scaled names the recipe it came from, as a link', () => {
   // An unscaled item names its recipe in brackets, so the reader knows which
   // page to look at. Recipe `a` lists olive oil with no amount; its flour and
-  // onions are scaled and say nothing.
+  // onions are scaled and say nothing. The bracket is outside the tick's
+  // label (#1457), so following the link never ticks the row.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.toggle('/food/recipes/b/');
   showTheList(doc);
   const html = aislesHtml(panel);
   assert.ok(html.includes(
-    '<span class="shopping-list-name">olive oil</span>' +
+    '<span class="shopping-list-name">olive oil</span></label>' +
     '<span class="shopping-list-unscaled">(' +
     '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>)</span>'),
     html);
   assert.strictEqual(html.split('shopping-list-unscaled').length - 1, 1,
     'only the unscaled row carries a bracket');
+});
+
+test('#1457: every row has a tick box, and a tick made earlier is drawn ticked', () => {
+  // The list is rebuilt whole on every number change: the store is what
+  // carries a tick across, so the render must read it back.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.setTicked('onion', true);
+  showTheList(doc);
+  const html = aislesHtml(panel);
+  assert.ok(html.includes(
+    '<li class="shopping-list-row is-ticked"><label class="shopping-list-line">' +
+    '<input type="checkbox" class="shopping-list-tick" data-key="onion" checked>' +
+    '<span class="shopping-list-amount">2</span>'), html);
+  assert.ok(html.includes(
+    '<li class="shopping-list-row"><label class="shopping-list-line">' +
+    '<input type="checkbox" class="shopping-list-tick" data-key="plain flour">'), html);
 });
 
 test('a count above one is still batches of that many', () => {

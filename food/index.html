@@ -432,6 +432,11 @@ permalink: /food/
   <p class="shopping-list-note" hidden></p>
 
   <div class="shopping-list-aisles"></div>
+  {% comment %} #1457: every row above carries a tick box, remembered in this
+     browser. The button clears them all for the next shop; filters.js shows it
+     only while a row is ticked. Below the rows, so its appearing moves none of
+     them. {% endcomment %}
+  <p class="shopping-list-untick-row"><button type="button" class="shopping-list-untick" hidden>Untick all</button></p>
   <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
 </section>
 

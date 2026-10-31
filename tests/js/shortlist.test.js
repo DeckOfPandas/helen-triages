@@ -409,6 +409,209 @@ test('#1297: clear() empties the batches too', () => {
   assert.strictEqual(HTF.shortlist.batches('/a/'), null);
 });
 
+// --- ticking the shopping list off (#1457) ------------------------------------
+// The lists are rebuilt whole on every number change, so a tick lives here
+// and nowhere else. It must survive a reload (a phone drops the tab mid-shop)
+// and go only when "untick all" says so.
+
+const TICKED_KEY = 'htf-shortlist-ticked-food-v1';
+
+test('#1457: nothing is ticked until something is', () => {
+  const { HTF } = pageWith();
+  assert.strictEqual(HTF.shortlist.ticked('onion'), false);
+});
+
+test('#1457: a tick is stored under its own key and survives a reload', () => {
+  const storage = workingStorage();
+  pageWith(storage).HTF.shortlist.setTicked('onion', true);
+  assert.deepStrictEqual(JSON.parse(storage.read(TICKED_KEY)), ['onion']);
+  assert.strictEqual(pageWith(storage).HTF.shortlist.ticked('onion'), true);
+});
+
+test('#1457: unticking one row leaves the others ticked', () => {
+  const { HTF } = pageWith();
+  HTF.shortlist.setTicked('onion', true);
+  HTF.shortlist.setTicked('plain flour', true);
+  assert.strictEqual(HTF.shortlist.setTicked('onion', false), false);
+  assert.strictEqual(HTF.shortlist.ticked('onion'), false);
+  assert.strictEqual(HTF.shortlist.ticked('plain flour'), true);
+});
+
+test('#1457: ticking twice stores the row once, so one untick clears it', () => {
+  const { HTF, storage } = pageWith();
+  HTF.shortlist.setTicked('onion', true);
+  HTF.shortlist.setTicked('onion', true);
+  HTF.shortlist.setTicked('onion', false);
+  assert.deepStrictEqual(JSON.parse(storage.read(TICKED_KEY)), []);
+});
+
+test('#1457: untickAll() clears every tick, and leaves the shortlist alone', () => {
+  const { HTF, storage } = pageWith();
+  HTF.shortlist.toggle('/a/');
+  HTF.shortlist.setTicked('onion', true);
+  HTF.shortlist.setTicked('lime', true);
+  HTF.shortlist.untickAll();
+  HTF.shortlist._forget();
+  assert.strictEqual(HTF.shortlist.ticked('onion'), false);
+  assert.strictEqual(HTF.shortlist.ticked('lime'), false);
+  assert.deepStrictEqual(JSON.parse(storage.read(TICKED_KEY)), []);
+  assert.strictEqual(HTF.shortlist.has('/a/'), true);
+});
+
+test('#1457: clear() empties the ticks too', () => {
+  const { HTF } = pageWith();
+  HTF.shortlist.setTicked('onion', true);
+  HTF.shortlist.clear();
+  HTF.shortlist._forget();
+  assert.strictEqual(HTF.shortlist.ticked('onion'), false);
+});
+
+test('#1457: a ticks record of the wrong shape reads as nothing ticked', () => {
+  ['{"onion": true}', '"onion"', 'not json', JSON.stringify([3, null, 'lime'])]
+    .forEach((raw) => {
+      const { HTF } = pageWith(workingStorage({ [TICKED_KEY]: raw }));
+      assert.strictEqual(HTF.shortlist.ticked('onion'), false, raw);
+    });
+  // Inside a list, the strings survive what is dropped around them.
+  const { HTF } = pageWith(workingStorage({ [TICKED_KEY]: JSON.stringify([3, null, 'lime']) }));
+  assert.strictEqual(HTF.shortlist.ticked('lime'), true);
+});
+
+test('#1457: an empty row key is refused rather than stored', () => {
+  const { HTF, storage } = pageWith();
+  assert.strictEqual(HTF.shortlist.setTicked('', true), false);
+  assert.strictEqual(storage.read(TICKED_KEY), undefined);
+});
+
+test('#1457: the two sites keep separate ticks', () => {
+  const shared = workingStorage();
+  pageWith(shared, 'food').HTF.shortlist.setTicked('lime', true);
+  assert.strictEqual(pageWith(shared, 'cocktails').HTF.shortlist.ticked('lime'), false);
+});
+
+test('#1457: a failed write does not lose the tick just made', () => {
+  const { HTF } = pageWith({
+    getItem: () => null,
+    setItem: () => { throw new Error('QuotaExceededError'); }
+  });
+  HTF.shortlist.setTicked('onion', true);
+  assert.strictEqual(HTF.shortlist.ticked('onion'), true);
+});
+
+// --- the tick box and its wiring (#1457) --------------------------------------
+// HTF.shoppingTicks, which both index scripts use. The list here is a
+// hand-made stand-in: enough element for the delegated listener to walk.
+
+function fakeRow(key, checked) {
+  const row = {
+    classes: new Set(),
+    classList: {
+      toggle: (c, on) => { if (on) row.classes.add(c); else row.classes.delete(c); },
+      remove: (c) => row.classes.delete(c),
+      contains: (c) => row.classes.has(c)
+    }
+  };
+  const box = {
+    checked: !!checked,
+    dataset: { key },
+    classList: { contains: (c) => c === 'shopping-list-tick' },
+    closest: (sel) => (sel === 'li' ? row : null),
+    focus() { box.focused = true; }
+  };
+  return { row, box };
+}
+
+function fakeList(rows) {
+  const listeners = {};
+  return {
+    addEventListener: (type, fn) => { listeners[type] = fn; },
+    fire: (type, target) => listeners[type]({ target }),
+    querySelector: (sel) => {
+      const boxes = rows.map((r) => r.box);
+      if (sel === '.shopping-list-tick:checked') return boxes.find((b) => b.checked) || null;
+      return boxes[0] || null;
+    },
+    querySelectorAll: () => rows.map((r) => r.box)
+  };
+}
+
+function fakeButton() {
+  const listeners = {};
+  return {
+    hidden: true,
+    addEventListener: (type, fn) => { listeners[type] = fn; },
+    click: () => listeners.click()
+  };
+}
+
+test('#1457: box() draws a checkbox carrying the row key, checked when ticked', () => {
+  const { HTF } = pageWith();
+  assert.strictEqual(HTF.shoppingTicks.box('olive oil'),
+    '<input type="checkbox" class="shopping-list-tick" data-key="olive oil">');
+  HTF.shortlist.setTicked('olive oil', true);
+  assert.strictEqual(HTF.shoppingTicks.box('olive oil'),
+    '<input type="checkbox" class="shopping-list-tick" data-key="olive oil" checked>');
+  assert.strictEqual(HTF.shoppingTicks.rowClass('olive oil'), ' is-ticked');
+  assert.strictEqual(HTF.shoppingTicks.rowClass('lime'), '');
+});
+
+test('#1457: box() escapes the key, which is a name from a recipe', () => {
+  const { HTF } = pageWith();
+  assert.ok(HTF.shoppingTicks.box('"><b>').includes('data-key="&quot;&gt;&lt;b&gt;"'));
+});
+
+test('#1457: ticking a box stores it, marks the row and shows "untick all"', () => {
+  const { HTF } = pageWith();
+  const onion = fakeRow('onion');
+  const lime = fakeRow('lime');
+  const list = fakeList([onion, lime]);
+  const button = fakeButton();
+  const refresh = HTF.shoppingTicks.wire(list, button);
+  refresh();
+  assert.strictEqual(button.hidden, true, 'nothing ticked, no button');
+
+  onion.box.checked = true;
+  list.fire('change', onion.box);
+  assert.strictEqual(HTF.shortlist.ticked('onion'), true);
+  assert.ok(onion.row.classes.has('is-ticked'));
+  assert.strictEqual(button.hidden, false);
+
+  onion.box.checked = false;
+  list.fire('change', onion.box);
+  assert.strictEqual(HTF.shortlist.ticked('onion'), false);
+  assert.ok(!onion.row.classes.has('is-ticked'));
+  assert.strictEqual(button.hidden, true);
+});
+
+test('#1457: "untick all" clears the store and every box, and keeps focus in the list', () => {
+  const { HTF } = pageWith();
+  const onion = fakeRow('onion', true);
+  const lime = fakeRow('lime', true);
+  HTF.shortlist.setTicked('onion', true);
+  HTF.shortlist.setTicked('lime', true);
+  // A tick from an earlier shop, on a row not shown today, goes too.
+  HTF.shortlist.setTicked('saffron', true);
+  const list = fakeList([onion, lime]);
+  const button = fakeButton();
+  HTF.shoppingTicks.wire(list, button)();
+  assert.strictEqual(button.hidden, false);
+
+  button.click();
+  assert.strictEqual(onion.box.checked, false);
+  assert.strictEqual(lime.box.checked, false);
+  ['onion', 'lime', 'saffron'].forEach((k) => assert.strictEqual(HTF.shortlist.ticked(k), false, k));
+  assert.strictEqual(button.hidden, true);
+  assert.strictEqual(onion.box.focused, true, 'focus goes to the first box, not <body>');
+});
+
+test('#1457: a change from anything but a tick box is ignored', () => {
+  const { HTF } = pageWith();
+  const list = fakeList([]);
+  HTF.shoppingTicks.wire(list, null);
+  list.fire('change', { classList: { contains: () => false }, dataset: { key: 'x' }, checked: true });
+  assert.strictEqual(HTF.shortlist.ticked('x'), false);
+});
+
 // --- the ceiling --------------------------------------------------------------
 // A box's `max` is not enforced on typing; uncapped, 1e9 portions printed
 // "6.2e+28 kg mussels" and came back after a reload.

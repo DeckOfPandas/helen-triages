@@ -359,6 +359,42 @@ window.HTF = window.HTF || {};
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
+    /* --- What is already in the basket (#1457) ----------------------------
+       One list of shopping-list row keys, as each list's build() returns them:
+       folded names, so a row keeps its tick when "lemon" becomes "lemons" or
+       its amount changes. Kept until "untick all", not pruned to the rows on
+       show: the list is redrawn with no rows at all while it is hidden. */
+    var TICKED_PREFIX = 'htf-shortlist-ticked-';
+    var tickedRows = null;
+
+    function tickedKey() {
+      return HTF.site ? TICKED_PREFIX + HTF.site + '-v1' : '';
+    }
+
+    function readTicked() {
+      if (tickedRows) return tickedRows;
+      tickedRows = [];
+      var key = tickedKey();
+      if (!key) return tickedRows;
+      try {
+        var raw = JSON.parse(localStorage.getItem(key));
+        if (Array.isArray(raw)) {
+          raw.forEach(function (v) {
+            if (typeof v === 'string' && v && tickedRows.indexOf(v) === -1) tickedRows.push(v);
+          });
+        }
+      } catch (e) { /* nothing ticked, and the page works */ }
+      return tickedRows;
+    }
+
+    function writeTicked() {
+      var key = tickedKey();
+      if (!key) return;
+      try {
+        localStorage.setItem(key, JSON.stringify(tickedRows));
+      } catch (e) { /* this visit still has it; tomorrow will not */ }
+    }
+
     /* A key's slug: the last non-empty path segment, lowercased.
        `/food/recipes/dal/` and `/food/drafts/dal/` both answer `dal`; "/"
        answers ''. The share link (#1093) is built from it. */
@@ -407,9 +443,11 @@ window.HTF = window.HTF || {};
         return at === -1;
       },
 
-      /** Empty it — the marks and all three count maps together. No page
-          control calls it (#1100); the store's tests do. */
+      /** Empty it — the marks, all three count maps and the ticks together.
+          No page control calls it (#1100); the store's tests do. */
       clear: function () {
+        tickedRows = [];
+        writeTicked();
         entries = [];
         write();
         counts = {};
@@ -501,6 +539,30 @@ window.HTF = window.HTF || {};
         return value;
       },
 
+      /** @param {string} rowKey - a shopping-list row's `key` @returns {boolean} */
+      ticked: function (rowKey) { return readTicked().indexOf(rowKey) !== -1; },
+
+      /**
+       * @param {string} rowKey - a shopping-list row's `key`
+       * @param {boolean} on
+       * @returns {boolean} whether it is now ticked
+       */
+      setTicked: function (rowKey, on) {
+        if (typeof rowKey !== 'string' || !rowKey) return false;
+        var all = readTicked();
+        var at = all.indexOf(rowKey);
+        if (on && at === -1) all.push(rowKey);
+        if (!on && at !== -1) all.splice(at, 1);
+        writeTicked();
+        return !!on;
+      },
+
+      /** Every tick, shown or not: the list starts afresh for the next shop. */
+      untickAll: function () {
+        tickedRows = [];
+        writeTicked();
+      },
+
       /* --- A shortlist someone sent (#1093) ---------------------------------
          `?shortlist=aviation,negroni` names drinks by slug: the folders
          around a key move and the last segment does not. slugOf() is the one
@@ -549,10 +611,70 @@ window.HTF = window.HTF || {};
 
       /* For tests only: drops the cached reads so a test can stage a second
          scenario in the same page. */
-      _forget: function () { entries = null; counts = null; servings = null; batchCounts = null; }
+      _forget: function () {
+        entries = null; counts = null; servings = null; batchCounts = null; tickedRows = null;
+      }
     };
   })();
 
   HTF.shortlist = shortlist;
+
+  // --- Ticking off the shopping list (#1457) ---------------------------------
+  // Shared by filters.js and cocktail-index.js, whose lists are rebuilt whole
+  // on every number change: a tick lives in the store and each render reads it
+  // back through box() and rowClass(). The box sits inside a <label> with the
+  // amount and the name, so tapping the words ticks it and the words name it.
+  HTF.shoppingTicks = {
+    /** The checkbox for one row. @param {string} key - the row's `key` */
+    box: function (key) {
+      return '<input type="checkbox" class="shopping-list-tick" data-key="' +
+        HTF.escapeHtml(key) + '"' + (shortlist.ticked(key) ? ' checked' : '') + '>';
+    },
+
+    /** ' is-ticked' for a ticked row, '' otherwise: a class to append. */
+    rowClass: function (key) {
+      return shortlist.ticked(key) ? ' is-ticked' : '';
+    },
+
+    /**
+     * Listen on a list the boxes are rendered into, and on its "untick all".
+     * @param {Element} list - the element whose innerHTML holds the rows
+     * @param {Element|null} untick - the button; hidden while nothing shown is ticked
+     * @returns {function} call after every render, to show or hide the button
+     */
+    wire: function (list, untick) {
+      function refresh() {
+        if (!untick) return;
+        untick.hidden = !list.querySelector('.shopping-list-tick:checked');
+      }
+
+      // Delegated, because the rows are replaced on every render.
+      list.addEventListener('change', function (ev) {
+        var box = ev.target;
+        if (!box.classList || !box.classList.contains('shopping-list-tick')) return;
+        shortlist.setTicked(box.dataset.key, box.checked);
+        var row = box.closest ? box.closest('li') : null;
+        if (row) row.classList.toggle('is-ticked', box.checked);
+        refresh();
+      });
+
+      if (untick) {
+        untick.addEventListener('click', function () {
+          shortlist.untickAll();
+          Array.prototype.forEach.call(list.querySelectorAll('.shopping-list-tick'), function (box) {
+            box.checked = false;
+            var row = box.closest ? box.closest('li') : null;
+            if (row) row.classList.remove('is-ticked');
+          });
+          refresh();
+          // The button has just hidden itself; focus must not fall to <body>.
+          var first = list.querySelector('.shopping-list-tick');
+          if (first) first.focus();
+        });
+      }
+
+      return refresh;
+    }
+  };
 
 })(window.HTF);

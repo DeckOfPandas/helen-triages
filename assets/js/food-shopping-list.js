@@ -262,7 +262,7 @@
    * @param {Array} [options.quarterMeasures] - `quarter_step_measures`, bought in whole ones too
    * @param {Array} [options.countNouns] - `count_nouns` in scaling.yml: a row label may change number
    * @param {Array} [options.aisles] - [{key, label}] in display order; an unknown aisle falls to the last
-   * @returns {Array} [{ key, label, items: [{ label, text, aside, totals, unquantified }] }] */
+   * @returns {Array} [{ key, label, items: [{ key, label, text, aside, totals, unquantified }] }] */
   function build(entries, options) {
     var opts = options || {};
     var aisles = opts.aisles && opts.aisles.length
@@ -421,6 +421,9 @@
         });
 
       return {
+        // The folded name: what a tick is stored under (#1457), and unlike the
+        // label it does not change with the count.
+        key: key,
         aside: asides.length ? asides.join(' + ') + ' in the recipes' : '',
         label: countedLabel(group, totals, unquantified, countNouns, byEye),
         aisle: group.aisle || fallback,

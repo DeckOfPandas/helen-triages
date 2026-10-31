@@ -1,4 +1,5 @@
 @use "food/palette" as *;
+@use "shared/rule" as *;
 @use "shared/tokens" as *;
 
 // =============================================================================
@@ -207,6 +208,44 @@
   }
 }
 
+// --- ticking a row off (#1457) -----------------------------------------------
+// The label wraps the box, the amount and the name so that tapping the words
+// ticks the row, and lays out as if it were not there: its children stay the
+// row's flex items, in the columns above.
+.shopping-list-line {
+  display: contents;
+  cursor: pointer;
+}
+
+// Magenta, the shortlist's own "on" colour (_shortlist.scss): a tick is the
+// same act of marking a thing. The edge is the quiet text colour, because
+// $color-border is too faint to read as a control.
+.shopping-list-tick {
+  @include shopping-tick($color-clear-text, $color-recipe-link, $color-bg, $color-bg);
+}
+
+// Under the rows, left, in the shortlist button's Courier caps (#1005).
+.shopping-list-untick-row {
+  margin: $space-md 0 0;
+}
+
+.shopping-list-untick {
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: $color-clear-text;
+  transition: color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
 // Plex, in ink: a number you act on (MANUAL §13.10). The accent is spent on
 // the aisle heading, which is what the reader navigates by.
 .shopping-list-amount {
@@ -231,9 +270,18 @@
 
 // On a narrow phone the amount sits on its own line above the name, which
 // keeps the amount first without spending 8.5rem of the row on its column.
+// The box keeps a column of its own on the left, level with the amount.
 @media (max-width: 420px) {
   .shopping-list-items li {
     display: block;
+    position: relative;
+    padding-left: calc(1.05em + #{$space-sm});
+  }
+
+  .shopping-list-tick {
+    position: absolute;
+    left: 0;
+    top: calc(#{$space-xs} + 0.25em);
   }
 
   .shopping-list-amount {

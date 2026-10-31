@@ -985,6 +985,10 @@ function renderResultsPool() {
   var shoppingAisles = shoppingEl && shoppingEl.querySelector('.shopping-list-aisles');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
   var shoppingNote = shoppingEl && shoppingEl.querySelector('.shopping-list-note');
+  // #1457. Ticking a row off, and starting the next shop afresh.
+  var refreshUntick = shoppingAisles
+    ? HTF.shoppingTicks.wire(shoppingAisles, shoppingEl.querySelector('.shopping-list-untick'))
+    : function () {};
   var setAllInput = document.getElementById('shopping-list-setall');
 
   /* Each recipe's ingredients and yield, emitted by food/index.html from
@@ -1350,6 +1354,7 @@ function renderResultsPool() {
         '<p class="shopping-list-empty">No ingredient data was built for '
         + 'these recipes, so there is nothing to add up. If this is the local '
         + 'server, restart it — its plugins are loaded once at startup.</p>';
+      refreshUntick();
       return;
     }
 
@@ -1379,13 +1384,17 @@ function renderResultsPool() {
         '<h3 class="shopping-list-aisle-name">' + HTF.escapeHtml(aisle.label) + '</h3>' +
         '<ul class="shopping-list-items">' +
         aisle.items.map(function (row) {
-          return '<li>' +
+          return '<li class="shopping-list-row' + HTF.shoppingTicks.rowClass(row.key) + '">' +
+            '<label class="shopping-list-line">' +
+            HTF.shoppingTicks.box(row.key) +
             '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
             '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + '</span>' +
             /* "(1¼ in the recipes)" (#1297): the amount is what to buy. */
             (row.aside ? '<span class="shopping-list-aside">(' +
               HTF.escapeHtml(row.aside) + ')</span>' : '') +
-            /* Whose line was not scaled: each a link to its recipe. */
+            '</label>' +
+            /* Whose line was not scaled: each a link to its recipe. Outside
+               the label, so following a link never ticks the row (#1457). */
             (row.unscaledRecipes && row.unscaledRecipes.length
               ? '<span class="shopping-list-unscaled">(' +
                 row.unscaledRecipes.map(recipeLink).join(', ') + ')</span>'
@@ -1394,6 +1403,7 @@ function renderResultsPool() {
         }).join('') +
         '</ul></section>';
     }).join('');
+    refreshUntick();
   }
 
   if (shoppingRecipes) {

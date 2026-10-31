@@ -539,6 +539,15 @@ test('#1297: a count of more than one takes the plural, whichever spelling came 
     count('1 large', 'lemon', 'b')]), '2 large lemons');
 });
 
+test('#1457: a row\'s key, what its tick is stored under, does not move with the count', () => {
+  // "1 lemon" becoming "2 lemons" must not drop a tick made on it.
+  const keyOf = (entries) =>
+    F.build(entries, { aisles: PRODUCE, countNouns: NOUNS })[0].items[0].key;
+  assert.strictEqual(keyOf([count('1', 'lemon', 'a')]), keyOf([count('1', 'lemon', 'a'),
+    count('1', 'lemon', 'b')]));
+  assert.strictEqual(keyOf([count('2', 'Lemons', 'a')]), keyOf([count('½', 'lemon', 'a')]));
+});
+
 test('#1297: one or less takes the singular', () => {
   assert.strictEqual(labelOf([count('½', 'lemons', 'a'), count('½', 'lemons', 'b')]), '1 lemon');
   assert.strictEqual(labelOf([count('½', 'limes', 'a')]), '½ lime');

@@ -1586,6 +1586,23 @@ a range of one (`yieldBox`: 5 is `2–3`, `125 ml` is `62–63 ml`, `64+` is
 - `tests/test_food_yield.py` names the published recipes offered a half
   step, and fails a published `makes:` it cannot read.
 
+#### Ticking rows off
+
+Every total on both sites' lists (this one and §9.13's) has a square tick box
+on its left (#1457). `HTF.shoppingTicks` in `assets.js` draws it and wires it
+for `filters.js` and `cocktail-index.js` alike; `@mixin shopping-tick` in
+`shared/_rule.scss` draws it for both stylesheets, in each site's shortlist
+"on" colour.
+
+- **A tick is stored under the row's `key`**, the folded name `build()`
+  groups by, so it survives the label changing number and every redraw.
+- **The box, the amount and the name share one `<label>`**
+  (`.shopping-list-line`, `display: contents`), so tapping the words ticks
+  the row. The recipe links and the price stay outside it.
+- **Ticks last until "Untick all"**, under the rows and shown only while a
+  shown row is ticked. Untick all clears ticks on rows not shown too. Ticks
+  are never pruned to the rows on screen: a hidden list renders no rows.
+
 #### Storage
 
 `HTF.shortlist` (`assets/js/assets.js`) keeps the counts in localStorage keys
@@ -1593,7 +1610,8 @@ of their own, per site: glasses, portions and batches. They are separate
 because a missing entry means something different in each: one glass; however
 many this recipe makes, so `1` is a real stored answer; one batch. A stored 6
 cannot say whether it meant people or batches. A half batch is storable;
-whether this recipe may have one is `filters.js`'s question.
+whether this recipe may have one is `filters.js`'s question. The ticks are a
+fourth key, a list of row keys.
 
 #### Tests
 

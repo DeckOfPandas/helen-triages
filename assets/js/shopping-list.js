@@ -616,6 +616,9 @@
         }));
 
       return {
+        // The folded generic: what a tick is stored under (#1457), and unlike
+        // the label it does not change with the count.
+        key: key,
         label: label,
         note: note,
         generic: group.generic,

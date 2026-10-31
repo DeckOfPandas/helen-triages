@@ -60,6 +60,15 @@ test('the same generic across two drinks makes one line and one total', () => {
   assert.strictEqual(rows[0].text, '75 ml');
 });
 
+test('#1457: a row\'s key, what its tick is stored under, does not move with the label', () => {
+  // "sugar cube" prints "sugar cubes" past one; the tick must stay on it.
+  const one = SL.build([ing('1 cube', 'Sugar cube')]);
+  const many = SL.build([ing('1 cube', 'sugar cube'), ing('2 cubes', 'sugar cube')]);
+  assert.notStrictEqual(one[0].label, many[0].label);
+  assert.strictEqual(one[0].key, many[0].key);
+  assert.strictEqual(one[0].key, 'sugar cube');
+});
+
 test('the decimals this collection is full of do not go floating-point', () => {
   // 22.5 and 7.5 sit on the collection's 2.5 ml grid: the ordinary case, not an
   // edge one.

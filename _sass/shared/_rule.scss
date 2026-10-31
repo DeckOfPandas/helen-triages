@@ -1,3 +1,5 @@
+@use "sass:color";
+@use "sass:math";
 @use "shared/lightness";
 @use "shared/theme" as *;
 @use "shared/tokens" as *;
@@ -404,6 +406,49 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
     outline: 2px solid $hover;
     outline-offset: 2px;
     color: $hover;
+  }
+}
+
+// --- The shopping list's tick box (#1457) ---------------------------------------
+// One square box for both sites' shopping lists, with the colours as arguments:
+// food's and cocktails' `.shopping-list-tick` include it, so the two cannot
+// drift. A real checkbox with its native look taken off, so it keeps the
+// keyboard and the screen reader. The tick is an SVG drawn in $tick, not a
+// glyph: a font's ✓ differs by platform. Sized in em and nudged down to sit
+// centred on the row's first line, which is aligned by baseline.
+@function -svg-rgb($colour) {
+  @return 'rgb(' + math.round(color.channel($colour, "red", $space: rgb)) + ',' +
+    math.round(color.channel($colour, "green", $space: rgb)) + ',' +
+    math.round(color.channel($colour, "blue", $space: rgb)) + ')';
+}
+
+@mixin shopping-tick($edge, $fill, $tick, $ground) {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 1.05em;
+  height: 1.05em;
+  margin: 0;
+  position: relative;
+  top: 0.18em;
+  border: 1.5px solid $edge;
+  border-radius: 2px;
+  background: $ground no-repeat center / 100% 100%;
+  cursor: pointer;
+
+  &:checked {
+    border-color: $fill;
+    background-color: $fill;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.6 8.4l2.9 2.9 5.9-6.6' fill='none' stroke='#{-svg-rgb($tick)}' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+
+  &:hover { border-color: $fill; }
+
+  // The scaler's rule (#1086): focus is an outline, never a border or a size.
+  &:focus-visible {
+    outline: 2px solid $fill;
+    outline-offset: 2px;
   }
 }
 

@@ -420,6 +420,10 @@
   var shoppingDrinks = shoppingEl && shoppingEl.querySelector('.shopping-list-drinks');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
   var setAllInput = document.getElementById('shopping-list-setall');
+  // #1457. Ticking a row off, and starting the next shop afresh.
+  var refreshUntick = shoppingItems
+    ? HTF.shoppingTicks.wire(shoppingItems, shoppingEl.querySelector('.shopping-list-untick'))
+    : function () {};
 
   /* The card's own unmarked title, so a drink found by a name search still
      lists under its real name. */
@@ -533,12 +537,16 @@
         ? '<span class="shopping-list-price">' + HTF.escapeHtml(row.price.text) + '</span>'
         : '';
 
-      return '<li>' +
+      return '<li class="shopping-list-row' + HTF.shoppingTicks.rowClass(row.key) + '">' +
+        '<label class="shopping-list-line">' +
+        HTF.shoppingTicks.box(row.key) +
         '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
         '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + suffix + '</span>' +
+        '</label>' +
         price +
         '</li>';
     }).join('');
+    refreshUntick();
 
     renderShoppingTotal(rows);
   }
