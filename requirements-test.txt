@@ -22,7 +22,7 @@
 # which is pinned in the Dockerfile and in scripts/browser/install.sh with
 # tests/test_browser_harness.py holding them together. A "keep in sync by hand"
 # comment is a hope; a test is the sync.
-pytest==9.1.1
+pytest==9.2.0
 PyYAML==6.0.3
 
 # PLAYWRIGHT'S PYTHON BINDING, for the headless smoke test of both indexes
