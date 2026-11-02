@@ -35,8 +35,9 @@ private drafts repos, so it cannot check for duplicates.
    - **In bulk, at a desk:** ask the chat for the envelopes as files, one `.md`
      per recipe zipped, or as one combined file with each envelope under its
      `# ingest: <slug>` heading. Put them in `tmp/inbox/` in a Claude Code
-     session and say so. That session runs `scripts/ingest_inbox.py
-     --from-file tmp/inbox`, which reads the folder and splits a combined
+     session and say so. That session runs `python3 scripts/ingest_inbox.py
+     --site food --from-file tmp/inbox` (or `--site cocktail`; a folder holds
+     one site's envelopes), which reads the folder and splits a combined
      file, and no issue is raised. This is the route for a big batch: a Claude
      Code session never files dozens of issues (`CLAUDE.md`, "never create
      issues or PRs in a burst"). **Never paste a batch into an issue on the
@@ -73,7 +74,7 @@ private drafts repos, so it cannot check for duplicates.
   `QQ`.**
 - **It will not deduplicate against your collection** or remember an earlier
   dump. The local consumer compares a fingerprint of the amounts against every
-  existing draft.
+  existing draft and every published recipe.
 - **It says where a photograph ends** rather than finishing the recipe from
   its neighbours on the page.
 
@@ -129,7 +130,7 @@ consumer does that against the real files. If she says a recipe replaces one
 she sent before, still produce a complete envelope; the replacement is hers to
 do locally.
 
-ASK IN THE REPLY, NEVER WAIT FOR THE ANSWER (Helen's ruling, 2026-10-30). A
+ASK IN THE REPLY, NEVER WAIT FOR THE ANSWER (Helen's ruling). A
 question goes in your reply as soon as you hit it, at the top under
 the index, and the envelope is produced anyway with the question also in its
 hand-back list. When she answers, fold the answer into the envelopes still to

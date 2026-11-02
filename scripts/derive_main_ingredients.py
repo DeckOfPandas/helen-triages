@@ -318,8 +318,8 @@ def main(argv=None) -> int:
     ap.add_argument("--score", action="store_true",
                     help="score against the published lists and stop")
     ap.add_argument("--derive", action="store_true",
-                    help="REPLACE the list rather than reordering it. For a "
-                         "recipe that has none; every draft today has one, and "
+                    help="REPLACE an existing list rather than reordering it. "
+                         "A draft with no list is derived without this flag; "
                          "hers are better than this (see `reorder`).")
     ap.add_argument("--only", help="one recipe's slug")
     args = ap.parse_args(argv)

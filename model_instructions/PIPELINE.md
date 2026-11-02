@@ -90,7 +90,7 @@ Helen sends material several ways and the difference is transport only:
 |---|---|---|
 | a claude.ai chat (`CLAUDE_WEB_INGEST.md`) | one envelope per recipe: the complete file, a "what I could not know" list and a fingerprint | Helen carries the envelopes to the repo by one of the next three rows |
 | an `ingest` issue on the matching private repo | one envelope, as issue text, pasted from a phone | Claude: `/ingest-inbox`. `scripts/ingest_inbox.py` parses, deduplicates by fingerprint, writes the file, never repairs |
-| envelope files in `tmp/inbox/`, one `.md` per recipe | a batch from a chat, unzipped at a desk | Claude: `python3 scripts/ingest_inbox.py --site food --from-file tmp/inbox/‹slug›.md` (or `--site cocktail`), one call per file. It is a dry run until `--write`. No issue is raised: this is the route for a big batch |
+| envelope files in `tmp/inbox/`, one `.md` per recipe or one combined file | a batch from a chat, unzipped at a desk | Claude: `python3 scripts/ingest_inbox.py --site food --from-file tmp/inbox` (or `--site cocktail`), which reads every `.md` in the folder and splits a combined file at its `# ingest: ‹slug›` headings; a single file's path works too. It is a dry run until `--write`. No issue is raised: this is the route for a big batch |
 | the `yaml` block of one envelope, saved by hand into the root of a drafts clone | one file | Claude: the finishing pass in `ingest.md` |
 | files in `tmp/inbox-food-recipes/` or `tmp/inbox-cocktail-recipes/`, or a paste | photographs, screenshots, text | Claude: `/ingest`. Transcribe by opening every capture |
 
@@ -107,8 +107,10 @@ before it wrote:
 3. Cocktails: `python3 scripts/derive_cocktail_moods.py --write`. The moods
    are computed from the generics step 2 wrote, so they run after it.
 4. Cocktails: `python3 scripts/tidy_drafts.py --site cocktails --only order
-   --apply`, which puts the top-level keys in page order; the suite fails
-   without it. Either site: `/tidy-drafts` if the quoting or typography needs it.
+   --apply`, which puts the top-level keys in page order; food: the same with
+   `--site food`, which puts `meta:` directly under `title:`. The suite fails
+   without either. Either site: `/tidy-drafts` if the quoting or typography
+   needs it.
 5. `pytest`.
 6. `python3 scripts/ingest_preflight.py`, which reports what is valid and
    still needs a person.
@@ -193,8 +195,9 @@ before one.
 **Testing a recipe is reading its rendered page on the local server.** Every
 draft renders on `jekyll-local` at `/food/drafts/‹folder›/‹slug›/` or
 `/cocktails/drafts/‹folder›/‹slug›/` (a pool file has no folder segment), and
-the local index lists every draft with a `draft` badge. Helen starts her own
-servers; a session names the URLs.
+the local index lists every draft with a `draft` badge. A session serves its
+own worktree, whose drafts clone is on the batch branch, and gives her the
+URLs (`CLAUDE.md`, "Working with Helen").
 
 ---
 

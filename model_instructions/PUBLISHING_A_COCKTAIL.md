@@ -23,12 +23,12 @@ and Claude commits and pushes there. Helen's own local clone is not written to
 while a batch is open. One copy, always pushed: a commit that sits unpushed on
 one disk exists in one place.
 
-**Never start a dev server, and never offer to. Helen starts her own:** *"I
-start my own local servers, so don't do that."* A session says which pages
-need reading and at what URLs (`/cocktails/drafts/4-promote/<slug>/`) and
-stops there. `jekyll-local` and `jekyll-prod` are hers to run; a server a
-session starts is a process she did not ask for, on a port she may already be
-using, outliving the turn that made it.
+**She reads the pages on a server the session runs, never by pulling and
+building the branch herself.** The session serves its own worktree, whose
+drafts clone is on the batch branch, on a free port of a bound pair, and
+gives her the URLs (`/cocktails/drafts/4-promote/<slug>/`). The ports, the
+command and the rule that a server you did not start is never stopped are
+`CLAUDE.md`'s ("Working with Helen") and MANUAL §13.11's.
 
 ## The steps
 
@@ -65,22 +65,17 @@ using, outliving the turn that made it.
    those files again except to open an `awaiting_fix` round or change a flag
    Helen asks for. **Until Helen sees that word, the served pages are work in
    progress and not for proofreading.**
-5. **Helen proofreads** by reading each cocktail's built page on her own dev
-   server, at `/cocktails/drafts/<folder>/<slug>/`, and sets `proofread: true`
-   in the file. Reading the served page is the proofread; the flag says "I
-   read this rendered and it is what I want".
-   - **Say which repo the branch is in, and how to get it. The URLs are
-     useless without the files.** `_cocktail_drafts/` is a separate private
-     repo, gitignored here, so checking out the public branch brings no
-     cocktail files at all: her clone stays on its own `main` and the pages
-     she is being sent to do not exist. "Pushed" is not "she can see it". Put
-     these in the message that gives the URLs. **They are Helen's, to run on
-     her own machine; a session cannot run them** (the hooks refuse `git -C`,
-     and a session fetches with `sh scripts/git-fetch-agent.sh`):
-
-         git -C _cocktail_drafts fetch origin
-         git -C _cocktail_drafts checkout content/<the-batch-branch>
-
+5. **Helen proofreads** by reading each cocktail's built page on the server
+   the session runs for the branch, at `/cocktails/drafts/<folder>/<slug>/`,
+   and sets `proofread: true` in the file. Reading the served page is the
+   proofread; the flag says "I read this rendered and it is what I want".
+   - **Say which private branch the pages come from, in the message that
+     gives the URLs.** `_cocktail_drafts/` is a separate private repo,
+     gitignored here, so the public branch alone carries no cocktail files:
+     the served worktree's clone must be on the batch branch, fetched with
+     `sh scripts/git-fetch-agent.sh _cocktail_drafts
+     helen-triages-cocktails-private <branch>`, before the URLs mean
+     anything. "Pushed" is not "she can see it".
    - If a small thing is wrong: `awaiting_fix: true` in a commit that says
      what; fix between them; Helen re-reads the whole page (a cocktail recipe
      is short); flag back.

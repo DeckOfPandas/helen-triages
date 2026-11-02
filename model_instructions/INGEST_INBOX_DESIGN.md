@@ -99,14 +99,20 @@ crispy sage butter gnocchi | 500 g | 60 g | 12 | 1 | 30 g
 
 - **Duplicates are found by fingerprint, never by title.** The script builds
   the same line for every draft already under the drafts folder, staging
-  subfolders included. An envelope whose fingerprint matches one is reported
-  as a probable duplicate and not written.
+  subfolders included, and for every recipe in the published collection
+  (`_food_recipes/` or `_cocktail_recipes/`), since a duplicate of a live
+  recipe is as much a duplicate. An envelope whose fingerprint matches one is
+  reported as a probable duplicate (`published <slug>` when the match is
+  live) and not written. `--recipes-dir` points the published scan at
+  another folder; a run on a copy (`--drafts-dir`) reads no published
+  collection unless told where.
 - **A matching title with a different fingerprint** is a different recipe
   under the same name (the Sazerac case). It is written, and reported for
   Helen to name.
 - **The slug** is the whole title: apostrophes dropped, accents folded,
-  everything outside `[a-z0-9]` turned to a hyphen. If a draft with that slug
-  exists the script appends `-2` (then `-3`, and so on) and reports it.
+  everything outside `[a-z0-9]` turned to a hyphen. If a draft or a published
+  recipe with that slug exists the script appends `-2` (then `-3`, and so on)
+  and reports it.
 - **The file written** is the fenced block byte for byte, never a YAML
   round-trip, as `<slug>.md` at the top level of the drafts folder, at a path
   that does not yet exist. One line may differ: an empty
