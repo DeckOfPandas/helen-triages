@@ -96,7 +96,7 @@ canonical_glasses:
 # because no rule gets them right from the key. A glass in use with no phrase
 # fails test_every_glass_in_use_has_a_serving_phrase.
 serving:
-  brandy glass: "a brandy glass"   # kept, Helen 2026-09-25 (#1186): no drink uses it yet
+  brandy glass: "a brandy glass"   # kept though no drink uses it (#1186)
   collins: "a collins glass"
   coconut shell: "a coconut shell"
   coupe: "a coupe"
@@ -107,7 +107,7 @@ serving:
   julep cup: "a julep cup"
   margarita: "a margarita glass"
   martini: "a martini glass"
-  martini glass: "a martini glass"   # kept, Helen 2026-09-25 (#1186): no drink uses it yet
+  martini glass: "a martini glass"   # kept though no drink uses it (#1186)
   mug: "a mug"
   mule mug: "a mule mug"
   piña colada: "a piña colada glass"

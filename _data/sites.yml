@@ -25,7 +25,8 @@ food:
   reference_links:
     - text: internal temperatures
       url: /food/reference/internal-temperatures/
-    # "methods and times": the wording follows the page's name (#385).
+    # The footer's own wording, printed verbatim by _layouts/default.html and
+    # shorter than the page's heading: Helen's words (#385).
     - text: methods and times
       url: /food/reference/cooking-methods-and-timings/
 

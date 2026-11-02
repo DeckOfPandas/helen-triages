@@ -23,7 +23,7 @@ import svgrender  # noqa: E402
 
 GLASSES = os.path.join(ROOT, "_includes", "icons", "glasses", "*.svg")
 HEIGHT = 224      # 14rem, the drink page's $glass-min
-STROKE = 2        # the weight Helen chose 2026-09-05, down from 3
+STROKE = 2        # the drink page's non-scaling stroke, in px; Helen's choice
 
 
 def coverage(path):

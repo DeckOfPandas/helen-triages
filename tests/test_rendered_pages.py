@@ -2942,10 +2942,9 @@ def test_a_drink_with_no_volume_keeps_the_units_sentence_it_had_before(prod_site
 
 
 def test_no_drink_page_prints_a_batch_volume(prod_site):
-    """No drink page prints an "Approximately X ml" line under the scaler. #1257.
-
-    #1121 asked for that line and #1257 removed it; this stops the older
-    ruling being restored in good faith.
+    """No drink page prints an "Approximately X ml" line under the scaler
+    (#1257). #1121 asked for one, so this holds the later ruling against a
+    good-faith restoration.
 
     The words are looked for between the scaler and the method only: an
     ingredient note of Helen's ("Approximately 90 ml for this one.") sits

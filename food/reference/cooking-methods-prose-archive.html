@@ -1,40 +1,19 @@
 ---
-# =============================================================================
-# ARCHIVE — THE COOKING METHODS PAGE'S ORIGINAL PROSE. Issue #400.
+# ARCHIVE: THE COOKING METHODS PAGE'S ORIGINAL PROSE (#400). Committed but
+# not built: `published: false` makes Jekyll skip this file, so it has no URL
+# and is in no index. It is here to be read in the repository.
 #
-# COMMITTED BUT NOT BUILT. `published: false` is what does that: Jekyll skips
-# this file entirely, so it produces no URL, appears in no index and is served
-# to nobody. It is here to be read in the repository, by a person, on purpose.
-#
-# WHY IT EXISTS. food/reference/cooking-methods.html used to render these
-# paragraphs around its timing tables. The 2026-08-13 migration moved the page
-# to render from _data/food/cooking_methods.yml, and the prose came across into
-# a `groups` key -- where it has sat ever since, serialised into a 58 KB JSON
-# blob shipped to every visitor's browser and rendered by nothing at all.
-#
-# #400 called `groups` and `columns` dead data and asked for their removal. That
-# is right about the rendering and wrong about the content: `groups` holds 35
-# paragraphs, 1,942 words and 14 outbound links, and 14 of those paragraphs are
-# sourcing notes naming where each timing figure actually came from -- Delia
-# Smith, Waitrose, the American Lamb Board, Gressingham. That research exists
-# nowhere else. Helen, 2026-08-21, having read it: "It doesn't need to be on the
-# website, but I don't want to lose it entirely."
-#
-# So it lands here first, complete and verbatim, and only then comes out of the
-# shipped data. Every paragraph is reproduced with its original inner HTML --
-# the <strong> weight figures, the <em>, and the links, which live INSIDE the
-# sourcing notes and are exactly what a flatten-to-text would lose silently.
+# The paragraphs that surrounded each timing table before the page was built
+# from _data/food/cooking_methods.yml, verbatim with their inner HTML. Many are
+# sourcing notes naming where a timing figure came from, and that research is
+# recorded nowhere else: Helen keeps it off the site and in the repo.
 #
 # `kind` and the before/after slot are kept on each paragraph because position
-# was load-bearing on the original page: beef ran subtitle, table, weight note,
-# sources, then a second subtitle and did it again. See the docstring of
-# scripts/build_cooking_methods_prose.py for why these were ordered lists
-# rather than named fields.
+# carried meaning on the original page; scripts/build_cooking_methods_prose.py's
+# docstring says why they are ordered lists rather than named fields.
 #
-# NOT A PAGE TO REVIVE BY DELETING ONE LINE. If this ever goes back on the site
-# it needs a layout, a route and Helen's proofread; flipping `published` alone
-# would put unstyled archive markup on a live URL.
-# =============================================================================
+# NOT A PAGE TO REVIVE BY DELETING ONE LINE: it needs a layout, a route and
+# Helen's proofread. Flipping `published` alone puts unstyled markup on a live URL.
 published: false
 title: "Cooking Methods and Timings — archived page prose"
 ---
@@ -42,10 +21,10 @@ title: "Cooking Methods and Timings — archived page prose"
 <h1>Cooking methods and timings: the original page prose</h1>
 
 <p>
-  Archived {{ "now" | date: "%Y-%m-%d" }} — but see the front matter above for
-  the real history. These are the paragraphs that surrounded each timing table
-  on the cooking methods page before it was rebuilt from data, kept because the
-  sourcing notes are original research and are recorded nowhere else.
+  These are the paragraphs that surrounded each timing table on the cooking
+  methods page before it was rebuilt from data, kept because the sourcing
+  notes are original research and are recorded nowhere else. The history is
+  in git (#400).
 </p>
 
 <h2 id="chicken">Chicken</h2>
