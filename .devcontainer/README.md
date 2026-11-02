@@ -47,14 +47,19 @@ Prefer to do it by hand instead? The equivalent manual steps are:
     docker volume create helen-triages-claude-config
     docker volume create helen-triages-bundle-cache-helen-triages
     docker run -it --rm \
+      --name helen-triages-primary \
       -v "$(pwd):/workspace" \
       -v helen-triages-claude-config:/home/helen/.claude \
       -v helen-triages-bundle-cache-helen-triages:/home/helen/.bundle-cache \
+      -p 5998:4001 -p 5999:4002 \
       -w /workspace \
       helen-triages-devcontainer \
       bash
 
-(The build context is `.devcontainer/` itself, not the whole repo -- the
+(The fixed `--name` is what makes a second `run.sh` fail at the door
+rather than give two containers one bind mount. The ports publish the
+container's `jekyll-local`/`jekyll-prod` as 5998/5999 on the host, so a
+running container never holds your own 4001. The build context is `.devcontainer/` itself, not the whole repo -- the
 Dockerfile only needs `init-firewall.sh` from that folder. Your project
 files are never copied into the image; they're bind-mounted at runtime,
 so editing them doesn't require rebuilding.)
@@ -84,11 +89,13 @@ have a trap this sidesteps -- a fully cached rebuild keeps the *cached*
 layer's Created date, so an image's timestamp can stay older than the
 Dockerfile forever and an mtime check would never settle.
 
-Every file in `.devcontainer/` counts, not just the `Dockerfile` and the
-`init-firewall.sh` it `COPY`s, so nothing has to be kept in sync by hand
-when a new `COPY` appears. The cost is that editing `run.sh` or this
-README rebuilds once -- with the Dockerfile unchanged that's a cached
-no-op of about a second, needing no network.
+Every file in `.devcontainer/` counts except the ones `.dockerignore`
+names (this README, `run.sh`, `devcontainer.json`, `claude_code_latest.py`,
+none of which the image uses), so a new `COPY` is covered without anything
+kept in sync by hand, and editing this README costs no rebuild.
+`.dockerignore` takes exact filenames only: a line with a `*`, a `/` or a
+`!` makes `run.sh` hash the whole folder, ignore file and all -- wrong only
+in the safe direction, a spurious cached rebuild rather than a missed one.
 
 What it **can't** see: `ruby:3.3-bookworm` moving upstream, or an
 `apt-get install` resolving to newer packages than last time. Nothing on
@@ -115,8 +122,9 @@ Claude Code layer -- the last one in the Dockerfile -- is rebuilt: one
 `com.deckofpandas.claude-code-version`, records what the image carries.
 
 If the lookup fails (offline, registry slow) the container starts on the
-image it has. A hand build passes no version and gets `latest`, which
-Docker will happily serve from cache; add
+image it has. `PIN_CLAUDE_CODE=<number>` in the environment skips the
+lookup and builds that version. A hand build passes no version and gets
+`latest`, which Docker will happily serve from cache; add
 `--build-arg CLAUDE_CODE_VERSION=<number>` to move it.
 
 ### 3. First-time Claude Code login (Max plan, no API key needed)
@@ -155,11 +163,12 @@ Read them yourself first for anything that shouldn't be there (a
 stray token, an odd credential export) -- this only mounts what's
 already on your host, it doesn't vet it for you.
 
-They land at alternate paths (`~/.host-bashrc` etc.) rather than
-overwriting the container's own `.bashrc`, which already defines
-`jekyll-local`/`jekyll-prod`; the container's `.bashrc` sources yours
-from there afterwards, so both sets of aliases coexist rather than one
-replacing the other. Verified live: baked-in and mounted aliases,
+The three shell files land at alternate paths (`~/.host-bashrc` etc.)
+rather than overwriting the container's own `.bashrc`, which already
+defines `jekyll-local`/`jekyll-prod`; the container's `.bashrc` sources
+yours from there afterwards, once per shell, so both sets of aliases
+coexist rather than one replacing the other. `.gitconfig` lands at its
+usual path. Verified live: baked-in and mounted aliases,
 custom `PS1`, and `.gitconfig` settings all came through together in
 the same shell.
 

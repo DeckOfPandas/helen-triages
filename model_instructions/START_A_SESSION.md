@@ -23,9 +23,12 @@ shall we drink). You are in a git worktree; do not leave it.
    `model_instructions/PIPELINE.md` — the one map — and the procedure it names
    for your step: `.claude/commands/ingest.md`, `ingest-inbox.md`,
    `tidy-drafts.md`, or `model_instructions/PUBLISHING_A_COCKTAIL.md` (read it
-   before touching `4-promote/`). `LETTERING.md` is the punched-tape type.
+   before touching `4-promote/`). `INGEST_INBOX_DESIGN.md` is the envelope an
+   `ingest` issue carries; `SOURCE_ATTRIBUTION_SPEC.md` is the `source` and
+   `source_type` contract a citation must meet. `LETTERING.md` is the
+   punched-tape type and `LEOPARD.md` the black-on-black print.
    `INGEST_ONE_RECIPE.md`, `INGEST_ONE_COCKTAIL.md` and `CLAUDE_WEB_INGEST.md`
-   are for a Claude with no repository, not for you.
+   are for a Claude with no repository, not for you to follow.
 
 The two drafts collections are private repos and are absent in a fresh
 worktree: clone the one you need (`CLAUDE.md` has the commands).
