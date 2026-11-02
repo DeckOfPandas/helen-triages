@@ -257,7 +257,7 @@
 
 // The active ingredient-search button takes the STAR/MOOD/PRACTICALITIES
 // active treatment in its own green. Its .tag-shape slot is added by
-// filters.js (ensureActiveIngredientShape), since the button is built as you
+// filters.js (ensureActiveIngredientShapes), since the button is built as you
 // type.
 .search .btn-tag.btn-ingredient.active {
   @include index-chip-chosen($color-text);

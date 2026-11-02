@@ -19,7 +19,7 @@ that links to each, because those links 404 in production; writes one issue
 body with a checklist to tmp/needs-helen-batch.md; and prints the one command
 that opens it. It opens no issue and makes no commit.
 
-One issue per batch, never one per file (DECISIONS §4.0). Before opening it,
+One issue per batch, never one per file (DECISIONS §11). Before opening it,
 check the tracker for an open `blocked-on-helen` issue naming one of the
 slugs: comment there and leave that slug out of the new body.
 `scripts/dark_pages.py` lists everything the gate is hiding.

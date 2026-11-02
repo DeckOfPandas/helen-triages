@@ -2,49 +2,33 @@
 layout: default
 title: "??"
 permalink: /about/
-# The word on the tape, overriding this site's own (see _layouts/default.html).
-# HELEN TRIAGES / [ ?? ] rather than / [ FOOD ]: this page is reached from the
-# shared header of both sites and is about neither one in particular, so the
-# site slot says so. Helen's idea, 2026-08-19; the h1 below and the "??" nav
-# link that reaches this page were already speaking in the same voice.
+# The word on the tape, overriding this site's own (_layouts/default.html):
+# HELEN TRIAGES / [ ?? ], because this page is reached from both sites' shared
+# header and belongs to neither. The h1 below and the "??" nav link say the same.
 wordmark_word: "??"
-# THIS PAGE BELONGS TO NO SITE, for display purposes -- issue #395. It suppresses
-# the "| Helen Triages Food" that _layouts/default.html appends to every other
-# page's <title>, so the browser tab reads "??" and not one site's name on a page
-# reached from both. Helen: "The name of that page is '??', so wherever a title
-# would appear it should read '??'."
-#
-# Display only. `site_key: food` below is unaffected and still required -- it is
-# what gives this page a stylesheet. Two different claims; see default.html.
+
+# Display only (#395): drops the "| Helen Triages Food" that _layouts/default.html
+# appends to every other page's <title>, so the tab reads "??" on a page reached
+# from both sites. `site_key: food` below is a different claim and still
+# required: it is what gives this page a stylesheet.
 site_neutral: true
-# ONE ABOUT PAGE FOR THE WHOLE REPO -- issue #374, and the reason this file sits
-# at the root rather than under food/. The header's "??" link is part of the
-# shared chrome, so it cannot point at a page that belongs to one site: it did,
-# and cocktails therefore had no "??" at all. This page moved from
-# /food/about/ on 2026-08-19.
-#
-# site_key IS SET BY HAND HERE, AND IT HAS TO BE. _config.yml's `defaults:`
-# assign site_key by directory -- "food" and "cocktails" -- so a page at the
-# root matches neither and would inherit none. MANUAL 2.4: a page with no
-# site_key gets the repo-level title and NO STYLESHEET AT ALL, silently. That is
-# not a hypothetical here; it is what this file would have shipped as.
-#
-# `food` rather than a third value, deliberately. This page's longform styling
-# is _sass/food/_about.scss, sitting on .recipe-body-content, and food's is the
-# only finished palette in the repo. Giving /about/ its own stylesheet would
-# recreate assets/css/root.scss exactly -- the third consumer of shared/ that
-# belonged to neither site, that nobody thought to check, and that broke
-# silently for precisely that reason (MANUAL 2.2, issue #204).
-#
-# The cost this would have carried is that /about/ says "Helen Triages Food" in
-# its title bar. It does not: site_neutral above removes it from the <title>,
-# and wordmark_word handles the tape. See #395.
-#
-# DO NOT DELETE THE LINE BELOW. It has now gone missing twice. Without it this
-# page has no site_key, _layouts/default.html links no stylesheet at all, and
-# /about/ ships as raw unstyled HTML -- silently, because that is a missing tag
-# rather than a broken one. tests/test_rendered_pages.py::
-# test_every_published_page_links_a_stylesheet exists for exactly this.
+
+# One about page for the whole repo (#374), at the root rather than under food/:
+# the header's "??" link is shared chrome, so it cannot point at a page that
+# belongs to one site.
+
+# site_key is set by hand here and has to be. _config.yml's `defaults:` assign
+# it by directory, so a root page inherits none, and a page with no site_key
+# gets the repo-level title and no stylesheet at all, silently (MANUAL §2.4).
+# `food` rather than a third value: the longform styling is
+# _sass/food/_about.scss on .recipe-body-content, and a third stylesheet would
+# be a third consumer of shared/ that belongs to neither site (MANUAL §2.2,
+# #204). site_neutral above keeps "Helen Triages Food" out of the title bar.
+
+# DO NOT DELETE THE LINE BELOW. Without it _layouts/default.html links no
+# stylesheet and /about/ ships as raw HTML, silently: a missing tag, not a
+# broken one. tests/test_rendered_pages.py::
+# test_every_published_page_links_a_stylesheet holds it.
 site_key: food
 ---
 

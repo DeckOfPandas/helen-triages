@@ -3,7 +3,9 @@
 
     python3 scripts/ingest_review.py --from-file tmp/inbox --out tmp/review.md
 
-It reads the envelopes, as `ingest_inbox.py --from-file` does, and the draft
+Food batches only: every envelope is parsed as food and every draft is looked
+for under `_food_drafts/`, so a cocktail envelope is listed as rejected. It
+reads the envelopes, as `ingest_inbox.py --from-file` does, and the draft
 each one became, by slug, as it stands now (after the finishing pass). It
 writes markdown for the drafts PR's description:
 

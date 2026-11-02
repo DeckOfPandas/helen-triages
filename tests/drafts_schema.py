@@ -27,6 +27,13 @@ REQUIRED = {
     "_food_drafts": 2,
 }
 
+# The private repo each clone is fetched from, for the message below: the
+# sanctioned fetch is the wrapper, which takes the repo's name.
+REMOTES = {
+    "_cocktail_drafts": "helen-triages-cocktails-private",
+    "_food_drafts": "helen-triages-food-private",
+}
+
 # What each version required of the data. One line per bump; never rewrite a
 # line, because the whole value of this file is being able to read what a
 # mismatch means.
@@ -115,8 +122,10 @@ def mismatch(repo: str) -> str | None:
             f"in your work: tests here will report real drinks as breaking "
             f"rules whose migration simply has not arrived yet.\n"
             f"  Fetch and merge the drafts branch that carries:\n{needed}\n"
-            f"  `git -C {repo} fetch` first -- a stale clone is the other half "
-            f"of this trap (MANUAL 9.1)."
+            f"  Fetch first -- a stale clone is the other half of this trap "
+            f"(MANUAL 9.1). In a session: `sh scripts/git-fetch-agent.sh "
+            f"{repo} {REMOTES[repo]} main --keep-head`; by hand, a plain "
+            f"`git fetch` inside {repo}/."
         )
 
     ahead = "\n".join(f"    {v}: {log.get(v, '(undocumented)')}"

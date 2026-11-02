@@ -11,9 +11,9 @@ permalink: /food/
 
 <h1 class="visually-hidden">{{ this_site.title }} — {{ this_site.description }}</h1>
 
-{% comment %} No random-deal section above the panel on food (PR #660 added one and Helen
-   removed it): the panel of choices is the fold on a triage site. Recover it
-   from git if the question is reopened; do not rebuild it from memory. {% endcomment %}
+{% comment %} No random-deal section above the panel on food: the panel of choices
+   is the fold on a triage site (Helen's ruling, #660). If the question is
+   reopened, the section is in git history; do not rebuild it from memory. {% endcomment %}
 
 {% comment %} `data-filter-panel`: the results pill shows "top" once this has left the
    screen above (_includes/results-pill.html). {% endcomment %}

@@ -45,9 +45,9 @@ script; `--help` prints them):
 | `quoting` | both | quotes the scalar string fields; on food also the `main_ingredients`/`tags` lists and every group's `- name:` |
 | `dashes` | both | `3-4` → `3–4` |
 | `typography` | both | `--` → em dash, `->` → → |
-| `units` | both | `15ml` → `15 ml`, for `kg g ml cl cm mm oz tsp tbsp`; never a temperature, which wants a degree sign and is reported |
+| `units` | both | `15ml` → `15 ml`, for the metric, imperial and spoon units in the script's `UNITS`; never a temperature, which wants a degree sign and is reported |
 | `accents` | both | the words in `_data/accented_words.yml` |
-| `meta` | food | the `meta:` block's keys, order and unquoted booleans; it never invents a flag |
+| `meta` | food | the `meta:` block's keys and order: retired keys dropped, the flags in `META_ORDER`; a missing flag is reported, never invented, and an unrecognised key leaves the block alone |
 | `size` | food | `amount: "2"` / `item: "large onions"` → `amount: "2 large"` / `item: "onions"`, only where `test_size_word_is_with_the_count_not_the_item` would fire |
 | `incidentals` | food | a fat or flour only for the tin or the pan (`"butter, for greasing"`) gains `incidental: true`; `", plus extra for the tin"` and its kin are trimmed off a real line; deep-frying oil loses its amount and reads `"<oil>, for deep frying"`. All by `incidental_verdict` in `tests/test_taxonomy.py`, over the words in `_data/food/incidentals.yml` (#1356). A `QQ` line gains the flag but is never trimmed |
 | `titles` | cocktails | Title Case by the suite's `title_cased`: it only raises a letter, and leaves anything in brackets as written |

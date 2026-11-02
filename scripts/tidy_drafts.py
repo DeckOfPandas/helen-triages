@@ -1229,8 +1229,8 @@ def main(argv=None):
                     help="write the fixes; without it nothing is changed")
     ap.add_argument("--only", default="",
                     help="comma-separated subset of: " + ",".join(RULE_NAMES)
-                         + " (meta and size are food's alone, titles is "
-                           "cocktails' alone)")
+                         + " (meta, size and incidentals are food's alone, "
+                           "titles is cocktails' alone)")
     ap.add_argument("--site", choices=sorted(SITES), default=None,
                     help="one collection only; the default is both")
     ap.add_argument("--allow-dirty", action="store_true",

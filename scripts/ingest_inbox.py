@@ -23,14 +23,19 @@ Flags:
     --comment              post each outcome back on its issue; ignored with
                            --from-file
     --drafts-dir DIR       use DIR as the drafts folder, to prove a run on a
-                           copy
+                           copy; the published collection is then read only
+                           if --recipes-dir says where
+    --recipes-dir DIR      the published collection to deduplicate against;
+                           `_food_recipes/` or `_cocktail_recipes/` by default
     --every-bullet         print the hand-back bullets a standing ruling
                            settles (FOLDS), which are otherwise only counted
 
 It reads the open issues labelled `ingest` on the site's private repo, through
-the GitHub API with `AGENT_GH_TOKEN`, and every `.md` under the drafts folder,
-recursively. With `--write` it creates `<slug>.md` at the top of the drafts
-folder. Its only write to GitHub is the comment `--comment` posts.
+the GitHub API with `AGENT_GH_TOKEN`, every `.md` under the drafts folder,
+recursively, and every recipe in the site's published collection, so that a
+duplicate of a live recipe is reported as `published <slug>` and a slug a live
+recipe holds gains `-2`. With `--write` it creates `<slug>.md` at the top of
+the drafts folder. Its only write to GitHub is the comment `--comment` posts.
 
 The rules:
 
@@ -510,7 +515,8 @@ def main(argv=None) -> int:
     ap.add_argument("--comment", action="store_true",
                     help="post the outcome back on the issue")
     ap.add_argument("--from-file", default=None,
-                    help="parse a local envelope file instead of fetching")
+                    help="parse a local envelope file, batch file or folder "
+                         "of them instead of fetching")
     ap.add_argument("--drafts-dir", default=None,
                     help="operate on a different directory. Exists so this can "
                          "be proved against a COPY before it is ever pointed "

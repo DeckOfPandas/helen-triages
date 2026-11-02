@@ -17,14 +17,14 @@
 // chip) must stay apart; a heading bar sits under its own name and need not.
 
 // --- Raw palette -------------------------------------------------------------
-$color-ink:          #e8e6e2;   // was #1b1b1f
+$color-ink:          #e8e6e2;
 // The page ground. Page, band (`$color-chrome-ground`) and card
 // (`$color-surface`) are always in that order, each lighter than the one before
-// (LEOPARD.md §2). The contrast figures quoted in this file were measured on
-// lighter grounds than these; a darker ground only widens them.
-$color-paper:        #030304;   // was #060607 until 2026-10-08, #0e0e10 until 2026-10-06, and #fbfbfa before the inversion
-$color-grey-mid:     #97959a;   // 6.50:1 on the old ground -- de-emphasised UI text
-$color-grey-light:   #2c2c31;   // borders; L* 18.2 against the old ground's 4.0
+// (LEOPARD.md §2). The contrast figures quoted in this file are measured on a
+// lighter ground than this; a darker ground only widens them.
+$color-paper:        #030304;
+$color-grey-mid:     #97959a;   // de-emphasised UI text; 6.50:1 on the lighter ground
+$color-grey-light:   #2c2c31;   // borders; L* 18.2, a line on a near-black ground
 
 // --- The accents -------------------------------------------------------------
 // Each is named after the drink it is the colour of (#555), and its job, stated

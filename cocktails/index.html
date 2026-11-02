@@ -525,7 +525,7 @@ permalink: /cocktails/
      ingredient-search.js; cocktail-index.js needs filter-state.js,
      cocktail-search.js and shopping-list.js.
      tests/test_site_config.py::test_the_cocktail_index_scripts_load_in_dependency_order
-     guards all but shopping-list.js. {% endcomment %}
+     holds the order. {% endcomment %}
   {% comment %} list-view.js is shared with the food index (#694), so the two
      pagers agree on what a page is. Loaded before cocktail-index.js, which
      calls it. {% endcomment %}

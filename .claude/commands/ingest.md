@@ -192,10 +192,12 @@ without its flag, so run it dry first if you want to see what it will do.
    supplies the derived moods and keeps a hand-assigned one already in the
    file, which an envelope carries only where Helen named it in the chat.
 4. **Food, only if the file has no `main_ingredients`:** `python3
-   scripts/derive_main_ingredients.py --derive --only <slug>`. Read its
-   docstring before trusting the result; a list of hers is better than the
-   derivation. Without `--derive` the script only reorders an existing list
-   into Helen's stated order and changes no membership.
+   scripts/derive_main_ingredients.py --only <slug>` to see the list it would
+   derive, then the same with `--write` to write it; nothing is written
+   without `--write`. A draft with no list gets a derived one without any
+   other flag; `--derive` REPLACES a list that exists, which is the one thing
+   not to do to a file that arrived with one. Read its docstring before
+   trusting the result; a list of hers is better than the derivation.
 5. **Tidy.** A cocktail always gets `python3 scripts/tidy_drafts.py --site
    cocktails --only order --apply`, which puts its keys in page order by moving
    whole blocks and editing no line;
@@ -355,10 +357,11 @@ else has already done (MANUAL §9.1).
     `test_group_names_are_quoted` fails on a bare one and `/tidy-drafts`
     (`--only quoting`) fixes it.
 - **House style** -- en dashes, `°C`, unicode fractions, quoting, accents, and
-  **a space between a number and its unit** (`15ml` -> `15 ml`). The units are
-  `kg`, `g`, `ml`, `cl`, `cm`, `mm`, `oz`, `tsp`, `tbsp`; a temperature is NOT
-  one of them, because `180C` wants a degree sign and spacing it would half-fix
-  it. `scripts/tidy_drafts.py --only units` is the same rule for a drafts pass.
+  **a space between a number and its unit** (`15ml` -> `15 ml`): metric,
+  imperial and spoon units alike, the list being `UNITS` in
+  `scripts/tidy_drafts.py`. A temperature is NOT one of them, because `180C`
+  wants a degree sign and spacing it would half-fix it.
+  `scripts/tidy_drafts.py --only units` is the same rule for a drafts pass.
   On food the formatting reaches `QQ` lines too, so Helen rewrites from house
   style; a `QQ original` still keeps every word the source printed.
 - **The citation**, per `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`. For
@@ -391,7 +394,8 @@ else has already done (MANUAL §9.1).
   cook would pause. Never cut an original, never merge two, never reorder.
 
   **WHAT HER OWN REWRITE LOOKS LIKE, once she's actually cooked from a `QQ
-  Claude` line** (`sticky-squidge-ginger-loaf.md`). She asked for the
+  Claude` line** (`sticky-squidgy-ginger-loaf-treaecle-topping.md` in
+  `_food_drafts/`). She asked for the
   comparison herself and it holds four real patterns, worth aiming for on the
   NEXT `QQ Claude` line rather than waiting for her to fix this one:
 

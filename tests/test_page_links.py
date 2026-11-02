@@ -233,7 +233,7 @@ TRUSTED_DYNAMIC = (
     re.compile(r"^\{\{\s*back_site\.home\s*\|\s*relative_url\s*\}\}$"),
     # The see-shortlist link (#1011, _includes/page-actions.html). The query
     # does not change the page fetched, and `#results` is an id both indexes
-    # carry (test_the_search_box_searches_for_anything_on_a_local_build,
+    # carry (test_the_search_box_searches_for_anything_on_every_site_page,
     # tests/test_site_config.py).
     re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1#results$"),
     # The footer's reference links.

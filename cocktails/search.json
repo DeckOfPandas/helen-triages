@@ -3,60 +3,43 @@ permalink: /cocktails/search.json
 sitemap: false
 ---
 {%- comment -%}
-  WHAT THE "SEARCH FOR ANYTHING" BOX SEARCHES ON A DRINK PAGE -- GitHub issue
-  #1050, 2026-09-15. The drinks' half of food/search.json; read that file's
-  comment for the shape and the reasoning, which are the same. Fetched by
-  assets/js/page-search.js from the box _includes/page-search.html renders
-  at the top right of every drink page.
-
-  THE SAME LIST THE INDEX SHOWS. `all_drinks` is assembled exactly as
-  cocktails/index.html assembles it -- the gated public collection, plus the
-  drafts ONLY under `site.show_drafts`, which _config_local.yml declares and
+  What the "search for anything" box searches on a drink page (#1050): the
+  drinks' half of food/search.json, whose comment gives the shape and the
+  reasoning. Fetched by assets/js/page-search.js from the box
+  _includes/page-search.html renders on every drink page.
+{%- endcomment -%}
+{%- comment -%}
+  THE SAME LIST THE INDEX SHOWS. `all_drinks` is assembled as
+  cocktails/index.html assembles it: the gated public collection, plus the
+  drafts only under `site.show_drafts`, which _config_local.yml declares and
   production does not (#235). tests/test_rendered_pages.py holds the two lists
   equal in a production build.
-
-  WHAT A DRINK CARRIES HERE. `moods` is the drink's mood list, which the MOOD
-  and HASSLE groups both count (one filter with two headings, MANUAL 9.13 --
-  the split is taxonomy.yml's `mood_groups`). `ing` is the CARD'S ingredient
-  line, label for label, from _plugins/cocktail_card_ingredients.rb: the card
-  name is the chip the index's HAS TO HAVE field offers (MANUAL 9.10.1, "cards
-  and search read the VOCABULARY"), so a word chosen here is a word the index
-  can apply.
-
-  A JOINED "X OR Y" LABEL IS OFFERED AS ITS PARTS -- #1130, 2026-09-20. The
-  card prints "cherry brandy or cherry liqueur" as a true fact about the pour,
-  and that string names no single HAS TO HAVE chip, so offering it would be a
-  result that matches nothing when clicked (the `?ing=` grammar matches a chip
-  WHOLE, MANUAL 13.13). #1051 solved that by dropping such a row from this
-  feed; this offers `ing.search_labels` instead, which is the same label in
-  the pieces a filter can actually apply -- one per generic, from the same
-  `card_names` map the chips themselves are built from.
-
-  WHY IT IS BETTER THAN DROPPING THE ROW. A disjunctive `generic` means
-  "either would do" (#441), so the drink genuinely answers a HAS TO HAVE
-  question about either -- and `buildPool` in cocktail-search.js already adds
-  a chip PER GENERIC, so both halves have been clickable on the index all
-  along. The box was the one door that disagreed. The Singapore Sling going
-  live made it visible: `cherry brandy` and `cherry liqueur` are poured by
-  nothing else, so neither word existed in this feed at all, and the drink was
-  findable only by name. Two of the three joined pours were quieter and no
-  more correct -- Grand Marnier, triple sec, lightly aged rum and clear
-  blended rum are all poured alone elsewhere, so the words were here and the
-  two drinks that could use them simply did not answer to them.
-
-  IT STILL FAILS OPEN, and the reason is worth keeping because it has bitten.
-  The first version of #1051 kept `where: "generics", 1`, which dropped a row
-  with no generic at all (`generics: 0`, labelled from its item) and EVERY row
-  on a `jekyll serve` started before the plugin gained the field (MANUAL §1:
-  plugins are not reloaded). Helen, testing it on 2026-09-15: "Now the only
-  things it returns are cocktail names. Please put it back." So the `if`
-  below falls back to `ing.label` whenever `search_labels` is missing: on a
-  stale server that is exactly the pre-#1051 behaviour, which is imperfect,
-  rather than an empty list, which is broken.
-
-  `items_label` IS THE NAME SEARCH'S OWN HEADING, I KNOW WHAT I WANT, as
-  cocktails/index.html words it: each heading in the dropdown is the index
-  section a result lands on (DECISIONS §13). food/search.json says the same.
+{%- endcomment -%}
+{%- comment -%}
+  WHAT A DRINK CARRIES. `moods` is the drink's mood list, which the MOOD and
+  HASSLE groups both count (one filter with two headings, MANUAL §9.13; the
+  split is taxonomy.yml's `mood_groups`). `ing` is the card's ingredient line,
+  label for label, from _plugins/cocktail_card_ingredients.rb, so a word
+  chosen here is a chip the index's HAS TO HAVE field can apply (MANUAL §9.10.1).
+{%- endcomment -%}
+{%- comment -%}
+  A JOINED "X OR Y" LABEL IS OFFERED AS ITS PARTS (#1130). The card prints
+  "cherry brandy or cherry liqueur", which names no single chip (the `?ing=`
+  grammar matches a chip whole, MANUAL §13.13), so a row offers
+  `ing.search_labels` instead: one per generic, from the same `card_names` map
+  the chips are built from. A disjunctive `generic` means either would do
+  (#441), and `buildPool` in cocktail-search.js already adds a chip per generic.
+{%- endcomment -%}
+{%- comment -%}
+  IT FAILS OPEN. The `if` below falls back to `ing.label` whenever
+  `search_labels` is missing, so a `jekyll serve` started before the plugin
+  gained the field (MANUAL §1: plugins are not reloaded) still offers every
+  drink's ingredients rather than an empty list.
+{%- endcomment -%}
+{%- comment -%}
+  `items_label` is the name search's own heading, I KNOW WHAT I WANT, as
+  cocktails/index.html words it: each dropdown heading is the index section a
+  result lands on (DECISIONS §13). food/search.json says the same.
 {%- endcomment -%}
 {%- assign this_site = site.data.sites[page.site_key] -%}
 {%- assign groups = site.data.cocktails.taxonomy.mood_groups -%}

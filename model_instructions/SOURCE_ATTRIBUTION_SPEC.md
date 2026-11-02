@@ -63,7 +63,7 @@ without naming anyone, so that case is yours to catch.
 
 ### A magazine page: whose credit, and which month
 
-Helen's rulings, 2026-10-30:
+Helen's rulings:
 
 - **A book extract keeps the book's shape and adds where it was read**:
   `Adapted from Mary Berry's Absolute Favourites, via Good Food, March 2015`.

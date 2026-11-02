@@ -63,22 +63,28 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
       file arrives with `mood: []`, and
       `test_every_drinks_moods_match_the_derivation` fails until this runs.
    3. **Food, only if the file has no `main_ingredients`:** `python3
-      scripts/derive_main_ingredients.py --derive --only <slug>`.
-   4. **Cocktails: `python3 scripts/tidy_drafts.py --site cocktails --only
-      order --apply`.** An envelope can arrive with its keys in another order,
-      and `test_a_draft_drinks_keys_are_in_page_order` fails until this runs.
-      Then `/tidy-drafts`, either collection, if the quoting or typography
-      needs it. It formats a food `QQ` line and never rewords one.
+      scripts/derive_main_ingredients.py --only <slug>` to see the derived
+      list, then `--only <slug> --write` to write it. Never `--derive` on a
+      file that arrived with a list: that flag replaces one.
+   4. **Key order: `python3 scripts/tidy_drafts.py --site cocktails --only
+      order --apply` for a drink, `--site food --only order --apply` for a
+      food draft.** An envelope can arrive with its keys in another order, and
+      `test_a_draft_drinks_keys_are_in_page_order` (a drink) or
+      `test_meta_sits_directly_under_the_title` (a food draft) fails until
+      this runs. Then `/tidy-drafts`, either collection, if the quoting or
+      typography needs it. It formats a food `QQ` line and never rewords one.
    5. **`pytest`.** Once, and never two at a time.
    6. **`python3 scripts/ingest_preflight.py`** -- undeclared bottles,
       near-miss garnishes, unstated times, in the same shape a photo batch
       gets.
 
-5. **Bring Helen one page**, built by
+5. **Bring Helen one page**, built for a FOOD batch by
 
        python3 scripts/ingest_review.py --from-file <the same path> --out tmp/review.md
 
-   and put in the drafts PR's description: a table of every recipe's tags,
+   (it parses every envelope as food and reads `_food_drafts/`, so a cocktail
+   batch's page is written by hand, in the same shape) and put in the drafts
+   PR's description: a table of every recipe's tags,
    star, servings and times as the drafts now stand, for her to answer with
    corrections only, then every hand-back bullet no standing ruling settles.
    A bullet a ruling settles (`ingest_inbox.FOLDS`, and per source

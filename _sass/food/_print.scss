@@ -73,7 +73,7 @@
     filter: none;
   }
 
-  // --- One thing that was masking the screen's ground ---------------------
+  // --- A label that paints over the screen's ground -----------------------
   // .note-label is the tab on a note box's top border, and it works by
   // painting $color-bg over the line behind it. On paper the ground is the
   // paper (shared/_print.scss), so it paints white: it must still be opaque,
