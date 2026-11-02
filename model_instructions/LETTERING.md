@@ -83,12 +83,13 @@ without touching a call site.
 
 | tier | food stroke | food highlight | food shadow | cocktails stroke | cocktails highlight | cocktails shadow |
 |---|---|---|---|---|---|---|
-| display | `darken($color-text,12%)` ≈ `#000` | `lighten($color-text,53%)` ≈ `#aaa4a7` | `rgba($color-text,0.24)` | `$color-label-stroke` | `#fdfbfe` | `rgba(5,5,5,0.9)` |
-| heading | `darken($color-text,5%)` ≈ `#141213` | `lighten($color-text,65%)` ≈ `#c9c4c7` | `rgba($color-text,0.16)` | `$color-label-stroke` | `$color-white` | `rgba($color-paper,0.06)` |
+| display | `lightness.shift($color-text, -12%)` ≈ `#000` | `lightness.shift($color-text, 53%)` ≈ `#aaa4a7` | `rgba($color-text, 0.24)` | `$color-label-stroke` | `#fdfbfe` | `rgba(5, 5, 5, 0.9)` |
+| heading | `lightness.shift($color-text, -5%)` ≈ `#141213` | `lightness.shift($color-text, 65%)` ≈ `#c9c4c7` | `rgba($color-text, 0.16)` | `$color-label-stroke` | `$color-white` | `rgba($color-paper, 0.06)` |
 | label | `$color-label-stroke` | — | — | `$color-label-stroke` | — | — |
 
 Food's display and heading values are the shared defaults, computed from
-`$color-text` in `_sass/shared/_rule.scss`; food re-points only the label
+`$color-text` in `_sass/shared/_rule.scss` through `lightness.shift()`
+(`_sass/shared/_lightness.scss`, MANUAL §12); food re-points only the label
 stroke. Cocktails re-points all three sets in its own `_rule.scss`, because
 the same formulas applied to a near-white `$color-text` are illegible on a
 dark ground. Display is heading's construction pushed further in the same

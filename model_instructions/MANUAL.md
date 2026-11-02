@@ -63,7 +63,7 @@ All in `model_instructions/` unless a path is given.
 ```
 python3 scripts/verify.py    # every check below, in one command -- prefer this
 pytest                       # content and structure; one session at a time
-node --test                  # the JS suite, discovered from the root (§10)
+node --test                  # the JS suite (§10: CI globs tests/js/*.test.js)
 jekyll-local                 # port 4001, drafts visible
 jekyll-prod                  # port 4002, exactly what deploys
 ```
@@ -72,16 +72,19 @@ Inside the container these serve on 4001 and 4002; `.devcontainer/run.sh`
 publishes them to the host as 5998 and 5999, so Helen's browser opens
 `http://localhost:5998/helen-triages/`, then `/food/` or `/cocktails/`.
 
-**A session starts one when Helen asks**, from its own worktree, in the
-background, and gives her the host URL. `scripts/browser/serve.sh` is a
-different thing: a short-lived server the screenshot tooling owns (below), on
-a port the host cannot reach.
+**A session shows Helen its branch on a server it runs itself**, from its
+own worktree, in the background, on a free port of a pair the container binds,
+and gives her the host URL; it never stops a server it did not start (§13.11,
+DECISIONS §13). `scripts/browser/serve.sh` is a different thing: a
+short-lived server the screenshot tooling owns (below), on a port the host
+cannot reach.
 
 #### `scripts/verify.py`
 
-Runs five checks and exits non-zero if any fails: `pytest`, the JS suite,
-`scripts/derive_cocktail_moods.py` (did a vocabulary edit move a cocktail's
-moods?), `scripts/build_ingest_vocab.py --check` (do the standalone ingest
+Runs five checks and exits non-zero if any fails: `pytest`, the JS suite
+(`node --test` over a glob of `tests/js/*.test.js`, so a new test file cannot
+be left out), `scripts/derive_cocktail_moods.py` (did a vocabulary edit move
+a cocktail's moods?), `scripts/build_ingest_vocab.py --check` (do the standalone ingest
 documents still match the data they are rendered from?) and
 `scripts/check_slug_keys.py` (does every slug-keyed entry in the public
 cocktail taxonomy name a cocktail?). The last three are the ones a session
@@ -126,10 +129,11 @@ with Chromium and WebKit (Safari's engine, for a script that launches
 `webkit` itself; the harness and the suite use Chromium) under
 `/opt/playwright`; `sh scripts/browser/install.sh`
 checks the image's copy is the pinned version and stops. Outside the image,
-or in an image built before the pin moved, it installs both under
-`tmp/browser/`, and `scripts/browser/env.sh` prefers that local copy when it
-exists. The Python binding used by `tests/test_browser_smoke.py` is the same
-version and resolves to the same Chromium.
+or in an image built before the pin moved, it installs Playwright and
+Chromium only under `tmp/browser/`, and `scripts/browser/env.sh` prefers that
+local copy when it exists. The Python binding used by
+`tests/test_browser_smoke.py` is the same version and resolves to the same
+Chromium.
 
 The Playwright version is pinned on one number in the Dockerfile (npm and
 pip), `install.sh` and `requirements-test.txt`.
@@ -201,8 +205,9 @@ plugins are loaded once at boot, so a server started before a plugin existed
 or changed serves a site where that plugin never ran, with nothing in the log
 and no error on the page. Restart after adding or editing any file in
 `_plugins/`. To confirm which you are looking at, the plugins log a line each
-at build (`Costs:`, `Units:`, `Cards:`, `Shopping:`); no line means it did not
-run. `--plugins <empty dir>` reproduces the state deliberately.
+at build (`publish gate:`, `Costs:`, `Units:`, `Tops:`, `Volume:`, `Cards:`,
+`Shopping:`); no line means it did not run. `--plugins <empty dir>`
+reproduces the state deliberately.
 
 **`_config_local.yml` is where every local-only switch lives.** Two
 mechanisms, and they are not the same:
@@ -504,7 +509,12 @@ BEHAVIOUR       what it does         assets/js/*.js
 
 Each layer knows nothing about the layer above it.
 `_sass/<site>/_palette.scss` is the only place a colour is written down (JS
-reads custom properties; SVGs use `currentColor`). `_data/food/taxonomy.yml`
+reads custom properties; SVGs use `currentColor`). What guards that today:
+`test_palette_is_the_only_place_hex_colours_are_written` in
+`tests/test_site_config.py` scans `assets/js/` only; `_sass/` is held to it
+by hand, and a forked partial that restates the other site's colour, a
+`#fff` or an `rgba(...)` literal is a breach the suite does not see.
+`_data/food/taxonomy.yml`
 is the only place food's tags and stars are declared. `assets/js/assets.js`
 is the only place a base URL or site key is derived, or a file fetched.
 Helen's principle: *the data model must not assume anything about or impose
@@ -650,7 +660,10 @@ takes `proofread` down with it.
 - **An ingredient's quantity is its own `amount:` key, never inside `item:`
   text.** The highlighter is driven by `{% if item.amount %}` and never scans
   text, so `item: "~1 tbsp tamarind paste"` renders unstyled with no error.
-  No test catches this.
+  No test catches a quantity in `item:`; `tests/test_style.py` catches only
+  two neighbours of it, a size word prefixed to the item
+  (`test_size_word_is_with_the_count_not_the_item`) and citrus measured as
+  "a squeeze" (`test_citrus_is_measured_not_squeezed`).
 - **`serves:` opens with a number and `makes:` with a count; Helen's words
   follow it** ("4, depending on appetite", "1 batch — I mean, who cares, make
   double anyway"). The scaler reads the figure and the page quotes the rest.
@@ -1387,10 +1400,14 @@ the server (§1).
 `build()` in `food-shopping-list.js` takes one entry per ingredient with its
 recipe's scale: portions wanted over portions made, or the batch count.
 
-- **Grouping.** The key is the folded name, plural folded to singular
-  (`foldUnit(foldKey(name))`), so `onion` and `onions` are one row. The key is
-  never shown; the label is the first spelling seen. Rows are alphabetical by
-  folded name within an aisle.
+- **Grouping.** The key is the folded name (`foldName`, which is
+  `foldUnit(foldKey(name))`), so `onion` and `onions` are one row. The fold is
+  a suffix rule, not a dictionary: `foldUnit` takes `es` off a sibilant and
+  `s` off anything else, after a four-word irregular map (`dashes`, `drops`,
+  `cubes`, `leaves`); it does not turn `-ies` or `-oes` back (`tomatoes` and
+  `tomato`, `cherries` and `cherry`, stay two rows). The key is never shown;
+  the label is the first spelling seen. Rows are alphabetical by folded name
+  within an aisle.
 - **Units.** Grams and millilitres are the only units totalled in; `kg`, `l`,
   `litre` and `cl` fold into them and a total of a thousand or more is shown
   in the bigger unit. Nothing else is converted: two units of one ingredient
@@ -1953,8 +1970,10 @@ ingredients:                     # FULL list, untriaged, in build order
   - amount: "15 ml"              # the ONLY quantity field, no US units, and
                                  # never a bare number — the unit is required
     generic: "moderately aged Jamaican rum"  # the vocabulary; see §9.3.1
-    suggestion: ["Appleton Estate Signature"]  # the bottle. ALWAYS A LIST, and
-                                 # `[]` where nobody has chosen one — §9.10
+    suggestion: ["Appleton Estate Signature"]  # the bottle. A LIST; an ingest
+                                 # writes it on every line, `[]` where nobody
+                                 # has chosen one, and no test requires the
+                                 # key — §9.10
   - amount: "15 ml"
     generic:                     # a LIST means "or", never "and" — §9.3.1
       - "lightly aged and filtered rum"
@@ -2180,8 +2199,10 @@ character, so a character an agent infers at ingest goes in
 `character_claude` beside a `QQ -` note, not in `character`.
 
 **An ingest writes `suggestion` on every line, `[]` where nobody has chosen a
-bottle**, so Helen can fill it without typing YAML. No test requires the key,
-and older published files omit it on some lines. `["QQ"]` is not a shape: it
+bottle**, so Helen can fill it without typing YAML. No test requires the key
+(`REQUIRED_INGREDIENT` is `generic` alone), and many published pours omit it:
+an absent `suggestion` and an empty one both mean no bottle chosen. `["QQ"]`
+is not a shape: it
 would make `test_every_suggested_bottle_resolves` skip the pour.
 
 **Sugar is in the generic, and so is the ratio**: `cane sugar syrup 1:1`,
@@ -3561,9 +3582,12 @@ holds the workflow to this.
 - **`fetch-depth: 0` on the `test` checkout is load-bearing.** In a shallow
   clone `git log -- <file>` reports one commit for every file, and §4.0's
   provenance test would pass over nothing.
-- **The JS suite is bare `node --test` from the repo root**; it finds every
-  `*.test.js` itself. The workflow passes `tests/js/*.test.js`, which the
-  runner's shell expands and the hook refuses in a session. Never pass the
+- **The JS suite is `node --test tests/js/*.test.js`.** The workflow spells
+  it with the glob, which the runner's shell expands, and
+  `test_the_deploy_workflow_runs_the_tests_and_gates_on_them` holds it to that
+  spelling; `scripts/verify.py` globs the same files in Python. In a session
+  the hook refuses the glob, and bare `node --test` from the repo root is the
+  allow-listed form: it discovers every `*.test.js` itself. Never pass the
   directory: node treats it as one module and reports "tests 1, fail 1".
 - **CI has no private drafts.** `SKIPS_WITHOUT_DRAFTS` and `PARTIAL_IN_CI` in
   `tests/test_suite_hygiene.py` record what each draft-reading test does about
@@ -3606,6 +3630,12 @@ is not a green result.
   own branch, so the corrected copy runs and reports.
 - **A Dependabot PR opened while CI was broken does not re-run on its own, and
   closing and reopening it does nothing.** Comment `@dependabot rebase`.
+- **Rolling the live site back has two routes, and they are different
+  things.** Re-running the last green push run from the Actions tab builds
+  and deploys that run's commit again, through the same `test` gate, and
+  moves `main` not at all (`workflow_dispatch` is on, which also allows a
+  fresh run of `main`'s head). A revert PR moves `main` to a commit without
+  the change and deploys when Helen merges it. Which to use is her call.
 
 #### A public test can need private data
 
@@ -3663,7 +3693,7 @@ with the `<script src>` tags in `cocktails/index.html`, and checks that every
 id the script reaches for exists in the fixture. No jsdom, no `package.json`,
 no `node_modules`: `node:test` and `node:assert` alone.
 
-A script with no startup test (`decorations.js`) gets one by copying the
+`decorations.js` has no startup test; a script that needs one copies the
 harness. Read the script order from the built `_site/`, not the layouts: a
 page layout's scripts land inside `{{ content }}`.
 
@@ -3747,8 +3777,9 @@ branch; what you ruled out; the guards added, and that you broke them to
 prove they bite. Before reporting an issue as done:
 `git log origin/main --grep='#N'`.
 
-**The two servers are Helen's to start, and a session never offers.** Say
-which URL needs looking at and stop there (§1).
+**A session serves its own branch and hands Helen the URL; she never pulls
+and builds it herself.** The command, the ports and the one rule about other
+people's servers are §13.11 (DECISIONS §13).
 
 **One agent at a time in a working tree, and never one that switches
 branches.** Delegate the reading and the scanning; keep the branching in the
@@ -3907,8 +3938,9 @@ engines run in a fixed order and each refuses the next one's job:
 `scripts/derive_cocktail_moods.py` writes what the amounts and generics imply;
 `scripts/ingest_preflight.py` reports what is left as one list for Helen,
 grouped by decision. `scripts/derive_main_ingredients.py` is food's: by
-default it reorders a list and changes no membership, and it never writes to
-`_food_recipes/` (DECISIONS §6).
+default it reorders a list and changes no membership, it reports until
+`--write` is given (dry-run one draft first with `--only <slug>`), and it
+never writes to `_food_recipes/` (DECISIONS §6).
 
 **A whole method of verbatim book prose in one `Write` can be refused by the
 API's content filter.** Write the source wording one step-pair per `Edit`.
@@ -4398,7 +4430,10 @@ cuts every transition for a reader who asks.
 Five sections in page order: STAR INGREDIENT, MOOD, PRACTICALITIES, then HAS
 TO HAVE and LEAVE OUT side by side (`.search-pair`), then I KNOW WHAT I WANT,
 the escape hatch, last on purpose. The labels are in
-`_data/food/filter_sections.yml`.
+`_data/food/filter_sections.yml`. STAR INGREDIENT renders a chip for every
+star `taxonomy.yml` declares, counted or not, so a star with no published
+recipe is a chip that leads to an empty list; the cocktails index counts a
+mood's members and renders no chip for an empty one (§9.13).
 
 - There are no work-state or `draft` filters. The `draft` and `magic bag`
   badges on a row stay: they say what you are about to click.
@@ -4525,7 +4560,7 @@ to the body default on purpose. The digits alone take `$font-label`
 `#recipe-count-n` and `#drink-count-n`); the word stays bare.
 
 **The results pill** (#1448) floats on both indexes, centred at the foot of
-the screen in the site's accent, 28px tall: `_includes/results-pill.html`,
+the screen in the site's accent, 1.75rem tall: `_includes/results-pill.html`,
 placed by `assets/js/results-bar.js` and styled in
 `_sass/shared/_results-bar.scss`. It ships `hidden` and shows one face at a
 time, read off where the filter panel (`[data-filter-panel]`) and `#results`
@@ -4670,9 +4705,9 @@ candidates, publish them, let her pick. Do not write a paragraph arguing for
 one.
 
 **What a branch actually does, she sees on a local server the session runs**,
-never by pulling and building it herself. Serve your own worktree in the
-background with the local config, on a port of a pair the container binds,
-and give her the URL:
+never by pulling and building it herself (DECISIONS §13). Serve your own
+worktree in the background with the local config, on a free port of a pair
+the container binds, and give her the URL:
 
     bundle exec jekyll serve --config _config.yml,_config_local.yml \
       --port <port> --host 0.0.0.0 --destination tmp/site-<port>
@@ -4710,10 +4745,8 @@ and is not reachable from her browser.
 - **Derive numbers, do not pick them, and keep the derivation in
   `scripts/`** (`universe_glass_slot.py`, `universe_line_width.py`); a
   number derived in `tmp/` is one nobody can reproduce. **And say where the
-  number went:** a derivation's docstring opens with a `REPRODUCES …` line
-  naming the value and the file that quotes it, or `REPRODUCES NO NUMBER`
-  and what depends on it instead. `grep -rl '^REPRODUCES' scripts/` lists
-  every one.
+  number went:** a derivation's docstring names the variable it derives and
+  the stylesheet that holds it, and says when to re-run it.
 - **A worktree has no drafts.** Clone them, or the index renders nothing.
 - **Delegation:** a precise spec, reviewed by diff. Tell agents to delete
   only what they created.
