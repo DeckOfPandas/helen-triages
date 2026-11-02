@@ -204,6 +204,7 @@ argument and the rules each field is read by.
 - 2026-10-04 · §8.2 · #1286 · a count that scales down to exactly one makes its item's noun singular.
 - 2026-10-07 · §8.2 · a makes: range starts from its lower number.
 - 2026-10-09 · §8.2 · #1297 · on the shopping list a makes: recipe counts batches, in words; a serves: recipe counts portions.
+- 2026-11-02 · §8.2 · #1457 · the food shopping list has no "set all to N portions" box.
 - 2026-10-09 · §8.2 · #1297 · the shopping list reads the zest and the juice of one lemon as one lemon.
 - 2026-10-10 · §8.2 · #1125 #1297 · on a recipe page a handful, sprig or bunch scales to the nearest quarter; a pinch, dash, splash, knob, drop, twist, lot or pat to the nearest half.
 - 2026-10-10 · §8.2 · #1297 · on the shopping list a by-eye measure is bought as the next whole one, with the recipes' figure in brackets, stepped as the recipe page steps it.

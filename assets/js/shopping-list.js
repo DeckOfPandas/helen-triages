@@ -411,7 +411,7 @@
   }
 
   /** Total up a shortlist.
-   * @param {Array} entries - { amount, generic, bottle, glasses? } per ingredient of every shortlisted drink
+   * @param {Array} entries - { amount, generic, bottle, glasses?, recipe? } per ingredient of every shortlisted drink
    * @param {Object} [options]
    * @param {number} [options.multiplier=1] - glasses of each drink
    * @param {string[]} [options.exclude=[]] - generics to leave out, folded as the keys are (`not_on_cards`)
@@ -493,11 +493,16 @@
           topUpMin: 0,
           topUpMax: 0,
           unquantified: {},
-          unquantifiedOrder: []
+          unquantifiedOrder: [],
+          recipes: []
         };
         order.push(key);
       }
       var group = groups[key];
+      if (entry.recipe !== undefined && entry.recipe !== null &&
+          group.recipes.indexOf(entry.recipe) === -1) {
+        group.recipes.push(entry.recipe);
+      }
 
       /* Aliases are resolved per alternative, not on the joined string: only
          the members of "Havana 3 or El Dorado 3" are names an alias can know. */
@@ -616,6 +621,11 @@
         }));
 
       return {
+        // The folded generic: what a tick is stored under (#1457), and unlike
+        // the label it does not change with the count.
+        key: key,
+        // Every drink (`recipe`) behind the row: a count change unticks it.
+        recipes: group.recipes,
         label: label,
         note: note,
         generic: group.generic,

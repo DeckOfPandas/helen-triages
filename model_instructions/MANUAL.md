@@ -1371,8 +1371,9 @@ figures the recipe's own page uses, so the two step alike.
 - **The batch rows come last, under a hairline** on the first of them
   (`.shopping-list-recipe--first-batch`), drawn only when there are portions
   rows above. Each group keeps shortlist order.
-- **"Set all to N portions" sets the portions rows and skips the batch rows.**
-  It ships empty: no single number means "as written" for every recipe.
+- **Food's list has no "set all" box**, unlike the cocktails list: one number
+  cannot mean portions for some rows and batches for others. Each recipe is
+  set by its own box.
 - **A batch box steps ½ (only where `h`), 1, 2, 3 and never 1½.** The input's
   step is a half where a half is offered, so its spinner lands on 1½;
   `batchCount` sends that to the next whole batch in the direction of travel.
@@ -1603,6 +1604,33 @@ a range of one (`yieldBox`: 5 is `2–3`, `125 ml` is `62–63 ml`, `64+` is
 - `tests/test_food_yield.py` names the published recipes offered a half
   step, and fails a published `makes:` it cannot read.
 
+#### Ticking rows off
+
+Every total on both sites' lists (this one and §9.13's) has a square tick box
+on its left (#1457). `HTF.shoppingTicks` in `assets.js` draws it and wires it
+for `filters.js` and `cocktail-index.js` alike; `@mixin shopping-tick` in
+`shared/_rule.scss` draws it for both stylesheets, in each site's shortlist
+"on" colour.
+
+- **A tick is stored under the row's `key`**, the folded name `build()`
+  groups by, so it survives the label changing number and every redraw.
+- **A ticked row's words are struck through and dimmed**
+  (`@mixin shopping-ticked-row`), Helen's pick. Only what sits inside the
+  label takes it.
+- **The box, the amount and the name share one `<label>`**
+  (`.shopping-list-line`, `display: contents`), so tapping the words ticks
+  the row. The recipe links and the price stay outside it.
+- **Changing a recipe's count unticks its rows.** Each `build()` row carries
+  `recipes`, the recipe keys behind it; a portions, batches or glasses box,
+  or the cocktails' "set all", that changes a recipe's number unticks every
+  row that recipe stands behind (`HTF.shoppingTicks.recount`), shared rows
+  included. "Set all" unticks nothing for a drink already at that number.
+- **Ticks otherwise last until "Untick all"**, under the rows and shown only
+  while a shown row is ticked. Hidden, it keeps its room
+  (`@mixin shopping-untick-held`), so its appearing moves nothing under it,
+  the costings line included. Untick all clears ticks on rows not shown too.
+  Ticks are never pruned to the rows on screen: a hidden list renders no rows.
+
 #### Storage
 
 `HTF.shortlist` (`assets/js/assets.js`) keeps the counts in localStorage keys
@@ -1610,7 +1638,8 @@ of their own, per site: glasses, portions and batches. They are separate
 because a missing entry means something different in each: one glass; however
 many this recipe makes, so `1` is a real stored answer; one batch. A stored 6
 cannot say whether it meant people or batches. A half batch is storable;
-whether this recipe may have one is `filters.js`'s question.
+whether this recipe may have one is `filters.js`'s question. The ticks are a
+fourth key, a list of row keys.
 
 #### Tests
 

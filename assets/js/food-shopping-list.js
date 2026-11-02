@@ -262,7 +262,7 @@
    * @param {Array} [options.quarterMeasures] - `quarter_step_measures`, bought in whole ones too
    * @param {Array} [options.countNouns] - `count_nouns` in scaling.yml: a row label may change number
    * @param {Array} [options.aisles] - [{key, label}] in display order; an unknown aisle falls to the last
-   * @returns {Array} [{ key, label, items: [{ label, text, aside, totals, unquantified }] }] */
+   * @returns {Array} [{ key, label, items: [{ key, label, text, aside, totals, unquantified, recipes }] }] */
   function build(entries, options) {
     var opts = options || {};
     var aisles = opts.aisles && opts.aisles.length
@@ -298,12 +298,17 @@
           unitOrder: [],
           unquantified: {},
           unquantifiedOrder: [],
-          unscaledRecipes: []
+          unscaledRecipes: [],
+          recipes: []
         };
         order.push(key);
       }
       var group = groups[key];
       if (group.spellings.indexOf(name) === -1) group.spellings.push(name);
+      if (entry.recipe !== undefined && entry.recipe !== null &&
+          group.recipes.indexOf(entry.recipe) === -1) {
+        group.recipes.push(entry.recipe);
+      }
 
       /* The first aisle wins: the aisle is derived from the name at build
          time, so entries sharing a folded name share an aisle. */
@@ -421,6 +426,9 @@
         });
 
       return {
+        // The folded name: what a tick is stored under (#1457), and unlike the
+        // label it does not change with the count.
+        key: key,
         aside: asides.length ? asides.join(' + ') + ' in the recipes' : '',
         label: countedLabel(group, totals, unquantified, countNouns, byEye),
         aisle: group.aisle || fallback,
@@ -429,6 +437,8 @@
         // The `recipe` keys of the entries behind `unquantified`, for the
         // page to name beside the row.
         unscaledRecipes: group.unscaledRecipes,
+        // Every `recipe` behind the row: a count change unticks it (#1457).
+        recipes: group.recipes,
         text: parts.join(' + ')
       };
     });

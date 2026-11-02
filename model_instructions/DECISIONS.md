@@ -1309,10 +1309,14 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   half-batches where that doesn't split eggs. Is that doable? That stops us
   saying 2 cookies is a portion -- not out of principle, but because that's
   meaningless.'* The figure after "of" is one batch's and does not multiply.
-  The half step is the build's existing judge, and "set all" skips batch rows.
-  The batch box she killed in September (#815) was wrong because it looked
-  like a portions box; this one says which it is. (Replaces #815's "no
-  batches", for `makes:` recipes only.)
+  The half step is the build's existing judge. The batch box she killed in
+  September (#815) was wrong because it looked like a portions box; this one
+  says which it is. (Replaces #815's "no batches", for `makes:` recipes only.)
+- **2026-11-02, #1457 — the food shopping list has no "set all to N portions"
+  box.** Helen: *"it's hard to know how to label and use this when we have
+  "batches" as well as portions, which suggests it isn't doing anything
+  useful."* It could only ever set the portions rows. Each recipe keeps its
+  own box. The cocktails list keeps its "set all", having no batches.
 - **2026-10-09, #1297 — the shopping list reads the zest and the juice of one
   lemon as one lemon.** Helen: *'I would like to cleverly combine e.g. "zest
   of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the shopping list.'*

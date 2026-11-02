@@ -220,9 +220,7 @@ function boot(options) {
     id: 'shopping-list', 'data-whole-measures': 'handful,pinch',
     'data-count-nouns': 'onion,lemon', 'data-container-nouns': 'jar,tin,batch'
   });
-  const head = el('div', 'shopping-list-head');
-  head.appendChild(el('input', '', { id: 'shopping-list-setall', type: 'number' }));
-  panel.appendChild(head);
+  panel.appendChild(el('div', 'shopping-list-head'));
   panel.appendChild(el('ul', 'shopping-list-recipes'));
   panel.appendChild(el('p', 'shopping-list-note'));
   panel.appendChild(el('div', 'shopping-list-aisles'));
@@ -396,34 +394,6 @@ test('the totals are grouped by aisle, in the declared order', () => {
   // -- the plural reaching build() through `data-count-nouns` (#1297).
   assert.match(html,
     /<span class="shopping-list-amount">3<\/span><span class="shopping-list-name">onions<\/span>/);
-});
-
-test('typing into "set all to" rescales every recipe', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  showTheList(doc);
-
-  const setAll = doc.getElementById('shopping-list-setall');
-  setAll.value = '8';
-  setAll.dispatch('input');
-
-  // a: 200 g x (8/4) = 400. b: 300 g x (8/6) = 400. Total 800.
-  assert.match(aislesHtml(panel), /<span class="shopping-list-amount">800 g<\/span>/);
-});
-
-test('a number below one is ignored rather than emptying the list', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-
-  const setAll = doc.getElementById('shopping-list-setall');
-  ['', '0', '-4', 'x'].forEach((value) => {
-    setAll.value = value;
-    setAll.dispatch('input');
-    assert.match(aislesHtml(panel),
-      /<span class="shopping-list-amount">200 g<\/span>/, `value ${value!== '' ? value : '(empty)'}`);
-  });
 });
 
 /* The per-recipe inputs are written with innerHTML, which this stub stores as
@@ -661,20 +631,60 @@ test('every recipe named in the panel is a link to it, in the row title\'s class
 test('an item nobody scaled names the recipe it came from, as a link', () => {
   // An unscaled item names its recipe in brackets, so the reader knows which
   // page to look at. Recipe `a` lists olive oil with no amount; its flour and
-  // onions are scaled and say nothing.
+  // onions are scaled and say nothing. The bracket is outside the tick's
+  // label (#1457), so following the link never ticks the row.
   const { win, doc, panel } = boot();
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.toggle('/food/recipes/b/');
   showTheList(doc);
   const html = aislesHtml(panel);
   assert.ok(html.includes(
-    '<span class="shopping-list-name">olive oil</span>' +
+    '<span class="shopping-list-name">olive oil</span></label>' +
     '<span class="shopping-list-unscaled">(' +
     '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>)</span>'),
     html);
   assert.strictEqual(html.split('shopping-list-unscaled').length - 1, 1,
     'only the unscaled row carries a bracket');
 });
+
+test('#1457: every row has a tick box, and a tick made earlier is drawn ticked', () => {
+  // The list is rebuilt whole on every number change: the store is what
+  // carries a tick across, so the render must read it back.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.setTicked('onion', true);
+  showTheList(doc);
+  const html = aislesHtml(panel);
+  assert.ok(html.includes(
+    '<li class="shopping-list-row is-ticked"><label class="shopping-list-line">' +
+    '<input type="checkbox" class="shopping-list-tick" data-key="onion" checked>' +
+    '<span class="shopping-list-amount">2</span>'), html);
+  assert.ok(html.includes(
+    '<li class="shopping-list-row"><label class="shopping-list-line">' +
+    '<input type="checkbox" class="shopping-list-tick" data-key="plain flour">'), html);
+});
+
+test('#1457: a new count for one recipe unticks its rows, and only its rows', () => {
+  // Recipe a stands behind flour, onions and olive oil; the cookies behind
+  // peanut butter and an egg.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  ['plain flour', 'olive oil', 'egg'].forEach((k) => win.HTF.shortlist.setTicked(k, true));
+  showTheList(doc);
+  const rows = panel.querySelector('.shopping-list-recipes');
+
+  // The number it already had is not a new count.
+  rows.dispatch('input', { target: typedInto('/food/recipes/a/', 4) });
+  assert.strictEqual(win.HTF.shortlist.ticked('plain flour'), true, 'no change, no untick');
+
+  rows.dispatch('input', { target: typedInto('/food/recipes/a/', 8) });
+  assert.strictEqual(win.HTF.shortlist.ticked('plain flour'), false);
+  assert.strictEqual(win.HTF.shortlist.ticked('olive oil'), false, 'unscaled rows go too');
+  assert.strictEqual(win.HTF.shortlist.ticked('egg'), true, 'another recipe keeps its ticks');
+  assert.ok(!aislesHtml(panel).includes('data-key="plain flour" checked'), 'and the redraw shows it');
+});
+
 
 test('a count above one is still batches of that many', () => {
   // 18 of something is a batch, unlike one named thing.
@@ -754,24 +764,11 @@ test('there is no batch and a half: the spinner goes on to the next whole one', 
   assert.strictEqual(win.HTF.shortlist.batches('/food/recipes/gelato/'), 1);
 });
 
-test('"set all to" sets the portions rows and leaves the batch rows alone', () => {
-  // "6 portions" of 18 cookies has no answer that does not decide how many
-  // cookies a portion is, so "set all to" leaves the batch rows alone.
-  const { win, doc, panel } = boot();
-  Object.keys(RECIPES).forEach((url) => win.HTF.shortlist.toggle(url));
-  showTheList(doc);
-
-  const setAll = doc.getElementById('shopping-list-setall');
-  setAll.value = '12';
-  setAll.dispatch('input');
-
-  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/a/'), 12);
-  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/b/'), 12);
-  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/gelato/'), null);
-  assert.strictEqual(win.HTF.shortlist.batches('/food/recipes/cookies/'), null);
-  // a: 200 g x3, b: 300 g x2, so the flour is 600 + 600; the cookies unmoved.
-  assert.match(aislesHtml(panel), /1\.2 kg/);
-  assert.match(aislesHtml(panel), /100 g/);
+test('the food list has no "set all" box: one number cannot mean portions and batches', () => {
+  // Helen removed it: with batch rows beside portions rows it could only ever
+  // set some of the list. Each recipe is set by its own box.
+  const template = fs.readFileSync(path.join(ROOT, 'food', 'index.html'), 'utf8');
+  assert.ok(!template.includes('shopping-list-setall'), 'food/index.html has a "set all" box again');
 });
 
 test('a portions number left in the store is not read as batches', () => {
@@ -1239,8 +1236,8 @@ test('this harness loads what food/index.html actually loads', () => {
 const noteOf = (panel) => panel.querySelector('.shopping-list-note');
 
 test('#1297: the batch rows come last, under a rule, whatever order they were shortlisted in', () => {
-  // Grouped at the bottom, so it is clear that "set all to" multiplies the
-  // portions rows and the batch rows are set by hand.
+  // Grouped at the bottom, so boxes counting people and boxes counting
+  // batches read as two kinds.
   const { win, doc, panel } = boot();
   ['/food/recipes/cookies/', '/food/recipes/a/', '/food/recipes/gelato/',
     '/food/recipes/b/'].forEach((url) => win.HTF.shortlist.toggle(url));
