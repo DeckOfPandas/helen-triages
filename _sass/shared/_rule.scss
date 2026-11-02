@@ -452,6 +452,27 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   }
 }
 
+// A ticked row's words, struck through and dimmed: Helen's pick (#1457).
+// Included on `li.is-ticked`; only what sits inside the row's label takes it.
+@mixin shopping-ticked-row {
+  .shopping-list-amount,
+  .shopping-list-name,
+  .shopping-list-aside {
+    opacity: 0.45;
+    text-decoration: line-through;
+  }
+}
+
+// "Untick all" keeps its room while hidden, so its appearing on the first
+// tick moves nothing under it, the costings line included (#1457).
+// `visibility` also takes it out of the tab order and the screen reader.
+@mixin shopping-untick-held {
+  &[hidden] {
+    display: inline-block;
+    visibility: hidden;
+  }
+}
+
 // --- The chip in a search pool ------------------------------------------------
 // One chip for both sites' search pools, with the colours as arguments:
 // food's `.btn-tag` and cocktails' `.btn-pool` both include these, so the two

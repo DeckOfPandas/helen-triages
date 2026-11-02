@@ -989,6 +989,8 @@ function renderResultsPool() {
   var refreshUntick = shoppingAisles
     ? HTF.shoppingTicks.wire(shoppingAisles, shoppingEl.querySelector('.shopping-list-untick'))
     : function () {};
+  // The rows last drawn, for HTF.shoppingTicks.recount when a count changes.
+  var shownRows = [];
   var setAllInput = document.getElementById('shopping-list-setall');
 
   /* Each recipe's ingredients and yield, emitted by food/index.html from
@@ -1354,6 +1356,7 @@ function renderResultsPool() {
         '<p class="shopping-list-empty">No ingredient data was built for '
         + 'these recipes, so there is nothing to add up. If this is the local '
         + 'server, restart it — its plugins are loaded once at startup.</p>';
+      shownRows = [];
       refreshUntick();
       return;
     }
@@ -1362,6 +1365,8 @@ function renderResultsPool() {
       aisles: AISLES, wholeMeasures: WHOLE_MEASURES,
       quarterMeasures: QUARTER_MEASURES, countNouns: COUNT_NOUNS
     });
+    shownRows = [];
+    aisles.forEach(function (aisle) { shownRows = shownRows.concat(aisle.items); });
 
     /* What the numbers did not reach, as on the recipe page (#1088): a row
        is named when any line behind it had no amount to scale ("salt, to
@@ -1412,6 +1417,7 @@ function renderResultsPool() {
       var input = ev.target;
       if (!input.classList || !input.classList.contains('shopping-list-portions')) return;
       var url = input.dataset.url;
+      var before = isBatch(url) ? batchesFor(url) : portionsFor(url);
       var shown;
       if (isBatch(url)) {
         var typed = Number(input.value);
@@ -1428,6 +1434,10 @@ function renderResultsPool() {
       var word = input.parentNode && input.parentNode.querySelector &&
         input.parentNode.querySelector('.shopping-list-count-word');
       if (word && word.parentNode) word.parentNode.innerHTML = rowInner(url, shown);
+      // A new count is a new shop for that recipe's rows (#1457).
+      if ((isBatch(url) ? batchesFor(url) : portionsFor(url)) !== before) {
+        HTF.shoppingTicks.recount(shownRows, [url]);
+      }
       // Totals only. Re-rendering the recipe list would replace the very input
       // being typed into and take the caret with it.
       renderTotals();
@@ -1459,9 +1469,14 @@ function renderResultsPool() {
       if (n === null) return;
       /* A batch row is left alone (#1297): "6 portions" has no answer for a
          recipe that makes 18 cookies. */
+      var changed = [];
       shortlistedRecipes().forEach(function (url) {
-        if (!isBatch(url)) HTF.shortlist.setPortions(url, n);
+        if (isBatch(url)) return;
+        var before = portionsFor(url);
+        HTF.shortlist.setPortions(url, n);
+        if (portionsFor(url) !== before) changed.push(url);
       });
+      HTF.shoppingTicks.recount(shownRows, changed);
       renderShoppingList();
     });
 

@@ -1596,12 +1596,22 @@ for `filters.js` and `cocktail-index.js` alike; `@mixin shopping-tick` in
 
 - **A tick is stored under the row's `key`**, the folded name `build()`
   groups by, so it survives the label changing number and every redraw.
+- **A ticked row's words are struck through and dimmed**
+  (`@mixin shopping-ticked-row`), Helen's pick. Only what sits inside the
+  label takes it.
 - **The box, the amount and the name share one `<label>`**
   (`.shopping-list-line`, `display: contents`), so tapping the words ticks
   the row. The recipe links and the price stay outside it.
-- **Ticks last until "Untick all"**, under the rows and shown only while a
-  shown row is ticked. Untick all clears ticks on rows not shown too. Ticks
-  are never pruned to the rows on screen: a hidden list renders no rows.
+- **Changing a recipe's count unticks its rows.** Each `build()` row carries
+  `recipes`, the recipe keys behind it; a portions, batches or glasses box,
+  or "set all", that changes a recipe's number unticks every row that recipe
+  stands behind (`HTF.shoppingTicks.recount`), shared rows included. "Set all"
+  unticks nothing for a recipe already at that number.
+- **Ticks otherwise last until "Untick all"**, under the rows and shown only
+  while a shown row is ticked. Hidden, it keeps its room
+  (`@mixin shopping-untick-held`), so its appearing moves nothing under it,
+  the costings line included. Untick all clears ticks on rows not shown too.
+  Ticks are never pruned to the rows on screen: a hidden list renders no rows.
 
 #### Storage
 

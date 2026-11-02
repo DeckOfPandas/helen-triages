@@ -427,8 +427,9 @@ permalink: /cocktails/
     <ul class="shopping-list-items"></ul>
     {% comment %} #1457: every row above carries a tick box, remembered in this
        browser. The button clears them all for the next shop;
-       cocktail-index.js shows it only while a row is ticked. Below the rows,
-       so its appearing moves none of them. {% endcomment %}
+       cocktail-index.js shows it only while a row is ticked. Hidden, it keeps
+       its room (shopping-untick-held), so the total under it never moves.
+       {% endcomment %}
     <p class="shopping-list-untick-row"><button type="button" class="shopping-list-untick" hidden>Untick all</button></p>
 
     {% comment %} What the shop comes to (#817), local only: `site.show_costs`

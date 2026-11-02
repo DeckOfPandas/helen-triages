@@ -604,6 +604,31 @@ test('#1457: "untick all" clears the store and every box, and keeps focus in the
   assert.strictEqual(onion.box.focused, true, 'focus goes to the first box, not <body>');
 });
 
+test('#1457: untick() drops only the rows it names, and says how many were ticked', () => {
+  const { HTF, storage } = pageWith();
+  ['onion', 'lime', 'salt'].forEach((k) => HTF.shortlist.setTicked(k, true));
+  assert.strictEqual(HTF.shortlist.untick(['onion', 'salt', 'never ticked']), 2);
+  assert.deepStrictEqual(JSON.parse(storage.read(TICKED_KEY)), ['lime']);
+  assert.strictEqual(HTF.shortlist.untick('onion'), 0, 'not a list: nothing happens');
+});
+
+test('#1457: recount() unticks every row a changed recipe stands behind, shared ones too', () => {
+  const { HTF } = pageWith();
+  ['flour', 'onion', 'egg'].forEach((k) => HTF.shortlist.setTicked(k, true));
+  const rows = [
+    { key: 'flour', recipes: ['/a/', '/b/'] },
+    { key: 'onion', recipes: ['/a/'] },
+    { key: 'egg', recipes: ['/b/'] }
+  ];
+  HTF.shoppingTicks.recount(rows, []);
+  assert.strictEqual(HTF.shortlist.ticked('flour'), true, 'nothing changed, nothing unticked');
+
+  HTF.shoppingTicks.recount(rows, ['/a/']);
+  assert.strictEqual(HTF.shortlist.ticked('flour'), false, 'shared with /b/, still unticked');
+  assert.strictEqual(HTF.shortlist.ticked('onion'), false);
+  assert.strictEqual(HTF.shortlist.ticked('egg'), true);
+});
+
 test('#1457: a change from anything but a tick box is ignored', () => {
   const { HTF } = pageWith();
   const list = fakeList([]);

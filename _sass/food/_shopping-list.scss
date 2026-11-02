@@ -224,12 +224,17 @@
   @include shopping-tick($color-clear-text, $color-recipe-link, $color-bg, $color-bg);
 }
 
+.shopping-list-items li.is-ticked {
+  @include shopping-ticked-row;
+}
+
 // Under the rows, left, in the shortlist button's Courier caps (#1005).
 .shopping-list-untick-row {
   margin: $space-md 0 0;
 }
 
 .shopping-list-untick {
+  @include shopping-untick-held;
   font-family: $font-headings;
   font-size: 0.78rem;
   font-weight: 700;

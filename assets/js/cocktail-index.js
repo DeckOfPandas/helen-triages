@@ -424,6 +424,8 @@
   var refreshUntick = shoppingItems
     ? HTF.shoppingTicks.wire(shoppingItems, shoppingEl.querySelector('.shopping-list-untick'))
     : function () {};
+  // The rows last drawn, for HTF.shoppingTicks.recount when a count changes.
+  var shownRows = [];
 
   /* The card's own unmarked title, so a drink found by a name search still
      lists under its real name. */
@@ -491,7 +493,8 @@
           amount: ing.a,
           generic: ing.g,
           bottle: picked || ing.b,
-          glasses: glasses
+          glasses: glasses,
+          recipe: url
         });
       });
     });
@@ -514,6 +517,7 @@
         of: VOCABULARY.shelf_of || {}
       }
     });
+    shownRows = rows;
 
     shoppingItems.innerHTML = rows.map(function (row) {
       /* Bottle and fruit count share one bracket, as two spans: only the
@@ -575,7 +579,11 @@
     shoppingDrinks.addEventListener('input', function (ev) {
       var input = ev.target;
       if (!input.classList || !input.classList.contains('shopping-list-glasses')) return;
-      HTF.shortlist.setGlasses(input.dataset.url, input.value);
+      var url = input.dataset.url;
+      var before = HTF.shortlist.glasses(url);
+      HTF.shortlist.setGlasses(url, input.value);
+      // A new count is a new shop for that drink's rows (#1457).
+      if (HTF.shortlist.glasses(url) !== before) HTF.shoppingTicks.recount(shownRows, [url]);
       // Totals only. Re-rendering the drinks list would replace the very input
       // being typed into and take the caret with it.
       renderTotals();
@@ -615,7 +623,13 @@
     setAllInput.addEventListener('input', function () {
       var n = setAllValue();
       if (n === null) return;
-      shortlistedDrinks().forEach(function (url) { HTF.shortlist.setGlasses(url, n); });
+      var changed = [];
+      shortlistedDrinks().forEach(function (url) {
+        var before = HTF.shortlist.glasses(url);
+        HTF.shortlist.setGlasses(url, n);
+        if (HTF.shortlist.glasses(url) !== before) changed.push(url);
+      });
+      HTF.shoppingTicks.recount(shownRows, changed);
       renderShoppingList();
     });
 

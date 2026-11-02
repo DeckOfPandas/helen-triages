@@ -69,6 +69,15 @@ test('#1457: a row\'s key, what its tick is stored under, does not move with the
   assert.strictEqual(one[0].key, 'sugar cube');
 });
 
+test('#1457: a row names every drink behind it, once each, so a new count can untick it', () => {
+  const rows = SL.build([
+    Object.assign(ing('30 ml', 'London dry gin'), { recipe: '/negroni/' }),
+    Object.assign(ing('45 ml', 'London dry gin'), { recipe: '/martini/' }),
+    Object.assign(ing('15 ml', 'London dry gin'), { recipe: '/negroni/' })
+  ]);
+  assert.deepStrictEqual(rows[0].recipes, ['/negroni/', '/martini/']);
+});
+
 test('the decimals this collection is full of do not go floating-point', () => {
   // 22.5 and 7.5 sit on the collection's 2.5 ml grid: the ordinary case, not an
   // edge one.

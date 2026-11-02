@@ -548,6 +548,12 @@ test('#1457: a row\'s key, what its tick is stored under, does not move with the
   assert.strictEqual(keyOf([count('2', 'Lemons', 'a')]), keyOf([count('½', 'lemon', 'a')]));
 });
 
+test('#1457: a row names every recipe behind it, once each, so a new count can untick it', () => {
+  const row = F.build([count('1', 'lemon', 'a'), count('2', 'lemons', 'b'),
+    count('1', 'lemon', 'a')], { aisles: PRODUCE, countNouns: NOUNS })[0].items[0];
+  assert.deepStrictEqual(row.recipes, ['a', 'b']);
+});
+
 test('#1297: one or less takes the singular', () => {
   assert.strictEqual(labelOf([count('½', 'lemons', 'a'), count('½', 'lemons', 'b')]), '1 lemon');
   assert.strictEqual(labelOf([count('½', 'limes', 'a')]), '½ lime');

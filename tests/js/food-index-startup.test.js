@@ -694,6 +694,42 @@ test('#1457: every row has a tick box, and a tick made earlier is drawn ticked',
     '<input type="checkbox" class="shopping-list-tick" data-key="plain flour">'), html);
 });
 
+test('#1457: a new count for one recipe unticks its rows, and only its rows', () => {
+  // Recipe a stands behind flour, onions and olive oil; the cookies behind
+  // peanut butter and an egg.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  ['plain flour', 'olive oil', 'egg'].forEach((k) => win.HTF.shortlist.setTicked(k, true));
+  showTheList(doc);
+  const rows = panel.querySelector('.shopping-list-recipes');
+
+  // The number it already had is not a new count.
+  rows.dispatch('input', { target: typedInto('/food/recipes/a/', 4) });
+  assert.strictEqual(win.HTF.shortlist.ticked('plain flour'), true, 'no change, no untick');
+
+  rows.dispatch('input', { target: typedInto('/food/recipes/a/', 8) });
+  assert.strictEqual(win.HTF.shortlist.ticked('plain flour'), false);
+  assert.strictEqual(win.HTF.shortlist.ticked('olive oil'), false, 'unscaled rows go too');
+  assert.strictEqual(win.HTF.shortlist.ticked('egg'), true, 'another recipe keeps its ticks');
+  assert.ok(!aislesHtml(panel).includes('data-key="plain flour" checked'), 'and the redraw shows it');
+});
+
+test('#1457: "set all" unticks the rows of every recipe it changes, and no others', () => {
+  // A batch recipe is not set by "set all", so its ticks stay.
+  const { win, doc } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  ['onion', 'egg'].forEach((k) => win.HTF.shortlist.setTicked(k, true));
+  showTheList(doc);
+
+  const setAll = doc.getElementById('shopping-list-setall');
+  setAll.value = '8';
+  setAll.dispatch('input');
+  assert.strictEqual(win.HTF.shortlist.ticked('onion'), false);
+  assert.strictEqual(win.HTF.shortlist.ticked('egg'), true);
+});
+
 test('a count above one is still batches of that many', () => {
   // 18 of something is a batch, unlike one named thing.
   const { win, doc, panel } = boot();

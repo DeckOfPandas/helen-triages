@@ -557,6 +557,22 @@ window.HTF = window.HTF || {};
         return !!on;
       },
 
+      /**
+       * Untick several rows and persist once.
+       * @param {string[]} rowKeys
+       * @returns {number} how many were ticked
+       */
+      untick: function (rowKeys) {
+        var all = readTicked();
+        var dropped = 0;
+        (Array.isArray(rowKeys) ? rowKeys : []).forEach(function (rowKey) {
+          var at = all.indexOf(rowKey);
+          if (at !== -1) { all.splice(at, 1); dropped += 1; }
+        });
+        if (dropped) writeTicked();
+        return dropped;
+      },
+
       /** Every tick, shown or not: the list starts afresh for the next shop. */
       untickAll: function () {
         tickedRows = [];
@@ -634,6 +650,21 @@ window.HTF = window.HTF || {};
     /** ' is-ticked' for a ticked row, '' otherwise: a class to append. */
     rowClass: function (key) {
       return shortlist.ticked(key) ? ' is-ticked' : '';
+    },
+
+    /**
+     * Untick every row a recipe whose count has just changed stands behind:
+     * its amounts are new, so what was ticked no longer covers them. Call
+     * before the re-render, with the rows of the render before it.
+     * @param {Array} rows - build() rows, each with `key` and `recipes`
+     * @param {string[]} urls - the recipes whose count changed
+     */
+    recount: function (rows, urls) {
+      if (!urls || !urls.length) return;
+      var keys = (rows || []).filter(function (row) {
+        return (row.recipes || []).some(function (url) { return urls.indexOf(url) !== -1; });
+      }).map(function (row) { return row.key; });
+      shortlist.untick(keys);
     },
 
     /**

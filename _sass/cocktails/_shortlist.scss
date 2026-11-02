@@ -376,12 +376,17 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
   @include shopping-tick($color-clear-text, $color-wicked-woowoo, $color-bg, $color-bg);
 }
 
+.shopping-list-items li.is-ticked {
+  @include shopping-ticked-row;
+}
+
 // Under the rows, left, in the shortlist button's caps (#1005).
 .shopping-list-untick-row {
   margin: $space-md 0 0;
 }
 
 .shopping-list-untick {
+  @include shopping-untick-held;
   @extend %cocktail-heading-face;
   font-size: 0.78rem;
   font-weight: 700;
