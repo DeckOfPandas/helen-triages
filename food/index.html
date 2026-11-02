@@ -405,20 +405,12 @@ permalink: /food/
    class names, without costing. It appears only while the shortlisted filter
    is on. A `serves:` recipe's box counts portions (people), the number
    _plugins/food_shopping.rb reads off `serves:`; a `makes:`
-   recipe's box counts batches (#1297), which is why "set all to N portions"
-   leaves those rows alone. `data-whole-measures` is the by-eye measures whose
+   recipe's box counts batches (#1297). There is no "set all": one number
+   cannot mean both. `data-whole-measures` is the by-eye measures whose
    totals are bought in whole ones. {% endcomment %}
 <section class="shopping-list" id="shopping-list" hidden aria-live="polite" data-whole-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: ',' | escape }}" data-quarter-measures="{{ site.data.food.scaling.quarter_step_measures | join: ',' | escape }}" data-count-nouns="{{ site.data.food.scaling.count_nouns | join: ',' | escape }}" data-container-nouns="{{ site.data.food.scaling.yields.container_words | join: ',' | escape }}">
   <div class="shopping-list-head">
     <h2 class="shopping-list-title">Shopping list</h2>
-    {% comment %} Set all, not a multiplier: it writes every recipe's own number and then has
-       no further opinion, so there is one figure per recipe and one place it
-       lives. {% endcomment %}
-    <label class="shopping-list-setall">
-      <span>set all to</span>
-      <input type="number" id="shopping-list-setall" min="1" max="99" step="1" inputmode="numeric">
-      <span>portions</span>
-    </label>
   </div>
 
   {% comment %} One count per recipe, rendered by filters.js from the shortlist because

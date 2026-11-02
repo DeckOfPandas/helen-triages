@@ -64,18 +64,6 @@
   }
 }
 
-.shopping-list-setall {
-  display: flex;
-  align-items: baseline;
-  gap: $space-xs;
-  font-family: $font-label;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  color: $color-clear-text;
-
-  input { @extend %food-number-input; }
-}
-
 // --- one count per recipe ----------------------------------------------------
 // One recipe per line (#1297): each row is a sentence ("2 batches of 18 Peanut
 // Butter Cookies"), and sentences side by side do not scan.

@@ -991,7 +991,6 @@ function renderResultsPool() {
     : function () {};
   // The rows last drawn, for HTF.shoppingTicks.recount when a count changes.
   var shownRows = [];
-  var setAllInput = document.getElementById('shopping-list-setall');
 
   /* Each recipe's ingredients and yield, emitted by food/index.html from
      _plugins/food_shopping.rb. Absent or unreadable, the shopping list
@@ -1269,8 +1268,8 @@ function renderResultsPool() {
     /* Rebuilt whole, but never from the input handler: replacing the node
        under a typing cursor loses the caret (it calls renderTotals() alone).
        Batch rows go last, under a hairline drawn on the first one when
-       portions rows sit above it, so "set all" sits over the rows it sets.
-       Each group keeps shortlist order. */
+       portions rows sit above it, so the boxes counting people and the ones
+       counting batches read as two kinds. Each group keeps shortlist order. */
     var portionRows = urls.filter(function (url) { return !isBatch(url); });
     var batchRows = urls.filter(isBatch);
     var firstBatch = portionRows.length ? batchRows[0] : null;
@@ -1450,40 +1449,6 @@ function renderResultsPool() {
       if (!input.classList || !input.classList.contains('shopping-list-portions')) return;
       var url = input.dataset.url;
       input.value = String(isBatch(url) ? batchesFor(url) : portionsFor(url));
-    });
-  }
-
-  if (setAllInput) {
-    /* Set all writes every recipe's own number and keeps no state. It ships
-       empty: each recipe starts at its own yield, so no one number means "as
-       written". */
-    /* Number(), not parseInt: parseInt reads "1e9" as 1, and the list then
-       disagreed with the box. */
-    function setAllValue() {
-      var n = Number(setAllInput.value);
-      return isFinite(n) && n >= 1 ? Math.min(99, Math.floor(n)) : null;
-    }
-
-    setAllInput.addEventListener('input', function () {
-      var n = setAllValue();
-      if (n === null) return;
-      /* A batch row is left alone (#1297): "6 portions" has no answer for a
-         recipe that makes 18 cookies. */
-      var changed = [];
-      shortlistedRecipes().forEach(function (url) {
-        if (isBatch(url)) return;
-        var before = portionsFor(url);
-        HTF.shortlist.setPortions(url, n);
-        if (portionsFor(url) !== before) changed.push(url);
-      });
-      HTF.shoppingTicks.recount(shownRows, changed);
-      renderShoppingList();
-    });
-
-    /* On `change` the box shows what was applied, or empties if nothing was. */
-    setAllInput.addEventListener('change', function () {
-      var n = setAllValue();
-      setAllInput.value = n === null ? '' : String(n);
     });
   }
 

@@ -1358,8 +1358,9 @@ figures the recipe's own page uses, so the two step alike.
 - **The batch rows come last, under a hairline** on the first of them
   (`.shopping-list-recipe--first-batch`), drawn only when there are portions
   rows above. Each group keeps shortlist order.
-- **"Set all to N portions" sets the portions rows and skips the batch rows.**
-  It ships empty: no single number means "as written" for every recipe.
+- **Food's list has no "set all" box**, unlike the cocktails list: one number
+  cannot mean portions for some rows and batches for others. Each recipe is
+  set by its own box.
 - **A batch box steps ½ (only where `h`), 1, 2, 3 and never 1½.** The input's
   step is a half where a half is offered, so its spinner lands on 1½;
   `batchCount` sends that to the next whole batch in the direction of travel.
@@ -1604,9 +1605,9 @@ for `filters.js` and `cocktail-index.js` alike; `@mixin shopping-tick` in
   the row. The recipe links and the price stay outside it.
 - **Changing a recipe's count unticks its rows.** Each `build()` row carries
   `recipes`, the recipe keys behind it; a portions, batches or glasses box,
-  or "set all", that changes a recipe's number unticks every row that recipe
-  stands behind (`HTF.shoppingTicks.recount`), shared rows included. "Set all"
-  unticks nothing for a recipe already at that number.
+  or the cocktails' "set all", that changes a recipe's number unticks every
+  row that recipe stands behind (`HTF.shoppingTicks.recount`), shared rows
+  included. "Set all" unticks nothing for a drink already at that number.
 - **Ticks otherwise last until "Untick all"**, under the rows and shown only
   while a shown row is ticked. Hidden, it keeps its room
   (`@mixin shopping-untick-held`), so its appearing moves nothing under it,
