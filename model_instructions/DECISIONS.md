@@ -467,9 +467,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   9 biscuits."* The recipe page counts the thing made and the shopping list
   counts batches (§8.2). One figure, never an alternative: "9 large or 16
   small biscuits" reads as nine of something called "large".
-- **2026-11-03 — a dessert or a cake is `makes:`, almost always.** Helen:
-  *"Desserts and cakes will almost always be makes not serves."* A source's
-  "Serves 8–10" for a sliced dessert is `makes: "8–10 slices"`.
+- **2026-11-03 — a dessert, cake or bake makes the thing, sized from its
+  tin, with the source's slices in brackets.** Helen: *"I NEVER want to
+  portion desserts, cakes, biscuits etc.,"* then *"one 20-cm cake (about 10
+  slices). Let's always use that. If we don't know slices, then leave them
+  out."* So `makes: "one 20-cm cake (about 10 slices)"`, `"one 900-g loaf
+  (8–10 slices)"`, `"one 23-cm cake"` where no slices are given, `"16
+  biscuits"`. The scaler counts the whole thing and ignores the bracket.
 - **2026-10-08 — Helen's own recipes are `source: "Henry"`, `source_type:
   person`.** Confirmed as standing the same day, as the old journal recorded
   it.

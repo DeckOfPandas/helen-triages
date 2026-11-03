@@ -667,8 +667,10 @@ takes `proofread` down with it.
 - **`serves:` opens with a number and `makes:` with a count; Helen's words
   follow it** ("4, depending on appetite", "1 batch — I mean, who cares, make
   double anyway"). The scaler reads the figure and the page quotes the rest.
-  A `makes:` must open with a count `_plugins/food_yield.rb` reads ("16
-  slices", "one 8-inch cake", "about 300 ml", "1 batch");
+  A `makes:` must open with a count `_plugins/food_yield.rb` reads ("one
+  20-cm cake (about 10 slices)", "16 biscuits", "about 300 ml", "1 batch"); a
+  dessert, cake or bake counts the whole thing, sized from its tin, with any
+  slices the source gives in brackets, which the scaler ignores (DECISIONS §4);
   `ruby scripts/food_yield.rb "<line>"` says how one reads. `makes:` is never
   read as people however numeric it looks: 950 ml is not 950 portions. A
   draft's yield may be `QQ`, Helen's question, and has no scaler until she

@@ -302,7 +302,7 @@ _QUALIFIED_BUTTER = {"salted butter", "unsalted butter", "clarified butter"}
 # A line that is butter for the tin and nothing else. "plus extra" means the
 # line is an ingredient of the dish too, so it does not match.
 _ONLY_FOR_GREASING = re.compile(r"^(?!.*\bplus\b).*,\s*(?:extra,\s*)?(?:for greasing|to grease)\b", re.I)
-_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour", "wholemeal flour"}
+_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour", "wholemeal flour", "dark rye flour"}
 _QUALIFIED_SUGAR = {
     "golden caster sugar", "golden granulated sugar", "white caster sugar",
     "light brown soft sugar", "dark brown soft sugar",

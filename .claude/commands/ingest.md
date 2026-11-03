@@ -322,17 +322,19 @@ else has already done (MANUAL §9.1).
 - **Size words with the count** -- `amount: "2 large"`, not `item: "large
   onions"`.
 - **A FOOD recipe's yield opens with its number**: `serves:` with a number
-  of people, or `makes:` with a count of a named thing -- `"16 slices"`,
-  `"2 loaf cakes"`, `"one 8-inch cake"`, `"About 750 ml"`, `"1 batch"` for a
+  of people, or `makes:` with a count of a named thing -- `"one 20-cm cake
+  (about 10 slices)"`, `"2 loaf cakes"`, `"About 750 ml"`, `"1 batch"` for a
   sauce or a spice blend. Any words the source adds follow the figure
   (`"4, depending on appetite"`). **One figure, never an alternative**: "9
   large or 16 small biscuits" reads as nine "large", so it is `"9 biscuits"`.
-  `ruby scripts/food_yield.rb "<line>"` says how a line reads. **A dessert or
-  a cake is almost always `makes:`** (`"8–10 slices"` for a source's "Serves
-  8–10"). **`makes:` is
+  `ruby scripts/food_yield.rb "<line>"` says how a line reads. **A dessert, cake
+  or bake makes the thing, sized from its tin, with the source's slices in
+  brackets**: `"one 20-cm cake (about 10 slices)"`, `"one 900-g loaf (8–10
+  slices)"`; with no slices given, `"one 23-cm cake"`. Never portions as the
+  count (DECISIONS §4). **`makes:` is
   never read as people** however numeric it looks. **Where the source gives
-  no figure, the yield is `"QQ"`**, with a suggested figure on her list (a
-  round cake 12, a loaf 10, 18 cookies 9): never a guessed number in the
+  no figure, the yield is `"QQ"`**, with a suggested figure on her list (for a
+  bake, the thing its tin makes: `"one 20-cm cake"`): never a guessed number in the
   file. A `QQ` yield has no scaler until she answers it. There is no
   `serves_estimate:`; it is retired (DECISIONS §4).
 - **Split `ingredient_groups` and `method_groups`** -- once, here, and never
