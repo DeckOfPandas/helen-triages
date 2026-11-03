@@ -429,9 +429,15 @@
 
   /* The card's own unmarked title, so a drink found by a name search still
      lists under its real name. */
+  var hrefByUrl = {};
   var titleByUrl = (function () {
     var map = {};
-    model.forEach(function (d) { if (d.url) map[d.url] = d.title || d.url; });
+    model.forEach(function (d) {
+      if (!d.url) return;
+      map[d.url] = d.title || d.url;
+      // The card link's href carries the base URL; the store's key does not.
+      hrefByUrl[d.url] = (d.nameEl && d.nameEl.getAttribute('href')) || d.url;
+    });
     return map;
   })();
 
@@ -463,7 +469,9 @@
           'inputmode="numeric" value="' + HTF.shortlist.glasses(url) + '" ' +
           'data-url="' + HTF.escapeHtml(url) + '" ' +
           'aria-label="glasses of ' + HTF.escapeHtml(titleByUrl[url] || url) + '">' +
-          '<span>' + HTF.escapeHtml(titleByUrl[url] || url) +
+          '<span><a class="shopping-list-drink-link" href="' +
+          HTF.escapeHtml(hrefByUrl[url] || url) + '">' +
+          HTF.escapeHtml(titleByUrl[url] || url) + '</a>' +
           /* Inside the title span so the price wraps with the name. */
           '<span class="shopping-list-cost">' + costSuffix(url) + '</span>' +
           '</span>' +

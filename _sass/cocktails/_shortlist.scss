@@ -302,6 +302,22 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
   input.shopping-list-glasses { @extend %cocktail-number-input; }
 }
 
+// A drink's name here is the card's title, at the size of the surrounding
+// text, and a link to the drink (#1464): the face of `.drink-card-name`
+// (_cards.scss) and the hover of its link. Food's twin is
+// `.shopping-list-recipe-link` (food/_shopping-list.scss); change both.
+.shopping-list-drink-link {
+  @extend %cocktail-heading-face;
+  font-size: 1em;
+  letter-spacing: 0.03em;
+  color: $color-text;
+  text-decoration: none;
+  transition: color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { color: $color-wicked-woowoo-deep; }
+}
+
 // An ingredient that offers a choice of bottle (#818): one row each, labelled
 // with the generic, so it is visible which ingredient the buttons belong to.
 // Indented, so the rows read as belonging to the drink above.
