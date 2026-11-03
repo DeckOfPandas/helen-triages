@@ -5660,6 +5660,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   does not.** Helen: *"breast, legs and thighs served whole should count,
   diced/strips/whatever should not."* So "no figure for pieces" is a reason
   only for chicken that has been cut up.
+- **2026-11-03 — a braise takes no temperature, whatever the meat.** Helen:
+  *"braising chicken doesn't need a temperature. Same for all other meats."*
+  The youvetsi kind of `NO_TEMPERATURE_BECAUSE` entry, made general: a braised
+  or curried cut is never wired, even when the data has its figure.
 - **Undated (August 2026) — pork "medium" and fresh ham's "hint of pink" stay
   as they are.** Both sit below the cited safety figure. They were flagged and
   deliberately not corrected: whether to serve pork pink is Helen's call, and

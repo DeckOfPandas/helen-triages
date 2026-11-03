@@ -408,7 +408,7 @@ else has already done (MANUAL §9.1).
   cook would pause. Never cut an original, never merge two, never reorder.
 
   **WHAT HER OWN REWRITE LOOKS LIKE, once she's actually cooked from a `QQ
-  Claude` line** (`3-keep/sticky-squidgy-ginger-loaf-cake-with-treacle-topping.md` in
+  Claude` line** (`3-keep/sticky-squidgy-ginger-loaf-cake-treacle-topping.md` in
   `_food_drafts/`). She asked for the
   comparison herself and it holds four real patterns, worth aiming for on the
   NEXT `QQ Claude` line rather than waiting for her to fix this one:
