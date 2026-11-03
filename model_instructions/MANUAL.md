@@ -1505,13 +1505,14 @@ no price. DECISIONS §8.2.
   total it cannot reach makes the row unpriced, or "from £X" where part of
   it was priced; never zero.
 - **What shows**: each row's price (`.shopping-list-price`), the total under
-  the rows (`.shopping-list-total`, "roughly £X–£Y", or "from £X — n lines
-  have no price"), and after each recipe's sentence one portion of a
+  the rows (`.shopping-list-total`, "roughly £M (£X–£Y)", or "from £X — n
+  lines have no price"), and after each recipe's sentence one portion of a
   `serves:` recipe or one batch of a `makes:` one (`.shopping-list-cost`),
   priced from the recipe as written and fixed whatever the box says.
 - **The recipe page** says the same figure in the drink page's footer
-  layout, between two rules above IF YOU LIKED THIS: "Roughly £X–£Y a
-  portion in ingredients." (`.recipe-footer`, `.recipe-cost`). The footer,
+  layout, between two rules above IF YOU LIKED THIS: "Roughly £M (£X–£Y) a
+  portion in ingredients.", or "From £X a portion in ingredients, not
+  counting n unpriced items." (`.recipe-footer`, `.recipe-cost`). The footer,
   `#recipe-cost-data` and `assets/js/recipe-cost.js` are all behind
   `site.show_costs`; the script calls `recipeCost`, the function the
   shortlist calls, and leaves the footer hidden, rules and all, where

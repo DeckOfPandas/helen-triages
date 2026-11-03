@@ -274,15 +274,21 @@
   white-space: nowrap;
 }
 
-// A row's price, pushed right so the prices form a column to read down.
+// A row's price, pushed right so the prices form a column to read down. It
+// may shrink to its widest part, so a narrow row puts "(£X–£Y)" under the
+// mean rather than squeezing the name, as on the drinks list.
 .shopping-list-price {
   margin-left: auto;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   padding-left: $space-sm;
   font-family: $font-label;
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
   color: $color-clear-text;
+  text-align: right;
+}
+
+.shopping-list-price-part {
   white-space: nowrap;
 }
 

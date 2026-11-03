@@ -180,12 +180,25 @@
       : low + '–' + high;
   }
 
-  /* "£11.34", or "£11.34–£14.70" for a range: the same shape as `costSuffix`
-     in cocktail-index.js. Always two decimal places. */
+  /* "£11.34", or "£12.02 (£9.34–£14.70)" for a range: the midpoint, then the
+     ends. cocktail-index.js's `costSuffix`, the drink page and food's
+     `moneyText` print the same shape. Always two decimal places. */
   function moneyText(low, high) {
     var lo = '£' + Number(low).toFixed(2);
     if (Math.abs(Number(high) - Number(low)) < 0.005) return lo;
-    return lo + '–£' + Number(high).toFixed(2);
+    return '£' + ((Number(low) + Number(high)) / 2).toFixed(2) +
+      ' (' + lo + '–£' + Number(high).toFixed(2) + ')';
+  }
+
+  /* A moneyText as HTML for a shopping-list row: the mean and the bracketed
+     range in their own spans, which never break inside, so a narrow row
+     drops the range under the mean rather than squeezing the name. Either
+     site's text, escaped here. */
+  function moneyHtml(text, escape) {
+    var cut = String(text).indexOf(' (');
+    if (cut < 0) return escape(text);
+    return '<span class="shopping-list-price-part">' + escape(text.slice(0, cut)) + '</span> ' +
+      '<span class="shopping-list-price-part">' + escape(text.slice(cut + 1)) + '</span>';
   }
 
   /* What a line costs (#820, #748): quantity times a rate resolved at build
@@ -665,6 +678,7 @@
     build: build,
     total: total,
     moneyText: moneyText,
+    moneyHtml: moneyHtml,
     parseAmount: parseAmount,
     fruitCount: fruitCount,
     foldKey: foldKey,

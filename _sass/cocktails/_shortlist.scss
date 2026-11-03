@@ -460,15 +460,21 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
 // What the line costs — #820. Local only, like `.shopping-list-cost` above.
 // Plex and tabular, and pushed right by the `auto` margin so the prices form a
 // column you can read down to the total. Quieter than the amount: the
-// millilitres are what you shop by and the price is context.
+// millilitres are what you shop by and the price is context. It may shrink to
+// its widest part, so a narrow row puts "(£X–£Y)" under the mean rather than
+// squeezing the name (#1458).
 .shopping-list-price {
   margin-left: auto;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   padding-left: $space-sm;
   font-family: $font-label;
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
   color: $color-clear-text;
+  text-align: right;
+}
+
+.shopping-list-price-part {
   white-space: nowrap;
 }
 

@@ -627,17 +627,17 @@ const priced = (amount, rate, scale) =>
   costed([{ amount, name: 'thing', aisle: 'cupboard', scale, rate }])[0].cost;
 
 test('#1458: a weight, a volume and a count are each priced by their own rate', () => {
-  assert.strictEqual(priced('500 g', FLOUR).text, '£0.50–£1.00');
-  assert.strictEqual(priced('2 tbsp', OIL).text, '£0.15–£0.30');
-  assert.strictEqual(priced('3 large', EGG).text, '£0.60–£1.50');
+  assert.strictEqual(priced('500 g', FLOUR).text, '£0.75 (£0.50–£1.00)');
+  assert.strictEqual(priced('2 tbsp', OIL).text, '£0.22 (£0.15–£0.30)');
+  assert.strictEqual(priced('3 large', EGG).text, '£1.05 (£0.60–£1.50)');
 });
 
 test('#1458: a line is priced after scaling, so four of a recipe for two is double', () => {
-  assert.strictEqual(priced('500 g', FLOUR, 2).text, '£1.00–£2.00');
+  assert.strictEqual(priced('500 g', FLOUR, 2).text, '£1.50 (£1.00–£2.00)');
 });
 
 test('#1458: a weight-priced thing measured in spoons is costed at 1 ml to 1 g', () => {
-  assert.strictEqual(priced('2 tbsp', FLOUR).text, '£0.03–£0.06');
+  assert.strictEqual(priced('2 tbsp', FLOUR).text, '£0.04 (£0.03–£0.06)');
   assert.strictEqual(priced('100 ml', { g: [0.01, 0.01] }).text, '£1.00');
 });
 
@@ -656,10 +656,10 @@ test('#1458: no rate, or a unit the rate cannot reach, is unpriced, never zero',
 test('#1458: "2 x 400 g cans" is 800 g, whatever the container is called', () => {
   // Beef Wellington's "2 x 400 g beef fillets" is its dearest line; unpriced,
   // the dish read as "from £2.33 a portion".
-  assert.strictEqual(priced('2 x 400 g cans', FLOUR).text, '£0.80–£1.60');
-  assert.strictEqual(priced('2 x 400 g', FLOUR).text, '£0.80–£1.60');
-  assert.strictEqual(priced('1 x 1 kg bag', FLOUR).text, '£1.00–£2.00');
-  assert.strictEqual(priced('2 x 250 ml cartons', OIL).text, '£2.50–£5.00');
+  assert.strictEqual(priced('2 x 400 g cans', FLOUR).text, '£1.20 (£0.80–£1.60)');
+  assert.strictEqual(priced('2 x 400 g', FLOUR).text, '£1.20 (£0.80–£1.60)');
+  assert.strictEqual(priced('1 x 1 kg bag', FLOUR).text, '£1.50 (£1.00–£2.00)');
+  assert.strictEqual(priced('2 x 250 ml cartons', OIL).text, '£3.75 (£2.50–£5.00)');
 });
 
 test('#1458: a row priced in part says "from" its known part', () => {
@@ -681,7 +681,7 @@ test('#1458: the total sums what is priced and counts what is not', () => {
   assert.strictEqual(sum.unpriced, 1);
   assert.strictEqual(sum.text, 'from £0.65');
   const whole = F.costTotal(list.filter((r) => r.label !== 'kohlrabi'));
-  assert.strictEqual(whole.text, '£0.65–£1.30');
+  assert.strictEqual(whole.text, '£0.98 (£0.65–£1.30)');
   assert.strictEqual(whole.unpriced, 0);
 });
 
@@ -691,12 +691,14 @@ test('#1458: a recipe costs per portion, or per batch with per = 1, and keeps "f
     { amount: '2 tbsp', name: 'oil', aisle: 'cupboard', rate: OIL }
   ];
   const o = { aisles: AISLES, costUnits: UNITS };
-  assert.strictEqual(F.recipeCost(lines, 4, o).text, '£0.16–£0.33');
-  assert.strictEqual(F.recipeCost(lines, 1, o).text, '£0.65–£1.30');
+  assert.strictEqual(F.recipeCost(lines, 4, o).text, '£0.24 (£0.16–£0.33)');
+  assert.strictEqual(F.recipeCost(lines, 1, o).text, '£0.98 (£0.65–£1.30)');
   const partial = F.recipeCost(lines.concat(
     [{ amount: '200 g', name: 'kohlrabi', aisle: 'produce' }]), 1, o);
   assert.strictEqual(partial.text, 'from £0.65');
   assert.strictEqual(partial.partial, true);
+  // The recipe page says "not counting 1 unpriced item" from this count.
+  assert.strictEqual(partial.unpriced, 1);
 });
 
 test('#1458: no portion count, or no unit table, is no recipe figure at all', () => {

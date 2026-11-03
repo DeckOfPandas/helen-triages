@@ -1213,7 +1213,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   a lower bound, never withheld and never silent.** Chosen over cocktails'
   withholding and over an unmarked sum, given that a keyword table cannot
   price every one of the collection's ingredient names. Seasoning, a pinch
-  and an unquantified line cost nothing and do not count as unpriced.
+  and an unquantified line cost nothing and do not count as unpriced. The
+  recipe page says how many are missing: "From £X a portion in ingredients,
+  not counting 2 unpriced items." — Helen: *"number 1, but with "not counting
+  X unpriced items""*.
+- **2026-11-03, #1458 — both sites print a range as "mean (lowest–highest)",
+  everywhere a price shows.** Helen: *"For each food or bottle, please give the
+  mean price you found, with (x--y) afterwards for lowest and highest."* The
+  mean is the midpoint of the ends, which are all the tables record. A point
+  price stays one figure, and a "from" figure has no mean. And: *"Let's use
+  the same language on both sites: "Roughly X a [glass] in ingredients."
+  swapping glass for portion on the food site."* A `makes:` recipe still says
+  "a batch" (her choice, asked).
 - **2026-11-03, #1458 — each recipe page carries a cost line, local only, in
   the drink page's layout.** Helen: *"Please also add a cost line to each
   recipe page. Use the layout from the cocktails site -- the two horizontal
@@ -2448,7 +2459,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   locally built site, and only as an incidental — just somewhere on the recipe
   page."* `site.show_costs` is declared in `_config_local.yml` and never in
   `_config.yml`, so a production build prints no cost line at all. Locally it
-  reads "Roughly £X–£Y a glass in ingredients."
+  reads "Roughly £M (£X–£Y) a glass in ingredients." (§8.2's 2026-11-03
+  entry on "mean (lowest–highest)".)
 - **2026-09-05, #547 — `default_bottles` are pricing inputs and are never named
   on a recipe.** Helen: *"Don't name these on the recipes, but you can note
   them as inputs to the default prices."* Since 2026-09-14 (#1016) the same map

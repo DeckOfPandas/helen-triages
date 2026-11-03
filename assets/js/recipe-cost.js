@@ -38,9 +38,13 @@
   });
   if (!each) return;
 
-  // "Roughly £2.26–£5.91 a portion in ingredients.", the drink page's sentence;
-  // "From £2.19 ..." where some line could not be priced.
+  // "Roughly £4.09 (£2.26–£5.91) a portion in ingredients.", the drink page's
+  // sentence; "From £2.19 a portion in ingredients, not counting 2 unpriced
+  // items." where some line could not be priced.
   var figure = each.text.replace(/^from /, '');
+  var missing = each.partial
+    ? ', not counting ' + each.unpriced + (each.unpriced === 1 ? ' unpriced item' : ' unpriced items')
+    : '';
   line.textContent = '';
   line.appendChild(document.createTextNode(each.partial ? 'From ' : 'Roughly '));
   var span = document.createElement('span');
@@ -48,6 +52,6 @@
   span.textContent = figure;
   line.appendChild(span);
   line.appendChild(document.createTextNode(
-    (data.batch ? ' a batch' : ' a portion') + ' in ingredients.'));
+    (data.batch ? ' a batch' : ' a portion') + ' in ingredients' + missing + '.'));
   footer.hidden = false;
 })();

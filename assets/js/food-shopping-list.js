@@ -258,13 +258,16 @@
     return words.join(' ');
   }
 
-  /* "£11.34", or "£11.34–£14.70"; "from £3.10" where something is unpriced
-     (#1458): the low end of what is known, since the rest costs more. */
+  /* "£11.34", or "£12.02 (£9.34–£14.70)" for a range: the midpoint, then the
+     ends, as shopping-list.js prints a drink's. "from £3.10" where something
+     is unpriced (#1458): the low end of what is known, since the rest costs
+     more, so a midpoint would mislead. */
   function moneyText(cost) {
     var lo = '£' + Number(cost.min).toFixed(2);
     if (cost.partial) return 'from ' + lo;
     if (Math.abs(cost.max - cost.min) < 0.005) return lo;
-    return lo + '–£' + Number(cost.max).toFixed(2);
+    return '£' + ((Number(cost.min) + Number(cost.max)) / 2).toFixed(2) +
+      ' (' + lo + '–£' + Number(cost.max).toFixed(2) + ')';
   }
 
   /* "2 x 400 g cans" totals as 2 of the unit `x 400 g can`: that is 400 g
@@ -353,7 +356,9 @@
     build(entries, options).forEach(function (aisle) { rows = rows.concat(aisle.items); });
     var sum = costTotal(rows);
     if (!sum) return null;
-    var each = { min: sum.min / per, max: sum.max / per, partial: sum.partial };
+    var each = {
+      min: sum.min / per, max: sum.max / per, partial: sum.partial, unpriced: sum.unpriced
+    };
     each.text = moneyText(each);
     return each;
   }

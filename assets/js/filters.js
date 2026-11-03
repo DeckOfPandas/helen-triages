@@ -1455,7 +1455,8 @@ function renderResultsPool() {
             /* What the line costs (#1458), local only; outside the label like
                the cocktail list's. A free or unpriced row draws nothing. */
             (row.cost && row.cost.text
-              ? '<span class="shopping-list-price">' + HTF.escapeHtml(row.cost.text) + '</span>'
+              ? '<span class="shopping-list-price">' +
+                HTF.shoppingList.moneyHtml(row.cost.text, HTF.escapeHtml) + '</span>'
               : '') +
             '</li>';
         }).join('') +

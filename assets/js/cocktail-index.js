@@ -139,14 +139,12 @@
     return { lo: lo, hi: hi };
   }
 
-  /* " @ £2.34", or a range, or nothing. Per glass, never multiplied by the
-     count: it is the figure the drink's own page shows. */
+  /* " @ £2.34", or " @ £3.10 (£2.34–£3.86)", or nothing. Per glass, never
+     multiplied by the count: it is the figure the drink's own page shows. */
   function costSuffix(url) {
     var c = costFor(url);
     if (!c) return '';
-    var lo = '£' + Number(c.lo).toFixed(2);
-    if (Math.abs(c.hi - c.lo) < 0.005) return ' @ ' + lo;
-    return ' @ ' + lo + '–£' + Number(c.hi).toFixed(2);
+    return ' @ ' + HTF.shoppingList.moneyText(c.lo, c.hi);
   }
 
   /* One row of radios per ingredient that has a choice (#818). The group
@@ -546,7 +544,8 @@
       /* The price (#820) is its own span because it is absent on the deployed
          site. A row with no rate prints nothing, never a zero. */
       var price = row.price
-        ? '<span class="shopping-list-price">' + HTF.escapeHtml(row.price.text) + '</span>'
+        ? '<span class="shopping-list-price">' +
+          HTF.shoppingList.moneyHtml(row.price.text, HTF.escapeHtml) + '</span>'
         : '';
 
       return '<li class="shopping-list-row' + HTF.shoppingTicks.rowClass(row.key) + '">' +
