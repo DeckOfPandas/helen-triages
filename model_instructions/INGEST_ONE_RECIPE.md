@@ -86,7 +86,9 @@ she would far rather answer a question than discover an invention.
 ingredient list, a photograph that ends mid-sentence — these do not announce
 themselves, and the sibling recipes on the same page ending the same way is not
 evidence. Transcribe what is in frame, then say in your list where the frame
-ended.
+ended. **A recipe with most of its text out of frame is left out on purpose**:
+do not transcribe it, ask about it, or note it. Helen: *"As a rule please
+assume recipes with lots of missing text are to be deliberately excluded."*
 
 ---
 
@@ -143,7 +145,7 @@ name you give is a courtesy rather than a contract.
 | `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
-| the yield's number | **`serves:` opens with a number of people; `makes:` opens with a count of a named thing**: "16 slices", "2 loaf cakes", "one 8-inch cake", "950 ml", "1 batch" for a sauce or spice blend. The source's other words follow the figure: "4, depending on appetite". **One figure, not an alternative:** "9 large or 16 small biscuits" reads as nine of something called "large", so write the one the source leads with ("9 biscuits"). **`makes` is never read as people** however numeric it looks. **Where the source prints no figure, write `"QQ"`** and put a suggested one in your list (a round cake 12, a loaf 10, 18 cookies 9); never a guessed number in the file. There is no `serves_estimate` field: it is retired, and the suite refuses it. |
+| the yield's number | **`serves:` opens with a number of people; `makes:` opens with a count of a named thing**: "16 slices", "2 loaf cakes", "one 8-inch cake", "950 ml", "1 batch" for a sauce or spice blend. The source's other words follow the figure: "4, depending on appetite". **One figure, not an alternative:** "9 large or 16 small biscuits" reads as nine of something called "large", so write the one the source leads with ("9 biscuits"). **`makes` is never read as people** however numeric it looks. **A dessert or a cake is almost always `makes`**: a source's "Serves 8–10" for a sliced dessert is `makes: "8–10 slices"`. **Where the source prints no figure, write `"QQ"`** and put a suggested one in your list (a round cake 12, a loaf 10, 18 cookies 9); never a guessed number in the file. There is no `serves_estimate` field: it is retired, and the suite refuses it. |
 | `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. **Not in the source? Estimate it, as `"Estimated 20 mins"`, and say so in your list** — Helen: *"I would like "Estimated 10 mins" to be written, then our tidying scripts block promotion for recipes with estimated times."* Her repository refuses to promote a recipe whose time still says `Estimated`, so a guess never publishes. Write `"QQ"` only where you cannot estimate at all. `cook_time: "None"` for a genuinely uncooked dish. |
 | `main_ingredients` | Section 4. Lowercase, a flat list. |
 | `star_ingredient` | Section 4. **Optional** — leave it out rather than force one. |
@@ -217,14 +219,17 @@ vinegar type, mustard type, chocolate percentage. The answer is printed on the
 page in front of you, and one left off costs her a trip back to a source she
 may no longer have. If the source is silent, write what it says and no more.
 
-**Butter is the one qualifier whose silence you mark.** Where the source says
-"butter" and not which, the item is `QQ butter` — Helen: *"Write QQ
-butter in the ingredients list where it isn't specified."* Salted or unsalted
-changes a bake and she always has to decide it, so the `QQ` puts the question
-where she will see it. **Never choose for her**, in either direction: not
-"salted" because it is a savoury dish, not plain "butter" because it is a
-precise bake. Where the source does say — "unsalted butter", "slightly salted
-butter" — that is reading, and you write it.
+**Milk, eggs and butter have house defaults, and the line says when one was
+used.** Where the source prints them unqualified: milk is `semi-skimmed milk`,
+an egg is large (with the count: `amount: "2 large"`), and butter is `salted
+butter` — or `unsalted butter` in a bake whose recipe names salt. Each such
+line gets `note: "The source gave \"butter\"."` (with the source's own word).
+Helen: *"If milk and eggs aren't qualified in the source then: milk ->
+semi-skimmed milk, egg -> large egg, butter -> salted butter UNLESS it's
+baking and salt is named, then for each please add a note to the ingredient
+line item saying "The source gave "butter"."* Where the source does say —
+"unsalted butter", "medium eggs", "whole milk" — that is reading, and you
+write it, with no note.
 
 **The ingredient list is the source's own list. Never add to it from the
 method.** Helen: *"We shouldn't list incidentals. We can trust the
@@ -242,13 +247,15 @@ prints is kept.
   for frying", "flour, for dusting". A real line with the use tacked on
   ("175 g butter, softened, plus extra for the tin") is not flagged: write it
   without the tail ("butter, softened"). Deep-frying oil is not flagged
-  either: write it with no amount, as "vegetable oil, for deep frying".
+  either: write it with no amount, as "vegetable oil, for deep frying". Oil a
+  centimetre or two deep in a pan is "for shallow frying", and is flagged.
 
   ```yaml
   ingredient_groups:
     - name: ""
       items:
-      - item: "QQ butter, for greasing"
+      - item: "salted butter, for greasing"
+        note: "The source gave \"butter\"."
         incidental: true
   ```
 
@@ -578,9 +585,9 @@ silly". A long spice list that defines a curry belongs in full.
 
 Lowercase throughout. Cheeses use the bare name — `cheddar`, `feta`, `comté` —
 keeping "cheese" only where the qualifier means nothing without it (`blue
-cheese`, `cream cheese`). Butter is `butter`, never salted or unsalted (the
-kind is settled at promotion), and a `QQ butter` line still earns it. Leave
-out frying and greasing oil.
+cheese`, `cream cheese`). Butter is `butter` here, whatever the ingredient
+line says (the kind is settled at promotion). Leave out frying and greasing
+oil.
 
 ---
 
@@ -638,6 +645,8 @@ batch comes from one of them, the index may say so once.
 **Good Food** — a `source:` containing "Good Food":
 - Both units are printed (100g/4oz). Write the metric figure only, bakes included, and do not list the dropped imperial. Helen: *"Metric only, bakes too"*
 - An aside under the standing "gf tip" rubric is transcribed without the label: it is Good Food's tip, not gluten-free. Helen: *"Good Food tip, the magazine source I use a lot?"*
+- Cite it as "Adapted from Good Food, <Month Year>", never "BBC Good Food". An issue whose footer says "Christmas" is the November issue. Helen: *""Christmas 2026" means "November 2026" -- this is always the case for Good Food, Nov not Dec."*
+- Add the recipe's author to the citation (", <Firstname Lastname>") where the magazine makes a fuss about them: a byline, a photo, a named feature. Helen: *"Add Good Food recipe authors where the magazine has made a fuss about them."*
 
 **Delia Smith** — a `source:` containing "Delia":
 - Keep the ounces. Never convert a Delia recipe to metric.
@@ -713,7 +722,8 @@ agonising over.** Get it right where it is easy; do not let it slow down section
 - **Never fill a silence in the source from general cooking knowledge.**
 - **Never draft a tagline of your own.** An intro becomes the `QQ original` /
   `QQ Claude` pair; no intro is a bare `QQ`.
-- **Never decide which butter.** Unstated is `QQ butter`.
+- **Never leave milk, eggs or butter unqualified**, and never default one
+  without the note saying what the source printed.
 - **Never split a source step into several pairs**, and never add an
   ingredient line the source's own list does not print.
 - **Never reconstruct a truncated method**, even when the pattern is obvious.

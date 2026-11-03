@@ -35,7 +35,7 @@ what makes it findable, and there are exactly these:**
 |---|---|
 | a COCKTAIL's `tagline` | `tagline: "QQ"`, bare, and **nothing drafted** -- Helen: *"Let's stop Claude drafting taglines. It turns out me doing them in batches works the best."* Her own line, if she gives one for that drink, goes in as she gave it with no `QQ`. Her reason: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"* |
 | a FOOD `tagline` | where the source has an intro, the PAIR on one line: `"QQ original <the intro, verbatim> QQ Claude <a plain rewrite of it>"` -- Helen: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* Where it has none, `"QQ"` alone. Never a line of the ingest's own |
-| butter the source does not specify | `item: "QQ butter"` -- Helen: *"Write QQ butter in the ingredients list where it isn't specified."* Never "salted" by default and never plain "butter" |
+| milk, eggs or butter the source does not qualify | **not a `QQ`**: the house default plus a note saying what the source printed -- see TIER 1. Older drafts still say `QQ butter` |
 | a `generic` the vocabulary does not settle outright | `generic: "QQ <the source's words>"` -- see the block below |
 | a `suggestion` | `suggestion: []` unless a DECLARED bottle names it; the bottle the source names goes in that ingredient's `note` as `"Originally <bottle>."` |
 | a cocktail's `meta.ship` | `"who knows"`, never `"QQ"` -- `QQ` is not a ship value (`test_meta_ship_is_a_rung_or_off_scale`); `meta.made_before: false` beside it says she has not made it, and the two must agree (`test_ship_agrees_with_made_before`) |
@@ -261,7 +261,14 @@ else has already done (MANUAL §9.1).
 
 - **Every qualifier the source states.** Sugar, butter, flour, milk, eggs,
   garlic, ginger, chocolate, mustard, vinegar. Source silent → `QQ`, never a
-  default.
+  default -- **except milk, eggs and butter, which have house defaults**:
+  `semi-skimmed milk`, a large egg (`amount: "2 large"`), `salted butter`, or
+  `unsalted butter` in a bake whose recipe names salt. Each such line gets
+  `note: "The source gave \"butter\"."` in the source's own word. Helen: *"If
+  milk and eggs aren't qualified in the source then: milk -> semi-skimmed
+  milk, egg -> large egg, butter -> salted butter UNLESS it's baking and salt
+  is named, then for each please add a note to the ingredient line item
+  saying "The source gave "butter"."*
 - **The fan oven temperature**, from the printed pair. Check WHICH is the fan
   figure; they are not always in the same order. **A `QQ Claude` line gives the
   fan figure alone; its `QQ original` keeps everything the source printed.**
@@ -279,8 +286,12 @@ else has already done (MANUAL §9.1).
   and add clear instructions for ingestion to ignore these"*); a "you will
   need" equipment list (*"the rule is "trust the cook""*); anything on the page
   that sells something -- a show, a ticket line, a book plug, a TV listing,
-  "next month", a web pointer, a wine box (*"Drop ads, keep essays"*). An essay
-  or a bio about the dish is kept, in the body. **A sidebar box with no list
+  "next month", a web pointer, a wine box (*"Drop ads, keep essays"*).
+  **Everything else written on the page goes in the body**: an essay, a bio,
+  a boxed aside, a tips box, a tasting-panel comment, each under a heading
+  starting `QQ` in MANUAL §4.1's markup -- never parked in a note asking where
+  it belongs (*"Extra text can always go as body content and I'll turn it
+  into something"*). **A sidebar box with no list
   has no body**: its words are already its `QQ original` lines.
 - **No dietary marking, ever.** Helen: *"I don't mark dietary restrictions."*
   Vegan, gluten-free and their kin get no tag, note or question; a claim in a
@@ -300,7 +311,8 @@ else has already done (MANUAL §9.1).
   ("175 g butter, softened, plus extra for the tin") is not flagged; write it
   without the tail ("butter, softened"). Deep-frying oil is not incidental:
   it keeps its line with no amount, reading "vegetable oil, for deep frying",
-  because the pan decides the volume. The words are
+  because the pan decides the volume. Oil a centimetre or two deep is "for
+  shallow frying", and is incidental (DECISIONS §4). The words are
   `_data/food/incidentals.yml`, and `test_tin_and_pan_fats_are_flagged_incidental`,
   `test_no_real_line_carries_its_tin_and_pan_extra` and
   `test_deep_frying_oil_is_listed_without_an_amount` hold all three.
@@ -315,7 +327,9 @@ else has already done (MANUAL §9.1).
   sauce or a spice blend. Any words the source adds follow the figure
   (`"4, depending on appetite"`). **One figure, never an alternative**: "9
   large or 16 small biscuits" reads as nine "large", so it is `"9 biscuits"`.
-  `ruby scripts/food_yield.rb "<line>"` says how a line reads. **`makes:` is
+  `ruby scripts/food_yield.rb "<line>"` says how a line reads. **A dessert or
+  a cake is almost always `makes:`** (`"8–10 slices"` for a source's "Serves
+  8–10"). **`makes:` is
   never read as people** however numeric it looks. **Where the source gives
   no figure, the yield is `"QQ"`**, with a suggested figure on her list (a
   round cake 12, a loaf 10, 18 cookies 9): never a guessed number in the
@@ -566,7 +580,9 @@ her flip it.**
 
 5. **Transcribe.** Tier 1 unasked, tier 2 as proposals, tier 3 never. Say in the
    file where the frame ended if a capture stops mid-recipe -- a screenshot that
-   ends mid-list looks exactly like a complete one.
+   ends mid-list looks exactly like a complete one. **A recipe with most of its
+   text out of frame is left out on purpose**: not transcribed, not asked
+   about, not noted (DECISIONS §4).
 
 6. **Run the finishing pass, steps 2 to 8.** It ends with the pre-flight, which
    is the whole point of doing this in a batch.
@@ -602,7 +618,8 @@ her flip it.**
 
 - **A capture that ends mid-recipe looks exactly like a complete one.** Count
   every ingredient the method names; that proves nothing is missing that is
-  USED, not that nothing follows. Say so in a note and ask.
+  USED, not that nothing follows. Say so in a note and ask -- unless most of
+  the recipe is missing, when it is left out without a word (DECISIONS §4).
 - **The source is the best audit the collection ever gets.** Transcribing a page
   beside a cocktail already derived from it has found a missing citation, a wrong
   ice instruction and an amount out by a factor of 24. **Record all of it and

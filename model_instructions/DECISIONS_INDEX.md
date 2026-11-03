@@ -55,7 +55,7 @@ argument and the rules each field is read by.
 - 2026-10-18 · §4 · a time the source does not print is written Estimated N mins, and promotion refuses it.
 - 2026-10-18 · §4 · an ingest ignores a nutrition box and its badges.
 - 2026-10-18 · §4 · an ingest ignores a "you will need" equipment list.
-- 2026-10-18 · §4 · page furniture: drop what sells, keep what is written about the dish.
+- 2026-11-03 · §4 · page furniture: drop what sells; everything else written on the page goes in the body.
 - 2026-10-18 · §4 · a sidebar box ingested as a recipe has no body.
 - 2026-10-30 · §4 · a magazine page's citation: the book shape plus "via" for an extract, a credit only from the page itself, the cover month.
 - 2026-10-30 · §4 · header and method times that disagree: cook_time takes the header's and a QQ note names the mismatch.
@@ -73,14 +73,16 @@ argument and the rules each field is read by.
 - 2026-10-04 · §4 · #814 · interleaved phases take narrative group names, and Claude suggests them.
 - 2026-10-04 · §4 · #814 · method group names are imperatives, as a trial.
 - 2026-10-04 · §4 · #814 · a component with ingredients and no method gets a QQ - MISSING: step, not silence.
+- 2026-11-03 · §4 · a recipe the photos show only part of is left out on purpose.
 - 2026-10-04 · §4 · #814 · group names are quoted — Helen, told the difference between - name: cake and - name: "Make the batter" was only how the name is typed: "Let's make future recipes quote group …
 - 2026-10-07 · §4 · a source's bottle goes in that pour's note as "Originally X.", never in suggestion.
 - 2026-10-08 · §4 · a cocktail's tagline is a bare QQ at ingest; nothing is drafted.
 - 2026-10-08 · §4 · a food tagline at ingest is the method's pair on one line, where the source has an intro.
-- 2026-10-08 · §4 · unspecified butter is QQ butter — Helen: "Write QQ butter in the ingredients list where it isn't specified." Replaces a chat's "salted, or plain in precise bakes".
+- 2026-11-03 · §4 · an unqualified milk, egg or butter takes the house default, and the line says what the source printed.
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
 - 2026-10-28 · §4 · makes: is written as a count of a named thing.
+- 2026-11-03 · §4 · a dessert or a cake is makes:, almost always.
 - 2026-10-08 · §4 · Helen's own recipes are source: "Henry", source_type: person.
 - 2026-10-08 · §4 · four ingest rulings apply to Difford's alone.
 - 2026-10-08 · §4 · three things a chat did are NOT ingest rules: one question per recipe, hand-assigned moods, and alternative paths as method groups.
@@ -90,6 +92,7 @@ argument and the rules each field is read by.
 - 2026-10-10 · §4 · #1356 · a fat or flour the source lists only for the tin or the pan is kept and flagged incidental: true, at every ingest.
 - 2026-10-16 · §4 · #1356 · on a real fat or flour line, ", plus extra for the tin" and its kin are trimmed, at tidy.
 - 2026-10-16 · §4 · #1356 · deep-frying oil is listed, unquantified, as "<oil>, for deep frying", and is not incidental.
+- 2026-11-03 · §4 · oil a couple of centimetres deep is "for shallow frying", and is incidental.
 - 2026-08-20 · §4 · #406 · "Adapted from" prefixes published work and only published work.
 - 2026-08-20 · §4 · #406 · a source with no date is a website; a publication is a print issue and always carries one.
 - 2026-08-20 · §4 · #406 · a source nobody has established is source: "QQ" with source_type: unknown, and on a published recipe it is meant to break the build.

@@ -322,10 +322,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-18 — an ingest ignores a "you will need" equipment list.** Helen:
   *"the rule is "trust the cook"."* As a group it had put a cake ring on the
   shopping list.
-- **2026-10-18 — page furniture: drop what sells, keep what is written about
-  the dish.** Helen: *"Drop ads, keep essays."* Shows, ticket lines, book plugs,
-  TV listings, "next month", web pointers and wine boxes go; essays, bios and
-  boxed asides go in the body.
+- **2026-11-03 — page furniture: drop what sells; everything else written on
+  the page goes in the body.** Helen: *"Drop ads, keep essays,"* and then
+  *"Extra text can always go as body content and I'll turn it into
+  something."* Shows, ticket lines, book plugs, TV listings, "next month", web
+  pointers and wine boxes go; essays, bios, boxed asides, tips boxes and
+  tasting-panel comments go in the body, under a heading starting `QQ`, never
+  parked in a note asking where they belong.
 - **2026-10-18 — a sidebar box ingested as a recipe has no body.** Helen chose
   *"Delete the bodies"*: the body repeated the `QQ original` lines unmarked,
   and would have published the book's text.
@@ -416,6 +419,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-04, #814 — a component with ingredients and no method gets a
   `QQ - MISSING:` step, not silence.** Helen: *'Leave a QQ in there for me please
   under e.g. "Make the treacle topping"'*.
+- **2026-11-03 — a recipe the photos show only part of is left out on
+  purpose.** Helen: *"none of those are an accident -- I don't want any of
+  them. As a rule please assume recipes with lots of missing text are to be
+  deliberately excluded."* Not transcribed, not asked about, and no note
+  points at it; a step that sends the cook to such a page keeps the pointer
+  only in its `QQ original`.
 - **2026-10-04, #814 — group names are quoted.** Helen, told the difference
   between `- name: cake` and `- name: "Make the batter"` was only how the name
   is typed: *"Let's make future recipes quote group titles, so add that to the
@@ -435,9 +444,14 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   where the source has an intro.** Helen: *"QQ original yes, then QQ claude
   rewrite, then I'll do my own and delete the other two."* A rewrite of the
   intro, not a quip; an ingest never drafts a tagline of its own.
-- **2026-10-08 — unspecified butter is `QQ butter`.** Helen: *"Write QQ butter
-  in the ingredients list where it isn't specified."* Replaces a chat's
-  "salted, or plain in precise bakes".
+- **2026-11-03 — an unqualified milk, egg or butter takes the house default,
+  and the line says what the source printed.** Helen: *"If milk and eggs
+  aren't qualified in the source then: milk -> semi-skimmed milk, egg -> large
+  egg, butter -> salted butter UNLESS it's baking and salt is named, then for
+  each please add a note to the ingredient line item saying "The source gave
+  "butter"."* A bake whose recipe names salt takes unsalted butter. The size
+  goes with the count (`amount: "2 large"`). Replaces "unspecified butter is
+  `QQ butter`"; older drafts still carry that shape.
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
   rulings from two claude.ai chats that Helen confirmed as standing, each a
   yes. Its `QQ original` keeps everything the source printed.
@@ -449,6 +463,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   9 biscuits."* The recipe page counts the thing made and the shopping list
   counts batches (§8.2). One figure, never an alternative: "9 large or 16
   small biscuits" reads as nine of something called "large".
+- **2026-11-03 — a dessert or a cake is `makes:`, almost always.** Helen:
+  *"Desserts and cakes will almost always be makes not serves."* A source's
+  "Serves 8–10" for a sliced dessert is `makes: "8–10 slices"`.
 - **2026-10-08 — Helen's own recipes are `source: "Henry"`, `source_type:
   person`.** Confirmed as standing the same day, as the old journal recorded
   it.
@@ -501,6 +518,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   frying', because I will use different pans with different volumes."*
   Held by `test_deep_frying_oil_is_listed_without_an_amount`; `/tidy-drafts`
   drops the amount and rewords the line.
+- **2026-11-03 — oil a couple of centimetres deep is "for shallow frying", and
+  is incidental.** Helen: *"2 cm oil is shallow frying not deep frying (as
+  opposed to just "frying")."* The line says "shallow" so the cook knows the
+  depth; `_data/food/incidentals.yml` reads it as a frying use.
 - **2026-08-20, #406 — "Adapted from" prefixes published work and only
   published work.** Helen: *"Bare labels don't need 'adapted from', only work
   published by other people."* And why the prefix is always true for the rest:
@@ -859,7 +880,7 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   wrong, because the cook is left guessing golden or white, soft or
   muscovado. `_QUALIFIED_BUTTER`, `_QUALIFIED_SUGAR` and `_QUALIFIED_FLOUR` in
   `tests/test_style.py`; a new name joins a list on her say. At ingest an
-  unspecified butter is `QQ butter` (§4). Butter that is only for greasing is
+  unqualified butter takes the house default with a note saying so (§4). Butter that is only for greasing is
   exempt (Helen, 2026-10-13); "plus extra for greasing" is not, because that
   line is also in the dish.
 - **Undated, #136 — ginger says fresh, ground or paste, in the ingredient list
