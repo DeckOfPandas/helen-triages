@@ -1,4 +1,5 @@
-"""guard-main-branch.py and guard-destructive-git.py, broken on purpose.
+"""guard-main-branch.py, guard-destructive-git.py, guard-git-output.py and
+guard-dev-null.py, broken on purpose.
 
 A guard is proved by breaking the thing on purpose (#1198, DECISIONS §11).
 Each hook is fed the JSON the harness feeds it, on stdin, with the subprocess's
@@ -404,6 +405,84 @@ def test_destructive_guard_says_nothing_when_there_is_no_repository(tmp_path):
     assert _decision("guard-destructive-git.py", "git reset --hard", nowhere) is None
 
 
+# ---- guard-git-output.py: the diff options that are not reads (#1463) ----
+# `git diff *`, `git log *` and `git show *` are allowed unasked, and a prefix
+# rule cannot exclude an option that comes later.
+
+@pytest.mark.parametrize("command", [
+    "git diff --output=/etc/x",
+    "git diff HEAD --output /home/x",
+    "git log -p --output=tmp/../../x",
+    "git show --outp=x",
+    "git diff --no-index /etc/passwd README.md",
+    "git diff --no-ind a b",
+    "git diff --ext-diff",
+    "git show --ext HEAD",
+    "git log --textconv -p",
+    "git -c core.pager=cat diff --output=x",
+    "git --no-pager diff --output=x",
+    "/usr/bin/git diff --output=x",
+    "git diff-tree --output=x HEAD",
+    "git diff --output='a b'",
+    "git diff --output='unbalanced",
+])
+def test_git_output_guard_refuses_options_that_write_read_outside_or_run(tmp_path, command):
+    assert _decision("guard-git-output.py", command, tmp_path), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    "git diff",
+    "git diff --stat origin/main",
+    "git diff --text HEAD~1",
+    "git diff --output-indicator-new=+ HEAD",
+    "git log --oneline -5",
+    "git show --stat HEAD",
+    "git diff main > tmp/changes.patch",
+    # not a diff command
+    "git commit -F tmp/msg.txt",
+    "git status --output=x",
+    # prose about the option
+    "grep -rn -- '--output=' scripts/",
+])
+def test_git_output_guard_leaves_reads_and_mentions_alone(tmp_path, command):
+    assert _decision("guard-git-output.py", command, tmp_path) is None, f"refused {command!r}"
+
+
+# ---- guard-dev-null.py: /dev/null as an argument prompts Helen (#1463) ----
+
+@pytest.mark.parametrize("command", [
+    "curl -s -o /dev/null https://example.com/",
+    "curl -s -o/dev/null https://example.com/",
+    "curl -s --output=/dev/null https://example.com/",
+    "diff tmp/a.txt /dev/null",
+    "cat /dev/null",
+    "cp /dev/null tmp/empty.txt",
+    "/dev/null",
+    # Quoting does not make it a pattern to the checker; search `dev/null`.
+    "grep -rn '/dev/null' scripts/",
+])
+def test_dev_null_guard_refuses_it_as_an_argument(tmp_path, command):
+    assert _decision("guard-dev-null.py", command, tmp_path), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    "python3 scripts/verify.py > /dev/null",
+    "python3 scripts/verify.py >/dev/null 2>&1",
+    "python3 scripts/verify.py 2>/dev/null",
+    "python3 scripts/verify.py 2> /dev/null",
+    "python3 scripts/verify.py &>/dev/null",
+    "python3 scripts/verify.py >> /dev/null",
+    "python3 tmp/x.py < /dev/null",
+    # a pattern without the leading slash, and a path that only contains it
+    "grep -rn 'dev/null' scripts/",
+    "ls tmp/dev/nullish",
+    # unparseable: left to guard-unanalyzable-bash.py
+    "echo 'unbalanced /dev/null",
+])
+def test_dev_null_guard_leaves_redirections_and_mentions_alone(tmp_path, command):
+    assert _decision("guard-dev-null.py", command, tmp_path) is None, f"refused {command!r}"
+
+
 # ---- Wiring ----
 # A hook that exists but is not wired guards nothing, and the suite would not
 # notice: every test above runs the file directly.
@@ -436,3 +515,18 @@ def test_both_git_guards_are_wired_as_bash_pretooluse_hooks(name):
         "test_a_leading_cd_into_a_nested_repo_is_refused_by_the_other_guard "
         "records what the gate lets past."
     )
+
+
+@pytest.mark.parametrize("name", [
+    "guard-git-output.py",
+    "guard-dev-null.py",
+])
+def test_the_argument_guards_are_wired_ungated(name):
+    """Ungated: `git` can follow `env` or a path, and `/dev/null` can follow
+    any command, so an `if` prefix match would be a hole."""
+    wired = [
+        hook for hook in _pre_tool_use_hooks()
+        if hook["command"].endswith(f'/.claude/hooks/{name}"')
+    ]
+    assert len(wired) == 1, f"{name} is wired {len(wired)} times"
+    assert "if" not in wired[0], f"{name} is gated on {wired[0]['if']!r}"

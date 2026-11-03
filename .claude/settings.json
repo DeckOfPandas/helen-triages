@@ -128,6 +128,18 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-unanalyzable-bash.py\"",
             "timeout": 20,
             "statusMessage": "Checking the command can be analysed"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-git-output.py\"",
+            "timeout": 20,
+            "statusMessage": "Checking git diff options"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-dev-null.py\"",
+            "timeout": 20,
+            "statusMessage": "Checking for /dev/null as an argument"
           }
         ]
       }

@@ -36,6 +36,10 @@ Refused:
      runs the rest as a second command, which the checker sees as a fragment
      and asks Helen about. It arrives in an unquoted URL query string.
      `&&` is shape 5; `2>&1`, `>&2` and `&>file` are redirections.
+ 13. An unquoted word starting `=` and something after it: zsh expands
+     `=cmd` to that command's path, so the checker cannot know the argument.
+     It arrives as `curl --proto =https`. `--flag=value` and a quoted `'=x'`
+     pass.
 
 Allowed on purpose, because a guard that fires on harmless commands gets
 routed around:
@@ -88,6 +92,9 @@ _GLOB = re.compile(r"\*")
 # Shape 12, applied BEFORE _REDIRECT, which leaves `&> file` as a bare `&`.
 # Neither half of `&&`, nor the `&` of `2>&1`, `<&0` or `&>file`.
 _LONE_AMPERSAND = re.compile(r"(?<![&<>])&(?![&>])")
+
+# Shape 13: a word that starts `=`, applied to quote-stripped text.
+_EQUALS_WORD = re.compile(r"(?:^|\s)=\S")
 
 # The only command shape 7 applies to: a committed wrapper run as `sh scripts/`.
 _SCRIPT_CALL = re.compile(r"^\s*sh\s+scripts/")
@@ -240,6 +247,11 @@ def _offence(command: str) -> tuple[str, str] | None:
                 "'repos/o/r/issues?state=open&per_page=100' --each "
                 "number,title`. To run something in the background, use the "
                 "Bash tool's run_in_background, never a trailing `&`")
+
+    if _EQUALS_WORD.search(scannable):
+        return ("an unquoted word starting with `=`, which zsh expands to a "
+                "command's path",
+                "single-quote the word: `curl --proto '=https'`")
 
     # Shape 9. An unquoted parenthesis is a subshell or, as in an unquoted
     # `git log --format=%(trailers)`, a parse error. A backslash-escaped paren

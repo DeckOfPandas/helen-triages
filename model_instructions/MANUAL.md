@@ -3771,16 +3771,26 @@ the hook wherever there is one.
 | `guard-inline-script.py` | a program given to `python -c`, or `ruby`, `node`, `perl` `-e`, at any length | a file argument; `git -c`, `sh -c`, `bash -c` |
 | `guard-sed.py`, `guard-awk.py` | a command word whose last path component is `sed`, `awk`, `gawk`, `mawk` or `nawk` | the word in quotes; a token that contains it (`guard-sed.py`) |
 | `guard-token-expansion.py` | a secret probed, printed, put in a URL or typed out | a secret consumed, not printed |
+| `guard-git-output.py` | `--output`, `--no-index`, `--ext-diff`, `--textconv` or an unambiguous prefix of one, after `git diff`, `log`, `show` and their plumbing kin | `--text`, `--output-indicator-*`; the option outside a diff command or in quotes as a pattern |
+| `guard-dev-null.py` | `/dev/null` as an argument, or glued to an option (`-o/dev/null`) | `/dev/null` after a redirection operator; `dev/null` without its leading slash, as a search pattern |
 | `session-ground-truth.py` | nothing: it reports | — |
 
-- **The two git guards** carry an `if: Bash(git *)` filter, so they see only a
-  command that begins with `git`. The rest run on every Bash call.
+- **The two branch guards** carry an `if: Bash(git *)` filter, so they see
+  only a command that begins with `git`. The rest run on every Bash call.
+- **`guard-git-output.py`** exists because `git diff *`, `git log *` and
+  `git show *` are allowed unasked: a prefix rule cannot exclude an option
+  that comes later. To save a diff, redirect it: `git diff > tmp/x.patch`.
+- **`guard-dev-null.py`** exists because `blockReadsOutsideWorkingDirectories`
+  makes an argument of `/dev/null` prompt whatever the allow list says
+  (`Read(//dev/null)` covers the Read tool only), while a redirection is never
+  checked.
 - **`guard-unanalyzable-bash.py`** blanks quoted spans, then looks for
   operators. `&&`, `||`, `;`, `|`, `*` and parentheses are inert in either
   kind of quote; `$(`, a backtick and `$[` are inert only in single quotes,
   because the shell expands them in double ones. Redirections are removed
   first, so `2>&1` is not chaining. The quoted `[`, `]`, `|` shape applies
-  only to a command beginning `sh scripts/`.
+  only to a command beginning `sh scripts/`. An unquoted word starting `=`
+  (`curl --proto =https`) is refused because zsh expands `=cmd` to a path.
 - **`guard-token-expansion.py`** counts as a secret any variable named
   `TOKEN`, `SECRET`, `PASSWORD` or `PASSWD`, alone or after a `_`. It refuses
   a default expansion of one (`${TOK:-x}`); any mention in an `echo` or
@@ -3865,19 +3875,28 @@ pushed commit. Answer by hash against what this session sent, or with a
 `gh-read.sh` call on the branch or its pull request.
 `scripts/git-fetch-agent.sh` does update the ref, and detaches HEAD.
 
-**`scripts/gh-write.sh`** makes the three routine REST writes:
+**`scripts/gh-write.sh`** makes the four routine REST writes:
 
     sh scripts/gh-write.sh pr-create helen-triages data/some-branch "(data) the title" tmp/pr-body.md
     sh scripts/gh-write.sh pr-body   helen-triages 1081 tmp/pr-body.md
     sh scripts/gh-write.sh comment   helen-triages 1064 tmp/comment.md
+    sh scripts/gh-write.sh issue-label helen-triages 1463 "devops and docs"
 
 The body is a plain file under `tmp/`; the repo is one of the three, named
-bare; the base is always `main`; `comment` takes an issue or a PR number. It
+bare; the base is always `main`; `comment` and `issue-label` take an issue or
+a PR number. `issue-label` adds one label the repo already has, checked by a
+GET first because GitHub would otherwise create it, and removes none. It
 prints the new PR's number, URL and author. It cannot merge, approve, close or
 change a title, which is why it can be allow-listed where
 `sh scripts/gh-agent.sh api -X ...` never can. A PR's title is Helen's to
 change: `gh pr edit` goes through GraphQL, which wants `read:org`, and that is
 not a scope to ask for.
+
+**`scripts/git-diff-main-checkout.sh [--stat] [<path> ...]`** shows the
+uncommitted edits in the main checkout (`/workspace`, where Helen edits) from
+inside a worktree, read-only; `--patch tmp/<name>.patch` writes them to a file
+for `git apply`. It finds the main checkout through git's common directory,
+so no path outside the worktree is typed. Untracked files do not appear.
 
 **`scripts/github-public-status.sh <url>`** prints the logged-out HTTP status
 of a page under `DeckOfPandas` or an agent account: 200 is visible; 404 on
