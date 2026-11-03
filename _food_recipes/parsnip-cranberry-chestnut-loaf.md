@@ -1,7 +1,7 @@
 ---
 title: "Parsnip, Cranberry and Chestnut Loaf"
 tagline: "I promise this is delicious."
-source: "Adapted from BBC Good Food, recipe Sarah Cook"
+source: "Adapted from Good Food, recipe Sarah Cook"
 source_type: website
 serves: "4–6"
 prep_time: "30 mins"
