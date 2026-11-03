@@ -54,13 +54,14 @@ def main(out: Path) -> None:
         if m := SECTION.match(line):
             section = m.group(1)
         elif m := FOOD.match(line):
-            section_of[m.group(1)] = section
+            # A quoted name ("a, b") is read back the way YAML reads it.
+            section_of[str(next(iter(yaml.safe_load(m.group(1) + ": 0"))))] = section
     lines = [f"Prices from `_data/food/price_research.yml`, checked "
              f"{yaml.safe_load(text)['checked']}.\n"]
     current = None
     for food, entry in foods.items():
-        if section_of.get(food) != current:
-            current = section_of.get(food)
+        if section_of.get(food, "other") != current:
+            current = section_of.get(food, "other")
             lines += ["", f"### {current.capitalize()}", "",
                       "| food | prices found | median | confidence |", "|---|---|---|---|"]
         for unit, prices in entry.items():

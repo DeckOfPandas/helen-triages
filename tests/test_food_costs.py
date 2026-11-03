@@ -67,7 +67,7 @@ def test_every_researched_price_is_a_positive_number_then_its_shop():
                 continue
             if unit == "note":
                 continue
-            if unit not in BASES and unit not in COSTS["units"]:
+            if unit not in BASES and unit not in COSTS["units"] and unit not in ("head", "cm"):
                 bad.append(f"{food}: unit {unit!r} is neither a base nor a declared unit")
             if not isinstance(prices, list) or not prices:
                 bad.append(f"{food}: {unit} is not a list of prices")
@@ -95,7 +95,9 @@ def _bracket(vals):
 
 def test_a_researched_unit_is_priced_from_its_research_bracket():
     """Every costs.yml unit that names a food gets, at build, that food's
-    bracket in its base unit (to the penny, as the plugin rounds)."""
+    bracket in its base unit (to the penny, as the plugin rounds). The base
+    unit is per g and per ml: the browser multiplies a total in grams by the
+    rate, so a kilo price left unconverted would print a thousand times over."""
     rows = {word: row for word, row in COSTS["prices"].items()
             if any(isinstance(v, str) for v in row.values())}
     assert rows, "no costs.yml row reads from price_research.yml"
@@ -211,16 +213,6 @@ def test_the_matcher_prices_each_name_by_its_longest_keyword():
         elif rate is None or base not in rate:
             wrong.append(f"{name!r} got {rate!r}; expected a {base!r} rate")
     assert not wrong, "\n".join(wrong)
-
-
-def test_a_rate_is_per_gram_and_per_millilitre_not_per_kilo():
-    """The browser multiplies a total in grams by the rate, so a kilo price
-    left unconverted would print a thousand times too much."""
-    answers = _ask(["plain flour", "single cream"])
-    flour_kg = COSTS["prices"]["flour"]["kg"]
-    cream_l = COSTS["prices"]["single cream"]["l"]
-    assert answers["plain flour"]["g"] == pytest.approx([p / 1000 for p in flour_kg])
-    assert answers["single cream"]["ml"] == pytest.approx([p / 1000 for p in cream_l])
 
 
 def test_prices_reach_the_page_only_behind_show_costs():

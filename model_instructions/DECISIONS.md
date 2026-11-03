@@ -1229,6 +1229,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   probably should do."* `_data/food/price_research.yml` holds each price
   with its shop; a `costs.yml` unit names the food, and the build takes the
   bracket and confidence from the list, so re-pricing is editing one list.
+  Where to look first, for every food: *"Use Ocado and Farm Direct where
+  possible, then e.g. Tesco, Asda, etc as you did before."*
 - **2026-11-03, #1458 — both sites print a range as "mean (lowest–highest)",
   everywhere a price shows.** Helen: *"For each food or bottle, please give the
   mean price you found, with (x--y) afterwards for lowest and highest."* The
