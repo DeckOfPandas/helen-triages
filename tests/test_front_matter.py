@@ -763,6 +763,12 @@ ADJUDICATED_REWRITES = {
             "granted this entry, and one for each later flip of hers that an "
             "agent commits the same way, each quoting the commit."
         ),
+        "094ebbab": (
+            "1-rewrite/teriyaki-marinade.md, 2026-11-03. Helen's own rewrite "
+            "and flag, made while the agent was committing other files; its "
+            "stage-everything swept them into an unrelated commit. Covered "
+            "by her standing grant under 026f3224."
+        ),
     },
 }
 
