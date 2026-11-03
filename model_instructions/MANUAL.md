@@ -1493,6 +1493,12 @@ no price. DECISIONS §8.2.
   giving any of `kg`, `l`, `each`, `pack` or a named unit (`head`, `cm`) as
   a `[low, high]` GBP range. `free:` names cost nothing. `units:` says what
   every folded unit is in grams, millilitres, pieces or packs, or `free`.
+- **Where a range comes from**: a row with `confidence` was researched
+  against shop prices on the `checked` date. Its `[low, high]` is the middle
+  50% (inclusive quartiles) of 6 or more prices, the whole range of 3–5, or
+  both prices of 2; `confidence` is `high` for 4+ prices whose dearest is
+  within twice the cheapest, `medium` for 2+, `low` for one or a thin source.
+  A row without `confidence` is an estimate.
 - **Matching**: `_plugins/food_costs.rb`, after `food_shopping.rb`, adds a
   `rate` to each shopping row in GBP per g, ml, piece or pack. A fruit row is
   priced by its fruit; a cross-recipe link (`link: true`) never is. The build

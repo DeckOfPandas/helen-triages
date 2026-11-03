@@ -1217,6 +1217,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   recipe page says how many are missing: "From £X a portion in ingredients,
   not counting 2 unpriced items." — Helen: *"number 1, but with "not counting
   X unpriced items""*.
+- **2026-11-03, #1458 — a researched food price's range is the median's
+  bracket: the middle 50% of 6+ shop prices, the range of 3–5, the mean's two
+  ends of 2.** Helen: *"2 points mean, 3-5 points median with range in
+  brackets, 6+ points median with IQR in brackets"*, then *"Please update
+  cost.yml now, using the bracketed figure we're now using in this table."*
+  No reason given. `costs.yml`'s `confidence` marks the researched rows;
+  Farm Direct, her favourite shop, is one of the sources.
 - **2026-11-03, #1458 — both sites print a range as "mean (lowest–highest)",
   everywhere a price shows.** Helen: *"For each food or bottle, please give the
   mean price you found, with (x--y) afterwards for lowest and highest."* The
