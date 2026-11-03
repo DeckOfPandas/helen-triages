@@ -302,9 +302,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   also delete any original lines that have been totally superseded by yours,
   leaving me less to pick through in the kitchen."* The folders are how she
   tracks HER work; the folder is `1-rewrite/` today.
-- **2026-09-03 — a recipe's filename is the whole title slugged, not the head
-  clause.** Helen: *"Slug the whole title"*, so two "with" dishes sharing a
-  head clause do not collide. Existing files keep their names.
+- **2026-11-03 — a food filename is the whole title slugged, not the head
+  clause, without "and" and "with".** Helen, 2026-09-03: *"Slug the whole
+  title"*, so two "with" dishes sharing a head clause do not collide; and
+  2026-11-03: *"yes please add a rule to drop filler words from slugs. Please
+  rename all current drafts."* Other small words stay, being part of a dish's
+  name (toad-in-the-hole, à la meunière); a drink's slug keeps "and" too.
+  `test_a_draft_slug_drops_and_and_with`; `envelope.slug_for`.
 - **2026-10-18 — every note an ingest adds is `{label, text}` with both
   fields set and both beginning `QQ`; the label may carry a topic, `QQ
   nutrition`.** Helen, 2026-09-04: *"It's annoying for me to remember how to

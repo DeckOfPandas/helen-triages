@@ -383,7 +383,10 @@ else has already done (MANUAL §9.1).
   undated one is a `website`, and that distinction catches everyone out. For
   cocktails `source` is free text and empty is fine.
 - **Name the file from the whole title**, lowercased and hyphenated, so slug
-  and title cannot diverge. Existing files are not renamed.
+  and title cannot diverge. **A food filename drops "and" and "with"**; other
+  small words stay, being part of a dish's name (`toad-in-the-hole`), and a
+  drink's slug keeps "and" (DECISIONS §4). `scripts/envelope.py`'s `slug_for`
+  and `test_a_draft_slug_drops_and_and_with` hold it.
 
 ### Food only
 

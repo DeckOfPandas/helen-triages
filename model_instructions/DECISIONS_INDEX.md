@@ -50,7 +50,7 @@ argument and the rules each field is read by.
 - 2026-08-29 · §4 · the ingest contract is one question: is the answer in the source document, or in Helen's head?
 - 2026-08-29 · §4 · ingredient and method groups are split at ingest, once, and not again afterwards.
 - 2026-09-01 · §4 · Helen keeps the rewrite staging folder, and no agent deletes a QQ original line or moves a file between staging folders unasked.
-- 2026-09-03 · §4 · a recipe's filename is the whole title slugged, not the head clause.
+- 2026-11-03 · §4 · a food filename is the whole title slugged, not the head clause, without "and" and "with".
 - 2026-10-18 · §4 · every note an ingest adds is {label, text} with both fields set and both beginning QQ; the label may carry a topic, QQ nutrition.
 - 2026-10-18 · §4 · a time the source does not print is written Estimated N mins, and promotion refuses it.
 - 2026-10-18 · §4 · an ingest ignores a nutrition box and its badges.

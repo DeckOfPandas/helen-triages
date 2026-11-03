@@ -541,6 +541,19 @@ def test_note_dicts_have_label_and_text_when_dict(draft):
             )
 
 
+def test_a_draft_slug_drops_and_and_with(draft):
+    """A food draft's filename is its title slugged without "and" and "with"
+    (DECISIONS §4). `scripts/envelope.py`'s `FOOD_SLUG_FILLER` is the same pair.
+    Other small words stay: they are part of a dish's name (toad-in-the-hole).
+    """
+    filler = set(draft.slug.split("-")) & {"and", "with"}
+    assert not filler, (
+        f"{where_draft(draft)} has {sorted(filler)} in its filename. Rename it "
+        f"to {'-'.join(w for w in draft.slug.split('-') if w not in filler)!r}, "
+        f"and update any link to it."
+    )
+
+
 def test_a_draft_has_a_notes_slot_and_no_unlabelled_note(draft):
     """Every draft has a notes slot, and a note with text has a label (#1258).
 

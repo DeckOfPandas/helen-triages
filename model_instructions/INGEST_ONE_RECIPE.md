@@ -130,9 +130,10 @@ notes:
 ```
 
 **The filename** is the whole title, any "with …" clause included, lowercased,
-hyphenated, ASCII only, `.md`.
+hyphenated, ASCII only, `.md`, **without the words "and" and "with"**. Other
+small words stay, because they are part of a dish's name ("toad in the hole").
 "Charred Asparagus and Fennel Salad with Crispy Prosciutto" →
-`charred-asparagus-and-fennel-salad-with-crispy-prosciutto.md`. Accents and
+`charred-asparagus-fennel-salad-crispy-prosciutto.md`. Accents and
 apostrophes are stripped in a filename even though they are kept in the
 title. Her repo derives the same slug from your `title:` regardless, so the
 name you give is a courtesy rather than a contract.
