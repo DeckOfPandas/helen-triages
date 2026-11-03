@@ -1,24 +1,15 @@
-# What a food recipe costs, approximately (#1458, DECISIONS §8.2). Shown on
-# local builds only, behind `site.show_costs`; the prices are public either way.
+# What a food recipe costs, approximately (#1458). Local builds only, behind
+# `site.show_costs`; the prices are public either way. MANUAL §8.2.
 #
-# _plugins/food_costs.rb matches each shopping-list ingredient against
-# `prices:` and `free:` by keyword, exactly as aisles.yml is matched: the
-# longest whole-word keyword in the folded name wins, so `butter beans` beats
-# `butter`. The browser is handed each ingredient's rates and the `units:`
-# table, and only multiplies.
+# Matched as aisles.yml is: the longest whole-word keyword in the folded name
+# wins, so `butter beans` beats `butter`. A row gives any of `kg`, `l`,
+# `each`, `pack` or a named unit (`head`, `cm`), each `[low, high]` in GBP:
+# low a budget own-label shelf price, high a premium or branded one. A spoon
+# of a thing priced by weight is costed at 1 ml to 1 g.
 #
-# A price row gives any of these, each `[low, high]` in GBP:
-#   kg     per kilogram          l      per litre
-#   each   per piece             pack   per supermarket pack or bunch
-#   <unit> per that unit, for one no family covers (`head` of garlic, `cm`
-#          of ginger)
-# Low is a budget own-label shelf price, high a premium or branded one.
-# A spoon of a thing priced by weight is costed as if 1 ml weighed 1 g, and
-# the other way round: rough, and too small to matter.
-#
-# `confidence` as in _data/cocktails/costs.yml: `medium` is a row compared
-# with live supermarket listings on the `checked` date; a row without one is
-# `low`, an estimate, and the first to overwrite. Shelf prices, never offers.
+# `confidence: medium` is a row compared with live supermarket listings on
+# the `checked` date; a row without one is an estimate, the first to
+# overwrite. Shelf prices, never offers.
 
 # The day the prices were last compared with shops. A test fails once it is
 # two years old; the fix is re-reading the prices, never moving the date alone.
