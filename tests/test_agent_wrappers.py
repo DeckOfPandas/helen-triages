@@ -1199,6 +1199,10 @@ REVIEWED_OPEN_RULES = {
     "Bash(sh scripts/browser/styles.sh *)",
     "Bash(sh scripts/browser/gaps.sh *)",
     "Bash(sh scripts/browser/click-crop.sh *)",
+    # A plain `git diff` of the main checkout, its paths checked as plain
+    # relative ones and its one write held to a non-symlink under tmp/; no
+    # option reaches git. The refusals are tested above.
+    "Bash(sh scripts/git-diff-main-checkout.sh *)",
 }
 
 
