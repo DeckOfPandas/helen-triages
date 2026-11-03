@@ -340,6 +340,24 @@
     return sum;
   }
 
+  /** One portion or one batch of a recipe as written (#1458): its own lines
+   * at x1, costed and divided by `per` (its portions, or 1 for a batch). The
+   * shortlist's line and the recipe page's cost line both call this, so the
+   * two cannot disagree. null where nothing could be priced.
+   * @param {Array} entries - the recipe's lines, as for build(), each with `rate`
+   * @param {number} per - how many the recipe as written is divided into
+   * @param {Object} options - as for build(); `costUnits` is required */
+  function recipeCost(entries, per, options) {
+    if (!options || !options.costUnits || !(per > 0)) return null;
+    var rows = [];
+    build(entries, options).forEach(function (aisle) { rows = rows.concat(aisle.items); });
+    var sum = costTotal(rows);
+    if (!sum) return null;
+    var each = { min: sum.min / per, max: sum.max / per, partial: sum.partial };
+    each.text = moneyText(each);
+    return each;
+  }
+
   /** Total up a shortlist of recipes, grouped by aisle.
    * @param {Array} entries - { amount, name, aisle, scale, recipe? } per ingredient, plus the marks `reunite` reads
    * @param {Object} [options]
@@ -555,6 +573,7 @@
     build: build,
     costTotal: costTotal,
     moneyText: moneyText,
+    recipeCost: recipeCost,
     totalText: totalText,
     amountNumber: amountNumber,
     CANONICAL: CANONICAL,

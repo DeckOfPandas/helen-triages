@@ -1214,6 +1214,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   withholding and over an unmarked sum, given that a keyword table cannot
   price every one of the collection's ingredient names. Seasoning, a pinch
   and an unquantified line cost nothing and do not count as unpriced.
+- **2026-11-03, #1458 — each recipe page carries a cost line, local only, in
+  the drink page's layout.** Helen: *"Please also add a cost line to each
+  recipe page. Use the layout from the cocktails site -- the two horizontal
+  rules with the line in between, above IF YOU LIKED THIS. Use food site
+  styling, but the same layout code."* and *"Costs should only show on the
+  local build."* `.recipe-footer` is `.cocktail-footer` rule for rule.
 - **2026-09-07 — a scaled amount is never rounded coarser than 1 g.** Helen:
   *"For now, don't tidy/round beyond 1 g precision"*, then, unprompted: *"I
   mean don't roudn to 10 g or 5 g, round to 1g"*. Two thirds of 200 g prints

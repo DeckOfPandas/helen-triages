@@ -1366,15 +1366,9 @@ function renderResultsPool() {
   function recipeCostSuffix(url) {
     if (!COST_UNITS) return '';
     var per = isBatch(url) ? 1 : (hasPortions(url) ? RECIPES[url].p : 0);
-    if (!per) return '';
-    var rows = [];
-    HTF.foodShoppingList.build(entriesFor(url, 1), buildOptions())
-      .forEach(function (aisle) { rows = rows.concat(aisle.items); });
-    var sum = HTF.foodShoppingList.costTotal(rows);
-    if (!sum) return '';
-    var each = { min: sum.min / per, max: sum.max / per, partial: sum.partial };
-    return ' @ ' + HTF.foodShoppingList.moneyText(each) +
-      (isBatch(url) ? ' a batch' : ' a portion');
+    var each = HTF.foodShoppingList.recipeCost(entriesFor(url, 1), per, buildOptions());
+    if (!each) return '';
+    return ' @ ' + each.text + (isBatch(url) ? ' a batch' : ' a portion');
   }
 
   /* The sentence and its price in one inline box, so the price wraps with the

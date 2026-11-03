@@ -154,6 +154,19 @@ def test_prices_reach_the_page_only_behind_show_costs():
     page = (ROOT / "food" / "index.html").read_text(encoding="utf-8")
     assert '{% if site.show_costs and ing.rate %},"r":' in page, (
         "food/index.html emits a rate without the show_costs gate")
-    units_at = page.index('id="food-cost-units"')
-    assert page.rfind("{% if site.show_costs %}", 0, units_at) > page.rfind("{% endif %}", 0, units_at), (
-        "#food-cost-units is emitted outside a show_costs block")
+    _assert_gated(page, 'id="food-cost-units"', "food/index.html")
+
+    # The recipe page's cost line: the footer, its data and its script.
+    layout = (ROOT / "_layouts" / "recipe.html").read_text(encoding="utf-8")
+    for marker in ('class="recipe-footer"', 'id="recipe-cost-data"', "/assets/js/recipe-cost.js"):
+        _assert_gated(layout, marker, "_layouts/recipe.html")
+
+
+def _assert_gated(text: str, marker: str, where: str) -> None:
+    """`marker` sits inside an open `{% if site.show_costs ... %}` block."""
+    at = text.index(marker)
+    opened = max(text.rfind("{% if site.show_costs %}", 0, at),
+                 text.rfind("{% if site.show_costs and", 0, at))
+    assert opened > text.rfind("{% endif %}", 0, at), (
+        f"{where}: {marker} is emitted outside a show_costs block, so a "
+        "production build would carry it")

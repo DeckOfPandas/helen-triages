@@ -1509,6 +1509,14 @@ no price. DECISIONS §8.2.
   have no price"), and after each recipe's sentence one portion of a
   `serves:` recipe or one batch of a `makes:` one (`.shopping-list-cost`),
   priced from the recipe as written and fixed whatever the box says.
+- **The recipe page** says the same figure in the drink page's footer
+  layout, between two rules above IF YOU LIKED THIS: "Roughly £X–£Y a
+  portion in ingredients." (`.recipe-footer`, `.recipe-cost`). The footer,
+  `#recipe-cost-data` and `assets/js/recipe-cost.js` are all behind
+  `site.show_costs`; the script calls `recipeCost`, the function the
+  shortlist calls, and leaves the footer hidden, rules and all, where
+  nothing could be priced. The second rule exists only under a shown footer,
+  so a production page keeps its layout.
 - **The usual fix for a "from"** is a keyword in `costs.yml`. Mind the
   longest-keyword rule: `chicken stock` needs its own row or it is priced as
   chicken.

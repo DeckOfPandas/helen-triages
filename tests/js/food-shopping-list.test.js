@@ -685,6 +685,28 @@ test('#1458: the total sums what is priced and counts what is not', () => {
   assert.strictEqual(whole.unpriced, 0);
 });
 
+test('#1458: a recipe costs per portion, or per batch with per = 1, and keeps "from"', () => {
+  const lines = [
+    { amount: '500 g', name: 'flour', aisle: 'cupboard', rate: FLOUR },
+    { amount: '2 tbsp', name: 'oil', aisle: 'cupboard', rate: OIL }
+  ];
+  const o = { aisles: AISLES, costUnits: UNITS };
+  assert.strictEqual(F.recipeCost(lines, 4, o).text, '£0.16–£0.33');
+  assert.strictEqual(F.recipeCost(lines, 1, o).text, '£0.65–£1.30');
+  const partial = F.recipeCost(lines.concat(
+    [{ amount: '200 g', name: 'kohlrabi', aisle: 'produce' }]), 1, o);
+  assert.strictEqual(partial.text, 'from £0.65');
+  assert.strictEqual(partial.partial, true);
+});
+
+test('#1458: no portion count, or no unit table, is no recipe figure at all', () => {
+  const lines = [{ amount: '500 g', name: 'flour', aisle: 'cupboard', rate: FLOUR }];
+  assert.strictEqual(F.recipeCost(lines, 0, { costUnits: UNITS }), null);
+  assert.strictEqual(F.recipeCost(lines, 4, { aisles: AISLES }), null);
+  assert.strictEqual(F.recipeCost([{ amount: '1', name: 'x', aisle: 'other' }], 4,
+    { costUnits: UNITS }), null);
+});
+
 test('#1458: without the unit table, which only a local build carries, nothing is costed', () => {
   const row = F.build([{ amount: '500 g', name: 'flour', aisle: 'cupboard', rate: FLOUR }],
     { aisles: AISLES })[0].items[0];
