@@ -1,6 +1,7 @@
 """What a food recipe costs: the data and the matcher (#1458, DECISIONS §8.2).
 
-`_data/food/costs.yml` holds keyword price ranges and the unit table;
+`_data/food/costs.yml` holds keyword price ranges and the unit table, a
+researched unit naming its food's shop prices in `price_research.yml`;
 `_plugins/food_costs.rb` matches each shopping-list ingredient to a rate at
 build, and assets/js/food-shopping-list.js multiplies
 (tests/js/food-shopping-list.test.js). The matcher is asked through
@@ -22,6 +23,9 @@ pytestmark = pytest.mark.food
 
 ROOT = Path(__file__).resolve().parent.parent
 COSTS = yaml.safe_load((ROOT / "_data" / "food" / "costs.yml").read_text(encoding="utf-8"))
+RESEARCH_FILE = yaml.safe_load(
+    (ROOT / "_data" / "food" / "price_research.yml").read_text(encoding="utf-8"))
+RESEARCH = RESEARCH_FILE["foods"]
 FAMILIES = {"g", "ml", "each", "pack", "free"}
 BASES = {"kg", "l", "each", "pack"}
 
@@ -42,6 +46,74 @@ def test_the_prices_were_checked_within_two_years():
     )
 
 
+def test_the_research_was_checked_within_two_years():
+    checked = datetime.date.fromisoformat(str(RESEARCH_FILE.get("checked")))
+    age = (datetime.date.today() - checked).days
+    assert age <= 730, (
+        f"_data/food/price_research.yml was checked on {checked}, {age} days "
+        "ago. Re-read the prices against shops and move `checked:` forward.")
+
+
+def test_every_researched_price_is_a_positive_number_then_its_shop():
+    bad = []
+    for food, entry in RESEARCH.items():
+        if not isinstance(entry, dict):
+            bad.append(f"{food}: {entry!r} is not a mapping of unit to prices")
+            continue
+        for unit, prices in entry.items():
+            if unit == "thin":
+                if prices is not True:
+                    bad.append(f"{food}: thin {prices!r} must be true or absent")
+                continue
+            if unit == "note":
+                continue
+            if unit not in BASES and unit not in COSTS["units"]:
+                bad.append(f"{food}: unit {unit!r} is neither a base nor a declared unit")
+            if not isinstance(prices, list) or not prices:
+                bad.append(f"{food}: {unit} is not a list of prices")
+                continue
+            for item in prices:
+                number, _, shop = str(item).partition(" ")
+                try:
+                    ok = float(number) > 0 and shop.strip()
+                except ValueError:
+                    ok = False
+                if not ok:
+                    bad.append(f"{food}: {unit} {item!r} is not '<price> <shop>'")
+    assert not bad, "_data/food/price_research.yml:\n  " + "\n  ".join(bad)
+
+
+def _bracket(vals):
+    """The rule in MANUAL §8.2, from Python's own quartiles, so the plugin's
+    arithmetic is checked against an independent one."""
+    import statistics
+    if len(vals) >= 6:
+        q1, _, q3 = statistics.quantiles(vals, n=4, method="inclusive")
+        return [q1, q3]
+    return [min(vals), max(vals)]
+
+
+def test_a_researched_unit_is_priced_from_its_research_bracket():
+    """Every costs.yml unit that names a food gets, at build, that food's
+    bracket in its base unit (to the penny, as the plugin rounds)."""
+    rows = {word: row for word, row in COSTS["prices"].items()
+            if any(isinstance(v, str) for v in row.values())}
+    assert rows, "no costs.yml row reads from price_research.yml"
+    answers = _ask(list(rows))
+    wrong = []
+    for word, row in rows.items():
+        for unit, food in row.items():
+            if not isinstance(food, str) or unit == "confidence":
+                continue
+            vals = [float(str(p).split(" ", 1)[0]) for p in RESEARCH[food][unit]]
+            base, per = {"kg": ("g", 1000), "l": ("ml", 1000)}.get(unit, (unit, 1))
+            want = [v / per for v in _bracket(vals)]
+            got = (answers.get(word) or {}).get(base)
+            if got is None or any(abs(g - w) > 0.006 / per for g, w in zip(got, want)):
+                wrong.append(f"{word} {unit} ({food}): got {got}, want {want}")
+    assert not wrong, "\n".join(wrong)
+
+
 def test_every_price_is_a_low_and_high_range_in_a_known_unit():
     bad = []
     for word, row in (COSTS.get("prices") or {}).items():
@@ -55,6 +127,11 @@ def test_every_price_is_a_low_and_high_range_in_a_known_unit():
                 continue
             if unit not in BASES and unit not in COSTS["units"] and unit not in ("head", "cm"):
                 bad.append(f"{word}: unit {unit!r} is neither a base nor a declared unit")
+            if isinstance(value, str):
+                if not (RESEARCH.get(value) or {}).get(unit):
+                    bad.append(f"{word}: {unit} names {value!r}, which "
+                               f"price_research.yml has no {unit} prices for")
+                continue
             if (not isinstance(value, list) or len(value) != 2
                     or not all(isinstance(v, (int, float)) for v in value)
                     or not 0 <= value[0] <= value[1]):
@@ -139,11 +216,11 @@ def test_the_matcher_prices_each_name_by_its_longest_keyword():
 def test_a_rate_is_per_gram_and_per_millilitre_not_per_kilo():
     """The browser multiplies a total in grams by the rate, so a kilo price
     left unconverted would print a thousand times too much."""
-    answers = _ask(["plain flour", "double cream"])
+    answers = _ask(["plain flour", "single cream"])
     flour_kg = COSTS["prices"]["flour"]["kg"]
-    cream_l = COSTS["prices"]["double cream"]["l"]
+    cream_l = COSTS["prices"]["single cream"]["l"]
     assert answers["plain flour"]["g"] == pytest.approx([p / 1000 for p in flour_kg])
-    assert answers["double cream"]["ml"] == pytest.approx([p / 1000 for p in cream_l])
+    assert answers["single cream"]["ml"] == pytest.approx([p / 1000 for p in cream_l])
 
 
 def test_prices_reach_the_page_only_behind_show_costs():

@@ -1,5 +1,6 @@
 # What each food shopping-list ingredient costs, as rates (#1458, DECISIONS
-# §8.2). Data: _data/food/costs.yml. Runs after _plugins/food_shopping.rb and
+# §8.2). Data: _data/food/costs.yml, whose researched units name a food in
+# _data/food/price_research.yml. Runs after _plugins/food_shopping.rb and
 # adds a `rate` to each row of `doc.data["shopping"]`; food/index.html emits
 # the rates only behind `site.show_costs`.
 #
@@ -21,12 +22,14 @@ module HelenTriages
     end
 
     # [[pattern, rate]], longest keyword first. `rate` is {"free" => true}, or
-    # a hash of base unit => [low, high] per one of it.
-    def table(data)
+    # a hash of base unit => [low, high] per one of it. `research` is
+    # price_research.yml, which a unit written as a food's name reads from.
+    def table(data, research = nil)
+      foods = (research || {})["foods"] || {}
       rows = []
       Array(data["free"]).each { |word| rows << [fold(word), { "free" => true }] }
       (data["prices"] || {}).each do |word, row|
-        rows << [fold(word), rate_from(row)]
+        rows << [fold(word), rate_from(row, foods, word)]
       end
       rows.sort_by! { |word, _| [-word.length, word] }
       rows.map do |word, rate|
@@ -34,14 +37,44 @@ module HelenTriages
       end
     end
 
-    def rate_from(row)
+    def rate_from(row, foods = {}, word = nil)
       rate = {}
       row.each do |unit, range|
         next if unit == "confidence"
+        range = researched(foods, range, unit, word)[0..1] if range.is_a?(String)
         base, per = BASE[unit] || [unit, 1.0]
         rate[base] = range.map { |price| (price.to_f / per).round(8) }
       end
       rate
+    end
+
+    # [low, high, confidence] for one food's prices in one unit (MANUAL §8.2):
+    # the middle 50% of 6+, the range of 3-5, both of 2, the one price twice.
+    # Rounded to the penny before a base-unit rate is taken from it.
+    def researched(foods, food, unit, word = nil)
+      entry = foods[food]
+      prices = entry.is_a?(Hash) ? entry[unit] : nil
+      unless prices.is_a?(Array) && !prices.empty?
+        raise ArgumentError, "costs.yml #{word}: #{unit} names #{food.inspect}, " \
+                             "which price_research.yml has no #{unit} prices for"
+      end
+      vals = prices.map { |p| Float(p.to_s.split(" ", 2).first) }.sort
+      lo, hi = vals.length >= 6 ? [quartile(vals, 1), quartile(vals, 3)] : [vals.first, vals.last]
+      [lo.round(2), hi.round(2), confidence(vals, entry["thin"])]
+    end
+
+    # Inclusive quartile, as Excel's QUARTILE.INC and Python's
+    # statistics.quantiles(method="inclusive"): linear between sorted values.
+    def quartile(sorted, q)
+      pos = (sorted.length - 1) * q / 4.0
+      low = pos.floor
+      return sorted[low] if low + 1 >= sorted.length
+      sorted[low] + (sorted[low + 1] - sorted[low]) * (pos - low)
+    end
+
+    def confidence(vals, thin)
+      return "low" if thin || vals.length < 2
+      vals.length >= 4 && vals.max <= 2 * vals.min ? "high" : "medium"
     end
 
     # The rate for one shopping row, or nil where nothing matches.
@@ -63,7 +96,7 @@ module HelenTriages
       data = site.data.dig("food", "costs")
       return unless data
 
-      patterns = FoodCosts.table(data)
+      patterns = FoodCosts.table(data, site.data.dig("food", "price_research"))
       names = {}
       FoodShopping::COLLECTIONS.each do |key|
         next unless site.collections[key]

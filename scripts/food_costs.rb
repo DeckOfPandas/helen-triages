@@ -28,7 +28,8 @@ end
 require File.join(root, "_plugins", "food_costs.rb")
 
 data = YAML.safe_load(File.read(File.join(root, "_data", "food", "costs.yml"), encoding: "utf-8"))
-patterns = HelenTriages::FoodCosts.table(data)
+research = YAML.safe_load(File.read(File.join(root, "_data", "food", "price_research.yml"), encoding: "utf-8"))
+patterns = HelenTriages::FoodCosts.table(data, research)
 
 out = {}
 ARGV.each do |text|

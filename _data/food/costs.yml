@@ -6,10 +6,9 @@
 # `each`, `pack` or a named unit (`head`, `cm`), each `[low, high]` in GBP.
 # A spoon of a thing priced by weight is costed at 1 ml to 1 g.
 #
-# A row with `confidence` was researched against shop prices on the
-# `checked` date: [low, high] is the middle 50% of 6+ prices, the whole range
-# of 3-5, or both of 2 (MANUAL §8.2). A row without one is an estimate, the
-# first to overwrite. Shelf prices, never offers.
+# A unit written as a food's name, `kg: "goose"`, was researched: the range
+# comes at build from that food's shop prices in price_research.yml (MANUAL
+# §8.2). A `[low, high]` written here is an estimate, the first to overwrite.
 
 # The day the prices were last compared with shops. A test fails once it is
 # two years old; the fix is re-reading the prices, never moving the date alone.
@@ -155,7 +154,7 @@ prices:
   lettuce: { each: [0.50, 1.20] }
   lime: { each: [0.20, 0.50] }
   limes: { each: [0.20, 0.50] }
-  lime leaves: { each: [0.50, 0.55], confidence: low }
+  lime leaves: { each: "makrut lime leaves, fresh" }
   mango: { each: [0.80, 1.50] }
   mint: { pack: [0.60, 1.20], g: [0.020, 0.040], each: [0.02, 0.05] }
   mushrooms: { kg: [2.50, 6.00] }
@@ -206,163 +205,163 @@ prices:
   turnip: { each: [0.20, 0.50], kg: [1.00, 2.50] }
   turnips: { each: [0.20, 0.50], kg: [1.00, 2.50] }
   watercress: { kg: [8.00, 16.00] }
-  galangal: { kg: [16.50, 40.00], confidence: medium }
-  curry leaves: { kg: [62.50, 249.50], confidence: low }
+  galangal: { kg: "galangal, fresh" }
+  curry leaves: { kg: "curry leaves, fresh" }
 
   # --- meat --------------------------------------------------------------
-  bacon: { kg: [4.97, 5.22], each: [0.15, 0.21], confidence: high }
-  beef: { kg: [12.50, 14.45], confidence: high }
-  beef fillet: { kg: [45.45, 55.00], confidence: medium }
-  beef fillets: { kg: [45.45, 55.00], confidence: medium }
-  parma ham: { kg: [38.22, 75.00], each: [0.21, 0.63], confidence: medium }
-  prosciutto: { kg: [38.22, 75.00], each: [0.21, 0.63], confidence: medium }
-  fillet of beef: { kg: [45.45, 55.00], confidence: medium }
-  beef mince: { kg: [7.14, 11.42], confidence: medium }
-  short ribs: { kg: [15.69, 16.89], confidence: high }
-  steak: { kg: [26.93, 35.19], confidence: medium }
-  chicken: { kg: [2.85, 3.65], confidence: medium }
-  chicken breast: { kg: [6.77, 7.42], each: [1.15, 4.98], confidence: medium }
-  chicken breasts: { kg: [6.77, 7.42], each: [1.15, 4.98], confidence: medium }
-  chicken thighs: { kg: [2.96, 3.48], each: [0.50, 1.20], confidence: medium }
-  chicken legs: { kg: [2.25, 3.86], each: [0.90, 1.80], confidence: medium }
-  chorizo: { kg: [13.74, 17.57], confidence: medium }
-  duck: { kg: [5.29, 12.00], each: [9.00, 36.00], confidence: medium }
-  duck breast: { kg: [21.23, 26.00], each: [2.19, 5.25], confidence: medium }
-  duck breasts: { kg: [21.23, 26.00], each: [2.19, 5.25], confidence: medium }
-  duck legs: { kg: [10.00, 10.39], each: [2.25, 2.40], confidence: medium }
-  duck leg: { kg: [10.00, 10.39], each: [2.25, 2.40], confidence: medium }
-  gammon: { kg: [7.00, 15.11], confidence: medium }
-  goose: { kg: [15.00, 21.67], confidence: high }
-  ham: { kg: [10.55, 17.92], confidence: medium }
-  lamb: { kg: [13.49, 17.62], confidence: medium }
-  lamb mince: { kg: [12.20, 13.75], confidence: high }
-  mutton: { kg: [12.99, 16.61], confidence: medium }
-  oxtail: { kg: [9.00, 19.99], confidence: medium }
-  pancetta: { kg: [14.25, 24.62], confidence: high }
-  pork: { kg: [4.98, 5.81], confidence: medium }
-  pork belly: { kg: [7.32, 11.50], confidence: medium }
-  pork mince: { kg: [4.78, 5.12], confidence: medium }
-  sausages: { kg: [3.94, 5.61], each: [0.22, 0.29], confidence: high }
-  turkey: { kg: [3.00, 5.24], confidence: high }
-  venison: { kg: [13.03, 18.96], confidence: medium }
-  fillet steak: { kg: [50.00, 66.67], confidence: medium }
-  fillet steaks: { kg: [50.00, 66.67], confidence: medium }
-  sirloin: { kg: [26.93, 35.19], confidence: medium }
-  ribeye: { kg: [29.37, 38.99], confidence: medium }
-  rib-eye: { kg: [29.37, 38.99], confidence: medium }
-  stewing steak: { kg: [12.50, 14.45], confidence: high }
-  braising steak: { kg: [12.50, 14.45], confidence: high }
-  diced beef: { kg: [12.50, 14.45], confidence: high }
-  chuck steak: { kg: [12.50, 14.45], confidence: high }
-  steak mince: { kg: [14.00, 18.00], confidence: medium }
-  leg of lamb: { kg: [13.49, 17.62], confidence: medium }
-  lamb leg: { kg: [13.49, 17.62], confidence: medium }
-  lamb shoulder: { kg: [14.93, 18.98], confidence: high }
-  shoulder of lamb: { kg: [14.93, 18.98], confidence: high }
-  pork shoulder: { kg: [4.98, 5.81], confidence: medium }
-  pork loin: { kg: [5.59, 15.00], confidence: medium }
-  boneless chicken thighs: { kg: [7.14, 9.02], confidence: high }
-  chicken thigh fillets: { kg: [7.14, 9.02], confidence: high }
-  turkey breast: { kg: [15.00, 26.35], confidence: high }
-  turkey crown: { kg: [15.00, 26.35], confidence: high }
-  venison steak: { kg: [27.62, 39.26], confidence: high }
-  venison steaks: { kg: [27.62, 39.26], confidence: high }
-  venison haunch: { kg: [14.00, 28.06], confidence: medium }
-  haunch of venison: { kg: [14.00, 28.06], confidence: medium }
-  muntjac: { kg: [14.00, 28.06], confidence: medium }
+  bacon: { kg: "smoked back bacon, standard", each: "back bacon, standard" }
+  beef: { kg: "beef, diced / stewing / braising" }
+  beef fillet: { kg: "beef fillet (whole)" }
+  beef fillets: { kg: "beef fillet (whole)" }
+  parma ham: { kg: "parma ham / prosciutto", each: "parma ham / prosciutto" }
+  prosciutto: { kg: "parma ham / prosciutto", each: "parma ham / prosciutto" }
+  fillet of beef: { kg: "beef fillet (whole)" }
+  beef mince: { kg: "beef mince 10–12%" }
+  short ribs: { kg: "beef short ribs" }
+  steak: { kg: "sirloin steak" }
+  chicken: { kg: "whole chicken" }
+  chicken breast: { kg: "chicken breast", each: "chicken breast" }
+  chicken breasts: { kg: "chicken breast", each: "chicken breast" }
+  chicken thighs: { kg: "chicken thighs, bone-in", each: [0.50, 1.20] }
+  chicken legs: { kg: "chicken legs", each: [0.90, 1.80] }
+  chorizo: { kg: "cooking chorizo" }
+  duck: { kg: "whole duck", each: "whole duck" }
+  duck breast: { kg: "duck breast", each: "duck breast" }
+  duck breasts: { kg: "duck breast", each: "duck breast" }
+  duck legs: { kg: "duck legs", each: "duck legs" }
+  duck leg: { kg: "duck legs", each: "duck legs" }
+  gammon: { kg: "gammon joint" }
+  goose: { kg: "goose" }
+  ham: { kg: "sliced cooked ham" }
+  lamb: { kg: "leg of lamb" }
+  lamb mince: { kg: "lamb mince" }
+  mutton: { kg: "mutton" }
+  oxtail: { kg: "oxtail" }
+  pancetta: { kg: "pancetta cubes" }
+  pork: { kg: "pork shoulder" }
+  pork belly: { kg: "pork belly" }
+  pork mince: { kg: "pork mince" }
+  sausages: { kg: "sausages, standard", each: "sausages, standard" }
+  turkey: { kg: "whole turkey, standard" }
+  venison: { kg: "venison, diced" }
+  fillet steak: { kg: "beef fillet (steak)" }
+  fillet steaks: { kg: "beef fillet (steak)" }
+  sirloin: { kg: "sirloin steak" }
+  ribeye: { kg: "ribeye steak" }
+  rib-eye: { kg: "ribeye steak" }
+  stewing steak: { kg: "beef, diced / stewing / braising" }
+  braising steak: { kg: "beef, diced / stewing / braising" }
+  diced beef: { kg: "beef, diced / stewing / braising" }
+  chuck steak: { kg: "beef, diced / stewing / braising" }
+  steak mince: { kg: "beef mince, butcher (fat not stated)" }
+  leg of lamb: { kg: "leg of lamb" }
+  lamb leg: { kg: "leg of lamb" }
+  lamb shoulder: { kg: "lamb shoulder" }
+  shoulder of lamb: { kg: "lamb shoulder" }
+  pork shoulder: { kg: "pork shoulder" }
+  pork loin: { kg: "pork loin" }
+  boneless chicken thighs: { kg: "chicken thighs, boneless" }
+  chicken thigh fillets: { kg: "chicken thighs, boneless" }
+  turkey breast: { kg: "turkey breast joint / crown" }
+  turkey crown: { kg: "turkey breast joint / crown" }
+  venison steak: { kg: "venison steaks" }
+  venison steaks: { kg: "venison steaks" }
+  venison haunch: { kg: "venison haunch" }
+  haunch of venison: { kg: "venison haunch" }
+  muntjac: { kg: "venison haunch" }
 
   # --- fish --------------------------------------------------------------
-  anchovies: { kg: [22.90, 34.00], confidence: medium }
-  cod: { kg: [20.41, 26.43], confidence: high }
-  haddock: { kg: [18.75, 26.25], confidence: high }
-  mackerel: { kg: [18.00, 28.00], confidence: high }
-  smoked mackerel: { kg: [20.84, 24.60], confidence: high }
-  mussels: { kg: [4.00, 6.99], confidence: high }
-  prawns: { kg: [18.12, 31.82], confidence: high }
-  salmon: { kg: [19.81, 25.00], each: [2.36, 2.99], confidence: medium }
-  smoked salmon: { kg: [36.35, 50.75], confidence: medium }
-  tuna: { kg: [5.39, 11.03], confidence: medium }
-  cod loin: { kg: [18.75, 30.59], confidence: high }
-  cod loins: { kg: [18.75, 30.59], confidence: high }
-  smoked haddock: { kg: [21.05, 27.72], confidence: high }
-  hake: { kg: [15.80, 27.50], confidence: high }
-  tuna steak: { kg: [21.61, 25.77], confidence: medium }
-  tuna steaks: { kg: [21.61, 25.77], confidence: medium }
-  king prawns: { kg: [18.12, 31.82], confidence: high }
-  cooked prawns: { kg: [16.62, 22.42], confidence: high }
-  anchovy fillets: { kg: [22.90, 34.00], confidence: medium }
-  scallops: { kg: [44.00, 58.33], each: [1.00, 5.99], confidence: medium }
-  scallop: { kg: [44.00, 58.33], each: [1.00, 5.99], confidence: medium }
-  white crab meat: { kg: [72.00, 77.00], confidence: medium }
-  white crabmeat: { kg: [72.00, 77.00], confidence: medium }
-  brown crab meat: { kg: [32.50, 33.00], confidence: medium }
-  brown crabmeat: { kg: [32.50, 33.00], confidence: medium }
-  sea bass: { kg: [30.56, 33.06], each: [2.75, 2.98], confidence: high }
-  monkfish: { kg: [31.87, 49.10], confidence: high }
-  trout: { kg: [16.63, 27.36], confidence: high }
-  smoked trout: { kg: [30.04, 35.76], confidence: high }
-  hot-smoked trout: { kg: [30.04, 35.76], confidence: high }
-  hot smoked trout: { kg: [30.04, 35.76], confidence: high }
-  squid: { kg: [16.00, 34.25], confidence: medium }
-  clams: { kg: [12.00, 27.95], confidence: medium }
-  cockles: { kg: [10.99, 15.95], confidence: medium }
-  brown shrimp: { kg: [64.29, 70.71], confidence: low }
-  potted shrimp: { kg: [60.00, 135.00], confidence: medium }
+  anchovies: { kg: "anchovy fillets in oil (gross tin)" }
+  cod: { kg: "cod fillets" }
+  haddock: { kg: "haddock fillets" }
+  mackerel: { kg: "mackerel fillets" }
+  smoked mackerel: { kg: "smoked mackerel" }
+  mussels: { kg: "mussels, live" }
+  prawns: { kg: "raw king prawns" }
+  salmon: { kg: "salmon fillets", each: "salmon fillet" }
+  smoked salmon: { kg: "smoked salmon, sliced" }
+  tuna: { kg: "tinned tuna (drained)" }
+  cod loin: { kg: "cod loins" }
+  cod loins: { kg: "cod loins" }
+  smoked haddock: { kg: "smoked haddock" }
+  hake: { kg: "hake fillets" }
+  tuna steak: { kg: "tuna steaks" }
+  tuna steaks: { kg: "tuna steaks" }
+  king prawns: { kg: "raw king prawns" }
+  cooked prawns: { kg: "cooked prawns" }
+  anchovy fillets: { kg: "anchovy fillets in oil (gross tin)" }
+  scallops: { kg: "king scallops", each: "king scallop" }
+  scallop: { kg: "king scallops", each: "king scallop" }
+  white crab meat: { kg: "white crab meat" }
+  white crabmeat: { kg: "white crab meat" }
+  brown crab meat: { kg: "brown crab meat" }
+  brown crabmeat: { kg: "brown crab meat" }
+  sea bass: { kg: "sea bass fillets", each: "sea bass fillet" }
+  monkfish: { kg: "monkfish tail" }
+  trout: { kg: "trout fillets" }
+  smoked trout: { kg: "hot-smoked trout" }
+  hot-smoked trout: { kg: "hot-smoked trout" }
+  hot smoked trout: { kg: "hot-smoked trout" }
+  squid: { kg: "squid, prepared" }
+  clams: { kg: "clams, live" }
+  cockles: { kg: "cockles, live" }
+  brown shrimp: { kg: "peeled brown shrimp" }
+  potted shrimp: { kg: "potted brown shrimp" }
 
   # --- dairy & eggs --------------------------------------------------------
-  butter: { kg: [6.76, 7.96], confidence: high }
+  butter: { kg: "butter, own-label" }
   buttermilk: { l: [1.50, 3.50] }
-  cheddar: { kg: [6.23, 10.45], confidence: high }
+  cheddar: { kg: "mature cheddar, budget" }
   cheese: { kg: [6.00, 20.00] }
   cream: { l: [3.00, 7.00] }
-  cream cheese: { kg: [6.00, 11.61], confidence: high }
-  clotted cream: { kg: [13.44, 14.43], confidence: medium }
-  double cream: { l: [5.00, 5.19], confidence: medium }
+  cream cheese: { kg: "cream cheese" }
+  clotted cream: { kg: "clotted cream" }
+  double cream: { l: "double cream" }
   single cream: { l: [3.50, 7.00] }
   soured cream: { l: [3.00, 6.00] }
   whipping cream: { l: [4.00, 8.00] }
-  crème fraîche: { l: [2.88, 9.77], confidence: medium }
-  creme fraiche: { l: [2.88, 9.77], confidence: medium }
+  crème fraîche: { l: "crème fraîche" }
+  creme fraiche: { l: "crème fraîche" }
   egg: { each: [0.20, 0.55] }
   eggs: { each: [0.20, 0.55] }
   egg white: { each: [0.20, 0.55] }
   egg whites: { each: [0.20, 0.55] }
   egg yolk: { each: [0.20, 0.55] }
   egg yolks: { each: [0.20, 0.55] }
-  feta: { kg: [8.45, 11.25], confidence: high }
-  goat's cheese: { kg: [20.32, 32.50], confidence: high }
-  gruyère: { kg: [23.75, 26.75], confidence: medium }
-  gruyere: { kg: [23.75, 26.75], confidence: medium }
-  halloumi: { kg: [8.76, 30.33], confidence: medium }
-  mascarpone: { kg: [7.60, 9.00], confidence: high }
+  feta: { kg: "feta" }
+  goat's cheese: { kg: "goat's cheese, soft" }
+  gruyère: { kg: "gruyère" }
+  gruyere: { kg: "gruyère" }
+  halloumi: { kg: "halloumi" }
+  mascarpone: { kg: "mascarpone" }
   milk: { l: [0.90, 1.80] }
-  mozzarella: { kg: [4.96, 14.13], confidence: medium }
-  parmesan: { kg: [21.19, 24.19], confidence: high }
-  pecorino: { kg: [23.53, 26.00], confidence: medium }
-  ricotta: { kg: [5.88, 15.68], confidence: medium }
-  stilton: { kg: [13.41, 25.41], confidence: medium }
+  mozzarella: { kg: "mozzarella" }
+  parmesan: { kg: "parmesan (Parmigiano Reggiano)" }
+  pecorino: { kg: "pecorino romano" }
+  ricotta: { kg: "ricotta" }
+  stilton: { kg: "stilton" }
   yoghurt: { kg: [1.50, 6.00] }
   yogurt: { kg: [1.50, 6.00] }
   greek yoghurt: { kg: [2.50, 7.00] }
-  ghee: { kg: [12.50, 14.99], confidence: high }
-  parmigiano reggiano: { kg: [21.19, 24.19], confidence: high }
-  grana padano: { kg: [14.23, 17.50], confidence: high }
-  comté: { kg: [21.94, 24.75], confidence: high }
-  comte: { kg: [21.94, 24.75], confidence: high }
-  emmental: { kg: [11.00, 12.00], confidence: high }
-  swiss cheese: { kg: [11.00, 12.00], confidence: high }
-  vintage cheddar: { kg: [13.10, 24.60], confidence: high }
-  montgomery: { kg: [24.00, 39.67], confidence: high }
-  cornish kern: { kg: [32.30, 32.30], confidence: low }
-  gorgonzola: { kg: [18.50, 23.33], confidence: medium }
-  roquefort: { kg: [27.62, 30.00], confidence: high }
-  goats cheese: { kg: [20.32, 32.50], confidence: high }
-  buffalo mozzarella: { kg: [10.69, 24.00], confidence: medium }
-  burrata: { kg: [21.66, 26.18], each: [3.15, 3.69], confidence: medium }
-  taleggio: { kg: [20.00, 22.00], confidence: medium }
-  camembert: { kg: [9.64, 13.50], each: [2.41, 3.38], confidence: medium }
-  brie: { kg: [8.25, 29.25], confidence: medium }
-  paneer: { kg: [9.79, 12.65], confidence: high }
+  ghee: { kg: "ghee" }
+  parmigiano reggiano: { kg: "parmesan (Parmigiano Reggiano)" }
+  grana padano: { kg: "grana padano" }
+  comté: { kg: "comté" }
+  comte: { kg: "comté" }
+  emmental: { kg: "emmental / swiss" }
+  swiss cheese: { kg: "emmental / swiss" }
+  vintage cheddar: { kg: "cheddar, premium supermarket" }
+  montgomery: { kg: "farmhouse cheddar (Montgomery's, Westcombe)" }
+  cornish kern: { kg: "cornish kern" }
+  gorgonzola: { kg: "gorgonzola" }
+  roquefort: { kg: "roquefort" }
+  goats cheese: { kg: "goat's cheese, soft" }
+  buffalo mozzarella: { kg: "buffalo mozzarella" }
+  burrata: { kg: "burrata", each: "burrata" }
+  taleggio: { kg: "taleggio" }
+  camembert: { kg: "camembert", each: "camembert" }
+  brie: { kg: "brie" }
+  paneer: { kg: "paneer" }
 
   # --- bakery ------------------------------------------------------------
   bread: { kg: [1.00, 4.00], each: [0.08, 0.30] }
@@ -376,8 +375,8 @@ prices:
   peas: { kg: [1.00, 2.50] }
 
   # --- store cupboard ----------------------------------------------------
-  almonds: { kg: [11.62, 18.01], confidence: high }
-  ground almonds: { kg: [11.40, 17.50], confidence: medium }
+  almonds: { kg: "almonds" }
+  ground almonds: { kg: "ground almonds" }
   flaked almonds: { kg: [10.00, 18.00] }
   baking powder: { kg: [5.00, 15.00] }
   bicarbonate of soda: { kg: [5.00, 12.00] }
@@ -387,14 +386,14 @@ prices:
   cannellini beans: { kg: [1.20, 3.50] }
   chickpeas: { kg: [1.20, 3.50] }
   capers: { kg: [10.00, 25.00] }
-  cashews: { kg: [10.50, 29.00], confidence: medium }
+  cashews: { kg: "cashews" }
   chestnuts: { kg: [8.00, 14.00] }
-  chocolate: { kg: [12.27, 23.25], confidence: medium }
-  dark chocolate: { kg: [12.27, 23.25], confidence: medium }
-  milk chocolate: { kg: [10.00, 24.00], confidence: medium }
-  white chocolate: { kg: [12.06, 18.33], confidence: medium }
-  cocoa: { kg: [11.96, 27.20], confidence: medium }
-  cocoa powder: { kg: [11.96, 27.20], confidence: medium }
+  chocolate: { kg: "dark cooking chocolate" }
+  dark chocolate: { kg: "dark cooking chocolate" }
+  milk chocolate: { kg: "milk chocolate" }
+  white chocolate: { kg: "white chocolate" }
+  cocoa: { kg: "cocoa powder" }
+  cocoa powder: { kg: "cocoa powder" }
   coconut: { kg: [5.00, 10.00] }
   coconut milk: { l: [2.50, 6.00] }
   cornflour: { kg: [2.00, 4.50] }
@@ -409,7 +408,7 @@ prices:
   rice flour: { kg: [2.00, 5.00] }
   glacé cherries: { kg: [6.00, 12.00] }
   glace cherries: { kg: [6.00, 12.00] }
-  hazelnuts: { kg: [14.25, 37.00], confidence: medium }
+  hazelnuts: { kg: "hazelnuts" }
   jam: { kg: [2.00, 7.00] }
   lasagne: { kg: [2.00, 4.00] }
   lentils: { kg: [2.00, 5.00] }
@@ -424,9 +423,9 @@ prices:
   passata: { kg: [1.00, 3.00] }
   peanut butter: { kg: [3.50, 8.00] }
   peanuts: { kg: [4.00, 8.00] }
-  pecans: { kg: [17.50, 24.00], confidence: high }
-  pine nuts: { kg: [36.70, 40.00], confidence: medium }
-  pistachios: { kg: [30.00, 33.33], confidence: medium }
+  pecans: { kg: "pecans" }
+  pine nuts: { kg: "pine nuts" }
+  pistachios: { kg: "pistachios, shelled" }
   raisins: { kg: [3.00, 7.00] }
   rice: { kg: [1.00, 4.00] }
   basmati rice: { kg: [1.50, 4.50] }
@@ -451,33 +450,33 @@ prices:
   rice wine: { l: [6.00, 15.00] }
   orange blossom water: { l: [10.00, 20.00] }
   sultanas: { kg: [3.00, 7.00] }
-  tahini: { kg: [8.70, 11.20], confidence: high }
+  tahini: { kg: "tahini" }
   tomato purée: { kg: [3.00, 7.00] }
   tomato puree: { kg: [3.00, 7.00] }
   chopped tomatoes: { kg: [1.00, 3.00] }
-  walnuts: { kg: [11.00, 19.09], confidence: high }
+  walnuts: { kg: "walnuts" }
   yeast: { kg: [10.00, 30.00] }
-  chocolate chips: { kg: [11.90, 27.50], confidence: medium }
-  dark chocolate chips: { kg: [11.90, 27.50], confidence: medium }
-  macadamia: { kg: [29.00, 32.50], confidence: medium }
-  cashew nuts: { kg: [10.50, 29.00], confidence: medium }
-  walnut: { kg: [11.00, 19.09], confidence: high }
-  porcini: { kg: [99.67, 125.00], confidence: high }
-  harissa: { kg: [18.19, 26.73], confidence: high }
-  gochujang: { kg: [4.74, 21.11], confidence: medium }
-  kecap manis: { l: [6.86, 11.72], confidence: medium }
-  tamarind: { kg: [4.96, 21.67], confidence: medium }
-  marzipan: { kg: [5.43, 5.51], confidence: high }
-  gelatine: { each: [0.28, 0.30], confidence: high }
-  liquid glucose: { kg: [16.07, 16.79], confidence: high }
-  medjool dates: { kg: [9.96, 10.83], confidence: high }
-  dried figs: { kg: [10.00, 12.00], confidence: high }
-  prunes: { kg: [6.35, 10.53], confidence: high }
-  quinoa: { kg: [9.80, 10.33], confidence: medium }
-  bulgur: { kg: [4.00, 4.20], confidence: medium }
-  freekeh: { kg: [6.50, 8.00], confidence: high }
-  gnocchi: { kg: [4.14, 5.88], confidence: high }
-  fresh pasta: { kg: [4.14, 6.17], confidence: high }
+  chocolate chips: { kg: "dark chocolate chips" }
+  dark chocolate chips: { kg: "dark chocolate chips" }
+  macadamia: { kg: "macadamia nuts" }
+  cashew nuts: { kg: "cashews" }
+  walnut: { kg: "walnuts" }
+  porcini: { kg: "dried porcini" }
+  harissa: { kg: "harissa" }
+  gochujang: { kg: "gochujang" }
+  kecap manis: { l: "kecap manis" }
+  tamarind: { kg: "tamarind paste" }
+  marzipan: { kg: "marzipan" }
+  gelatine: { each: "gelatine leaves" }
+  liquid glucose: { kg: "liquid glucose" }
+  medjool dates: { kg: "medjool dates" }
+  dried figs: { kg: "dried figs" }
+  prunes: { kg: "prunes" }
+  quinoa: { kg: "quinoa" }
+  bulgur: { kg: "bulgur wheat" }
+  freekeh: { kg: "freekeh" }
+  gnocchi: { kg: "fresh gnocchi" }
+  fresh pasta: { kg: "fresh pasta" }
 
   # sugars and syrups
   sugar: { kg: [0.95, 1.60] }
@@ -491,25 +490,25 @@ prices:
   black treacle: { kg: [3.00, 5.00] }
   treacle: { kg: [3.00, 5.00] }
   honey: { kg: [3.00, 15.00] }
-  maple syrup: { l: [20.20, 24.41], confidence: high }
+  maple syrup: { l: "maple syrup" }
 
   # oils, vinegars and sauces
   oil: { l: [1.60, 6.00] }
   olive oil: { l: [5.00, 12.00] }
-  extra virgin olive oil: { l: [6.29, 9.31], confidence: high }
-  extra-virgin olive oil: { l: [6.29, 9.31], confidence: high }
+  extra virgin olive oil: { l: "extra virgin olive oil, everyday" }
+  extra-virgin olive oil: { l: "extra virgin olive oil, everyday" }
   vegetable oil: { l: [1.60, 3.50] }
   sunflower oil: { l: [1.60, 3.50] }
   rapeseed oil: { l: [2.00, 6.00] }
   groundnut oil: { l: [3.00, 7.00] }
-  sesame oil: { l: [10.67, 11.30], confidence: high }
+  sesame oil: { l: "sesame oil" }
   coconut oil: { kg: [8.00, 16.00] }
   vinegar: { l: [1.50, 6.00] }
   wine vinegar: { l: [1.50, 6.00] }
   red wine vinegar: { l: [1.50, 6.00] }
   white wine vinegar: { l: [1.50, 6.00] }
   cider vinegar: { l: [1.50, 6.00] }
-  balsamic vinegar: { l: [7.00, 10.00], confidence: high }
+  balsamic vinegar: { l: "balsamic vinegar" }
   sherry vinegar: { l: [6.00, 15.00] }
   rice vinegar: { l: [4.00, 10.00] }
   rice wine vinegar: { l: [4.00, 10.00] }
@@ -519,25 +518,25 @@ prices:
   hoisin sauce: { l: [5.00, 12.00] }
   worcestershire sauce: { l: [6.00, 14.00] }
   mirin: { l: [8.00, 20.00] }
-  miso: { kg: [15.60, 19.00], confidence: high }
-  miso paste: { kg: [15.60, 19.00], confidence: high }
+  miso: { kg: "miso" }
+  miso paste: { kg: "miso" }
   mustard: { kg: [4.00, 12.00] }
   mustard powder: { kg: [20.00, 40.00] }
   curry paste: { kg: [8.00, 20.00] }
-  tamarind paste: { kg: [4.96, 21.67], confidence: medium }
-  vanilla extract: { l: [35.83, 75.00], confidence: medium }
-  vanilla bean paste: { l: [44.00, 143.98], confidence: medium }
-  vanilla pod: { each: [2.66, 3.44], confidence: high }
-  aged balsamic: { l: [32.00, 49.40], confidence: high }
-  truffle oil: { l: [12.80, 23.20], confidence: medium }
-  vanilla paste: { l: [44.00, 143.98], confidence: medium }
-  vanilla pods: { each: [2.66, 3.44], confidence: high }
+  tamarind paste: { kg: "tamarind paste" }
+  vanilla extract: { l: "vanilla extract" }
+  vanilla bean paste: { l: "vanilla bean paste" }
+  vanilla pod: { each: "vanilla pods" }
+  aged balsamic: { l: "balsamic vinegar, aged" }
+  truffle oil: { l: "truffle oil" }
+  vanilla paste: { l: "vanilla bean paste" }
+  vanilla pods: { each: "vanilla pods" }
 
   # --- spices & seasonings -----------------------------------------------
   allspice: { kg: [20.00, 50.00] }
   caraway seeds: { kg: [20.00, 50.00] }
-  cardamom: { kg: [41.07, 65.00], each: [0.03, 0.08], confidence: high }
-  cardamom pods: { kg: [41.07, 65.00], each: [0.03, 0.08], confidence: high }
+  cardamom: { kg: "cardamom pods", each: [0.03, 0.08] }
+  cardamom pods: { kg: "cardamom pods", each: [0.03, 0.08] }
   chilli flakes: { kg: [15.00, 40.00] }
   chilli powder: { kg: [15.00, 40.00] }
   cinnamon: { kg: [15.00, 45.00] }
@@ -551,7 +550,7 @@ prices:
   dried herbs: { kg: [25.00, 60.00] }
   fennel seeds: { kg: [15.00, 40.00] }
   five-spice: { kg: [20.00, 50.00] }
-  garam masala: { kg: [13.21, 29.27], confidence: medium }
+  garam masala: { kg: "garam masala" }
   garlic granules: { kg: [15.00, 40.00] }
   garlic powder: { kg: [15.00, 40.00] }
   ground ginger: { kg: [15.00, 40.00] }
@@ -560,16 +559,16 @@ prices:
   nigella seeds: { kg: [15.00, 40.00] }
   nutmeg: { each: [0.25, 0.60], kg: [30.00, 70.00] }
   paprika: { kg: [15.00, 40.00] }
-  smoked paprika: { kg: [21.70, 43.39], confidence: medium }
+  smoked paprika: { kg: "smoked paprika" }
   peppercorns: { kg: [15.00, 40.00], each: [0.001, 0.003] }
   black peppercorns: { kg: [15.00, 40.00], each: [0.001, 0.003] }
-  saffron: { kg: [5750, 10565], confidence: medium }
-  star anise: { kg: [30.00, 150.00], each: [0.03, 0.08], confidence: medium }
+  saffron: { g: "saffron" }
+  star anise: { kg: "star anise", each: [0.03, 0.08] }
   turmeric: { kg: [12.00, 35.00] }
-  sumac: { kg: [22.63, 35.60], confidence: medium }
-  za'atar: { kg: [57.14, 71.43], confidence: medium }
-  ras el hanout: { kg: [52.86, 57.14], confidence: medium }
-  dukkah: { kg: [40.91, 79.29], confidence: high }
+  sumac: { kg: "sumac" }
+  za'atar: { kg: "za'atar" }
+  ras el hanout: { kg: "ras el hanout" }
+  dukkah: { kg: "dukkah" }
 
   # --- drinks ------------------------------------------------------------
   beer: { l: [2.50, 6.00] }

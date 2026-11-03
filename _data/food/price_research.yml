@@ -1,0 +1,1288 @@
+# The shop prices behind every researched row of costs.yml (#1458, MANUAL
+# §8.2). A costs.yml unit written as a food's name here, `kg: "goose"`, is
+# priced from that food's list in that unit at build: the middle 50% of 6+
+# prices (inclusive quartiles), the whole range of 3-5, both of 2, the one
+# price twice. Confidence: high for 4+ prices with the dearest at most twice
+# the cheapest, medium for 2+, low for one price or a row marked `thin`.
+#
+# Each price is "GBP-per-unit shop and pack". Shelf prices, never offers; FD
+# is Farm Direct. Add, correct or remove a price and move `checked`; costs.yml
+# follows on the next build. `scripts/food_price_table.py` writes the table.
+
+checked: "2026-11-03"
+
+foods:
+  # --- meat, poultry and game ------------------------------------------------
+  beef fillet (steak):
+    kg:
+      - 44.12 Tesco
+      - 50.00 Tesco Finest
+      - 66.67 Tesco Finest 14-day
+      - 52.94 Co-op
+      - 55.82 Asda Exceptional
+      - 39.94 Aldi
+      - 82.50 Waitrose No.1
+      - 60.97 FD
+      - 69.26 FD Red Poll
+  beef fillet (whole):
+    kg:
+      - 55.00 Knightwick
+      - 54.44 Booths
+      - 45.45 Costco
+  sirloin steak:
+    kg:
+      - 26.43 Tesco
+      - 33.04 Tesco Finest
+      - 26.67 Sainsbury's
+      - 33.33 Sainsbury's TTD
+      - 32.38 Morrisons
+      - 23.03 Aldi 21-day
+      - 27.71 Aldi 30-day
+      - 60.87 Waitrose No.1
+      - 35.81 FD
+      - 46.15 FD Red Poll
+  ribeye steak:
+    kg:
+      - 28.63 Tesco
+      - 35.24 Tesco Finest
+      - 28.89 Sainsbury's
+      - 35.96 Sainsbury's TTD
+      - 34.00 Morrisons
+      - 25.08 Aldi 21-day
+      - 30.79 Aldi 30-day
+      - 40.00 Waitrose
+      - 49.16 FD
+      - 61.55 FD Red Poll
+  beef, diced / stewing / braising:
+    kg:
+      - 12.50 Tesco
+      - 13.33 Tesco lean
+      - 12.50 Sainsbury's
+      - 12.78 Asda
+      - 12.79 Morrisons
+      - 16.00 Morrisons braising
+      - 11.23 Aldi
+      - 11.11 Aldi braising
+      - 18.50 Tesco Finest
+      - 14.90 FD braising
+      - 14.00 FD stewing
+  beef mince 5%:
+    kg:
+      - 10.10 Tesco
+      - 11.00 Sainsbury's
+      - 10.10 Morrisons
+      - 10.10 Aldi
+      - 13.04 Asda Exceptional
+      - 13.00 Sainsbury's TTD
+  beef mince 10–12%:
+    kg:
+      - 12.00 Waitrose
+      - 12.00 Sainsbury's TTD
+      - 6.60 Morrisons Scotch
+      - 5.91 Morrisons
+      - 9.67 Iceland
+      - 8.78 Aldi 10%
+  beef mince 20%:
+    kg:
+      - 6.50 Tesco
+      - 7.00 Sainsbury's
+      - 6.50 Morrisons
+      - 6.50 Aldi
+      - 6.67 Iceland
+  beef mince, butcher (fat not stated):
+    kg:
+      - 14.00 FD
+      - 18.00 FD steak mince
+      - 17.70 FD Red Poll
+  beef short ribs:
+    kg:
+      - 18.20 Tesco Finest
+      - 15.60 Waitrose
+      - 15.96 FD
+      - 16.92 FD Red Poll
+      - 16.79 Thorners
+      - 13.80 Darts Farm
+  oxtail:
+    kg:
+      - 11.00 Morrisons
+      - 14.99 Truebites
+      - 19.99 Eversfield organic
+      - 9.00 Allens of Mayfair
+      - 18.50 FD
+  leg of lamb:
+    kg:
+      - 16.70 Tesco
+      - 17.00 Tesco half leg
+      - 10.00 Sainsbury's NZ
+      - 12.00 Morrisons
+      - 13.99 Morrisons joint
+      - 14.00 Asda half leg
+      - 25.19 Waitrose boneless
+      - 19.50 FD
+  lamb shoulder:
+    kg:
+      - 14.90 Tesco
+      - 15.00 Tesco half
+      - 14.00 Morrisons
+      - 18.32 Waitrose half
+      - 19.20 FD on the bone
+      - 21.21 FD whole
+  lamb mince:
+    kg:
+      - 13.00 Tesco
+      - 14.00 Sainsbury's
+      - 12.84 Asda
+      - 11.98 Aldi
+      - 11.00 Morrisons
+      - 16.00 FD
+  mutton:
+    kg:
+      - 15.50 Booths shoulder
+      - 16.61 Booths leg
+      - 15.55 FD shoulder
+      - 16.05 FD leg
+      - 21.87 FD diced
+      - 19.00 Grid Iron
+      - 10.62 Eurofoods shoulder
+      - 11.39 Eurofoods leg
+      - 12.99 Kingsley
+  pork shoulder:
+    kg:
+      - 5.00 Tesco
+      - 6.00 Morrisons boneless
+      - 5.25 Morrisons
+      - 3.79 Aldi
+      - 4.97 Asda
+      - 13.80 FD
+  pork loin:
+    kg:
+      - 8.00 Tesco
+      - 7.50 Morrisons
+      - 8.00 Morrisons Market Street
+      - 5.59 Aldi
+      - 15.00 FD
+  pork belly:
+    kg:
+      - 9.00 Tesco slices
+      - 9.30 Sainsbury's
+      - 13.00 Waitrose free range
+      - 7.50 Morrisons joint
+      - 6.65 Aldi joint
+      - 6.78 Aldi slices
+      - 11.00 Tesco Finest
+      - 13.80 FD slices
+  pork mince:
+    kg:
+      - 4.78 Tesco 5%
+      - 4.60 Tesco 20%
+      - 4.98 Sainsbury's 5%
+      - 4.90 Sainsbury's 20%
+      - 4.94 Asda
+      - 5.12 Morrisons
+      - 4.30 Aldi
+      - 6.00 Waitrose free range
+      - 11.40 FD
+  smoked back bacon, standard:
+    kg:
+      - 4.97 Tesco
+      - 4.97 Sainsbury's
+      - 4.34 Aldi Essentials
+      - 4.97 Aldi Oakhurst
+      - 5.30 Asda
+      - 7.08 Morrisons
+  back bacon, dry-cured / premium:
+    kg:
+      - 16.67 Tesco Finest
+      - 10.38 Aldi Specially Selected
+      - 16.25 Morrisons The Best
+      - 18.75 Denhay
+      - 17.66 Spoiltpig
+      - 20.50 FD Old Spot smoked
+      - 19.17 FD Old Spot
+      - 30.25 FD dry-cured smoked
+  back bacon, standard:
+    note: each is one rasher
+    each:
+      - 0.15 Aldi
+      - 0.17 Asda
+      - 0.21 Morrisons
+      - 0.20 Iceland
+  back bacon, premium:
+    note: each is one rasher
+    each:
+      - 0.50 Tesco Finest
+      - 0.31 Aldi Specially Selected
+      - 0.41 Morrisons The Best
+  streaky bacon, standard:
+    kg:
+      - 7.63 Tesco
+      - 7.63 Sainsbury's
+      - 7.60 Morrisons
+      - 7.63 Aldi Oakhurst
+      - 9.57 Iceland
+      - 4.34 Aldi Essentials
+  streaky bacon, dry-cured / premium:
+    kg:
+      - 16.67 Tesco Finest
+      - 17.00 Waitrose
+      - 9.95 Aldi Specially Selected
+      - 15.48 Morrisons The Best
+      - 18.15 Asda Exceptional
+      - 16.08 FD Old Spot
+      - 17.46 FD Old Spot smoked
+  pancetta cubes:
+    kg:
+      - 14.25 Sainsbury's
+      - 24.62 Waitrose
+      - 15.71 Morrisons
+      - 17.86 Morrisons unsmoked
+      - 15.25 Asda
+  pancetta, sliced:
+    kg:
+      - 78.00 FD (75 g £5.85)
+      - 83.33 FD (60 g £5.00)
+  cooking chorizo:
+    kg:
+      - 14.47 Sainsbury's
+      - 13.50 Tesco
+      - 15.00 Morrisons
+      - 18.42 Waitrose
+      - 9.45 Aldi ring
+      - 32.50 FD cured spicy chorizo
+  parma ham / prosciutto:
+    note: each is one slice
+    kg:
+      - 37.50 Sainsbury's
+      - 38.46 Tesco Finest
+      - 72.22 Waitrose No.1
+      - 40.50 Asda Exceptional
+      - 23.63 Aldi
+      - 50.00 Morrisons The Best
+      - 83.33 FD British air-dried
+      - 97.50 FD Monmouthshire
+    each:
+      - 0.50 Sainsbury's
+      - 0.63 Waitrose
+      - 0.21 Aldi
+  gammon joint:
+    kg:
+      - 7.00 Tesco
+      - 6.52 Sainsbury's
+      - 7.33 Iceland
+      - 7.33 Morrisons
+      - 5.19 Aldi
+      - 11.67 Tesco Finest dry-cured
+      - 15.11 Waitrose No.1
+      - 18.00 FD
+      - 19.65 FD oak smoked
+  sliced cooked ham:
+    kg:
+      - 11.33 Sainsbury's 16 slices
+      - 16.67 Sainsbury's 6 slices
+      - 19.17 Tesco
+      - 8.75 Morrisons 400 g
+      - 10.00 Morrisons 125 g
+      - 11.11 Iceland
+      - 40.00 FD traditional
+  sausages, standard:
+    kg:
+      - 3.94 Aldi
+      - 3.94 Morrisons
+      - 5.61 Richmond 8
+      - 5.37 Richmond 12
+    each:
+      - 0.22 Aldi
+      - 0.22 Morrisons
+      - 0.29 Richmond 8
+      - 0.28 Richmond 12
+  sausages, premium:
+    kg:
+      - 8.25 Sainsbury's TTD
+      - 8.13 Morrisons The Best
+      - 5.73 Aldi Specially Selected
+      - 8.13 Heck
+      - 9.38 Jolly Hog
+      - 8.75 Black Farmer
+      - 12.95 FD handmade
+    each:
+      - 0.55 Sainsbury's TTD
+      - 0.54 Morrisons The Best
+      - 0.38 Aldi
+      - 0.54 Heck
+      - 0.63 Jolly Hog
+      - 0.58 Black Farmer
+  whole chicken:
+    kg:
+      - 2.54 Aldi large
+      - 2.68 Aldi medium
+      - 3.24 Morrisons
+      - 3.03 Tesco
+      - 3.44 Sainsbury's
+      - 3.86 Waitrose
+      - 9.00 FD free range
+  chicken breast:
+    kg:
+      - 6.69 Aldi
+      - 6.99 Morrisons
+      - 7.63 Tesco 300 g
+      - 6.84 Tesco 950 g
+      - 7.22 Sainsbury's
+      - 6.15 Sainsbury's 2 kg
+      - 17.79 FD free range
+    each:
+      - 1.15 Tesco
+      - 1.25 Morrisons
+      - 1.73 Sainsbury's
+      - 4.98 FD free range (280 g)
+  chicken thighs, bone-in:
+    kg:
+      - 2.95 Tesco
+      - 2.99 Aldi
+      - 3.40 Morrisons
+      - 2.88 Sainsbury's
+      - 3.50 Waitrose
+      - 10.37 FD free range
+  chicken thighs, boneless:
+    kg:
+      - 5.99 Aldi 900 g
+      - 7.32 Aldi 600 g
+      - 7.25 Morrisons 1 kg
+      - 9.58 Morrisons 600 g
+      - 7.10 Tesco
+      - 10.67 FD free range skinless
+  chicken legs:
+    kg:
+      - 2.25 Tesco
+      - 2.25 Sainsbury's
+      - 2.25 Aldi
+      - 2.70 Morrisons
+      - 4.25 Iceland
+      - 9.00 FD leg quarter
+  whole duck:
+    kg:
+      - 5.29 Morrisons Gressingham
+      - 5.31 Gressingham
+      - 5.56 Gressingham frozen
+      - 12.00 FD free range
+    each:
+      - 9.00 Morrisons 1.7 kg
+      - 9.55 Gressingham 1.8 kg
+      - 10.00 Gressingham frozen
+      - 10.61 Gressingham
+      - 36.00 FD free range 3 kg
+  duck breast:
+    kg:
+      - 25.00 Morrisons fillets
+      - 20.00 Morrisons portions
+      - 22.67 Sainsbury's
+      - 30.88 Gressingham
+      - 22.47 Gressingham Easy
+      - 14.60 Aldi
+      - 27.00 FD free range
+    each:
+      - 4.50 Sainsbury's
+      - 5.25 Gressingham
+      - 2.19 Aldi 150 g
+  duck legs:
+    kg:
+      - 10.20 Aldi
+      - 10.39 Morrisons
+      - 10.00 Sainsbury's
+    each:
+      - 2.40 Sainsbury's
+      - 2.40 Morrisons
+      - 2.25 Aldi
+  goose:
+    kg:
+      - 14.00 Tesco Finest
+      - 18.00 Waitrose No.1
+      - 18.60 Waitrose traditional
+      - 14.00 Waitrose Gressingham
+      - 22.70 Field & Flower
+      - 22.79 FD Suffolk
+  whole turkey, standard:
+    kg:
+      - 5.00 Tesco
+      - 5.05 Sainsbury's
+      - 5.24 Morrisons frozen
+      - 3.00 Morrisons fresh
+  whole turkey, bronze / free range:
+    kg:
+      - 11.00 Tesco Finest
+      - 8.50 Morrisons The Best
+      - 9.30 Sainsbury's TTD
+      - 17.41 FD bronze
+      - 16.59 FD white
+  turkey breast joint / crown:
+    kg:
+      - 15.38 Tesco
+      - 15.00 Sainsbury's
+      - 20.00 Morrisons large
+      - 17.86 Morrisons butter
+      - 26.35 FD bronze crown
+  venison, diced:
+    kg:
+      - 15.83 Highland Game
+      - 12.78 Costco
+      - 12.00 Cranborne
+      - 31.00 Riverford organic
+      - 20.00 Farm Butchers
+      - 13.78 FD wild
+  venison steaks:
+    kg:
+      - 30.00 Highland Game
+      - 39.26 Waitrose
+      - 35.00 Waitrose No.1
+      - 27.62 FD wild haunch steak
+  venison haunch:
+    kg:
+      - 13.85 Tesco Finest
+      - 30.93 Ocado Hampshire Game
+      - 32.74 Carmichael
+      - 25.00 Darts Farm
+      - 27.10 Field & Flower
+      - 14.00 Cranborne
+      - 19.50 FD muntjac boned
+      - 14.00 FD muntjac bone-in
+
+  # --- fish and seafood ------------------------------------------------------
+  cod fillets:
+    kg:
+      - 20.83 Tesco
+      - 27.86 Tesco boneless
+      - 21.53 Sainsbury's
+      - 25.00 Asda
+      - 19.79 Waitrose
+      - 20.00 M&S
+      - 33.43 FD
+  cod loins:
+    kg:
+      - 28.93 Tesco Finest
+      - 16.67 Tesco Finest 2-pack
+      - 16.50 Tesco
+      - 25.00 M&S
+      - 31.15 Sainsbury's TTD
+      - 32.33 Fish Society
+  haddock fillets:
+    kg:
+      - 20.89 Tesco
+      - 19.23 Sainsbury's
+      - 18.75 Asda
+      - 26.25 FD
+      - 25.00 FD portion
+  smoked haddock:
+    kg:
+      - 20.83 Tesco
+      - 20.89 Tesco boneless
+      - 21.53 Sainsbury's
+      - 28.96 Sainsbury's MSC
+      - 31.04 Waitrose
+      - 24.00 FD line-caught
+  hake fillets:
+    kg:
+      - 18.33 Tesco
+      - 18.33 Asda
+      - 15.80 Sainsbury's
+      - 27.50 Waitrose
+  white fish, frozen (pollock / hake):
+    thin: true
+    kg:
+      - 4.52 Tesco pollock
+      - 4.23 Tesco value
+      - 10.00 Tesco hake
+  salmon fillets:
+    kg:
+      - 16.21 Aldi
+      - 15.98 Lidl
+      - 20.63 Sainsbury's
+      - 19.81 Tesco
+      - 25.00 Tesco Scottish
+      - 22.31 Waitrose
+      - 23.44 M&S
+      - 31.80 FD Scottish
+      - 37.73 FD Scottish
+  salmon fillet:
+    each:
+      - 1.95 Aldi
+      - 2.00 Lidl
+      - 2.48 Sainsbury's
+      - 2.58 Tesco
+      - 3.25 Tesco Scottish
+      - 2.90 Waitrose
+      - 2.81 M&S
+      - 4.77 FD 150 g
+  smoked salmon, sliced:
+    kg:
+      - 30.90 Aldi
+      - 32.90 Lidl
+      - 37.50 Tesco
+      - 40.00 Tesco Finest
+      - 37.50 Sainsbury's
+      - 57.50 M&S
+      - 48.50 FD
+      - 84.70 FD hand-sliced Scottish
+  mackerel fillets:
+    kg:
+      - 24.69 Tesco
+      - 21.94 Sainsbury's
+      - 18.00 Waitrose
+      - 28.00 FD
+  smoked mackerel:
+    kg:
+      - 16.45 Aldi
+      - 22.00 Tesco
+      - 25.00 Tesco peppered
+      - 26.79 Sainsbury's
+      - 20.45 Asda
+      - 23.41 FD
+  tuna steaks:
+    kg:
+      - 15.69 Asda
+      - 20.83 Tesco Finest
+      - 23.95 Aldi
+      - 23.95 Sainsbury's
+      - 26.38 Sainsbury's TTD
+      - 32.50 Waitrose
+  tinned tuna (drained):
+    kg:
+      - 6.37 Tesco
+      - 5.39 Stockwell
+      - 6.10 Tesco in oil
+      - 10.42 Princes
+      - 11.03 John West
+  raw king prawns:
+    kg:
+      - 21.21 Tesco
+      - 18.12 Sainsbury's
+      - 19.19 Asda
+      - 31.82 Waitrose
+      - 23.75 Tesco Finest
+  cooked prawns:
+    kg:
+      - 16.67 Tesco
+      - 13.27 Seachill
+      - 16.60 Aldi
+      - 18.34 Waitrose
+      - 25.00 Sainsbury's
+      - 23.78 Tesco Finest
+  mussels, live:
+    kg:
+      - 4.00 Asda
+      - 4.20 Tesco Finest
+      - 4.99 Waitrose
+      - 6.99 FD
+  anchovy fillets in oil (gross tin):
+    kg:
+      - 13.80 Aldi
+      - 16.80 Asda
+      - 29.00 Sainsbury's
+      - 33.00 Tesco Finest
+      - 35.00 Waitrose No.1
+      - 29.90 FD
+      - 65.79 FD organic
+  king scallops:
+    kg:
+      - 50.00 Sainsbury's
+      - 58.33 Tesco Finest
+      - 56.00 M&S
+      - 44.00 Waitrose No.1
+  king scallop:
+    each:
+      - 1.00 Tesco
+      - 2.92 Fish Society
+      - 2.35 Fine Food Specialist
+      - 2.08 Sainsbury's
+      - 5.99 FD hand-dived Cornish
+  white crab meat:
+    kg:
+      - 72.00 Tesco
+      - 77.00 Waitrose
+      - 75.00 Sainsbury's
+  brown crab meat:
+    kg:
+      - 32.50 Waitrose
+      - 33.00 Seafood & Eat It
+  sea bass fillets:
+    kg:
+      - 31.94 Tesco
+      - 33.06 Sainsbury's
+      - 31.94 Asda
+      - 30.56 Morrisons
+  sea bass fillet:
+    each:
+      - 2.88 Tesco
+      - 2.98 Sainsbury's
+      - 2.88 Asda
+      - 2.75 Morrisons
+  monkfish tail:
+    kg:
+      - 34.65 Tesco Finest
+      - 42.29 Waitrose
+      - 49.10 Waitrose No.1
+      - 31.87 FD tail
+      - 34.00 FD fillet
+  trout fillets:
+    kg:
+      - 16.63 Aldi
+      - 16.67 Sainsbury's
+      - 24.79 Sainsbury's TTD
+      - 23.85 Tesco Finest
+      - 27.36 Waitrose
+  hot-smoked trout:
+    kg:
+      - 29.76 Waitrose
+      - 43.44 Waitrose Scottish
+      - 30.88 Tesco
+      - 32.35 Sainsbury's
+      - 27.94 Sainsbury's own
+      - 36.90 FD
+  squid, prepared:
+    kg:
+      - 17.00 Tesco rings
+      - 16.00 Sainsbury's rings
+      - 24.00 Waitrose rings
+      - 34.25 FD handline
+      - 25.00 FD net-caught
+  squid, whole uncleaned:
+    kg:
+      - 18.99 Ocean Catch
+      - 20.00 Fish Glorious Fish
+      - 27.95 Cornish Fishmonger
+  clams, live:
+    kg:
+      - 12.00 Waitrose
+      - 27.95 Fine Food Specialist
+      - 18.00 Dorset Shellfish
+      - 26.75 Cornish Fishmonger
+      - 18.00 FD palourde
+  cockles, live:
+    kg:
+      - 15.95 Trident
+      - 10.99 FD
+  potted brown shrimp:
+    kg:
+      - 60.00 Waitrose
+      - 84.00 Morrisons
+      - 93.33 Booths
+      - 120.54 Regal Fish
+      - 135.00 Rockfish
+  peeled brown shrimp:
+    thin: true
+    kg:
+      - 70.71 Waitrose
+      - 64.29 Waitrose
+
+  # --- chocolate -------------------------------------------------------------
+  dark chocolate 70%, eating:
+    kg:
+      - 15.00 Tesco Finest
+      - 38.89 Green & Black's
+      - 35.00 Lindt Tesco
+      - 34.80 Lindt Asda
+      - 35.00 Lindt Sainsbury's
+  dark cooking chocolate:
+    kg:
+      - 12.33 Tesco
+      - 12.25 Sainsbury's
+      - 10.00 Tesco bar
+      - 23.33 Green & Black's
+      - 23.00 Dr Oetker
+      - 28.75 Lindt
+  milk chocolate:
+    kg:
+      - 12.33 Tesco cooking
+      - 10.00 Tesco bar
+      - 15.28 Cadbury 180 g
+      - 13.58 Cadbury 95 g
+      - 24.00 Sainsbury's Belgian
+  white chocolate:
+    kg:
+      - 12.00 Tesco cooking
+      - 10.00 Tesco bar
+      - 12.25 Sainsbury's
+      - 19.44 Waitrose
+      - 15.00 Milkybar
+      - 25.00 Dr Oetker
+  dark chocolate chips:
+    kg:
+      - 11.90 Tesco
+      - 12.50 Sainsbury's
+      - 20.00 Waitrose
+      - 23.75 Menier
+      - 27.50 Dr Oetker
+  cocoa powder:
+    kg:
+      - 17.80 Bournville Tesco
+      - 14.60 Bournville Morrisons
+      - 14.80 Bournville Ocado
+      - 11.96 Tesco
+      - 27.20 Green & Black's
+
+  # --- cheese ----------------------------------------------------------------
+  parmesan (Parmigiano Reggiano):
+    kg:
+      - 20.00 Tesco
+      - 20.75 Sainsbury's
+      - 24.75 Sainsbury's TTD
+      - 26.00 Waitrose
+      - 22.50 Tesco Finest
+      - 22.50 M&S
+  grana padano:
+    kg:
+      - 16.50 Sainsbury's
+      - 16.06 Asda
+      - 14.23 Tesco
+      - 17.50 Ocado
+  pecorino romano:
+    kg:
+      - 23.53 Sainsbury's
+      - 23.53 Tesco
+      - 26.00 Waitrose
+  gruyère:
+    kg:
+      - 23.85 Tesco
+      - 23.75 Sainsbury's TTD
+      - 26.75 Waitrose
+  comté:
+    kg:
+      - 21.94 Tesco
+      - 21.94 Sainsbury's TTD
+      - 17.60 Asda
+      - 25.00 Waitrose
+      - 28.75 Ocado
+      - 24.00 Co-op
+  emmental / swiss:
+    kg:
+      - 11.40 Sainsbury's
+      - 12.00 Waitrose
+      - 11.40 Tesco
+      - 11.00 Morrisons
+  mature cheddar, budget:
+    kg:
+      - 6.23 Aldi
+      - 6.23 Tesco
+      - 8.00 Sainsbury's
+      - 6.64 Asda
+      - 10.45 FD
+  cheddar, premium supermarket:
+    kg:
+      - 17.50 Waitrose vintage
+      - 13.10 Waitrose extra mature
+      - 13.33 Davidstow
+      - 24.60 FD extra mature
+  farmhouse cheddar (Montgomery's, Westcombe):
+    kg:
+      - 38.00 Paxton & Whitfield
+      - 39.67 Ocado
+      - 24.00 Farm Direct 2 kg
+      - 27.67 FD Montgomery's
+      - 27.70 FD Westcombe
+  cornish kern:
+    kg:
+      - 32.30 FD
+  stilton:
+    kg:
+      - 13.41 Tesco
+      - 13.41 Sainsbury's
+      - 11.88 Sainsbury's 400 g
+      - 22.22 Tesco Finest
+      - 21.25 Waitrose Cropwell Bishop
+      - 28.60 FD Colston Bassett
+      - 31.15 FD Cropwell Bishop
+  gorgonzola:
+    kg:
+      - 18.50 Sainsbury's TTD
+      - 18.75 Waitrose
+      - 23.33 Tesco Finest
+  roquefort:
+    kg:
+      - 28.00 Tesco
+      - 30.00 Tesco Finest
+      - 31.00 Waitrose No.1
+      - 27.50 Waitrose
+      - 30.00 Morrisons
+      - 25.70 Asda
+  goat's cheese, soft:
+    kg:
+      - 20.40 Tesco
+      - 20.40 Sainsbury's
+      - 20.32 Asda
+      - 22.00 Waitrose
+      - 32.50 FD plain
+  feta:
+    kg:
+      - 8.45 Aldi
+      - 10.75 Tesco
+      - 11.25 Sainsbury's
+      - 10.50 Waitrose
+  halloumi:
+    kg:
+      - 8.84 Tesco
+      - 8.84 Sainsbury's
+      - 8.76 Asda
+      - 30.33 FD
+  mozzarella:
+    kg:
+      - 10.33 Sainsbury's
+      - 6.50 Tesco
+      - 4.44 Asda
+      - 15.52 Galbani
+      - 3.29 Tesco Creamfields
+      - 15.40 FD nodino
+  buffalo mozzarella:
+    kg:
+      - 20.00 Sainsbury's TTD
+      - 24.00 Waitrose No.1
+      - 12.50 Tesco Finest
+      - 10.69 Waitrose 290 g
+  burrata:
+    kg:
+      - 23.33 Galbani Tesco
+      - 21.33 Sainsbury's TTD
+      - 22.67 Waitrose No.1
+      - 12.60 Tesco Finest
+      - 27.13 FD 400 g
+      - 29.52 FD baby
+    each:
+      - 3.50 Galbani Tesco
+      - 3.20 Sainsbury's TTD
+      - 3.40 Waitrose No.1
+      - 3.15 Tesco Finest
+      - 3.69 FD baby 125 g
+  taleggio:
+    kg:
+      - 22.00 Waitrose
+      - 20.00 Sainsbury's TTD
+  camembert:
+    kg:
+      - 11.20 Tesco
+      - 10.00 Sainsbury's
+      - 9.00 Président Morrisons
+      - 9.28 Président Waitrose
+      - 13.00 Tesco Finest
+      - 14.00 Sainsbury's TTD
+      - 30.24 FD Boy Laity
+    each:
+      - 2.80 Tesco
+      - 2.50 Sainsbury's
+      - 2.25 Morrisons
+      - 2.32 Waitrose
+      - 3.25 Tesco Finest
+      - 3.50 Sainsbury's TTD
+      - 4.99 FD Boy Laity 165 g
+  brie:
+    kg:
+      - 8.25 Tesco
+      - 8.25 Sainsbury's
+      - 14.75 Président
+      - 20.75 FD Somerset
+      - 29.25 FD Cornish
+  mascarpone:
+    kg:
+      - 8.80 Tesco
+      - 8.92 Asda
+      - 9.00 Sainsbury's
+      - 9.00 Aldi
+      - 7.60 Waitrose
+  ricotta:
+    kg:
+      - 6.00 Tesco
+      - 5.88 Asda
+      - 6.40 Waitrose
+      - 5.88 Sainsbury's
+      - 15.68 FD fior di latte
+  paneer:
+    kg:
+      - 11.28 Tesco
+      - 11.28 Sainsbury's
+      - 8.85 Asda
+      - 9.30 Waitrose
+      - 13.11 FD block
+      - 14.42 FD diced
+  cream cheese:
+    kg:
+      - 11.61 Philadelphia
+      - 7.83 Sainsbury's
+      - 7.75 Tesco
+      - 6.00 Waitrose
+
+  # --- butter, cream and ghee ------------------------------------------------
+  butter, own-label:
+    kg:
+      - 7.96 Tesco
+      - 7.96 Sainsbury's
+      - 7.92 Asda
+      - 6.76 Aldi
+  butter, branded / farm:
+    kg:
+      - 14.00 Lurpak Tesco
+      - 13.50 Lurpak Morrisons
+      - 14.40 Duchy Waitrose
+      - 13.56 FD Brue Valley
+      - 11.96 FD Longmans
+      - 16.45 FD Yeo Valley
+  ghee:
+    kg:
+      - 15.00 East End Tesco
+      - 15.00 East End Sainsbury's
+      - 12.00 KTC Sainsbury's
+      - 14.97 KTC Asda
+      - 14.00 Laila Asda
+      - 10.00 Heera Iceland
+  double cream:
+    l:
+      - 5.00 Tesco
+      - 5.00 Sainsbury's
+      - 5.00 Asda
+      - 5.25 Waitrose
+      - 4.30 Creamfields
+      - 15.69 FD Jersey
+  clotted cream:
+    kg:
+      - 13.66 Tesco
+      - 13.66 Sainsbury's
+      - 14.32 Waitrose
+      - 13.22 Iceland
+      - 10.48 Asda
+      - 14.54 Co-op
+      - 22.04 FD Langage
+  crème fraîche:
+    l:
+      - 2.50 Tesco
+      - 2.67 Asda
+      - 3.50 Sainsbury's
+      - 3.67 Waitrose
+      - 12.05 FD 220 ml
+      - 11.80 FD 250 ml
+
+  # --- special ingredients ---------------------------------------------------
+  saffron:
+    g:
+      - 9.88 Tesco
+      - 9.88 Sainsbury's
+      - 12.25 Waitrose
+      - 11.25 Schwartz
+      - 8.25 Bart
+      - 3.25 East End
+      - 3.00 Fudco
+  vanilla pods:
+    each:
+      - 2.50 Taylor & Colledge
+      - 3.25 Tesco
+      - 3.00 Nielsen-Massey
+      - 3.50 Waitrose
+      - 3.50 Sainsbury's TTD
+      - 2.55 Bart
+  vanilla extract:
+    l:
+      - 63.56 Nielsen-Massey
+      - 36.84 Dr Oetker
+      - 75.00 Sainsbury's TTD
+      - 35.83 Tesco Finest
+      - 50.00 Taylor & Colledge
+  vanilla bean paste:
+    l:
+      - 44.00 Dr Oetker
+      - 61.54 Taylor & Colledge
+      - 95.83 Nielsen-Massey 60 ml
+      - 143.98 Nielsen-Massey 118 ml
+  pine nuts:
+    kg:
+      - 39.50 Tesco
+      - 40.00 Sainsbury's
+      - 36.70 Asda
+  pistachios, shelled:
+    kg:
+      - 30.40 Tesco
+      - 33.33 Waitrose
+      - 30.00 Sainsbury's
+  pecans:
+    kg:
+      - 20.59 Sainsbury's
+      - 20.00 Tesco
+      - 17.50 Tesco halves
+      - 17.65 Tesco 170 g
+      - 24.00 Sainsbury's Mammoth
+  macadamia nuts:
+    kg:
+      - 32.50 Tesco
+      - 29.00 Asda
+      - 32.50 Sainsbury's
+  cashews:
+    kg:
+      - 11.25 Tesco
+      - 10.50 Aasani
+      - 14.80 Fudco
+      - 11.11 Whitworths
+      - 29.00 Sainsbury's Fairtrade
+  hazelnuts:
+    kg:
+      - 25.00 Tesco blanched
+      - 26.00 Sainsbury's blanched
+      - 14.25 Tesco
+      - 22.67 Waitrose
+      - 37.00 Waitrose blanched
+  walnuts:
+    kg:
+      - 11.75 Sainsbury's
+      - 11.25 Tesco
+      - 11.00 Tesco halves
+      - 19.09 Whitworths
+      - 17.50 Fudco
+  almonds:
+    kg:
+      - 13.50 Sainsbury's
+      - 11.00 Tesco
+      - 18.50 Tesco blanched
+      - 19.00 Waitrose blanched
+      - 16.53 Asda blanched
+      - 11.00 Fudco
+  ground almonds:
+    kg:
+      - 17.50 Sainsbury's
+      - 13.20 Tesco
+      - 11.40 Asda
+  maple syrup:
+    l:
+      - 19.89 Clarks
+      - 26.00 Tesco Finest
+      - 24.00 Waitrose Duchy
+      - 24.55 Asda Exceptional
+      - 21.12 Sainsbury's
+      - 15.84 Maple Crest
+  extra virgin olive oil, everyday:
+    l:
+      - 7.00 Tesco
+      - 6.29 Aldi
+      - 7.80 La Española
+      - 9.31 Filippo Berio
+      - 8.00 Napolina
+  extra virgin olive oil, premium:
+    l:
+      - 15.00 Il Casolare
+      - 12.80 Belazu Envero
+      - 15.70 Odysea
+      - 19.90 Filippo Berio Italian
+      - 15.00 Belazu Crete
+      - 15.33 Iliada
+  sesame oil:
+    l:
+      - 11.00 Sainsbury's
+      - 11.00 Tesco
+      - 11.40 Waitrose
+      - 10.56 Asda
+      - 8.80 KTC
+      - 13.29 Lee Kum Kee
+  balsamic vinegar:
+    l:
+      - 7.00 Tesco
+      - 7.00 Sainsbury's
+      - 8.60 Sainsbury's organic
+      - 10.00 Filippo Berio
+  balsamic vinegar, aged:
+    l:
+      - 43.00 Mazzetti
+      - 32.00 Sainsbury's TTD
+      - 32.00 Tesco Finest
+      - 49.40 Belazu
+      - 40.00 Filippo Berio
+  truffle oil:
+    l:
+      - 15.00 Sainsbury's TTD
+      - 12.80 Waitrose
+      - 23.20 La Española
+  dried porcini:
+    kg:
+      - 99.67 Merchant Gourmet
+      - 108.75 Cooks & Co
+      - 103.33 Waitrose
+      - 120.00 M&S
+      - 125.00 Merchant Gourmet Sainsbury's
+  miso:
+    kg:
+      - 19.50 Tesco
+      - 15.91 Morrisons
+      - 22.00 Waitrose
+      - 17.50 Yutaka
+      - 13.33 Clearspring
+      - 15.50 Miso Tasty
+  tahini:
+    kg:
+      - 10.00 Sainsbury's
+      - 10.33 Tesco
+      - 11.17 Waitrose
+      - 11.20 Belazu
+      - 8.70 Baracke
+  harissa:
+    kg:
+      - 21.67 Tesco
+      - 21.11 Asda
+      - 28.42 Waitrose
+      - 29.15 Belazu rose
+      - 17.22 Al'Fez
+      - 17.11 Tesco Finest rose
+  gochujang:
+    kg:
+      - 21.11 Tesco
+      - 19.00 Sainsbury's
+      - 19.05 Waitrose
+      - 13.24 Sun Hee
+      - 4.74 Ajumma Republic 500 g
+  kecap manis:
+    l:
+      - 12.33 Blue Dragon
+      - 8.00 Waitrose
+      - 9.90 Tesco
+      - 6.44 ABC 620 ml
+      - 6.48 ABC 600 ml
+      - 14.00 ABC 275 ml
+  tamarind paste:
+    kg:
+      - 21.67 Sainsbury's
+      - 19.05 Asda
+      - 16.15 Thai Taste
+      - 9.25 Mahi pulp
+      - 4.96 Niru
+  sumac:
+    kg:
+      - 32.22 Sainsbury's
+      - 20.21 Asda
+      - 12.00 Village
+      - 36.73 Waitrose
+      - 53.33 Steenbergs
+      - 29.90 Sussex Wholefoods
+  za'atar:
+    kg:
+      - 57.14 Schwartz
+      - 71.43 Sainsbury's
+      - 61.43 Ocado
+  ras el hanout:
+    kg:
+      - 52.86 Bart
+      - 55.00 Waitrose
+      - 57.14 Schwartz
+  dukkah:
+    kg:
+      - 42.00 Waitrose
+      - 40.91 M&S
+      - 72.00 Ottolenghi
+      - 79.29 Classic Ayurveda
+  cardamom pods:
+    kg:
+      - 41.07 Sainsbury's
+      - 65.00 Fudco
+      - 63.80 Rajah
+      - 65.00 Natco
+  star anise:
+    kg:
+      - 90.91 Tesco
+      - 76.67 Sainsbury's
+      - 150.00 Waitrose
+      - 30.00 Fudco
+  smoked paprika:
+    kg:
+      - 20.83 Tesco
+      - 21.11 Asda
+      - 23.47 Sainsbury's
+      - 50.00 Schwartz
+      - 45.00 Waitrose
+      - 38.57 La Chinata
+  garam masala:
+    kg:
+      - 26.32 Tesco
+      - 30.26 Sainsbury's
+      - 10.33 Asda
+      - 66.67 Schwartz
+      - 12.94 Rajah
+      - 14.00 East End
+  galangal, fresh:
+    kg:
+      - 22.90 Sing Kee
+      - 28.90 Thai Food Direct
+      - 40.00 The Spice Shop
+      - 18.50 Yao Thai
+      - 16.50 Zing Asia
+  curry leaves, fresh:
+    thin: true
+    kg:
+      - 249.50 The Spice Shop
+      - 62.50 Green Oranges
+      - 100.00 Garden Fresh Exotics
+      - 79.50 Veenas
+  makrut lime leaves, fresh:
+    thin: true
+    each:
+      - 0.50 Sainsbury's
+      - 0.55 Tesco
+  marzipan:
+    kg:
+      - 4.70 Silver Spoon
+      - 5.50 Tesco
+      - 5.51 Sainsbury's
+      - 5.50 Waitrose
+      - 5.40 Asda
+      - 8.15 Dr Oetker
+  gelatine leaves:
+    each:
+      - 0.28 Tesco
+      - 0.31 Waitrose
+      - 0.29 Sainsbury's
+      - 0.27 Asda
+      - 0.28 Morrisons
+      - 0.31 Ocado
+  liquid glucose:
+    kg:
+      - 16.43 Tesco
+      - 16.79 Waitrose
+      - 16.07 Sainsbury's
+      - 16.07 Morrisons
+      - 16.43 Ocado
+  medjool dates:
+    kg:
+      - 10.00 Sainsbury's TTD
+      - 10.00 Tesco Finest
+      - 9.94 Medjool Village
+      - 9.25 Natures Candy
+      - 11.11 Greenfields
+      - 13.75 Sainsbury's organic
+  dried figs:
+    kg:
+      - 10.80 Tesco
+      - 12.00 Whitworths
+      - 10.00 Sofra
+      - 11.60 Tesco 250 g
+  prunes:
+    kg:
+      - 6.35 Tesco 1 kg
+      - 8.00 Tesco
+      - 8.75 Sainsbury's
+      - 8.00 Sainsbury's 500 g
+      - 10.53 Whitworths
+  quinoa:
+    kg:
+      - 10.33 Tesco
+      - 10.33 Sainsbury's
+      - 9.80 Asda
+  bulgur wheat:
+    kg:
+      - 4.20 Sainsbury's
+      - 4.00 Tesco
+      - 4.00 Asda
+  freekeh:
+    kg:
+      - 6.50 Waitrose
+      - 8.00 Greenfields
+      - 7.48 Greenfields
+      - 7.50 Ocado
+  fresh gnocchi:
+    kg:
+      - 4.50 Sainsbury's
+      - 4.14 Asda
+      - 4.50 Tesco
+      - 5.88 Co-op
+  fresh pasta:
+    kg:
+      - 4.14 Asda
+      - 5.50 Waitrose
+      - 5.00 Tesco
+      - 6.17 Co-op

@@ -1222,8 +1222,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   ends of 2.** Helen: *"2 points mean, 3-5 points median with range in
   brackets, 6+ points median with IQR in brackets"*, then *"Please update
   cost.yml now, using the bracketed figure we're now using in this table."*
-  No reason given. `costs.yml`'s `confidence` marks the researched rows;
-  Farm Direct, her favourite shop, is one of the sources.
+  No reason given. Farm Direct, her favourite shop, is one of the sources.
+- **2026-11-03, #1458 — the shop prices are kept, and `costs.yml` reads its
+  researched ranges from them.** Helen: *"Yes, add the research table as a
+  reference file that can be updated. Does costs.yml read from it? It
+  probably should do."* `_data/food/price_research.yml` holds each price
+  with its shop; a `costs.yml` unit names the food, and the build takes the
+  bracket and confidence from the list, so re-pricing is editing one list.
 - **2026-11-03, #1458 — both sites print a range as "mean (lowest–highest)",
   everywhere a price shows.** Helen: *"For each food or bottle, please give the
   mean price you found, with (x--y) afterwards for lowest and highest."* The
