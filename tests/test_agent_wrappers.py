@@ -352,6 +352,29 @@ def test_the_hook_leaves_quoted_ampersands_and_redirections_alone(command):
     assert not _unanalyzable_denies(command), f"refused {command!r}"
 
 
+# --- guard-unanalyzable-bash.py shape 13: an unquoted word starting `=` ------
+#
+# zsh expands `=cmd` to that command's path, so the checker asks Helen (#1463).
+
+@pytest.mark.parametrize("command", [
+    "curl --proto =https --output tmp/x https://x",
+    "ls =python3",
+    'grep -n "x" =foo',
+])
+def test_the_hook_refuses_an_unquoted_word_starting_with_equals(command):
+    assert _unanalyzable_denies(command), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    "curl --proto '=https' --output tmp/x https://x",
+    "git log --format=%h --since=yesterday",
+    "grep -n 'a = b' tests/test_agent_wrappers.py",
+    "grep -n a = tests/test_agent_wrappers.py",
+])
+def test_the_hook_leaves_quoted_equals_and_flag_values_alone(command):
+    assert not _unanalyzable_denies(command), f"refused {command!r}"
+
+
 # --- session-ground-truth.py: the one hook that TELLS rather than refuses ----
 #
 # Every other hook here refuses something; this one reports where the session
@@ -711,8 +734,22 @@ def body_file():
     ["pr-body", "helen-triages", "-1", BODY],
     ["pr-body", "helen-triages", "", BODY],
     ["pr-body", "helen-triages", "1", BODY, "-f", "state=closed"],
+    # labels: one plain existing name, nothing that reads as an option
+    ["issue-label", "helen-triages", "1"],
+    ["issue-label", "helen-triages", "1", "bug", "data"],
+    ["issue-label", "helen-triages", "x1", "bug"],
+    ["issue-label", "some-other-repo", "1", "bug"],
+    ["issue-label", "helen-triages", "1", ""],
+    ["issue-label", "helen-triages", "1", "-f"],
+    ["issue-label", "helen-triages", "1", "--method=DELETE"],
+    ["issue-label", "helen-triages", "1", " bug"],
+    ["issue-label", "helen-triages", "1", "bug "],
+    ["issue-label", "helen-triages", "1", "devops  and docs"],
+    ["issue-label", "helen-triages", "1", "bug/../x"],
+    ["issue-label", "helen-triages", "1", "a=b"],
+    ["issue-label", "helen-triages", "1", "bug?x=1"],
 ])
-def test_gh_write_refuses_everything_but_its_three_writes(body_file, args):
+def test_gh_write_refuses_everything_but_its_four_writes(body_file, args):
     _assert_refused("gh-write.sh", args)
 
 
@@ -758,6 +795,65 @@ def test_gh_write_comments_on_an_issue_or_pr(body_file):
                          "repos/DeckOfPandas/helen-triages/issues/1064/comments"]
     fields = [lines[i + 1] for i, line in enumerate(lines) if line in ("-f", "-F")]
     assert fields == [f"body=@{BODY}"]
+
+
+@pytest.mark.parametrize("label", ["bug", "devops and docs", "github_actions"])
+def test_gh_write_adds_one_label_to_an_issue_or_pr(label):
+    lines = _gh_write_lines(["issue-label", "helen-triages", "1463", label])
+    assert lines[:4] == ["api", "--method", "POST",
+                         "repos/DeckOfPandas/helen-triages/issues/1463/labels"]
+    fields = [lines[i + 1] for i, line in enumerate(lines) if line in ("-f", "-F")]
+    assert fields == [f"labels[]={label}"], f"a label call sends only the label, not {fields!r}"
+
+
+# --- git-diff-main-checkout.sh: the main checkout's edits, read-only ----------
+#
+# It reads a checkout outside the worktree, so its one write -- the --patch
+# file -- is held to tmp/ and its paths to plain relative ones (#1463).
+
+@pytest.mark.parametrize("args", [
+    ["--patch"],
+    ["--patch", "x.patch"],
+    ["--patch", "/etc/x.patch"],
+    ["--patch", "tmp/../x.patch"],
+    ["--patch", "tmp/a b.patch"],
+    ["--patch", "tmp/x.patch", "--output=/etc/x"],
+    ["--output=/etc/x"],
+    ["--no-index", "a", "b"],
+    ["/etc/passwd"],
+    ["../README.md"],
+    ["--stat", "-p"],
+    ["$HOME"],
+])
+def test_git_diff_main_checkout_refuses_options_and_outside_paths(args):
+    _assert_refused("git-diff-main-checkout.sh", args)
+
+
+def test_git_diff_main_checkout_refuses_a_symlinked_patch_file():
+    link = ROOT / "tmp" / "test-diff-main-link.patch"
+    link.parent.mkdir(exist_ok=True)
+    link.unlink(missing_ok=True)
+    link.symlink_to(ROOT / "CLAUDE.md")
+    try:
+        _assert_refused("git-diff-main-checkout.sh", ["--patch", "tmp/test-diff-main-link.patch"])
+    finally:
+        link.unlink()
+
+
+def test_git_diff_main_checkout_writes_its_patch_under_tmp():
+    out = "tmp/test-diff-main.patch"
+    try:
+        result = _run("git-diff-main-checkout.sh", "--patch", out, "CLAUDE.md")
+        assert result.returncode == 0, result.stderr
+        assert result.stdout.strip() == f"wrote {out}"
+        assert (ROOT / out).is_file()
+    finally:
+        (ROOT / out).unlink(missing_ok=True)
+
+
+def test_git_diff_main_checkout_stat_runs():
+    result = _run("git-diff-main-checkout.sh", "--stat", "CLAUDE.md")
+    assert result.returncode == 0, result.stderr
 
 
 # --- github-public-status.sh: logged-out status of our own pages only ---------
