@@ -1,0 +1,495 @@
+# What a food recipe costs, approximately (#1458, DECISIONS §8.2). Shown on
+# local builds only, behind `site.show_costs`; the prices are public either way.
+#
+# _plugins/food_costs.rb matches each shopping-list ingredient against
+# `prices:` and `free:` by keyword, exactly as aisles.yml is matched: the
+# longest whole-word keyword in the folded name wins, so `butter beans` beats
+# `butter`. The browser is handed each ingredient's rates and the `units:`
+# table, and only multiplies.
+#
+# A price row gives any of these, each `[low, high]` in GBP:
+#   kg     per kilogram          l      per litre
+#   each   per piece             pack   per supermarket pack or bunch
+#   <unit> per that unit, for one no family covers (`head` of garlic, `cm`
+#          of ginger)
+# Low is a budget own-label shelf price, high a premium or branded one.
+# A spoon of a thing priced by weight is costed as if 1 ml weighed 1 g, and
+# the other way round: rough, and too small to matter.
+#
+# `confidence` as in _data/cocktails/costs.yml: `medium` is a row compared
+# with live supermarket listings on the `checked` date; a row without one is
+# `low`, an estimate, and the first to overwrite. Shelf prices, never offers.
+
+# The day the prices were last compared with shops. A test fails once it is
+# two years old; the fix is re-reading the prices, never moving the date alone.
+checked: "2026-11-03"
+
+# Every unit the shopping list can total in, by the name assets/js/
+# shopping-list.js folds it to, as [family, how many of the family's base
+# unit one of it is]. Families: g, ml, each, pack, and free (costs nothing:
+# a pinch is not shopping). kg, l, litre and cl are folded into g and ml
+# before they arrive. A unit missing here is unpriced, and the figure says
+# "from".
+units:
+  g: [g, 1]
+  gram: [g, 1]
+  oz: [g, 28.35]
+  lb: [g, 453.6]
+  g can: [g, 1]
+  g tin: [g, 1]
+  g jar: [g, 1]
+  g pack: [g, 1]
+  g bag: [g, 1]
+  g piece: [g, 1]
+  g bunch: [g, 1]
+  knob: [g, 15]
+  ml: [ml, 1]
+  ml can: [ml, 1]
+  pint: [ml, 568]
+  fl oz: [ml, 28.4]
+  cup: [ml, 240]
+  tsp: [ml, 5]
+  level tsp: [ml, 5]
+  heaped tsp: [ml, 7.5]
+  rounded tsp: [ml, 6]
+  slightly rounded tsp: [ml, 6]
+  large tsp: [ml, 6]
+  tbsp: [ml, 15]
+  level tbsp: [ml, 15]
+  heaped tbsp: [ml, 22]
+  rounded tbsp: [ml, 20]
+  good tbsp: [ml, 20]
+  glass: [ml, 175]
+  large glass: [ml, 250]
+  bottle: [ml, 750]
+  splash: [free, 0]
+  "": [each, 1]
+  each: [each, 1]
+  whole: [each, 1]
+  large: [each, 1]
+  medium: [each, 1]
+  small: [each, 1]
+  piece: [each, 1]
+  clove: [each, 1]
+  stick: [each, 1]
+  stalk: [each, 1]
+  sprig: [each, 1]
+  leaf: [each, 1]
+  rasher: [each, 1]
+  slice: [each, 1]
+  bunch: [pack, 1]
+  small bunch: [pack, 1]
+  large bunch: [pack, 1.5]
+  pack: [pack, 1]
+  small pack: [pack, 1]
+  handful: [pack, 0.5]
+  small handful: [pack, 0.33]
+  large handful: [pack, 0.75]
+  good handful: [pack, 0.6]
+  pinch: [free, 0]
+  good pinch: [free, 0]
+  dash: [free, 0]
+  drop: [free, 0]
+  twist: [free, 0]
+  good grinding: [free, 0]
+
+# Costs nothing, whatever the amount: seasoning, and what comes out of a tap.
+free:
+  - salt
+  - sea salt
+  - black pepper
+  - white pepper
+  - pepper
+  - water
+  # Zest comes off a fruit bought for its juice, or is too little to matter;
+  # by name, because `lemon` is the longer keyword than `zest`.
+  - lemon zest
+  - lime zest
+  - orange zest
+
+prices:
+
+  # --- produce -----------------------------------------------------------
+  apple: { each: [0.20, 0.60], kg: [1.50, 3.50] }
+  apples: { each: [0.20, 0.60], kg: [1.50, 3.50] }
+  apricots: { kg: [3.00, 7.00], each: [0.20, 0.50] }
+  asparagus: { kg: [6.00, 14.00] }
+  aubergine: { each: [0.60, 1.20] }
+  avocado: { each: [0.60, 1.50] }
+  banana: { each: [0.12, 0.30] }
+  basil: { pack: [0.60, 1.20], g: [0.020, 0.040], each: [0.03, 0.08] }
+  bay leaf: { each: [0.02, 0.08] }
+  bay leaves: { each: [0.02, 0.08] }
+  beansprouts: { kg: [2.50, 5.00] }
+  beetroot: { kg: [1.50, 4.00], each: [0.20, 0.50] }
+  blackberries: { kg: [8.00, 16.00] }
+  blueberries: { kg: [6.00, 14.00] }
+  bok choi: { each: [0.50, 1.20] }
+  broccoli: { kg: [1.50, 4.00], each: [0.50, 1.20] }
+  brussels sprouts: { kg: [1.20, 3.00] }
+  sprouts: { kg: [1.20, 3.00] }
+  butternut squash: { kg: [1.00, 2.50], each: [1.00, 2.00] }
+  squash: { kg: [1.00, 2.50], each: [1.00, 2.00] }
+  cabbage: { each: [0.60, 1.50] }
+  carrot: { each: [0.05, 0.20], kg: [0.50, 1.40] }
+  carrots: { each: [0.05, 0.20], kg: [0.50, 1.40] }
+  cauliflower: { each: [0.80, 2.00] }
+  cavolo nero: { kg: [4.00, 10.00] }
+  celeriac: { each: [0.80, 1.80], kg: [1.20, 2.50] }
+  celery: { each: [0.06, 0.15], kg: [1.00, 2.50] }
+  cherries: { kg: [6.00, 14.00] }
+  cherry tomatoes: { kg: [3.00, 8.00], each: [0.03, 0.08] }
+  chilli: { each: [0.10, 0.30] }
+  chillies: { each: [0.10, 0.30] }
+  chives: { pack: [0.60, 1.20], g: [0.020, 0.040] }
+  coriander: { pack: [0.60, 1.20], g: [0.020, 0.040] }
+  courgette: { each: [0.30, 0.80], kg: [1.50, 3.50] }
+  courgettes: { each: [0.30, 0.80], kg: [1.50, 3.50] }
+  cranberries: { kg: [6.00, 12.00] }
+  cucumber: { each: [0.45, 0.90] }
+  dill: { pack: [0.60, 1.20], g: [0.020, 0.040] }
+  fennel: { each: [0.60, 1.50] }
+  garlic: { each: [0.03, 0.10], head: [0.25, 0.70] }
+  garlic clove: { each: [0.03, 0.10] }
+  garlic cloves: { each: [0.03, 0.10] }
+  ginger: { kg: [3.00, 8.00], cm: [0.03, 0.08], each: [0.20, 0.50] }
+  green beans: { kg: [3.00, 8.00] }
+  herbs: { pack: [0.60, 1.20], g: [0.020, 0.040] }
+  kale: { kg: [2.50, 6.00] }
+  leek: { each: [0.30, 0.80], kg: [1.50, 3.50] }
+  leeks: { each: [0.30, 0.80], kg: [1.50, 3.50] }
+  lemon: { each: [0.25, 0.60] }
+  lemons: { each: [0.25, 0.60] }
+  lemongrass: { each: [0.25, 0.60] }
+  lettuce: { each: [0.50, 1.20] }
+  lime: { each: [0.20, 0.50] }
+  limes: { each: [0.20, 0.50] }
+  lime leaves: { each: [0.05, 0.15] }
+  mango: { each: [0.80, 1.50] }
+  mint: { pack: [0.60, 1.20], g: [0.020, 0.040], each: [0.02, 0.05] }
+  mushrooms: { kg: [2.50, 6.00] }
+  chestnut mushrooms: { kg: [3.00, 7.00] }
+  onion: { each: [0.10, 0.30], kg: [0.70, 1.60] }
+  onions: { each: [0.10, 0.30], kg: [0.70, 1.60] }
+  red onion: { each: [0.15, 0.35], kg: [0.90, 2.00] }
+  red onions: { each: [0.15, 0.35], kg: [0.90, 2.00] }
+  orange: { each: [0.25, 0.70] }
+  oranges: { each: [0.25, 0.70] }
+  blood orange: { each: [0.40, 0.90] }
+  blood oranges: { each: [0.40, 0.90] }
+  parsley: { pack: [0.60, 1.20], g: [0.020, 0.040] }
+  parsnip: { each: [0.15, 0.40], kg: [1.00, 2.50] }
+  parsnips: { each: [0.15, 0.40], kg: [1.00, 2.50] }
+  peaches: { each: [0.30, 0.80] }
+  pear: { each: [0.25, 0.60] }
+  pears: { each: [0.25, 0.60] }
+  red pepper: { each: [0.40, 0.90] }
+  peppers: { each: [0.40, 0.90] }
+  pineapple: { each: [1.00, 2.00] }
+  plums: { kg: [2.50, 5.00], each: [0.15, 0.40] }
+  pomegranate: { each: [0.80, 1.50] }
+  pomegranate seeds: { kg: [8.00, 16.00] }
+  potato: { each: [0.10, 0.30], kg: [0.70, 2.00] }
+  potatoes: { each: [0.10, 0.30], kg: [0.70, 2.00] }
+  new potatoes: { kg: [1.00, 3.00] }
+  baby potatoes: { kg: [1.00, 3.00] }
+  sweet potato: { each: [0.40, 0.90], kg: [1.20, 3.00] }
+  sweet potatoes: { each: [0.40, 0.90], kg: [1.20, 3.00] }
+  raspberries: { kg: [8.00, 18.00] }
+  rhubarb: { kg: [3.00, 7.00] }
+  rocket: { kg: [8.00, 16.00] }
+  rosemary: { pack: [0.60, 1.20], each: [0.05, 0.12] }
+  sage: { pack: [0.60, 1.20], each: [0.02, 0.05] }
+  shallot: { each: [0.10, 0.30], kg: [2.00, 5.00] }
+  shallots: { each: [0.10, 0.30], kg: [2.00, 5.00] }
+  banana shallots: { each: [0.20, 0.50] }
+  sorrel: { pack: [0.80, 1.50], g: [0.025, 0.050] }
+  spinach: { kg: [3.50, 8.00] }
+  spring onion: { each: [0.06, 0.15], pack: [0.50, 0.90] }
+  spring onions: { each: [0.06, 0.15], pack: [0.50, 0.90] }
+  strawberries: { kg: [4.00, 10.00] }
+  tarragon: { pack: [0.60, 1.20], g: [0.020, 0.040], each: [0.03, 0.08] }
+  thyme: { pack: [0.60, 1.20], each: [0.03, 0.08] }
+  tomato: { each: [0.10, 0.40], kg: [1.50, 4.50] }
+  tomatoes: { each: [0.10, 0.40], kg: [1.50, 4.50] }
+  turnip: { each: [0.20, 0.50], kg: [1.00, 2.50] }
+  turnips: { each: [0.20, 0.50], kg: [1.00, 2.50] }
+  watercress: { kg: [8.00, 16.00] }
+
+  # --- meat --------------------------------------------------------------
+  bacon: { kg: [8.00, 16.00], each: [0.15, 0.40] }
+  beef: { kg: [9.00, 18.00] }
+  beef fillet: { kg: [35.00, 70.00], confidence: medium }
+  beef fillets: { kg: [35.00, 70.00], confidence: medium }
+  parma ham: { kg: [25.00, 45.00], each: [0.25, 0.60] }
+  prosciutto: { kg: [25.00, 45.00], each: [0.25, 0.60] }
+  fillet of beef: { kg: [35.00, 70.00], confidence: medium }
+  beef mince: { kg: [6.00, 12.00] }
+  short ribs: { kg: [10.00, 18.00] }
+  steak: { kg: [18.00, 40.00] }
+  chicken: { kg: [3.00, 8.00] }
+  chicken breast: { kg: [6.00, 14.00], each: [1.20, 2.50] }
+  chicken breasts: { kg: [6.00, 14.00], each: [1.20, 2.50] }
+  chicken thighs: { kg: [3.50, 9.00], each: [0.50, 1.20] }
+  chicken legs: { kg: [3.50, 8.00], each: [0.90, 1.80] }
+  chorizo: { kg: [12.00, 22.00] }
+  duck: { kg: [6.00, 12.00], each: [12.00, 25.00], confidence: medium }
+  duck breast: { kg: [14.00, 25.00], each: [3.00, 5.50] }
+  duck breasts: { kg: [14.00, 25.00], each: [3.00, 5.50] }
+  duck legs: { kg: [5.00, 15.00], each: [1.50, 4.00], confidence: medium }
+  duck leg: { kg: [5.00, 15.00], each: [1.50, 4.00], confidence: medium }
+  gammon: { kg: [6.00, 14.00] }
+  goose: { kg: [12.00, 20.00] }
+  ham: { kg: [6.00, 14.00] }
+  lamb: { kg: [10.00, 20.00] }
+  lamb mince: { kg: [8.00, 14.00] }
+  mutton: { kg: [9.00, 18.00] }
+  oxtail: { kg: [8.00, 15.00] }
+  pancetta: { kg: [14.00, 25.00] }
+  pork: { kg: [5.00, 10.00] }
+  pork belly: { kg: [7.00, 13.00] }
+  pork mince: { kg: [5.00, 10.00] }
+  sausages: { kg: [5.00, 12.00], each: [0.30, 0.90] }
+  turkey: { kg: [5.00, 15.00] }
+  venison: { kg: [14.00, 35.00], confidence: medium }
+
+  # --- fish --------------------------------------------------------------
+  anchovies: { kg: [25.00, 50.00] }
+  cod: { kg: [14.00, 25.00] }
+  haddock: { kg: [12.00, 22.00] }
+  mackerel: { kg: [8.00, 14.00] }
+  smoked mackerel: { kg: [10.00, 18.00] }
+  mussels: { kg: [4.00, 9.00] }
+  prawns: { kg: [12.00, 28.00] }
+  salmon: { kg: [15.00, 31.00], each: [2.50, 4.50], confidence: medium }
+  smoked salmon: { kg: [18.00, 50.00], confidence: medium }
+  tuna: { kg: [8.00, 15.00] }
+
+  # --- dairy & eggs --------------------------------------------------------
+  butter: { kg: [8.00, 13.00], confidence: medium }
+  buttermilk: { l: [1.50, 3.50] }
+  cheddar: { kg: [6.00, 15.00] }
+  cheese: { kg: [6.00, 20.00] }
+  cream: { l: [3.00, 7.00] }
+  cream cheese: { kg: [4.00, 9.00] }
+  clotted cream: { kg: [10.00, 18.00] }
+  double cream: { l: [4.60, 8.80], confidence: medium }
+  single cream: { l: [3.50, 7.00] }
+  soured cream: { l: [3.00, 6.00] }
+  whipping cream: { l: [4.00, 8.00] }
+  crème fraîche: { l: [3.00, 7.00] }
+  creme fraiche: { l: [3.00, 7.00] }
+  egg: { each: [0.20, 0.55] }
+  eggs: { each: [0.20, 0.55] }
+  egg white: { each: [0.20, 0.55] }
+  egg whites: { each: [0.20, 0.55] }
+  egg yolk: { each: [0.20, 0.55] }
+  egg yolks: { each: [0.20, 0.55] }
+  feta: { kg: [7.00, 15.00] }
+  goat's cheese: { kg: [10.00, 20.00] }
+  gruyère: { kg: [14.00, 28.00] }
+  gruyere: { kg: [14.00, 28.00] }
+  halloumi: { kg: [9.00, 15.00] }
+  mascarpone: { kg: [5.00, 10.00] }
+  milk: { l: [0.90, 1.80] }
+  mozzarella: { kg: [5.00, 12.00] }
+  parmesan: { kg: [14.00, 30.00] }
+  pecorino: { kg: [14.00, 28.00] }
+  ricotta: { kg: [5.00, 10.00] }
+  stilton: { kg: [10.00, 20.00] }
+  yoghurt: { kg: [1.50, 6.00] }
+  yogurt: { kg: [1.50, 6.00] }
+  greek yoghurt: { kg: [2.50, 7.00] }
+
+  # --- bakery ------------------------------------------------------------
+  bread: { kg: [1.00, 4.00], each: [0.08, 0.30] }
+  breadcrumbs: { kg: [3.00, 8.00] }
+  puff pastry: { kg: [3.00, 8.00] }
+  shortcrust pastry: { kg: [3.00, 7.00] }
+  filo pastry: { kg: [5.00, 10.00] }
+
+  # --- frozen ------------------------------------------------------------
+  frozen peas: { kg: [1.00, 2.50] }
+  peas: { kg: [1.00, 2.50] }
+
+  # --- store cupboard ----------------------------------------------------
+  almonds: { kg: [9.00, 16.00] }
+  ground almonds: { kg: [8.00, 16.00] }
+  flaked almonds: { kg: [10.00, 18.00] }
+  baking powder: { kg: [5.00, 15.00] }
+  bicarbonate of soda: { kg: [5.00, 12.00] }
+  barley: { kg: [1.50, 3.50] }
+  beans: { kg: [1.20, 3.50] }
+  butter beans: { kg: [1.20, 3.50] }
+  cannellini beans: { kg: [1.20, 3.50] }
+  chickpeas: { kg: [1.20, 3.50] }
+  capers: { kg: [10.00, 25.00] }
+  cashews: { kg: [10.00, 20.00] }
+  chestnuts: { kg: [8.00, 14.00] }
+  chocolate: { kg: [8.00, 25.00] }
+  dark chocolate: { kg: [8.00, 25.00] }
+  milk chocolate: { kg: [7.00, 20.00] }
+  white chocolate: { kg: [8.00, 20.00] }
+  cocoa: { kg: [8.00, 20.00] }
+  cocoa powder: { kg: [8.00, 20.00] }
+  coconut: { kg: [5.00, 10.00] }
+  coconut milk: { l: [2.50, 6.00] }
+  cornflour: { kg: [2.00, 4.50] }
+  couscous: { kg: [1.50, 4.00] }
+  currants: { kg: [3.00, 7.00] }
+  dates: { kg: [5.00, 12.00] }
+  dried apricots: { kg: [5.00, 10.00] }
+  dried cranberries: { kg: [6.00, 12.00] }
+  flour: { kg: [0.45, 1.40] }
+  strong flour: { kg: [0.60, 1.80] }
+  wholemeal flour: { kg: [0.60, 1.80] }
+  rice flour: { kg: [2.00, 5.00] }
+  glacé cherries: { kg: [6.00, 12.00] }
+  glace cherries: { kg: [6.00, 12.00] }
+  hazelnuts: { kg: [10.00, 20.00] }
+  jam: { kg: [2.00, 7.00] }
+  lasagne: { kg: [2.00, 4.00] }
+  lentils: { kg: [2.00, 5.00] }
+  marmalade: { kg: [2.50, 7.00] }
+  mayonnaise: { kg: [2.50, 6.00] }
+  mixed peel: { kg: [5.00, 10.00] }
+  noodles: { kg: [3.00, 8.00] }
+  oats: { kg: [0.90, 3.00] }
+  orzo: { kg: [1.50, 4.00] }
+  panko: { kg: [3.00, 8.00] }
+  pasta: { kg: [1.00, 4.00] }
+  passata: { kg: [1.00, 3.00] }
+  peanut butter: { kg: [3.50, 8.00] }
+  peanuts: { kg: [4.00, 8.00] }
+  pecans: { kg: [14.00, 26.00] }
+  pine nuts: { kg: [25.00, 50.00] }
+  pistachios: { kg: [18.00, 35.00] }
+  raisins: { kg: [3.00, 7.00] }
+  rice: { kg: [1.00, 4.00] }
+  basmati rice: { kg: [1.50, 4.50] }
+  risotto rice: { kg: [2.50, 5.00] }
+  sesame seeds: { kg: [6.00, 14.00] }
+  # Each stock by name: the longest keyword wins, so `chicken stock` would
+  # otherwise be priced as chicken.
+  stock: { l: [0.20, 4.00] }
+  chicken stock: { l: [0.20, 4.00] }
+  beef stock: { l: [0.20, 4.00] }
+  vegetable stock: { l: [0.20, 4.00] }
+  fish stock: { l: [0.30, 5.00] }
+  lemon curd: { kg: [3.00, 8.00] }
+  ketchup: { kg: [1.50, 4.00] }
+  chilli sauce: { l: [6.00, 15.00] }
+  sriracha: { l: [6.00, 15.00] }
+  onion powder: { kg: [15.00, 40.00] }
+  cream of tartar: { kg: [15.00, 30.00] }
+  coconut cream: { l: [3.00, 8.00] }
+  sour cream: { l: [3.00, 6.00] }
+  sugar snap peas: { kg: [5.00, 10.00] }
+  rice wine: { l: [6.00, 15.00] }
+  orange blossom water: { l: [10.00, 20.00] }
+  sultanas: { kg: [3.00, 7.00] }
+  tahini: { kg: [7.00, 14.00] }
+  tomato purée: { kg: [3.00, 7.00] }
+  tomato puree: { kg: [3.00, 7.00] }
+  chopped tomatoes: { kg: [1.00, 3.00] }
+  walnuts: { kg: [9.00, 18.00] }
+  yeast: { kg: [10.00, 30.00] }
+
+  # sugars and syrups
+  sugar: { kg: [0.95, 1.60] }
+  caster sugar: { kg: [1.10, 2.20] }
+  golden caster sugar: { kg: [1.40, 2.40] }
+  icing sugar: { kg: [1.40, 2.80] }
+  brown sugar: { kg: [1.60, 3.00] }
+  demerara sugar: { kg: [1.50, 2.80] }
+  muscovado sugar: { kg: [2.50, 4.50] }
+  golden syrup: { kg: [2.00, 3.60] }
+  black treacle: { kg: [3.00, 5.00] }
+  treacle: { kg: [3.00, 5.00] }
+  honey: { kg: [3.00, 15.00] }
+  maple syrup: { l: [15.00, 35.00] }
+
+  # oils, vinegars and sauces
+  oil: { l: [1.60, 6.00] }
+  olive oil: { l: [5.00, 12.00] }
+  extra virgin olive oil: { l: [7.00, 18.00] }
+  extra-virgin olive oil: { l: [7.00, 18.00] }
+  vegetable oil: { l: [1.60, 3.50] }
+  sunflower oil: { l: [1.60, 3.50] }
+  rapeseed oil: { l: [2.00, 6.00] }
+  groundnut oil: { l: [3.00, 7.00] }
+  sesame oil: { l: [10.00, 25.00] }
+  coconut oil: { kg: [8.00, 16.00] }
+  vinegar: { l: [1.50, 6.00] }
+  wine vinegar: { l: [1.50, 6.00] }
+  red wine vinegar: { l: [1.50, 6.00] }
+  white wine vinegar: { l: [1.50, 6.00] }
+  cider vinegar: { l: [1.50, 6.00] }
+  balsamic vinegar: { l: [3.00, 20.00] }
+  sherry vinegar: { l: [6.00, 15.00] }
+  rice vinegar: { l: [4.00, 10.00] }
+  rice wine vinegar: { l: [4.00, 10.00] }
+  soy sauce: { l: [3.00, 10.00] }
+  fish sauce: { l: [5.00, 12.00] }
+  oyster sauce: { l: [5.00, 12.00] }
+  hoisin sauce: { l: [5.00, 12.00] }
+  worcestershire sauce: { l: [6.00, 14.00] }
+  mirin: { l: [8.00, 20.00] }
+  miso: { kg: [8.00, 20.00] }
+  miso paste: { kg: [8.00, 20.00] }
+  mustard: { kg: [4.00, 12.00] }
+  mustard powder: { kg: [20.00, 40.00] }
+  curry paste: { kg: [8.00, 20.00] }
+  tamarind paste: { kg: [6.00, 15.00] }
+  vanilla extract: { l: [60.00, 200.00] }
+  vanilla bean paste: { l: [150.00, 350.00] }
+  vanilla pod: { each: [1.50, 4.00] }
+
+  # --- spices & seasonings -----------------------------------------------
+  allspice: { kg: [20.00, 50.00] }
+  caraway seeds: { kg: [20.00, 50.00] }
+  cardamom: { kg: [40.00, 100.00], each: [0.03, 0.08] }
+  cardamom pods: { kg: [40.00, 100.00], each: [0.03, 0.08] }
+  chilli flakes: { kg: [15.00, 40.00] }
+  chilli powder: { kg: [15.00, 40.00] }
+  cinnamon: { kg: [15.00, 45.00] }
+  cinnamon stick: { each: [0.15, 0.50] }
+  cinnamon sticks: { each: [0.15, 0.50] }
+  cloves: { kg: [30.00, 80.00], each: [0.01, 0.03] }
+  coriander seeds: { kg: [12.00, 35.00] }
+  ground coriander: { kg: [12.00, 35.00] }
+  cumin: { kg: [15.00, 40.00] }
+  dried oregano: { kg: [25.00, 60.00] }
+  dried herbs: { kg: [25.00, 60.00] }
+  fennel seeds: { kg: [15.00, 40.00] }
+  five-spice: { kg: [20.00, 50.00] }
+  garam masala: { kg: [20.00, 50.00] }
+  garlic granules: { kg: [15.00, 40.00] }
+  garlic powder: { kg: [15.00, 40.00] }
+  ground ginger: { kg: [15.00, 40.00] }
+  mixed spice: { kg: [20.00, 50.00] }
+  mustard seeds: { kg: [10.00, 30.00] }
+  nigella seeds: { kg: [15.00, 40.00] }
+  nutmeg: { each: [0.25, 0.60], kg: [30.00, 70.00] }
+  paprika: { kg: [15.00, 40.00] }
+  smoked paprika: { kg: [20.00, 50.00] }
+  peppercorns: { kg: [15.00, 40.00], each: [0.001, 0.003] }
+  black peppercorns: { kg: [15.00, 40.00], each: [0.001, 0.003] }
+  saffron: { kg: [4000.00, 10000.00] }
+  star anise: { kg: [25.00, 60.00], each: [0.03, 0.08] }
+  turmeric: { kg: [12.00, 35.00] }
+
+  # --- drinks ------------------------------------------------------------
+  beer: { l: [2.50, 6.00] }
+  brandy: { l: [20.00, 45.00] }
+  cider: { l: [2.00, 5.00] }
+  port: { l: [10.00, 20.00] }
+  rum: { l: [18.00, 35.00] }
+  sake: { l: [10.00, 25.00] }
+  sherry: { l: [8.00, 16.00] }
+  wine: { l: [5.00, 12.00] }
+  red wine: { l: [5.00, 12.00] }
+  white wine: { l: [5.00, 12.00] }
+  orange juice: { l: [1.00, 3.00] }
+  lemon juice: { l: [3.00, 8.00] }
+  lime juice: { l: [3.00, 8.00] }

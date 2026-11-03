@@ -114,7 +114,8 @@
 
 // A recipe's name here is the index row's title, smaller, and a link. These
 // are `.recipe-title-link`'s type values (_recipe-list.scss) at the size of
-// the surrounding text: if the titles change, change both.
+// the surrounding text: if the titles change, change both. The drinks twin is
+// `.shopping-list-drink-link` (cocktails/_shortlist.scss).
 .shopping-list-recipe-link {
   font-family: $font-headings;
   font-size: 1em;
@@ -259,6 +260,40 @@
 .shopping-list-empty {
   font-size: 0.95rem;
   color: $color-clear-text;
+}
+
+// --- what it costs (#1458), local only --------------------------------------
+// The cocktail list's three, class for class (cocktails/_shortlist.scss).
+// Nothing here hides them: filters.js draws none of them unless
+// #food-cost-units is on the page, which is a local build only.
+
+// "@ £1.80 a portion" after a recipe's sentence: dimmed, an aside.
+.shopping-list-cost {
+  color: $color-clear-text;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// A row's price, pushed right so the prices form a column to read down.
+.shopping-list-price {
+  margin-left: auto;
+  flex: 0 0 auto;
+  padding-left: $space-sm;
+  font-family: $font-label;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: $color-clear-text;
+  white-space: nowrap;
+}
+
+.shopping-list-total {
+  margin: $space-sm 0 0;
+  padding-top: $space-xs;
+  font-family: $font-label;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  color: $color-text;
+  text-align: right;
 }
 
 // On a narrow phone the amount sits on its own line above the name, which

@@ -1253,7 +1253,8 @@ and run `IS.create(vocab).search('chi', IS.buildMasterList(entries))` in Node.
 ### 8.2 The food shopping list and its scaler
 
 Two controls share one set of arithmetic: the shopping list at the foot of the
-food index, and the scaler on each recipe page. Costing is cocktails' only.
+food index, and the scaler on each recipe page. The list is costed on a local
+build only ("What it costs", below).
 The rulings behind every rule here are in DECISIONS §8.2.
 
 #### Where each part lives
@@ -1479,6 +1480,38 @@ exclusion index and the list must agree on it; the fruit travels beside it.
 **A pointer is keyed on its own words** (`whole_fruit.pointers`, or "the zest
 of the one …"), never on "no amount, same name": "salted butter, extra, for
 greasing" is extra and stays counted.
+
+#### What it costs — local only
+
+`site.show_costs` (`_config_local.yml` alone) puts each ingredient's rate
+(`r`) into `#recipe-ingredients` and the unit table into
+`#food-cost-units`; without that block `filters.js` costs nothing and draws
+no price. DECISIONS §8.2.
+
+- **Data**: `_data/food/costs.yml`. `prices:` are keyword rows, matched as
+  `aisles.yml` is (longest whole-word keyword in the folded name), each
+  giving any of `kg`, `l`, `each`, `pack` or a named unit (`head`, `cm`) as
+  a `[low, high]` GBP range. `free:` names cost nothing. `units:` says what
+  every folded unit is in grams, millilitres, pieces or packs, or `free`.
+- **Matching**: `_plugins/food_costs.rb`, after `food_shopping.rb`, adds a
+  `rate` to each shopping row in GBP per g, ml, piece or pack. A fruit row is
+  priced by its fruit; a cross-recipe link (`link: true`) never is. The build
+  log's `Food costs:` line says how many names were priced and how long ago
+  the prices were checked. `ruby scripts/food_costs.rb "<name>" ...` asks the
+  matcher without a build.
+- **Arithmetic**: `rowCost` in `food-shopping-list.js` multiplies each total
+  by its unit's rate, or its family's, with a gram and a millilitre standing
+  in for each other. Unquantified lines and `free` units cost nothing. A
+  total it cannot reach makes the row unpriced, or "from £X" where part of
+  it was priced; never zero.
+- **What shows**: each row's price (`.shopping-list-price`), the total under
+  the rows (`.shopping-list-total`, "roughly £X–£Y", or "from £X — n lines
+  have no price"), and after each recipe's sentence one portion of a
+  `serves:` recipe or one batch of a `makes:` one (`.shopping-list-cost`),
+  priced from the recipe as written and fixed whatever the box says.
+- **The usual fix for a "from"** is a keyword in `costs.yml`. Mind the
+  longest-keyword rule: `chicken stock` needs its own row or it is priced as
+  chicken.
 
 #### The recipe page's scaler
 

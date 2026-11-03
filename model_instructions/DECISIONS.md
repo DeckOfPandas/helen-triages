@@ -1188,16 +1188,32 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 
 ### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
 
-- **2026-09-07, #801 — the food index has cocktails' shopping list and scaler,
-  with every feature except costing.** Helen: *"add scaler and shopping list
-  feature to food recipe shortlist page. This can be copied directly from the
-  food page — I would like all the same features. But there is no need to cost
-  the portions. When serving size is unclear, please make your best guess.
-  Group the shopping list by grocery aisle, e.g. produce, dairy, fish, meat,
-  non-perishable etc."* "The food page" was read as the cocktail page, which
-  had the feature since #546. A `serves:` recipe's box counts people, so a
-  fractional multiplier (four portions of a recipe for six) is ordinary here,
-  as it is not for drinks.
+- **2026-09-07, #801 — the food index has cocktails' shopping list and
+  scaler.** Helen: *"add scaler and shopping list feature to food recipe
+  shortlist page. This can be copied directly from the food page — I would
+  like all the same features. ... When serving size is unclear, please make
+  your best guess. Group the shopping list by grocery aisle, e.g. produce,
+  dairy, fish, meat, non-perishable etc."* "The food page" was read as the
+  cocktail page, which had the feature since #546. A `serves:` recipe's box
+  counts people, so a fractional multiplier (four portions of a recipe for
+  six) is ordinary here, as it is not for drinks.
+- **2026-11-03, #1458 — the food shortlist is costed, on a local build only,
+  as the cocktail one is.** Helen: *"Please research food items and use the
+  ranges to give approximate costs for each dish. Display local build only.
+  Display like the cocktails costings."* This replaces #801's *"there is no
+  need to cost the portions"*. `site.show_costs`, `_data/food/costs.yml`,
+  `_plugins/food_costs.rb`; the rows' prices and the total as on the drinks
+  list.
+- **2026-11-03, #1458 — a recipe's line quotes one portion of a `serves:`
+  recipe or one batch of a `makes:` one, and does not move with the box.**
+  Chosen from three shown on the shopping list ("per portion / per batch",
+  "what the line costs", "the whole recipe as written"); the drink's price
+  per glass is the precedent (§9.3.5).
+- **2026-11-03, #1458 — where anything is unpriced, a figure reads "from £X":
+  a lower bound, never withheld and never silent.** Chosen over cocktails'
+  withholding and over an unmarked sum, given that a keyword table cannot
+  price every one of the collection's ingredient names. Seasoning, a pinch
+  and an unquantified line cost nothing and do not count as unpriced.
 - **2026-09-07 — a scaled amount is never rounded coarser than 1 g.** Helen:
   *"For now, don't tidy/round beyond 1 g precision"*, then, unprompted: *"I
   mean don't roudn to 10 g or 5 g, round to 1g"*. Two thirds of 200 g prints

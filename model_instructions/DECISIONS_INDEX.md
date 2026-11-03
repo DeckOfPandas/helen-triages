@@ -189,7 +189,10 @@ argument and the rules each field is read by.
 - undated · §8 · #273 · Undated, #273 — in the exclude picker a descriptor that does not change what the thing is collapses into the plain ingredient.
 - 2026-08-16 · §8 · #281 · an "X or Y" ingredient splits into two picker entries only where both halves are already known ingredients; two joined by a method both count; a citrus fruit covers its juice and …
 - undated · §8 · Undated — gressingham is stripped as a modifier, "five-spice powder" is "five-spice", and to glaze is a trailing phrase.
-- 2026-09-07 · §8.2 · #801 · the food index has cocktails' shopping list and scaler, with every feature except costing.
+- 2026-09-07 · §8.2 · #801 · the food index has cocktails' shopping list and scaler.
+- 2026-11-03 · §8.2 · #1458 · the food shortlist is costed, on a local build only, as the cocktail one is.
+- 2026-11-03 · §8.2 · #1458 · a recipe's line quotes one portion of a serves: recipe or one batch of a makes: one, and does not move with the box.
+- 2026-11-03 · §8.2 · #1458 · where anything is unpriced, a figure reads "from £X": a lower bound, never withheld and never silent.
 - 2026-09-07 · §8.2 · a scaled amount is never rounded coarser than 1 g.
 - 2026-09-07 · §8.2 · the shopping list has ten aisles, in shop order: produce, meat, fish, dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks, other.
 - 2026-09-07 · §8.2 · within an aisle the shopping list is alphabetical.

@@ -139,7 +139,13 @@ module HelenTriages
         next if name.nil?
 
         row = { "amount" => amount.to_s, "name" => name, "aisle" => aisle }
-        mark_fruit(row, raw.to_s) unless raw.to_s.strip.match?(LINK)
+        # A link is another recipe, never priced by a word in its title
+        # (_plugins/food_costs.rb).
+        if raw.to_s.strip.match?(LINK)
+          row["link"] = true
+        else
+          mark_fruit(row, raw.to_s)
+        end
         rows << row
       end
       rows
