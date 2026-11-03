@@ -865,6 +865,7 @@ argument and the rules each field is read by.
 - 2026-08-19 · §14 · #382 · there is no methods tables page and no steak table; fish and shellfish live on the calculator page.
 - 2026-08-21 · §14 · #400 · the sourcing prose cut from cooking_methods.yml is kept in cooking-methods-prose-archive.html, committed and unpublished.
 - 2026-08-21 · §14 · youvetsi carries no internal temperature.
+- 2026-11-03 · §14 · chicken served whole takes poultry.chicken; cut-up chicken does not.
 - undated · §14 · Undated (August 2026) — pork "medium" and fresh ham's "hint of pink" stay as they are.
 - 2026-10-08 · §14 · #1326 · the reference pages have no tooltips, and nothing that lived in one was rehomed.
 - 2026-10-08 · §14 · #1327 · the temperature charts stay one scroll, with the contents as sticky chips; no per-protein picker.

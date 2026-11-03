@@ -5656,6 +5656,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   just fall off at the end, being whatever temperature the pan sits at for 3
   hours"*. It is the third kind of `NO_TEMPERATURE_BECAUSE` entry: a figure
   that is right about the cut and useless in the method.
+- **2026-11-03 — chicken served whole takes `poultry.chicken`; cut-up chicken
+  does not.** Helen: *"breast, legs and thighs served whole should count,
+  diced/strips/whatever should not."* So "no figure for pieces" is a reason
+  only for chicken that has been cut up.
 - **Undated (August 2026) — pork "medium" and fresh ham's "hint of pink" stay
   as they are.** Both sit below the cited safety figure. They were flagged and
   deliberately not corrected: whether to serve pork pink is Helen's call, and

@@ -5112,7 +5112,8 @@ test failure**:
 demands a ref or an entry in `NO_TEMPERATURE_BECAUSE`
 (`tests/test_reference_data.py`). The reasons are of three kinds: the
 protein is not the dish; the data has no figure for that cut (the honest
-gaps, such as chicken pieces); and a figure that is right about the cut and
+gaps, such as diced or sliced chicken; whole breasts, legs and thighs take
+`poultry.chicken`); and a figure that is right about the cut and
 useless in the method, because no step probes anything. Drafts are exempt.
 `test_internal_temp_ref_resolves` (`tests/test_front_matter.py`) catches a
 mistyped path, which Liquid otherwise renders as no section at all.

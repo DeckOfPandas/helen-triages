@@ -231,6 +231,9 @@ aliases:
   vanilla bean paste: vanilla paste
   vanilla bean paste or extract: [vanilla paste, vanilla extract]
   vanilla extract or paste: [vanilla extract, vanilla paste]
+  # Another name for the same product; files print the right-hand form.
+  rice wine vinegar: rice vinegar
+  baking soda: bicarbonate of soda
   # Plurals offered beside their own singular. `singulars` cannot do this: it
   # normalises a word for matching and does not merge two entries. Singular
   # wins, so the label reads as the ingredient.
