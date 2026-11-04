@@ -652,6 +652,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §11 · #1008 · the drafts staging folders are 1-rewrite/, 2-make/, 3-keep/, 4-promote/, the same four in both drafts repos.
 - 2026-10-11 · §11 · 0-not-made/ in the cocktails drafts repo is a temporary bucket for drinks Helen has never made.
 - 2026-09-14 · §11 · #1008 · Claude moves a draft between the staging folders on Helen's word: rewrite, make, keep, ready or bin, followed by a slug.
+- 2026-11-04 · §11 · a food draft that leaves the pool gets the promotion rules run against it.
 - 2026-09-14 · §11 · never create issues or PRs in a burst: a batch of issues is one issue with a checklist.
 - 2026-09-15 · §11 · the account GitHub recorded is read off what a write returns, never assumed.
 - 2026-09-15 · §11 · a command that builds a path at run time gets a committed wrapper, not a prompt.

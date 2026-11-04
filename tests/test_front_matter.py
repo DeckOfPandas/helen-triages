@@ -769,6 +769,12 @@ ADJUDICATED_REWRITES = {
             "stage-everything swept them into an unrelated commit. Covered "
             "by her standing grant under 026f3224."
         ),
+        "fc0742e8": (
+            "2-make/crispy-whole-roast-duck.md and 2-make/new-best-ever-"
+            "lasagne-thats-actually-good-this-time.md, 2026-11-04. Helen's "
+            "own rewrites and flags, committed for her as she left them. "
+            "Covered by her standing grant under 026f3224."
+        ),
     },
 }
 

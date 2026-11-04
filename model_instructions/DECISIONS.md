@@ -4334,6 +4334,13 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   there are a few intermediate states."* This reversed "never move a file
   between these folders unless asked" by making the word the ask. Each move is
   a commit on a branch of the private repo.
+- **2026-11-04 — a food draft that leaves the pool gets the promotion rules
+  run against it.** Helen: *"I want you to run the promotion rules against
+  drafts I progress from the main pool,"* wanting to "promote 3-keep recipes
+  ASAP" and to cook from `2-make/` "without being infuriated". `python3
+  scripts/promotion_qa.py` sorts what it finds into FIX, HELEN'S and AT
+  PROMOTION; a `2-make/` draft is also checked to render and read for sense.
+  PIPELINE.md §3.
 - **2026-09-14 — never create issues or PRs in a burst: a batch of issues is
   one issue with a checklist.** Twenty issues and two PRs in under an hour got
   the agent account flagged as spam, and GitHub hid everything it had ever
