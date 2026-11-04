@@ -33,8 +33,18 @@ module HelenTriages
       end
       rows.sort_by! { |word, _| [-word.length, word] }
       rows.map do |word, rate|
-        [/(?<![a-z0-9])#{Regexp.escape(word)}(?![a-z0-9])/, rate, word]
+        [/(?<![a-z0-9])#{plural_pattern(word)}(?![a-z0-9])/, rate, word]
       end
+    end
+
+    # A keyword also matches its plural (s, es, y to ies, f to ves), so
+    # costs.yml writes the singular only. A plural written as its own row is
+    # longer, so it still wins over its singular.
+    def plural_pattern(word)
+      forms = [word, "#{word}s", "#{word}es"]
+      forms << "#{word[0..-2]}ies" if word.match?(/[^aeiou]y\z/)
+      forms << "#{word[0..-2]}ves" if word.end_with?("f")
+      "(?:#{forms.map { |form| Regexp.escape(form) }.join('|')})"
     end
 
     def rate_from(row, foods = {}, word = nil)

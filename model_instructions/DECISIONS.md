@@ -1231,6 +1231,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   bracket and confidence from the list, so re-pricing is editing one list.
   Where to look first, for every food: *"Use Ocado and Farm Direct where
   possible, then e.g. Tesco, Asda, etc as you did before."*
+- **2026-11-04, #1468 — stock is priced as made up from cubes, never as
+  ready-made liquid stock.** Helen: *"Stock: use the stock cube price.
+  Pre-made liquid stock is invariably horrible!"* A litre's price is the
+  cube's at the packet's dilution.
+- **2026-11-04, #1468 — shop prices are what a household pays, not trade
+  prices.** Of sorrel: *"Commercial buyers can get it for about £20/kg but
+  that's not us."*
+- **2026-11-04, #1468 — a `costs.yml` keyword matches its plural, so a row is
+  written singular.** Helen: *"Please do the collapsing of the plurals
+  work."*
 - **2026-11-03, #1458 — both sites print a range as "mean (lowest–highest)",
   everywhere a price shows.** Helen: *"For each food or bottle, please give the
   mean price you found, with (x--y) afterwards for lowest and highest."* The

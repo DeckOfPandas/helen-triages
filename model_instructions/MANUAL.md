@@ -1489,8 +1489,11 @@ greasing" is extra and stays counted.
 no price. DECISIONS §8.2.
 
 - **Data**: `_data/food/costs.yml`. `prices:` are keyword rows, matched as
-  `aisles.yml` is (longest whole-word keyword in the folded name), each
-  giving any of `kg`, `l`, `each`, `pack` or a named unit (`head`, `cm`) as
+  `aisles.yml` is (longest whole-word keyword in the folded name), except
+  that a keyword also matches its plural (`s`, `es`, `y`→`ies`, `f`→`ves`),
+  so a row is written singular and a plural row exists only to price
+  differently (`peppers` beside the free `pepper`). Each row gives
+  any of `kg`, `l`, `each`, `pack` or a named unit (`head`, `cm`) as
   a `[low, high]` GBP range. `free:` names cost nothing. `units:` says what
   every folded unit is in grams, millilitres, pieces or packs, or `free`.
 - **Where a range comes from**: a unit written as a food's name
@@ -1501,7 +1504,9 @@ no price. DECISIONS §8.2.
   Confidence is `high` for 4+ prices whose dearest is within twice the
   cheapest, `medium` for 2+, `low` for one price or a food marked `thin`. A
   unit written as `[low, high]` is an estimate, unless its row says
-  `confidence`. To re-price, edit the research file's list and its
+  `confidence`. Stock is priced from cubes: its `l` prices are a cube at the
+  packet's dilution, never ready-made liquid stock. Prices are retail, never
+  trade. To re-price, edit the research file's list and its
   `checked`; `python3 scripts/food_price_table.py` writes the table, prices
   and bracket per food, to `tmp/food-price-research.md` for reading.
 - **Matching**: `_plugins/food_costs.rb`, after `food_shopping.rb`, adds a

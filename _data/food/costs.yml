@@ -2,7 +2,8 @@
 # `site.show_costs`; the prices are public either way. MANUAL §8.2.
 #
 # Matched as aisles.yml is: the longest whole-word keyword in the folded name
-# wins, so `butter beans` beats `butter`. A row gives any of `kg`, `l`,
+# wins, so `butter beans` beats `butter`; a keyword also matches its plural,
+# so a row is written singular. A row gives any of `kg`, `l`,
 # `each`, `pack` or a named unit (`head`, `cm`), each `[low, high]` in GBP.
 # A spoon of a thing priced by weight is costed at 1 ml to 1 g.
 #
@@ -101,7 +102,6 @@ prices:
 
   # --- produce -----------------------------------------------------------
   apple: { each: "apple", kg: "apple" }
-  apples: { each: "apple", kg: "apple" }
   apricots: { kg: "apricots", each: [0.20, 0.50] }
   asparagus: { kg: "asparagus" }
   aubergine: { each: "aubergine" }
@@ -109,7 +109,6 @@ prices:
   banana: { each: "banana" }
   basil: { pack: "basil", kg: "basil", each: [0.03, 0.08] }
   bay leaf: { kg: "bay leaf", each: [0.02, 0.08] }
-  bay leaves: { kg: "bay leaf", each: [0.02, 0.08] }
   beansprouts: { kg: "beansprouts" }
   beetroot: { kg: "beetroot", each: [0.20, 0.50] }
   blackberries: { kg: "blackberries" }
@@ -122,7 +121,6 @@ prices:
   squash: { kg: "butternut squash", each: "butternut squash" }
   cabbage: { each: "cabbage" }
   carrot: { kg: "carrot", each: "carrot" }
-  carrots: { kg: "carrot", each: "carrot" }
   cauliflower: { each: "cauliflower" }
   cavolo nero: { kg: "cavolo nero" }
   celeriac: { each: "celeriac", kg: "celeriac" }
@@ -130,49 +128,37 @@ prices:
   cherries: { kg: "cherries" }
   cherry tomatoes: { kg: "cherry tomatoes", each: [0.03, 0.08] }
   chilli: { kg: "chilli", each: [0.10, 0.30] }
-  chillies: { kg: "chilli", each: [0.10, 0.30] }
   chives: { pack: "chives", kg: "chives" }
   coriander: { pack: "coriander", kg: "coriander" }
   courgette: { each: "courgette", kg: "courgette" }
-  courgettes: { each: "courgette", kg: "courgette" }
   cranberries: { kg: "cranberries" }
   cucumber: { each: "cucumber" }
   dill: { pack: "dill", kg: "dill" }
   fennel: { each: "fennel" }
   garlic: { head: "garlic", kg: "garlic", each: [0.03, 0.10] }
   garlic clove: { each: [0.03, 0.10] }
-  garlic cloves: { each: [0.03, 0.10] }
   ginger: { kg: "ginger", cm: [0.03, 0.08], each: [0.20, 0.50] }
   green beans: { kg: "green beans" }
   herbs: { pack: "herbs", kg: "herbs" }
   kale: { kg: "kale" }
   leek: { kg: "leek", each: "leek" }
-  leeks: { kg: "leek", each: "leek" }
   lemon: { each: "lemon" }
-  lemons: { each: "lemon" }
   lemongrass: { each: "lemongrass" }
   lettuce: { each: "lettuce" }
   lime: { each: "lime" }
-  limes: { each: "lime" }
   lime leaves: { each: "makrut lime leaves, fresh" }
   mango: { each: "mango" }
   mint: { pack: "mint", kg: "mint", each: [0.02, 0.05] }
   mushrooms: { kg: "mushrooms" }
   chestnut mushrooms: { kg: "chestnut mushrooms" }
   onion: { each: "onion", kg: "onion" }
-  onions: { each: "onion", kg: "onion" }
   red onion: { each: "red onion", kg: "red onion" }
-  red onions: { each: "red onion", kg: "red onion" }
   orange: { each: "orange" }
-  oranges: { each: "orange" }
   blood orange: { each: "blood orange" }
-  blood oranges: { each: "blood orange" }
   parsley: { pack: "parsley", kg: "parsley" }
   parsnip: { each: "parsnip", kg: "parsnip" }
-  parsnips: { each: "parsnip", kg: "parsnip" }
   peaches: { each: "peaches" }
   pear: { each: "pear" }
-  pears: { each: "pear" }
   red pepper: { each: "red pepper" }
   peppers: { each: "red pepper" }
   pineapple: { each: "pineapple" }
@@ -180,30 +166,24 @@ prices:
   pomegranate: { each: "pomegranate" }
   pomegranate seeds: { kg: "pomegranate seeds" }
   potato: { kg: "potato", each: "potato" }
-  potatoes: { kg: "potato", each: "potato" }
   new potatoes: { kg: "new potatoes" }
   baby potatoes: { kg: "new potatoes" }
   sweet potato: { kg: "sweet potato", each: "sweet potato" }
-  sweet potatoes: { kg: "sweet potato", each: "sweet potato" }
   raspberries: { kg: "raspberries" }
   rhubarb: { kg: "rhubarb" }
   rocket: { kg: "rocket" }
   rosemary: { pack: "rosemary", each: [0.05, 0.12] }
   sage: { pack: "sage", each: [0.02, 0.05] }
   shallot: { kg: "shallot", each: [0.10, 0.30] }
-  shallots: { kg: "shallot", each: [0.10, 0.30] }
   banana shallots: { kg: "banana shallots", each: [0.20, 0.50] }
   sorrel: { kg: "sorrel", pack: "sorrel" }
   spinach: { kg: "spinach" }
   spring onion: { pack: "spring onion", each: [0.06, 0.15] }
-  spring onions: { pack: "spring onion", each: [0.06, 0.15] }
   strawberries: { kg: "strawberries" }
   tarragon: { pack: "tarragon", kg: "tarragon", each: [0.03, 0.08] }
   thyme: { pack: "thyme", each: [0.03, 0.08] }
   tomato: { each: "tomato", kg: "tomato" }
-  tomatoes: { each: "tomato", kg: "tomato" }
   turnip: { each: "turnip", kg: "turnip" }
-  turnips: { each: "turnip", kg: "turnip" }
   watercress: { kg: "watercress" }
   galangal: { kg: "galangal, fresh" }
   curry leaves: { kg: "curry leaves, fresh" }
@@ -212,7 +192,6 @@ prices:
   bacon: { kg: "smoked back bacon, standard", each: "back bacon, standard" }
   beef: { kg: "beef, diced / stewing / braising" }
   beef fillet: { kg: "beef fillet (whole)" }
-  beef fillets: { kg: "beef fillet (whole)" }
   parma ham: { kg: "parma ham / prosciutto", each: "parma ham / prosciutto" }
   prosciutto: { kg: "parma ham / prosciutto", each: "parma ham / prosciutto" }
   fillet of beef: { kg: "beef fillet (whole)" }
@@ -221,20 +200,18 @@ prices:
   steak: { kg: "sirloin steak" }
   chicken: { kg: "whole chicken" }
   chicken breast: { kg: "chicken breast", each: "chicken breast" }
-  chicken breasts: { kg: "chicken breast", each: "chicken breast" }
   chicken thighs: { kg: "chicken thighs, bone-in", each: [0.50, 1.20] }
   chicken legs: { kg: "chicken legs", each: [0.90, 1.80] }
   chorizo: { kg: "cooking chorizo" }
   duck: { kg: "whole duck", each: "whole duck" }
   duck breast: { kg: "duck breast", each: "duck breast" }
-  duck breasts: { kg: "duck breast", each: "duck breast" }
-  duck legs: { kg: "duck legs", each: "duck legs" }
   duck leg: { kg: "duck legs", each: "duck legs" }
   gammon: { kg: "gammon joint" }
   goose: { kg: "goose" }
   ham: { kg: "sliced cooked ham" }
   lamb: { kg: "leg of lamb" }
   lamb mince: { kg: "lamb mince" }
+  lamb steak: { kg: "leg of lamb" }
   mutton: { kg: "mutton" }
   oxtail: { kg: "oxtail" }
   pancetta: { kg: "pancetta cubes" }
@@ -245,7 +222,6 @@ prices:
   turkey: { kg: "whole turkey, standard" }
   venison: { kg: "venison, diced" }
   fillet steak: { kg: "beef fillet (steak)" }
-  fillet steaks: { kg: "beef fillet (steak)" }
   sirloin: { kg: "sirloin steak" }
   ribeye: { kg: "ribeye steak" }
   rib-eye: { kg: "ribeye steak" }
@@ -265,7 +241,6 @@ prices:
   turkey breast: { kg: "turkey breast joint / crown" }
   turkey crown: { kg: "turkey breast joint / crown" }
   venison steak: { kg: "venison steaks" }
-  venison steaks: { kg: "venison steaks" }
   venison haunch: { kg: "venison haunch" }
   haunch of venison: { kg: "venison haunch" }
   muntjac: { kg: "venison haunch" }
@@ -282,15 +257,12 @@ prices:
   smoked salmon: { kg: "smoked salmon, sliced" }
   tuna: { kg: "tinned tuna (drained)" }
   cod loin: { kg: "cod loins" }
-  cod loins: { kg: "cod loins" }
   smoked haddock: { kg: "smoked haddock" }
   hake: { kg: "hake fillets" }
   tuna steak: { kg: "tuna steaks" }
-  tuna steaks: { kg: "tuna steaks" }
   king prawns: { kg: "raw king prawns" }
   cooked prawns: { kg: "cooked prawns" }
   anchovy fillets: { kg: "anchovy fillets in oil (gross tin)" }
-  scallops: { kg: "king scallops", each: "king scallop" }
   scallop: { kg: "king scallops", each: "king scallop" }
   white crab meat: { kg: "white crab meat" }
   white crabmeat: { kg: "white crab meat" }
@@ -323,11 +295,8 @@ prices:
   crème fraîche: { l: "crème fraîche" }
   creme fraiche: { l: "crème fraîche" }
   egg: { each: "egg" }
-  eggs: { each: "egg" }
   egg white: { each: "egg" }
-  egg whites: { each: "egg" }
   egg yolk: { each: "egg" }
-  egg yolks: { each: "egg" }
   feta: { kg: "feta" }
   goat's cheese: { kg: "goat's cheese, soft" }
   gruyère: { kg: "gruyère" }
@@ -454,7 +423,6 @@ prices:
   tomato purée: { kg: "tomato purée" }
   tomato puree: { kg: "tomato purée" }
   chopped tomatoes: { kg: "chopped tomatoes" }
-  walnuts: { kg: "walnuts" }
   yeast: { kg: "yeast" }
   chocolate chips: { kg: "dark chocolate chips" }
   dark chocolate chips: { kg: "dark chocolate chips" }
@@ -530,7 +498,6 @@ prices:
   aged balsamic: { l: "balsamic vinegar, aged" }
   truffle oil: { l: "truffle oil" }
   vanilla paste: { l: "vanilla bean paste" }
-  vanilla pods: { each: "vanilla pods" }
 
   # --- spices & seasonings -----------------------------------------------
   allspice: { kg: "allspice" }
@@ -541,7 +508,6 @@ prices:
   chilli powder: { kg: "chilli powder" }
   cinnamon: { kg: "cinnamon" }
   cinnamon stick: { each: "cinnamon stick", kg: "cinnamon stick" }
-  cinnamon sticks: { each: "cinnamon stick", kg: "cinnamon stick" }
   cloves: { kg: "cloves", each: [0.01, 0.03] }
   coriander seeds: { kg: "coriander seeds" }
   ground coriander: { kg: "ground coriander" }

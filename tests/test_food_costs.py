@@ -196,6 +196,12 @@ MATCHES = {
     "lemon zest": "free",
     # Whole words: `salt` is not inside `unsalted`.
     "salted butter": "g",
+    # A keyword matches its plural, so costs.yml writes rows singular; a
+    # plural row that prices differently still wins (`peppers` is not free).
+    "cucumbers": "each",
+    "cherries": "g",
+    "bay leaves": "each",
+    "red peppers": "each",
     # Another recipe, linked, is never priced by a word in its title.
     "[grandma's lemon curd](../grandmas-lemon-curd/)": None,
     "kohlrabi": None,

@@ -1427,12 +1427,11 @@ foods:
       - "3.17 Waitrose 300 g"
       - "4.36 Farm Direct 250 g"
   beef stock:
-    note: "each is one stock cube"
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
     l:
-      - "4.58 Potts 500 ml"
-      - "5.00 Oxo ready-to-use 500 ml"
-      - "6.00 Tesco Finest 450 ml"
-      - "8.00 TRUEfoods chilled 500 g"
+      - "1.00 Oxo 12 cubes, one cube to 190 ml"
+      - "0.68 Oxo 60 cubes, one cube to 190 ml"
+      - "0.42 Knorr 8 cubes, taken as Knorr chicken's 450 ml"
     each:
       - "0.19 Oxo 12 cubes"
       - "0.11 Morrisons 12 cubes"
@@ -1749,12 +1748,12 @@ foods:
       - "7.50 Sainsbury's cooked 400 g"
       - "11.11 Merchant Gourmet whole cooked 180 g"
   chicken stock:
-    note: "each is one stock cube"
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
     l:
-      - "4.58 Potts 500 ml"
-      - "4.00 Oxo ready-to-use 500 ml"
-      - "6.00 Tesco Finest 450 ml"
-      - "5.80 Sainsbury's 500 ml"
+      - "0.89 Oxo 12 cubes, one cube to 190 ml"
+      - "1.00 Oxo reduced salt 12 cubes, one cube to 190 ml"
+      - "0.42 Knorr 8 cubes, one cube to 450 ml"
+      - "0.38 Knorr 20 cubes, one cube to 450 ml"
     each:
       - "0.17 Oxo 12 cubes"
       - "0.19 Knorr 8 cubes"
@@ -2115,10 +2114,10 @@ foods:
       - "11.07 Blue Dragon 150 ml"
       - "14.00 Waitrose Cooks' Ingredients 150 ml"
   fish stock:
-    note: "each is one stock cube"
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
     thin: true
     l:
-      - "1.00 Tesco Knorr stock pot 4 pots, one pot to 500 ml"
+      - "0.69 Knorr 8 cubes, one cube to 450 ml"
     each:
       - "0.31 Knorr 8 cubes"
   five-spice:
@@ -3005,16 +3004,17 @@ foods:
       - "4.67 Waitrose Essential 300 ml"
       - "10.56 Farm Direct 142 ml"
   sorrel:
-    note: "pack is one small bunch or punnet"
+    note: "pack is one bunch or punnet; Farm Direct's bunch is taken as 50 g"
     thin: true
     kg:
       - "27.60 Nurtured in Norfolk bunch 50 g"
-      - "23.90 Nurtured in Norfolk bunch 100 g"
-      - "286.67 Artisan Food Company buckler leaves 15 g"
       - "252.50 Artisan Food Company micro red 20 g"
+      - "69.80 Farm Direct bunch, taken as 50 g"
+      - "71.67 Riverford 30 g"
     pack:
       - "1.38 Nurtured in Norfolk 50 g"
-      - "4.30 Artisan Food Company 15 g"
+      - "3.49 Farm Direct bunch"
+      - "2.15 Riverford 30 g"
   sour cream:
     l:
       - "2.83 Tesco 300 ml"
@@ -3064,13 +3064,11 @@ foods:
       - "6.50 Sainsbury's 300 g"
       - "8.42 Tesco 285 g"
   stock:
-    note: "each is one stock cube"
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
     l:
-      - "4.00 Oxo chicken ready-to-use 500 ml"
-      - "5.00 Oxo vegetable ready-to-use 500 ml"
-      - "4.58 Potts chicken 500 ml"
-      - "4.80 Potts vegetable 500 ml"
-      - "5.80 Sainsbury's vegetable 500 ml"
+      - "0.89 Oxo chicken 12 cubes, one cube to 190 ml"
+      - "1.00 Oxo vegetable 12 cubes, one cube to 190 ml"
+      - "0.42 Knorr chicken 8 cubes, one cube to 450 ml"
     each:
       - "0.17 Oxo chicken 12 cubes"
       - "0.19 Oxo vegetable 12 cubes"
@@ -3205,11 +3203,10 @@ foods:
       - "1.45 Morrisons 1 l"
       - "2.00 Waitrose Essential 2 l"
   vegetable stock:
-    note: "each is one stock cube"
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
     l:
-      - "4.80 Potts 500 ml"
-      - "5.00 Oxo ready-to-use 500 ml"
-      - "5.80 Sainsbury's 500 ml"
+      - "1.00 Oxo 12 cubes, one cube to 190 ml"
+      - "0.47 Knorr 8 cubes, taken as Knorr chicken's 450 ml"
     each:
       - "0.19 Oxo 12 cubes"
       - "0.11 Sainsbury's 10 cubes"

@@ -195,6 +195,9 @@ argument and the rules each field is read by.
 - 2026-11-03 · §8.2 · #1458 · where anything is unpriced, a figure reads "from £X": a lower bound, never withheld and never silent.
 - 2026-11-03 · §8.2 · #1458 · a researched food price's range is the median's bracket: the middle 50% of 6+ shop prices, the range of 3–5, the mean's two ends of 2.
 - 2026-11-03 · §8.2 · #1458 · the shop prices are kept, and costs.yml reads its researched ranges from them.
+- 2026-11-04 · §8.2 · #1468 · stock is priced as made up from cubes, never as ready-made liquid stock.
+- 2026-11-04 · §8.2 · #1468 · shop prices are what a household pays, not trade prices.
+- 2026-11-04 · §8.2 · #1468 · a costs.yml keyword matches its plural, so a row is written singular.
 - 2026-11-03 · §8.2 · #1458 · both sites print a range as "mean (lowest–highest)", everywhere a price shows.
 - 2026-11-03 · §8.2 · #1458 · each recipe page carries a cost line, local only, in the drink page's layout.
 - 2026-09-07 · §8.2 · a scaled amount is never rounded coarser than 1 g.
