@@ -674,7 +674,7 @@ test('a line is priced from its millilitres and a declared rate', () => {
 test('a generic that spans a range prices as a range', () => {
   const rows = SL.build([ing('500 ml', 'lime juice')], { rates: RATES });
   // 0.5 l x 6.00 to 0.5 l x 15.00
-  assert.strictEqual(rows[0].price.text, '£3.00–£7.50');
+  assert.strictEqual(rows[0].price.text, '£5.25 (£3.00–£7.50)');
 });
 
 test('the named bottles beat the generic when every one is priced', () => {
@@ -685,7 +685,7 @@ test('the named bottles beat the generic when every one is priced', () => {
     ing('200 ml', 'London dry gin', 'Beefeater')
   ], { rates: RATES });
   // 0.4 l x 24.29 to 0.4 l x 31.43
-  assert.strictEqual(rows[0].price.text, '£9.72–£12.57');
+  assert.strictEqual(rows[0].price.text, '£11.14 (£9.72–£12.57)');
 });
 
 test('one unpriced bottle sends the whole line back to the generic', () => {
@@ -719,7 +719,7 @@ test('a whole fruit is priced per piece from the fruit table', () => {
   const rows = SL.build([ing('1 whole', 'pear'), ing('1 whole', 'pear')],
                         { rates: SOLID_RATES });
   assert.strictEqual(rows[0].text, '2 whole');
-  assert.strictEqual(rows[0].price.text, '£0.80–£1.40');
+  assert.strictEqual(rows[0].price.text, '£1.10 (£0.80–£1.40)');
 });
 
 test('half a lime is half a lime\'s price, and `each` and `cubes` are pieces', () => {
@@ -728,15 +728,15 @@ test('half a lime is half a lime\'s price, and `each` and `cubes` are pieces', (
     ing('15 each', 'raspberries')
   ], { rates: SOLID_RATES });
   // 0.5 x 0.18 to 0.5 x 0.30
-  assert.strictEqual(byLabel(rows, 'lime').price.text, '£0.09–£0.15');
+  assert.strictEqual(byLabel(rows, 'lime').price.text, '£0.12 (£0.09–£0.15)');
   // 15 x 0.05 to 15 x 0.10
-  assert.strictEqual(byLabel(rows, 'raspberries').price.text, '£0.75–£1.50');
+  assert.strictEqual(byLabel(rows, 'raspberries').price.text, '£1.13 (£0.75–£1.50)');
 });
 
 test('a weighed solid is priced per kilo from the weight table', () => {
   // 25 g of honey at GBP 9-18 a kilo
   const rows = SL.build([ing('25 g', 'honey')], { rates: SOLID_RATES });
-  assert.strictEqual(rows[0].price.text, '£0.23–£0.45');
+  assert.strictEqual(rows[0].price.text, '£0.34 (£0.23–£0.45)');
 });
 
 test('a counted or weighed line with no row stays unpriced', () => {
@@ -826,7 +826,7 @@ test('the old rate tables, with no fruit or weight map, still price volumes only
   const rows = SL.build([ing('1 whole', 'pear'), ing('500 ml', 'lime juice')],
                         { rates: RATES });
   assert.strictEqual(byLabel(rows, 'pear').price, null);
-  assert.strictEqual(byLabel(rows, 'lime juice').price.text, '£3.00–£7.50');
+  assert.strictEqual(byLabel(rows, 'lime juice').price.text, '£5.25 (£3.00–£7.50)');
 });
 
 test('a top-up range widens the price too', () => {
@@ -841,7 +841,7 @@ test('a top-up range widens the price too', () => {
     rates: { generics: { 'soda water': [1.0, 2.0] }, bottles: {} }
   });
   assert.strictEqual(rows[0].text, '300–450 ml');
-  assert.strictEqual(rows[0].price.text, '£0.30–£0.90');
+  assert.strictEqual(rows[0].price.text, '£0.60 (£0.30–£0.90)');
 });
 
 test('no rates at all means no prices, and everything else is unchanged', () => {
@@ -857,7 +857,7 @@ test('the total is the sum of the lines above it', () => {
   ], { rates: RATES });
   const sum = SL.total(rows);
   // 13.20 + 3.00, 13.20 + 7.50
-  assert.strictEqual(sum.text, '£16.20–£20.70');
+  assert.strictEqual(sum.text, '£18.45 (£16.20–£20.70)');
   assert.strictEqual(sum.priced, 2);
   assert.strictEqual(sum.unpriced, 0);
 });
@@ -882,9 +882,19 @@ test('a list with nothing priceable has no total at all', () => {
 
 test('moneyText collapses when the ends meet, and always shows pennies', () => {
   assert.strictEqual(SL.moneyText(13.2, 13.2), '£13.20');
-  assert.strictEqual(SL.moneyText(3, 7.5), '£3.00–£7.50');
+  assert.strictEqual(SL.moneyText(3, 7.5), '£5.25 (£3.00–£7.50)');
   // An en dash, like the drink page's own cost suffix.
   assert.ok(SL.moneyText(3, 7.5).includes('–'));
+});
+
+test('#1458: moneyHtml splits the mean from the range, so a narrow row can wrap between them', () => {
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  assert.strictEqual(SL.moneyHtml('£5.25 (£3.00–£7.50)', esc),
+    '<span class="shopping-list-price-part">£5.25</span> ' +
+    '<span class="shopping-list-price-part">(£3.00–£7.50)</span>');
+  // A point price, or food's "from £X", is one piece, escaped.
+  assert.strictEqual(SL.moneyHtml('£13.20', esc), '£13.20');
+  assert.strictEqual(SL.moneyHtml('from <£1', esc), 'from &lt;£1');
 });
 
 // --- shelf order, #848 --------------------------------------------------------

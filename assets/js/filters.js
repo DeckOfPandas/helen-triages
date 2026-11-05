@@ -985,6 +985,7 @@ function renderResultsPool() {
   var shoppingAisles = shoppingEl && shoppingEl.querySelector('.shopping-list-aisles');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
   var shoppingNote = shoppingEl && shoppingEl.querySelector('.shopping-list-note');
+  var shoppingTotal = shoppingEl && shoppingEl.querySelector('.shopping-list-total');
   // #1457. Ticking a row off, and starting the next shop afresh.
   var refreshUntick = shoppingAisles
     ? HTF.shoppingTicks.wire(shoppingAisles, shoppingEl.querySelector('.shopping-list-untick'))
@@ -1015,6 +1016,20 @@ function renderResultsPool() {
     } catch (e) {
       console.warn('filters.js: could not parse #recipe-aisles — ' + e.message);
       return [];
+    }
+  })();
+
+  /* #1458. Present on a local build only (site.show_costs); null here means
+     nothing is costed and no price is drawn. */
+  var COST_UNITS = (function () {
+    var node = document.getElementById('food-cost-units');
+    if (!node) return null;
+    try {
+      var parsed = JSON.parse(node.textContent);
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch (e) {
+      console.warn('filters.js: could not parse #food-cost-units — ' + e.message);
+      return null;
     }
   })();
 
@@ -1293,7 +1308,7 @@ function renderResultsPool() {
             'data-url="' + HTF.escapeHtml(url) + '" data-batches ' +
             'title="' + HTF.escapeHtml(title + makes) + '" ' +
             'aria-label="' + HTF.escapeHtml(boxLabel(url) + title + makes) + '">' +
-            rowSentence(url, batches) +
+            withCost(url, rowSentence(url, batches)) +
             '</li>';
         }
 
@@ -1315,12 +1330,56 @@ function renderResultsPool() {
           'data-url="' + HTF.escapeHtml(url) + '" ' +
           'title="' + HTF.escapeHtml(title + relative) + '" ' +
           'aria-label="portions of ' + HTF.escapeHtml(title + relative) + '">' +
-          rowSentence(url, portionsFor(url)) +
+          withCost(url, rowSentence(url, portionsFor(url))) +
           '</li>';
       }).join('');
     }
 
     renderTotals(urls);
+  }
+
+  /* One recipe's lines as build() takes them. `recipe` and the four marks are
+     #1297's: see `reunite` in food-shopping-list.js for what each one does to
+     the total. `rate` is #1458's, present on a local build only. */
+  function entriesFor(url, scale) {
+    return ((RECIPES[url] || {}).i || []).map(function (ing) {
+      return {
+        amount: ing.a, name: ing.n, aisle: ing.s, scale: scale,
+        recipe: url, parts: ing.pt, fruit: ing.f, count: ing.c, pointer: ing.x,
+        rate: ing.r
+      };
+    });
+  }
+
+  function buildOptions() {
+    return {
+      aisles: AISLES, wholeMeasures: WHOLE_MEASURES,
+      quarterMeasures: QUARTER_MEASURES, countNouns: COUNT_NOUNS,
+      costUnits: COST_UNITS
+    };
+  }
+
+  /* " @ £1.80 a portion", " @ £4.20 a batch", or "" (#1458). Like a drink's
+     price per glass, it does not move with the box: one portion of a `serves:`
+     recipe, one batch of a `makes:` one, priced from the recipe as written.
+     "from £X" where some line could not be priced. */
+  function recipeCostSuffix(url) {
+    if (!COST_UNITS) return '';
+    var per = isBatch(url) ? 1 : (hasPortions(url) ? RECIPES[url].p : 0);
+    var each = HTF.foodShoppingList.recipeCost(entriesFor(url, 1), per, buildOptions());
+    if (!each) return '';
+    return ' @ ' + each.text + (isBatch(url) ? ' a batch' : ' a portion');
+  }
+
+  /* The sentence and its price in one inline box, so the price wraps with the
+     words as the drinks list's does rather than squeezing them into a column
+     of their own. Outside rowSentence's span, which the input handler
+     rewrites: the figure does not move with the box. */
+  function withCost(url, sentence) {
+    var text = recipeCostSuffix(url);
+    if (!text) return sentence;
+    return '<span>' + sentence +
+      '<span class="shopping-list-cost">' + HTF.escapeHtml(text) + '</span></span>';
   }
 
   function renderTotals(urls) {
@@ -1329,15 +1388,7 @@ function renderResultsPool() {
     var shortlisted = urls || shortlistedRecipes();
     var entries = [];
     shortlisted.forEach(function (url) {
-      var scale = scaleFor(url);
-      ((RECIPES[url] || {}).i || []).forEach(function (ing) {
-        // `recipe` and the four marks are #1297's: see `reunite` in
-        // food-shopping-list.js for what each one does to the total.
-        entries.push({
-          amount: ing.a, name: ing.n, aisle: ing.s, scale: scale,
-          recipe: url, parts: ing.pt, fruit: ing.f, count: ing.c, pointer: ing.x
-        });
-      });
+      entries = entries.concat(entriesFor(url, scaleFor(url)));
     });
 
     /* A panel with boxes and no totals says so. The usual cause is
@@ -1357,13 +1408,11 @@ function renderResultsPool() {
         + 'server, restart it — its plugins are loaded once at startup.</p>';
       shownRows = [];
       refreshUntick();
+      renderShoppingTotal([]);
       return;
     }
 
-    var aisles = HTF.foodShoppingList.build(entries, {
-      aisles: AISLES, wholeMeasures: WHOLE_MEASURES,
-      quarterMeasures: QUARTER_MEASURES, countNouns: COUNT_NOUNS
-    });
+    var aisles = HTF.foodShoppingList.build(entries, buildOptions());
     shownRows = [];
     aisles.forEach(function (aisle) { shownRows = shownRows.concat(aisle.items); });
 
@@ -1403,11 +1452,37 @@ function renderResultsPool() {
               ? '<span class="shopping-list-unscaled">(' +
                 row.unscaledRecipes.map(recipeLink).join(', ') + ')</span>'
               : '') +
+            /* What the line costs (#1458), local only; outside the label like
+               the cocktail list's. A free or unpriced row draws nothing. */
+            (row.cost && row.cost.text
+              ? '<span class="shopping-list-price">' +
+                HTF.shoppingList.moneyHtml(row.cost.text, HTF.escapeHtml) + '</span>'
+              : '') +
             '</li>';
         }).join('') +
         '</ul></section>';
     }).join('');
     refreshUntick();
+    renderShoppingTotal(shownRows);
+  }
+
+  /* What the shop comes to (#1458), as on the cocktail list (#817), and how
+     many lines it could not price. Hidden where nothing is costed. */
+  function renderShoppingTotal(rows) {
+    if (!shoppingTotal) return;
+    var sum = COST_UNITS ? HTF.foodShoppingList.costTotal(rows) : null;
+    if (!sum) {
+      shoppingTotal.hidden = true;
+      shoppingTotal.textContent = '';
+      return;
+    }
+    var text = (sum.partial ? '' : 'roughly ') + sum.text;
+    if (sum.unpriced) {
+      text += ' — ' + sum.unpriced +
+        (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
+    }
+    shoppingTotal.textContent = text;
+    shoppingTotal.hidden = false;
   }
 
   if (shoppingRecipes) {
