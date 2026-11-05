@@ -97,9 +97,7 @@ const TEMPS = {
 };
 
 // --- rounding and duration formatting ---------------------------------------
-// Cooking times round to the nearest five minutes. The clock arithmetic rounds
-// with the same function, so a printed duration can never disagree with the
-// times printed either side of it.
+// Cooking times round to the nearest five minutes.
 
 test('round5 rounds to the nearest five minutes, both directions', () => {
   assert.strictEqual(CS.round5(97), 95);
@@ -138,53 +136,6 @@ test('span prints both ends when they genuinely differ, joined by an en dash', (
   assert.strictEqual(CS.span(60, 120), '1h – 2h');
   assert.strictEqual(CS.span(240, 290), '4h – 4h50m');
   assert.strictEqual(CS.span(10, 15), '10m – 15m');
-});
-
-// --- clock arithmetic -------------------------------------------------------
-// Minutes-from-midnight in, "HH:MM" out. This is where time bugs live.
-
-test('clock zero-pads both halves', () => {
-  assert.strictEqual(CS.clock(0), '00:00');
-  assert.strictEqual(CS.clock(9 * 60 + 5), '09:05');
-  assert.strictEqual(CS.clock(23 * 60 + 59), '23:59');
-});
-
-test('clock wraps backwards over midnight rather than printing a negative time', () => {
-  // A 6 kg turkey for a 1pm lunch genuinely does start the night before, and
-  // "-45:00" instead of "22:15 (the day before)" is a bug you would only
-  // notice at Christmas.
-  assert.strictEqual(CS.clock(-110), '22:10 (the day before)');
-  assert.strictEqual(CS.clock(-1), '23:59 (the day before)');
-});
-
-test('clock COUNTS the days it wraps back, rather than saying "the day before" once', () => {
-  // The days are counted, not labelled once on every pass. The page's own
-  // inputs reach it: a big brisket at the low-and-slow rate crosses midnight
-  // twice.
-  assert.strictEqual(CS.clock(-1500), '23:00 (2 days before)');
-  assert.strictEqual(CS.clock(-2880), '00:00 (2 days before)');
-  assert.strictEqual(CS.clock(-2881), '23:59 (3 days before)');
-  // The one-day case keeps its English rather than becoming "(1 days before)".
-  assert.strictEqual(CS.clock(-1440), '00:00 (the day before)');
-});
-
-test('parseClock reads what an <input type=time> gives, and rejects the rest', () => {
-  assert.strictEqual(CS.parseClock('14:00'), 840);
-  assert.strictEqual(CS.parseClock('00:30'), 30);
-  assert.strictEqual(CS.parseClock('9:05'), 545);   // single-digit hour
-  assert.strictEqual(CS.parseClock(' 14:00 '), 840); // trimmed
-});
-
-test('parseClock returns null — not 0, not NaN — when there is no time at all', () => {
-  // The empty case is the DEFAULT state of the page: the serving time is
-  // optional on purpose, and null is what tells the renderer to leave clock
-  // times off entirely. A 0 here would silently schedule everything for
-  // midnight.
-  assert.strictEqual(CS.parseClock(''), null);
-  assert.strictEqual(CS.parseClock(null), null);
-  assert.strictEqual(CS.parseClock(undefined), null);
-  assert.strictEqual(CS.parseClock('nonsense'), null);
-  assert.strictEqual(CS.parseClock('2pm'), null);
 });
 
 // --- resolve: one branch per shape ------------------------------------------
@@ -355,69 +306,7 @@ test('orderMethods returns a new array and leaves the caller\'s alone', () => {
   assert.deepStrictEqual(all, copy);
 });
 
-// --- working backwards from the plate ----------------------------------------
-// The whole point of the page. Everything below is minutes from midnight;
-// negatives are the previous day and are clock()'s problem, not this function's.
-
-test('scheduleBack: rest comes off the serving time, cooking off that', () => {
-  const s = CS.scheduleBack(100, 130, CS.parseClock('14:00'), 20);
-  assert.strictEqual(CS.clock(s.outAt), '13:40');
-  assert.strictEqual(CS.clock(s.inAt), '11:30');
-  assert.strictEqual(CS.clock(s.restUntil), '14:00');
-});
-
-test('scheduleBack: the LONGER estimate drives the start time', () => {
-  // Being ready early and holding is recoverable; being late is not. So `inAt`
-  // is the serving time minus the longest cook, and the quicker end is the
-  // afterthought in brackets, not the headline.
-  const s = CS.scheduleBack(100, 130, 840, 20);
-  assert.ok(s.inAt < s.inAtQuicker);
-  assert.strictEqual(CS.clock(s.inAtQuicker), '12:00');
-  assert.strictEqual(s.hasRange, true);
-});
-
-test('scheduleBack: no range to show when the two ends round together', () => {
-  // The same five-minute rounding as the printed duration, so a card can never
-  // print one duration above two start times that differ by two minutes.
-  const s = CS.scheduleBack(95, 97, 840, 0);
-  assert.strictEqual(s.hasRange, false);
-  assert.strictEqual(s.inAt, s.inAtQuicker);
-});
-
-test('scheduleBack: zero or missing rest leaves the out time on the plate', () => {
-  assert.strictEqual(CS.scheduleBack(60, 60, 840, 0).outAt, 840);
-  assert.strictEqual(CS.scheduleBack(60, 60, 840).outAt, 840);
-});
-
-test('scheduleBack: eating at 00:30 means going in the PREVIOUS DAY', () => {
-  // The midnight wrap, explicitly. 00:30 minus a 20 minute rest minus a two
-  // hour cook is 22:10 yesterday, not a negative number and not 22:10 today.
-  const s = CS.scheduleBack(120, 120, CS.parseClock('00:30'), 20);
-  assert.strictEqual(s.inAt, -110);
-  assert.strictEqual(CS.clock(s.inAt), '22:10 (the day before)');
-  assert.strictEqual(CS.clock(s.outAt), '00:10');
-  assert.strictEqual(CS.clock(s.restUntil), '00:30');
-});
-
-test('scheduleBack: a cook longer than a day still returns a real number of minutes', () => {
-  // 43 hours of brisket for a 2pm Sunday lunch starts on Friday evening. This
-  // asserts the arithmetic only; turning the minutes into words is clock()'s
-  // job, covered by its own day-counting test.
-  const s = CS.scheduleBack(43 * 60, 43 * 60, 840, 20);
-  assert.strictEqual(s.inAt, 820 - 43 * 60);
-});
-
-test('scheduleBack never consults the clock, so "in the past" is not its question', () => {
-  // Nothing here knows what time it is now, deliberately: the same inputs give
-  // the same answer whenever they are asked. A start time that has already gone
-  // is a comparison the page would have to make against a `now` it injects, and
-  // it makes none.
-  const a = CS.scheduleBack(120, 120, 840, 20);
-  const b = CS.scheduleBack(120, 120, 840, 20);
-  assert.deepStrictEqual(a, b);
-});
-
-// --- the temperature and rest lookups ----------------------------------------
+// --- the temperature lookup -----------------------------------------------
 // `temps` is injected, not required: the page serialises internal_temperatures
 // .yml into the document and this module has no business knowing that.
 
@@ -440,26 +329,6 @@ test('finishingTemp returns null rather than throwing on a missing or bad ref', 
   assert.strictEqual(CS.finishingTemp(TEMPS, ''), null);
   assert.strictEqual(CS.finishingTemp(TEMPS, 'beef.nosuchcut'), null);
   assert.strictEqual(CS.finishingTemp(TEMPS, 'no.such.path.at.all'), null);
-});
-
-test('statedRest reads a published rest time, and null when none is published', () => {
-  assert.strictEqual(CS.statedRest(TEMPS, 'beef.tender'), 15);
-  assert.strictEqual(CS.statedRest(TEMPS, 'poultry.chicken'), null);
-  assert.strictEqual(CS.statedRest(TEMPS, 'beef.nosuchcut'), null);
-});
-
-test('restFor marks a cited figure as stated and a fallback as not', () => {
-  // Some proteins publish no rest time, and the page must not present a working
-  // default with the same confidence as a figure someone wrote down. The
-  // fallback is injected so that policy stays with the page.
-  assert.deepStrictEqual(CS.restFor(TEMPS, 'beef.tender', 20), { mins: 15, stated: true });
-  assert.deepStrictEqual(CS.restFor(TEMPS, 'poultry.chicken', 20), { mins: 20, stated: false });
-  assert.deepStrictEqual(CS.restFor(TEMPS, null, 20), { mins: 20, stated: false });
-});
-
-test('restFor treats a stated rest of zero as stated, not as missing', () => {
-  const temps = { fish: { fillet: { rest_min: 0 } } };
-  assert.deepStrictEqual(CS.restFor(temps, 'fish.fillet', 20), { mins: 0, stated: true });
 });
 
 // --- the protein dropdown ----------------------------------------------------

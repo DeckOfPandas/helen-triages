@@ -6,22 +6,14 @@
 //
 // One file, two loaders: a plain <script> before cook-timer.js (attaching to
 // window.HTF), and require() in Node.
-//
-// scheduleBack, parseClock, clock, statedRest and restFor have no caller on
-// any page, and are kept with their tests on purpose (#244) until it is
-// decided whether working backwards from a serving time comes back. Reconnect
-// them, or delete them together with their tests; do not tidy them away
-// piecemeal.
 (function (root) {
   'use strict';
 
   /* --- formatting ---------------------------------------------------------
      Minutes are the working unit throughout and only become a figure at the
      edge. */
-  /* Five-minute granularity, applied here and reused by the clock arithmetic
-     so a duration and the time it implies can never disagree. The underlying
-     rates are ranges and estimates; finer figures would claim a precision
-     they have not got. */
+  /* Five-minute granularity. The underlying rates are ranges and estimates;
+     finer figures would claim a precision they have not got. */
   function round5(mins) {
     return Math.round(mins / 5) * 5;
   }
@@ -43,26 +35,6 @@
        range on. */
     return round5(lo) === round5(hi)
       ? hhmm(lo) : hhmm(lo) + " – " + hhmm(hi);
-  }
-
-  /* Clock arithmetic in minutes-since-midnight, wrapping backwards over
-     midnight: a big turkey for lunch starts the night before. */
-  function clock(minsFromMidnight) {
-    /* COUNT the wraps: a long enough low-and-slow cook crosses midnight
-       twice, and must not be labelled one day back. */
-    var daysBack = 0;
-    while (minsFromMidnight < 0) { minsFromMidnight += 1440; daysBack += 1; }
-    var day = "";
-    if (daysBack === 1) day = " (the day before)";
-    else if (daysBack > 1) day = " (" + daysBack + " days before)";
-    var h = Math.floor(minsFromMidnight / 60) % 24, m = Math.round(minsFromMidnight) % 60;
-    return ("0" + h).slice(-2) + ":" + ("0" + m).slice(-2) + day;
-  }
-
-  function parseClock(value) {
-    var m = /^(\d{1,2}):(\d{2})$/.exec((value || "").trim());
-    if (!m) return null;
-    return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
   }
 
   /* --- resolving a method to minutes -------------------------------------- */
@@ -176,25 +148,6 @@
     });
   }
 
-  /* --- working backwards from the plate -----------------------------------
-     From a resolved range, the rest time and serveAt (all minutes; serveAt is
-     minutes from midnight): when does it go in? The LONGER estimate drives
-     `inAt`: ready early and holding is recoverable, late is not. `hasRange`
-     uses the same round5 as the printed duration, so a card cannot show a
-     duration that disagrees with its times. Results are minutes from
-     midnight, negative if they run back past it; clock() formats that. */
-  function scheduleBack(lo, hi, serveAt, rest) {
-    var outAt = serveAt - (rest || 0);
-    var longest = round5(hi), shortest = round5(lo);
-    return {
-      inAt: outAt - longest,
-      inAtQuicker: outAt - shortest,
-      hasRange: shortest !== longest,
-      outAt: outAt,
-      restUntil: serveAt
-    };
-  }
-
   /* --- the temperature table ----------------------------------------------
      `temps` is the parsed internal_temperatures.yml, passed in, never read
      here. */
@@ -218,21 +171,6 @@
     return null;
   }
 
-  /* Rest time from the protein's own entry where the data states one. Where
-     it does not, restFor returns the caller's fallback with `stated: false`,
-     so a working default is never presented as a cited figure. */
-  function statedRest(temps, ref) {
-    var node = lookup(temps, ref);
-    return node && node.rest_min != null ? node.rest_min : null;
-  }
-
-  function restFor(temps, ref, fallback) {
-    var stated = statedRest(temps, ref);
-    return stated != null
-      ? { mins: stated, stated: true }
-      : { mins: fallback, stated: false };
-  }
-
   /* Alphabetical by the label you read, sorted here so the data file can keep
      its own sequence. */
   function proteinOrder(methodsByKey) {
@@ -245,15 +183,10 @@
     round5: round5,
     hhmm: hhmm,
     span: span,
-    clock: clock,
-    parseClock: parseClock,
     baseFor: baseFor,
     resolve: resolve,
     orderMethods: orderMethods,
-    scheduleBack: scheduleBack,
     finishingTemp: finishingTemp,
-    statedRest: statedRest,
-    restFor: restFor,
     proteinOrder: proteinOrder
   };
 
