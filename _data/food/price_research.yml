@@ -3008,7 +3008,6 @@ foods:
     thin: true
     kg:
       - "27.60 Nurtured in Norfolk bunch 50 g"
-      - "252.50 Artisan Food Company micro red 20 g"
       - "69.80 Farm Direct bunch, taken as 50 g"
       - "71.67 Riverford 30 g"
     pack:
@@ -3069,6 +3068,7 @@ foods:
       - "0.89 Oxo chicken 12 cubes, one cube to 190 ml"
       - "1.00 Oxo vegetable 12 cubes, one cube to 190 ml"
       - "0.42 Knorr chicken 8 cubes, one cube to 450 ml"
+      - "0.38 Kallo vegetable 8 cubes, one cube to 500 ml"
     each:
       - "0.17 Oxo chicken 12 cubes"
       - "0.19 Oxo vegetable 12 cubes"
@@ -3207,6 +3207,7 @@ foods:
     l:
       - "1.00 Oxo 12 cubes, one cube to 190 ml"
       - "0.47 Knorr 8 cubes, taken as Knorr chicken's 450 ml"
+      - "0.38 Kallo 8 cubes, one cube to 500 ml"
     each:
       - "0.19 Oxo 12 cubes"
       - "0.11 Sainsbury's 10 cubes"
