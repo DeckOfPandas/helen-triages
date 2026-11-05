@@ -1,12 +1,13 @@
 {% comment %} The ship mark and its word, shared by the index card and the drink
    page so the two cannot disagree. Takes `ship`, the raw `meta.ship`, which may
-   be absent.
-
-   The word is ship-word.html's, which asks `ship_scale` whether a value is a
-   rung and never tests against a literal (MANUAL §9.9), so the card, the drink
-   page and the ship key say the same thing (DECISIONS §9.4).
-
+   be absent. The word is ship-word.html's, which asks `ship_scale` whether a
+   value is a rung and never tests against a literal (MANUAL §9.9), so the
+   card, the drink page and the ship key say the same thing (DECISIONS §9.4).
    Emits the two inner spans only; the wrapper is each call site's own.
-   `word_only=true` emits the word alone, for the ship key's rows (#1440),
-   which carry one ship in their heading. {% endcomment %}
+   `word_only=true` emits the word alone, for the ship key's rows (#1440).
+   icons/ship.svg is plain XML with no comment in it, because it is drawn once
+   per card: its viewBox is fitted to the ink (scripts/svgrender.py), it is
+   filled, coloured by currentColor, and aria-hidden because the word is
+   always beside it (#1086). Its CC BY credit is in README.md's License
+   section. {% endcomment %}
 {% unless include.word_only %}<span class="drink-card-ship-icon">{% include icons/ship.svg %}</span>{% endunless %}<span class="drink-card-ship-word">{% include cocktails/ship-word.html ship=include.ship %}</span>

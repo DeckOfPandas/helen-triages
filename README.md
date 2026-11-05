@@ -242,3 +242,7 @@ Mitigations:
 Code: [MIT](LICENSE).
 Recipes and writing: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — reuse freely, just credit me.
 
+Artwork: most of it is from a paid Shutterstock licence, which needs no credit. The exception:
+
+- **The ship** (the SHIP IT? mark on the cocktails site, `_includes/icons/ship.svg`): created by Ricons, from the [Noun Project](https://thenounproject.com/). CC BY. The credit is owed visibly on the site, so it belongs on an attributions page, linked from the footer, once the icon set settles.
+

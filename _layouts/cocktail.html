@@ -127,11 +127,12 @@ layout: default
   {% comment %} The controls row, under the head's rule: read it / make it at
      the left (both labels always visible), the shortlist pair at the right from
      page-actions.html, the include a recipe page also uses. MANUAL §9.13,
-     §13.13. {% endcomment %}
+     §13.13. The track is a switch, on while making, so it says its state as
+     the two labels do; cocktail-make.js keeps `aria-checked` in step. {% endcomment %}
   <div class="cocktail-controls">
     <div class="cocktail-toggle" role="group" aria-label="read it or make it">
       <button type="button" class="cocktail-toggle-label is-active" data-mode="read" aria-pressed="true">read it</button>
-      <button type="button" class="cocktail-toggle-track" id="cocktail-make" aria-label="switch reading or making">
+      <button type="button" class="cocktail-toggle-track" id="cocktail-make" role="switch" aria-checked="false" aria-label="make it">
         <span class="cocktail-toggle-knob"></span>
       </button>
       <button type="button" class="cocktail-toggle-label" data-mode="make" aria-pressed="false">make it</button>
@@ -149,6 +150,11 @@ layout: default
      reference. {% endcomment %}
   {% assign always_fresh = site.data.cocktails.ingredients.always_fresh %}
   {% assign standing_notes = site.data.cocktails.ingredients.standing_notes %}
+  {% comment %} The drink's generics as a `|`-fenced, downcased list, so
+     `contains` matches whole names only: the notes below test their labels
+     against it, for `make it` (MANUAL §9.13). {% endcomment %}
+  {% assign ingredient_keys = "|" %}
+  {% for item in page.ingredients %}{% for g in item.generic %}{% capture ingredient_keys %}{{ ingredient_keys }}{{ g | downcase | strip }}|{% endcapture %}{% endfor %}{% endfor %}
   {% if page.ingredients.size > 0 %}
     {% comment %} The scaler sits under the list it re-reads: a box, a word and
        two step buttons, no other text (the `aria-label`s carry the sentences).
@@ -168,9 +174,11 @@ layout: default
              standing note is picked up in the same pass (#707). {% endcomment %}
           {% assign headline = "" %}
           {% assign standing_note = "" %}
+          {% assign item_keys = "|" %}
           {% assign g_count = 0 %}
           {% for g in item.generic %}
             {% assign g_count = g_count | plus: 1 %}
+            {% capture item_keys %}{{ item_keys }}{{ g | downcase | strip }}|{% endcapture %}
             {% assign g_display = g %}
             {% if always_fresh contains g %}
               {% capture g_display %}fresh {{ g }}{% endcapture %}
@@ -273,7 +281,7 @@ layout: default
               <p class="cocktail-type-line">{{ class_html }}</p>
             {% endif %}
             {% if item.note %}
-              <p class="cocktail-note">{{ item.note }}</p>
+              <p class="cocktail-note" data-generics="{{ item_keys | escape }}">{{ item.note }}</p>
             {% endif %}
             {% comment %} The standing note never replaces the drink's own note:
                it fills the gap, or follows it (#707). {% endcomment %}
@@ -522,18 +530,23 @@ layout: default
      the keys, not the value: a pair whose text is empty would otherwise fall to
      the bare-string branch and be rendered as the mapping. {% endcomment %}
   {% assign shown_notes = 0 %}
+  {% assign making_notes = 0 %}
   {% for note in page.notes %}
     {% if note.label == nil and note.text == nil %}
       {% assign note_body = note | default: "" | strip %}
     {% else %}
       {% assign note_body = note.text | default: "" | strip %}
     {% endif %}
-    {% if note_body != "" %}{% assign shown_notes = shown_notes | plus: 1 %}{% endif %}
+    {% if note_body != "" %}
+      {% assign shown_notes = shown_notes | plus: 1 %}
+      {% capture label_key %}|{{ note.label | downcase | strip }}|{% endcapture %}
+      {% if note.label and ingredient_keys contains label_key %}{% assign making_notes = making_notes | plus: 1 %}{% endif %}
+    {% endif %}
   {% endfor %}
 
   {% if shown_notes > 0 %}
-    <h2 class="cocktail-section-heading cocktail-section-heading--notes"><span>Notes</span></h2>
-    <div class="notes {% if shown_notes == 1 %}notes--single{% endif %}">
+    <h2 class="cocktail-section-heading cocktail-section-heading--notes{% if making_notes > 0 %} has-making-notes{% endif %}"><span>Notes</span></h2>
+    <div class="notes {% if shown_notes == 1 %}notes--single{% endif %}{% if making_notes > 0 %} has-making-notes{% endif %}">
       {% for note in page.notes %}
         {% if note.label == nil and note.text == nil %}
           {% assign note_body = note | default: "" | strip %}
@@ -543,7 +556,8 @@ layout: default
           {% assign note_label = note.label | default: "note" %}
         {% endif %}
         {% if note_body != "" %}
-          <div class="note">
+          {% capture label_key %}|{{ note.label | downcase | strip }}|{% endcapture %}
+          <div class="note{% if note.label and ingredient_keys contains label_key %} note--for-making{% endif %}"{% if note.label and ingredient_keys contains label_key %} data-for="{{ label_key | escape }}"{% endif %}>
             <span class="note-label">{{ note_label }}</span>
             {{ note_body | markdownify }}
           </div>

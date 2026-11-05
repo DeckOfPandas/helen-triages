@@ -10,10 +10,25 @@
   var article = document.querySelector('article.cocktail');
   if (!track || !labels.length || !article) return;
 
+  /* A note `make it` keeps (`.note--for-making`, a house syrup's recipe) is
+     pointed at from its ingredient's own note, which stays with it. The
+     layout writes each note's `|label|` and each ingredient note's
+     `|generic|generic|`; whole names, so `indexOf` cannot half-match. */
+  var kept = article.querySelectorAll('.note--for-making[data-for]');
+  Array.prototype.forEach.call(article.querySelectorAll('.cocktail-note[data-generics]'), function (note) {
+    var generics = note.getAttribute('data-generics');
+    Array.prototype.forEach.call(kept, function (k) {
+      if (generics.indexOf(k.getAttribute('data-for')) !== -1) {
+        note.classList.add('cocktail-note--for-making');
+      }
+    });
+  });
+
   /* Three controls, one piece of state (`is-making` on the article). A label
      sets the mode its `data-mode` names; the track flips whatever is current. */
   function setMode(making) {
     article.classList.toggle('is-making', making);
+    track.setAttribute('aria-checked', making ? 'true' : 'false');
     Array.prototype.forEach.call(labels, function (label) {
       var active = (label.getAttribute('data-mode') === 'make') === making;
       label.classList.toggle('is-active', active);

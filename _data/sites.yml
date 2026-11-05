@@ -41,7 +41,9 @@ cocktails:
   icon: glass-martini
   social_image: /assets/img/social/cocktails.png
   reference_links:
-    - text: rum categories
+    # Helen's word (#1462 A8), and the page's <title> too: the wayfinding
+    # label, which the h1 does not have to match.
+    - text: rum
       url: /cocktails/reference/rum-categories/
     # What each glass type holds (#295).
     - text: glasses
