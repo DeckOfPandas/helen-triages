@@ -784,6 +784,28 @@ def test_size_word_is_with_the_count_not_the_item(recipe):
     )
 
 
+# --- a weight belongs in the amount -------------------------------------------
+# DECISIONS §5. The scaler reads only the amount, so a bracket in the item
+# that is nothing but a quantity never moves. "(about 150 g each)", "(or
+# 400 g frozen)" and "(about 60 ml juice)" say something else and stay.
+_NUM = r"(?:\d+(?:\.\d+)?[½¼¾⅓⅔]?|[½¼¾⅓⅔])"
+_QTY = rf"{_NUM}(?:\s*[–-]\s*{_NUM})?\s*(?:g|kg|ml|l|litres?|oz|lb|fl oz)"
+_ITEM_WEIGHT = re.compile(
+    rf"\(\s*(?:about|approx\.?|around|roughly|weighing)?\s*{_QTY}"
+    rf"(?:\s+\d+\s*oz)?(?:\s*/\s*{_QTY}(?:\s+\d+\s*oz)?)?(?:\s+in total)?\s*\)")
+
+
+def test_weight_is_in_the_amount_not_the_item(recipe):
+    bad = [str(item.get("item")) for group in recipe.fm.get("ingredient_groups") or []
+           for item in (group.get("items") or [])
+           if isinstance(item, dict) and _ITEM_WEIGHT.search(str(item.get("item", "")))]
+    assert not bad, (
+        f"{where(recipe)} writes a weight in the item, where the scaler never "
+        f"moves it: {bad!r}. Put it in the amount's bracket: amount: \"1 bunch "
+        f"(about 25 g)\", item: \"fresh dill\"."
+    )
+
+
 # --- homemade pastry needs salt ----------------------------------------------
 # #135. Detected by an ingredient GROUP named for pastry, dough or choux: not
 # "has flour and butter", which a cake batter also has, and not the word

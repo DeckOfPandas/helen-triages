@@ -853,6 +853,8 @@ NO_TEMPERATURE_BECAUSE = {
                             "glazed; done by time, and no step probes anything — "
                             "ham.cured is right about the cut and irrelevant to "
                             "the method",
+    "treacle-glazed-roast-gammon": "a gammon poached for 2½ hrs then glazed; done "
+                                   "by time, and no step probes anything",
 }
 
 

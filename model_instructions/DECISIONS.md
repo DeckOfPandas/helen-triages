@@ -848,6 +848,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the oil"; "of it" names the thing ("2 tsp spice mix"). A `QQ original` line
   is the source's and is left alone. The "spoon amount with 'of'" entry in
   `TYPOGRAPHY` (`tests/test_style.py`), on recipes and drafts.
+- **2026-11-05 — a scaled amount of one or less is singular: "½ bunch".**
+  Helen, of the mackerel's dill halved: *"half a bunch"*. It was "½ bunches".
+  Above one is plural ("1½ bunches"). One rule for every unit on both sites:
+  `unitLabel` in `assets/js/shopping-list.js`.
+- **2026-11-05 — a weight goes in the amount's bracket, never the item.**
+  Asked whether "fresh dill (approx 25 g)" should scale by the scaler reading
+  item text or by moving the weight, Helen chose *"Move into the amount"*:
+  amount `"1 bunch (about 25 g)"`, item `"fresh dill"`. "approx", "around"
+  and "roughly" become "about". A bracket that says more ("about 150 g
+  each", "or 400 g frozen", "about 60 ml juice") stays in the item.
+  `test_weight_is_in_the_amount_not_the_item` (`tests/test_style.py`).
 - **Undated — "180°C fan" is correct and is not a conversion; what is banned
   is a second, conventional-oven temperature beside it, and gas marks
   always.** Helen: *"saying 'fan' isn't a conversion."* The site is fan-oven

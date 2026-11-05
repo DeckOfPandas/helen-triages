@@ -81,9 +81,11 @@
     large: true, small: true, medium: true
   };
 
+  /* Singular at one or less: "½ bunch", "¼ handful", "1 dash"; plural above
+     one: "1½ bunches". */
   function unitLabel(unit, quantity) {
     if (SYMBOL_UNITS[unit]) return unit;
-    if (quantity === 1) return unit;
+    if (quantity <= 1 + 1e-9) return unit;
 
     /* Must agree with foldUnit or a unit will not survive the round trip:
        `x 400 g can` prints `x 400 g cans`, `heaped tbsp` prints unchanged. */
@@ -356,16 +358,13 @@
     return parsed;
   }
 
-  /* The bracket that restates the same quantity: `1 tbsp (6 g)`. It has to
-     come off the unit before grouping (`tbsp (6 g)` and `tbsp (12 g)` are one
-     unit) and before scaling (both figures must move together). Returned, not
-     applied: the food callers decide what to do with it.
-
-     @param {string} unit
-     @returns {{unit: string, lo: number, hi: number|null, unit2: string}|
-               {unit: string}} */
+  /* The bracket that restates the same quantity: `1 tbsp (6 g)`. It comes
+     off the unit before grouping (`tbsp (6 g)` and `tbsp (12 g)` are one
+     unit) and before scaling (both figures move together). Returned, not
+     applied; `(about 25 g)` sets `about: true` for the caller to print.
+     @returns {{unit, lo, hi: number|null, unit2, about?: true}|{unit}} */
   var PARENTHETICAL = new RegExp(
-    '^(.*?)\\s*\\(\\s*' + NUMBER +
+    '^(.*?)\\s*\\(\\s*(about\\s+)?' + NUMBER +
     '(?:\\s*(?:–|—|-)\\s*' + NUMBER + ')?' +
     '\\s*([^)]*?)\\s*\\)\\s*$'
   );
@@ -374,16 +373,18 @@
     var match = PARENTHETICAL.exec(String(unit || ''));
     if (!match) return { unit: String(unit || '') };
 
-    var lo = numberFrom(match[2], match[3]);
+    var lo = numberFrom(match[3], match[4]);
     if (lo === null) return { unit: String(unit || '') };
-    var hi = numberFrom(match[4], match[5]);
+    var hi = numberFrom(match[5], match[6]);
 
-    return {
+    var split = {
       unit: match[1],
       lo: lo,
       hi: hi !== null && hi > lo ? hi : null,
-      unit2: foldUnit(match[6])
+      unit2: foldUnit(match[7])
     };
+    if (match[2]) split.about = true;
+    return split;
   }
 
   function pluralise(word) {

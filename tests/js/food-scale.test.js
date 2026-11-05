@@ -127,8 +127,8 @@ test('THE ROUNDING, HANDFULS: the nearest quarter, and never less than a quarter
   assert.strictEqual(at('2 handfuls', 2 / 3, WORDS), '1¼ handfuls');
   assert.strictEqual(at('2 handfuls', 7 / 6, WORDS), '2¼ handfuls');
   assert.strictEqual(at('2 handfuls', 1.05, WORDS), '2 handfuls');
-  assert.strictEqual(at('1 handful', 2 / 3, WORDS), '¾ handfuls');
-  assert.strictEqual(at('1 handful', 1 / 12, WORDS), '¼ handfuls');
+  assert.strictEqual(at('1 handful', 2 / 3, WORDS), '¾ handful');
+  assert.strictEqual(at('1 handful', 1 / 12, WORDS), '¼ handful');
   assert.strictEqual(foodScale.quarterStep(1.17), 1.25);
   assert.strictEqual(foodScale.quarterStep(0.1), 0.25);
 });
@@ -141,22 +141,22 @@ test('THE ROUNDING, PINCHES AND THE REST: the nearest half, and never less than 
   assert.strictEqual(at('1 pinch', 4 / 3, WORDS), '1½ pinches');
   assert.strictEqual(at('2 dashes', 7 / 6, WORDS), '2½ dashes');
   // Two thirds is nearer a half than one; a twelfth still leaves a half.
-  assert.strictEqual(at('1 knob', 2 / 3, WORDS), '½ knobs');
-  assert.strictEqual(at('1 splash', 1 / 12, WORDS), '½ splashes');
+  assert.strictEqual(at('1 knob', 2 / 3, WORDS), '½ knob');
+  assert.strictEqual(at('1 splash', 1 / 12, WORDS), '½ splash');
   assert.strictEqual(foodScale.halfStep(1.17), 1);
   assert.strictEqual(foodScale.halfStep(0.1), 0.5);
   assert.strictEqual(foodScale.halfStep(1.25), 1.5);
 });
 
-test('THE PLURAL is the site\'s existing rule: singular at exactly one, plural otherwise', () => {
-  // The plural comes from shopping-list.js's `unitLabel`, which every unit
-  // prints through, stepped or not. To print "½ handful", change `unitLabel`,
-  // for every unit at once.
-  assert.strictEqual(at('1 pat', 0.5, WORDS), '½ pats');
+test('THE PLURAL: singular at one or less, plural above one', () => {
+  // shopping-list.js's `unitLabel` decides it, for every unit at once,
+  // stepped or not. DECISIONS §5.
+  assert.strictEqual(at('1 pat', 0.5, WORDS), '½ pat');
   assert.strictEqual(at('1 pat', 1.5, WORDS), '1½ pats');
-  assert.strictEqual(at('1 handful', 0.5, WORDS), '½ handfuls');
+  assert.strictEqual(at('1 handful', 0.5, WORDS), '½ handful');
   assert.strictEqual(at('1 handful', 1.5, WORDS), '1½ handfuls');
-  assert.strictEqual(at('1 pinch', 0.5, WORDS), '½ pinches');
+  assert.strictEqual(at('1 pinch', 0.5, WORDS), '½ pinch');
+  assert.strictEqual(at('1 bunch', 0.5, WORDS), '½ bunch');
   assert.strictEqual(at('2 handfuls', 0.5, WORDS), '1 handful');
 });
 
@@ -190,8 +190,8 @@ test('a range and a tilde survive the whole step', () => {
   assert.strictEqual(at('~1 handful', 3, WORDS), '~3 handfuls');
   assert.strictEqual(at('1–2 handfuls', 0.5, WORDS), '½–1 handful');
   // Both ends landing on the same step is one number, not "¼–¼".
-  assert.strictEqual(at('1–2 handfuls', 0.1, WORDS), '¼ handfuls');
-  assert.strictEqual(at('1–2 pinches', 0.1, WORDS), '½ pinches');
+  assert.strictEqual(at('1–2 handfuls', 0.1, WORDS), '¼ handful');
+  assert.strictEqual(at('1–2 pinches', 0.1, WORDS), '½ pinch');
 });
 
 test('an amount that is only the measure counts as one of it', () => {
@@ -216,8 +216,8 @@ test('an amount that is only the measure counts as one of it', () => {
 test('the measure is a whole word, so nothing else is caught by it', () => {
   // `dash` must not step a dashi sachet, nor `pinch` a pinchos stick: a third
   // of three would read "1" either way, but two thirds of one would read "½".
-  assert.strictEqual(at('1 pinchos', 2 / 3, WORDS), '⅔ pinchos');
-  assert.strictEqual(at('1 dashi sachet', 2 / 3, WORDS), '⅔ dashi sachets');
+  assert.strictEqual(at('1 pinchos', 2 / 3, WORDS), '⅔ pincho');
+  assert.strictEqual(at('1 dashi sachet', 2 / 3, WORDS), '⅔ dashi sachet');
   assert.strictEqual(at('200 g', 2, WORDS), '400 g');
 });
 
@@ -265,7 +265,7 @@ test('at one, a leading measure keeps the recipe\'s own words', () => {
   // Anything but one is a number, in the same glyphs the amounts use.
   assert.strictEqual(
     foodScale.scaleLeadingMeasure('a handful of fresh parsley', 2 / 3, WORDS).text,
-    '¾ handfuls of fresh parsley');
+    '¾ handful of fresh parsley');
   assert.strictEqual(
     foodScale.scaleLeadingMeasure('a handful of fresh parsley', 1.5, WORDS).text,
     '1½ handfuls of fresh parsley');
@@ -329,11 +329,11 @@ test('a handful, a sprig and a bunch go to the nearest quarter, in fractions -- 
   assert.deepStrictEqual(WORDS.quarterStep, ['handful', 'sprig', 'bunch']);
   assert.strictEqual(scaleAmount('1 sprig', 7 / 6, WORDS).text, '1¼ sprigs');
   assert.strictEqual(scaleAmount('1 bunch', 7 / 6, WORDS).text, '1¼ bunches');
-  assert.strictEqual(scaleAmount('1 sprig', 2 / 3, WORDS).text, '¾ sprigs');
+  assert.strictEqual(scaleAmount('1 sprig', 2 / 3, WORDS).text, '¾ sprig');
   assert.strictEqual(scaleAmount('1 sprig', 4 / 3, WORDS).text, '1¼ sprigs');
   assert.strictEqual(scaleAmount('3 sprigs', 0.5, WORDS).text, '1½ sprigs');
   assert.strictEqual(scaleAmount('2 sprigs', 0.5, WORDS).text, '1 sprig');
-  assert.strictEqual(scaleAmount('1 sprig', 0.1, WORDS).text, '¼ sprigs',
+  assert.strictEqual(scaleAmount('1 sprig', 0.1, WORDS).text, '¼ sprig',
     'never less than a quarter');
   assert.strictEqual(scaleAmount('2 large sprigs', 7 / 6, WORDS).text, '2¼ large sprigs');
   assert.strictEqual(scaleAmount('2–3 sprigs', 7 / 6, WORDS).text, '2¼–3½ sprigs');
@@ -359,13 +359,27 @@ test('drops, twists, lots and pats step in halves -- Helen: "round to the neares
   assert.strictEqual(scaleAmount('2 pats', 2 / 3, WORDS).text, '1½ pats');
   assert.strictEqual(scaleAmount('3–4 drops', 7 / 6, WORDS).text, '3½–4½ drops');
   assert.strictEqual(scaleAmount('1 lot', 7 / 6, WORDS).text, '1 lot');
-  assert.strictEqual(scaleAmount('1 drop', 0.1, WORDS).text, '½ drops');
+  assert.strictEqual(scaleAmount('1 drop', 0.1, WORDS).text, '½ drop');
   // Whole multiples are what they always were.
   assert.strictEqual(scaleAmount('1 pat', 2, WORDS).text, '2 pats');
   assert.strictEqual(scaleAmount('2 pats', 0.5, WORDS).text, '1 pat');
   assert.strictEqual(scaleAmount('2 large pats', 2, WORDS).text, '4 large pats');
   assert.strictEqual(scaleAmount('2 large pats', 0.5, WORDS).text, '1 large pat');
   assert.strictEqual(scaleAmount('2 pats', 2, WORDS).scaled, true);
+});
+
+test('a weight in the amount\'s bracket scales with it, whatever the amount is', () => {
+  // A weight lives in the amount, never the item, so it moves (DECISIONS §5).
+  assert.strictEqual(at('1 bunch (25 g)', 0.5, WORDS), '½ bunch (13 g)');
+  assert.strictEqual(at('1 bunch (about 25 g)', 0.5, WORDS), '½ bunch (about 13 g)');
+  assert.strictEqual(at('1 bunch (about 25 g)', 2, WORDS), '2 bunches (about 50 g)');
+  assert.strictEqual(at('1 (about 600 g)', 0.5, WORDS), '½ (about 300 g)');
+  assert.strictEqual(at('2 medium (about 225 g)', 0.5, WORDS), '1 medium (about 113 g)');
+  assert.strictEqual(at('8 oz (225 g)', 0.5, WORDS), '4 oz (113 g)');
+  assert.strictEqual(at('1 bottle (750 ml)', 0.5, WORDS), '½ bottle (375 ml)');
+  // A bare count with a bracket still tells the item its noun is now one.
+  assert.strictEqual(scaleAmount('2 (about 300 g)', 0.5, WORDS).one, true);
+  assert.strictEqual(scaleAmount('1 (about 600 g)', 2, WORDS).many, true);
 });
 
 test('the index shopping list buys whole ones, and quotes this page\'s own figure beside them', () => {

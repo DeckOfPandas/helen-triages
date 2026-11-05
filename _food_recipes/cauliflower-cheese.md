@@ -11,8 +11,8 @@ star_ingredient: "greens"
 tags: ["cheese-tastic", "one-handed food", "make-ahead", "side"]
 ingredient_groups:
   - items:
-    - amount: "1"
-      item: "cauliflower (about 600 g), cut into florets"
+    - amount: "1 (about 600 g)"
+      item: "cauliflower, cut into florets"
     - amount: "60 g"
       item: salted butter
     - amount: "60 g"
@@ -56,5 +56,4 @@ meta:
   rewritten: true
   awaiting_fix: false
   proofread: true
-
 ---

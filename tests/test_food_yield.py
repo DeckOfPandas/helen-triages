@@ -336,12 +336,13 @@ GETS_A_HALF_STEP = {
     # "1 batch": half a batch is offered where every line halves (#1089).
     "caramel", "cherry-glaze",
     "chocolate-ganache", "delias-classic-pancakes", "five-spice-powder",
-    "gluten-free-crumble-topping", "grandmas-fairy-cakes",
-    "henrys-dark-chocolate-almond-truffles",
+    "florentines", "gluten-free-crumble-topping", "grandmas-fairy-cakes",
+    "henrys-blackberry-gelato-sicilian-style", "henrys-dark-chocolate-almond-truffles",
     "jerrys-chocolate-ice-cream", "macarons", "mixed-spice-powder",
     "mrs-nicholsons-creme-patissiere",
     "mrs-nicholsons-yorkshire-puddings",
-    "sweet-potato-chocolate-brownies", "teriyaki-sauce", "wagamama-teriyaki-sauce",
+    "sweet-potato-chocolate-brownies", "teriyaki-marinade-or-glaze", "teriyaki-sauce",
+    "wagamama-teriyaki-sauce",
     "wagamama-yakitori-sauce",
 }
 

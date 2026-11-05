@@ -318,6 +318,10 @@ def test_number_ranges_use_en_dashes(draft):
     _st.test_number_ranges_use_en_dashes(draft)
 
 
+def test_weight_is_in_the_amount_not_the_item(draft):
+    _st.test_weight_is_in_the_amount_not_the_item(draft)
+
+
 def test_meta_fields_are_nested_not_top_level(draft):
     _fm.test_meta_fields_are_nested_not_top_level(draft)
 

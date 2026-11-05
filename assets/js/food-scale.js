@@ -29,6 +29,7 @@
   var splitParenthetical = shoppingList.splitParenthetical;
   var unitLabel = shoppingList.unitLabel;
   var totalText = foodShoppingList.totalText;
+  var parenText = foodShoppingList.parenText;
   // The same unit fold and size words the shopping list applies.
   var CANONICAL = foodShoppingList.CANONICAL;
   var SIZE_UNITS = foodShoppingList.SIZE_UNITS;
@@ -148,6 +149,20 @@
       measureWords(options && options.quarterStep), tail, quarterStep);
   }
 
+  /* The bracket that restates an amount, scaled by the same factor:
+     "(about 25 g)" x½ is "(about 12.5 g)". */
+  function scaledParen(split, factor) {
+    var pcanon = CANONICAL[split.unit2];
+    var pf = pcanon ? pcanon.factor : 1;
+    var paren = {
+      unit: pcanon ? pcanon.unit : split.unit2,
+      lo: split.lo * factor * pf,
+      hi: (split.hi === null ? split.lo : split.hi) * factor * pf
+    };
+    if (split.about) paren.about = true;
+    return paren;
+  }
+
   /**
    * @param {string} amount - as the recipe wrote it: "200 g", "30–50 g", "2 large"
    * @param {number} factor - portions wanted over portions the recipe makes
@@ -167,13 +182,22 @@
       return eitherStep(written, factor, options, '\\s*$');
     }
 
-    var stepped = scaleSteppedMeasure(parsed, factor, words, halfStep) ||
-      scaleSteppedMeasure(parsed, factor,
-        measureWords(options && options.quarterStep), quarterStep);
-    if (stepped) return stepped;
-
     var split = splitParenthetical(parsed.unit);
     var unitWritten = split.lo === undefined ? parsed.unit : split.unit;
+    var paren = split.lo === undefined ? null : scaledParen(split, factor);
+
+    /* A stepped measure is matched on the unit without its bracket, and the
+       bracket is scaled exactly beside it: "1 bunch (25 g)" halves to
+       "½ bunch (12.5 g)". */
+    var bare = { quantity: parsed.quantity, max: parsed.max,
+      approx: parsed.approx, unit: unitWritten };
+    var stepped = scaleSteppedMeasure(bare, factor, words, halfStep) ||
+      scaleSteppedMeasure(bare, factor,
+        measureWords(options && options.quarterStep), quarterStep);
+    if (stepped) {
+      if (paren) stepped.text += ' ' + parenText(paren);
+      return stepped;
+    }
     var canon = CANONICAL[unitWritten];
     var unit = canon ? canon.unit : unitWritten;
     var f = canon ? canon.factor : 1;
@@ -184,31 +208,21 @@
       lo: parsed.quantity * factor * f,
       hi: hiQuantity * factor * f,
       approx: !!parsed.approx,
-      paren: null
+      paren: paren
     };
-
-    if (split.lo !== undefined) {
-      var pcanon = CANONICAL[split.unit2];
-      var pf = pcanon ? pcanon.factor : 1;
-      total.paren = {
-        unit: pcanon ? pcanon.unit : split.unit2,
-        lo: split.lo * factor * pf,
-        hi: (split.hi === null ? split.lo : split.hi) * factor * pf
-      };
-    }
 
     /* `one` says the noun in the ITEM must now be singular: a bare count or
        size word, written for more than one, has come down to exactly one
-       ("2 large eggs" halved). "2 cloves" is not this case: its noun is the
-       unit and `totalText` already prints "1 clove". */
+       ("2 large eggs" halved, "2 (300 g)" mackerel fillets halved). "2 cloves"
+       is not this case: its noun is the unit and `totalText` already prints
+       "1 clove". */
     var bareCount = unit === '' || SIZE_UNITS[unit] === true;
-    var one = bareCount && split.lo === undefined &&
+    var one = bareCount &&
       Math.abs(total.lo - 1) < 1e-9 && Math.abs(total.hi - 1) < 1e-9 &&
       hiQuantity > 1;
     /* `many` is the reverse: a bare count written for one or less ("1 lemon",
        "½ lemon") is now more than one, so the item's noun goes plural. */
-    var many = bareCount && split.lo === undefined &&
-      hiQuantity <= 1 + 1e-9 && total.hi > 1 + 1e-9;
+    var many = bareCount && hiQuantity <= 1 + 1e-9 && total.hi > 1 + 1e-9;
 
     return { text: totalText(total), scaled: true, one: one, many: many };
   }
