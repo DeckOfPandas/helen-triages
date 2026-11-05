@@ -307,11 +307,12 @@ test('it still gets to the end with a shortlist to render', () => {
 
 test('the count paints its number and its word into separate spans', () => {
   // The digits take `.results-count-number` and the word stays bare; the
-  // outer element still reads "N survivors".
+  // outer element still reads "N recipes", which is the word until a filter
+  // narrows the list (#1462 A3).
   const { doc } = boot();
   assert.strictEqual(doc.getElementById('recipe-count-n').textContent, '4');
-  assert.strictEqual(doc.getElementById('recipe-count-word').textContent, 'survivors');
-  assert.strictEqual(doc.getElementById('recipe-count').textContent, '4 survivors');
+  assert.strictEqual(doc.getElementById('recipe-count-word').textContent, 'recipes');
+  assert.strictEqual(doc.getElementById('recipe-count').textContent, '4 recipes');
 });
 
 test('a page with no shopping list at all still runs', () => {
@@ -1027,6 +1028,8 @@ test('#1024: ?q= fills the name box and narrows the list', () => {
   // first, and the order is what proves the query reached the script.
   assert.strictEqual(list.children[0].getAttribute('data-url'), '/food/recipes/b/',
     'the query must reach reorderForTitleSearch(), not only the box.');
+  assert.strictEqual(doc.getElementById('recipe-count-word').textContent.replace(/s$/, ''), 'survivor',
+    'a name search narrows the list, so the count says survivors (#1462 A3)');
 });
 
 // --- arriving with an ingredient, #1050 -----------------------------------------

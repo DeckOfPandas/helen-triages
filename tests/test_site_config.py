@@ -2291,12 +2291,6 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "80px; the first is the list above. Measured at 360px with every line "
         "on one row."
     ),
-    ".recipe-pagination": (
-        "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "
-        "of Courier all told, so it is believed to fit a 360px phone -- BELIEVED, "
-        "not measured, and it is the same shape as the footer row that did not. "
-        "The status string is built in filters.js and is the part that could grow."
-    ),
     ".cocktail-ingredients": (
         "`max-content 1fr` -- the amount column and the ingredient "
         "name/suggestion text. It was `.cocktail-ingredient-top` with "

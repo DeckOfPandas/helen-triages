@@ -10,10 +10,11 @@
        on an inline box, and .category-label is a flex item, which is blockified.
        The inner span is not a flex item and can stay inline. No square brackets:
        they are the wordmark's device, so the labels in
-       _data/food/filter_sections.yml have none. {% endcomment %}
-    <span class="category-label">
+       _data/food/filter_sections.yml have none. An <h2>, as on the cocktails
+       index, so a screen reader can jump between sections. {% endcomment %}
+    <h2 class="category-label">
       <span class="category-label-text">{{ include.label }}</span>
-    </span>
+    </h2>
     <button type="button" class="btn-clear-inline" style="display:none;">&times; clear</button>
   </div>
   <div class="category-buttons">

@@ -32,6 +32,9 @@
     @include lettering(heading);
     color: $color-text;
     position: relative;   // anchors the absolutely-positioned wash slot
+    // A chip section's label is an <h2> (_includes/filter_group.html); the
+    // browser's heading margin is not part of the look.
+    margin: 0;
   }
 }
 
@@ -62,6 +65,8 @@
   .category-label-row { @include index-label-row; }
 
   .btn-clear-inline {
+    // 32px, not 44: a taller area would reach the first row of chips.
+    @include tap-area(32px);
     // A real <button>, so it is reachable by keyboard; these lines strip the
     // browser chrome.
     border: 0;

@@ -435,19 +435,21 @@
     return map;
   })();
 
-  /* In the order they were shortlisted, which is the store's insertion order.
-     Drinks no longer on the page are dropped. */
+  /* In the order they were shortlisted, which is the store's insertion order,
+     or a shared link's own order. Drinks no longer on the page are dropped. */
   function shortlistedDrinks() {
-    return HTF.shortlist.list().filter(function (url) {
+    return (sharedKeys || HTF.shortlist.list()).filter(function (url) {
       return Object.prototype.hasOwnProperty.call(INGREDIENTS, url);
     });
   }
 
   function renderShoppingList() {
     if (!shoppingEl) return;
-    // Hidden over a shared list (#1093): its numbers write to this browser's
-    // store, and a list you were sent is not yours until you keep it.
-    shoppingEl.hidden = !state.shortlisted || !!sharedKeys;
+    /* Shown over a shared list too, as on food (DECISIONS §8.3, which covers
+       both sites). Opening the link still saves nothing: the list is totalled
+       from the link. A number typed into a box is saved, as that drink's
+       count. */
+    shoppingEl.hidden = !state.shortlisted;
     if (shoppingEl.hidden) return;
 
     var urls = shortlistedDrinks();
@@ -791,8 +793,11 @@
     renderShoppingList();
 
     if (countEl) countEl.textContent = shown;
-    /* The word moves with the number; the template does the first render. */
-    if (wordEl) wordEl.textContent = 'survivor' + (shown === 1 ? '' : 's');
+    /* The word moves with the number; the template does the first render.
+       "drinks" until something narrows the list, then "survivors" (Helen's
+       ruling, DECISIONS §13). */
+    var countNoun = FilterState.hasAnythingToClear(state) ? 'survivor' : 'drink';
+    if (wordEl) wordEl.textContent = countNoun + (shown === 1 ? '' : 's');
     if (noneEl) noneEl.hidden = shown > 0;
   }
 
@@ -1190,6 +1195,11 @@
     state = FilterState.emptyState();
     resetControls();
     apply();
+    /* The query a link arrived with is cleared too, or a reload puts the
+       filter straight back (#1454 C4). */
+    if (location.search && window.history && typeof history.replaceState === 'function') {
+      history.replaceState(null, '', location.pathname + location.hash);
+    }
   }
 
   clearAllButtons.forEach(function (btn) { btn.addEventListener('click', clearAll); });

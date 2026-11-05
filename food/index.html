@@ -1,6 +1,5 @@
 ---
 layout: default
-title: Home
 permalink: /food/
 ---
 
@@ -51,14 +50,37 @@ permalink: /food/
      matter, where a typo would silently mint a new star ingredient. {% endcomment %}
   {% assign all_stars = site.data.food.taxonomy.star_ingredients %}
 
-  {% if all_stars.size > 0 %}
+  {% comment %} A declared star no recipe on this build answers is not offered: a
+     chip that can only lead to "Blank canvas." is hidden until a recipe
+     publishes (DECISIONS §13). A row answers a star by `star_ingredient` or by
+     a `star_also` rule, the two tests behind its `data-star` and
+     `data-star-also` below; this loop must make the same two. {% endcomment %}
+  {% assign _live_stars = "|" %}
+  {% for recipe in _rendered_recipes %}
+    {% assign _live_stars = _live_stars | append: recipe.star_ingredient | append: "|" %}
+    {% for _rule in site.data.food.taxonomy.star_also %}
+      {% if recipe.star_ingredient == _rule.from %}
+        {% for _ing in recipe.main_ingredients %}
+          {% assign _ing_key = _ing | downcase %}
+          {% if _rule.main_ingredients contains _ing_key %}{% assign _live_stars = _live_stars | append: _rule.star | append: "|" %}{% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+  {% assign shown_stars = "" | split: "" %}
+  {% for _star in all_stars %}
+    {% capture _star_probe %}|{{ _star }}|{% endcapture %}
+    {% if _live_stars contains _star_probe %}{% assign shown_stars = shown_stars | push: _star %}{% endif %}
+  {% endfor %}
+
+  {% if shown_stars.size > 0 %}
     {% comment %} `section_id="filter-star"` (#1059): a star badge's own link
        (recipe_badges.html) ends in this exact fragment, so a reader following it
        lands on this section. {% endcomment %}
     {% include filter_group.html
       group_class=star_data.class
       label=star_data.label
-      items=all_stars
+      items=shown_stars
       btn_class="btn-star"
       data_attr="data-star"
       section_id="filter-star"
@@ -152,16 +174,13 @@ permalink: /food/
 
 </div>
 
-{% comment %} Reuses the filter-heading treatment (punched label and stroke) with no
-   colour rule underneath: it is not a filter category, so it borrows none of
-   their hues. {% endcomment %}
-{% comment %} `id="results"` is where a search result lands (#1050): every filtered link
-   the search dropdown offers ends in `#results`, and filters.js scrolls here
-   again once the list is revealed. The drinks index carries the same id. {% endcomment %}
-{% comment %} Number and word are two spans (MANUAL 13.7): the digits take the label
-   face (`.results-count-number`). filters.js paints both after the first render. {% endcomment %}
+{% comment %} Not a filter category, so no colour rule under it. `id="results"` is
+   where a search result lands (#1050), as on the drinks index. Number and word
+   are two spans (MANUAL 13.7), painted by filters.js after the first render:
+   "recipes" until a filter narrows the list, then "survivors" (DECISIONS
+   §13.7). `role="status"` announces each new count. {% endcomment %}
 <div class="results-heading" id="results">
-  <span class="category-label"><span class="category-label-text" id="recipe-count"><span class="results-count-number" id="recipe-count-n">{{ _rendered_recipes.size }}</span> <span id="recipe-count-word">survivor{% unless _rendered_recipes.size == 1 %}s{% endunless %}</span></span></span>
+  <span class="category-label"><span class="category-label-text" id="recipe-count" role="status"><span class="results-count-number" id="recipe-count-n">{{ _rendered_recipes.size }}</span> <span id="recipe-count-word">recipe{% unless _rendered_recipes.size == 1 %}s{% endunless %}</span></span></span>
 
   {% comment %} The shortlisted-only button is in `.results-count-row` below, on its own
      line under the count rather than beside it: as a pill on the count's
@@ -206,6 +225,10 @@ permalink: /food/
   <button type="button" class="btn-shared-keep" data-shared-shortlist-keep hidden>keep these</button>
 </p>
 
+{% comment %} `.recipe-list` is visibility:hidden until filters.js has shuffled it
+   (MANUAL 13.7). Without scripts nothing would ever reveal it, so a reader
+   with them off gets the alphabetical list instead of an empty page. {% endcomment %}
+<noscript><style>.recipe-list { visibility: visible; }</style></noscript>
 <ul class="recipe-list">
   {% for recipe in all_recipes %}
     {% assign is_magic_bag = false %}

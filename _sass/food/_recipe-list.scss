@@ -48,7 +48,7 @@
   scroll-margin-top: $space-sm;
   // Hidden until filters.js has shuffled the list and reveals it, so the
   // server-rendered alphabetical order is never painted first. Layout height
-  // is unaffected.
+  // is unaffected. A `<noscript>` in food/index.html lifts it without scripts.
   visibility: hidden;
 
   li {
@@ -199,9 +199,28 @@ article.recipe .recipe-related .recipe-title-link {
 .btn-page-see-all {
   grid-column: 3;
   justify-self: end;
+  // One phrase, never broken.
+  white-space: nowrap;
+}
+
+// One column on a phone, as cocktails' pager is: three columns at 360px leave
+// "(see all)" too little room.
+@media (max-width: 600px) {
+  .recipe-pagination {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: $space-sm;
+  }
+
+  .recipe-pagination-nav,
+  .btn-page-see-all {
+    grid-column: 1;
+    justify-self: center;
+  }
 }
 
 .btn-page {
+  @include tap-area(44px);
   font-family: $font-headings;
   text-transform: lowercase;
   background: none;

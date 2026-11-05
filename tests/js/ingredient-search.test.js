@@ -436,6 +436,32 @@ test('a prefix still reaches a longer word, which is the point of prefix', () =>
   assert.strictEqual(m.entriesMatchKey(['coriander'], 'cori'), true);
 });
 
+// #1462 C1. A never_family word heads entries that are not kinds of it, so a
+// bare chip for it matches only where it names the thing: the last word.
+test('a bare never_family chip matches its own word, not what it modifies', () => {
+  const m = IS.create(Object.assign({}, VOCAB, {
+    never_family: ['plum', 'tomato', 'fennel'],
+    family_exceptions: ['cherry tomatoes']
+  }));
+  assert.strictEqual(m.entriesMatchKey(['plums'], 'plum'), true);
+  assert.strictEqual(m.entriesMatchKey(['plum'], 'plum'), true);
+  assert.strictEqual(m.entriesMatchKey(['plum tomatoes'], 'plum'), false,
+    'plum tomatoes are tomatoes, not plums');
+  assert.strictEqual(m.entriesMatchKey(['baby plum tomatoes'], 'plum'), false);
+  assert.strictEqual(m.entriesMatchKey(['plum jam'], 'plum'), false);
+  assert.strictEqual(m.entriesMatchKey(['cherry tomatoes'], 'tomato'), true,
+    'a tomato chip still finds cherry tomatoes');
+  assert.strictEqual(m.entriesMatchKey(['tomato purée'], 'tomato'), false);
+  assert.strictEqual(m.entriesMatchKey(['fennel seeds'], 'fennel'), false);
+  assert.strictEqual(m.entriesMatchKey(['fennel'], 'fennel'), true);
+  // A family exception does not count towards its head word.
+  assert.strictEqual(m.entriesMatchKey(['cherry tomatoes'], 'cherry'), false);
+  // A word not in either list still widens by prefix.
+  assert.strictEqual(m.entriesMatchKey(['chicken breast'], 'chicken'), true);
+  // A two-word key is untouched.
+  assert.strictEqual(m.entriesMatchKey(['plum tomatoes'], 'plum tomatoes'), true);
+});
+
 // #1386. A phone keyboard types no accents, so a two-word query must fold the
 // entry as the one-word query always has.
 test('a two-word query typed without accents finds the accented entry', () => {

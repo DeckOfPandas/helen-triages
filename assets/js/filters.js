@@ -778,10 +778,13 @@ function renderResultsPool() {
 
     /* Number and word are two spans, so the digits can take the label face
        (`.results-count-number`); results-bar.js mirrors both. The fallback
-       keeps a template or fixture with only the outer element painting. */
+       keeps a template or fixture with only the outer element painting.
+       "recipes" until something narrows the list, then "survivors" (Helen's
+       ruling, DECISIONS §13): the joke needs a filter to land. */
     var recipeCountEl = document.getElementById('recipe-count');
     if (recipeCountEl) {
-      var survivorWord = visibleCount === 1 ? 'survivor' : 'survivors';
+      var countNoun = hasAnythingToClear() ? 'survivor' : 'recipe';
+      var survivorWord = visibleCount === 1 ? countNoun : countNoun + 's';
       var recipeCountN = document.getElementById('recipe-count-n');
       var recipeCountWord = document.getElementById('recipe-count-word');
       if (recipeCountN && recipeCountWord) {
@@ -970,6 +973,11 @@ function renderResultsPool() {
       // return to zero filters, which would reorder the page under the reader.
       shuffleRecipeList();
       update();
+      // The query a link arrived with is cleared too, or a reload puts the
+      // filter straight back (#1454 C4).
+      if (location.search && window.history && typeof history.replaceState === 'function') {
+        history.replaceState(null, '', location.pathname + location.hash);
+      }
     };
     clearButtons.forEach(function (btn) {
       btn.addEventListener('click', clearAllFilters);
