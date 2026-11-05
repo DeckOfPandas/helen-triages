@@ -73,7 +73,7 @@ def review(paths: list, root: Path) -> str:
         except inbox.Rejected as reason:
             questions.append((origin, [f"REJECTED: {reason}"]))
             continue
-        slug = inbox.slug_for(env.fm["title"])
+        slug = inbox.slug_for(env.fm["title"], env.site)
         fm = _draft_fm(root, slug)
         unwritten = fm is None
         fm = env.fm if unwritten else fm

@@ -184,6 +184,17 @@ and `ready` when the words are already hers. A `3-keep/` file can later become
 repo, pushed, and one line in the reply. She can still move files by hand; the
 words exist so she does not have to.
 
+**A food draft that leaves the pool gets the promotion rules run against it.**
+Helen: *"I want you to run the promotion rules against drafts I progress from
+the main pool."* Whenever a draft lands in `1-rewrite/`, `2-make/`, `3-keep/`
+or `4-promote/`, by her word or her hand, run `python3 scripts/promotion_qa.py
+<folder or path>`. It applies every per-recipe rule the published collection
+is held to, in place, and sorts the findings: **FIX** (mechanical: fix it, in a
+commit of its own), **HELEN'S** (a `QQ`, and the flag-only rules: bring them
+in one list) and **AT PROMOTION** (settled by the promotion copy: leave them).
+A `2-make/` draft is also checked to render on the local server, and read for
+sense, because she cooks from it.
+
 **Run `python3 scripts/verify.py` before every push to a drafts repo.** The
 private repos have no CI (#1194), and CI on the public repo checks out the
 public repo alone. Most draft checks are parametrised per file, so without a

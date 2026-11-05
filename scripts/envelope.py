@@ -279,14 +279,21 @@ def fingerprint(fm: dict, site: str) -> str:
     return " | ".join([title] + amounts)
 
 
-def slug_for(title: str) -> str:
+FOOD_SLUG_FILLER = ("and", "with")
+
+
+def slug_for(title: str, site: str) -> str:
     """The whole title, folded and hyphenated, not its head clause.
 
-    Two "with" dishes that share a head clause get distinct slugs
-    (DECISIONS §4).
+    Two "with" dishes that share a head clause get distinct slugs. A food
+    slug drops the joining words "and" and "with"; a drink's keeps them,
+    because there they are usually the name (DECISIONS §4).
     """
     text = _fold(title.replace("’", "").replace("'", ""))
-    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", text)).strip("-")
+    words = [w for w in re.split(r"[^a-z0-9]+", text) if w]
+    if site == "food":
+        words = [w for w in words if w not in FOOD_SLUG_FILLER]
+    return "-".join(words)
 
 
 def _fold(text: str) -> str:
@@ -314,7 +321,7 @@ def _check(path: str) -> int:
             print(f"{where}: REJECTED: {why}")
             bad += 1
             continue
-        slug = slug_for(env.fm["title"])
+        slug = slug_for(env.fm["title"], env.site)
         note = "" if heading in (None, slug) else f" (the heading says {heading!r})"
         print(f"{where}: OK, {slug}.md{note}")
         print(f"    fingerprint: {env.fingerprint}")

@@ -50,12 +50,12 @@ argument and the rules each field is read by.
 - 2026-08-29 · §4 · the ingest contract is one question: is the answer in the source document, or in Helen's head?
 - 2026-08-29 · §4 · ingredient and method groups are split at ingest, once, and not again afterwards.
 - 2026-09-01 · §4 · Helen keeps the rewrite staging folder, and no agent deletes a QQ original line or moves a file between staging folders unasked.
-- 2026-09-03 · §4 · a recipe's filename is the whole title slugged, not the head clause.
+- 2026-11-03 · §4 · a food filename is the whole title slugged, not the head clause, without "and" and "with".
 - 2026-10-18 · §4 · every note an ingest adds is {label, text} with both fields set and both beginning QQ; the label may carry a topic, QQ nutrition.
 - 2026-10-18 · §4 · a time the source does not print is written Estimated N mins, and promotion refuses it.
 - 2026-10-18 · §4 · an ingest ignores a nutrition box and its badges.
 - 2026-10-18 · §4 · an ingest ignores a "you will need" equipment list.
-- 2026-10-18 · §4 · page furniture: drop what sells, keep what is written about the dish.
+- 2026-11-03 · §4 · page furniture: drop what sells; everything else written on the page goes in the body.
 - 2026-10-18 · §4 · a sidebar box ingested as a recipe has no body.
 - 2026-10-30 · §4 · a magazine page's citation: the book shape plus "via" for an extract, a credit only from the page itself, the cover month.
 - 2026-10-30 · §4 · header and method times that disagree: cook_time takes the header's and a QQ note names the mismatch.
@@ -73,14 +73,16 @@ argument and the rules each field is read by.
 - 2026-10-04 · §4 · #814 · interleaved phases take narrative group names, and Claude suggests them.
 - 2026-10-04 · §4 · #814 · method group names are imperatives, as a trial.
 - 2026-10-04 · §4 · #814 · a component with ingredients and no method gets a QQ - MISSING: step, not silence.
+- 2026-11-03 · §4 · a recipe the photos show only part of is left out on purpose.
 - 2026-10-04 · §4 · #814 · group names are quoted — Helen, told the difference between - name: cake and - name: "Make the batter" was only how the name is typed: "Let's make future recipes quote group …
 - 2026-10-07 · §4 · a source's bottle goes in that pour's note as "Originally X.", never in suggestion.
 - 2026-10-08 · §4 · a cocktail's tagline is a bare QQ at ingest; nothing is drafted.
 - 2026-10-08 · §4 · a food tagline at ingest is the method's pair on one line, where the source has an intro.
-- 2026-10-08 · §4 · unspecified butter is QQ butter — Helen: "Write QQ butter in the ingredients list where it isn't specified." Replaces a chat's "salted, or plain in precise bakes".
+- 2026-11-03 · §4 · an unqualified milk, egg or butter takes the house default, and the line says what the source printed.
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
 - 2026-10-28 · §4 · makes: is written as a count of a named thing.
+- 2026-11-03 · §4 · a dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets.
 - 2026-10-08 · §4 · Helen's own recipes are source: "Henry", source_type: person.
 - 2026-10-08 · §4 · four ingest rulings apply to Difford's alone.
 - 2026-10-08 · §4 · three things a chat did are NOT ingest rules: one question per recipe, hand-assigned moods, and alternative paths as method groups.
@@ -90,6 +92,7 @@ argument and the rules each field is read by.
 - 2026-10-10 · §4 · #1356 · a fat or flour the source lists only for the tin or the pan is kept and flagged incidental: true, at every ingest.
 - 2026-10-16 · §4 · #1356 · on a real fat or flour line, ", plus extra for the tin" and its kin are trimmed, at tidy.
 - 2026-10-16 · §4 · #1356 · deep-frying oil is listed, unquantified, as "<oil>, for deep frying", and is not incidental.
+- 2026-11-03 · §4 · oil a couple of centimetres deep is "for shallow frying", and is incidental.
 - 2026-08-20 · §4 · #406 · "Adapted from" prefixes published work and only published work.
 - 2026-08-20 · §4 · #406 · a source with no date is a website; a publication is a print issue and always carries one.
 - 2026-08-20 · §4 · #406 · a source nobody has established is source: "QQ" with source_type: unknown, and on a published recipe it is meant to break the build.
@@ -131,6 +134,7 @@ argument and the rules each field is read by.
 - 2026-10-08 · §5 · #1089 · copy Helen settled at the design review's sitting stays as she left it.
 - 2026-10-01 · §5 · a number and its unit take a space (15 ml, 400 g), fixed mechanically at ingest and by the tidy pass.
 - 2026-09-06 · §5 · #711 · every note starts with a capital letter and ends with a full stop, on both sites.
+- 2026-11-05 · §5 · a spoon amount takes no "of" — Helen: "Never "2 tbsp of" something.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
@@ -649,6 +653,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §11 · #1008 · the drafts staging folders are 1-rewrite/, 2-make/, 3-keep/, 4-promote/, the same four in both drafts repos.
 - 2026-10-11 · §11 · 0-not-made/ in the cocktails drafts repo is a temporary bucket for drinks Helen has never made.
 - 2026-09-14 · §11 · #1008 · Claude moves a draft between the staging folders on Helen's word: rewrite, make, keep, ready or bin, followed by a slug.
+- 2026-11-04 · §11 · a food draft that leaves the pool gets the promotion rules run against it.
 - 2026-09-14 · §11 · never create issues or PRs in a burst: a batch of issues is one issue with a checklist.
 - 2026-09-15 · §11 · the account GitHub recorded is read off what a write returns, never assumed.
 - 2026-09-15 · §11 · a command that builds a path at run time gets a committed wrapper, not a prompt.
@@ -862,6 +867,8 @@ argument and the rules each field is read by.
 - 2026-08-19 · §14 · #382 · there is no methods tables page and no steak table; fish and shellfish live on the calculator page.
 - 2026-08-21 · §14 · #400 · the sourcing prose cut from cooking_methods.yml is kept in cooking-methods-prose-archive.html, committed and unpublished.
 - 2026-08-21 · §14 · youvetsi carries no internal temperature.
+- 2026-11-03 · §14 · chicken served whole takes poultry.chicken; cut-up chicken does not.
+- 2026-11-03 · §14 · a braise takes no temperature, whatever the meat.
 - undated · §14 · Undated (August 2026) — pork "medium" and fresh ham's "hint of pink" stay as they are.
 - 2026-10-08 · §14 · #1326 · the reference pages have no tooltips, and nothing that lived in one was rehomed.
 - 2026-10-08 · §14 · #1327 · the temperature charts stay one scroll, with the contents as sticky chips; no per-protein picker.

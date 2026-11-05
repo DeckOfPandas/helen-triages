@@ -327,7 +327,7 @@ def plan_for(body: str, site: str, existing: list, root: Path, number=None,
         return plan
     plan.envelope = envelope
 
-    slug = slug_for(envelope.fm["title"])
+    slug = slug_for(envelope.fm["title"], envelope.site)
     if not SLUG_OK.match(slug):
         plan.reason = (f"slug {slug!r} from title {envelope.fm['title']!r} is "
                        f"not [a-z0-9-]")
