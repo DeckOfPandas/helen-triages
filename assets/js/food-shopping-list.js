@@ -37,18 +37,46 @@
   /* Decimal places for the measured units: `g` and `ml` print whole, `kg` and
      `l` to three places (the same precision in a bigger unit). Any unit absent
      from here goes through `fractionText`. */
-  var DECIMALS = { g: 0, ml: 0, kg: 3, l: 3, cl: 1, oz: 1 };
+  var DECIMALS = { g: 0, ml: 0, kg: 3, l: 3, cl: 1, oz: 1, cm: 1 };
 
-  /* Grams and millilitres are the only units totalled in; kilograms, litres
-     and centilitres fold into them by definition, so `1½ l` and `500 ml` of
-     stock are one row. Nothing else is converted. `displayUnit` re-expresses
-     a total of a thousand or more. food-scale.js folds with this same table. */
+  /* Kilograms, litres and centilitres fold into grams and millilitres by
+     definition, so `1½ l` and `500 ml` of stock are one row. `displayUnit`
+     re-expresses a total of a thousand or more. food-scale.js folds with this
+     same table, so imperial measures are METRIC's, below, not this one's. */
   var CANONICAL = {
     kg: { unit: 'g', factor: 1000 },
     l: { unit: 'ml', factor: 1000 },
     litre: { unit: 'ml', factor: 1000 },
     cl: { unit: 'ml', factor: 10 }
   };
+
+  /* Metric on the shopping list (#1462 D2): imperial measures total in
+     grams, millilitres and centimetres, so 3 oz and 100 g of butter are one
+     row. A table of its own, not CANONICAL, which the recipe page shares:
+     a recipe keeps the unit it was written in. British measures, as the
+     books are, except the cup, which only American recipes write. */
+  var METRIC = {
+    oz: { unit: 'g', factor: 28.3495 },
+    lb: { unit: 'g', factor: 453.592 },
+    'fl oz': { unit: 'ml', factor: 28.4131 },
+    pint: { unit: 'ml', factor: 568.261 },
+    cup: { unit: 'ml', factor: 240 },
+    inch: { unit: 'cm', factor: 2.54 }
+  };
+
+  /* One spelling per unit on the shopping list (#1462 D3): how full a spoon
+     is goes, so a heaped and a level tablespoon of flour are one row; a can
+     is a tin; `×` is `x`, the form packUnit reads. */
+  var SPOON_QUALIFIER = /^(?:slightly rounded|rounded|heaped|level|good|generous|large) (tsp|tbsp)$/;
+
+  function shoppingUnit(unit) {
+    return String(unit || '')
+      .replace(/×/g, 'x')
+      .replace(/(\d)-(g|ml)\b/g, '$1 $2')
+      .replace(/^(tsp|tbsp), slightly rounded$/, '$1')
+      .replace(SPOON_QUALIFIER, '$1')
+      .replace(/(^| )can$/, '$1tin');
+  }
 
   // A size standing in for a noun nobody writes: "2 large" counts the item.
   var SIZE_UNITS = { large: true, medium: true, small: true };
@@ -84,6 +112,9 @@
     return String(rounded);
   }
 
+  // ⅛ tsp, the smallest spoon; tolerant of floating point, so ⅛ itself is a spoon.
+  var PINCH_BELOW = 0.125 - 1e-9;
+
   /** "60–100 g", "133 g", "⅔ tsp", "~4 tbsp", "3 tbsp (18 g)".
    *
    * The raw sum goes to `amountNumber`, never `tidy()`'s version of it: tidy
@@ -96,6 +127,12 @@
 
     // Chosen off the top end, so a range never straddles two units.
     var as = displayUnit(total.unit, hi);
+
+    /* Under ⅛ tsp is "a pinch" (#1462 C5): no spoon in the drawer measures
+       it, and "0.06 tsp" is the arithmetic showing. */
+    if (as.unit === 'tsp' && lo < PINCH_BELOW) {
+      return hi < PINCH_BELOW ? 'a pinch' : 'a pinch to ' + amountNumber(total.hi, 'tsp') + ' tsp';
+    }
 
     var number = amountNumber(total.lo * as.factor, as.unit);
     if (hi > lo) number += '–' + amountNumber(total.hi * as.factor, as.unit);
@@ -449,11 +486,20 @@
       }
 
       var split = splitParenthetical(parsed.unit);
-      var written = split.lo === undefined ? parsed.unit : split.unit;
+      var written = shoppingUnit(split.lo === undefined ? parsed.unit : split.unit);
 
-      // Kilograms and litres are totalled as grams and millilitres; see
-      // CANONICAL, and note that nothing else is touched.
-      var canon = CANONICAL[written];
+      /* "400 g tin" is one 400 g tin: counted as `x 400 g tin`, the form
+         "2 x 400 g tins" takes, so the two total together and packUnit can
+         price them. A single noun only: "250 g per person" is a weight. */
+      var pack = /^(g|ml) ([a-z]+)$/.exec(written);
+      if (pack && parsed.max === undefined && split.lo === undefined) {
+        written = 'x ' + tidy(parsed.quantity) + ' ' + pack[1] + ' ' + pack[2];
+        parsed = { quantity: 1, unit: written, approx: parsed.approx };
+      }
+
+      // Kilograms and litres total as grams and millilitres (CANONICAL), and
+      // imperial measures as metric (METRIC); nothing else is converted.
+      var canon = CANONICAL[written] || METRIC[written];
       var unit = canon ? canon.unit : written;
       var factor = canon ? canon.factor : 1;
 
@@ -472,7 +518,7 @@
       if (parsed.approx) total.approx = true;
 
       if (split.lo !== undefined) {
-        var pcanon = CANONICAL[split.unit2];
+        var pcanon = CANONICAL[split.unit2] || METRIC[split.unit2];
         var punit = pcanon ? pcanon.unit : split.unit2;
         var pfactor = pcanon ? pcanon.factor : 1;
         if (!total.paren) {
@@ -582,6 +628,8 @@
     totalText: totalText,
     amountNumber: amountNumber,
     CANONICAL: CANONICAL,
+    METRIC: METRIC,
+    shoppingUnit: shoppingUnit,
     SIZE_UNITS: SIZE_UNITS
   };
 });
