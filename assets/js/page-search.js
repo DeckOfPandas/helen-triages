@@ -330,15 +330,19 @@
   var expanded = {};      // kinds whose "+N more" was pressed, for this query
 
   // Fetched on first focus, once, through assets.js's fetchJson. A failed
-  // fetch leaves `searcher` null and the box stays a plain form.
+  // fetch leaves `searcher` null and the box stays a plain form, and is not
+  // tried again on every keystroke after it.
+  var failed = false;
   function load(then) {
     if (searcher) { then(); return; }
+    if (failed) return;
     waiting.push(then);
     if (loading) return;
     loading = true;
     root.HTF.fetchJson(indexUrl, function (json) {
       withPicker(json, function () {
         if (json) searcher = create(json);
+        else failed = true;
         loading = false;
         var fns = waiting;
         waiting = [];
@@ -400,9 +404,15 @@
   }
 
   // Every option and every "+N more" is in `flat`, so the arrow keys reach it.
+  // The pointer moves the keyboard's row too, so only one row is ever lit and
+  // Enter follows what is lit.
   function addOption(node, section) {
     node.setAttribute('role', 'option');
-    node.id = 'page-search-option-' + flat.length;
+    var index = flat.length;
+    node.id = 'page-search-option-' + index;
+    node.addEventListener('mousemove', function () {
+      if (active !== index) setActive(index);
+    });
     section.appendChild(node);
     flat.push(node);
   }
@@ -426,7 +436,11 @@
     found.groups.forEach(function (group) {
       var section = el('div', 'page-search-group page-search-group--' + group.kind);
       section.setAttribute('role', 'group');
+      // The heading names the group, so a screen reader says "STAR
+      // INGREDIENT", not just "group".
       var heading = el('div', 'page-search-group-label');
+      heading.id = 'page-search-group-' + group.kind;
+      section.setAttribute('aria-labelledby', heading.id);
       heading.textContent = group.label;
       section.appendChild(heading);
 
