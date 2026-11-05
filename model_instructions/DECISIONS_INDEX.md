@@ -557,6 +557,8 @@ argument and the rules each field is read by.
 - 2026-09-05 · §9.13 · the drink page's title is 2.6rem on tape padded 1.6em each side.
 - 2026-09-05 · §9.13 · #710 · the drink page's mood chips are links to the filtered index, in alphabetical order.
 - 2026-09-05 · §9.13 · SHIP IT? shows in read it only; make it hides it in the stylesheet.
+- 2026-11-03 · §9.13 · #1462 · A6 — make it keeps a note an ingredient points at, and hides every other note.
+- 2026-11-03 · §9.13 · #1462 · E7 — the ship icon's CC BY credit is recorded in the README's License section, not in the SVG.
 - 2026-09-05 · §9.13 · yes² is not renamed: the drink page says the rung's own words and the card keeps the compression.
 - 2026-09-10 · §9.13 · #897 · read it / make it is under the title block's rule, at the row's left.
 - 2026-09-10 · §9.13 · the drink page's title block starts 1rem under the back arrow.
@@ -711,6 +713,9 @@ argument and the rules each field is read by.
 - 2026-08-30 · §13 · #562 · the list carries no chips about how finished an entry is.
 - 2026-09-04 · §13 · the food index has no "the universe says…" line.
 - 2026-09-06 · §13 · the food index has no META FILTERS block.
+- 2026-11-03 · §13 · #1462 · D1 — a declared STAR INGREDIENT no published recipe answers is not offered on the index.
+- 2026-11-03 · §13 · #1462 · E5 — an index page's <title> is the site's name alone.
+- 2026-11-03 · §13 · #1462 · C1 — a bare HAS TO HAVE chip for a never_family word matches only where the word names the thing.
 - 2026-09-15 · §13 · #1050 #1057 #1059 · / #1057 / #1059 — a link that arrives at a filtered index lands on what it filtered.
 - 2026-10-08 · §13 · #1288 · the I KNOW WHAT I WANT sections stay — Helen: "The I KNOW WHAT I WANT sections should probably go, but I'm not ready to drop their colours from my palette, and I am the main/only …
 - 2026-10-11 · §13 · #1219 · both indexes wear one filter chip: cocktails' type on food's torn tape.
@@ -752,6 +757,7 @@ argument and the rules each field is read by.
 - 2026-10-30 · §13 · #1448 · the pill's × is each index's only clear-all.
 - 2026-10-29 · §13 · #1441 · the pills are the site's accent, small and short, with the lettering centred.
 - 2026-10-29 · §13 · #1441 · the pills show whatever has focus — Asked whether they should step aside while a search box has focus on a phone, Helen picked "Always show".
+- 2026-11-03 · §13 · #1462 · A3 — the count says "recipes" (or "drinks") until a filter narrows the list, and "survivors" from then on.
 - 2026-09-14 · §13 · #1007 · the header's door to the other site is the bracketed word and an arrow, no icon.
 - 2026-09-15 · §13 · #1086 · below 600px the wordmark lockup is two thirds size ($wordmark-phone-scale: 0.6667).
 - 2026-09-15 · §13 · #1086 · /about/ shows both doors on one line and no ??.
@@ -905,7 +911,7 @@ argument and the rules each field is read by.
 - 2026-09-10 · §14 · the sipping shelf is deleted, page and data both.
 - 2026-09-10 · §14 · #784 · the retired rum words are a bare list: no reasons and no lines under them.
 - 2026-09-10 · §14 · #921 · "blackstrap" stays on both the retired list and the characters list, and Characters is the page's last section.
-- 2026-09-10 · §14 · #921 · links and the tab say "rum categories" and the h1 says "My Philosophy of Rum"; they disagree on purpose.
+- 2026-11-03 · §14 · #1462 · A8 — links and the tab say "rum" and the h1 says "My Philosophy of Rum"; they disagree on purpose.
 - 2026-09-10 · §14 · #921 · a rum category with no bottle shows an empty cell; "none in the house" is gone.
 - 2026-09-11 · §14 · #784 · the rum table's column headings are "category", "site display name" and "examples", all Helen's.
 - 2026-09-11 · §14 · #973 · the rum table's three column labels look the same, and pink is for bottles only.

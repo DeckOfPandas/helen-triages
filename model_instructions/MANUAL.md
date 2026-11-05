@@ -1164,8 +1164,8 @@ entries; check the real data before adding to any list.
 | `display_names` | a button label for a match key; matching still runs on the key |
 | `singulars` | plural → singular, so `cherries` and `cherry` are one button |
 | `synonyms` | curated families: typing toward the key widens to every member, matched by containment |
-| `never_family` | head words that never earn an `(all)` button (`red`) |
-| `family_exceptions` | entries that do not count toward their head word's family (`cherry tomatoes`) |
+| `never_family` | head words that never earn an `(all)` button (`red`), and whose bare chip matches an entry's last word only (`plum` finds plums, not plum tomatoes) |
+| `family_exceptions` | entries that do not count toward their head word's family, nor match its bare chip (`cherry tomatoes`) |
 
 **One normalisation pipeline, `normaliseEntry`:** trailing phrase → leading
 quantity → measure phrase → modifiers, then `aliases`. So "juice of 2 lemons"
@@ -3196,7 +3196,11 @@ that file's comments describe earlier arrangements.
 its tape, its ingredients in round brackets, and `deal again` at the end of the
 row. `assets/js/universe.js` deals from the cards the section's
 `data-universe-rows` selects, which names the two top ship rungs.
-`data-universe-parts` names the card's child classes it copies.
+`data-universe-parts` names the card's child classes it copies. It loads
+before `cocktail-index.js`, so the line is dealt before that script restores
+the remembered scroll; dealt after, it would push the page down under the
+reader.
+"Deal again" never deals the drink already showing.
 
 - It is a line, not a card: no box, no ship mark, no mood chips, not full
   width.
@@ -3391,8 +3395,13 @@ so it takes the `-last-line` mixin and is in `last-line-rule.js`'s `TARGETS`.
 **Two states, one page.** `assets/js/cocktail-make.js` toggles one class,
 `is-making`, and `_cocktail.scss` does the rest. Nothing leaves the DOM.
 `make it` hides the tagline, the chips, SHIP IT?, the bottle suggestions, each
-ingredient's note, the notes section and the related cards, and enlarges the
-amounts and the method. A method step's note (a `{step, note}` pair) stays
+ingredient's note, the notes and the related cards, and enlarges the amounts
+and the method. One note stays: a note labelled with one of the drink's
+generics (a house syrup's recipe), with that ingredient's own note pointing
+to it. `_layouts/cocktail.html` marks the note `note--for-making` and the
+NOTES heading `has-making-notes`; `cocktail-make.js` marks the pointer
+`cocktail-note--for-making` by matching the note's `data-for` against the
+ingredient note's `data-generics`. A method step's note (a `{step, note}` pair) stays
 visible: it is how to do the step. Print is the full read page, forced by
 `_print.scss`.
 
@@ -4601,11 +4610,14 @@ opened.
 
 ### 13.7 Results heading, pagination, shuffle
 
-**The count line** ("N survivors") is left-aligned plain body text with no
+**The count line** ("N recipes" or "N drinks" until a filter narrows the
+list, then "N survivors"; the test is each index's clear-all test, the one
+that shows the pill's ×) is left-aligned plain body text with no
 punched treatment; `.results-heading .category-label` sets every value back
 to the body default on purpose. The digits alone take `$font-label`
 (`.results-count-number` in `_sass/shared/_results-bar.scss`, on
-`#recipe-count-n` and `#drink-count-n`); the word stays bare.
+`#recipe-count-n` and `#drink-count-n`); the word stays bare. The count is a
+`role="status"` live region, so a screen reader hears each new count.
 
 **The results pill** (#1448) floats on both indexes, centred at the foot of
 the screen in the site's accent, 1.75rem tall: `_includes/results-pill.html`,
@@ -4642,7 +4654,13 @@ visibility changes. The script must load after the index script
 
 **Shuffle** (Fisher-Yates, `list-view.js`) on clear-all and on every fresh
 load. `.recipe-list` starts `visibility: hidden` and is revealed after the
-first render, trading a visible flip for a blank instant.
+first render, trading a visible flip for a blank instant. A `<noscript>`
+style in `food/index.html` reveals it without scripts, so a reader with them
+off gets the alphabetical list.
+
+**Clear-all clears the address bar too.** Both clear-alls drop the query
+string with `history.replaceState`, so a reload after × does not bring back
+the filter a link arrived with.
 
 **Two empty states, and they are different lines.** "Blank canvas." on both
 indexes says the search was too narrow; the pill's × is the way out of it.
@@ -5220,8 +5238,8 @@ page restates a fact the data holds.
 - **Section order** is the rum shelves (the rum-adjacent block among them),
   the rum-based liqueurs, then the "styles" she does not recognise, then
   characters last.
-- **The tab and the footer link say "rum categories" and the h1 says "My
-  Philosophy of Rum", on purpose.** The label is wayfinding, the headline is
+- **The tab and the footer link say "rum" and the h1 says "My Philosophy of
+  Rum", on purpose.** The label is wayfinding, the headline is
   voice; do not make them agree.
 
 #### Glasses: `cocktails/reference/glasses.html`

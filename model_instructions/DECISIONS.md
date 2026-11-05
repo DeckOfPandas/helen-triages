@@ -1446,7 +1446,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   show the index page with the shortlist open (i.e. with shopping list
   open)"*. Read as the sent-list link, since `?shortlist=1` already opened it;
   that reading is a session's. Opening still saves nothing. (Replaces #1093's
-  *"Hide it in shared view"* of 2026-09-15.)
+  *"Hide it in shared view"* of 2026-09-15.) It covers both sites: asked on
+  2026-11-03 (#1462 C4), Helen: *"Yes shopping list shared link ruling covers
+  cocktails."*
 - **Undated, #546 — the shortlist lives in one browser on one device, one
   list per site, with no account; that is a ceiling, not a first step.**
   Helen: *"one browser, one device, no sharing, no account etc is truly all I
@@ -3656,6 +3658,17 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   leaves the DOM, so print and a no-JS reader keep the fuller page. It shipped
   the other way round for an hour on a mis-stated instruction; the stylesheet
   is the authority.
+- **2026-11-03, #1462 A6 — `make it` keeps a note an ingredient points at, and
+  hides every other note.** The mode built for making a drink hid the house
+  syrup's recipe. Asked whether to keep the pointed-at note or every note,
+  Helen: *"Keep a note if referenced."* A note is referenced when its label
+  is the name of one of the drink's generics; that ingredient's own note
+  ("See below for the recipe.") stays with it. `make it` is not remembered
+  per device: asked, Helen said *"No."*
+- **2026-11-03, #1462 E7 — the ship icon's CC BY credit is recorded in the
+  README's License section, not in the SVG.** Helen: *"In the README in the
+  licences section."* The note had shipped once per card, 138 times on the
+  index. The visible credit is still owed on an attributions page.
 - **2026-09-05 — `yes²` is not renamed: the drink page says the rung's own
   words and the card keeps the compression.** A review read it as a footnote
   marker. Helen: *"that's not a footnote marker, it's a joke, a cocktail so
@@ -4729,6 +4742,21 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-09-06 — the food index has no META FILTERS block.** Helen: *"I don't
   want this block on the index page any more. It was useful when I was still
   ingesting recipes I know, but it's not now I've done most of that."*
+- **2026-11-03, #1462 D1 — a declared STAR INGREDIENT no published recipe
+  answers is not offered on the index.** Asked whether to keep the empty
+  button as a promise or hide it, Helen: *"Hide until used."* The star stays
+  declared in `taxonomy.yml` (§7); the chip comes back when a recipe
+  publishes, through `star_ingredient` or a `star_also` rule. Cocktails
+  already skipped an empty mood.
+- **2026-11-03, #1462 E5 — an index page's `<title>` is the site's name
+  alone.** Asked about "Home | Helen Triages Food", Helen: *"Great, not
+  'home'"*. Neither index sets `title:`, so the layout's fallback names it.
+- **2026-11-03, #1462 C1 — a bare HAS TO HAVE chip for a `never_family` word
+  matches only where the word names the thing.** Asked whether a plain chip
+  should ever widen, Helen agreed it should honour `never_family`. A one-word
+  key from that list matches an entry's last word only: `plum` finds plums,
+  not plum tomatoes or plum jam; `tomato` finds cherry tomatoes, not tomato
+  purée. A `family_exceptions` entry matches the same way.
 - **2026-09-15, #1050 / #1057 / #1059 — a link that arrives at a filtered index
   lands on what it filtered.** Helen: *"load the index page filtered as
   appropriate, with the screen snapped to the returned recipes (so don't have
@@ -4982,6 +5010,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-10-29, #1441 — the pills show whatever has focus.** Asked whether
   they should step aside while a search box has focus on a phone, Helen
   picked *"Always show"*.
+- **2026-11-03, #1462 A3 — the count says "recipes" (or "drinks") until a
+  filter narrows the list, and "survivors" from then on.** Asked whether "90
+  survivors" with nothing chosen was the joke, Helen: *"90 recipes until
+  filtered, then survivors."* The joke needs a filter to land. "Narrowing" is
+  each index's clear-all test, so the word and the pill's × agree.
 
 **§13.8 The wordmark and the header.**
 
@@ -5920,12 +5953,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   whole line, written out as #975's title on 2026-09-11 after a session's
   paraphrase had shipped as copy. It is a lookup on `rum_characters`, so a
   second such word cannot arrive without it.
-- **2026-09-10, #921 — links and the tab say "rum categories" and the h1 says
-  "My Philosophy of Rum"; they disagree on purpose.** Helen: *"I need links to
-  the page to stay as 'rum categories' because if links say 'my philosophy of
+- **2026-11-03, #1462 A8 — links and the tab say "rum" and the h1 says "My
+  Philosophy of Rum"; they disagree on purpose.** Asked whether the page is a
+  reference or an essay, Helen: *"How about just 'rum'?"* The label is
+  wayfinding and the headline is voice (#921: *"if links say 'my philosophy of
   rum' the reader expects stories about walks on the beach and my favourite
-  tiki mug."* The label is wayfinding and the headline is voice. Do not make
-  them agree.
+  tiki mug."*). Do not make them agree. Replaces #921's "rum categories".
 - **2026-09-10, #921 — a rum category with no bottle shows an empty cell;
   "none in the house" is gone.** Helen: *"If we're not using them, delete
   them, boom."* The empty third track is the honest rendering, and a category
