@@ -205,8 +205,12 @@
     var one = bareCount && split.lo === undefined &&
       Math.abs(total.lo - 1) < 1e-9 && Math.abs(total.hi - 1) < 1e-9 &&
       hiQuantity > 1;
+    /* `many` is the reverse: a bare count written for one or less ("1 lemon",
+       "½ lemon") is now more than one, so the item's noun goes plural. */
+    var many = bareCount && split.lo === undefined &&
+      hiQuantity <= 1 + 1e-9 && total.hi > 1 + 1e-9;
 
-    return { text: totalText(total), scaled: true, one: one };
+    return { text: totalText(total), scaled: true, one: one, many: many };
   }
 
   /* "1 large egg", not "1 large eggs" (#1286). Makes the item's LEADING NOUN
@@ -243,6 +247,26 @@
     if (!single || single === noun) return written;
 
     words[words.length - 1] = single;
+    return match[1] + words.join(' ') + after + match[3];
+  }
+
+  /* "2 lemons", not "2 lemon": the item's leading noun goes plural, found as
+     `singularItem` finds it. Only a noun on `count_nouns` in
+     _data/food/scaling.yml, passed in, whose plural is regular (`s`, or `es`
+     after a sibilant): a general rule gets "thymes" and "gooses" wrong. */
+  function pluralItem(text, countNouns) {
+    var written = String(text === undefined || text === null ? '' : text);
+    var match = /^(\s*)([^,(]*?)(\s*(?:[,(][\s\S]*)?)$/.exec(written);
+    if (!match || match[2] === '') return written;
+    var cut = /\s(?:of|in|for|with|like|from)\s/i.exec(match[2]);
+    var head = cut ? match[2].slice(0, cut.index) : match[2];
+    var after = cut ? match[2].slice(cut.index) : '';
+    if (/\s(?:or|and)\s|\//i.test(head)) return written;
+
+    var words = head.split(' ');
+    var noun = words[words.length - 1];
+    if ((countNouns || []).indexOf(noun) === -1) return written;
+    words[words.length - 1] = noun + (/(?:s|x|z|ch|sh)$/.test(noun) ? 'es' : 's');
     return match[1] + words.join(' ') + after + match[3];
   }
 
@@ -417,6 +441,7 @@
     scaleLeadingMeasure: scaleLeadingMeasure,
     noteName: noteName,
     singularItem: singularItem,
+    pluralItem: pluralItem,
     halfStep: halfStep,
     quarterStep: quarterStep,
     portionsMode: portionsMode,

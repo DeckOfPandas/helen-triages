@@ -224,7 +224,8 @@ may no longer have. If the source is silent, write what it says and no more.
 used.** Where the source prints them unqualified: milk is `semi-skimmed milk`,
 an egg is large (with the count: `amount: "2 large"`), and butter is `salted
 butter` — or `unsalted butter` in a bake whose recipe names salt. Each such
-line gets `note: "The source gave \"butter\"."` (with the source's own word).
+line gets `note: "the source gave \"butter\""` (with the source's own word;
+an ingredient note is a lowercase fragment with no full stop).
 Helen: *"If milk and eggs aren't qualified in the source then: milk ->
 semi-skimmed milk, egg -> large egg, butter -> salted butter UNLESS it's
 baking and salt is named, then for each please add a note to the ingredient
@@ -256,7 +257,7 @@ prints is kept.
     - name: ""
       items:
       - item: "salted butter, for greasing"
-        note: "The source gave \"butter\"."
+        note: "the source gave \"butter\""
         incidental: true
   ```
 

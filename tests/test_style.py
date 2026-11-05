@@ -198,6 +198,9 @@ TYPOGRAPHY = [
     ("reversed link brackets", r"\([^()\n]+\)\[[^\]\n]*\]",
      "markdown links are [display text](../slug/), not (display text)[...] — "
      "the (text)[url] order never renders as a link, in any field"),
+    # DECISIONS §5. "2 tbsp of the oil", "1 tsp of it" alike: name the thing.
+    ("spoon amount with 'of'", r"\b\d[\d½¼¾⅓⅔⅛.–-]*\s*(?:tbsp|tsp)\s+of\b",
+     "a spoon amount takes no 'of': '2 tbsp oil', not '2 tbsp of the oil'"),
     ("ampersand in title", None, None),  # handled separately below
 ]
 

@@ -307,7 +307,11 @@ HALF_CASES = {
     "no amount": (_recipe("12 buns", [(None, "salt, to taste"), ("some", "pepper")]), True, None),
     "by-eye measures": (_recipe("12 buns", [("1 handful", "parsley"), ("1 pinch", "salt")]), True, None),
     # --- the yield has to halve too ------------------------------------------
+    # A round thing never halves: Helen, "the human brain cannot handle
+    # volumes that include pi". One of it refuses on the yield.
     "one cake": (_recipe("one 8-inch cake", [("200 g", "flour")]), False, "less than one"),
+    "one cake, slices in brackets": (_recipe("one 20-cm cake (about 10 slices)", [("200 g", "flour")]), False, "less than one"),
+    "one trifle bowl": (_recipe("one 24-cm trifle bowl (about 15 portions)", [("200 g", "cream")]), False, "less than one"),
     "one jar": (_recipe("1 jar", [("200 g", "sugar")]), False, "less than one"),
     "one dozen": (_recipe("1 dozen mince pies", [("200 g", "flour")]), False, "less than one"),
     "one litre": (_recipe("1 litre", [("200 g", "bones")]), False, "less than one"),

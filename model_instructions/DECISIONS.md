@@ -453,7 +453,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   aren't qualified in the source then: milk -> semi-skimmed milk, egg -> large
   egg, butter -> salted butter UNLESS it's baking and salt is named, then for
   each please add a note to the ingredient line item saying "The source gave
-  "butter"."* A bake whose recipe names salt takes unsalted butter. The size
+  "butter"."* The note is written as a fragment, `note: "the source gave
+  \"butter\""` (below, §5). A bake whose recipe names salt takes unsalted butter. The size
   goes with the count (`amount: "2 large"`). Replaces "unspecified butter is
   `QQ butter`"; older drafts still carry that shape.
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
@@ -837,7 +838,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   placeholder and is skipped; a digit or a quoted term may open a note, and
   `!` or `?` may close one. An exception is declared with its reason in
   `NOTE_EXCEPTIONS` (`tests/test_style.py`) or `DRINK_NOTE_EXCEPTIONS`. A food
-  ingredient's `note:` is the opposite: a lowercase fragment.
+  ingredient's `note:` is the opposite: a lowercase fragment with no full
+  stop, drafts included. Helen, 2026-11-05: *"Ingredient notes should be
+  fragments, so no capital letter and full stop. Method step notes should be
+  sentences."* A proper noun may open one (`proper_nouns` in
+  `_data/food/taxonomy.yml`).
+- **2026-11-05 — a spoon amount takes no "of".** Helen: *"Never "2 tbsp of"
+  something. Just "2 tbsp $something". Always."* "2 tbsp oil", not "2 tbsp of
+  the oil"; "of it" names the thing ("2 tsp spice mix"). A `QQ original` line
+  is the source's and is left alone. The "spoon amount with 'of'" entry in
+  `TYPOGRAPHY` (`tests/test_style.py`), on recipes and drafts.
 - **Undated — "180°C fan" is correct and is not a conversion; what is banned
   is a second, conventional-oven temperature beside it, and gas marks
   always.** Helen: *"saying 'fan' isn't a conversion."* The site is fan-oven

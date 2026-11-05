@@ -264,11 +264,14 @@ else has already done (MANUAL §9.1).
   default -- **except milk, eggs and butter, which have house defaults**:
   `semi-skimmed milk`, a large egg (`amount: "2 large"`), `salted butter`, or
   `unsalted butter` in a bake whose recipe names salt. Each such line gets
-  `note: "The source gave \"butter\"."` in the source's own word. Helen: *"If
+  `note: "the source gave \"butter\""` in the source's own word: an
+  ingredient note is a lowercase fragment, no full stop. Helen: *"If
   milk and eggs aren't qualified in the source then: milk -> semi-skimmed
   milk, egg -> large egg, butter -> salted butter UNLESS it's baking and salt
   is named, then for each please add a note to the ingredient line item
   saying "The source gave "butter"."*
+- **A spoon amount takes no "of"**: "2 tbsp oil", never "2 tbsp of the
+  oil", in every line but a `QQ original`. DECISIONS §5.
 - **The fan oven temperature**, from the printed pair. Check WHICH is the fan
   figure; they are not always in the same order. **A `QQ Claude` line gives the
   fan figure alone; its `QQ original` keeps everything the source printed.**
