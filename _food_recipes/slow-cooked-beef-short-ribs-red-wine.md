@@ -18,8 +18,8 @@ ingredient_groups:
       item: "garlic, cut in half horizontally"
     - amount: "1 heaped tbsp"
       item: tomato purée
-    - amount: "1 bottle"
-      item: "red wine (750 ml)"
+    - amount: "1 bottle (750 ml)"
+      item: "red wine"
       note: preferably Merlot or Cab
     - amount: "1 litre"
       item: good beef stock
@@ -39,6 +39,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

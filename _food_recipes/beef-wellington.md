@@ -47,8 +47,8 @@ ingredient_groups:
       item: thyme sprig
     - amount: "1 splash"
       item: "red wine vinegar"
-    - amount: "1 bottle"
-      item: "red wine (750 ml)"
+    - amount: "1 bottle (750 ml)"
+      item: "red wine"
       note: "preferably Merlot or Cab"
     - amount: "750 ml"
       item: beef stock
@@ -88,6 +88,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

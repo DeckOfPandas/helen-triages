@@ -11,8 +11,8 @@ star_ingredient: "root veg"
 tags: ["bakes", "sweet snack"]
 ingredient_groups:
   - items:
-    - amount: "2"
-      item: "sweet potatoes (about 400 g), halved"
+    - amount: "2 (about 400 g)"
+      item: "sweet potatoes, halved"
     - amount: "125 g"
       item: almond butter
     - amount: "100 g"
@@ -37,6 +37,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---
