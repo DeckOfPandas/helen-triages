@@ -169,6 +169,9 @@
         name: name,
         aisle: entry.aisle,
         scale: entry.scale,
+        // #1458. Resolved at build by _plugins/food_costs.rb; absent when
+        // the page carries no costs.
+        rate: entry.rate,
         // Carried through for build(), which names it beside an unscaled row.
         recipe: entry.recipe,
         parts: Array.isArray(entry.parts) ? entry.parts : [],
@@ -255,6 +258,111 @@
     return words.join(' ');
   }
 
+  /* "£11.34", or "£12.02 (£9.34–£14.70)" for a range: the midpoint, then the
+     ends, as shopping-list.js prints a drink's. "from £3.10" where something
+     is unpriced (#1458): the low end of what is known, since the rest costs
+     more, so a midpoint would mislead. */
+  function moneyText(cost) {
+    var lo = '£' + Number(cost.min).toFixed(2);
+    if (cost.partial) return 'from ' + lo;
+    if (Math.abs(cost.max - cost.min) < 0.005) return lo;
+    return '£' + ((Number(cost.min) + Number(cost.max)) / 2).toFixed(2) +
+      ' (' + lo + '–£' + Number(cost.max).toFixed(2) + ')';
+  }
+
+  /* "2 x 400 g cans" totals as 2 of the unit `x 400 g can`: that is 400 g
+     apiece, whatever the container is called. Read off the unit's own words
+     so no can, tin or pack size needs a row in costs.yml. */
+  var PACKED = /^x\s*(\d+(?:\.\d+)?)\s*(g|kg|ml|l)(?:\s|$)/;
+  var PACKED_BASE = { g: ['g', 1], kg: ['g', 1000], ml: ['ml', 1], l: ['ml', 1000] };
+
+  function packUnit(unit) {
+    var m = PACKED.exec(String(unit || ''));
+    if (!m) return null;
+    var base = PACKED_BASE[m[2]];
+    return [base[0], Number(m[1]) * base[1]];
+  }
+
+  /* What one row's totals cost (#1458). `rate` is GBP per base unit; `units`
+     maps a unit to [family, factor] (_data/food/costs.yml). A unit the rate
+     names itself wins; otherwise its family's rate, a weight and a volume
+     standing in for each other at 1 g to 1 ml. Unquantified lines cost
+     nothing, as on the cocktail list. Returns null where nothing could be
+     priced, with `unpriced` saying whether something should have been. */
+  function rowCost(totals, rate, units) {
+    var min = 0;
+    var max = 0;
+    var priced = false;
+    var unpriced = false;
+    if (rate && rate.free) return { min: 0, max: 0, partial: false, free: true };
+
+    totals.forEach(function (t) {
+      var spec = units[t.unit] || packUnit(t.unit);
+      var family = spec ? spec[0] : null;
+      if (family === 'free') return;
+      var per = null;
+      var factor = 1;
+      if (rate && rate[t.unit]) {
+        per = rate[t.unit];
+      } else if (rate && family) {
+        per = rate[family] ||
+          (family === 'g' ? rate.ml : null) ||
+          (family === 'ml' ? rate.g : null);
+        factor = spec[1];
+      }
+      if (!per) { unpriced = true; return; }
+      min += t.lo * factor * per[0];
+      max += t.hi * factor * per[1];
+      priced = true;
+    });
+
+    if (!priced) return unpriced ? { unpriced: true } : null;
+    return { min: min, max: max, partial: unpriced };
+  }
+
+  /** What a list of rows comes to (#1458): the priced rows summed, and how
+   * many rows could not be priced, wholly or in part. null where no row was
+   * priced at all. */
+  function costTotal(rows) {
+    var min = 0;
+    var max = 0;
+    var priced = 0;
+    var unpriced = 0;
+    (rows || []).forEach(function (row) {
+      var cost = row && row.cost;
+      if (!cost) return;
+      if (cost.unpriced) { unpriced += 1; return; }
+      min += cost.min;
+      max += cost.max;
+      priced += 1;
+      if (cost.partial) unpriced += 1;
+    });
+    if (!priced) return null;
+    var sum = { min: min, max: max, partial: unpriced > 0, unpriced: unpriced };
+    sum.text = moneyText(sum);
+    return sum;
+  }
+
+  /** One portion or one batch of a recipe as written (#1458): its own lines
+   * at x1, costed and divided by `per` (its portions, or 1 for a batch). The
+   * shortlist's line and the recipe page's cost line both call this, so the
+   * two cannot disagree. null where nothing could be priced.
+   * @param {Array} entries - the recipe's lines, as for build(), each with `rate`
+   * @param {number} per - how many the recipe as written is divided into
+   * @param {Object} options - as for build(); `costUnits` is required */
+  function recipeCost(entries, per, options) {
+    if (!options || !options.costUnits || !(per > 0)) return null;
+    var rows = [];
+    build(entries, options).forEach(function (aisle) { rows = rows.concat(aisle.items); });
+    var sum = costTotal(rows);
+    if (!sum) return null;
+    var each = {
+      min: sum.min / per, max: sum.max / per, partial: sum.partial, unpriced: sum.unpriced
+    };
+    each.text = moneyText(each);
+    return each;
+  }
+
   /** Total up a shortlist of recipes, grouped by aisle.
    * @param {Array} entries - { amount, name, aisle, scale, recipe? } per ingredient, plus the marks `reunite` reads
    * @param {Object} [options]
@@ -262,7 +370,8 @@
    * @param {Array} [options.quarterMeasures] - `quarter_step_measures`, bought in whole ones too
    * @param {Array} [options.countNouns] - `count_nouns` in scaling.yml: a row label may change number
    * @param {Array} [options.aisles] - [{key, label}] in display order; an unknown aisle falls to the last
-   * @returns {Array} [{ key, label, items: [{ key, label, text, aside, totals, unquantified, recipes }] }] */
+   * @param {Object} [options.costUnits] - `units` from _data/food/costs.yml; absent, no row is costed
+   * @returns {Array} [{ key, label, items: [{ key, label, text, aside, totals, unquantified, recipes, cost? }] }] */
   function build(entries, options) {
     var opts = options || {};
     var aisles = opts.aisles && opts.aisles.length
@@ -299,12 +408,15 @@
           unquantified: {},
           unquantifiedOrder: [],
           unscaledRecipes: [],
-          recipes: []
+          recipes: [],
+          // One name, one keyword, one rate: the first one met stands.
+          rate: entry.rate || null
         };
         order.push(key);
       }
       var group = groups[key];
       if (group.spellings.indexOf(name) === -1) group.spellings.push(name);
+      if (!group.rate && entry.rate) group.rate = entry.rate;
       if (entry.recipe !== undefined && entry.recipe !== null &&
           group.recipes.indexOf(entry.recipe) === -1) {
         group.recipes.push(entry.recipe);
@@ -425,7 +537,7 @@
           return totals.length > 1 ? t.used + ' ' + usedUnit[t.unit] : t.used;
         });
 
-      return {
+      var row = {
         // The folded name: what a tick is stored under (#1457), and unlike the
         // label it does not change with the count.
         key: key,
@@ -441,6 +553,13 @@
         recipes: group.recipes,
         text: parts.join(' + ')
       };
+      if (opts.costUnits) {
+        row.cost = rowCost(totals, group.rate, opts.costUnits);
+        if (row.cost && !row.cost.unpriced && !row.cost.free) {
+          row.cost.text = moneyText(row.cost);
+        }
+      }
+      return row;
     });
 
     /* Alphabetical within the aisle: an aisle mixes grams, spoons and counts,
@@ -457,6 +576,9 @@
 
   return {
     build: build,
+    costTotal: costTotal,
+    moneyText: moneyText,
+    recipeCost: recipeCost,
     totalText: totalText,
     amountNumber: amountNumber,
     CANONICAL: CANONICAL,

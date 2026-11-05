@@ -1227,16 +1227,73 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 
 ### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
 
-- **2026-09-07, #801 — the food index has cocktails' shopping list and scaler,
-  with every feature except costing.** Helen: *"add scaler and shopping list
-  feature to food recipe shortlist page. This can be copied directly from the
-  food page — I would like all the same features. But there is no need to cost
-  the portions. When serving size is unclear, please make your best guess.
-  Group the shopping list by grocery aisle, e.g. produce, dairy, fish, meat,
-  non-perishable etc."* "The food page" was read as the cocktail page, which
-  had the feature since #546. A `serves:` recipe's box counts people, so a
-  fractional multiplier (four portions of a recipe for six) is ordinary here,
-  as it is not for drinks.
+- **2026-09-07, #801 — the food index has cocktails' shopping list and
+  scaler.** Helen: *"add scaler and shopping list feature to food recipe
+  shortlist page. This can be copied directly from the food page — I would
+  like all the same features. ... When serving size is unclear, please make
+  your best guess. Group the shopping list by grocery aisle, e.g. produce,
+  dairy, fish, meat, non-perishable etc."* "The food page" was read as the
+  cocktail page, which had the feature since #546. A `serves:` recipe's box
+  counts people, so a fractional multiplier (four portions of a recipe for
+  six) is ordinary here, as it is not for drinks.
+- **2026-11-03, #1458 — the food shortlist is costed, on a local build only,
+  as the cocktail one is.** Helen: *"Please research food items and use the
+  ranges to give approximate costs for each dish. Display local build only.
+  Display like the cocktails costings."* This replaces #801's *"there is no
+  need to cost the portions"*. `site.show_costs`, `_data/food/costs.yml`,
+  `_plugins/food_costs.rb`; the rows' prices and the total as on the drinks
+  list.
+- **2026-11-03, #1458 — a recipe's line quotes one portion of a `serves:`
+  recipe or one batch of a `makes:` one, and does not move with the box.**
+  Chosen from three shown on the shopping list ("per portion / per batch",
+  "what the line costs", "the whole recipe as written"); the drink's price
+  per glass is the precedent (§9.3.5).
+- **2026-11-03, #1458 — where anything is unpriced, a figure reads "from £X":
+  a lower bound, never withheld and never silent.** Chosen over cocktails'
+  withholding and over an unmarked sum, given that a keyword table cannot
+  price every one of the collection's ingredient names. Seasoning, a pinch
+  and an unquantified line cost nothing and do not count as unpriced. The
+  recipe page says how many are missing: "From £X a portion in ingredients,
+  not counting 2 unpriced items." — Helen: *"number 1, but with "not counting
+  X unpriced items""*.
+- **2026-11-03, #1458 — a researched food price's range is the median's
+  bracket: the middle 50% of 6+ shop prices, the range of 3–5, the mean's two
+  ends of 2.** Helen: *"2 points mean, 3-5 points median with range in
+  brackets, 6+ points median with IQR in brackets"*, then *"Please update
+  cost.yml now, using the bracketed figure we're now using in this table."*
+  No reason given. Farm Direct, her favourite shop, is one of the sources.
+- **2026-11-03, #1458 — the shop prices are kept, and `costs.yml` reads its
+  researched ranges from them.** Helen: *"Yes, add the research table as a
+  reference file that can be updated. Does costs.yml read from it? It
+  probably should do."* `_data/food/price_research.yml` holds each price
+  with its shop; a `costs.yml` unit names the food, and the build takes the
+  bracket and confidence from the list, so re-pricing is editing one list.
+  Where to look first, for every food: *"Use Ocado and Farm Direct where
+  possible, then e.g. Tesco, Asda, etc as you did before."*
+- **2026-11-04, #1468 — stock is priced as made up from cubes, never as
+  ready-made liquid stock.** Helen: *"Stock: use the stock cube price.
+  Pre-made liquid stock is invariably horrible!"* A litre's price is the
+  cube's at the packet's dilution.
+- **2026-11-04, #1468 — shop prices are what a household pays, not trade
+  prices.** Of sorrel: *"Commercial buyers can get it for about £20/kg but
+  that's not us."*
+- **2026-11-04, #1468 — a `costs.yml` keyword matches its plural, so a row is
+  written singular.** Helen: *"Please do the collapsing of the plurals
+  work."*
+- **2026-11-03, #1458 — both sites print a range as "mean (lowest–highest)",
+  everywhere a price shows.** Helen: *"For each food or bottle, please give the
+  mean price you found, with (x--y) afterwards for lowest and highest."* The
+  mean is the midpoint of the ends, which are all the tables record. A point
+  price stays one figure, and a "from" figure has no mean. And: *"Let's use
+  the same language on both sites: "Roughly X a [glass] in ingredients."
+  swapping glass for portion on the food site."* A `makes:` recipe still says
+  "a batch" (her choice, asked).
+- **2026-11-03, #1458 — each recipe page carries a cost line, local only, in
+  the drink page's layout.** Helen: *"Please also add a cost line to each
+  recipe page. Use the layout from the cocktails site -- the two horizontal
+  rules with the line in between, above IF YOU LIKED THIS. Use food site
+  styling, but the same layout code."* and *"Costs should only show on the
+  local build."* `.recipe-footer` is `.cocktail-footer` rule for rule.
 - **2026-09-07 — a scaled amount is never rounded coarser than 1 g.** Helen:
   *"For now, don't tidy/round beyond 1 g precision"*, then, unprompted: *"I
   mean don't roudn to 10 g or 5 g, round to 1g"*. Two thirds of 200 g prints
@@ -2465,7 +2522,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   locally built site, and only as an incidental — just somewhere on the recipe
   page."* `site.show_costs` is declared in `_config_local.yml` and never in
   `_config.yml`, so a production build prints no cost line at all. Locally it
-  reads "Roughly £X–£Y a glass in ingredients."
+  reads "Roughly £M (£X–£Y) a glass in ingredients." (§8.2's 2026-11-03
+  entry on "mean (lowest–highest)".)
 - **2026-09-05, #547 — `default_bottles` are pricing inputs and are never named
   on a recipe.** Helen: *"Don't name these on the recipes, but you can note
   them as inputs to the default prices."* Since 2026-09-14 (#1016) the same map

@@ -1,0 +1,781 @@
+# What a food recipe costs, approximately (#1458). Local builds only, behind
+# `site.show_costs`; the prices are public either way. MANUAL §8.2.
+#
+# Matched as aisles.yml is: the longest whole-word keyword in the folded name
+# wins, so `butter beans` beats `butter`; a keyword also matches its plural,
+# so a row is written singular. A row gives any of `kg`, `l`,
+# `each`, `pack` or a named unit (`head`, `cm`), each `[low, high]` in GBP.
+# A spoon of a thing priced by weight is costed at 1 ml to 1 g.
+#
+# A unit written as a food's name, `kg: "goose"`, was researched: the range
+# comes at build from that food's shop prices in price_research.yml (MANUAL
+# §8.2). A `[low, high]` written here is an estimate, the first to overwrite.
+
+# The day the prices were last compared with shops. A test fails once it is
+# two years old; the fix is re-reading the prices, never moving the date alone.
+checked: "2026-11-03"
+
+# Every unit the shopping list can total in, by the name assets/js/
+# shopping-list.js folds it to, as [family, how many of the family's base
+# unit one of it is]. Families: g, ml, each, pack, and free (costs nothing:
+# a pinch is not shopping). kg, l, litre and cl are folded into g and ml
+# before they arrive. A unit missing here is unpriced, and the figure says
+# "from".
+units:
+  g: [g, 1]
+  gram: [g, 1]
+  oz: [g, 28.35]
+  lb: [g, 453.6]
+  g can: [g, 1]
+  g tin: [g, 1]
+  g jar: [g, 1]
+  g pack: [g, 1]
+  g bag: [g, 1]
+  g piece: [g, 1]
+  g bunch: [g, 1]
+  knob: [g, 15]
+  ml: [ml, 1]
+  ml can: [ml, 1]
+  pint: [ml, 568]
+  fl oz: [ml, 28.4]
+  cup: [ml, 240]
+  tsp: [ml, 5]
+  level tsp: [ml, 5]
+  heaped tsp: [ml, 7.5]
+  rounded tsp: [ml, 6]
+  slightly rounded tsp: [ml, 6]
+  large tsp: [ml, 6]
+  tbsp: [ml, 15]
+  level tbsp: [ml, 15]
+  heaped tbsp: [ml, 22]
+  rounded tbsp: [ml, 20]
+  good tbsp: [ml, 20]
+  glass: [ml, 175]
+  large glass: [ml, 250]
+  bottle: [ml, 750]
+  splash: [free, 0]
+  "": [each, 1]
+  each: [each, 1]
+  whole: [each, 1]
+  large: [each, 1]
+  medium: [each, 1]
+  small: [each, 1]
+  piece: [each, 1]
+  clove: [each, 1]
+  stick: [each, 1]
+  stalk: [each, 1]
+  sprig: [each, 1]
+  leaf: [each, 1]
+  rasher: [each, 1]
+  slice: [each, 1]
+  bunch: [pack, 1]
+  small bunch: [pack, 1]
+  large bunch: [pack, 1.5]
+  pack: [pack, 1]
+  small pack: [pack, 1]
+  handful: [pack, 0.5]
+  small handful: [pack, 0.33]
+  large handful: [pack, 0.75]
+  good handful: [pack, 0.6]
+  pinch: [free, 0]
+  good pinch: [free, 0]
+  dash: [free, 0]
+  drop: [free, 0]
+  twist: [free, 0]
+  good grinding: [free, 0]
+
+# Costs nothing, whatever the amount: seasoning, and what comes out of a tap.
+free:
+  - salt
+  - sea salt
+  - black pepper
+  - white pepper
+  - pepper
+  - water
+  # Zest comes off a fruit bought for its juice, or is too little to matter;
+  # by name, because `lemon` is the longer keyword than `zest`.
+  - lemon zest
+  - lime zest
+  - orange zest
+
+prices:
+
+  # --- produce -----------------------------------------------------------
+  apple: { each: "apple", kg: "apple" }
+  apricots: { kg: "apricots", each: [0.20, 0.50] }
+  asparagus: { kg: "asparagus" }
+  aubergine: { each: "aubergine" }
+  avocado: { each: "avocado" }
+  banana: { each: "banana" }
+  basil: { pack: "basil", kg: "basil", each: [0.03, 0.08] }
+  bay leaf: { kg: "bay leaf", each: [0.02, 0.08] }
+  beansprouts: { kg: "beansprouts" }
+  beetroot: { kg: "beetroot", each: [0.20, 0.50] }
+  blackberries: { kg: "blackberries" }
+  blueberries: { kg: "blueberries" }
+  bok choi: { each: "bok choi", kg: "bok choi" }
+  broccoli: { kg: "broccoli", each: "broccoli" }
+  brussels sprouts: { kg: "brussels sprouts" }
+  sprouts: { kg: "brussels sprouts" }
+  butternut squash: { kg: "butternut squash", each: "butternut squash" }
+  squash: { kg: "butternut squash", each: "butternut squash" }
+  cabbage: { each: "cabbage" }
+  carrot: { kg: "carrot", each: "carrot" }
+  cauliflower: { each: "cauliflower" }
+  cavolo nero: { kg: "cavolo nero" }
+  celeriac: { each: "celeriac", kg: "celeriac" }
+  celery: { kg: "celery", each: [0.06, 0.15] }
+  cherries: { kg: "cherries" }
+  cherry tomatoes: { kg: "cherry tomatoes", each: [0.03, 0.08] }
+  chilli: { kg: "chilli", each: [0.10, 0.30] }
+  chives: { pack: "chives", kg: "chives" }
+  coriander: { pack: "coriander", kg: "coriander" }
+  courgette: { each: "courgette", kg: "courgette" }
+  cranberries: { kg: "cranberries" }
+  cucumber: { each: "cucumber" }
+  dill: { pack: "dill", kg: "dill" }
+  fennel: { each: "fennel" }
+  garlic: { head: "garlic", kg: "garlic", each: [0.03, 0.10] }
+  garlic clove: { each: [0.03, 0.10] }
+  ginger: { kg: "ginger", cm: [0.03, 0.08], each: [0.20, 0.50] }
+  green beans: { kg: "green beans" }
+  herbs: { pack: "herbs", kg: "herbs" }
+  kale: { kg: "kale" }
+  leek: { kg: "leek", each: "leek" }
+  lemon: { each: "lemon" }
+  lemongrass: { each: "lemongrass" }
+  lettuce: { each: "lettuce" }
+  lime: { each: "lime" }
+  lime leaves: { each: "makrut lime leaves, fresh" }
+  mango: { each: "mango" }
+  mint: { pack: "mint", kg: "mint", each: [0.02, 0.05] }
+  mushrooms: { kg: "mushrooms" }
+  chestnut mushrooms: { kg: "chestnut mushrooms" }
+  onion: { each: "onion", kg: "onion" }
+  red onion: { each: "red onion", kg: "red onion" }
+  orange: { each: "orange" }
+  blood orange: { each: "blood orange" }
+  parsley: { pack: "parsley", kg: "parsley" }
+  parsnip: { each: "parsnip", kg: "parsnip" }
+  peaches: { each: "peaches" }
+  pear: { each: "pear" }
+  red pepper: { each: "red pepper" }
+  peppers: { each: "red pepper" }
+  pineapple: { each: "pineapple" }
+  plums: { kg: "plums", each: "plums" }
+  pomegranate: { each: "pomegranate" }
+  pomegranate seeds: { kg: "pomegranate seeds" }
+  potato: { kg: "potato", each: "potato" }
+  new potatoes: { kg: "new potatoes" }
+  baby potatoes: { kg: "new potatoes" }
+  sweet potato: { kg: "sweet potato", each: "sweet potato" }
+  raspberries: { kg: "raspberries" }
+  rhubarb: { kg: "rhubarb" }
+  rocket: { kg: "rocket" }
+  rosemary: { pack: "rosemary", each: [0.05, 0.12] }
+  sage: { pack: "sage", each: [0.02, 0.05] }
+  shallot: { kg: "shallot", each: [0.10, 0.30] }
+  banana shallots: { kg: "banana shallots", each: [0.20, 0.50] }
+  sorrel: { kg: "sorrel", pack: "sorrel" }
+  spinach: { kg: "spinach" }
+  spring onion: { pack: "spring onion", each: [0.06, 0.15] }
+  strawberries: { kg: "strawberries" }
+  tarragon: { pack: "tarragon", kg: "tarragon", each: [0.03, 0.08] }
+  thyme: { pack: "thyme", each: [0.03, 0.08] }
+  tomato: { each: "tomato", kg: "tomato" }
+  turnip: { each: "turnip", kg: "turnip" }
+  watercress: { kg: "watercress" }
+  galangal: { kg: "galangal, fresh" }
+  curry leaves: { kg: "curry leaves, fresh" }
+
+  # --- meat --------------------------------------------------------------
+  bacon: { kg: "smoked back bacon, standard", each: "back bacon, standard" }
+  beef: { kg: "beef, diced / stewing / braising" }
+  beef fillet: { kg: "beef fillet (whole)" }
+  parma ham: { kg: "parma ham / prosciutto", each: "parma ham / prosciutto" }
+  prosciutto: { kg: "parma ham / prosciutto", each: "parma ham / prosciutto" }
+  fillet of beef: { kg: "beef fillet (whole)" }
+  beef mince: { kg: "beef mince 10–12%" }
+  short ribs: { kg: "beef short ribs" }
+  steak: { kg: "sirloin steak" }
+  chicken: { kg: "whole chicken" }
+  chicken breast: { kg: "chicken breast", each: "chicken breast" }
+  chicken thighs: { kg: "chicken thighs, bone-in", each: [0.50, 1.20] }
+  chicken legs: { kg: "chicken legs", each: [0.90, 1.80] }
+  chorizo: { kg: "cooking chorizo" }
+  duck: { kg: "whole duck", each: "whole duck" }
+  duck breast: { kg: "duck breast", each: "duck breast" }
+  duck leg: { kg: "duck legs", each: "duck legs" }
+  gammon: { kg: "gammon joint" }
+  goose: { kg: "goose" }
+  ham: { kg: "sliced cooked ham" }
+  lamb: { kg: "leg of lamb" }
+  lamb mince: { kg: "lamb mince" }
+  lamb steak: { kg: "leg of lamb" }
+  mutton: { kg: "mutton" }
+  oxtail: { kg: "oxtail" }
+  pancetta: { kg: "pancetta cubes" }
+  pork: { kg: "pork shoulder" }
+  pork belly: { kg: "pork belly" }
+  pork mince: { kg: "pork mince" }
+  sausages: { kg: "sausages, standard", each: "sausages, standard" }
+  turkey: { kg: "whole turkey, standard" }
+  venison: { kg: "venison, diced" }
+  fillet steak: { kg: "beef fillet (steak)" }
+  sirloin: { kg: "sirloin steak" }
+  ribeye: { kg: "ribeye steak" }
+  rib-eye: { kg: "ribeye steak" }
+  stewing steak: { kg: "beef, diced / stewing / braising" }
+  braising steak: { kg: "beef, diced / stewing / braising" }
+  diced beef: { kg: "beef, diced / stewing / braising" }
+  chuck steak: { kg: "beef, diced / stewing / braising" }
+  steak mince: { kg: "beef mince, butcher (fat not stated)" }
+  leg of lamb: { kg: "leg of lamb" }
+  lamb leg: { kg: "leg of lamb" }
+  lamb shoulder: { kg: "lamb shoulder" }
+  shoulder of lamb: { kg: "lamb shoulder" }
+  pork shoulder: { kg: "pork shoulder" }
+  pork loin: { kg: "pork loin" }
+  boneless chicken thighs: { kg: "chicken thighs, boneless" }
+  chicken thigh fillets: { kg: "chicken thighs, boneless" }
+  turkey breast: { kg: "turkey breast joint / crown" }
+  turkey crown: { kg: "turkey breast joint / crown" }
+  venison steak: { kg: "venison steaks" }
+  venison haunch: { kg: "venison haunch" }
+  haunch of venison: { kg: "venison haunch" }
+  muntjac: { kg: "venison haunch" }
+
+  # --- fish --------------------------------------------------------------
+  anchovies: { kg: "anchovy fillets in oil (gross tin)" }
+  cod: { kg: "cod fillets" }
+  haddock: { kg: "haddock fillets" }
+  mackerel: { kg: "mackerel fillets" }
+  smoked mackerel: { kg: "smoked mackerel" }
+  mussels: { kg: "mussels, live" }
+  prawns: { kg: "raw king prawns" }
+  salmon: { kg: "salmon fillets", each: "salmon fillet" }
+  smoked salmon: { kg: "smoked salmon, sliced" }
+  tuna: { kg: "tinned tuna (drained)" }
+  cod loin: { kg: "cod loins" }
+  smoked haddock: { kg: "smoked haddock" }
+  hake: { kg: "hake fillets" }
+  tuna steak: { kg: "tuna steaks" }
+  king prawns: { kg: "raw king prawns" }
+  cooked prawns: { kg: "cooked prawns" }
+  anchovy fillets: { kg: "anchovy fillets in oil (gross tin)" }
+  scallop: { kg: "king scallops", each: "king scallop" }
+  white crab meat: { kg: "white crab meat" }
+  white crabmeat: { kg: "white crab meat" }
+  brown crab meat: { kg: "brown crab meat" }
+  brown crabmeat: { kg: "brown crab meat" }
+  sea bass: { kg: "sea bass fillets", each: "sea bass fillet" }
+  monkfish: { kg: "monkfish tail" }
+  trout: { kg: "trout fillets" }
+  smoked trout: { kg: "hot-smoked trout" }
+  hot-smoked trout: { kg: "hot-smoked trout" }
+  hot smoked trout: { kg: "hot-smoked trout" }
+  squid: { kg: "squid, prepared" }
+  clams: { kg: "clams, live" }
+  cockles: { kg: "cockles, live" }
+  brown shrimp: { kg: "peeled brown shrimp" }
+  potted shrimp: { kg: "potted brown shrimp" }
+
+  # --- dairy & eggs --------------------------------------------------------
+  butter: { kg: "butter, own-label" }
+  buttermilk: { l: "buttermilk" }
+  cheddar: { kg: "mature cheddar, budget" }
+  cheese: { kg: "cheese" }
+  cream: { l: "cream" }
+  cream cheese: { kg: "cream cheese" }
+  clotted cream: { kg: "clotted cream" }
+  double cream: { l: "double cream" }
+  single cream: { l: "single cream" }
+  soured cream: { l: "soured cream" }
+  whipping cream: { l: "whipping cream" }
+  crème fraîche: { l: "crème fraîche" }
+  creme fraiche: { l: "crème fraîche" }
+  egg: { each: "egg" }
+  egg white: { each: "egg" }
+  egg yolk: { each: "egg" }
+  feta: { kg: "feta" }
+  goat's cheese: { kg: "goat's cheese, soft" }
+  gruyère: { kg: "gruyère" }
+  gruyere: { kg: "gruyère" }
+  halloumi: { kg: "halloumi" }
+  mascarpone: { kg: "mascarpone" }
+  milk: { l: "milk" }
+  mozzarella: { kg: "mozzarella" }
+  parmesan: { kg: "parmesan (Parmigiano Reggiano)" }
+  pecorino: { kg: "pecorino romano" }
+  ricotta: { kg: "ricotta" }
+  stilton: { kg: "stilton" }
+  yoghurt: { kg: "yoghurt" }
+  yogurt: { kg: "yoghurt" }
+  greek yoghurt: { kg: "greek yoghurt" }
+  ghee: { kg: "ghee" }
+  parmigiano reggiano: { kg: "parmesan (Parmigiano Reggiano)" }
+  grana padano: { kg: "grana padano" }
+  comté: { kg: "comté" }
+  comte: { kg: "comté" }
+  emmental: { kg: "emmental / swiss" }
+  swiss cheese: { kg: "emmental / swiss" }
+  vintage cheddar: { kg: "cheddar, premium supermarket" }
+  montgomery: { kg: "farmhouse cheddar (Montgomery's, Westcombe)" }
+  cornish kern: { kg: "cornish kern" }
+  gorgonzola: { kg: "gorgonzola" }
+  roquefort: { kg: "roquefort" }
+  goats cheese: { kg: "goat's cheese, soft" }
+  buffalo mozzarella: { kg: "buffalo mozzarella" }
+  burrata: { kg: "burrata", each: "burrata" }
+  taleggio: { kg: "taleggio" }
+  camembert: { kg: "camembert", each: "camembert" }
+  brie: { kg: "brie" }
+  paneer: { kg: "paneer" }
+
+  # --- bakery ------------------------------------------------------------
+  bread: { kg: "bread", each: "bread" }
+  breadcrumbs: { kg: "breadcrumbs" }
+  puff pastry: { kg: "puff pastry" }
+  shortcrust pastry: { kg: "shortcrust pastry" }
+  filo pastry: { kg: "filo pastry" }
+
+  # --- frozen ------------------------------------------------------------
+  frozen peas: { kg: "frozen peas" }
+  peas: { kg: "frozen peas" }
+
+  # --- store cupboard ----------------------------------------------------
+  almonds: { kg: "almonds" }
+  ground almonds: { kg: "ground almonds" }
+  flaked almonds: { kg: "flaked almonds" }
+  baking powder: { kg: "baking powder" }
+  bicarbonate of soda: { kg: "bicarbonate of soda" }
+  barley: { kg: "barley" }
+  beans: { kg: "beans" }
+  butter beans: { kg: "butter beans" }
+  cannellini beans: { kg: "cannellini beans" }
+  chickpeas: { kg: "chickpeas", each: "chickpeas" }
+  capers: { kg: "capers" }
+  cashews: { kg: "cashews" }
+  chestnuts: { kg: "chestnuts" }
+  chocolate: { kg: "dark cooking chocolate" }
+  dark chocolate: { kg: "dark cooking chocolate" }
+  milk chocolate: { kg: "milk chocolate" }
+  white chocolate: { kg: "white chocolate" }
+  cocoa: { kg: "cocoa powder" }
+  cocoa powder: { kg: "cocoa powder" }
+  coconut: { kg: "coconut" }
+  coconut milk: { l: "coconut milk" }
+  cornflour: { kg: "cornflour" }
+  couscous: { kg: "couscous" }
+  currants: { kg: "currants" }
+  dates: { kg: "dates" }
+  dried apricots: { kg: "dried apricots" }
+  dried cranberries: { kg: "dried cranberries" }
+  flour: { kg: "flour" }
+  strong flour: { kg: "strong flour" }
+  wholemeal flour: { kg: "wholemeal flour" }
+  rice flour: { kg: "rice flour" }
+  glacé cherries: { kg: "glacé cherries" }
+  glace cherries: { kg: "glacé cherries" }
+  hazelnuts: { kg: "hazelnuts" }
+  jam: { kg: "jam" }
+  lasagne: { kg: "lasagne" }
+  lentils: { kg: "lentils" }
+  marmalade: { kg: "marmalade" }
+  mayonnaise: { kg: "mayonnaise" }
+  mixed peel: { kg: "mixed peel" }
+  noodles: { kg: "noodles" }
+  oats: { kg: "oats" }
+  orzo: { kg: "orzo" }
+  panko: { kg: "panko" }
+  pasta: { kg: "pasta" }
+  passata: { kg: "passata" }
+  peanut butter: { kg: "peanut butter" }
+  peanuts: { kg: "peanuts" }
+  pecans: { kg: "pecans" }
+  pine nuts: { kg: "pine nuts" }
+  pistachios: { kg: "pistachios, shelled" }
+  raisins: { kg: "raisins" }
+  rice: { kg: "rice" }
+  basmati rice: { kg: "basmati rice" }
+  risotto rice: { kg: "risotto rice" }
+  sesame seeds: { kg: "sesame seeds" }
+  # Each stock by name: the longest keyword wins, so `chicken stock` would
+  # otherwise be priced as chicken.
+  stock: { l: "stock", each: "stock" }
+  chicken stock: { l: "chicken stock", each: "chicken stock" }
+  beef stock: { l: "beef stock", each: "beef stock" }
+  vegetable stock: { l: "vegetable stock", each: "vegetable stock" }
+  fish stock: { l: "fish stock", each: "fish stock" }
+  lemon curd: { kg: "lemon curd" }
+  ketchup: { kg: "ketchup" }
+  chilli sauce: { l: "chilli sauce" }
+  sriracha: { l: "sriracha" }
+  onion powder: { kg: "onion powder" }
+  cream of tartar: { kg: "cream of tartar" }
+  coconut cream: { l: "coconut cream" }
+  sour cream: { l: "sour cream" }
+  sugar snap peas: { kg: "sugar snap peas" }
+  rice wine: { l: "rice wine" }
+  orange blossom water: { l: "orange blossom water" }
+  sultanas: { kg: "sultanas" }
+  tahini: { kg: "tahini" }
+  tomato purée: { kg: "tomato purée" }
+  tomato puree: { kg: "tomato purée" }
+  chopped tomatoes: { kg: "chopped tomatoes" }
+  yeast: { kg: "yeast" }
+  chocolate chips: { kg: "dark chocolate chips" }
+  dark chocolate chips: { kg: "dark chocolate chips" }
+  macadamia: { kg: "macadamia nuts" }
+  cashew nuts: { kg: "cashews" }
+  walnut: { kg: "walnuts" }
+  porcini: { kg: "dried porcini" }
+  harissa: { kg: "harissa" }
+  gochujang: { kg: "gochujang" }
+  kecap manis: { l: "kecap manis" }
+  tamarind: { kg: "tamarind paste" }
+  marzipan: { kg: "marzipan" }
+  gelatine: { each: "gelatine leaves" }
+  liquid glucose: { kg: "liquid glucose" }
+  medjool dates: { kg: "medjool dates" }
+  dried figs: { kg: "dried figs" }
+  prunes: { kg: "prunes" }
+  quinoa: { kg: "quinoa" }
+  bulgur: { kg: "bulgur wheat" }
+  freekeh: { kg: "freekeh" }
+  gnocchi: { kg: "fresh gnocchi" }
+  fresh pasta: { kg: "fresh pasta" }
+
+  # sugars and syrups
+  sugar: { kg: "sugar" }
+  caster sugar: { kg: "caster sugar" }
+  golden caster sugar: { kg: "golden caster sugar" }
+  icing sugar: { kg: "icing sugar" }
+  brown sugar: { kg: "brown sugar" }
+  demerara sugar: { kg: "demerara sugar" }
+  muscovado sugar: { kg: "muscovado sugar" }
+  golden syrup: { kg: "golden syrup" }
+  black treacle: { kg: "black treacle" }
+  treacle: { kg: "black treacle" }
+  honey: { kg: "honey" }
+  maple syrup: { l: "maple syrup" }
+
+  # oils, vinegars and sauces
+  oil: { l: "oil" }
+  olive oil: { l: "olive oil" }
+  extra virgin olive oil: { l: "extra virgin olive oil, everyday" }
+  extra-virgin olive oil: { l: "extra virgin olive oil, everyday" }
+  vegetable oil: { l: "vegetable oil" }
+  sunflower oil: { l: "sunflower oil" }
+  rapeseed oil: { l: "rapeseed oil" }
+  groundnut oil: { l: "groundnut oil" }
+  sesame oil: { l: "sesame oil" }
+  coconut oil: { kg: "coconut oil" }
+  vinegar: { l: "vinegar" }
+  wine vinegar: { l: "white wine vinegar" }
+  red wine vinegar: { l: "red wine vinegar" }
+  white wine vinegar: { l: "white wine vinegar" }
+  cider vinegar: { l: "cider vinegar" }
+  balsamic vinegar: { l: "balsamic vinegar" }
+  sherry vinegar: { l: "sherry vinegar" }
+  rice vinegar: { l: "rice vinegar" }
+  rice wine vinegar: { l: "rice vinegar" }
+  soy sauce: { l: "soy sauce" }
+  fish sauce: { l: "fish sauce" }
+  oyster sauce: { l: "oyster sauce" }
+  hoisin sauce: { l: "hoisin sauce" }
+  worcestershire sauce: { l: "worcestershire sauce" }
+  mirin: { l: "mirin" }
+  miso: { kg: "miso" }
+  miso paste: { kg: "miso" }
+  mustard: { kg: "mustard" }
+  mustard powder: { kg: "mustard powder" }
+  curry paste: { kg: "curry paste" }
+  tamarind paste: { kg: "tamarind paste" }
+  vanilla extract: { l: "vanilla extract" }
+  vanilla bean paste: { l: "vanilla bean paste" }
+  vanilla pod: { each: "vanilla pods" }
+  aged balsamic: { l: "balsamic vinegar, aged" }
+  truffle oil: { l: "truffle oil" }
+  vanilla paste: { l: "vanilla bean paste" }
+
+  # --- spices & seasonings -----------------------------------------------
+  allspice: { kg: "allspice" }
+  caraway seeds: { kg: "caraway seeds" }
+  cardamom: { kg: "cardamom pods", each: [0.03, 0.08] }
+  cardamom pods: { kg: "cardamom pods", each: [0.03, 0.08] }
+  chilli flakes: { kg: "chilli flakes" }
+  chilli powder: { kg: "chilli powder" }
+  cinnamon: { kg: "cinnamon" }
+  cinnamon stick: { each: "cinnamon stick", kg: "cinnamon stick" }
+  cloves: { kg: "cloves", each: [0.01, 0.03] }
+  coriander seeds: { kg: "coriander seeds" }
+  ground coriander: { kg: "ground coriander" }
+  cumin: { kg: "cumin" }
+  dried oregano: { kg: "dried oregano" }
+  dried herbs: { kg: "dried herbs" }
+  fennel seeds: { kg: "fennel seeds" }
+  five-spice: { kg: "five-spice" }
+  garam masala: { kg: "garam masala" }
+  garlic granules: { kg: "garlic granules" }
+  garlic powder: { kg: "garlic powder" }
+  ground ginger: { kg: "ground ginger" }
+  mixed spice: { kg: "mixed spice" }
+  mustard seeds: { kg: "mustard seeds" }
+  nigella seeds: { kg: "nigella seeds" }
+  nutmeg: { each: "nutmeg", kg: "nutmeg" }
+  paprika: { kg: "paprika" }
+  smoked paprika: { kg: "smoked paprika" }
+  peppercorns: { kg: "peppercorns", each: [0.00, 0.00] }
+  black peppercorns: { kg: "peppercorns", each: [0.00, 0.00] }
+  saffron: { g: "saffron" }
+  star anise: { kg: "star anise", each: [0.03, 0.08] }
+  turmeric: { kg: "turmeric" }
+  sumac: { kg: "sumac" }
+  za'atar: { kg: "za'atar" }
+  ras el hanout: { kg: "ras el hanout" }
+  dukkah: { kg: "dukkah" }
+
+  # --- priced from #1468's unpriced list --------------------------
+  ajwain: { kg: "ajwain" }
+  almond essence: { l: "almond extract" }
+  almond extract: { l: "almond extract" }
+  amaretto: { l: "amaretto" }
+  amaretto or a few drops of stevia: { l: "amaretto" }
+  amchoor: { kg: "amchoor" }
+  anchovy paste: { kg: "anchovy paste" }
+  baby gem lettuces: { each: "baby gem lettuces" }
+  baby pak choi: { kg: "pak choi" }
+  baking soda: { kg: "baking soda" }
+  baking spread: { kg: "margarine" }
+  bamboo shoots from a can: { kg: "bamboo shoots from a can" }
+  bao buns: { each: "bao buns" }
+  bart bouquet garni bags: { each: "bart bouquet garni bags" }
+  bean curd skin: { kg: "bean curd skin" }
+  black or red seedless grapes: { kg: "black or red seedless grapes" }
+  bocconcini: { kg: "bocconcini" }
+  brioche burger buns: { each: "brioche burger buns" }
+  brown ale: { l: "brown ale" }
+  bunch of red grapes: { each: "bunch of red grapes", kg: "bunch of red grapes" }
+  cacao powder: { kg: "cacao powder" }
+  camomile teabags: { each: "camomile teabags" }
+  camp coffee: { l: "camp coffee" }
+  camp coffee or espresso: { l: "camp coffee" }
+  can sweetcorn: { kg: "can sweetcorn" }
+  caper berries: { kg: "caper berries" }
+  caramel: { kg: "caramel" }
+  chai spice powder: { kg: "chai spice powder" }
+  chai teabags: { each: "chai teabags" }
+  chard: { kg: "chard", each: "chard" }
+  chicory heads: { kg: "chicory heads", pack: "chicory heads" }
+  chicory or radicchio: { kg: "chicory heads", pack: "chicory heads" }
+  chile de árbol: { kg: "chile de árbol" }
+  chinese 5-spice powder: { kg: "chinese five-spice powder" }
+  chinese five-spice powder: { kg: "chinese five-spice powder" }
+  chipotle paste: { kg: "chipotle paste" }
+  chopped fresh oregano: { kg: "chopped fresh oregano" }
+  chopped nuts: { kg: "chopped nuts" }
+  citrus fruit: { each: "citrus fruit" }
+  clementines: { each: "clementines", kg: "clementines" }
+  conchiglie: { kg: "conchiglie" }
+  cooked grains: { kg: "cooked grains" }
+  corn cobs: { each: "corn cobs" }
+  corn tacos: { each: "corn tacos" }
+  cranberry or redcurrant jelly: { kg: "cranberry or redcurrant jelly" }
+  cranberry sauce: { kg: "cranberry sauce" }
+  croissants: { each: "croissants" }
+  cured or smoked fish: { kg: "cured or smoked fish" }
+  curry leaf sprigs: { kg: "curry leaf sprigs" }
+  curry powder: { kg: "medium curry powder" }
+  custard powder: { kg: "custard powder" }
+  daikon: { kg: "daikon", each: "daikon" }
+  daikon/mooli: { kg: "daikon", each: "daikon" }
+  dairy-free sunflower spread: { kg: "dairy-free sunflower spread" }
+  date molasses: { l: "date molasses" }
+  digestive biscuits: { kg: "digestive biscuits" }
+  dried fenugreek leaves: { kg: "dried fenugreek leaves" }
+  dried juniper berries: { kg: "dried juniper berries" }
+  dry pitted black olives: { kg: "dry pitted black olives" }
+  earl grey teabags: { each: "earl grey teabags" }
+  echalion: { kg: "echalion" }
+  espresso coffee: { kg: "espresso coffee" }
+  espresso or 30 ml very strong coffee: { kg: "espresso coffee" }
+  farfalle: { kg: "farfalle" }
+  fenugreek seeds: { kg: "fenugreek seeds" }
+  figs: { each: "figs" }
+  fine ground polenta: { kg: "fine ground polenta" }
+  firm tofu: { kg: "firm tofu" }
+  fish fillets: { kg: "fish fillets" }
+  five-spice powder: { kg: "chinese five-spice powder" }
+  flatbreads: { each: "flatbreads" }
+  fresh jalapeño: { kg: "fresh jalapeño" }
+  fresh or frozen blackcurrants: { kg: "fresh or frozen blackcurrants" }
+  fresh pesto: { kg: "fresh pesto" }
+  frozen chips: { kg: "frozen chips" }
+  frozen edamame: { kg: "frozen edamame" }
+  frozen or canned sweetcorn: { kg: "frozen sweetcorn" }
+  frozen oven chips: { kg: "frozen chips" }
+  frozen sweetcorn: { kg: "frozen sweetcorn" }
+  frozen wonton wrappers: { kg: "frozen wonton wrappers" }
+  garam masala powder: { kg: "garam masala powder" }
+  glycerine: { l: "glycerine" }
+  grand marnier: { l: "grand marnier" }
+  grapefruits: { each: "grapefruits" }
+  greek kalkidis olives: { kg: "greek kalkidis olives" }
+  green bananas or 2 plantains: { each: "green bananas or 2 plantains" }
+  green olives: { kg: "green olives" }
+  green pesto: { kg: "green pesto" }
+  green vegetables: { kg: "green vegetables" }
+  gros sel: { kg: "gros sel" }
+  ground fenugreek: { kg: "ground fenugreek" }
+  ground mace: { kg: "ground mace" }
+  guinness: { l: "guinness" }
+  guinness or other stout: { l: "guinness" }
+  gyoza sauce: { l: "gyoza sauce" }
+  handfuls of winter greens: { kg: "handfuls of winter greens" }
+  heads chicory: { kg: "heads chicory", each: "heads chicory" }
+  high quality mincemeat: { kg: "high quality mincemeat" }
+  hummus: { kg: "hummus" }
+  instant coffee: { kg: "instant coffee" }
+  instant coffee granules: { kg: "instant coffee" }
+  instant espresso powder: { kg: "instant espresso powder" }
+  instant polenta or cornmeal: { kg: "instant polenta or cornmeal" }
+  jerusalem artichokes: { kg: "jerusalem artichokes" }
+  juniper berries: { kg: "juniper berries" }
+  kalamata olives: { kg: "kalamata olives" }
+  kimchee: { kg: "kimchee" }
+  kirsch: { l: "kirsch" }
+  kombu: { kg: "kombu" }
+  korean barbecue sauce: { l: "korean barbecue sauce" }
+  lager: { l: "lager" }
+  loose black tea leaves: { kg: "loose black tea leaves" }
+  loose-leaf black tea: { kg: "loose black tea leaves" }
+  mace: { kg: "mace" }
+  mangetout: { kg: "mangetout" }
+  margarine: { kg: "margarine" }
+  marinated artichokes: { kg: "marinated artichokes" }
+  marmite: { kg: "marmite" }
+  marsala: { l: "marsala" }
+  matcha tea powder: { kg: "matcha tea powder" }
+  mayo: { kg: "mayo" }
+  medium curry powder: { kg: "medium curry powder" }
+  "medium–hot curry powder": { kg: "medium–hot curry powder" }
+  menma: { kg: "menma" }
+  mild curry powder: { kg: "mild curry powder" }
+  mixed berries: { kg: "mixed berries" }
+  mixed dried fruit: { kg: "mixed dried fruit" }
+  mixed root veg: { kg: "mixed root veg" }
+  mixed salad leaves: { kg: "mixed salad leaves" }
+  mixed seeds: { kg: "mixed seeds" }
+  mooli: { each: "mooli", kg: "mooli" }
+  nam pla: { l: "nam pla" }
+  okra: { kg: "okra" }
+  oregano: { kg: "oregano" }
+  oregano sprigs: { pack: "oregano sprigs", kg: "oregano sprigs" }
+  ox cheek: { kg: "ox cheek", each: "ox cheek" }
+  pack fresh tagliatelle: { kg: "pack fresh tagliatelle" }
+  packs ready-to-cook udon: { each: "packs ready-to-cook udon", kg: "packs ready-to-cook udon" }
+  pak choi: { kg: "pak choi" }
+  pak choi bulb: { kg: "pak choi bulb" }
+  pandan leaf: { kg: "pandan leaf" }
+  passion fruits: { each: "passion fruits" }
+  peach or nectarine: { each: "peach or nectarine" }
+  pearled spelt: { kg: "pearled spelt" }
+  perry: { l: "perry" }
+  pesto: { kg: "pesto" }
+  piece of horseradish: { each: "piece of horseradish", kg: "piece of horseradish" }
+  pieces sustainable white fish: { kg: "pieces sustainable white fish", each: "pieces sustainable white fish" }
+  pink grapefruit: { each: "pink grapefruit" }
+  pitted black olives: { kg: "pitted black olives" }
+  pitted kalamata olives: { kg: "pitted kalamata olives" }
+  plain curd: { l: "plain curd" }
+  poppy seeds: { kg: "poppy seeds" }
+  porter: { l: "porter" }
+  pouches mixed grains: { each: "pouches mixed grains" }
+  powdered loomi: { kg: "powdered loomi" }
+  pul biber: { kg: "pul biber" }
+  pumpkin: { each: "pumpkin" }
+  pumpkin seeds: { kg: "pumpkin seeds" }
+  pure almond essence: { l: "pure almond essence" }
+  radicchio: { each: "radicchio", kg: "radicchio" }
+  radish: { kg: "radish" }
+  rainbow radishes: { kg: "rainbow radishes", pack: "rainbow radishes" }
+  raw mangetout: { kg: "raw mangetout" }
+  ready-cooked spelt: { kg: "ready-cooked spelt", pack: "ready-cooked spelt" }
+  ready-made custard: { l: "ready-made custard" }
+  redcurrant jelly: { kg: "redcurrant jelly" }
+  rigatoni: { kg: "rigatoni" }
+  ripe avocados: { each: "ripe avocados" }
+  ripe bananas: { each: "ripe bananas" }
+  ripe fuyu persimmons: { each: "ripe fuyu persimmons" }
+  risoni: { kg: "risoni" }
+  round shortbread biscuits: { each: "round shortbread biscuits", kg: "round shortbread biscuits" }
+  salad radishes: { kg: "radish" }
+  salami napoli: { kg: "salami napoli" }
+  salsify: { kg: "salsify" }
+  salted caramel chocolates: { each: "salted caramel chocolates" }
+  satay sauce: { l: "satay sauce" }
+  sauerkraut: { kg: "sauerkraut" }
+  sausagemeat: { kg: "sausagemeat" }
+  scotch pancakes: { each: "scotch pancakes" }
+  seafood: { kg: "seafood" }
+  semolina: { kg: "semolina" }
+  sesame seeded burger buns: { each: "sesame seeded burger buns" }
+  shellfish or fish of choice: { kg: "seafood" }
+  shichimi: { kg: "shichimi" }
+  shredded spring greens: { kg: "spring greens", pack: "spring greens" }
+  shredded suet: { kg: "suet" }
+  shredded wheat biscuits: { each: "shredded wheat biscuits" }
+  shrimp paste: { kg: "shrimp paste" }
+  silken tofu: { kg: "silken tofu" }
+  slightly overripe bananas: { each: "ripe bananas" }
+  smoked tofu: { kg: "smoked tofu" }
+  soft herb leaves: { kg: "soft herb leaves" }
+  soft margarine: { kg: "margarine" }
+  spaghetti: { kg: "spaghetti" }
+  spelt: { kg: "spelt" }
+  spelt spaghetti: { kg: "spelt spaghetti" }
+  spring greens: { kg: "spring greens", pack: "spring greens" }
+  stout: { l: "stout" }
+  suet: { kg: "suet" }
+  sunflower seeds: { kg: "sunflower seeds" }
+  swede: { each: "swede" }
+  swiss chard: { kg: "swiss chard" }
+  tabasco: { l: "tabasco" }
+  tamari: { l: "tamari" }
+  tandoori masala: { kg: "tandoori masala" }
+  tea bags: { each: "tea bags" }
+  teriyaki sauce: { l: "teriyaki sauce" }
+  thick slices from a crusty loaf: { kg: "thick slices from a crusty loaf" }
+  toasted pumpkin seeds: { kg: "toasted pumpkin seeds" }
+  urucum seeds: { kg: "urucum seeds" }
+  vanilla bean pod: { each: "vanilla bean pod" }
+  vanilla essence: { l: "vanilla essence" }
+  vanilla or almond extract: { l: "vanilla or almond extract" }
+  vegetable bouillon powder: { kg: "vegetable bouillon powder" }
+  vegetarian mincemeat: { kg: "vegetarian mincemeat" }
+  wakame: { kg: "wakame" }
+  wasabi paste: { kg: "wasabi paste" }
+  watermelon: { each: "watermelon" }
+  wheatberries: { kg: "wheatberries" }
+  white chicory or endive: { kg: "white chicory or endive", pack: "white chicory or endive" }
+  whole black loomi: { kg: "whole black loomi" }
+  wholemeal spaghetti: { kg: "wholemeal spaghetti" }
+  xanthan gum: { kg: "xanthan gum" }
+  yakitori sauce: { l: "yakitori sauce" }
+  yellow loomi: { kg: "yellow loomi" }
+
+  # --- drinks ------------------------------------------------------------
+  beer: { l: "beer" }
+  brandy: { l: "brandy" }
+  cider: { l: "cider" }
+  port: { l: "port" }
+  rum: { l: "rum" }
+  sake: { l: "sake" }
+  sherry: { l: "sherry" }
+  wine: { l: "wine" }
+  red wine: { l: "red wine" }
+  white wine: { l: "white wine" }
+  orange juice: { l: "orange juice" }
+  lemon juice: { l: "lemon juice" }
+  lime juice: { l: "lime juice" }

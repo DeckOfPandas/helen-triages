@@ -139,14 +139,12 @@
     return { lo: lo, hi: hi };
   }
 
-  /* " @ £2.34", or a range, or nothing. Per glass, never multiplied by the
-     count: it is the figure the drink's own page shows. */
+  /* " @ £2.34", or " @ £3.10 (£2.34–£3.86)", or nothing. Per glass, never
+     multiplied by the count: it is the figure the drink's own page shows. */
   function costSuffix(url) {
     var c = costFor(url);
     if (!c) return '';
-    var lo = '£' + Number(c.lo).toFixed(2);
-    if (Math.abs(c.hi - c.lo) < 0.005) return ' @ ' + lo;
-    return ' @ ' + lo + '–£' + Number(c.hi).toFixed(2);
+    return ' @ ' + HTF.shoppingList.moneyText(c.lo, c.hi);
   }
 
   /* One row of radios per ingredient that has a choice (#818). The group
@@ -429,9 +427,15 @@
 
   /* The card's own unmarked title, so a drink found by a name search still
      lists under its real name. */
+  var hrefByUrl = {};
   var titleByUrl = (function () {
     var map = {};
-    model.forEach(function (d) { if (d.url) map[d.url] = d.title || d.url; });
+    model.forEach(function (d) {
+      if (!d.url) return;
+      map[d.url] = d.title || d.url;
+      // The card link's href carries the base URL; the store's key does not.
+      hrefByUrl[d.url] = (d.nameEl && d.nameEl.getAttribute('href')) || d.url;
+    });
     return map;
   })();
 
@@ -463,7 +467,9 @@
           'inputmode="numeric" value="' + HTF.shortlist.glasses(url) + '" ' +
           'data-url="' + HTF.escapeHtml(url) + '" ' +
           'aria-label="glasses of ' + HTF.escapeHtml(titleByUrl[url] || url) + '">' +
-          '<span>' + HTF.escapeHtml(titleByUrl[url] || url) +
+          '<span><a class="shopping-list-drink-link" href="' +
+          HTF.escapeHtml(hrefByUrl[url] || url) + '">' +
+          HTF.escapeHtml(titleByUrl[url] || url) + '</a>' +
           /* Inside the title span so the price wraps with the name. */
           '<span class="shopping-list-cost">' + costSuffix(url) + '</span>' +
           '</span>' +
@@ -538,7 +544,8 @@
       /* The price (#820) is its own span because it is absent on the deployed
          site. A row with no rate prints nothing, never a zero. */
       var price = row.price
-        ? '<span class="shopping-list-price">' + HTF.escapeHtml(row.price.text) + '</span>'
+        ? '<span class="shopping-list-price">' +
+          HTF.shoppingList.moneyHtml(row.price.text, HTF.escapeHtml) + '</span>'
         : '';
 
       return '<li class="shopping-list-row' + HTF.shoppingTicks.rowClass(row.key) + '">' +
