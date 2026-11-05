@@ -135,6 +135,8 @@ argument and the rules each field is read by.
 - 2026-10-01 · §5 · a number and its unit take a space (15 ml, 400 g), fixed mechanically at ingest and by the tidy pass.
 - 2026-09-06 · §5 · #711 · every note starts with a capital letter and ends with a full stop, on both sites.
 - 2026-11-05 · §5 · a spoon amount takes no "of" — Helen: "Never "2 tbsp of" something.
+- 2026-11-05 · §5 · a scaled amount of one or less is singular: "½ bunch".
+- 2026-11-05 · §5 · a weight goes in the amount's bracket, never the item.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.

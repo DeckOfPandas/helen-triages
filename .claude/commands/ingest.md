@@ -270,6 +270,9 @@ else has already done (MANUAL §9.1).
   milk, egg -> large egg, butter -> salted butter UNLESS it's baking and salt
   is named, then for each please add a note to the ingredient line item
   saying "The source gave "butter"."*
+- **A weight goes in the amount's bracket, never the item**: amount
+  `"1 bunch (about 25 g)"`, item `"fresh dill"`, so the scaler moves it.
+  "approx" is "about". DECISIONS §5.
 - **A spoon amount takes no "of"**: "2 tbsp oil", never "2 tbsp of the
   oil", in every line but a `QQ original`. DECISIONS §5.
 - **The fan oven temperature**, from the printed pair. Check WHICH is the fan

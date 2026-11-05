@@ -1507,8 +1507,8 @@ unit to the parser.
   Adding a measure is a line of YAML.
 - The word is matched whole, anywhere in the unit, singular or plural
   (`1 small handful`, `1 large handful each`), and the plural is written back
-  to suit the new number. The plural is `unitLabel`'s: singular at exactly
-  one, plural otherwise, so `½ handfuls`.
+  to suit the new number. The plural is `unitLabel`'s, on both sites:
+  singular at one or less, plural above, so `½ bunch` and `1½ bunches`.
 - **`half_step_counts` is separate from `half_step_measures` because of the
   half-recipe judge**, which is handed only the latter and lets those halve
   always. `1 lot` of another recipe must go on refusing a half recipe.

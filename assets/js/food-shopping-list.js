@@ -107,18 +107,22 @@
       ? number
       : (/^[^a-z0-9]/.test(shown) ? number + shown : number + ' ' + shown);
 
-    if (total.paren) {
-      var pas = displayUnit(total.paren.unit, tidy(total.paren.hi));
-      var plo = amountNumber(total.paren.lo * pas.factor, pas.unit);
-      var phi = tidy(total.paren.hi);
-      var pnumber = phi > tidy(total.paren.lo)
-        ? plo + '–' + amountNumber(total.paren.hi * pas.factor, pas.unit)
-        : plo;
-      var punit = unitLabel(pas.unit, phi * pas.factor);
-      text += ' (' + (punit ? pnumber + ' ' + punit : pnumber) + ')';
-    }
+    if (total.paren) text += ' ' + parenText(total.paren);
 
     return total.approx ? '~' + text : text;
+  }
+
+  /* The restating bracket, `{unit, lo, hi, about?}`, as "(about 12.5 g)". */
+  function parenText(paren) {
+    var pas = displayUnit(paren.unit, tidy(paren.hi));
+    var plo = amountNumber(paren.lo * pas.factor, pas.unit);
+    var phi = tidy(paren.hi);
+    var pnumber = phi > tidy(paren.lo)
+      ? plo + '–' + amountNumber(paren.hi * pas.factor, pas.unit)
+      : plo;
+    var punit = unitLabel(pas.unit, phi * pas.factor);
+    return '(' + (paren.about ? 'about ' : '') +
+      (punit ? pnumber + ' ' + punit : pnumber) + ')';
   }
 
   /* A stepped measure (handful, sprig, pinch) is bought in whole ones, rounded
@@ -458,6 +462,7 @@
   return {
     build: build,
     totalText: totalText,
+    parenText: parenText,
     amountNumber: amountNumber,
     CANONICAL: CANONICAL,
     SIZE_UNITS: SIZE_UNITS

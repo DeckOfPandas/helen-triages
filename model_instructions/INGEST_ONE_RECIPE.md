@@ -233,6 +233,11 @@ line item saying "The source gave "butter"."* Where the source does say —
 "unsalted butter", "medium eggs", "whole milk" — that is reading, and you
 write it, with no note.
 
+**A weight the source gives beside a count goes in the amount's bracket**,
+never the item, because the scaler reads only the amount: amount `"2 (about
+300 g)"`, item `"mackerel fillets"`. "approx" is "about". A bracket that
+says more ("about 150 g each", "or 400 g frozen") stays in the item.
+
 **The ingredient list is the source's own list. Never add to it from the
 method.** Helen: *"We shouldn't list incidentals. We can trust the
 cook."* "Pour over 75 ml boiling water" in step 1, "a pinch of salt", flour for
