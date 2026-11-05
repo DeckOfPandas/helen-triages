@@ -18,9 +18,10 @@
 
   // The filter kinds this grammar knows; parseQuery always returns a key for
   // each. The list is shared by both sites: each index reads only the keys it
-  // has buttons for. `ing` is the one kind both read, and each matches it
-  // against what its own picker would offer, never by substring (#1050).
-  var KINDS = ['star', 'tag', 'mood', 'ing'];
+  // has buttons for. `ing` (HAS TO HAVE) and `out` (LEAVE OUT) are read by
+  // both, each matched against what its own picker would offer, never by
+  // substring (#1050). `yolo` is cocktails' YOLO? switch.
+  var KINDS = ['star', 'tag', 'mood', 'ing', 'out', 'yolo'];
 
   var EXCLUDE_PREFIX = '-';
 
@@ -134,6 +135,36 @@
       if (SLUG_RE.test(slug) && slug !== '1' && kept.indexOf(slug) === -1) kept.push(slug);
     });
     return kept.length ? 'shortlist=' + kept.join(',') : '';
+  }
+
+  // The address bar's query, so a copied link or a reload shows the same list
+  // (#1462 C3). `pairs` is [[key, values], ...] in the order to write them. A
+  // value is encoded whole, so its own comma is `%2C` and parseQuery's split
+  // cannot cut it; one parseQuery would drop (empty, or a leading `-`) is left
+  // out, so what this writes is what the parsers read. '' for nothing.
+  function buildQuery(pairs) {
+    var parts = [];
+    (Array.isArray(pairs) ? pairs : []).forEach(function (pair) {
+      var kept = [];
+      (pair[1] || []).forEach(function (v) {
+        var value = String(v == null ? '' : v).trim();
+        if (value && value.charAt(0) !== EXCLUDE_PREFIX) kept.push(encodeURIComponent(value));
+      });
+      if (kept.length) parts.push(pair[0] + '=' + kept.join(','));
+    });
+    return parts.join('&');
+  }
+
+  // Writes `query` into the address bar without a new history entry, keeping
+  // the fragment and the entry's own state. Does nothing when nothing changes,
+  // or in a browser with no History API.
+  function replaceQuery(query) {
+    if (typeof window === 'undefined' || !window.history ||
+        typeof window.history.replaceState !== 'function') return;
+    var loc = window.location;
+    var next = loc.pathname + (query ? '?' + query : '') + loc.hash;
+    if (next === loc.pathname + loc.search + loc.hash) return;
+    window.history.replaceState(window.history.state, '', next);
   }
 
   // --- the state shape --------------------------------------------------------
@@ -438,6 +469,10 @@
     parseShip: parseShip,
     parseShortlist: parseShortlist,
     shortlistQuery: shortlistQuery,
+    buildQuery: buildQuery,
+    replaceQuery: replaceQuery,
+    isFamilyValue: isFamilyValue,
+    familyKey: familyKey,
     serialise: food.serialise,
     deserialise: food.deserialise,
     FIELDS: FIELDS,

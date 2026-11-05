@@ -11,12 +11,12 @@ const FS = require('../../assets/js/filter-state.js');
 test('the documented example parses to the documented shape', () => {
   assert.deepStrictEqual(
     FS.parseQuery('?star=lamb&tag=soup,make-ahead'),
-    { star: ['lamb'], tag: ['soup', 'make-ahead'], mood: [], ing: [] }
+    { star: ['lamb'], tag: ['soup', 'make-ahead'], mood: [], ing: [], out: [], yolo: [] }
   );
 });
 
 test('a leading ? is optional', () => {
-  assert.deepStrictEqual(FS.parseQuery('star=lamb'), { star: ['lamb'], tag: [], mood: [], ing: [] });
+  assert.deepStrictEqual(FS.parseQuery('star=lamb'), { star: ['lamb'], tag: [], mood: [], ing: [], out: [], yolo: [] });
 });
 
 // --- the + trap ---------------------------------------------------------------
@@ -67,21 +67,21 @@ test('a bare - names nothing and is dropped', () => {
 // A bad query string is not worth an error on a page that works without it.
 
 test('an empty string parses to empty, with every known kind still present', () => {
-  assert.deepStrictEqual(FS.parseQuery(''), { star: [], tag: [], mood: [], ing: [] });
+  assert.deepStrictEqual(FS.parseQuery(''), { star: [], tag: [], mood: [], ing: [], out: [], yolo: [] });
 });
 
 test('undefined and a bare ? parse to empty rather than throwing', () => {
-  assert.deepStrictEqual(FS.parseQuery(undefined), { star: [], tag: [], mood: [], ing: [] });
-  assert.deepStrictEqual(FS.parseQuery('?'), { star: [], tag: [], mood: [], ing: [] });
+  assert.deepStrictEqual(FS.parseQuery(undefined), { star: [], tag: [], mood: [], ing: [], out: [], yolo: [] });
+  assert.deepStrictEqual(FS.parseQuery('?'), { star: [], tag: [], mood: [], ing: [], out: [], yolo: [] });
 });
 
 test('unknown parameters are ignored, and do not become keys', () => {
   const parsed = FS.parseQuery('?protein=beef&tag=soup&utm_source=newsletter');
-  assert.deepStrictEqual(parsed, { star: [], tag: ['soup'], mood: [], ing: [] });
+  assert.deepStrictEqual(parsed, { star: [], tag: ['soup'], mood: [], ing: [], out: [], yolo: [] });
 });
 
 test('a parameter with no value at all says nothing', () => {
-  assert.deepStrictEqual(FS.parseQuery('?tag&star=lamb'), { star: ['lamb'], tag: [], mood: [], ing: [] });
+  assert.deepStrictEqual(FS.parseQuery('?tag&star=lamb'), { star: ['lamb'], tag: [], mood: [], ing: [], out: [], yolo: [] });
 });
 
 test('empty values between commas are dropped, not returned as empty strings', () => {
@@ -129,11 +129,11 @@ test('parseShip reads one whole ?ship= value, the last one winning (#1412)', () 
   assert.strictEqual(FS.parseShip('?ship=meh&ship=who%20knows'), 'who knows');
   assert.strictEqual(FS.parseShip('?mood=sharp'), '');
   assert.strictEqual(FS.parseShip('?ship='), '');
-  assert.deepStrictEqual(FS.parseQuery('?ship=IOU'), { star: [], tag: [], mood: [], ing: [] });
+  assert.deepStrictEqual(FS.parseQuery('?ship=IOU'), { star: [], tag: [], mood: [], ing: [], out: [], yolo: [] });
 });
 
 test('parseName does not leak into parseQuery', () => {
-  assert.deepStrictEqual(FS.parseQuery('?q=negroni'), { star: [], tag: [], mood: [], ing: [] });
+  assert.deepStrictEqual(FS.parseQuery('?q=negroni'), { star: [], tag: [], mood: [], ing: [], out: [], yolo: [] });
 });
 
 // --- ?shortlist=, #1093 ---------------------------------------------------------
@@ -191,14 +191,15 @@ test('shortlistQuery leaves out what the parser would drop, and is empty for not
 });
 
 test('parseShortlist does not leak into parseQuery', () => {
-  assert.deepStrictEqual(FS.parseQuery('?shortlist=dal'), { star: [], tag: [], mood: [], ing: [] });
+  assert.deepStrictEqual(FS.parseQuery('?shortlist=dal'), { star: [], tag: [], mood: [], ing: [], out: [], yolo: [] });
 });
 
 test('KINDS is exported so filters.js and the tests agree on what exists', () => {
-  assert.deepStrictEqual(FS.KINDS, ['star', 'tag', 'mood', 'ing']);
+  assert.deepStrictEqual(FS.KINDS, ['star', 'tag', 'mood', 'ing', 'out', 'yolo']);
 });
 
-test('toQuery is deliberately absent until something writes the URL back', () => {
+test('the address bar is written by buildQuery alone, not a second writer (#1462 C3)', () => {
+  assert.strictEqual(typeof FS.buildQuery, 'function');
   assert.strictEqual(FS.toQuery, undefined);
 });
 
@@ -814,7 +815,7 @@ test('the two tables are genuinely different -- this is not one index twice', ()
 
 test('a mood parses like any other kind', () => {
   assert.deepStrictEqual(FS.parseQuery('?mood=sharp'),
-    { star: [], tag: [], mood: ['sharp'], ing: [] });
+    { star: [], tag: [], mood: ['sharp'], ing: [], out: [], yolo: [] });
 });
 
 test("a two-word mood survives Jekyll's url_encode, which spells a space as +", () => {
@@ -826,5 +827,44 @@ test("a two-word mood survives Jekyll's url_encode, which spells a space as +", 
 
 test('moods and food kinds do not collide in one query', () => {
   assert.deepStrictEqual(FS.parseQuery('?tag=soup&mood=sharp'),
-    { star: [], tag: ['soup'], mood: ['sharp'], ing: [] });
+    { star: [], tag: ['soup'], mood: ['sharp'], ing: [], out: [], yolo: [] });
+});
+
+
+// --- buildQuery: the address bar (#1462 C3) ----------------------------------
+
+test('buildQuery writes the kinds in the order given, values comma-joined', () => {
+  assert.strictEqual(
+    FS.buildQuery([['star', ['lamb']], ['tag', ['soup', 'make-ahead']], ['q', []]]),
+    'star=lamb&tag=soup,make-ahead');
+});
+
+test('buildQuery writes nothing for nothing chosen', () => {
+  assert.strictEqual(FS.buildQuery([['star', []], ['tag', []]]), '');
+  assert.strictEqual(FS.buildQuery([]), '');
+  assert.strictEqual(FS.buildQuery(undefined), '');
+});
+
+test('buildQuery round-trips through parseQuery, commas and spaces included', () => {
+  // A comma inside one value must not become two values on the way back.
+  const ing = ['chicken (all)', 'salt, flaky', 'oily fish'];
+  const out = ['peas'];
+  const q = FS.buildQuery([['ing', ing], ['out', out], ['yolo', ['chaos']]]);
+  const back = FS.parseQuery(q);
+  assert.deepStrictEqual(back.ing, ing);
+  assert.deepStrictEqual(back.out, out);
+  assert.deepStrictEqual(back.yolo, ['chaos']);
+});
+
+test('buildQuery round-trips a name with a comma through parseName', () => {
+  const q = FS.buildQuery([['q', ['Salt, Fat, Acid']]]);
+  assert.strictEqual(FS.parseName(q), 'Salt, Fat, Acid');
+});
+
+test('buildQuery round-trips a ship value through parseShip', () => {
+  assert.strictEqual(FS.parseShip(FS.buildQuery([['ship', ['IOU']]])), 'IOU');
+});
+
+test('buildQuery leaves out what parseQuery would drop, so it never writes a lie', () => {
+  assert.strictEqual(FS.buildQuery([['tag', ['-fakeaway', '  ', 'soup']]]), 'tag=soup');
 });

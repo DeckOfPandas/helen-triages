@@ -799,6 +799,36 @@
     var countNoun = FilterState.hasAnythingToClear(state) ? 'survivor' : 'drink';
     if (wordEl) wordEl.textContent = countNoun + (shown === 1 ? '' : 's');
     if (noneEl) noneEl.hidden = shown > 0;
+    syncAddressBar();
+  }
+
+  /* The address bar says what is chosen (#1462 C3), so a reload or a copied
+     link shows the same list; the arrival blocks below read it back. Off
+     until they have read the query the page arrived with, which an earlier
+     apply() would overwrite. A shared shortlist keeps the link it came by
+     until the reader leaves it. */
+  var addressBarLive = false;
+  var arrivedSharedSlugs = [];
+  function setList(set) {
+    var list = [];
+    set.forEach(function (v) { list.push(v); });
+    return list;
+  }
+  function syncAddressBar() {
+    if (!addressBarLive) return;
+    var FS = HTF.filterState;
+    if (state.shortlisted) {
+      FS.replaceQuery(sharedKeys ? FS.shortlistQuery(arrivedSharedSlugs) : 'shortlist=1');
+      return;
+    }
+    FS.replaceQuery(FS.buildQuery([
+      ['mood', setList(state.moods)],
+      ['yolo', state.chaos ? [state.chaos] : []],
+      ['ship', state.ship ? [state.ship] : []],
+      ['ing', setList(state.include)],
+      ['out', setList(state.exclude)],
+      ['q', [nameInput ? nameInput.value : '']]
+    ]));
   }
 
   /* --- mood and chaos ----------------------------------------------------- */
@@ -1194,12 +1224,8 @@
        hasAnythingToClear() does. */
     state = FilterState.emptyState();
     resetControls();
+    // apply() empties the address bar's query with the filters.
     apply();
-    /* The query a link arrived with is cleared too, or a reload puts the
-       filter straight back (#1454 C4). */
-    if (location.search && window.history && typeof history.replaceState === 'function') {
-      history.replaceState(null, '', location.pathname + location.hash);
-    }
   }
 
   clearAllButtons.forEach(function (btn) { btn.addEventListener('click', clearAll); });
@@ -1281,6 +1307,14 @@
     if (changed) syncMoodButtons();
   })();
 
+  /* Is `value` a "word (all)" button the pickers would offer? For a link's
+     family chip, which is in no pool. */
+  function offeredFamily(value) {
+    if (!CS.isFamilyValue(value)) return false;
+    var family = value.slice(0, -FAMILY_SUFFIX.length);
+    return Search.search(family, pool, []).familyButtons.indexOf(family) !== -1;
+  }
+
   /* `?ing=`, from the search box (#1050). Matched against the pool whole and
      case-folded, never as a substring, and added to `include`; dropped in
      silence otherwise. Its own block, because a page with no mood buttons
@@ -1294,12 +1328,38 @@
       pool.forEach(function (chip) {
         if (!hit && String(chip.value).trim().toLowerCase() === key) hit = chip;
       });
-      if (hit && !state.include.has(hit.value)) {
-        state.include.add(hit.value);
+      var value2 = hit ? hit.value : (offeredFamily(value) ? value : null);
+      if (value2 && !state.include.has(value2)) {
+        state.include.add(value2);
         added = true;
       }
     });
     if (added && redrawPool.include) redrawPool.include();
+  })();
+
+  /* `?out=` and `?yolo=` (#1462 C3), from the address bar. LEAVE OUT takes a
+     pool entry or a family the picker would offer, compared whole; YOLO? a
+     narrowing button's value, the last one winning. Anything else is
+     dropped in silence, as `?mood=` is. */
+  (function applyAddressBarQuery() {
+    var wanted = HTF.filterState.parseQuery(location.search);
+    var excluded = false;
+    wanted.out.forEach(function (value) {
+      var offered = offeredFamily(value) ||
+        pool.some(function (chip) { return chip.value === value; });
+      if (offered && !state.exclude.has(value)) {
+        state.exclude.add(value);
+        excluded = true;
+      }
+    });
+    if (excluded && redrawPool.exclude) redrawPool.exclude();
+
+    wanted.yolo.forEach(function (value) {
+      if (value !== 'open' && chaosBtns.some(function (b) { return b.dataset.chaos === value; })) {
+        state.chaos = value;
+      }
+    });
+    if (wanted.yolo.length) syncChaosButtons();
   })();
 
   /* `?shortlist=1` (#994) or `?shortlist=slug,slug` (#1093). It does exactly
@@ -1311,6 +1371,7 @@
     state = FilterState.enterShortlistView();
     resetControls();
     if (arrivedShortlist.slugs.length) {
+      arrivedSharedSlugs = arrivedShortlist.slugs;
       var resolvedShared = HTF.shortlist.resolveSlugs(arrivedShortlist.slugs,
         model.map(function (d) { return d.url || ''; }));
       sharedKeys = resolvedShared.keys;
@@ -1338,6 +1399,7 @@
     restored = null;
   }
 
+  addressBarLive = true;
   apply();
 
   /* After apply(): the page is not its real height until cards are hidden. */

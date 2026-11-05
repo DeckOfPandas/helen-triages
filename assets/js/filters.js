@@ -818,6 +818,35 @@ function renderResultsPool() {
     updateIngredientClear();
     renderExcludeActive();
     syncAriaPressed();
+    syncAddressBar();
+  }
+
+  /* The address bar says what is chosen (#1462 C3), so a reload or a copied
+     link shows the same list; arrival reads it back in applyQueryString.
+     Off until startup has read the query it arrived with, which every
+     update() before then would otherwise overwrite. A shared shortlist keeps
+     the link it came by until the reader leaves it. */
+  var addressBarLive = false;
+  var arrivedSharedSlugs = [];
+  function setList(set) {
+    var list = [];
+    set.forEach(function (v) { list.push(v); });
+    return list;
+  }
+  function syncAddressBar() {
+    if (!addressBarLive) return;
+    if (state.shortlisted) {
+      FilterState.replaceQuery(sharedKeys
+        ? FilterState.shortlistQuery(arrivedSharedSlugs) : 'shortlist=1');
+      return;
+    }
+    FilterState.replaceQuery(FilterState.buildQuery([
+      ['star', state.star ? [state.star] : []],
+      ['tag', setList(state.tags)],
+      ['ing', setList(state.includedIngredients)],
+      ['out', setList(state.excludedIngredients)],
+      ['q', [nameSearchBox ? nameSearchBox.value : '']]
+    ]));
   }
 
   function updateInlineLabels() {
@@ -972,12 +1001,8 @@ function renderResultsPool() {
       // Reshuffles only on this deliberate action, never on an incidental
       // return to zero filters, which would reorder the page under the reader.
       shuffleRecipeList();
+      // update() empties the address bar's query with the filters.
       update();
-      // The query a link arrived with is cleared too, or a reload puts the
-      // filter straight back (#1454 C4).
-      if (location.search && window.history && typeof history.replaceState === 'function') {
-        history.replaceState(null, '', location.pathname + location.hash);
-      }
     };
     clearButtons.forEach(function (btn) {
       btn.addEventListener('click', clearAllFilters);
@@ -1573,29 +1598,46 @@ function renderResultsPool() {
       if (isOffered('.btn-star', 'star', value)) state.star = value;
     });
 
-    /* `?ing=` (#1050), from the search-for-anything box. The text goes into
-       HAS TO HAVE and the pool is painted as a keystroke would paint it,
-       which chooses a unique result. With several, the button whose name IS
-       the word is clicked, so the choice takes the click handler's path. With
-       none, the pool stays for the reader to pick from. Last value wins. */
+    /* `?ing=` (#1050, #1462 C3), from the search-for-anything box or the
+       address bar. Each value in turn goes into HAS TO HAVE and the pool is
+       painted as a keystroke would paint it, which chooses a unique result.
+       With several, the button whose name IS the word is clicked, so the
+       choice takes the click handler's path. With none, the pool stays for
+       the reader to pick from, until the next value replaces the text. */
     if (wanted.ing.length && searchBox && resultsPool) {
-      var wantedIng = wanted.ing[wanted.ing.length - 1];
-      searchBox.value = wantedIng;
-      renderResultsPool();
-      var wantedKey = fold(wantedIng.trim().toLowerCase());
-      var exact = null;
-      resultsPool.querySelectorAll('.btn-ingredient').forEach(function (btn) {
-        if (exact) return;
-        var byKey = fold(String(btn.dataset.ingredient || '').toLowerCase()) === wantedKey;
-        var byLabel = fold(String(btn.textContent || '').replace(' (all)', '').trim().toLowerCase()) === wantedKey;
-        if (byKey || byLabel) exact = btn;
+      wanted.ing.forEach(function (wantedIng) {
+        // A family chip is searched by its word: "(all)" is the button's, not
+        // the reader's.
+        searchBox.value = FilterState.isFamilyValue(wantedIng)
+          ? FilterState.familyKey(wantedIng) : wantedIng;
+        renderResultsPool();
+        var wantedKey = fold(wantedIng.trim().toLowerCase());
+        var buttons = Array.prototype.slice.call(resultsPool.querySelectorAll('.btn-ingredient'));
+        // The button's own key first, so "garlic (all)" is never taken for
+        // a bare "garlic" whose label reads the same.
+        var exact = buttons.filter(function (btn) {
+          return fold(String(btn.dataset.ingredient || '').toLowerCase()) === wantedKey;
+        })[0] || buttons.filter(function (btn) {
+          return fold(String(btn.textContent || '').replace(' (all)', '').trim().toLowerCase()) === wantedKey;
+        })[0] || null;
+        // Not when auto-select already chose it: a click on an active button
+        // removes it (#1092).
+        if (exact && !exact.classList.contains('active') && typeof exact.click === 'function') {
+          exact.click();
+        }
       });
-      // Not when auto-select already chose it: a click on an active button
-      // removes it (#1092).
-      if (exact && !exact.classList.contains('active') && typeof exact.click === 'function') {
-        exact.click();
-      }
     }
+
+    /* `?out=` (#1462 C3): LEAVE OUT, an entry the picker offers or a family
+       it would offer, compared whole. Anything else is dropped. */
+    wanted.out.forEach(function (value) {
+      var offered = excludeMasterList.indexOf(value) !== -1;
+      if (!offered && FilterState.isFamilyValue(value)) {
+        var key = FilterState.familyKey(value);
+        offered = IS.search(key, excludeMasterList).familyButtons.indexOf(fold(key.toLowerCase())) !== -1;
+      }
+      if (offered) state.excludedIngredients.add(value);
+    });
   })();
 
   // A fresh load starts shuffled, filtered or not, so no recipe is stuck at
@@ -1616,6 +1658,7 @@ function renderResultsPool() {
     resetFilterControls();
     restored = null;
     if (arrivedShortlist.slugs.length) {
+      arrivedSharedSlugs = arrivedShortlist.slugs;
       var resolvedShared = HTF.shortlist.resolveSlugs(arrivedShortlist.slugs,
         items.map(function (li) { return li.dataset.url || ''; }));
       sharedKeys = resolvedShared.keys;
@@ -1634,6 +1677,7 @@ function renderResultsPool() {
     restored = null;
   }
 
+  addressBarLive = true;
   update(!!restored);          // preserve the restored page number
   if (recipeList) recipeList.style.visibility = 'visible';
 
