@@ -1523,6 +1523,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `_sass/food/_recipe-scale.scss`, the formula
   `_sass/cocktails/_cocktail.scss` uses. The wider box on a `makes:` recipe
   (five characters, #1286) is a session's value and nobody has ruled on it.
+- **2026-11-03, #1462 D2 — the shopping list totals imperial measures in
+  metric.** Asked about ounces and cups on the list (36 lines, 14 recipes),
+  Helen: *"Convert to metric for the shopping list please."* Ounces and pounds
+  become grams, fluid ounces, pints and cups millilitres, inches centimetres.
+  The recipe page keeps the unit the recipe was written in.
+- **2026-11-03, #1462 D3 — how full a spoon is does not split a row, and a can
+  is a tin.** Helen: *"Yes ignore rounded, heaped etc. Cans and tins are one
+  word (tins)."* So `heaped tbsp` totals with `tbsp`; "400 g can" is one
+  400 g tin and totals with "2 x 400 g tins".
+- **2026-11-03, #1462 C5 — under ⅛ tsp is "a pinch".** Asked between "a
+  pinch", "<⅛ tsp" and the decimal, Helen: *"Yes"* to the pinch. It applies
+  wherever a food amount is printed scaled, the recipe page and the list.
 
 ### §8.3 The shortlist is a view, not a facet — #918, 2026-09-10
 

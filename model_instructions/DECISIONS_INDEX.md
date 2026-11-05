@@ -233,6 +233,9 @@ argument and the rules each field is read by.
 - 2026-10-30 · §8.2 · the shopping list quotes a yield's figure, never Helen's words after it; a measure after a count scales with it.
 - 2026-10-29 · §8.2 · a batch halves — Helen, on six "1 batch" recipes losing their ½: "Yes, half a batch is fine".
 - 2026-09-07 · §8.2 · #1118 · Undated, #1118 — the food scaler's box is as wide as the drink scaler's: two characters and the caret.
+- 2026-11-03 · §8.2 · #1462 · D2 — the shopping list totals imperial measures in metric.
+- 2026-11-03 · §8.2 · #1462 · D3 — how full a spoon is does not split a row, and a can is a tin.
+- 2026-11-03 · §8.2 · #1462 · C5 — under ⅛ tsp is "a pinch" — Asked between "a pinch", "<⅛ tsp" and the decimal, Helen: "Yes" to the pinch.
 - 2026-09-10 · §8.3 · #918 · shortlisted is a view, not a filter: it never combines with another filter.
 - 2026-09-15 · §8.3 · #1093 · a shortlist link is shown, not saved, and "keep these" makes it yours.
 - 2026-10-11 · §8.3 · opening a sent shortlist link shows the index with the shopping list open.

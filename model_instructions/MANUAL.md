@@ -1412,14 +1412,26 @@ recipe's scale: portions wanted over portions made, or the batch count.
   `tomato`, `cherries` and `cherry`, stay two rows). The key is never shown;
   the label is the first spelling seen. Rows are alphabetical by folded name
   within an aisle.
-- **Units.** Grams and millilitres are the only units totalled in; `kg`, `l`,
-  `litre` and `cl` fold into them and a total of a thousand or more is shown
-  in the bigger unit. Nothing else is converted: two units of one ingredient
-  print as `2 sprigs + 10 g`.
+- **Units.** Grams and millilitres are the units totalled in; `kg`, `l`,
+  `litre` and `cl` fold into them (`CANONICAL`) and a total of a thousand or
+  more is shown in the bigger unit. On the shopping list only, imperial
+  measures fold too (`METRIC`, DECISIONS §8.2): `oz` and `lb` to grams,
+  `fl oz`, `pint` (British, 568 ml) and `cup` (American, 240 ml) to
+  millilitres, `inch` to centimetres. The recipe page shares `CANONICAL`,
+  never `METRIC`, so a recipe keeps the unit it was written in. Spoons, counts
+  and measures by eye are never converted: two units of one ingredient print
+  as `2 sprigs + 10 g`.
+- **One spelling per unit on the list** (`shoppingUnit`): a spoon's fullness
+  goes (`heaped`, `level`, `rounded`, `slightly rounded`, `good`, `generous`
+  or `large` before `tsp` or `tbsp`), `can` is `tin`, and `×` is `x`. A pack
+  written by its weight, "400 g can", is counted as one `x 400 g tin`, so it
+  totals with "2 x 400 g tins" and the costing reads its size; "250 g per
+  person", two words after the weight, stays a weight.
 - **Precision.** Nothing is rounded coarser than a gram: two thirds of 200 g
   is 133 g. A sub-gram total keeps a decimal and is never `0 g`. Spoons and
   counts keep cook's fractions (`⅔ tsp`, `3⅓`), which is notation, not
-  rounding: ⅔ prints only for exactly two thirds.
+  rounding: ⅔ prints only for exactly two thirds. Under ⅛ tsp is "a pinch",
+  on the recipe page and the list alike (`totalText`).
 - **Ranges, tildes, brackets.** Both ends of `30–50 g` scale; `~` is kept; a
   bracket that restates the quantity scales with it (`1 tbsp (6 g)`).
 - **A line with no amount is counted, not summed**: `×3`, or `some (×2)`.
