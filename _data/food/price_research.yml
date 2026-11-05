@@ -1,0 +1,4763 @@
+# The shop prices behind every researched row of costs.yml (#1458, MANUAL
+# §8.2). A costs.yml unit written as a food's name here, `kg: "goose"`, is
+# priced from that food's list in that unit at build: the middle 50% of 6+
+# prices (inclusive quartiles), the whole range of 3-5, both of 2, the one
+# price twice. Confidence: high for 4+ prices with the dearest at most twice
+# the cheapest, medium for 2+, low for one price or a row marked `thin`.
+#
+# Each price is "GBP-per-unit shop and pack". Shelf prices, never offers; FD
+# is Farm Direct. Add, correct or remove a price and move `checked`; costs.yml
+# follows on the next build. `scripts/food_price_table.py` writes the table.
+
+checked: "2026-11-03"
+
+foods:
+  # --- meat, poultry and game ------------------------------------------------
+  beef fillet (steak):
+    kg:
+      - 44.12 Tesco
+      - 50.00 Tesco Finest
+      - 66.67 Tesco Finest 14-day
+      - 52.94 Co-op
+      - 55.82 Asda Exceptional
+      - 39.94 Aldi
+      - 82.50 Waitrose No.1
+      - 60.97 FD
+      - 69.26 FD Red Poll
+  beef fillet (whole):
+    kg:
+      - 55.00 Knightwick
+      - 54.44 Booths
+      - 45.45 Costco
+  sirloin steak:
+    kg:
+      - 26.43 Tesco
+      - 33.04 Tesco Finest
+      - 26.67 Sainsbury's
+      - 33.33 Sainsbury's TTD
+      - 32.38 Morrisons
+      - 23.03 Aldi 21-day
+      - 27.71 Aldi 30-day
+      - 60.87 Waitrose No.1
+      - 35.81 FD
+      - 46.15 FD Red Poll
+  ribeye steak:
+    kg:
+      - 28.63 Tesco
+      - 35.24 Tesco Finest
+      - 28.89 Sainsbury's
+      - 35.96 Sainsbury's TTD
+      - 34.00 Morrisons
+      - 25.08 Aldi 21-day
+      - 30.79 Aldi 30-day
+      - 40.00 Waitrose
+      - 49.16 FD
+      - 61.55 FD Red Poll
+  beef, diced / stewing / braising:
+    kg:
+      - 12.50 Tesco
+      - 13.33 Tesco lean
+      - 12.50 Sainsbury's
+      - 12.78 Asda
+      - 12.79 Morrisons
+      - 16.00 Morrisons braising
+      - 11.23 Aldi
+      - 11.11 Aldi braising
+      - 18.50 Tesco Finest
+      - 14.90 FD braising
+      - 14.00 FD stewing
+  beef mince 5%:
+    kg:
+      - 10.10 Tesco
+      - 11.00 Sainsbury's
+      - 10.10 Morrisons
+      - 10.10 Aldi
+      - 13.04 Asda Exceptional
+      - 13.00 Sainsbury's TTD
+  beef mince 10–12%:
+    kg:
+      - 12.00 Waitrose
+      - 12.00 Sainsbury's TTD
+      - 6.60 Morrisons Scotch
+      - 5.91 Morrisons
+      - 9.67 Iceland
+      - 8.78 Aldi 10%
+  beef mince 20%:
+    kg:
+      - 6.50 Tesco
+      - 7.00 Sainsbury's
+      - 6.50 Morrisons
+      - 6.50 Aldi
+      - 6.67 Iceland
+  beef mince, butcher (fat not stated):
+    kg:
+      - 14.00 FD
+      - 18.00 FD steak mince
+      - 17.70 FD Red Poll
+  beef short ribs:
+    kg:
+      - 18.20 Tesco Finest
+      - 15.60 Waitrose
+      - 15.96 FD
+      - 16.92 FD Red Poll
+      - 16.79 Thorners
+      - 13.80 Darts Farm
+  oxtail:
+    kg:
+      - 11.00 Morrisons
+      - 14.99 Truebites
+      - 19.99 Eversfield organic
+      - 9.00 Allens of Mayfair
+      - 18.50 FD
+  leg of lamb:
+    kg:
+      - 16.70 Tesco
+      - 17.00 Tesco half leg
+      - 10.00 Sainsbury's NZ
+      - 12.00 Morrisons
+      - 13.99 Morrisons joint
+      - 14.00 Asda half leg
+      - 25.19 Waitrose boneless
+      - 19.50 FD
+  lamb shoulder:
+    kg:
+      - 14.90 Tesco
+      - 15.00 Tesco half
+      - 14.00 Morrisons
+      - 18.32 Waitrose half
+      - 19.20 FD on the bone
+      - 21.21 FD whole
+  lamb mince:
+    kg:
+      - 13.00 Tesco
+      - 14.00 Sainsbury's
+      - 12.84 Asda
+      - 11.98 Aldi
+      - 11.00 Morrisons
+      - 16.00 FD
+  mutton:
+    kg:
+      - 15.50 Booths shoulder
+      - 16.61 Booths leg
+      - 15.55 FD shoulder
+      - 16.05 FD leg
+      - 21.87 FD diced
+      - 19.00 Grid Iron
+      - 10.62 Eurofoods shoulder
+      - 11.39 Eurofoods leg
+      - 12.99 Kingsley
+  pork shoulder:
+    kg:
+      - 5.00 Tesco
+      - 6.00 Morrisons boneless
+      - 5.25 Morrisons
+      - 3.79 Aldi
+      - 4.97 Asda
+      - 13.80 FD
+  pork loin:
+    kg:
+      - 8.00 Tesco
+      - 7.50 Morrisons
+      - 8.00 Morrisons Market Street
+      - 5.59 Aldi
+      - 15.00 FD
+  pork belly:
+    kg:
+      - 9.00 Tesco slices
+      - 9.30 Sainsbury's
+      - 13.00 Waitrose free range
+      - 7.50 Morrisons joint
+      - 6.65 Aldi joint
+      - 6.78 Aldi slices
+      - 11.00 Tesco Finest
+      - 13.80 FD slices
+  pork mince:
+    kg:
+      - 4.78 Tesco 5%
+      - 4.60 Tesco 20%
+      - 4.98 Sainsbury's 5%
+      - 4.90 Sainsbury's 20%
+      - 4.94 Asda
+      - 5.12 Morrisons
+      - 4.30 Aldi
+      - 6.00 Waitrose free range
+      - 11.40 FD
+  smoked back bacon, standard:
+    kg:
+      - 4.97 Tesco
+      - 4.97 Sainsbury's
+      - 4.34 Aldi Essentials
+      - 4.97 Aldi Oakhurst
+      - 5.30 Asda
+      - 7.08 Morrisons
+  back bacon, dry-cured / premium:
+    kg:
+      - 16.67 Tesco Finest
+      - 10.38 Aldi Specially Selected
+      - 16.25 Morrisons The Best
+      - 18.75 Denhay
+      - 17.66 Spoiltpig
+      - 20.50 FD Old Spot smoked
+      - 19.17 FD Old Spot
+      - 30.25 FD dry-cured smoked
+  back bacon, standard:
+    note: each is one rasher
+    each:
+      - 0.15 Aldi
+      - 0.17 Asda
+      - 0.21 Morrisons
+      - 0.20 Iceland
+  back bacon, premium:
+    note: each is one rasher
+    each:
+      - 0.50 Tesco Finest
+      - 0.31 Aldi Specially Selected
+      - 0.41 Morrisons The Best
+  streaky bacon, standard:
+    kg:
+      - 7.63 Tesco
+      - 7.63 Sainsbury's
+      - 7.60 Morrisons
+      - 7.63 Aldi Oakhurst
+      - 9.57 Iceland
+      - 4.34 Aldi Essentials
+  streaky bacon, dry-cured / premium:
+    kg:
+      - 16.67 Tesco Finest
+      - 17.00 Waitrose
+      - 9.95 Aldi Specially Selected
+      - 15.48 Morrisons The Best
+      - 18.15 Asda Exceptional
+      - 16.08 FD Old Spot
+      - 17.46 FD Old Spot smoked
+  pancetta cubes:
+    kg:
+      - 14.25 Sainsbury's
+      - 24.62 Waitrose
+      - 15.71 Morrisons
+      - 17.86 Morrisons unsmoked
+      - 15.25 Asda
+  pancetta, sliced:
+    kg:
+      - 78.00 FD (75 g £5.85)
+      - 83.33 FD (60 g £5.00)
+  cooking chorizo:
+    kg:
+      - 14.47 Sainsbury's
+      - 13.50 Tesco
+      - 15.00 Morrisons
+      - 18.42 Waitrose
+      - 9.45 Aldi ring
+      - 32.50 FD cured spicy chorizo
+  parma ham / prosciutto:
+    note: each is one slice
+    kg:
+      - 37.50 Sainsbury's
+      - 38.46 Tesco Finest
+      - 72.22 Waitrose No.1
+      - 40.50 Asda Exceptional
+      - 23.63 Aldi
+      - 50.00 Morrisons The Best
+      - 83.33 FD British air-dried
+      - 97.50 FD Monmouthshire
+    each:
+      - 0.50 Sainsbury's
+      - 0.63 Waitrose
+      - 0.21 Aldi
+  gammon joint:
+    kg:
+      - 7.00 Tesco
+      - 6.52 Sainsbury's
+      - 7.33 Iceland
+      - 7.33 Morrisons
+      - 5.19 Aldi
+      - 11.67 Tesco Finest dry-cured
+      - 15.11 Waitrose No.1
+      - 18.00 FD
+      - 19.65 FD oak smoked
+  sliced cooked ham:
+    kg:
+      - 11.33 Sainsbury's 16 slices
+      - 16.67 Sainsbury's 6 slices
+      - 19.17 Tesco
+      - 8.75 Morrisons 400 g
+      - 10.00 Morrisons 125 g
+      - 11.11 Iceland
+      - 40.00 FD traditional
+  sausages, standard:
+    kg:
+      - 3.94 Aldi
+      - 3.94 Morrisons
+      - 5.61 Richmond 8
+      - 5.37 Richmond 12
+    each:
+      - 0.22 Aldi
+      - 0.22 Morrisons
+      - 0.29 Richmond 8
+      - 0.28 Richmond 12
+  sausages, premium:
+    kg:
+      - 8.25 Sainsbury's TTD
+      - 8.13 Morrisons The Best
+      - 5.73 Aldi Specially Selected
+      - 8.13 Heck
+      - 9.38 Jolly Hog
+      - 8.75 Black Farmer
+      - 12.95 FD handmade
+    each:
+      - 0.55 Sainsbury's TTD
+      - 0.54 Morrisons The Best
+      - 0.38 Aldi
+      - 0.54 Heck
+      - 0.63 Jolly Hog
+      - 0.58 Black Farmer
+  whole chicken:
+    kg:
+      - 2.54 Aldi large
+      - 2.68 Aldi medium
+      - 3.24 Morrisons
+      - 3.03 Tesco
+      - 3.44 Sainsbury's
+      - 3.86 Waitrose
+      - 9.00 FD free range
+  chicken breast:
+    kg:
+      - 6.69 Aldi
+      - 6.99 Morrisons
+      - 7.63 Tesco 300 g
+      - 6.84 Tesco 950 g
+      - 7.22 Sainsbury's
+      - 6.15 Sainsbury's 2 kg
+      - 17.79 FD free range
+    each:
+      - 1.15 Tesco
+      - 1.25 Morrisons
+      - 1.73 Sainsbury's
+      - 4.98 FD free range (280 g)
+  chicken thighs, bone-in:
+    kg:
+      - 2.95 Tesco
+      - 2.99 Aldi
+      - 3.40 Morrisons
+      - 2.88 Sainsbury's
+      - 3.50 Waitrose
+      - 10.37 FD free range
+  chicken thighs, boneless:
+    kg:
+      - 5.99 Aldi 900 g
+      - 7.32 Aldi 600 g
+      - 7.25 Morrisons 1 kg
+      - 9.58 Morrisons 600 g
+      - 7.10 Tesco
+      - 10.67 FD free range skinless
+  chicken legs:
+    kg:
+      - 2.25 Tesco
+      - 2.25 Sainsbury's
+      - 2.25 Aldi
+      - 2.70 Morrisons
+      - 4.25 Iceland
+      - 9.00 FD leg quarter
+  whole duck:
+    kg:
+      - 5.29 Morrisons Gressingham
+      - 5.31 Gressingham
+      - 5.56 Gressingham frozen
+      - 12.00 FD free range
+    each:
+      - 9.00 Morrisons 1.7 kg
+      - 9.55 Gressingham 1.8 kg
+      - 10.00 Gressingham frozen
+      - 10.61 Gressingham
+      - 36.00 FD free range 3 kg
+  duck breast:
+    kg:
+      - 25.00 Morrisons fillets
+      - 20.00 Morrisons portions
+      - 22.67 Sainsbury's
+      - 30.88 Gressingham
+      - 22.47 Gressingham Easy
+      - 14.60 Aldi
+      - 27.00 FD free range
+    each:
+      - 4.50 Sainsbury's
+      - 5.25 Gressingham
+      - 2.19 Aldi 150 g
+  duck legs:
+    kg:
+      - 10.20 Aldi
+      - 10.39 Morrisons
+      - 10.00 Sainsbury's
+    each:
+      - 2.40 Sainsbury's
+      - 2.40 Morrisons
+      - 2.25 Aldi
+  goose:
+    kg:
+      - 14.00 Tesco Finest
+      - 18.00 Waitrose No.1
+      - 18.60 Waitrose traditional
+      - 14.00 Waitrose Gressingham
+      - 22.70 Field & Flower
+      - 22.79 FD Suffolk
+  whole turkey, standard:
+    kg:
+      - 5.00 Tesco
+      - 5.05 Sainsbury's
+      - 5.24 Morrisons frozen
+      - 3.00 Morrisons fresh
+  whole turkey, bronze / free range:
+    kg:
+      - 11.00 Tesco Finest
+      - 8.50 Morrisons The Best
+      - 9.30 Sainsbury's TTD
+      - 17.41 FD bronze
+      - 16.59 FD white
+  turkey breast joint / crown:
+    kg:
+      - 15.38 Tesco
+      - 15.00 Sainsbury's
+      - 20.00 Morrisons large
+      - 17.86 Morrisons butter
+      - 26.35 FD bronze crown
+  venison, diced:
+    kg:
+      - 15.83 Highland Game
+      - 12.78 Costco
+      - 12.00 Cranborne
+      - 31.00 Riverford organic
+      - 20.00 Farm Butchers
+      - 13.78 FD wild
+  venison steaks:
+    kg:
+      - 30.00 Highland Game
+      - 39.26 Waitrose
+      - 35.00 Waitrose No.1
+      - 27.62 FD wild haunch steak
+  venison haunch:
+    kg:
+      - 13.85 Tesco Finest
+      - 30.93 Ocado Hampshire Game
+      - 32.74 Carmichael
+      - 25.00 Darts Farm
+      - 27.10 Field & Flower
+      - 14.00 Cranborne
+      - 19.50 FD muntjac boned
+      - 14.00 FD muntjac bone-in
+
+  # --- fish and seafood ------------------------------------------------------
+  cod fillets:
+    kg:
+      - 20.83 Tesco
+      - 27.86 Tesco boneless
+      - 21.53 Sainsbury's
+      - 25.00 Asda
+      - 19.79 Waitrose
+      - 20.00 M&S
+      - 33.43 FD
+  cod loins:
+    kg:
+      - 28.93 Tesco Finest
+      - 16.67 Tesco Finest 2-pack
+      - 16.50 Tesco
+      - 25.00 M&S
+      - 31.15 Sainsbury's TTD
+      - 32.33 Fish Society
+  haddock fillets:
+    kg:
+      - 20.89 Tesco
+      - 19.23 Sainsbury's
+      - 18.75 Asda
+      - 26.25 FD
+      - 25.00 FD portion
+  smoked haddock:
+    kg:
+      - 20.83 Tesco
+      - 20.89 Tesco boneless
+      - 21.53 Sainsbury's
+      - 28.96 Sainsbury's MSC
+      - 31.04 Waitrose
+      - 24.00 FD line-caught
+  hake fillets:
+    kg:
+      - 18.33 Tesco
+      - 18.33 Asda
+      - 15.80 Sainsbury's
+      - 27.50 Waitrose
+  white fish, frozen (pollock / hake):
+    thin: true
+    kg:
+      - 4.52 Tesco pollock
+      - 4.23 Tesco value
+      - 10.00 Tesco hake
+  salmon fillets:
+    kg:
+      - 16.21 Aldi
+      - 15.98 Lidl
+      - 20.63 Sainsbury's
+      - 19.81 Tesco
+      - 25.00 Tesco Scottish
+      - 22.31 Waitrose
+      - 23.44 M&S
+      - 31.80 FD Scottish
+      - 37.73 FD Scottish
+  salmon fillet:
+    each:
+      - 1.95 Aldi
+      - 2.00 Lidl
+      - 2.48 Sainsbury's
+      - 2.58 Tesco
+      - 3.25 Tesco Scottish
+      - 2.90 Waitrose
+      - 2.81 M&S
+      - 4.77 FD 150 g
+  smoked salmon, sliced:
+    kg:
+      - 30.90 Aldi
+      - 32.90 Lidl
+      - 37.50 Tesco
+      - 40.00 Tesco Finest
+      - 37.50 Sainsbury's
+      - 57.50 M&S
+      - 48.50 FD
+      - 84.70 FD hand-sliced Scottish
+  mackerel fillets:
+    kg:
+      - 24.69 Tesco
+      - 21.94 Sainsbury's
+      - 18.00 Waitrose
+      - 28.00 FD
+  smoked mackerel:
+    kg:
+      - 16.45 Aldi
+      - 22.00 Tesco
+      - 25.00 Tesco peppered
+      - 26.79 Sainsbury's
+      - 20.45 Asda
+      - 23.41 FD
+  tuna steaks:
+    kg:
+      - 15.69 Asda
+      - 20.83 Tesco Finest
+      - 23.95 Aldi
+      - 23.95 Sainsbury's
+      - 26.38 Sainsbury's TTD
+      - 32.50 Waitrose
+  tinned tuna (drained):
+    kg:
+      - 6.37 Tesco
+      - 5.39 Stockwell
+      - 6.10 Tesco in oil
+      - 10.42 Princes
+      - 11.03 John West
+  raw king prawns:
+    kg:
+      - 21.21 Tesco
+      - 18.12 Sainsbury's
+      - 19.19 Asda
+      - 31.82 Waitrose
+      - 23.75 Tesco Finest
+  cooked prawns:
+    kg:
+      - 16.67 Tesco
+      - 13.27 Seachill
+      - 16.60 Aldi
+      - 18.34 Waitrose
+      - 25.00 Sainsbury's
+      - 23.78 Tesco Finest
+  mussels, live:
+    kg:
+      - 4.00 Asda
+      - 4.20 Tesco Finest
+      - 4.99 Waitrose
+      - 6.99 FD
+  anchovy fillets in oil (gross tin):
+    kg:
+      - 13.80 Aldi
+      - 16.80 Asda
+      - 29.00 Sainsbury's
+      - 33.00 Tesco Finest
+      - 35.00 Waitrose No.1
+      - 29.90 FD
+      - 65.79 FD organic
+  king scallops:
+    kg:
+      - 50.00 Sainsbury's
+      - 58.33 Tesco Finest
+      - 56.00 M&S
+      - 44.00 Waitrose No.1
+  king scallop:
+    each:
+      - 1.00 Tesco
+      - 2.92 Fish Society
+      - 2.35 Fine Food Specialist
+      - 2.08 Sainsbury's
+      - 5.99 FD hand-dived Cornish
+  white crab meat:
+    kg:
+      - 72.00 Tesco
+      - 77.00 Waitrose
+      - 75.00 Sainsbury's
+  brown crab meat:
+    kg:
+      - 32.50 Waitrose
+      - 33.00 Seafood & Eat It
+  sea bass fillets:
+    kg:
+      - 31.94 Tesco
+      - 33.06 Sainsbury's
+      - 31.94 Asda
+      - 30.56 Morrisons
+  sea bass fillet:
+    each:
+      - 2.88 Tesco
+      - 2.98 Sainsbury's
+      - 2.88 Asda
+      - 2.75 Morrisons
+  monkfish tail:
+    kg:
+      - 34.65 Tesco Finest
+      - 42.29 Waitrose
+      - 49.10 Waitrose No.1
+      - 31.87 FD tail
+      - 34.00 FD fillet
+  trout fillets:
+    kg:
+      - 16.63 Aldi
+      - 16.67 Sainsbury's
+      - 24.79 Sainsbury's TTD
+      - 23.85 Tesco Finest
+      - 27.36 Waitrose
+  hot-smoked trout:
+    kg:
+      - 29.76 Waitrose
+      - 43.44 Waitrose Scottish
+      - 30.88 Tesco
+      - 32.35 Sainsbury's
+      - 27.94 Sainsbury's own
+      - 36.90 FD
+  squid, prepared:
+    kg:
+      - 17.00 Tesco rings
+      - 16.00 Sainsbury's rings
+      - 24.00 Waitrose rings
+      - 34.25 FD handline
+      - 25.00 FD net-caught
+  squid, whole uncleaned:
+    kg:
+      - 18.99 Ocean Catch
+      - 20.00 Fish Glorious Fish
+      - 27.95 Cornish Fishmonger
+  clams, live:
+    kg:
+      - 12.00 Waitrose
+      - 27.95 Fine Food Specialist
+      - 18.00 Dorset Shellfish
+      - 26.75 Cornish Fishmonger
+      - 18.00 FD palourde
+  cockles, live:
+    kg:
+      - 15.95 Trident
+      - 10.99 FD
+  potted brown shrimp:
+    kg:
+      - 60.00 Waitrose
+      - 84.00 Morrisons
+      - 93.33 Booths
+      - 120.54 Regal Fish
+      - 135.00 Rockfish
+  peeled brown shrimp:
+    thin: true
+    kg:
+      - 70.71 Waitrose
+      - 64.29 Waitrose
+
+  # --- chocolate -------------------------------------------------------------
+  dark chocolate 70%, eating:
+    kg:
+      - 15.00 Tesco Finest
+      - 38.89 Green & Black's
+      - 35.00 Lindt Tesco
+      - 34.80 Lindt Asda
+      - 35.00 Lindt Sainsbury's
+  dark cooking chocolate:
+    kg:
+      - 12.33 Tesco
+      - 12.25 Sainsbury's
+      - 10.00 Tesco bar
+      - 23.33 Green & Black's
+      - 23.00 Dr Oetker
+      - 28.75 Lindt
+  milk chocolate:
+    kg:
+      - 12.33 Tesco cooking
+      - 10.00 Tesco bar
+      - 15.28 Cadbury 180 g
+      - 13.58 Cadbury 95 g
+      - 24.00 Sainsbury's Belgian
+  white chocolate:
+    kg:
+      - 12.00 Tesco cooking
+      - 10.00 Tesco bar
+      - 12.25 Sainsbury's
+      - 19.44 Waitrose
+      - 15.00 Milkybar
+      - 25.00 Dr Oetker
+  dark chocolate chips:
+    kg:
+      - 11.90 Tesco
+      - 12.50 Sainsbury's
+      - 20.00 Waitrose
+      - 23.75 Menier
+      - 27.50 Dr Oetker
+  cocoa powder:
+    kg:
+      - 17.80 Bournville Tesco
+      - 14.60 Bournville Morrisons
+      - 14.80 Bournville Ocado
+      - 11.96 Tesco
+      - 27.20 Green & Black's
+
+  # --- cheese ----------------------------------------------------------------
+  parmesan (Parmigiano Reggiano):
+    kg:
+      - 20.00 Tesco
+      - 20.75 Sainsbury's
+      - 24.75 Sainsbury's TTD
+      - 26.00 Waitrose
+      - 22.50 Tesco Finest
+      - 22.50 M&S
+  grana padano:
+    kg:
+      - 16.50 Sainsbury's
+      - 16.06 Asda
+      - 14.23 Tesco
+      - 17.50 Ocado
+  pecorino romano:
+    kg:
+      - 23.53 Sainsbury's
+      - 23.53 Tesco
+      - 26.00 Waitrose
+  gruyère:
+    kg:
+      - 23.85 Tesco
+      - 23.75 Sainsbury's TTD
+      - 26.75 Waitrose
+  comté:
+    kg:
+      - 21.94 Tesco
+      - 21.94 Sainsbury's TTD
+      - 17.60 Asda
+      - 25.00 Waitrose
+      - 28.75 Ocado
+      - 24.00 Co-op
+  emmental / swiss:
+    kg:
+      - 11.40 Sainsbury's
+      - 12.00 Waitrose
+      - 11.40 Tesco
+      - 11.00 Morrisons
+  mature cheddar, budget:
+    kg:
+      - 6.23 Aldi
+      - 6.23 Tesco
+      - 8.00 Sainsbury's
+      - 6.64 Asda
+      - 10.45 FD
+  cheddar, premium supermarket:
+    kg:
+      - 17.50 Waitrose vintage
+      - 13.10 Waitrose extra mature
+      - 13.33 Davidstow
+      - 24.60 FD extra mature
+  farmhouse cheddar (Montgomery's, Westcombe):
+    kg:
+      - 38.00 Paxton & Whitfield
+      - 39.67 Ocado
+      - 24.00 Farm Direct 2 kg
+      - 27.67 FD Montgomery's
+      - 27.70 FD Westcombe
+  cornish kern:
+    kg:
+      - 32.30 FD
+  stilton:
+    kg:
+      - 13.41 Tesco
+      - 13.41 Sainsbury's
+      - 11.88 Sainsbury's 400 g
+      - 22.22 Tesco Finest
+      - 21.25 Waitrose Cropwell Bishop
+      - 28.60 FD Colston Bassett
+      - 31.15 FD Cropwell Bishop
+  gorgonzola:
+    kg:
+      - 18.50 Sainsbury's TTD
+      - 18.75 Waitrose
+      - 23.33 Tesco Finest
+  roquefort:
+    kg:
+      - 28.00 Tesco
+      - 30.00 Tesco Finest
+      - 31.00 Waitrose No.1
+      - 27.50 Waitrose
+      - 30.00 Morrisons
+      - 25.70 Asda
+  goat's cheese, soft:
+    kg:
+      - 20.40 Tesco
+      - 20.40 Sainsbury's
+      - 20.32 Asda
+      - 22.00 Waitrose
+      - 32.50 FD plain
+  feta:
+    kg:
+      - 8.45 Aldi
+      - 10.75 Tesco
+      - 11.25 Sainsbury's
+      - 10.50 Waitrose
+  halloumi:
+    kg:
+      - 8.84 Tesco
+      - 8.84 Sainsbury's
+      - 8.76 Asda
+      - 30.33 FD
+  mozzarella:
+    kg:
+      - 10.33 Sainsbury's
+      - 6.50 Tesco
+      - 4.44 Asda
+      - 15.52 Galbani
+      - 3.29 Tesco Creamfields
+      - 15.40 FD nodino
+  buffalo mozzarella:
+    kg:
+      - 20.00 Sainsbury's TTD
+      - 24.00 Waitrose No.1
+      - 12.50 Tesco Finest
+      - 10.69 Waitrose 290 g
+  burrata:
+    kg:
+      - 23.33 Galbani Tesco
+      - 21.33 Sainsbury's TTD
+      - 22.67 Waitrose No.1
+      - 12.60 Tesco Finest
+      - 27.13 FD 400 g
+      - 29.52 FD baby
+    each:
+      - 3.50 Galbani Tesco
+      - 3.20 Sainsbury's TTD
+      - 3.40 Waitrose No.1
+      - 3.15 Tesco Finest
+      - 3.69 FD baby 125 g
+  taleggio:
+    kg:
+      - 22.00 Waitrose
+      - 20.00 Sainsbury's TTD
+  camembert:
+    kg:
+      - 11.20 Tesco
+      - 10.00 Sainsbury's
+      - 9.00 Président Morrisons
+      - 9.28 Président Waitrose
+      - 13.00 Tesco Finest
+      - 14.00 Sainsbury's TTD
+      - 30.24 FD Boy Laity
+    each:
+      - 2.80 Tesco
+      - 2.50 Sainsbury's
+      - 2.25 Morrisons
+      - 2.32 Waitrose
+      - 3.25 Tesco Finest
+      - 3.50 Sainsbury's TTD
+      - 4.99 FD Boy Laity 165 g
+  brie:
+    kg:
+      - 8.25 Tesco
+      - 8.25 Sainsbury's
+      - 14.75 Président
+      - 20.75 FD Somerset
+      - 29.25 FD Cornish
+  mascarpone:
+    kg:
+      - 8.80 Tesco
+      - 8.92 Asda
+      - 9.00 Sainsbury's
+      - 9.00 Aldi
+      - 7.60 Waitrose
+  ricotta:
+    kg:
+      - 6.00 Tesco
+      - 5.88 Asda
+      - 6.40 Waitrose
+      - 5.88 Sainsbury's
+      - 15.68 FD fior di latte
+  paneer:
+    kg:
+      - 11.28 Tesco
+      - 11.28 Sainsbury's
+      - 8.85 Asda
+      - 9.30 Waitrose
+      - 13.11 FD block
+      - 14.42 FD diced
+  cream cheese:
+    kg:
+      - 11.61 Philadelphia
+      - 7.83 Sainsbury's
+      - 7.75 Tesco
+      - 6.00 Waitrose
+
+  # --- butter, cream and ghee ------------------------------------------------
+  butter, own-label:
+    kg:
+      - 7.96 Tesco
+      - 7.96 Sainsbury's
+      - 7.92 Asda
+      - 6.76 Aldi
+  butter, branded / farm:
+    kg:
+      - 14.00 Lurpak Tesco
+      - 13.50 Lurpak Morrisons
+      - 14.40 Duchy Waitrose
+      - 13.56 FD Brue Valley
+      - 11.96 FD Longmans
+      - 16.45 FD Yeo Valley
+  ghee:
+    kg:
+      - 15.00 East End Tesco
+      - 15.00 East End Sainsbury's
+      - 12.00 KTC Sainsbury's
+      - 14.97 KTC Asda
+      - 14.00 Laila Asda
+      - 10.00 Heera Iceland
+  double cream:
+    l:
+      - 5.00 Tesco
+      - 5.00 Sainsbury's
+      - 5.00 Asda
+      - 5.25 Waitrose
+      - 4.30 Creamfields
+      - 15.69 FD Jersey
+  clotted cream:
+    kg:
+      - 13.66 Tesco
+      - 13.66 Sainsbury's
+      - 14.32 Waitrose
+      - 13.22 Iceland
+      - 10.48 Asda
+      - 14.54 Co-op
+      - 22.04 FD Langage
+  crème fraîche:
+    l:
+      - 2.50 Tesco
+      - 2.67 Asda
+      - 3.50 Sainsbury's
+      - 3.67 Waitrose
+      - 12.05 FD 220 ml
+      - 11.80 FD 250 ml
+
+  # --- special ingredients ---------------------------------------------------
+  saffron:
+    g:
+      - 9.88 Tesco
+      - 9.88 Sainsbury's
+      - 12.25 Waitrose
+      - 11.25 Schwartz
+      - 8.25 Bart
+      - 3.25 East End
+      - 3.00 Fudco
+  vanilla pods:
+    each:
+      - 2.50 Taylor & Colledge
+      - 3.25 Tesco
+      - 3.00 Nielsen-Massey
+      - 3.50 Waitrose
+      - 3.50 Sainsbury's TTD
+      - 2.55 Bart
+  vanilla extract:
+    l:
+      - 63.56 Nielsen-Massey
+      - 36.84 Dr Oetker
+      - 75.00 Sainsbury's TTD
+      - 35.83 Tesco Finest
+      - 50.00 Taylor & Colledge
+  vanilla bean paste:
+    l:
+      - 44.00 Dr Oetker
+      - 61.54 Taylor & Colledge
+      - 95.83 Nielsen-Massey 60 ml
+      - 143.98 Nielsen-Massey 118 ml
+  pine nuts:
+    kg:
+      - 39.50 Tesco
+      - 40.00 Sainsbury's
+      - 36.70 Asda
+  pistachios, shelled:
+    kg:
+      - 30.40 Tesco
+      - 33.33 Waitrose
+      - 30.00 Sainsbury's
+  pecans:
+    kg:
+      - 20.59 Sainsbury's
+      - 20.00 Tesco
+      - 17.50 Tesco halves
+      - 17.65 Tesco 170 g
+      - 24.00 Sainsbury's Mammoth
+  macadamia nuts:
+    kg:
+      - 32.50 Tesco
+      - 29.00 Asda
+      - 32.50 Sainsbury's
+  cashews:
+    kg:
+      - 11.25 Tesco
+      - 10.50 Aasani
+      - 14.80 Fudco
+      - 11.11 Whitworths
+      - 29.00 Sainsbury's Fairtrade
+  hazelnuts:
+    kg:
+      - 25.00 Tesco blanched
+      - 26.00 Sainsbury's blanched
+      - 14.25 Tesco
+      - 22.67 Waitrose
+      - 37.00 Waitrose blanched
+  walnuts:
+    kg:
+      - 11.75 Sainsbury's
+      - 11.25 Tesco
+      - 11.00 Tesco halves
+      - 19.09 Whitworths
+      - 17.50 Fudco
+  almonds:
+    kg:
+      - 13.50 Sainsbury's
+      - 11.00 Tesco
+      - 18.50 Tesco blanched
+      - 19.00 Waitrose blanched
+      - 16.53 Asda blanched
+      - 11.00 Fudco
+  ground almonds:
+    kg:
+      - 17.50 Sainsbury's
+      - 13.20 Tesco
+      - 11.40 Asda
+  maple syrup:
+    l:
+      - 19.89 Clarks
+      - 26.00 Tesco Finest
+      - 24.00 Waitrose Duchy
+      - 24.55 Asda Exceptional
+      - 21.12 Sainsbury's
+      - 15.84 Maple Crest
+  extra virgin olive oil, everyday:
+    l:
+      - 7.00 Tesco
+      - 6.29 Aldi
+      - 7.80 La Española
+      - 9.31 Filippo Berio
+      - 8.00 Napolina
+  extra virgin olive oil, premium:
+    l:
+      - 15.00 Il Casolare
+      - 12.80 Belazu Envero
+      - 15.70 Odysea
+      - 19.90 Filippo Berio Italian
+      - 15.00 Belazu Crete
+      - 15.33 Iliada
+  sesame oil:
+    l:
+      - 11.00 Sainsbury's
+      - 11.00 Tesco
+      - 11.40 Waitrose
+      - 10.56 Asda
+      - 8.80 KTC
+      - 13.29 Lee Kum Kee
+  balsamic vinegar:
+    l:
+      - 7.00 Tesco
+      - 7.00 Sainsbury's
+      - 8.60 Sainsbury's organic
+      - 10.00 Filippo Berio
+  balsamic vinegar, aged:
+    l:
+      - 43.00 Mazzetti
+      - 32.00 Sainsbury's TTD
+      - 32.00 Tesco Finest
+      - 49.40 Belazu
+      - 40.00 Filippo Berio
+  truffle oil:
+    l:
+      - 15.00 Sainsbury's TTD
+      - 12.80 Waitrose
+      - 23.20 La Española
+  dried porcini:
+    kg:
+      - 99.67 Merchant Gourmet
+      - 108.75 Cooks & Co
+      - 103.33 Waitrose
+      - 120.00 M&S
+      - 125.00 Merchant Gourmet Sainsbury's
+  miso:
+    kg:
+      - 19.50 Tesco
+      - 15.91 Morrisons
+      - 22.00 Waitrose
+      - 17.50 Yutaka
+      - 13.33 Clearspring
+      - 15.50 Miso Tasty
+  tahini:
+    kg:
+      - 10.00 Sainsbury's
+      - 10.33 Tesco
+      - 11.17 Waitrose
+      - 11.20 Belazu
+      - 8.70 Baracke
+  harissa:
+    kg:
+      - 21.67 Tesco
+      - 21.11 Asda
+      - 28.42 Waitrose
+      - 29.15 Belazu rose
+      - 17.22 Al'Fez
+      - 17.11 Tesco Finest rose
+  gochujang:
+    kg:
+      - 21.11 Tesco
+      - 19.00 Sainsbury's
+      - 19.05 Waitrose
+      - 13.24 Sun Hee
+      - 4.74 Ajumma Republic 500 g
+  kecap manis:
+    l:
+      - 12.33 Blue Dragon
+      - 8.00 Waitrose
+      - 9.90 Tesco
+      - 6.44 ABC 620 ml
+      - 6.48 ABC 600 ml
+      - 14.00 ABC 275 ml
+  tamarind paste:
+    kg:
+      - 21.67 Sainsbury's
+      - 19.05 Asda
+      - 16.15 Thai Taste
+      - 9.25 Mahi pulp
+      - 4.96 Niru
+  sumac:
+    kg:
+      - 32.22 Sainsbury's
+      - 20.21 Asda
+      - 12.00 Village
+      - 36.73 Waitrose
+      - 53.33 Steenbergs
+      - 29.90 Sussex Wholefoods
+  za'atar:
+    kg:
+      - 57.14 Schwartz
+      - 71.43 Sainsbury's
+      - 61.43 Ocado
+  ras el hanout:
+    kg:
+      - 52.86 Bart
+      - 55.00 Waitrose
+      - 57.14 Schwartz
+  dukkah:
+    kg:
+      - 42.00 Waitrose
+      - 40.91 M&S
+      - 72.00 Ottolenghi
+      - 79.29 Classic Ayurveda
+  cardamom pods:
+    kg:
+      - 41.07 Sainsbury's
+      - 65.00 Fudco
+      - 63.80 Rajah
+      - 65.00 Natco
+  star anise:
+    kg:
+      - 90.91 Tesco
+      - 76.67 Sainsbury's
+      - 150.00 Waitrose
+      - 30.00 Fudco
+  smoked paprika:
+    kg:
+      - 20.83 Tesco
+      - 21.11 Asda
+      - 23.47 Sainsbury's
+      - 50.00 Schwartz
+      - 45.00 Waitrose
+      - 38.57 La Chinata
+  garam masala:
+    kg:
+      - 26.32 Tesco
+      - 30.26 Sainsbury's
+      - 10.33 Asda
+      - 66.67 Schwartz
+      - 12.94 Rajah
+      - 14.00 East End
+  galangal, fresh:
+    kg:
+      - 22.90 Sing Kee
+      - 28.90 Thai Food Direct
+      - 40.00 The Spice Shop
+      - 18.50 Yao Thai
+      - 16.50 Zing Asia
+  curry leaves, fresh:
+    thin: true
+    kg:
+      - 249.50 The Spice Shop
+      - 62.50 Green Oranges
+      - 100.00 Garden Fresh Exotics
+      - 79.50 Veenas
+  makrut lime leaves, fresh:
+    thin: true
+    each:
+      - 0.50 Sainsbury's
+      - 0.55 Tesco
+  marzipan:
+    kg:
+      - 4.70 Silver Spoon
+      - 5.50 Tesco
+      - 5.51 Sainsbury's
+      - 5.50 Waitrose
+      - 5.40 Asda
+      - 8.15 Dr Oetker
+  gelatine leaves:
+    each:
+      - 0.28 Tesco
+      - 0.31 Waitrose
+      - 0.29 Sainsbury's
+      - 0.27 Asda
+      - 0.28 Morrisons
+      - 0.31 Ocado
+  liquid glucose:
+    kg:
+      - 16.43 Tesco
+      - 16.79 Waitrose
+      - 16.07 Sainsbury's
+      - 16.07 Morrisons
+      - 16.43 Ocado
+  medjool dates:
+    kg:
+      - 10.00 Sainsbury's TTD
+      - 10.00 Tesco Finest
+      - 9.94 Medjool Village
+      - 9.25 Natures Candy
+      - 11.11 Greenfields
+      - 13.75 Sainsbury's organic
+  dried figs:
+    kg:
+      - 10.80 Tesco
+      - 12.00 Whitworths
+      - 10.00 Sofra
+      - 11.60 Tesco 250 g
+  prunes:
+    kg:
+      - 6.35 Tesco 1 kg
+      - 8.00 Tesco
+      - 8.75 Sainsbury's
+      - 8.00 Sainsbury's 500 g
+      - 10.53 Whitworths
+  quinoa:
+    kg:
+      - 10.33 Tesco
+      - 10.33 Sainsbury's
+      - 9.80 Asda
+  bulgur wheat:
+    kg:
+      - 4.20 Sainsbury's
+      - 4.00 Tesco
+      - 4.00 Asda
+  freekeh:
+    kg:
+      - 6.50 Waitrose
+      - 8.00 Greenfields
+      - 7.48 Greenfields
+      - 7.50 Ocado
+  fresh gnocchi:
+    kg:
+      - 4.50 Sainsbury's
+      - 4.14 Asda
+      - 4.50 Tesco
+      - 5.88 Co-op
+  fresh pasta:
+    kg:
+      - 4.14 Asda
+      - 5.50 Waitrose
+      - 5.00 Tesco
+      - 6.17 Co-op
+
+  # --- produce, larder and the rest: estimates checked -----------------------
+  allspice:
+    kg:
+      - "28.75 Sainsbury's 40 g"
+      - "30.30 Tesco 33 g"
+      - "22.22 Asda 45 g"
+      - "54.05 Schwartz 37 g"
+      - "62.50 Bart 40 g"
+      - "45.00 Waitrose 40 g"
+  apple:
+    note: "each is one eating apple"
+    each:
+      - "0.45 Morrisons loose Royal Gala 1 apple"
+      - "0.45 Tesco large Gala loose 1 apple"
+      - "0.30 Sainsbury's Royal Gala 6 pack"
+      - "0.33 Waitrose Granny Smith 6 pack"
+      - "0.25 Iceland Royal Gala pack"
+      - "0.27 Co-op Royal Gala pack"
+      - "0.50 Morrisons loose Pink Lady 1 apple"
+    kg:
+      - "2.08 Morrisons apples 1.2 kg"
+      - "2.10 Sainsbury's apples 1 kg"
+      - "2.24 Asda Bramley 1 kg"
+      - "2.58 Farm Direct Cox 500 g"
+      - "2.78 Farm Direct Laxton Superb 500 g"
+      - "3.38 Farm Direct Egremont Russet 500 g"
+  apricots:
+    note: "out of season; only two fresh listings found; no shop states a count, so each is not priced"
+    thin: true
+    kg:
+      - "5.63 Tesco 320 g"
+      - "4.92 Morrisons punnet 325 g"
+  asparagus:
+    kg:
+      - "9.40 Morrisons 250 g"
+      - "9.40 Sainsbury's spears 250 g"
+      - "9.44 Tesco 180 g"
+      - "9.17 Asda 180 g"
+      - "10.20 Co-op 250 g"
+      - "12.75 Sainsbury's organic 200 g"
+      - "16.80 Tesco tips 125 g"
+      - "19.50 Waitrose tips 100 g"
+  aubergine:
+    note: "each is one aubergine"
+    each:
+      - "0.95 Tesco 1 aubergine"
+      - "1.05 Sainsbury's 1 aubergine"
+      - "0.95 Morrisons 1 aubergine"
+      - "0.77 Asda 1 aubergine"
+      - "1.50 Waitrose Duchy organic 1 aubergine"
+  avocado:
+    note: "each is one avocado"
+    each:
+      - "0.69 Tesco ripe & ready 1"
+      - "0.95 Sainsbury's large 1"
+      - "0.90 Waitrose medium 1"
+      - "0.95 Morrisons large single 1"
+      - "0.38 Morrisons ripen at home 4 pack"
+      - "0.75 Tesco twin pack"
+      - "0.90 Iceland 2 pack"
+      - "1.59 Farm Direct whole avocado 1"
+  baking powder:
+    kg:
+      - "4.06 Sainsbury's 160 g"
+      - "4.53 Asda 170 g"
+      - "5.75 Borwick's 200 g"
+      - "9.41 Dr. Oetker 170 g"
+      - "3.80 Stockwell & Co 150 g"
+      - "11.92 Doves Farm 130 g"
+  banana:
+    note: "each is one banana"
+    each:
+      - "0.16 Tesco loose 1"
+      - "0.16 Morrisons Fyffes 5 pack"
+      - "0.16 Sainsbury's Fairtrade pack"
+      - "0.13 Sainsbury's small pack"
+      - "0.20 Waitrose loose 1"
+      - "0.19 Morrisons premium 8 pack"
+  banana shallots:
+    note: "per kg, no shop gives a count per pack"
+    kg:
+      - "3.88 Sainsbury's echalion 400 g"
+      - "3.88 Tesco Finest echalion 400 g"
+      - "2.98 Nature's Pick echalion 400 g"
+      - "3.93 Asda Exceptional echalion 300 g"
+  barley:
+    kg:
+      - "2.40 Tesco pearl 500 g"
+      - "2.40 Sainsbury's pearl 500 g"
+      - "3.00 Co-op pearl 500 g"
+      - "2.28 Asda pearl 500 g"
+  basil:
+    note: "per-leaf \"each\" not priced: no page gives leaves per pack"
+    pack:
+      - "0.50 Tesco 30 g"
+      - "0.50 Sainsbury's 30 g"
+      - "0.50 Morrisons 30 g"
+      - "1.00 Tesco 18 g"
+      - "1.15 Sainsbury's 15 g"
+      - "1.29 Farm Direct 50 g"
+    kg:
+      - "16.67 Tesco 30 g"
+      - "16.67 Sainsbury's 30 g"
+      - "16.67 Morrisons 30 g"
+      - "55.56 Tesco 18 g"
+      - "76.67 Sainsbury's 15 g"
+      - "25.80 Farm Direct 50 g"
+  basmati rice:
+    kg:
+      - "3.00 Tilda 5 kg"
+      - "2.25 Tilda 10 kg"
+      - "2.20 Laila 5 kg"
+      - "3.90 Veetee 1 kg"
+      - "5.00 Sainsbury's TTD 500 g"
+      - "2.25 Akash 2 kg"
+  bay leaf:
+    note: "estimate is per leaf; no page gives leaves per pack, so each is not priced; dried jars vary 10x by size"
+    thin: true
+    kg:
+      - "29.90 Farm Direct fresh bunch 100 g"
+      - "100.00 Rajah dried 10 g"
+      - "110.00 Natco dried 10 g"
+      - "333.33 Tesco dried 3 g"
+      - "135.71 Asda Cook dried 7 g"
+      - "600.00 Waitrose Cooks' Ingredients dried 3 g"
+  beans:
+    note: "per kg of tin weight, priced as tinned white beans; Sainsbury's 400 g tin drains to 235 g"
+    kg:
+      - "1.13 Sainsbury's butter beans 400 g tin"
+      - "1.63 KTC butter beans 400 g tin"
+      - "2.13 Napolina cannellini 400 g tin"
+      - "1.38 Waitrose Essential cannellini 400 g tin"
+      - "4.38 Biona organic cannellini 400 g tin"
+  beansprouts:
+    kg:
+      - "2.83 Tesco 300 g"
+      - "2.85 Asda 200 g"
+      - "3.17 Waitrose 300 g"
+      - "4.36 Farm Direct 250 g"
+  beef stock:
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
+    l:
+      - "1.00 Oxo 12 cubes, one cube to 190 ml"
+      - "0.68 Oxo 60 cubes, one cube to 190 ml"
+      - "0.42 Knorr 8 cubes, taken as Knorr chicken's 450 ml"
+    each:
+      - "0.19 Oxo 12 cubes"
+      - "0.11 Morrisons 12 cubes"
+      - "0.17 Bovril 12 cubes"
+      - "0.19 Knorr 8 cubes"
+      - "0.13 Oxo 60 cubes"
+  beer:
+    l:
+      - "2.70 Boddingtons 4x440 ml"
+      - "2.93 Greene King Abbot 4x500 ml"
+      - "4.30 Adnams Southwold 500 ml"
+      - "4.90 Woodforde's Wherry 500 ml"
+      - "3.18 Newcastle Brown 550 ml"
+      - "2.27 Hobgoblin Ruby 4x440 ml"
+      - "4.55 Camden Pale 4x330 ml"
+  beetroot:
+    note: "each not priced: no page gives a count per pack"
+    kg:
+      - "4.60 Sainsbury's bunched 500 g"
+      - "5.10 Waitrose bunched 500 g"
+      - "4.89 Tesco organic 450 g"
+      - "3.14 Asda 500 g"
+      - "3.17 Morrisons cooked 300 g"
+      - "2.78 Farm Direct loose 500 g"
+      - "3.30 Farm Direct loose 500 g"
+  bicarbonate of soda:
+    kg:
+      - "3.61 Sainsbury's 180 g"
+      - "3.25 Asda 200 g"
+      - "3.25 Stockwell & Co 200 g"
+      - "5.75 Borwick's 200 g"
+      - "8.00 Dr. Oetker 200 g"
+      - "8.61 Waitrose Cooks' Ingredients 180 g"
+      - "8.50 Doves Farm 200 g"
+  black treacle:
+    kg:
+      - "3.85 Lyle's Tesco 454 g"
+      - "3.85 Lyle's Sainsbury's 454 g"
+      - "3.85 Lyle's Morrisons 454 g"
+      - "4.41 Lyle's Waitrose 454 g"
+      - "2.97 Lyle's Asda 454 g"
+  blackberries:
+    kg:
+      - "17.67 Tesco 150 g"
+      - "16.67 Asda 150 g"
+      - "16.67 Morrisons 150 g"
+      - "21.00 Waitrose No.1 150 g"
+      - "9.93 Aldi Rosedene Farms 150 g"
+      - "17.50 Farm Direct 300 g"
+      - "31.92 Farm Direct Sussex 125 g"
+  blood orange:
+    note: "out of season (November); only two listings, and Asda's 5 for 1.00 looks like a clearance line"
+    thin: true
+    each:
+      - "0.80 Waitrose blush min 4"
+      - "0.20 Asda 5 pack"
+  blueberries:
+    kg:
+      - "13.33 Tesco 150 g"
+      - "11.00 Sainsbury's 300 g"
+      - "11.00 Morrisons 300 g"
+      - "8.56 Morrisons 450 g"
+      - "8.57 Iceland 350 g"
+      - "10.33 Asda Just Essentials 150 g"
+      - "16.67 Waitrose 150 g"
+      - "18.33 Farm Direct 300 g"
+  bok choi:
+    note: "each is one supermarket pack (200-250 g); no page says how many heads a pack holds"
+    thin: true
+    each:
+      - "1.50 Tesco 250 g pack"
+      - "1.55 Sainsbury's 250 g pack"
+      - "1.24 Morrisons 200 g pack"
+      - "1.12 Asda 200 g pack"
+      - "1.29 Aldi Nature's Pick pack"
+      - "1.55 Co-op 200 g pack"
+    kg:
+      - "6.00 Tesco 250 g"
+      - "6.20 Sainsbury's 250 g"
+      - "6.20 Morrisons 200 g"
+      - "5.60 Asda 200 g"
+      - "7.40 Waitrose 250 g"
+      - "7.75 Co-op 200 g"
+      - "8.97 Farm Direct min 300 g"
+  brandy:
+    l:
+      - "19.00 Bardinet VSOP 1 l"
+      - "19.25 Fundador 1 l"
+      - "19.64 Sainsbury's Napoleon VSOP 70 cl"
+      - "24.64 Soberano 70 cl"
+      - "25.36 Jules Clairon 70 cl"
+      - "30.71 Three Barrels VSOP 70 cl"
+      - "28.57 St-Remy XO 70 cl"
+  bread:
+    note: "each is one slice, at 20 slices to an 800 g loaf (Ocado's Warburtons listing: 20 servings, 40.3 g a slice)"
+    thin: true
+    kg:
+      - "1.75 Warburtons medium white 800 g"
+      - "1.63 Kingsmill soft white 800 g"
+      - "1.56 Hovis soft white 800 g"
+      - "0.93 Tesco medium white 800 g"
+      - "0.94 Sainsbury's toastie white 800 g"
+      - "1.00 Waitrose toastie white 800 g"
+      - "1.94 Sainsbury's white farmhouse 800 g"
+    each:
+      - "0.070 Warburtons 800 g loaf"
+      - "0.070 Kingsmill 800 g loaf"
+      - "0.060 Hovis 800 g loaf"
+      - "0.040 Tesco 800 g loaf"
+      - "0.040 Sainsbury's 800 g loaf"
+  breadcrumbs:
+    kg:
+      - "6.83 Paxo 227 g"
+      - "6.96 Sainsbury's golden 230 g"
+      - "7.14 Tesco golden 175 g"
+      - "7.14 Asda golden 175 g"
+      - "14.00 Tesco panko 150 g"
+      - "15.83 Blue Dragon panko 120 g"
+  broccoli:
+    note: "each is one head"
+    kg:
+      - "2.40 Tesco 375 g"
+      - "2.40 Morrisons 375 g"
+      - "2.38 Morrisons large 500 g"
+      - "2.30 Morrisons 300 g"
+      - "4.67 Morrisons organic 300 g"
+      - "5.70 Farm Direct calabrese 500 g"
+      - "4.63 Farm Direct calabrese 300 g"
+    each:
+      - "0.90 Tesco loose 1 head"
+      - "0.90 Morrisons 375 g head"
+      - "0.86 Asda 1 head"
+      - "1.19 Morrisons large 500 g head"
+  brown sugar:
+    note: "light soft brown"
+    kg:
+      - "4.00 Tesco light soft 500 g"
+      - "3.75 Tesco light soft 1 kg"
+      - "4.10 Sainsbury's light soft 500 g"
+      - "3.60 Asda light 500 g"
+      - "4.08 Billington's light soft 500 g"
+  brussels sprouts:
+    note: "the 500 g bags are at seasonal (November) price"
+    kg:
+      - "1.78 Tesco 500 g"
+      - "1.78 Sainsbury's 500 g"
+      - "2.50 Iceland 400 g"
+      - "4.33 Co-op 450 g"
+      - "8.00 Tesco peeled 200 g"
+  butter beans:
+    note: "per kg of tin or jar weight; Sainsbury's 400 g tin drains to 235 g"
+    kg:
+      - "1.13 Sainsbury's 400 g tin"
+      - "2.13 Napolina 400 g tin"
+      - "1.63 KTC 400 g tin"
+      - "4.38 Biona organic 400 g tin"
+      - "5.70 Bold Bean Co jar 570 g"
+      - "8.33 Belazu Judion jar 360 g"
+  buttermilk:
+    l:
+      - "1.50 Dale Farm 568 ml"
+      - "3.70 Waitrose 284 ml"
+      - "3.33 Sainsbury's 300 ml"
+      - "4.83 Asda 300 ml"
+  butternut squash:
+    note: "each is one whole squash"
+    thin: true
+    kg:
+      - "2.50 Farm Direct approx 900 g"
+      - "1.86 Creamline approx 1 kg"
+    each:
+      - "1.50 Tesco 1 squash"
+      - "1.50 Sainsbury's loose 1 squash"
+      - "1.50 Morrisons 1 squash"
+      - "1.35 Morrisons 1 squash"
+      - "1.09 Aldi Nature's Pick 1 squash"
+      - "1.90 Sainsbury's organic 1 squash"
+      - "2.25 Farm Direct approx 900 g"
+  cabbage:
+    note: "each is one whole head"
+    each:
+      - "0.89 Tesco white 1 head"
+      - "0.77 Tesco savoy 1 head"
+      - "0.89 Morrisons white 1 head"
+      - "0.79 Morrisons savoy 1 head"
+      - "1.00 Asda white typically 1 kg"
+      - "0.95 Waitrose Essential savoy 1 head"
+      - "2.69 Farm Direct savoy 1 head"
+  cannellini beans:
+    note: "per kg of tin weight; Sainsbury's 400 g tin drains to 235 g"
+    kg:
+      - "1.13 Sainsbury's 400 g tin"
+      - "1.13 Tesco 400 g tin"
+      - "1.13 Asda 400 g tin"
+      - "1.13 Morrisons 400 g tin"
+      - "2.13 Napolina 400 g tin"
+      - "1.38 Waitrose Essential 400 g tin"
+      - "4.38 Biona organic 400 g tin"
+  capers:
+    note: "jar weight"
+    kg:
+      - "12.63 Tesco 190 g"
+      - "11.58 Asda 190 g"
+      - "12.89 Polli 190 g"
+      - "19.00 Sainsbury's nonpareilles 100 g"
+      - "23.94 Waitrose nonpareille 142 g"
+      - "13.54 Fragata 240 g"
+  caraway seeds:
+    kg:
+      - "25.00 Tesco 40 g"
+      - "26.74 Sainsbury's 43 g"
+      - "23.81 Asda 42 g"
+      - "41.25 Bart 40 g"
+  carrot:
+    note: "each is one loose carrot; only two loose listings priced each"
+    thin: true
+    kg:
+      - "0.69 Morrisons 1 kg"
+      - "0.88 Morrisons 500 g"
+      - "0.53 Tesco wonky 1.5 kg"
+      - "0.52 Morrisons wonky 1.45 kg"
+      - "1.92 Morrisons organic 600 g"
+      - "1.78 Farm Direct Suffolk washed 500 g"
+      - "2.90 Farm Direct loose 500 g"
+    each:
+      - "0.12 Tesco loose 1 carrot"
+      - "0.11 Waitrose loose 1 carrot"
+  caster sugar:
+    kg:
+      - "1.75 Sainsbury's 1 kg"
+      - "1.56 Silver Spoon 1 kg"
+      - "2.25 Tate & Lyle 1 kg"
+      - "2.18 Tate & Lyle 2 kg"
+      - "1.90 Sainsbury's Fairtrade 1 kg"
+  cauliflower:
+    note: "each is one head; Farm Direct's large white shown at its pre-offer price"
+    each:
+      - "1.18 Tesco 1 head"
+      - "1.19 Morrisons medium 1 head"
+      - "2.10 Tesco extra large 1 head"
+      - "1.95 Waitrose large 1 head"
+      - "2.00 Tesco organic 1 head"
+      - "2.89 Farm Direct large white 1 head"
+      - "2.99 Farm Direct white 1 head"
+  cavolo nero:
+    kg:
+      - "6.75 Tesco Finest 200 g"
+      - "6.67 Asda Exceptional 150 g"
+      - "8.75 Waitrose thick cut 200 g"
+      - "8.00 Tesco Finest sliced 200 g"
+      - "8.97 Farm Direct approx 300 g"
+      - "8.95 Farm Direct approx 200 g"
+  celeriac:
+    note: "each is one whole root"
+    thin: true
+    each:
+      - "1.70 Tesco 1 root"
+      - "1.70 Sainsbury's 1 root"
+      - "1.70 Morrisons loose 1 root"
+      - "1.69 Farm Direct small 1 root"
+      - "1.45 Farm Direct whole approx 900 g"
+    kg:
+      - "1.61 Farm Direct whole approx 900 g"
+      - "2.00 Waitrose loose per kg"
+  celery:
+    kg:
+      - "3.60 Tesco sticks 250 g"
+      - "3.60 Sainsbury's sticks 250 g"
+      - "3.60 Asda sticks 350 g"
+      - "4.00 Iceland sticks 250 g"
+  cheese:
+    note: "priced as cheddar"
+    kg:
+      - "8.00 Sainsbury's extra mature cheddar 400 g"
+      - "7.38 Sainsbury's farmhouse mature cheddar 400 g"
+      - "10.00 Cathedral City mature 350 g"
+      - "9.44 Pilgrims Choice mature 550 g"
+      - "10.45 Farm Direct mature cheddar 200 g"
+      - "21.25 Farm Direct Green's mature cheddar 200 g"
+      - "27.67 Farm Direct Montgomery's cheddar 180 g"
+  cherries:
+    note: "out of season (November)"
+    kg:
+      - "15.00 Tesco 200 g"
+      - "14.00 Morrisons 200 g"
+      - "14.00 Morrisons The Best 250 g"
+      - "14.00 Driscoll's Morrisons 250 g"
+  cherry tomatoes:
+    note: "each not priced: no page gives a count per pack"
+    kg:
+      - "3.33 Tesco 300 g"
+      - "2.90 Sainsbury's 500 g"
+      - "3.33 Morrisons 420 g"
+      - "4.00 Iceland 250 g"
+      - "6.00 Morrisons vine 225 g"
+      - "4.13 Waitrose Italian vine 400 g"
+      - "9.80 Sainsbury's TTD vine 250 g"
+      - "3.98 Farm Direct 400 g"
+      - "14.76 Farm Direct cherry vine 250 g"
+  chestnut mushrooms:
+    kg:
+      - "4.30 Sainsbury's 300 g"
+      - "4.40 Tesco 250 g"
+      - "4.12 Tesco 485 g"
+      - "4.00 Iceland 250 g"
+      - "4.44 Waitrose 450 g"
+      - "4.28 Asda 250 g"
+      - "4.41 Morrisons 340 g"
+      - "6.76 Farm Direct 250 g"
+  chestnuts:
+    note: "cooked peeled vacuum-packed"
+    kg:
+      - "7.50 Tesco cooked 400 g"
+      - "7.50 Sainsbury's cooked 400 g"
+      - "11.11 Merchant Gourmet whole cooked 180 g"
+  chicken stock:
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
+    l:
+      - "0.89 Oxo 12 cubes, one cube to 190 ml"
+      - "1.00 Oxo reduced salt 12 cubes, one cube to 190 ml"
+      - "0.42 Knorr 8 cubes, one cube to 450 ml"
+      - "0.38 Knorr 20 cubes, one cube to 450 ml"
+    each:
+      - "0.17 Oxo 12 cubes"
+      - "0.19 Knorr 8 cubes"
+      - "0.19 Oxo reduced salt 12 cubes"
+      - "0.17 Knorr 20 cubes"
+  chickpeas:
+    note: "each is one 400 g tin"
+    kg:
+      - "1.03 Tesco 400 g tin"
+      - "1.03 Asda 400 g tin"
+      - "0.93 Morrisons 400 g tin"
+      - "2.13 Napolina 400 g tin"
+      - "1.63 KTC 400 g tin"
+    each:
+      - "0.41 Tesco 400 g tin"
+      - "0.41 Asda 400 g tin"
+      - "0.37 Morrisons 400 g tin"
+      - "0.85 Napolina 400 g tin"
+      - "0.65 KTC 400 g tin"
+  chilli:
+    note: "estimate is each; no shop sells chillies singly or states a count per pack, so each is not priced"
+    thin: true
+    kg:
+      - "8.50 Tesco red 60 g"
+      - "8.46 Sainsbury's red 65 g"
+      - "8.83 Asda red 60 g"
+      - "11.80 Morrisons red 50 g"
+      - "14.38 Tesco finger 80 g"
+      - "13.90 Farm Direct Fresno 100 g"
+  chilli flakes:
+    kg:
+      - "12.50 Rajah crushed 200 g"
+      - "8.80 Natco crushed 250 g"
+      - "22.35 Sainsbury's crushed 85 g"
+      - "35.71 Tesco crushed 28 g"
+      - "31.25 Tesco bird's eye 32 g"
+      - "61.11 Bart 27 g"
+      - "68.97 Schwartz crushed 29 g"
+  chilli powder:
+    kg:
+      - "12.50 Rajah 100 g"
+      - "12.00 East End 100 g"
+      - "8.00 Natco 400 g"
+      - "9.80 Laila 100 g"
+      - "26.14 Sainsbury's 44 g"
+      - "20.00 Tesco 50 g"
+      - "52.63 Schwartz 38 g"
+  chilli sauce:
+    l:
+      - "8.10 Tesco sweet chilli 290 g"
+      - "8.39 Sainsbury's sweet chilli 280 g"
+      - "8.57 Blue Dragon sweet chilli 315 g"
+      - "7.54 Encona Thai sweet chilli 285 ml"
+      - "4.40 Thai Dragon hot chilli 455 ml"
+      - "4.29 KTC sweet chilli 700 ml"
+  chives:
+    note: "pack is one small cut-herb pack"
+    pack:
+      - "0.50 Tesco 20 g"
+      - "0.60 Sainsbury's 20 g"
+      - "0.48 Morrisons 20 g"
+      - "1.39 Farm Direct bunch 50 g"
+    kg:
+      - "25.00 Tesco 20 g"
+      - "30.00 Sainsbury's 20 g"
+      - "24.00 Morrisons 20 g"
+      - "27.80 Farm Direct 50 g"
+  chopped tomatoes:
+    kg:
+      - "1.18 Tesco 400 g"
+      - "1.13 Sainsbury's 4 x 400 g"
+      - "1.88 Napolina 400 g"
+      - "2.25 Cirio 400 g"
+      - "2.50 Waitrose 400 g"
+      - "2.50 Mutti polpa 4 x 400 g"
+  cider:
+    l:
+      - "1.82 Stowford Press 10x440 ml"
+      - "1.82 Strongbow 10x440 ml"
+      - "2.05 Thatchers Gold 10x440 ml"
+      - "2.33 Strongbow dry 2 l"
+      - "3.33 Westons Vintage 6x500 ml"
+      - "4.67 Westons medium dry 750 ml"
+      - "5.50 Henney's dry 500 ml"
+  cider vinegar:
+    l:
+      - "4.70 Sainsbury's 500 ml"
+      - "4.71 Tesco 350 ml"
+      - "4.23 Aspall 350 ml"
+      - "5.48 Aspall raw organic 500 ml"
+      - "5.90 De Nigris 500 ml"
+      - "5.30 Asda Extra Special raw organic 500 ml"
+      - "10.56 Bragg organic 946 ml"
+  cinnamon:
+    note: "ground"
+    kg:
+      - "14.00 Rajah 100 g"
+      - "27.78 Tesco 36 g"
+      - "30.26 Sainsbury's 38 g"
+      - "27.94 Asda 34 g"
+      - "42.31 Bart 39 g"
+      - "51.28 Schwartz 39 g"
+      - "56.25 Waitrose 32 g"
+  cinnamon stick:
+    note: "each is one stick; supermarkets sell by weight with no count"
+    thin: true
+    each:
+      - "0.49 Alnatura organic Ceylon Piccantino 6 sticks"
+      - "0.45 Pfefferdieb organic Ceylon Piccantino 20 sticks"
+    kg:
+      - "83.33 Tesco 12 g"
+      - "79.17 Asda 12 g"
+      - "126.92 Bart 13 g"
+      - "153.85 Schwartz 13 g"
+      - "22.00 Rajah cassia 50 g"
+      - "10.00 East End cassia 100 g"
+  cloves:
+    note: "whole; no each price found"
+    kg:
+      - "33.33 Tesco 30 g"
+      - "38.33 Sainsbury's 30 g"
+      - "30.00 Fudco 50 g"
+      - "25.00 East End 100 g"
+      - "90.91 Schwartz 22 g"
+  coconut:
+    note: "desiccated"
+    kg:
+      - "10.75 Tesco desiccated 200 g"
+      - "10.80 Sainsbury's desiccated 250 g"
+      - "9.87 Asda desiccated 150 g"
+      - "10.50 Whitworths desiccated 200 g"
+      - "7.50 East End desiccated 200 g"
+      - "7.40 Natco desiccated 200 g"
+  coconut cream:
+    l:
+      - "6.84 Blue Dragon 250 ml"
+      - "8.40 Sainsbury's 250 ml"
+      - "8.13 Tesco 160 ml"
+      - "11.25 Waitrose Duchy organic 160 ml"
+  coconut milk:
+    l:
+      - "3.95 Grace 400 ml"
+      - "3.33 Dunn's River 400 ml"
+      - "3.88 Aroy-D 400 ml"
+      - "2.50 Laila 400 ml"
+      - "2.45 Island Sun 400 ml"
+      - "7.13 Blue Dragon 400 ml"
+  coconut oil:
+    note: "sold by ml; costed 1 ml = 1 g"
+    kg:
+      - "18.55 Groovy Food organic 283 ml"
+      - "11.00 Lucy Bee 500 ml"
+      - "12.83 Sainsbury's organic virgin 300 ml"
+      - "14.30 KTC organic virgin 500 ml"
+      - "14.29 Niru organic 280 ml"
+      - "6.00 Shankar 1 l"
+  coriander:
+    note: "pack is one cut-herb pack (25-100 g)"
+    pack:
+      - "0.50 Tesco 30 g"
+      - "0.55 Sainsbury's 30 g"
+      - "0.50 Morrisons 30 g"
+      - "0.69 Co-op 25 g"
+      - "1.25 Sainsbury's 100 g"
+      - "0.99 Farm Direct approx 100 g"
+    kg:
+      - "16.67 Tesco 30 g"
+      - "18.33 Sainsbury's 30 g"
+      - "16.67 Morrisons 30 g"
+      - "27.60 Co-op 25 g"
+      - "12.50 Sainsbury's 100 g"
+      - "12.50 Morrisons 100 g"
+      - "9.90 Farm Direct approx 100 g"
+  coriander seeds:
+    kg:
+      - "38.46 Tesco 26 g"
+      - "46.00 Sainsbury's 25 g"
+      - "36.54 Asda 26 g"
+      - "10.00 Rajah 200 g"
+      - "9.40 Natco 100 g"
+      - "10.00 East End 100 g"
+      - "125.00 Bart 20 g"
+  cornflour:
+    kg:
+      - "5.30 Tesco 500 g"
+      - "5.30 Sainsbury's 500 g"
+      - "6.00 Brown & Polson 500 g"
+      - "5.60 Waitrose 250 g"
+      - "4.12 Asda 250 g"
+  courgette:
+    note: "each is one courgette; only two listings priced each"
+    thin: true
+    each:
+      - "0.56 Tesco loose 1 courgette"
+      - "0.83 Tesco organic 3 pack"
+    kg:
+      - "2.78 Morrisons 500 g"
+      - "2.90 Sainsbury's 500 g"
+      - "3.24 Asda 330 g"
+      - "4.63 Farm Direct 300 g"
+      - "8.33 Sainsbury's organic 300 g"
+  couscous:
+    kg:
+      - "2.60 Tesco 500 g"
+      - "2.60 Sainsbury's 500 g"
+      - "2.40 Asda 500 g"
+  cranberries:
+    kg:
+      - "15.50 Tesco 200 g"
+      - "6.67 Sainsbury's 300 g"
+      - "9.20 Morrisons 250 g"
+      - "14.00 Sainsbury's Christmas 200 g"
+      - "7.50 Tesco frozen 400 g"
+  cream:
+    note: "priced as double cream"
+    l:
+      - "5.00 Tesco double 600 ml"
+      - "5.00 Sainsbury's double 600 ml"
+      - "8.00 Sainsbury's double 150 ml"
+      - "5.67 Iceland double 300 ml"
+      - "6.00 Sainsbury's organic double 300 ml"
+      - "11.62 Farm Direct double 142 ml"
+  cream of tartar:
+    kg:
+      - "50.00 Tesco Dr Oetker sachets 30 g"
+      - "46.67 Asda Dr Oetker sachets 30 g"
+      - "8.44 Sainsbury's 160 g"
+  cucumber:
+    note: "each is one whole cucumber"
+    each:
+      - "0.99 Tesco 1"
+      - "1.09 Sainsbury's 1"
+      - "0.99 Morrisons 1"
+      - "0.99 Co-op 1"
+      - "1.00 Iceland 1"
+      - "1.35 Farm Direct long 1"
+  cumin:
+    kg:
+      - "23.26 Tesco ground 43 g"
+      - "26.74 Sainsbury's ground 43 g"
+      - "23.17 Asda ground 41 g"
+      - "45.00 Waitrose ground 40 g"
+      - "14.20 Rajah ground 100 g"
+      - "8.00 Natco ground 400 g"
+      - "54.05 Schwartz ground 37 g"
+      - "41.25 Bart seeds 40 g"
+  currants:
+    kg:
+      - "5.70 Tesco 500 g"
+      - "4.90 Tesco 1 kg"
+      - "5.48 Asda 500 g"
+  curry paste:
+    kg:
+      - "11.76 Blue Dragon Thai green 170 g"
+      - "13.89 Sainsbury's Thai red 180 g"
+      - "12.78 Tesco Thai red 180 g"
+      - "12.75 Asda Thai red 200 g"
+      - "5.25 Thai Dragon red 400 g"
+      - "32.47 Ice Kitchen Thai green 77 g"
+  dates:
+    kg:
+      - "6.67 Whitworths 300 g"
+      - "9.94 Medjool Village 500 g"
+      - "10.00 Tesco Finest medjool 500 g"
+      - "10.00 Sainsbury's TTD medjool 500 g"
+      - "9.25 Natures Candy medjool 454 g"
+      - "12.50 Sainsbury's deglet nour 200 g"
+  demerara sugar:
+    kg:
+      - "2.75 Tesco 1 kg"
+      - "2.70 Sainsbury's 2 kg"
+      - "2.85 Waitrose 1 kg"
+      - "3.60 Asda 500 g"
+      - "2.00 Billington's 1 kg"
+      - "2.78 Tate & Lyle 500 g"
+  dill:
+    note: "pack is one small cut-herb pack"
+    pack:
+      - "0.48 Tesco 20 g"
+      - "0.60 Sainsbury's 20 g"
+      - "0.48 Morrisons 20 g"
+      - "1.29 Farm Direct bunch 50 g"
+    kg:
+      - "24.00 Tesco 20 g"
+      - "30.00 Sainsbury's 20 g"
+      - "24.00 Morrisons 20 g"
+      - "25.80 Farm Direct 50 g"
+  dried apricots:
+    kg:
+      - "11.90 Sainsbury's 500 g"
+      - "12.00 Tesco 250 g"
+      - "12.25 Sainsbury's 200 g"
+      - "9.52 Asda chopped 250 g"
+      - "17.50 Waitrose 500 g"
+      - "14.29 Whitworths 140 g"
+  dried cranberries:
+    kg:
+      - "15.50 Tesco 200 g"
+      - "20.67 Sainsbury's 75 g"
+      - "15.38 Whitworths 130 g"
+      - "20.59 Forest Feast 170 g"
+  dried herbs:
+    note: "priced as mixed herbs"
+    kg:
+      - "55.56 Tesco mixed herbs 18 g"
+      - "82.14 Sainsbury's mixed herbs 14 g"
+      - "40.00 Asda Just Essentials 18 g"
+      - "45.56 Stamford Street 18 g"
+      - "76.67 Waitrose 30 g"
+      - "157.14 Bart 10.5 g"
+      - "181.82 Schwartz 11 g"
+  dried oregano:
+    kg:
+      - "71.43 Tesco 14 g"
+      - "60.00 Tesco 30 g"
+      - "60.00 Sainsbury's 60 g"
+      - "54.44 Stamford Street 18 g"
+      - "79.17 Asda 12 g"
+      - "150.00 Waitrose 12 g"
+      - "117.86 Bart 14 g"
+      - "285.71 Schwartz 7 g"
+  egg:
+    note: "each is one hen egg"
+    each:
+      - "0.35 Sainsbury's free range large 6"
+      - "0.31 Sainsbury's free range medium 6"
+      - "0.19 Tesco mixed free range 15"
+      - "0.48 Happy Egg large 6"
+      - "0.40 St Ewe large 10"
+      - "0.58 Clarence Court Burford Brown large 6"
+      - "0.46 Farm Direct large 6"
+  fennel:
+    note: "each is one bulb"
+    each:
+      - "1.25 Tesco 1 bulb"
+      - "1.25 Morrisons 250 g bulb"
+      - "3.95 Natoora large 1 bulb"
+  fennel seeds:
+    kg:
+      - "27.78 Tesco 36 g"
+      - "33.82 Sainsbury's 34 g"
+      - "25.68 Asda 37 g"
+      - "54.55 Waitrose 33 g"
+      - "55.00 Bart 30 g"
+      - "8.33 East End 300 g"
+      - "9.40 Natco 100 g"
+  filo pastry:
+    kg:
+      - "7.04 Jus-Rol 270 g"
+      - "7.20 Theos 250 g"
+      - "6.00 Asda 200 g"
+      - "4.98 Melis 400 g"
+  fish sauce:
+    note: "big Asian-grocer bottle vs small supermarket bottle"
+    l:
+      - "3.31 Squid Brand 725 ml"
+      - "9.25 Thai Dragon 200 ml"
+      - "11.07 Blue Dragon 150 ml"
+      - "14.00 Waitrose Cooks' Ingredients 150 ml"
+  fish stock:
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
+    thin: true
+    l:
+      - "0.69 Knorr 8 cubes, one cube to 450 ml"
+    each:
+      - "0.31 Knorr 8 cubes"
+  five-spice:
+    kg:
+      - "29.41 Tesco 34 g"
+      - "31.67 Asda 30 g"
+      - "51.43 Waitrose 35 g"
+      - "34.48 Schwartz 58 g"
+  flaked almonds:
+    kg:
+      - "17.40 Tesco 250 g"
+      - "19.25 Waitrose 200 g"
+      - "18.50 Tesco toasted 100 g"
+      - "32.00 Sainsbury's organic 100 g"
+      - "31.00 Tesco organic 100 g"
+  flour:
+    kg:
+      - "0.53 Tesco plain 1.5 kg"
+      - "0.90 Sainsbury's plain 500 g"
+      - "0.52 Asda plain 1.5 kg"
+      - "0.47 Stockwell & Co plain 1.5 kg"
+      - "1.00 Homepride plain 1.5 kg"
+      - "1.00 Allinson's plain 1 kg"
+  frozen peas:
+    kg:
+      - "1.60 Waitrose Essential 1.25 kg"
+      - "1.56 Tesco 1.6 kg"
+      - "1.70 Asda 1 kg"
+      - "1.65 Morrisons 1 kg"
+      - "2.11 Iceland 950 g"
+      - "2.81 Birds Eye 800 g"
+  garlic:
+    note: "per-clove each not priced: no page gives cloves per bulb"
+    thin: true
+    head:
+      - "0.22 Morrisons 4 pack"
+      - "0.33 Morrisons organic 3 pack"
+      - "0.22 Waitrose Cooks' Ingredients pack"
+      - "0.22 Sainsbury's 1 bulb"
+      - "0.50 Tesco large 1 bulb"
+      - "0.50 Sainsbury's large 1 bulb"
+      - "0.50 Farm Direct 1 bulb"
+    kg:
+      - "5.00 Morrisons 400 g"
+      - "9.90 Farm Direct net 500 g"
+      - "15.00 Morrisons cloves 100 g"
+  garlic granules:
+    kg:
+      - "17.86 Tesco 56 g"
+      - "13.04 Tesco 138 g"
+      - "19.83 Sainsbury's 58 g"
+      - "11.91 Asda 115 g"
+      - "13.29 Stamford Street 70 g"
+      - "35.87 Bart 46 g"
+      - "40.00 Schwartz 50 g"
+  garlic powder:
+    kg:
+      - "22.22 Tesco 45 g"
+      - "14.20 Rajah 100 g"
+      - "9.40 Natco 100 g"
+      - "10.00 East End 100 g"
+  ginger:
+    note: "each and per-cm not priced: loose listings give no weight per piece; the dearer prepacks and cheap loose root differ by more than double"
+    kg:
+      - "12.50 Sainsbury's 100 g"
+      - "13.00 Tesco 100 g"
+      - "12.40 Morrisons 125 g"
+      - "16.54 Natoora organic 130 g"
+      - "5.60 Sainsbury's loose per kg"
+  glacé cherries:
+    kg:
+      - "8.75 Asda 200 g"
+      - "11.75 Sainsbury's 200 g"
+      - "11.75 Tesco 200 g"
+      - "12.75 Waitrose 200 g"
+  golden caster sugar:
+    kg:
+      - "2.00 Billington's 1 kg"
+      - "2.95 Sainsbury's 1 kg"
+      - "2.50 Tate & Lyle 1 kg"
+      - "3.00 Waitrose 1 kg"
+  golden syrup:
+    kg:
+      - "2.72 Tesco 680 g"
+      - "2.73 Sainsbury's 750 g"
+      - "2.29 Asda 750 g"
+      - "2.87 Lyle's 907 g"
+      - "2.86 Lyle's 700 g"
+  greek yoghurt:
+    kg:
+      - "8.33 Fage Total 5% 450 g"
+      - "6.21 Fage Total 2% 950 g"
+      - "4.60 Sainsbury's TTD 0% Greek 500 g"
+      - "4.25 Tesco Finest 0% Greek 1 kg"
+  green beans:
+    note: "plain green beans run half the price of fine beans"
+    kg:
+      - "3.86 Tesco 220 g"
+      - "3.87 Sainsbury's 300 g"
+      - "3.85 Morrisons Savers 200 g"
+      - "7.00 Sainsbury's fine 200 g"
+      - "6.67 Waitrose fine 300 g"
+      - "8.18 Morrisons fine 170 g"
+      - "9.50 Co-op extra fine 200 g"
+  ground coriander:
+    kg:
+      - "27.78 Tesco 36 g"
+      - "31.94 Sainsbury's 36 g"
+      - "27.94 Asda 34 g"
+      - "42.86 Waitrose 42 g"
+      - "6.88 Rajah 400 g"
+      - "9.40 Natco 100 g"
+      - "9.80 Laila 100 g"
+      - "83.33 Schwartz 24 g"
+  ground ginger:
+    kg:
+      - "26.32 Tesco 38 g"
+      - "30.26 Sainsbury's 38 g"
+      - "33.93 Asda 28 g"
+      - "56.25 Waitrose 32 g"
+      - "11.76 Rajah 85 g"
+      - "10.00 East End 100 g"
+      - "47.14 Bart 35 g"
+      - "76.92 Schwartz 26 g"
+  groundnut oil:
+    l:
+      - "4.54 KTC 1 l"
+      - "6.00 Sainsbury's 500 ml"
+      - "5.68 Asda 500 ml"
+      - "6.50 Waitrose 500 ml"
+      - "6.00 Tesco 500 ml"
+  herbs:
+    note: "pack is one small cut-herb pack of any common herb"
+    pack:
+      - "0.50 Tesco basil 30 g"
+      - "0.55 Sainsbury's coriander 30 g"
+      - "0.50 Morrisons parsley 30 g"
+      - "0.48 Tesco dill 20 g"
+      - "0.48 Morrisons chives 20 g"
+      - "1.29 Farm Direct bunch 50 g"
+    kg:
+      - "16.67 Tesco basil 30 g"
+      - "18.33 Sainsbury's coriander 30 g"
+      - "16.67 Morrisons parsley 30 g"
+      - "24.00 Tesco dill 20 g"
+      - "25.00 Morrisons thyme 20 g"
+      - "25.80 Farm Direct bunch 50 g"
+  hoisin sauce:
+    note: "g costed 1 g = 1 ml"
+    l:
+      - "8.40 Blue Dragon rich 250 ml"
+      - "8.00 Blue Dragon sweet 250 ml"
+      - "10.71 Lee Kum Kee 210 g"
+      - "6.97 Lee Kum Kee sweet 567 g"
+      - "11.00 Sainsbury's 150 ml"
+  honey:
+    kg:
+      - "4.72 Hilltop squeezy 720 g"
+      - "4.56 Rowse runny 680 g"
+      - "5.88 Rowse runny jar 340 g"
+      - "3.96 Sainsbury's clear 454 g"
+      - "3.50 Tesco squeezy 340 g"
+      - "3.63 Waitrose Essential 454 g"
+      - "11.03 Waitrose Duchy Organic 340 g"
+      - "8.80 Pasieka multiflower 1 kg"
+  icing sugar:
+    kg:
+      - "2.20 Silver Spoon 3 kg"
+      - "2.50 Tate & Lyle 1 kg"
+      - "2.80 Sainsbury's 500 g"
+      - "3.50 Tate & Lyle 500 g"
+      - "3.00 Billington's golden 500 g"
+  jam:
+    kg:
+      - "2.18 Tesco strawberry 454 g"
+      - "2.18 Sainsbury's strawberry 454 g"
+      - "2.42 Co-op strawberry 454 g"
+      - "5.67 Hartley's Best 300 g"
+      - "7.30 Bonne Maman 370 g"
+      - "11.44 St Dalfour 284 g"
+  kale:
+    kg:
+      - "4.44 Tesco curly 180 g"
+      - "4.45 Sainsbury's 200 g"
+      - "4.80 Asda sliced curly 150 g"
+      - "4.40 Morrisons sliced 150 g"
+      - "5.94 Co-op sliced 160 g"
+      - "7.67 Farm Direct curly 450 g"
+      - "7.45 Farm Direct green curly 200 g"
+  ketchup:
+    kg:
+      - "3.64 Heinz 1.35 kg"
+      - "4.92 Heinz 910 g"
+      - "6.48 Heinz 460 g"
+      - "3.62 Daddies 685 g"
+      - "2.13 Sainsbury's reduced salt 445 g"
+      - "1.59 Stockwell & Co 540 g"
+  lasagne:
+    note: "dried sheets"
+    kg:
+      - "1.50 Tesco dried 500 g"
+      - "1.50 Sainsbury's dried 500 g"
+      - "1.92 Asda dried 375 g"
+      - "1.80 Co-op dried 500 g"
+      - "3.31 Napolina 375 g"
+      - "3.50 Barilla 500 g"
+  leek:
+    note: "each is one leek; only one listing priced each"
+    thin: true
+    kg:
+      - "2.74 Tesco 500 g"
+      - "2.74 Sainsbury's 500 g"
+      - "2.74 Asda 500 g"
+      - "2.74 Morrisons 500 g"
+      - "3.88 Co-op 400 g"
+      - "4.10 Farm Direct 500 g"
+      - "5.63 Farm Direct 300 g"
+    each:
+      - "0.69 Tesco loose 1 leek"
+  lemon:
+    note: "each is one lemon"
+    each:
+      - "0.37 Tesco loose 1"
+      - "0.36 Tesco pack"
+      - "0.40 Waitrose loose 1"
+      - "0.33 Iceland pack"
+      - "0.22 Morrisons Savers pack"
+      - "0.55 Morrisons The Best pack"
+      - "0.39 Farm Direct 1"
+  lemon curd:
+    kg:
+      - "3.04 Tesco 411 g"
+      - "3.04 Sainsbury's 411 g"
+      - "2.85 Asda 411 g"
+      - "6.11 Bonne Maman 360 g"
+      - "6.15 Waitrose 325 g"
+      - "4.88 Gale's 410 g"
+  lemon juice:
+    note: "bottled"
+    l:
+      - "9.50 Jif 100 ml"
+      - "3.20 Pride 250 ml"
+      - "3.60 Asda 250 ml"
+      - "3.60 Sainsbury's 250 ml"
+      - "3.20 Tesco 500 ml"
+      - "7.60 Waitrose Sicilian 250 ml"
+      - "7.00 Tuscanini 200 ml"
+      - "2.28 KTC 250 ml"
+  lemongrass:
+    note: "each is one stalk"
+    each:
+      - "0.30 Sainsbury's pack"
+      - "0.30 Tesco min 2 stems"
+      - "0.35 Morrisons 2 pack"
+  lentils:
+    kg:
+      - "2.60 Tesco red split 1 kg"
+      - "4.20 Sainsbury's red 500 g"
+      - "4.00 Asda red 500 g"
+      - "4.20 Morrisons red split 500 g"
+      - "2.00 Laila red split 1 kg"
+      - "3.00 East End red split 500 g"
+  lettuce:
+    note: "each is one head"
+    each:
+      - "0.89 Tesco iceberg 1"
+      - "0.89 Aldi Nature's Pick iceberg 1"
+      - "1.00 Iceland iceberg 1"
+      - "0.95 Sainsbury's round 1"
+      - "0.60 Sainsbury's sweet gem 2 pack"
+      - "1.39 Farm Direct green 1"
+      - "1.79 Farm Direct cos 1"
+  lime:
+    note: "each is one lime"
+    each:
+      - "0.23 Tesco pack"
+      - "0.25 Sainsbury's 1"
+      - "0.30 Waitrose loose 1"
+      - "0.23 Morrisons loose 1"
+      - "0.33 Iceland pack"
+      - "0.24 Asda 5 pack"
+  lime juice:
+    note: "bottled"
+    l:
+      - "4.00 Pride 250 ml"
+      - "5.20 Sainsbury's 250 ml"
+      - "5.20 Tesco 250 ml"
+      - "4.00 Asda 250 ml"
+      - "2.32 KTC 250 ml"
+  mango:
+    note: "each is one mango"
+    each:
+      - "0.94 Tesco 1"
+      - "0.95 Tesco twin pack"
+      - "0.94 Morrisons loose 1"
+      - "0.95 Morrisons 2 pack"
+      - "1.00 Waitrose 1"
+      - "1.55 Waitrose 2 pack"
+      - "2.35 Tesco Finest 1"
+  marmalade:
+    kg:
+      - "5.04 Robertson's 454 g"
+      - "5.51 Frank Cooper's 454 g"
+      - "5.88 Mackays 340 g"
+      - "6.22 Bonne Maman 370 g"
+      - "5.29 Duerr's 340 g"
+      - "5.44 Tesco Finest 340 g"
+  mayonnaise:
+    kg:
+      - "5.00 Hellmann's 800 g"
+      - "5.63 Hellmann's 400 g"
+      - "6.57 Hellmann's 600 g"
+      - "2.00 Sainsbury's squeezy 500 ml"
+      - "11.45 Stokes 345 g"
+      - "12.68 Kewpie 355 ml"
+  milk:
+    l:
+      - "0.77 Tesco semi-skimmed 2.272 l"
+      - "1.06 Tesco semi-skimmed 1.13 l"
+      - "1.50 Tesco semi-skimmed 568 ml"
+      - "1.20 Iceland semi-skimmed 1 l"
+      - "1.25 Cravendale 2 l"
+      - "1.13 Yeo Valley organic 2 l"
+  mint:
+    note: "per-leaf each not priced: no page gives leaves per pack"
+    pack:
+      - "0.50 Tesco 30 g"
+      - "0.50 Sainsbury's 30 g"
+      - "0.50 Morrisons 30 g"
+      - "1.19 Farm Direct 100 g"
+    kg:
+      - "16.67 Tesco 30 g"
+      - "16.67 Sainsbury's 30 g"
+      - "16.67 Morrisons 30 g"
+      - "11.90 Farm Direct 100 g"
+  mirin:
+    l:
+      - "14.00 Yutaka 150 ml"
+      - "12.67 Sainsbury's 150 ml"
+      - "19.33 Waitrose Cooks' Ingredients 150 ml"
+      - "14.20 Asda 150 ml"
+  mixed peel:
+    kg:
+      - "7.75 Sainsbury's 200 g"
+      - "7.75 Tesco 200 g"
+      - "6.80 Asda 200 g"
+  mixed spice:
+    kg:
+      - "27.03 Tesco 37 g"
+      - "33.82 Sainsbury's 34 g"
+      - "28.79 Asda 33 g"
+      - "71.43 Schwartz 28 g"
+  muscovado sugar:
+    kg:
+      - "3.50 Billington's dark 500 g"
+      - "3.50 Billington's light 500 g"
+      - "4.00 Waitrose dark 1 kg"
+      - "4.00 Waitrose light 1 kg"
+  mushrooms:
+    kg:
+      - "4.00 Morrisons closed cup 250 g"
+      - "3.23 Morrisons closed cup 465 g"
+      - "3.21 Morrisons 700 g"
+      - "3.23 Tesco closed cup 400 g"
+      - "2.96 Sainsbury's 625 g"
+      - "5.36 Farm Direct closed cup 250 g"
+      - "6.60 Waitrose Duchy organic 250 g"
+  mustard:
+    note: "own label ~2.50-5, branded ~11-13"
+    kg:
+      - "11.16 Maille Dijon 215 g"
+      - "13.02 Grey Poupon Dijon 215 g"
+      - "2.43 Sainsbury's Dijon 185 g"
+      - "2.43 Tesco Dijon 185 g"
+      - "5.00 Waitrose Essential Dijon 180 g"
+      - "13.24 Colman's English 170 g"
+      - "3.51 Tesco English 185 g"
+      - "11.43 Maille wholegrain 210 g"
+  mustard powder:
+    note: "one product (Colman's tin), five shops"
+    kg:
+      - "40.35 Colman's Tesco 57 g"
+      - "40.35 Colman's Morrisons 57 g"
+      - "43.86 Colman's Sainsbury's 57 g"
+      - "43.86 Colman's Asda 57 g"
+      - "48.25 Colman's Waitrose 57 g"
+  mustard seeds:
+    kg:
+      - "16.67 Tesco 60 g"
+      - "19.17 Sainsbury's 60 g"
+      - "11.00 Rajah black 100 g"
+      - "13.00 Fudco brown 100 g"
+  new potatoes:
+    kg:
+      - "2.83 Morrisons 300 g"
+      - "0.99 Sainsbury's baby 1 kg"
+      - "1.60 Nanna Tate baby 750 g"
+      - "2.20 Sainsbury's TTD Anya 750 g"
+  nigella seeds:
+    kg:
+      - "22.22 Tesco 45 g"
+      - "23.96 Sainsbury's 48 g"
+      - "40.00 Waitrose 45 g"
+  noodles:
+    note: "dried egg noodles"
+    kg:
+      - "3.80 Tesco egg 250 g"
+      - "3.80 Sainsbury's egg 250 g"
+      - "4.60 Asda egg 250 g"
+      - "4.80 Waitrose egg 250 g"
+      - "5.32 Blue Dragon egg 250 g"
+      - "5.53 Sharwood's egg 226 g"
+  nutmeg:
+    note: "each is one whole nutmeg; supermarkets sell by weight with no count"
+    thin: true
+    each:
+      - "0.98 Alnatura organic Piccantino 3 nuts 12 g"
+      - "0.62 Pfefferdieb organic Piccantino 10 nuts"
+    kg:
+      - "30.30 Tesco whole 33 g"
+      - "31.94 Sainsbury's whole 36 g"
+      - "64.29 Waitrose whole 28 g"
+      - "58.93 Bart whole 28 g"
+      - "49.00 Real Foods whole 50 g"
+  oats:
+    kg:
+      - "1.25 Sainsbury's 1 kg"
+      - "2.25 Scott's 1 kg"
+      - "3.00 Quaker 500 g"
+      - "3.14 Quaker jumbo 1 kg"
+      - "3.00 Flahavan's organic 1 kg"
+  oil:
+    note: "mixed: neutral oils and olive oil"
+    l:
+      - "1.45 Sainsbury's vegetable 1 l"
+      - "1.48 Tesco vegetable 3 l"
+      - "2.50 Flora sunflower 1 l"
+      - "2.25 Crisp 'N' Dry rapeseed 1 l"
+      - "8.00 Napolina extra virgin olive 500 ml"
+      - "9.31 Filippo Berio classico olive 750 ml"
+  olive oil:
+    l:
+      - "10.00 Filippo Berio special selection 500 ml"
+      - "7.80 La Espanola extra virgin 1 l"
+      - "9.31 Filippo Berio extra virgin 750 ml"
+      - "8.00 Napolina extra virgin 500 ml"
+      - "9.31 Filippo Berio classico 750 ml"
+      - "11.85 Terra Delyssa extra virgin 1 l"
+      - "9.95 Karyatis extra virgin 1 l"
+      - "11.96 Napolina light 500 ml"
+  onion:
+    note: "each is one brown onion"
+    each:
+      - "0.33 Sainsbury's 3 pack"
+      - "0.32 Morrisons 3 pack"
+      - "0.11 Tesco loose 1"
+    kg:
+      - "0.95 Tesco 1 kg"
+      - "0.98 Asda 1 kg"
+      - "0.95 Morrisons 1 kg"
+      - "0.95 Sainsbury's 1 kg"
+      - "1.25 Iceland 1 kg"
+      - "2.20 Tesco organic 750 g"
+      - "1.38 Farm Direct Kent 500 g"
+      - "3.80 Farm Direct 500 g"
+  onion powder:
+    note: "onion granules; no onion powder listed by these shops"
+    kg:
+      - "19.23 Tesco granules 52 g"
+      - "19.83 Sainsbury's granules 58 g"
+      - "66.67 Schwartz granules 30 g"
+      - "39.29 Bart granules 42 g"
+  orange:
+    note: "each is one orange"
+    each:
+      - "0.35 Tesco 1"
+      - "0.49 Waitrose large pack"
+      - "0.56 Sainsbury's TTD pack"
+      - "0.45 Iceland pack"
+      - "0.30 Asda 5 medium"
+      - "0.55 Asda 4 large"
+      - "0.50 Sainsbury's 4 large"
+  orange blossom water:
+    l:
+      - "6.63 Greenfields Halalo 300 ml"
+      - "12.00 Cortas Sous Chef 300 ml"
+      - "42.00 Mymoune Ottolenghi 250 ml"
+      - "66.67 Nielsen-Massey Tesco 60 ml"
+  orange juice:
+    l:
+      - "2.00 Tropicana smooth 1.5 l"
+      - "1.45 Grower's Harvest 1 l"
+      - "2.22 Innocent with bits 900 ml"
+      - "1.86 Sainsbury's not from concentrate 1.75 l"
+      - "2.00 Innocent 1.75 l"
+      - "2.00 Tesco pure squeezed 1 l"
+      - "1.75 Iceland from concentrate 1 l"
+      - "1.59 Sainsbury's pure 1 l"
+      - "3.85 Waitrose No.1 freshly squeezed 1 l"
+  orzo:
+    kg:
+      - "2.00 Napolina 500 g"
+      - "3.70 Waitrose 500 g"
+      - "4.30 Sainsbury's TTD 500 g"
+      - "4.30 Tesco Finest 500 g"
+      - "3.80 Asda Exceptional 500 g"
+      - "4.30 Morrisons Best 500 g"
+  oyster sauce:
+    note: "g costed 1 g = 1 ml"
+    l:
+      - "5.41 Lee Kum Kee Panda 510 g"
+      - "10.00 Lee Kum Kee premium 255 g"
+      - "22.00 Sharwood's 150 ml"
+      - "14.33 Blue Dragon 150 ml"
+      - "11.67 Sainsbury's 150 ml"
+      - "11.00 Tesco 150 ml"
+      - "5.67 Healthy Boy 300 ml"
+      - "12.95 Waitrose 220 g"
+  panko:
+    kg:
+      - "14.00 Tesco 150 g"
+      - "14.00 Sainsbury's 100 g"
+      - "17.67 Waitrose 150 g"
+      - "11.11 Yutaka 180 g"
+      - "7.43 I-Sushi 350 g"
+      - "15.83 Blue Dragon 120 g"
+  paprika:
+    kg:
+      - "20.00 Tesco 50 g"
+      - "20.83 Tesco smoked 48 g"
+      - "26.14 Sainsbury's smoked 44 g"
+      - "10.00 Rajah 100 g"
+      - "10.00 East End 100 g"
+      - "5.50 Natco 400 g"
+      - "38.37 Bart 43 g"
+      - "50.00 Schwartz smoked 40 g"
+      - "38.57 La Chinata smoked 70 g"
+  parsley:
+    note: "pack is one cut-herb pack (30-150 g)"
+    pack:
+      - "0.55 Sainsbury's curly 30 g"
+      - "0.50 Morrisons flat 30 g"
+      - "0.50 Morrisons curly 30 g"
+      - "1.25 Morrisons flat 100 g"
+      - "1.39 Farm Direct flat bunch 150 g"
+    kg:
+      - "18.33 Sainsbury's curly 30 g"
+      - "16.67 Morrisons flat 30 g"
+      - "16.67 Morrisons curly 30 g"
+      - "12.50 Morrisons flat 100 g"
+      - "9.27 Farm Direct flat 150 g"
+  parsnip:
+    note: "each is one loose parsnip"
+    thin: true
+    each:
+      - "0.36 Tesco loose 1 parsnip"
+    kg:
+      - "1.70 Tesco 500 g"
+      - "1.10 Tesco Perfectly Imperfect 500 g"
+      - "1.48 Sainsbury's 500 g"
+      - "1.48 Sainsbury's loose per kg"
+      - "1.48 Morrisons 500 g"
+      - "1.80 Co-op 500 g"
+      - "1.60 Waitrose Essential 500 g"
+      - "1.48 Asda 500 g"
+  passata:
+    kg:
+      - "1.20 Tesco 500 g"
+      - "1.20 Sainsbury's 500 g"
+      - "2.30 Napolina 500 g"
+      - "2.50 Cirio 500 g"
+      - "3.71 Mutti 700 g"
+      - "2.50 Waitrose rustica 680 g"
+  pasta:
+    note: "dried"
+    kg:
+      - "1.19 Tesco spaghetti 1 kg"
+      - "1.50 Sainsbury's spaghetti 1 kg"
+      - "2.00 Napolina 500 g"
+      - "3.00 Barilla 500 g"
+      - "3.00 De Cecco 500 g"
+  peaches:
+    note: "each is one peach"
+    each:
+      - "0.56 Tesco min 4"
+      - "0.88 Waitrose min 4"
+      - "0.32 Asda flat peaches 4"
+      - "0.47 Suntrail Farms min 4"
+  peanut butter:
+    kg:
+      - "7.50 Whole Earth 1 kg"
+      - "5.87 Pip & Nut 1 kg"
+      - "5.50 Meridian 1 kg"
+      - "5.45 Nuts About Nature 1 kg"
+      - "10.00 Meridian 280 g"
+      - "8.33 Pip & Nut 300 g"
+  peanuts:
+    kg:
+      - "4.64 Tesco salted roasted 550 g"
+      - "4.73 Sainsbury's dry roasted 550 g"
+      - "4.00 Asda salted 500 g"
+      - "4.60 Aasani red skin kernels 500 g"
+      - "11.00 KP unsalted roasted 250 g"
+  pear:
+    note: "each is one pear"
+    each:
+      - "0.40 Sainsbury's Conference 4"
+      - "0.58 Sainsbury's Ripe & Ready 4"
+      - "0.60 Tesco Ready to Eat 4"
+      - "0.52 Tesco large Conference loose 1"
+      - "0.75 Waitrose Perfectly Ripe Red 4"
+      - "0.33 Sainsbury's Rocha & Packham 5"
+      - "0.39 Co-op Conference 6"
+  peppercorns:
+    note: "no each price: peppercorns are not counted"
+    kg:
+      - "28.00 Tesco whole black 100 g"
+      - "18.00 Tesco black 250 g"
+      - "18.48 Asda whole black 250 g"
+      - "33.00 Waitrose black 100 g"
+      - "18.50 Rajah whole black 100 g"
+      - "57.00 Tesco grinder 50 g"
+  pineapple:
+    note: "each is one whole pineapple"
+    each:
+      - "0.98 Tesco 1"
+      - "0.98 Asda Tangy & Tropical 1"
+      - "1.00 Sainsbury's Crownless 1"
+      - "1.75 Sainsbury's Large 1"
+      - "2.35 Waitrose Extra Large 1"
+  plums:
+    note: "each is one plum"
+    thin: true
+    kg:
+      - "3.75 Tesco 400 g"
+      - "8.15 Tesco Perfectly Ripe 325 g"
+      - "2.93 Asda 400 g"
+      - "3.75 Sainsbury's 400 g"
+      - "1.99 Sainsbury's Family 1 kg"
+      - "4.00 Waitrose Essential 400 g"
+      - "1.99 Suntrail Farms 1 kg"
+    each:
+      - "0.52 Sainsbury's Ripe & Ready 5"
+      - "0.66 Waitrose min 4"
+  pomegranate:
+    note: "each is one whole pomegranate"
+    thin: true
+    each:
+      - "1.00 Morrisons loose 1"
+      - "1.50 Sainsbury's single 1"
+  pomegranate seeds:
+    kg:
+      - "18.75 Tesco 80 g"
+      - "10.70 Asda 200 g"
+      - "19.44 Waitrose Good to Go 90 g"
+  port:
+    l:
+      - "12.00 Cockburn's Fine Ruby 75 cl"
+      - "12.25 Sainsbury's ruby 1 l"
+      - "12.67 Tesco ruby 75 cl"
+      - "12.50 Asda ruby 1 l"
+      - "14.00 Waitrose Blueprint ruby 75 cl"
+      - "19.33 Taylor's LBV 75 cl"
+      - "20.67 Dow's Trademark 75 cl"
+  potato:
+    note: "each is one baking potato"
+    kg:
+      - "0.90 Asda Maris Piper 2 kg"
+      - "0.93 Tesco Maris Piper 2 kg"
+      - "0.90 Sainsbury's Maris Piper 2 kg"
+      - "0.85 Albert Bartlett Rooster 2 kg"
+      - "1.20 Sainsbury's TTD Vivaldi 2 kg"
+      - "0.90 Sainsbury's baking loose per kg"
+      - "0.81 Asda baking 2 kg"
+    each:
+      - "0.27 Tesco large baking loose 1"
+      - "0.20 Sainsbury's baking 4"
+      - "0.21 Asda large baking 4"
+      - "0.20 Morrisons baking 4"
+      - "0.21 Co-op baking 4"
+  puff pastry:
+    kg:
+      - "4.69 Jus-Rol 320 g"
+      - "3.09 Tesco ready rolled 320 g"
+      - "4.38 Sainsbury's sheet 320 g"
+      - "3.75 Asda ready rolled 320 g"
+      - "5.00 Waitrose 320 g"
+      - "10.31 Jus-Rol all butter 320 g"
+      - "7.81 Tesco Finest all butter 320 g"
+  raisins:
+    kg:
+      - "4.70 Tesco 500 g"
+      - "4.70 Sainsbury's 500 g"
+      - "3.60 Asda 500 g"
+      - "7.70 Tesco flame 500 g"
+      - "6.67 Whitworths jumbo 300 g"
+  rapeseed oil:
+    note: "two grades: refined ~2-4, cold pressed ~7.50-8"
+    l:
+      - "2.25 Crisp 'N' Dry 1 l"
+      - "3.74 Mazola 1 l"
+      - "2.50 KTC 1 l"
+      - "4.70 Sainsbury's SO Organic 1 l"
+      - "7.50 Farrington's cold pressed 500 ml"
+      - "8.00 Tesco Finest cold pressed 500 ml"
+      - "8.00 Asda Extra Special cold pressed 500 ml"
+      - "7.60 Borderfields cold pressed 500 ml"
+  raspberries:
+    kg:
+      - "15.00 Tesco 150 g"
+      - "16.67 Co-op 150 g"
+      - "19.67 Sainsbury's TTD 150 g"
+      - "20.00 Iceland 125 g"
+      - "19.80 Asda Exceptional 150 g"
+      - "11.92 Rosedene Farms 125 g"
+      - "11.43 Sainsbury's frozen 315 g"
+  red onion:
+    note: "each is one red onion"
+    each:
+      - "0.35 Tesco 3 pack"
+      - "0.33 Waitrose 3 pack"
+      - "0.33 Sainsbury's 3 pack"
+      - "0.32 Morrisons 3 pack"
+      - "0.33 Iceland 3 pack"
+      - "0.40 Co-op 3 pack"
+      - "0.13 Tesco loose 1"
+    kg:
+      - "0.95 Tesco 1 kg"
+      - "0.95 Asda 1 kg"
+      - "0.95 Morrisons 1 kg"
+      - "2.90 Sainsbury's organic 500 g"
+      - "1.40 Farm Direct Kent 500 g"
+      - "2.78 Farm Direct 500 g"
+      - "4.00 Farm Direct 500 g"
+  red pepper:
+    note: "each is one pepper"
+    each:
+      - "0.70 Tesco 1"
+      - "0.80 Sainsbury's 1"
+      - "0.80 Morrisons loose 1"
+      - "0.58 Morrisons Savers 3"
+      - "0.66 Sainsbury's Sweet Peppers 3"
+      - "0.80 Co-op Mixed 3"
+      - "0.58 Asda Just Essentials 3"
+  red wine:
+    l:
+      - "11.25 Casillero del Diablo Merlot 75 cl"
+      - "9.33 Jam Shed Malbec 75 cl"
+      - "9.33 Casillero del Diablo Tempranillo 75 cl"
+      - "9.67 Yellow Tail Jammy Red Roo 75 cl"
+      - "7.85 Hardys VR Shiraz 75 cl"
+      - "9.33 Hardys Crest 75 cl"
+      - "12.00 Porta 6 75 cl"
+      - "12.67 Penfolds Koonunga Hill 75 cl"
+  red wine vinegar:
+    l:
+      - "4.23 Aspall 350 ml"
+      - "4.70 Sainsbury's 500 ml"
+      - "4.71 Tesco 350 ml"
+      - "4.17 Asda 350 ml"
+      - "8.00 Odysea 250 ml"
+      - "8.00 Aspall organic 350 ml"
+  rhubarb:
+    thin: true
+    kg:
+      - "6.25 Tesco 400 g"
+  rice:
+    kg:
+      - "1.25 Tesco easy cook long grain 1 kg"
+      - "1.25 Sainsbury's long grain 2 kg"
+      - "1.26 Sainsbury's easy cook 500 g"
+      - "2.50 Tilda long grain 1 kg"
+      - "0.52 Grower's Harvest long grain 1 kg"
+  rice flour:
+    kg:
+      - "1.95 Doves Farm 1 kg"
+      - "1.67 Natco 1.5 kg"
+      - "2.48 Natco 1 kg"
+  rice vinegar:
+    l:
+      - "14.67 Yutaka 150 ml"
+      - "14.67 Blue Dragon 150 ml"
+      - "15.67 Sainsbury's 150 ml"
+      - "15.00 Tesco rice wine vinegar 150 ml"
+      - "15.00 Asda 150 ml"
+      - "18.33 Waitrose Cooks' Ingredients 150 ml"
+      - "7.86 Morrisons 350 ml"
+      - "7.20 Tiger Tiger 150 ml"
+  rice wine:
+    l:
+      - "13.17 Taijade Shaohsing 600 ml"
+      - "18.32 Sous Chef Shaoxing 600 ml"
+      - "22.00 Yutaka Shaoxing 150 ml"
+      - "25.33 Tesco Shaoxing 150 ml"
+      - "25.33 Waitrose Shaoxing 150 ml"
+  risotto rice:
+    kg:
+      - "4.90 Sainsbury's arborio 500 g"
+      - "3.30 Tesco 1 kg"
+      - "5.20 Asda arborio 500 g"
+      - "5.56 Gallo 500 g"
+      - "5.10 Tesco carnaroli 500 g"
+  rocket:
+    kg:
+      - "16.67 Sainsbury's 60 g"
+      - "16.67 Tesco 60 g"
+      - "16.67 Morrisons 60 g"
+      - "16.00 Asda 60 g"
+      - "22.50 Co-op 60 g"
+      - "18.33 Waitrose 150 g"
+      - "17.73 Waitrose 110 g"
+  rosemary:
+    note: "pack is one cut-herb pack of about 20 g"
+    pack:
+      - "0.50 Sainsbury's 20 g"
+      - "0.50 Tesco 20 g"
+      - "0.70 Morrisons 1 pack"
+      - "1.60 Sainsbury's living pot"
+  rum:
+    l:
+      - "27.86 Captain Morgan dark 70 cl"
+      - "24.29 Lamb's Navy 70 cl"
+      - "18.25 Sainsbury's Caribbean Pearl dark 1 l"
+      - "23.57 Bacardi Carta Blanca 70 cl"
+      - "26.26 Mount Gay Eclipse 70 cl"
+      - "23.57 Sailor Jerry spiced 70 cl"
+      - "35.71 Goslings Black Seal 70 cl"
+  sage:
+    note: "pack is one cut-herb pack of about 20 g"
+    pack:
+      - "0.60 Sainsbury's 20 g"
+      - "0.50 Tesco 20 g"
+      - "0.70 Morrisons 1 pack"
+  sake:
+    note: "one shop (WASO, Japanese grocer), cooking sake; no supermarket sake found"
+    thin: true
+    l:
+      - "18.20 Takara cooking sake WASO 500 ml"
+      - "14.10 Takara Ryorino Tameno Seishu WASO 900 ml"
+      - "18.73 Hinode cooking sake WASO 400 ml"
+  sesame seeds:
+    kg:
+      - "12.00 Tesco 100 g"
+      - "12.50 Sainsbury's 100 g"
+      - "11.33 Asda 150 g"
+      - "9.40 Natco 100 g"
+  shallot:
+    kg:
+      - "3.88 Sainsbury's echalion 400 g"
+      - "3.38 Tesco 400 g"
+      - "3.38 Sainsbury's 400 g"
+      - "3.33 Asda 300 g"
+      - "3.93 Asda Exceptional echalion 300 g"
+      - "4.50 Co-op 300 g"
+      - "2.98 Nature's Pick 400 g"
+  sherry:
+    l:
+      - "11.25 Tesco fino 1 l"
+      - "11.25 Tesco cream 1 l"
+      - "11.25 Sainsbury's pale cream 1 l"
+      - "13.00 Harveys Bristol Cream 1 l"
+      - "12.50 Croft Original 1 l"
+      - "15.33 Waitrose No.1 Amontillado 75 cl"
+      - "20.67 Tesco Finest fino 37.5 cl"
+  sherry vinegar:
+    note: "one product line only; own-label (Tesco/Asda 350 ml) listed but out of stock with no price"
+    thin: true
+    l:
+      - "30.00 Belazu Gran Reserva Tesco 250 ml"
+      - "31.80 Belazu Gran Reserva Waitrose 250 ml"
+  shortcrust pastry:
+    kg:
+      - "6.25 Jus-Rol ready rolled 320 g"
+      - "4.30 Jus-Rol 2 sheets 640 g"
+      - "4.38 Sainsbury's ready rolled 320 g"
+      - "3.75 Asda ready rolled 320 g"
+      - "3.09 Tesco 320 g"
+  single cream:
+    l:
+      - "3.75 Sainsbury's 600 ml"
+      - "6.33 Tesco 150 ml"
+      - "4.50 Asda 300 ml"
+      - "5.33 Co-op 300 ml"
+      - "4.67 Waitrose Essential 300 ml"
+      - "10.56 Farm Direct 142 ml"
+  sorrel:
+    note: "pack is one bunch or punnet; Farm Direct's bunch is taken as 50 g"
+    thin: true
+    kg:
+      - "27.60 Nurtured in Norfolk bunch 50 g"
+      - "69.80 Farm Direct bunch, taken as 50 g"
+      - "71.67 Riverford 30 g"
+    pack:
+      - "1.38 Nurtured in Norfolk 50 g"
+      - "3.49 Farm Direct bunch"
+      - "2.15 Riverford 30 g"
+  sour cream:
+    l:
+      - "2.83 Tesco 300 ml"
+      - "3.33 Sainsbury's 300 ml"
+      - "2.83 Asda 300 ml"
+      - "4.67 Tesco 150 ml"
+      - "5.67 Waitrose 150 ml"
+  soured cream:
+    l:
+      - "4.67 Tesco 150 ml"
+      - "2.83 Tesco 300 ml"
+      - "3.33 Sainsbury's 300 ml"
+      - "2.83 Asda 300 ml"
+      - "5.67 Waitrose 150 ml"
+      - "8.50 Yeo Valley organic 200 g"
+      - "7.93 Farm Direct 150 g"
+  soy sauce:
+    l:
+      - "4.00 Lee Kum Kee light 500 ml"
+      - "9.00 Lee Kum Kee light 250 ml"
+      - "10.00 Kikkoman 250 ml"
+      - "10.00 Amoy light 150 ml"
+      - "6.00 Amoy all purpose 500 ml"
+      - "5.73 Blue Dragon 375 ml"
+      - "3.67 Sainsbury's light 150 ml"
+      - "3.67 Tesco light 150 ml"
+  spinach:
+    kg:
+      - "7.50 Sainsbury's baby 200 g"
+      - "5.19 Sainsbury's young 260 g"
+      - "5.20 Tesco baby 250 g"
+      - "6.11 Asda baby 180 g"
+  spring onion:
+    note: "pack is one bunch of about 100 g"
+    pack:
+      - "0.65 Sainsbury's 100 g"
+      - "0.65 Tesco 100 g"
+      - "0.68 Asda 1 bunch"
+      - "0.65 Nature's Pick 1 bunch"
+      - "1.00 Iceland 1 bunch"
+      - "1.00 Tesco large 130 g"
+  sriracha:
+    l:
+      - "7.91 Flying Goose 455 ml"
+      - "7.08 Bangthai 480 g"
+      - "8.59 Tabasco 256 ml"
+      - "6.50 Sainsbury's 300 g"
+      - "8.42 Tesco 285 g"
+  stock:
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
+    l:
+      - "0.89 Oxo chicken 12 cubes, one cube to 190 ml"
+      - "1.00 Oxo vegetable 12 cubes, one cube to 190 ml"
+      - "0.42 Knorr chicken 8 cubes, one cube to 450 ml"
+      - "0.38 Kallo vegetable 8 cubes, one cube to 500 ml"
+    each:
+      - "0.17 Oxo chicken 12 cubes"
+      - "0.19 Oxo vegetable 12 cubes"
+      - "0.11 Morrisons beef 12 cubes"
+      - "0.11 Sainsbury's vegetable 10 cubes"
+      - "0.19 Knorr chicken 8 cubes"
+  strawberries:
+    kg:
+      - "8.13 Tesco 400 g"
+      - "8.05 Asda 400 g"
+      - "14.00 Sainsbury's TTD 250 g"
+      - "11.00 Sainsbury's 250 g"
+      - "12.11 Iceland 227 g"
+  strong flour:
+    kg:
+      - "0.97 Tesco 1.5 kg"
+      - "0.97 Sainsbury's 1.5 kg"
+      - "0.97 Waitrose Essential 1.5 kg"
+      - "1.13 Allinson's 3 kg"
+      - "1.60 Hovis 1 kg"
+      - "1.10 Carr's 1.5 kg"
+  sugar:
+    kg:
+      - "1.09 Tate & Lyle granulated 1 kg"
+      - "1.20 Sainsbury's granulated 1 kg"
+      - "1.20 Whitworths granulated 1 kg"
+      - "1.00 Silver Spoon granulated 5 kg"
+      - "1.09 Sainsbury's granulated 5 kg"
+  sugar snap peas:
+    kg:
+      - "9.25 Waitrose 200 g"
+      - "9.27 Morrisons 150 g"
+      - "8.89 Tesco 180 g"
+  sultanas:
+    kg:
+      - "4.50 Sainsbury's 1 kg"
+      - "4.50 Waitrose Essential 1 kg"
+      - "3.60 Asda 500 g"
+      - "2.98 Grower's Harvest 500 g"
+      - "6.46 Whitworths 325 g"
+  sunflower oil:
+    l:
+      - "1.45 Sainsbury's 1 l"
+      - "1.45 Sainsbury's 3 l"
+      - "1.70 Tesco 5 l"
+      - "2.50 Flora 1 l"
+      - "2.50 KTC 1 l"
+      - "2.00 Manor Grove 1 l"
+      - "3.40 Tesco Organic 1 l"
+  sweet potato:
+    note: "each is one sweet potato"
+    thin: true
+    kg:
+      - "1.19 Tesco 1 kg"
+      - "1.24 Asda 1 kg"
+      - "1.19 Morrisons 1 kg"
+      - "1.19 Sainsbury's 1.25 kg"
+      - "1.19 Sainsbury's loose per kg"
+      - "3.75 Waitrose Evangeline 600 g"
+      - "4.29 Waitrose Duchy Organic 700 g"
+    each:
+      - "0.34 Tesco large loose 1"
+      - "1.05 Co-op 2"
+  tarragon:
+    note: "pack is one cut-herb pack"
+    pack:
+      - "0.60 Sainsbury's 20 g"
+      - "0.50 Tesco 20 g"
+      - "0.60 Morrisons 1 pack"
+      - "0.90 Waitrose Cooks' Ingredients 1 pack"
+      - "1.00 Asda 10 g"
+    kg:
+      - "30.00 Sainsbury's 20 g"
+      - "25.00 Tesco 20 g"
+      - "100.00 Asda 10 g"
+  thyme:
+    note: "pack is one cut-herb pack of about 20 g"
+    pack:
+      - "0.50 Tesco 20 g"
+      - "0.55 Sainsbury's 20 g"
+      - "0.50 Morrisons 1 pack"
+      - "0.50 Asda 1 pack"
+      - "1.80 Waitrose Cooks' Ingredients 18 g"
+  tomato:
+    note: "each is one round salad tomato"
+    each:
+      - "0.17 Tesco Classic Round 6"
+      - "0.18 Sainsbury's Classic Round 6"
+      - "0.17 Iceland Salad 6"
+    kg:
+      - "2.38 Tesco salad 650 g"
+      - "2.37 Asda salad 750 g"
+      - "1.90 Sainsbury's loose per kg"
+      - "4.10 Waitrose large vine per kg"
+      - "3.33 Waitrose classic vine 450 g"
+      - "4.90 Tesco vine 255 g"
+      - "4.80 Morrisons vine 250 g"
+  tomato purée:
+    kg:
+      - "2.95 Sainsbury's 200 g"
+      - "3.50 Asda 200 g"
+      - "6.00 Napolina 200 g"
+      - "9.62 Mutti 130 g"
+      - "11.54 Heinz 130 g"
+      - "7.00 Rodolfi 200 g"
+  turmeric:
+    kg:
+      - "22.22 Tesco 45 g"
+      - "15.50 Tesco 100 g"
+      - "23.96 Sainsbury's 48 g"
+      - "16.25 Sainsbury's 120 g"
+      - "21.11 Asda 45 g"
+      - "5.00 Rajah 1 kg"
+      - "6.25 Natco 400 g"
+      - "8.33 East End 300 g"
+      - "54.05 Schwartz 37 g"
+  turnip:
+    note: "each is one turnip"
+    thin: true
+    each:
+      - "0.60 Tesco 1"
+    kg:
+      - "2.20 Sainsbury's white loose per kg"
+      - "3.30 Waitrose loose per kg"
+  vegetable oil:
+    l:
+      - "1.45 Sainsbury's 1 l"
+      - "1.48 Tesco 3 l"
+      - "1.70 Tesco 5 l"
+      - "1.45 Co-op 1 l"
+      - "1.38 Asda 3 l"
+      - "1.45 Morrisons 1 l"
+      - "2.00 Waitrose Essential 2 l"
+  vegetable stock:
+    note: "each is one stock cube; l is cubes made up as the packet says: Oxo one to 190 ml, Knorr one to 450 ml"
+    l:
+      - "1.00 Oxo 12 cubes, one cube to 190 ml"
+      - "0.47 Knorr 8 cubes, taken as Knorr chicken's 450 ml"
+      - "0.38 Kallo 8 cubes, one cube to 500 ml"
+    each:
+      - "0.19 Oxo 12 cubes"
+      - "0.11 Sainsbury's 10 cubes"
+      - "0.21 Knorr 8 cubes"
+      - "0.19 Kallo 8 cubes"
+      - "0.11 Morrisons 12 cubes"
+  vinegar:
+    note: "mixed: malt and white wine vinegar"
+    l:
+      - "0.62 Tesco malt 568 ml"
+      - "0.62 Asda malt 568 ml"
+      - "0.79 Sainsbury's distilled malt 568 ml"
+      - "1.41 Waitrose Essential malt 568 ml"
+      - "2.37 Sarson's pickling 950 ml"
+      - "4.71 Tesco white wine 350 ml"
+  watercress:
+    kg:
+      - "17.50 Tesco 80 g"
+      - "18.13 Sainsbury's 80 g"
+      - "15.53 Asda 85 g"
+      - "29.38 John Hurd's organic 80 g"
+  whipping cream:
+    l:
+      - "5.67 Sainsbury's 300 ml"
+      - "5.67 Tesco 300 ml"
+      - "5.67 Asda 300 ml"
+      - "6.80 Farm Direct 2 l"
+  white wine:
+    l:
+      - "7.93 Hardys VR Pinot Grigio 75 cl"
+      - "10.00 Casillero del Diablo Pinot Grigio 75 cl"
+      - "9.67 La Vieille Ferme Blanc 75 cl"
+      - "9.33 Brancott Flight 75 cl"
+      - "9.31 Gallo Pinot Grigio 75 cl"
+      - "10.00 Campo Viejo Blanco 75 cl"
+      - "9.20 McGuigan Black Label 75 cl"
+      - "7.31 Hardys Stamp 75 cl"
+  white wine vinegar:
+    l:
+      - "4.23 Aspall 350 ml"
+      - "4.70 Sainsbury's 500 ml"
+      - "4.71 Tesco 350 ml"
+      - "4.17 Asda 350 ml"
+      - "8.00 Odysea 250 ml"
+      - "8.00 Aspall organic 350 ml"
+  wholemeal flour:
+    kg:
+      - "1.00 Allinson's plain wholemeal 1 kg"
+      - "1.00 Sainsbury's strong wholemeal 1.5 kg"
+      - "0.97 Asda wholemeal bread 1.5 kg"
+      - "1.07 Wright's strong wholemeal 1.5 kg"
+      - "1.60 Hovis strong wholemeal 1 kg"
+      - "2.30 Doves Farm organic plain wholemeal 1 kg"
+  wine:
+    note: "red and white"
+    l:
+      - "7.85 Hardys VR Shiraz 75 cl"
+      - "9.33 Jam Shed Malbec 75 cl"
+      - "11.25 Casillero del Diablo Merlot 75 cl"
+      - "7.93 Hardys VR Pinot Grigio 75 cl"
+      - "9.33 Brancott Flight Sauvignon 75 cl"
+      - "10.00 Casillero del Diablo Pinot Grigio 75 cl"
+  worcestershire sauce:
+    l:
+      - "10.28 Lea & Perrins 290 ml"
+      - "13.33 Lea & Perrins 150 ml"
+      - "8.67 Tesco 150 ml"
+      - "8.67 Sainsbury's 150 ml"
+      - "8.67 Asda 150 ml"
+  yeast:
+    kg:
+      - "28.57 Tesco fast action 56 g"
+      - "28.57 Sainsbury's fast action 56 g"
+      - "15.00 Allinson's easy bake tin 100 g"
+      - "9.60 Allinson's dried active tin 125 g"
+  yoghurt:
+    kg:
+      - "1.72 Lancashire Farm natural 1 kg"
+      - "2.50 Lancashire Farm natural 500 g"
+      - "1.10 Sainsbury's fat free natural 500 g"
+      - "5.67 Yeo Valley natural 150 g"
+      - "6.18 Yeo Valley super thick 850 g"
+
+  # --- priced from #1468's unpriced list -------------------------------------
+  ajwain:
+    kg:
+      - "10.00 East End Tesco 100 g"
+      - "28.00 Natco Sous Chef 100 g"
+      - "8.90 Natco Sujash 100 g"
+      - "10.90 Natco SaveCo 100 g"
+  almond extract:
+    l:
+      - "66.67 Nielsen-Massey Tesco 60 ml"
+      - "66.67 Nielsen-Massey Sainsbury's 60 ml"
+      - "63.16 Sainsbury's TTD 38 ml"
+      - "47.14 Dr Oetker Trolley 35 ml"
+      - "77.00 Taylor & Colledge Trolley 50 ml"
+  amaretto:
+    l:
+      - "27.50 Disaronno Asda 500 ml"
+      - "28.50 Disaronno Co-op 500 ml"
+      - "38.00 Disaronno Sainsbury's 500 ml"
+      - "38.00 Disaronno Tesco 500 ml"
+      - "39.00 Disaronno Morrisons 500 ml"
+      - "14.00 Veroni Trolley 500 ml"
+  amchoor:
+    kg:
+      - "28.00 Natco Sous Chef 100 g"
+      - "10.90 Fudco Alli Bhavan 100 g"
+      - "14.90 MDH Alli Bhavan 100 g"
+      - "19.90 MDH Variety Foods 100 g"
+  anchovy paste:
+    thin: true
+    kg:
+      - "29.17 Lusso Vita Waitrose 60 g"
+      - "33.17 Scalia Italian Cookshop 60 g"
+  baby gem lettuces:
+    note: "each is one lettuce"
+    each:
+      - "0.60 Sainsbury's sweet gem 2"
+      - "0.39 Morrisons little gem 2"
+      - "0.39 Tesco little gem 2"
+      - "0.80 Sainsbury's organic little gem 2"
+  baking soda:
+    kg:
+      - "3.61 Sainsbury's 180 g"
+      - "3.25 Asda 200 g"
+      - "3.25 Tesco Stockwell 200 g"
+      - "5.75 Borwick's Trolley 200 g"
+      - "8.00 Dr Oetker Trolley 200 g"
+      - "8.61 Waitrose 180 g"
+  bamboo shoots from a can:
+    note: "per can weight; no drained weight listed"
+    kg:
+      - "4.67 Asda 225 g"
+      - "5.33 Sainsbury's 225 g"
+      - "5.11 Kingfisher Trolley 225 g"
+  bao buns:
+    note: "each is one plain bun"
+    thin: true
+    each:
+      - "0.39 Tesco 6"
+      - "0.48 Co-op 6"
+  bart bouquet garni bags:
+    note: "each is one bag; 10 g jar of 8 bags"
+    thin: true
+    each:
+      - "0.31 Bart Waitrose 8 bags"
+      - "0.31 Bart Ocado 8 bags"
+      - "0.28 Bart own shop 8 bags"
+  bean curd skin:
+    note: "dried sheets"
+    thin: true
+    kg:
+      - "17.00 Dali Waso 250 g"
+      - "15.40 Dali Getyouonline 250 g"
+  black or red seedless grapes:
+    kg:
+      - "4.00 Tesco red 500 g"
+      - "4.00 Sainsbury's black 500 g"
+      - "4.00 Tesco black 500 g"
+      - "5.63 Iceland black 400 g"
+  bocconcini:
+    note: "pack weights as listed; some include brine"
+    kg:
+      - "9.05 Tesco mini pearls 210 g"
+      - "15.20 Sainsbury's pearls 125 g"
+      - "15.67 Galbani minis 150 g"
+      - "7.50 Waitrose mini mozzarella 280 g"
+      - "7.89 Galbani 20 mini 285 g"
+  brioche burger buns:
+    note: "each is one bun"
+    each:
+      - "0.25 Tesco 4"
+      - "0.24 Tesco Fire Pit 8"
+      - "0.26 Sainsbury's 4"
+      - "0.38 Tesco Finest 4"
+      - "0.44 St Pierre Trolley 4"
+  brown ale:
+    l:
+      - "3.38 Newcastle Tesco 4x500 ml"
+      - "3.38 Newcastle Morrisons 4x500 ml"
+      - "3.18 Newcastle Trolley 550 ml"
+  bunch of red grapes:
+    note: "each is one punnet (400-500 g), the supermarket form of a bunch"
+    each:
+      - "2.00 Tesco 500 g"
+      - "2.00 Sainsbury's 500 g"
+      - "2.00 Asda 500 g"
+      - "2.25 Iceland 400 g"
+      - "2.60 Tesco Finest 500 g"
+    kg:
+      - "4.00 Tesco 500 g"
+      - "4.00 Sainsbury's 500 g"
+      - "4.00 Asda 500 g"
+      - "5.63 Iceland 400 g"
+      - "5.20 Tesco Finest 500 g"
+  cacao powder:
+    kg:
+      - "28.00 Naturya Tesco 250 g"
+      - "28.00 Naturya Sainsbury's 250 g"
+      - "40.00 Naturya Trolley 125 g"
+      - "31.60 Food Thoughts Trolley 125 g"
+  camomile teabags:
+    note: "each is one tea bag"
+    each:
+      - "0.040 Sainsbury's 80 bags"
+      - "0.050 Sainsbury's Infusions 20 bags"
+      - "0.040 Tesco 40 bags"
+      - "0.040 Asda 40 bags"
+      - "0.060 Waitrose 20 bags"
+      - "0.070 Twinings Sainsbury's 80 bags"
+      - "0.080 Twinings Waitrose 80 bags"
+  camp coffee:
+    l:
+      - "8.09 Sainsbury's 241 ml"
+      - "8.09 Tesco 241 ml"
+      - "8.30 Asda 241 ml"
+      - "8.30 Morrisons 241 ml"
+      - "8.30 Waitrose 241 ml"
+  can sweetcorn:
+    note: "Sainsbury's prices are per drained weight; Tesco and Asda per net can weight"
+    kg:
+      - "1.91 Sainsbury's 157 g drained"
+      - "1.92 Sainsbury's 260 g drained"
+      - "1.63 Tesco 325 g"
+      - "2.53 Asda 198 g"
+  caper berries:
+    note: "no listing gives a berry count, so priced by weight only"
+    thin: true
+    kg:
+      - "25.83 Sainsbury's Taste the Difference 120 g drained"
+      - "16.81 Waitrose 235 g jar"
+  caramel:
+    note: "priced as a tin of Carnation caramel"
+    kg:
+      - "3.70 Carnation Asda 397 g"
+      - "4.79 Carnation Tesco 397 g"
+      - "4.79 Carnation Sainsbury's 397 g"
+      - "3.69 Tesco caramel dessert sauce 325 g"
+  chai spice powder:
+    note: "no supermarket sells a ground chai blend"
+    thin: true
+    kg:
+      - "75.00 Steenbergs own shop 40 g"
+      - "74.75 Steenbergs Christmas spice Real Foods 40 g"
+  chai teabags:
+    note: "each is one tea bag"
+    each:
+      - "0.17 Twinings Sainsbury's 20 bags"
+      - "0.17 Twinings Tesco 20 bags"
+      - "0.050 Tesco Finest 50 bags"
+      - "0.060 Waitrose 50 bags"
+      - "0.25 Pukka Sainsbury's 20 bags"
+      - "0.24 Pukka Asda 20 bags"
+  chard:
+    note: "each is one 200 g bag; no supermarket sells chard by the bunch"
+    thin: true
+    kg:
+      - "9.00 Sainsbury's 200 g"
+      - "9.00 Tesco Finest 200 g"
+      - "9.00 Waitrose 200 g"
+    each:
+      - "1.80 Sainsbury's 200 g"
+      - "1.80 Tesco Finest 200 g"
+      - "1.80 Waitrose 200 g"
+  chicory heads:
+    note: "pack is one supermarket pack; no listing states how many heads it holds"
+    thin: true
+    kg:
+      - "7.40 Sainsbury's white 250 g"
+      - "8.00 Waitrose 250 g"
+      - "10.71 Sainsbury's red 140 g"
+      - "11.79 Waitrose red 140 g"
+    pack:
+      - "2.25 Tesco Finest pack"
+      - "2.25 Morrisons The Best pack"
+      - "2.00 Waitrose 250 g"
+      - "1.85 Sainsbury's 250 g"
+  chile de árbol:
+    note: "whole dried; specialists only; no per-chilli count given"
+    thin: true
+    kg:
+      - "232.50 Cool Chile Real Foods 20 g"
+      - "44.90 Mextrade 100 g"
+      - "29.99 Mextrade 1 kg"
+  chinese five-spice powder:
+    kg:
+      - "29.41 Tesco 34 g"
+      - "31.67 Asda 30 g"
+      - "51.43 Waitrose 35 g"
+      - "34.48 Schwartz Asda 58 g"
+      - "34.48 Schwartz Morrisons 58 g"
+      - "37.07 Schwartz Tesco 58 g"
+  chipotle paste:
+    kg:
+      - "20.53 Tesco 95 g"
+      - "20.00 Asda 100 g"
+      - "40.00 Gran Luchito Sainsbury's 100 g"
+      - "40.00 Gran Luchito Tesco 100 g"
+      - "40.00 Gran Luchito Morrisons 100 g"
+      - "42.50 Gran Luchito Waitrose 100 g"
+  chopped fresh oregano:
+    note: "fresh oregano; only two shops list it"
+    thin: true
+    kg:
+      - "35.00 Sainsbury's 20 g"
+      - "35.00 Morrisons 20 g"
+  chopped nuts:
+    note: "chopped mixed nuts"
+    kg:
+      - "9.75 Sainsbury's 200 g"
+      - "9.75 Tesco 200 g"
+      - "8.53 Asda 150 g"
+  citrus fruit:
+    note: "each is one orange or lemon; the item is vague, so priced as the commonest citrus"
+    thin: true
+    each:
+      - "0.35 Tesco orange"
+      - "0.30 Sainsbury's orange"
+      - "0.50 Sainsbury's 4 large oranges"
+      - "0.37 Tesco lemon"
+  clementines:
+    note: "shops sell them as easy peelers"
+    thin: true
+    each:
+      - "0.56 Iceland luxury easy peelers 4"
+    kg:
+      - "2.50 Sainsbury's easy peelers 600 g"
+      - "2.50 Tesco easy peelers 600 g"
+      - "2.80 Co-op easy peelers 500 g"
+      - "2.58 Iceland easy peelers 600 g"
+      - "3.44 Waitrose easy peelers 1 kg"
+  conchiglie:
+    kg:
+      - "1.19 Tesco 1 kg"
+      - "1.38 Sainsbury's 500 g"
+      - "1.54 Asda 500 g"
+      - "2.00 Napolina via trolley 500 g"
+      - "2.60 De Cecco via trolley 500 g"
+      - "4.30 Tesco Finest 500 g"
+  cooked grains:
+    note: "ready-to-eat grain pouch"
+    kg:
+      - "8.60 Merchant Gourmet Sainsbury's 250 g"
+      - "8.60 Merchant Gourmet Tesco 250 g"
+      - "8.60 Merchant Gourmet Morrisons 250 g"
+      - "6.00 Merchant Gourmet Asda 250 g"
+  corn cobs:
+    note: "each is one cob"
+    each:
+      - "0.65 Tesco twin pack"
+      - "0.65 Sainsbury's 2 pack"
+      - "0.70 Morrisons 2 pack"
+      - "0.83 Waitrose 2 pack"
+  corn tacos:
+    note: "each is one small tortilla; listings do not say whether each is all corn or corn and wheat"
+    thin: true
+    each:
+      - "0.18 Asda 8 corn tortillas"
+      - "0.20 Old El Paso white corn via trolley 10 pack"
+      - "0.21 Gran Luchito soft taco via trolley 10 pack"
+      - "0.13 Sainsbury's soft taco 10 pack"
+  cranberry or redcurrant jelly:
+    kg:
+      - "5.95 Tesco redcurrant 227 g"
+      - "5.95 Asda redcurrant 227 g"
+      - "5.80 Sainsbury's redcurrant 250 ml"
+      - "9.71 Tiptree redcurrant via trolley 340 g"
+  cranberry sauce:
+    kg:
+      - "2.25 Tesco 200 g"
+      - "3.20 Sainsbury's 250 ml"
+      - "8.70 Ocean Spray via trolley 200 g"
+      - "9.77 Sainsbury's Taste the Difference 220 g"
+      - "11.95 Waitrose 205 g"
+  croissants:
+    note: "each is one all-butter croissant"
+    each:
+      - "0.36 Sainsbury's 4 pack"
+      - "0.38 Tesco 4 pack"
+      - "0.35 Tesco 8 pack"
+      - "0.63 Tesco Finest 4 pack"
+      - "0.51 Waitrose 8 pack"
+  cured or smoked fish:
+    note: "smoked salmon and smoked mackerel both included"
+    kg:
+      - "38.00 Tesco smoked salmon 100 g"
+      - "39.50 Sainsbury's smoked salmon 100 g"
+      - "30.90 Sainsbury's smoked salmon 200 g"
+      - "49.50 Tesco Finest smoked salmon 100 g"
+      - "26.79 Sainsbury's smoked mackerel 140 g"
+      - "28.18 Tesco Finest hot smoked mackerel 110 g"
+  curry leaf sprigs:
+    note: "no listing sells by the sprig; the supermarket pack is tiny and far dearer per kg"
+    thin: true
+    kg:
+      - "37.00 Real Foods fresh 100 g"
+      - "19.90 Alli Bhavan fresh 100 g"
+      - "260.00 Sainsbury's 5 g"
+  custard powder:
+    kg:
+      - "5.71 Bird's Asda 350 g"
+      - "6.71 Bird's Tesco 350 g"
+      - "6.71 Bird's Sainsbury's 350 g"
+      - "6.71 Bird's Morrisons 350 g"
+  daikon:
+    note: "each is one whole mooli; Tesco is the only supermarket listing found"
+    thin: true
+    kg:
+      - "2.00 Tesco loose mooli"
+    each:
+      - "2.00 Tesco 1 mooli"
+      - "2.10 Tesco 1 mooli via trolley"
+  dairy-free sunflower spread:
+    kg:
+      - "3.68 Pure Asda 500 g"
+      - "4.30 Pure Tesco 500 g"
+      - "2.80 Vitalite via trolley 500 g"
+      - "4.33 Flora dairy free via trolley 450 g"
+  date molasses:
+    note: "g taken as ml; the cheaper two are sold as date syrup"
+    l:
+      - "17.40 Odysea Real Foods 250 ml"
+      - "20.40 Odysea Ottolenghi 250 ml"
+      - "12.22 Honey & Spice 450 ml"
+      - "8.24 Groovy Food date syrup via trolley 340 g"
+      - "8.87 Almanaar date syrup 450 g"
+  digestive biscuits:
+    kg:
+      - "4.63 McVitie's Asda 2x315 g"
+      - "4.68 McVitie's Sainsbury's 2x315 g"
+      - "5.08 McVitie's Tesco 2x315 g"
+      - "1.60 Asda digestives 400 g"
+      - "5.88 Hovis Trolley 250 g"
+  dried fenugreek leaves:
+    kg:
+      - "10.00 East End kasuri methi via trolley 100 g"
+      - "14.80 Natco kasoori methi via trolley 100 g"
+      - "30.00 Fudco kasuri methi via trolley 50 g"
+  dried juniper berries:
+    note: "Schwartz (Morrisons 2.00, Tesco 2.15) and Waitrose (1.80) jars list no weight; no per-berry count"
+    thin: true
+    kg:
+      - "41.07 Sainsbury's 28 g"
+  dry pitted black olives:
+    note: "dry-cured, not brined"
+    thin: true
+    kg:
+      - "20.91 Sainsbury's Moroccan dry 110 g"
+      - "25.00 Crespo Ocado 70 g"
+  earl grey teabags:
+    note: "each is one tea bag"
+    each:
+      - "0.060 Twinings Tesco 80 bags"
+      - "0.060 Twinings Sainsbury's 80 bags"
+      - "0.070 Twinings Waitrose 80 bags"
+      - "0.040 Twinings Asda 80 bags"
+      - "0.030 Sainsbury's Taste the Difference 100 bags"
+      - "0.030 Morrisons The Best 100 bags"
+  echalion:
+    note: "no shop states a count, so no each price"
+    kg:
+      - "3.88 Sainsbury's 400 g"
+      - "3.88 Tesco Finest 400 g"
+      - "2.98 Aldi 400 g"
+      - "3.93 Asda Exceptional 300 g"
+  espresso coffee:
+    note: "ground espresso coffee; recipes count shots, so a gram weight per shot is needed to cost one"
+    kg:
+      - "26.00 Lavazza Sainsbury's 250 g"
+      - "26.00 Lavazza Tesco 250 g"
+      - "26.00 Lavazza Asda 250 g"
+      - "27.80 Lavazza Waitrose 250 g"
+      - "14.32 Tesco espresso 227 g"
+      - "16.52 Sainsbury's espresso 227 g"
+      - "13.22 Asda Italian style 227 g"
+  farfalle:
+    kg:
+      - "1.50 Tesco 500 g"
+      - "1.38 Sainsbury's 500 g"
+      - "1.38 Co-op 500 g"
+      - "1.54 Asda 500 g"
+      - "3.30 Waitrose 500 g"
+      - "3.00 Napolina via trolley 500 g"
+  fenugreek seeds:
+    kg:
+      - "3.75 Natco Trolley 400 g"
+      - "30.00 Bart Trolley 55 g"
+      - "30.00 Waitrose 60 g"
+  figs:
+    note: "each is one fresh fig; the loose listing was out of stock; other shops' fig listings do not say fresh or dried"
+    thin: true
+    each:
+      - "0.67 Tesco 3 pack"
+      - "0.50 Tesco loose"
+  fine ground polenta:
+    note: "the two cheap ones are sold as fine cornmeal"
+    kg:
+      - "5.00 Sainsbury's 400 g"
+      - "5.87 Polenta Valsugana via trolley 375 g"
+      - "2.00 Tropical Sun fine cornmeal via trolley 500 g"
+      - "1.40 Natco fine cornmeal via trolley 1.5 kg"
+  firm tofu:
+    kg:
+      - "4.73 Sainsbury's SO Organic super firm 300 g"
+      - "8.11 Tofoo via trolley 280 g"
+      - "7.71 Tofoo XL via trolley 450 g"
+      - "7.25 Cauldron via trolley 396 g"
+  fish fillets:
+    note: "two grades: frozen basic white fish and boneless cod"
+    kg:
+      - "4.29 Sainsbury's Stamford Street frozen white fish 520 g"
+      - "4.42 Asda Just Essentials frozen white fish 520 g"
+      - "19.44 Sainsbury's cod 360 g"
+      - "29.11 Tesco cod 280 g"
+  flatbreads:
+    note: "each is one flatbread"
+    each:
+      - "0.38 Tesco Greek style folded 4 pack"
+      - "0.25 Sainsbury's plain folded 6 pack"
+      - "0.45 Sainsbury's Greek style 4 pack"
+      - "0.34 Deli Kitchen via trolley 4 pack"
+      - "0.50 Crosta & Mollica via trolley 4 pack"
+  fresh jalapeño:
+    note: "no listing gives a count, so priced by weight only; Ocado price from a price tracker"
+    thin: true
+    kg:
+      - "15.00 Waitrose 100 g"
+      - "11.25 Tesco 80 g"
+      - "8.00 Ocado 200 g"
+      - "9.09 Waitrose Mexican green 220 g"
+  fresh or frozen blackcurrants:
+    note: "no supermarket sells plain frozen blackcurrants; the Sainsbury's line is tinned"
+    kg:
+      - "5.69 Ardo frozen Natural Grocery 1 kg"
+      - "9.88 Windmill Hill organic frozen Real Foods 400 g"
+      - "11.23 organic frozen Natural Grocery 400 g"
+      - "5.86 Sainsbury's in fruit juice 290 g"
+  fresh pesto:
+    note: "Rana is chilled; listings do not say whether the own-label lines are chilled or jarred"
+    thin: true
+    kg:
+      - "12.14 Rana via trolley 140 g"
+      - "10.00 Rana basil & pine nut via trolley 250 g"
+      - "12.11 Sainsbury's Taste the Difference 190 g"
+      - "15.79 Waitrose No.1 190 g"
+  frozen chips:
+    kg:
+      - "1.67 Waitrose Essential 900 g"
+      - "1.33 Sainsbury's 1.5 kg"
+      - "2.79 Tesco 950 g"
+      - "2.18 McCain via trolley 1.7 kg"
+      - "2.29 Iceland 1.2 kg"
+  frozen edamame:
+    kg:
+      - "5.70 Asda frozen 600 g"
+      - "5.67 Tesco soya beans 600 g"
+      - "5.76 Sainsbury's 500 g"
+      - "5.50 Yutaka shelled Trolley 500 g"
+  frozen sweetcorn:
+    kg:
+      - "1.49 Sainsbury's Stamford Street 950 g"
+      - "1.49 Tesco Grower's Harvest 907 g"
+      - "1.90 Sainsbury's 1 kg"
+      - "2.33 Iceland 860 g"
+      - "4.69 Birds Eye via trolley 640 g"
+      - "4.20 Waitrose Duchy Organic 500 g"
+  frozen wonton wrappers:
+    note: "no supermarket other than Ocado lists them"
+    thin: true
+    kg:
+      - "9.00 Imperial Dragon Ocado 350 g"
+      - "11.25 Happy Boy Tuk Tuk Mart 200 g"
+  garam masala powder:
+    kg:
+      - "26.32 Tesco 38 g"
+      - "30.26 Sainsbury's 38 g"
+      - "10.33 Asda 92 g"
+      - "12.94 Rajah via trolley 85 g"
+      - "14.00 East End via trolley 100 g"
+      - "8.60 Natco via trolley 1 kg"
+  glycerine:
+    l:
+      - "27.63 Dr Oetker Morrisons 38 ml"
+      - "28.95 Dr Oetker Sainsbury's 38 ml"
+      - "28.95 Dr Oetker Tesco 38 ml"
+      - "28.95 Dr Oetker Waitrose 38 ml"
+  grand marnier:
+    note: "Waitrose shelf price, not its 18.00 offer"
+    l:
+      - "43.00 Waitrose 50 cl"
+      - "51.00 Tesco 50 cl"
+      - "35.64 Milroys 70 cl"
+      - "42.43 Amathus 70 cl"
+      - "44.99 House of Townend 70 cl"
+      - "49.93 Secret Bottle Shop 70 cl"
+  grapefruits:
+    note: "each is one grapefruit"
+    each:
+      - "0.44 Sainsbury's"
+      - "0.44 Asda"
+      - "0.49 Morrisons"
+      - "0.50 Tesco 3 pack"
+  greek kalkidis olives:
+    note: "read as Halkidiki olives"
+    kg:
+      - "17.50 Odysea Halkidiki via trolley 160 g drained"
+      - "20.31 Sainsbury's garlic stuffed Halkidiki 160 g"
+      - "30.77 Tesco Finest giant Halkidiki 130 g"
+      - "28.57 Belazu Halkidiki via trolley 140 g"
+      - "20.00 Olly's Halkidiki via trolley 200 g"
+  green bananas or 2 plantains:
+    note: "each is one plantain or green banana; no supermarket lists fresh plantain"
+    thin: true
+    each:
+      - "0.89 Alli Bhavan green plantain"
+      - "0.90 OSO Local green plantain"
+      - "0.45 The Black Farmer green banana"
+  green olives:
+    note: "per kg of drained olives where a jar gives its drained weight"
+    kg:
+      - "6.76 Sainsbury's 800 g jar 370 g drained"
+      - "9.00 Sainsbury's 340 g jar 150 g drained"
+      - "15.00 Sainsbury's 120 g pot"
+      - "16.43 Tesco with chilli 70 g pot"
+      - "21.92 Sainsbury's SO Organic 290 g jar 130 g drained"
+      - "23.33 Perello Gordal 350 g jar 150 g drained"
+  green pesto:
+    kg:
+      - "4.68 Tesco 190 g"
+      - "4.68 Sainsbury's 190 g"
+      - "6.84 ASDA 190 g"
+      - "10.53 Filippo Berio 190 g"
+      - "11.58 Waitrose 190 g"
+      - "13.16 Sacla 190 g"
+      - "16.36 Belazu 165 g"
+      - "17.63 Barilla 190 g"
+  green vegetables:
+    note: "generic leafy greens"
+    kg:
+      - "1.80 Sainsbury's greens 500 g"
+      - "5.00 Birds Eye Steamfresh green medley frozen 300 g"
+      - "6.75 Tesco sliced spring greens 200 g"
+      - "7.00 Tesco sliced greens 300 g"
+      - "6.75 Tesco Finest cavolo nero 200 g"
+  gros sel:
+    kg:
+      - "4.99 Leigh Court Farm Sel de Guerande coarse 1 kg"
+      - "5.29 Sous Chef Le Guerandais coarse grey 1 kg"
+      - "4.69 Saxa coarse sea salt 350 g"
+      - "5.43 Sainsbury's coarse sea salt 350 g"
+      - "5.71 Waitrose coarse sea salt 350 g"
+  ground fenugreek:
+    thin: true
+    kg:
+      - "23.00 Sainsbury's 50 g"
+      - "29.90 Healthy Supplies organic 100 g"
+  ground mace:
+    kg:
+      - "29.76 Sainsbury's 42 g"
+      - "162.07 Schwartz Ocado 29 g"
+      - "137.50 Steenbergs organic 40 g"
+      - "52.10 Real Foods 100 g"
+  guinness:
+    note: "shop not named on trolley.co.uk listings"
+    l:
+      - "3.20 Guinness Draught 4 x 440 ml"
+      - "3.19 Guinness Draught 8 x 440 ml"
+      - "3.47 Guinness Draught 10 x 440 ml"
+      - "2.65 Guinness Draught 12 x 440 ml"
+      - "3.18 Guinness Original 4 x 440 ml"
+  gyoza sauce:
+    note: "one listing; specialist shops' pages would not load"
+    thin: true
+    l:
+      - "11.33 Lee Kum Kee 150 ml"
+  handfuls of winter greens:
+    note: "recipes count handfuls; no shop weighs a handful"
+    kg:
+      - "1.80 Sainsbury's greens 500 g"
+      - "6.75 Tesco Finest cavolo nero 200 g"
+      - "6.67 ASDA Exceptional cavolo nero 150 g"
+      - "8.75 Waitrose thick cut cavolo nero 200 g"
+      - "6.75 Tesco sliced spring greens 200 g"
+      - "10.00 Sainsbury's TTD cavolo nero hispi & savoy 200 g"
+  heads chicory:
+    note: "each is one head; no listing states heads per pack, 2 per 250 g pack is from an M&S buyer review on trolley.co.uk"
+    thin: true
+    kg:
+      - "7.40 Sainsbury's white chicory 250 g"
+      - "8.00 Waitrose chicory 250 g"
+      - "10.71 Sainsbury's red chicory 140 g"
+      - "11.79 Waitrose red chicory 140 g"
+    each:
+      - "0.93 Sainsbury's 250 g pack of 2"
+      - "1.00 Waitrose 250 g pack of 2"
+  high quality mincemeat:
+    kg:
+      - "6.08 Sainsbury's Taste the Difference brandy 411 g"
+      - "6.08 Sainsbury's Taste the Difference cherry & amaretto 411 g"
+      - "6.69 Tesco Finest 411 g"
+  hummus:
+    kg:
+      - "5.56 Sainsbury's creamy classic 315 g"
+      - "6.75 Sainsbury's 200 g"
+      - "7.08 Ramona's original 500 g"
+      - "10.00 Waitrose extra virgin olive oil 200 g"
+      - "11.76 Yarden Prestige 250 g"
+      - "19.12 Sainsbury's Taste the Difference extra smooth 170 g"
+  instant coffee:
+    kg:
+      - "10.80 ASDA rich roast 200 g"
+      - "20.00 Nescafe Original 300 g"
+      - "32.89 Costa 190 g"
+      - "37.50 Douwe Egberts Pure Gold 400 g"
+      - "39.00 Kenco Rich 200 g"
+  instant espresso powder:
+    kg:
+      - "29.74 Nescafe Gold Blend Espresso 190 g"
+      - "40.53 Nescafe Gold Blend Espresso 95 g"
+      - "45.00 Percol Black & Beyond Morrisons 100 g"
+      - "46.50 Percol Intense Espresso Real Foods 100 g"
+  instant polenta or cornmeal:
+    kg:
+      - "2.00 Tropical Sun fine cornmeal 500 g"
+      - "5.00 Sainsbury's polenta 400 g"
+      - "5.87 Polenta Valsugana instant 375 g"
+  jerusalem artichokes:
+    thin: true
+    kg:
+      - "4.20 Waitrose loose"
+      - "4.38 Abel & Cole organic 400 g"
+  juniper berries:
+    note: "recipes count berries; no per-berry weight found, cost from kg"
+    kg:
+      - "41.07 Sainsbury's 28 g"
+      - "71.43 Schwartz Morrisons 28 g"
+      - "76.79 Schwartz Tesco 28 g"
+  kalamata olives:
+    note: "per kg of drained olives where a jar gives its drained weight"
+    kg:
+      - "12.50 Sainsbury's Taste the Difference whole 180 g"
+      - "16.97 Odysea 290 g jar 165 g drained"
+      - "20.29 Sainsbury's 335 g jar 170 g drained"
+      - "20.67 Sainsbury's SO Organic 295 g jar 150 g drained"
+      - "27.59 Waitrose 145 g"
+      - "30.00 Waitrose Duchy Organic 150 g"
+  kimchee:
+    kg:
+      - "8.75 Vadasz raw 400 g"
+      - "10.00 Mrs Elswood 300 g"
+      - "11.67 Bibigo 150 g"
+      - "14.86 Biona organic 350 g"
+      - "17.25 Yutaka 200 g"
+      - "19.00 Cultured Collective 250 g"
+  kirsch:
+    note: "one listing; Waitrose, Ocado and specialist spirit shops would not load"
+    thin: true
+    l:
+      - "43.57 Sainsbury's Taste the Difference eau de vie 35 cl"
+  kombu:
+    note: "one brand only; no listing gives the weight of a 10 cm piece"
+    thin: true
+    kg:
+      - "149.75 Clearspring Hokkaido Real Foods 40 g"
+      - "153.25 Clearspring Hokkaido Healthy Supplies 40 g"
+  korean barbecue sauce:
+    l:
+      - "6.31 Sharwood's 420 g"
+      - "9.19 Blue Dragon 310 g"
+      - "11.67 Wagamama 120 g"
+      - "12.24 Spice Tailor 245 g"
+  lager:
+    l:
+      - "1.10 Carling 18 x 440 ml"
+      - "2.31 Carlsberg Export 4 x 568 ml"
+      - "2.39 Kronenbourg 1664 15 x 440 ml"
+      - "2.84 Holsten Pils 4 x 440 ml"
+      - "3.59 Estrella Damm 4 x 440 ml"
+      - "4.12 Camden Hells 4 x 440 ml"
+  loose black tea leaves:
+    kg:
+      - "6.56 ASDA 250 g"
+      - "7.00 Tesco 250 g"
+      - "11.20 PG Tips loose 250 g"
+      - "13.52 Yorkshire Tea leaf 250 g"
+      - "20.80 Waitrose No.1 Kenyan 125 g"
+      - "22.40 Twinings Assam 125 g"
+  mace:
+    note: "whole blades; a strand is a fraction of a gram"
+    thin: true
+    kg:
+      - "90.80 Real Foods blades 25 g"
+      - "99.50 Healthy Supplies whole 100 g"
+  mangetout:
+    kg:
+      - "5.95 Aldi Nature's Pick 200 g"
+      - "7.75 ASDA 160 g"
+      - "8.89 Tesco 180 g"
+      - "9.25 Waitrose 200 g"
+      - "10.42 Co-op 120 g"
+  margarine:
+    kg:
+      - "4.50 Stork Trolley 500 g"
+      - "3.50 Stork Trolley 1 kg"
+      - "3.20 Sainsbury's baking spread 500 g"
+      - "3.10 Tesco baking spread 500 g"
+      - "1.85 Tesco soft baking spread 2 kg"
+      - "1.80 Asda soft spread 500 g"
+  marinated artichokes:
+    note: "per kg of jar contents as labelled, not drained"
+    kg:
+      - "10.53 Tesco artichoke antipasti 285 g"
+      - "11.96 Sainsbury's quartered artichoke hearts 280 g"
+      - "12.50 Waitrose chargrilled quartered 280 g"
+  marmite:
+    kg:
+      - "12.60 Tesco 250 g"
+      - "12.60 Sainsbury's 250 g"
+      - "12.60 Asda 250 g"
+      - "14.00 Waitrose 250 g"
+      - "6.98 Trolley 500 g"
+  marsala:
+    l:
+      - "14.67 Pellegrino Superiore 75 cl"
+      - "17.67 Pellegrino Garibaldi Dolce 75 cl"
+      - "18.67 Pellegrino Superiore Secco 75 cl"
+  matcha tea powder:
+    kg:
+      - "129.90 WeightWorld organic ceremonial 100 g"
+      - "283.00 PerfectTed ceremonial 30 g"
+      - "299.67 PerfectTed organic ceremonial 30 g"
+  mayo:
+    kg:
+      - "2.00 Sainsbury's squeezy 500 ml"
+      - "5.00 Hellmann's 800 g"
+      - "5.63 Hellmann's 400 g"
+      - "6.57 Hellmann's 600 g"
+      - "11.45 Stokes 345 g"
+      - "12.68 Kewpie 355 ml"
+  medium curry powder:
+    kg:
+      - "25.00 Schwartz Tesco 90 g"
+      - "25.00 Schwartz Asda 90 g"
+      - "16.25 Sainsbury's 80 g"
+      - "15.63 Tesco 80 g"
+      - "16.88 Asda 80 g"
+      - "24.21 Waitrose 95 g"
+  "medium–hot curry powder":
+    kg:
+      - "10.00 Rajah hot madras 100 g"
+      - "12.00 East End hot 100 g"
+      - "15.63 Tesco medium 80 g"
+      - "15.63 Tesco hot 80 g"
+      - "15.66 Sainsbury's hot 83 g"
+      - "25.00 Schwartz medium 90 g"
+  menma:
+    note: "one shop; recipes count pieces, no listing weighs one"
+    thin: true
+    kg:
+      - "31.00 Shin-shin seasoned menma Waso 90 g"
+      - "39.90 Momoya seasoned bamboo shoots Waso 100 g"
+  mild curry powder:
+    kg:
+      - "9.00 Dunn's River 100 g"
+      - "10.00 Rajah mild madras 100 g"
+      - "16.46 Sainsbury's 79 g"
+      - "16.88 ASDA 80 g"
+      - "26.47 Schwartz 85 g"
+  mixed berries:
+    note: "frozen"
+    kg:
+      - "2.99 Tesco frozen mixed berries 1 kg"
+      - "6.00 Tesco summer fruits 500 g"
+      - "8.00 Sainsbury's frozen summer fruits 450 g"
+      - "10.00 Sainsbury's frozen strawberries & blueberries 360 g"
+  mixed dried fruit:
+    kg:
+      - "3.60 Sainsbury's 1 kg"
+      - "4.00 Waitrose Essential 1 kg"
+      - "4.00 Tesco 500 g"
+      - "4.00 ASDA 500 g"
+      - "4.80 Tesco with cranberries & apricots 500 g"
+  mixed root veg:
+    kg:
+      - "2.00 Sainsbury's diced swede & carrot 600 g"
+      - "2.23 Asda casserole vegetables 600 g"
+      - "2.00 Iceland country mix 1 kg"
+      - "4.06 Tesco winter vegetables 480 g"
+      - "5.50 Tesco Finest roasting root veg 500 g"
+  mixed salad leaves:
+    kg:
+      - "5.85 ASDA 200 g"
+      - "10.00 Sainsbury's 180 g"
+      - "10.00 Morrisons 100 g"
+      - "10.83 Tesco 120 g"
+      - "12.00 Co-op 100 g"
+  mixed seeds:
+    kg:
+      - "8.00 Fudco sunflower & pumpkin 250 g"
+      - "9.83 Tesco 4 seed mix 300 g"
+      - "11.00 Waitrose 250 g"
+      - "11.33 Sainsbury's milled 150 g"
+  mooli:
+    note: "each is one mooli"
+    thin: true
+    each:
+      - "2.00 Tesco 1 mooli"
+    kg:
+      - "2.00 Tesco loose"
+  nam pla:
+    l:
+      - "3.31 Squid Brand 725 ml"
+      - "9.25 Thai Dragon 200 ml"
+      - "11.07 Blue Dragon 150 ml"
+      - "14.00 Waitrose Cooks' Ingredients 150 ml"
+  okra:
+    note: "recipes count pods, no listing gives a pod count; fresh and frozen are two grades"
+    kg:
+      - "10.00 Sainsbury's fresh 175 g"
+      - "12.00 Waitrose fresh 175 g"
+      - "2.47 Taj frozen cut 1 kg"
+      - "3.17 Surya frozen whole baby 300 g"
+  oregano:
+    note: "dried"
+    kg:
+      - "60.00 Tesco 30 g"
+      - "60.00 Sainsbury's 60 g"
+      - "71.43 Tesco 14 g"
+      - "79.17 ASDA 12 g"
+      - "150.00 Waitrose Cooks' Ingredients 12 g"
+      - "285.71 Schwartz 7 g"
+  oregano sprigs:
+    note: "pack is one 20 g packet of fresh oregano"
+    thin: true
+    pack:
+      - "0.70 Sainsbury's fresh 20 g"
+      - "0.70 Morrisons fresh 20 g"
+    kg:
+      - "35.00 Sainsbury's fresh 20 g"
+      - "35.00 Morrisons fresh 20 g"
+  ox cheek:
+    note: "each is one cheek, typically 450-500 g"
+    thin: true
+    kg:
+      - "19.95 Farm Direct approx 1 kg"
+      - "31.89 Dorset Meat Company 450 g"
+    each:
+      - "14.35 Dorset Meat Company one cheek 450 g"
+  pack fresh tagliatelle:
+    kg:
+      - "4.14 ASDA 500 g"
+      - "5.33 Tesco nests 300 g"
+      - "5.50 Waitrose 500 g"
+      - "6.17 Co-op 300 g"
+  packs ready-to-cook udon:
+    note: "each is one single-portion pack"
+    thin: true
+    each:
+      - "0.75 Itsu 150 g"
+      - "1.50 Amoy straight to wok 150 g"
+    kg:
+      - "3.67 Tesco straight to wok 300 g"
+      - "3.67 Sainsbury's 300 g"
+      - "4.00 Yutaka 750 g"
+      - "5.00 Itsu 150 g"
+      - "10.00 Amoy 150 g"
+  pak choi:
+    note: "no shop states heads per pack, so no each price"
+    kg:
+      - "6.00 Tesco 250 g"
+      - "6.20 Sainsbury's 250 g"
+      - "5.60 Asda 200 g"
+      - "6.20 Morrisons 200 g"
+      - "6.00 Ocado 250 g"
+      - "7.40 Waitrose 250 g"
+  pak choi bulb:
+    note: "recipes count heads; no listing gives heads per pack"
+    kg:
+      - "5.60 ASDA 200 g"
+      - "6.00 Tesco 250 g"
+      - "6.20 Sainsbury's 250 g"
+      - "6.20 Morrisons 200 g"
+      - "7.40 Waitrose 250 g"
+      - "7.75 Co-op 200 g"
+  pandan leaf:
+    note: "recipes measure in cm of leaf; no listing gives a leaf count or length"
+    thin: true
+    kg:
+      - "26.25 Osolocal2u fresh 200 g"
+      - "33.40 Nurtured in Norfolk fresh 100 g (out of stock)"
+  passion fruits:
+    note: "each is one fruit"
+    thin: true
+    each:
+      - "0.43 Tesco 3 pack"
+      - "0.43 Sainsbury's 3 pack"
+  peach or nectarine:
+    note: "each is one fruit"
+    each:
+      - "0.47 Aldi Suntrail Farms 4 pack"
+      - "0.62 ASDA 4 pack"
+      - "0.75 Sainsbury's 4 pack"
+      - "0.78 Waitrose 4 pack"
+      - "0.83 Tesco ripe 3 pack"
+  pearled spelt:
+    kg:
+      - "4.38 Farm Direct 500 g"
+      - "6.60 Waitrose 500 g"
+      - "11.67 Merchant Gourmet quick cook 300 g"
+  perry:
+    l:
+      - "2.50 Le Soleil 3 l"
+      - "3.33 Country Manor 2.25 l"
+      - "4.50 Babycham 4 x 200 ml"
+      - "4.54 Westons Vintage Pear 500 ml"
+  pesto:
+    kg:
+      - "4.68 Tesco green pesto 190 g"
+      - "4.68 Sainsbury's green pesto 190 g"
+      - "5.26 Asda green pesto 190 g"
+      - "11.58 Waitrose green basil pesto 190 g"
+      - "13.16 Sacla Morrisons 190 g"
+      - "17.63 Sacla Tesco 190 g"
+      - "17.63 Sacla Sainsbury's 190 g"
+  piece of horseradish:
+    note: "each is one root, weight not stated"
+    thin: true
+    each:
+      - "7.50 Wholefood Earth one large root"
+    kg:
+      - "21.40 Real Foods organic 250 g"
+  pieces sustainable white fish:
+    note: "each is one fillet of about 125 g"
+    thin: true
+    kg:
+      - "7.16 Tesco basa 250 g"
+      - "8.33 Sainsbury's MSC hoki 360 g"
+      - "19.44 Sainsbury's cod 360 g"
+      - "21.00 Tesco cod pieces 250 g"
+      - "30.21 Waitrose MSC cod 240 g"
+      - "33.43 Farm Direct cod fillet approx 400 g"
+    each:
+      - "0.90 Tesco basa 2 fillets 250 g"
+  pink grapefruit:
+    note: "each is one fruit; shops call it red grapefruit"
+    each:
+      - "0.44 Tesco red 1"
+      - "0.50 Tesco red 3 pack"
+      - "0.49 Morrisons red loose 1"
+      - "0.44 Sainsbury's red loose 1"
+      - "0.60 Tesco Jackson 1"
+  pitted black olives:
+    note: "per kg of drained olives where a jar gives its drained weight"
+    kg:
+      - "6.76 Sainsbury's 800 g jar 370 g drained"
+      - "9.00 Sainsbury's 340 g jar 150 g drained"
+      - "16.43 Tesco with sea salt 70 g pot"
+      - "17.50 Fragata marinated 120 g"
+      - "20.91 Sainsbury's Moroccan dry 110 g"
+  pitted kalamata olives:
+    note: "per drained weight"
+    kg:
+      - "20.29 Sainsbury's 170 g drained"
+      - "20.67 Sainsbury's organic 150 g drained"
+      - "16.97 Odysea Trolley 165 g drained"
+      - "16.43 Sainsbury's with herbs 70 g"
+  plain curd:
+    note: "plain yogurt (dahi), costed 1 ml = 1 g"
+    l:
+      - "1.10 Sainsbury's fat free natural yogurt 500 g"
+      - "1.72 Lancashire Farm natural 1 kg"
+      - "1.97 Pakeeza natural 1 kg"
+      - "2.50 Lancashire Farm natural 500 g"
+  poppy seeds:
+    kg:
+      - "12.00 Tesco 100 g"
+      - "12.50 Sainsbury's 100 g"
+      - "10.00 East End Trolley 100 g"
+  porter:
+    l:
+      - "4.40 Sainsbury's Taste the Difference London Porter 500 ml"
+      - "4.54 Titanic Plum Porter 500 ml"
+      - "5.10 Guinness West Indies Porter 500 ml"
+  pouches mixed grains:
+    note: "each is one 250 g pouch"
+    each:
+      - "1.45 Tesco seasoned mixed grains 250 g"
+      - "1.45 Sainsbury's Spanish style grains 250 g"
+      - "1.50 Merchant Gourmet glorious grains 250 g"
+      - "2.00 Jamie Oliver super grains 250 g"
+      - "2.15 Merchant Gourmet 6 super seeds & grains 250 g"
+  powdered loomi:
+    note: "Sous Chef's page shows one price against 75 g and 500 g sizes; taken as the 75 g"
+    thin: true
+    kg:
+      - "16.90 Anjoman lime powder Halalo 100 g"
+      - "39.87 Sous Chef lime powder 75 g"
+  pul biber:
+    note: "Waitrose's 40 g is from its product page as a search result showed it; trolley.co.uk gave the price"
+    kg:
+      - "27.00 Greenmax Aleppo chilli Halalo 70 g"
+      - "71.25 Waitrose Cooks' Ingredients Turkish pepper flakes 40 g"
+      - "100.00 Ottolenghi Aleppo & other chillies 40 g"
+  pumpkin:
+    note: "each is one small pumpkin; Delica is a premium culinary variety"
+    each:
+      - "1.00 Sainsbury's British cooking pumpkin"
+      - "1.00 Waitrose medium carving pumpkin"
+      - "1.15 Sainsbury's munchkin pumpkin"
+      - "7.20 Natoora Delica pumpkin"
+  pumpkin seeds:
+    kg:
+      - "7.33 ASDA 150 g"
+      - "8.40 Natco 250 g"
+      - "11.67 Tesco 150 g"
+      - "12.00 Sainsbury's 100 g"
+      - "13.00 Waitrose 200 g"
+  pure almond essence:
+    l:
+      - "66.67 Nielsen-Massey pure almond extract 60 ml"
+      - "47.14 Dr. Oetker Tesco 35 ml"
+      - "63.16 Sainsbury's Taste the Difference 38 ml"
+      - "77.00 Taylor & Colledge 50 ml"
+  radicchio:
+    note: "each is one head"
+    thin: true
+    each:
+      - "3.95 Ocado Natoora Chioggia 1 head"
+    kg:
+      - "15.83 Ocado Natoora Trevisano 300 g"
+      - "14.17 Ocado Natoora Verona 300 g"
+  radish:
+    kg:
+      - "2.33 Tesco 240 g"
+      - "2.33 Sainsbury's 240 g"
+      - "2.21 Asda 240 g"
+  rainbow radishes:
+    note: "pack is one supermarket punnet of mixed-colour radishes"
+    thin: true
+    kg:
+      - "4.75 Sainsbury's Taste the Difference speciality radish 200 g"
+    pack:
+      - "0.95 Sainsbury's Taste the Difference speciality radish 200 g"
+      - "0.95 Morrisons The Best mixed radish (weight not stated)"
+  raw mangetout:
+    kg:
+      - "7.75 Asda 160 g"
+      - "8.89 Tesco 180 g"
+      - "5.95 Aldi Nature's Pick 200 g"
+      - "9.25 Waitrose 200 g"
+      - "10.42 Co-op 120 g"
+  ready-cooked spelt:
+    note: "pack is one 250 g ready-to-eat pouch"
+    thin: true
+    kg:
+      - "11.96 Merchant Gourmet Healthy Supplies 250 g"
+      - "8.80 Merchant Gourmet Ocado 250 g"
+    pack:
+      - "2.99 Merchant Gourmet Healthy Supplies 250 g"
+      - "2.20 Merchant Gourmet Ocado 250 g"
+  ready-made custard:
+    l:
+      - "4.13 Ambrosia 400 g can"
+      - "2.67 Ambrosia 750 g carton"
+      - "2.75 Tesco 400 g"
+      - "1.30 Sainsbury's lighter 500 g"
+  redcurrant jelly:
+    kg:
+      - "5.95 Tesco 227 g"
+      - "5.95 Asda 227 g"
+      - "5.80 Sainsbury's 250 ml"
+      - "9.71 Tiptree Trolley 340 g"
+  rigatoni:
+    kg:
+      - "2.00 Napolina 500 g"
+      - "1.38 Sainsbury's 500 g"
+      - "1.50 Tesco 500 g"
+      - "1.54 Asda 500 g"
+      - "3.00 Barilla 500 g"
+      - "4.30 Tesco Finest 500 g"
+  ripe avocados:
+    note: "each is one avocado"
+    each:
+      - "0.69 Tesco ripe & ready 1"
+      - "0.95 Sainsbury's large ripe & ready 1"
+      - "0.90 Waitrose perfectly ripe medium 1"
+      - "0.90 Iceland ripe & ready 2 pack"
+      - "0.65 Sainsbury's 4 small"
+      - "0.75 Tesco twin pack"
+  ripe bananas:
+    note: "each is one banana"
+    each:
+      - "0.16 Tesco ripe bananas 5 pack"
+      - "0.16 Sainsbury's Fairtrade pack"
+      - "0.13 Sainsbury's small Fairtrade pack"
+      - "0.16 Tesco loose 1"
+      - "0.33 Waitrose Duchy organic pack"
+  ripe fuyu persimmons:
+    note: "each is one persimmon; supermarket packs do not name the variety"
+    thin: true
+    each:
+      - "0.85 Tesco 2 pack"
+      - "0.40 Aldi Nature's Pick pack"
+  risoni:
+    note: "risoni is sold as orzo"
+    kg:
+      - "3.70 Waitrose orzo 500 g"
+      - "3.90 Waitrose Duchy organic orzo 500 g"
+      - "4.30 Tesco Finest orzo 500 g"
+      - "4.30 Morrisons The Best orzo 500 g"
+  round shortbread biscuits:
+    note: "each is one biscuit; the only pack stating a count"
+    thin: true
+    each:
+      - "0.21 Asda Free From 8 shortbread rounds 150 g"
+    kg:
+      - "17.33 Tesco Finest shortbread rounds 150 g"
+      - "10.00 Sainsbury's Plant Pioneers rounds 175 g"
+      - "11.27 Asda Free From rounds 150 g"
+  salami napoli:
+    note: "only Waitrose sells a sliced Napoli; the Milano packs are the nearest sliced Italian salami"
+    thin: true
+    kg:
+      - "31.25 Waitrose Italian Napoli salami 80 g"
+      - "20.75 Sainsbury's Milano slices 53 g"
+      - "20.83 Montorsi Milano 120 g"
+      - "32.50 Morrisons The Best Milano 100 g"
+      - "30.22 Asda Exceptional Milano 90 g"
+  salsify:
+    note: "fresh salsify is a specialist item; no supermarket listing found"
+    thin: true
+    kg:
+      - "10.99 Wholefood Earth 900 g"
+  salted caramel chocolates:
+    note: "each is one Lindor truffle, approx. 16 to a 200 g box"
+    each:
+      - "0.47 Lindor salted caramel Tesco 200 g box"
+      - "0.47 Sainsbury's 200 g box"
+      - "0.47 Morrisons 200 g box"
+      - "0.47 Waitrose 200 g box"
+  satay sauce:
+    l:
+      - "6.25 Sainsbury's stir fry sauce 120 g"
+      - "6.67 Blue Dragon 120 g"
+      - "9.72 Tesco dipping sauce 180 g"
+      - "11.84 Lee Kum Kee 190 g"
+      - "10.91 The Spice Tailor 275 g"
+      - "13.89 Sainsbury's Inspired to Cook 180 g"
+  sauerkraut:
+    kg:
+      - "4.38 Baxters 480 g"
+      - "3.09 Hengstenberg 680 g"
+      - "7.64 Biona organic 360 g"
+      - "3.50 Dawtona 500 g"
+      - "1.88 Kuchnia Polska 520 g"
+  sausagemeat:
+    kg:
+      - "6.00 Sainsbury's 500 g"
+      - "7.50 Sainsbury's Butcher's Choice 400 g"
+      - "9.85 Sainsbury's Taste the Difference 330 g"
+      - "7.50 Tesco British 400 g"
+      - "10.00 Tesco Finest 350 g"
+      - "6.85 Asda seasoned 400 g"
+  scotch pancakes:
+    note: "each is one pancake"
+    each:
+      - "0.080 Sainsbury's 6 pack"
+      - "0.080 Tesco 6 pack"
+      - "0.080 Asda Bakery 6 pack"
+      - "0.21 Warburtons 6 pack"
+  seafood:
+    note: "mixed seafood selection packs"
+    kg:
+      - "19.75 Sainsbury's seafood selection 200 g"
+      - "18.67 Waitrose frozen seafood selection 300 g"
+      - "16.43 Tesco raw seafood selection 350 g"
+      - "12.17 Asda seafood selection 240 g"
+      - "11.25 Iceland cooked seafood mix 400 g"
+  semolina:
+    kg:
+      - "1.97 Natco 1.5 kg"
+      - "2.40 Tropical Sun 500 g"
+      - "2.90 Whitworths 500 g"
+      - "2.90 Sainsbury's 500 g"
+  sesame seeded burger buns:
+    note: "each is one bun"
+    each:
+      - "0.26 Sainsbury's sesame brioche buns pack"
+      - "0.38 Tesco Finest sesame brioche 4 pack"
+      - "0.17 Iceland seeded 12 pack"
+      - "0.22 Tesco seeded large pack"
+      - "0.24 Tesco Fire Pit seeded 8 pack"
+  shichimi:
+    kg:
+      - "72.00 Clearspring organic shichimi 50 g"
+      - "233.33 Sous Chef 15 g"
+      - "126.00 S&B Waso 15 g"
+  shredded wheat biscuits:
+    note: "each is one biscuit; one brand only"
+    thin: true
+    each:
+      - "0.14 Shredded Wheat 24 biscuits 540 g"
+      - "0.10 Shredded Wheat 30 biscuits 675 g"
+  shrimp paste:
+    note: "all four from search-result listings: the shop pages refused to load (rate limit); no supermarket stocks it"
+    thin: true
+    kg:
+      - "25.00 Maepranom kapi Morue Eats 100 g"
+      - "22.95 Nang Fah Tuk Tuk Mart 200 g"
+      - "18.54 Maepranom kapi Thai Food Online 350 g"
+      - "12.84 Pantai Tuk Tuk Mart 370 g"
+  silken tofu:
+    kg:
+      - "4.83 Clearspring 300 g"
+      - "6.50 Tofoo silken 300 g"
+      - "6.82 Yutaka 308 g"
+      - "6.51 Mori-Nu 307 g"
+  smoked tofu:
+    kg:
+      - "12.58 The Tofoo Co. 225 g"
+      - "23.95 Taifun with almonds & sesame 200 g"
+      - "12.00 The Tofoo Co. XL 400 g"
+      - "6.27 Tesco Plant Chef organic 399 g"
+  soft herb leaves:
+    note: "costed as fresh parsley and coriander packs"
+    kg:
+      - "16.67 Tesco flat leaf parsley 30 g"
+      - "13.50 Tesco flat leaf parsley 100 g"
+      - "12.50 Sainsbury's coriander 100 g"
+      - "30.00 Waitrose Cooks' Ingredients parsley 25 g"
+      - "27.60 Co-op coriander 25 g"
+  spaghetti:
+    kg:
+      - "1.50 Sainsbury's 500 g"
+      - "1.50 Tesco quick cook 500 g"
+      - "0.56 Tesco Hearty Food Co 500 g"
+      - "2.00 Napolina Trolley 500 g"
+      - "3.00 Barilla Trolley 500 g"
+      - "3.00 De Cecco Trolley 500 g"
+  spelt:
+    thin: true
+    kg:
+      - "6.60 Waitrose pearled spelt 500 g"
+      - "11.67 Merchant Gourmet quick cook spelt 300 g"
+  spelt spaghetti:
+    thin: true
+    kg:
+      - "6.10 Biona Real Foods 500 g"
+      - "5.98 Biona eBay 500 g"
+  spring greens:
+    note: "pack is one supermarket pack of whole spring greens"
+    thin: true
+    kg:
+      - "1.80 Sainsbury's greens 500 g"
+      - "6.75 Tesco sliced spring greens 200 g"
+      - "7.00 Tesco sliced greens 300 g"
+    pack:
+      - "1.10 Waitrose Essential"
+      - "0.90 Morrisons"
+      - "0.84 Asda"
+      - "0.90 Sainsbury's 500 g"
+  stout:
+    l:
+      - "3.20 Guinness Asda 4x440 ml"
+      - "3.27 Guinness Tesco 4x440 ml"
+      - "3.27 Guinness Sainsbury's 4x440 ml"
+      - "3.55 Guinness Waitrose 4x440 ml"
+      - "2.41 Murphy's Trolley 4x440 ml"
+  suet:
+    kg:
+      - "13.50 Atora beef 200 g"
+      - "13.45 Atora vegetable 200 g"
+      - "8.25 Tesco vegetable 200 g"
+      - "8.25 Tesco beef 200 g"
+  sunflower seeds:
+    kg:
+      - "12.50 Sainsbury's 100 g"
+      - "11.67 Tesco 150 g"
+      - "5.87 Asda 150 g"
+      - "12.57 Waitrose 175 g"
+      - "3.75 Natco 1 kg"
+  swede:
+    note: "each is one whole swede"
+    each:
+      - "0.62 Sainsbury's 1"
+      - "0.62 Tesco 1"
+      - "0.62 Asda 1"
+      - "0.62 Morrisons 1"
+      - "0.65 Waitrose 1"
+      - "0.39 Aldi 1"
+  swiss chard:
+    kg:
+      - "9.00 Sainsbury's Taste the Difference rainbow chard 200 g"
+      - "9.00 Tesco Finest rainbow chard 200 g"
+      - "9.00 Waitrose rainbow chard 200 g"
+  tabasco:
+    l:
+      - "26.32 Asda 57 ml"
+      - "26.32 Iceland 57 ml"
+      - "43.86 Sainsbury's 57 ml"
+      - "43.86 Tesco 57 ml"
+      - "47.37 Waitrose 57 ml"
+      - "54.39 Co-op 57 ml"
+  tamari:
+    l:
+      - "8.96 Kikkoman Asda 250 ml"
+      - "11.00 Kikkoman Tesco 250 ml"
+      - "12.00 Kikkoman Sainsbury's 250 ml"
+      - "14.20 Kikkoman Waitrose 250 ml"
+      - "15.67 Yutaka Trolley 150 ml"
+  tandoori masala:
+    kg:
+      - "10.00 East End 100 g"
+      - "6.88 Rajah 400 g"
+      - "5.50 Natco 400 g"
+      - "15.63 Tesco mild tandoori curry powder 80 g"
+  tea bags:
+    note: "each is one bag"
+    each:
+      - "0.030 PG Tips Morrisons 80"
+      - "0.050 PG Tips Waitrose 80"
+      - "0.020 Waitrose Essential 80"
+      - "0.030 Asda Extra Strong 80"
+      - "0.030 Tesco Extra Strong 80"
+      - "0.020 Tetley Trolley 160"
+  teriyaki sauce:
+    l:
+      - "9.60 Kikkoman Asda 250 ml"
+      - "13.40 Kikkoman Tesco 250 ml"
+      - "17.00 Kikkoman Co-op 250 ml"
+      - "9.00 Sainsbury's 150 ml"
+      - "9.00 Tesco 150 ml"
+  thick slices from a crusty loaf:
+    note: "recipes count slices; this is the price per kg of loaf, and no shop states a slice count for an unsliced loaf"
+    thin: true
+    kg:
+      - "3.25 Tesco crusty white bloomer 400 g"
+      - "4.17 Tesco Finest stonebaked crusty bloomer 600 g"
+      - "1.94 Sainsbury's white bloomer 800 g"
+      - "2.69 Black Sheep craft white bloomer 800 g"
+  toasted pumpkin seeds:
+    note: "priced as plain pumpkin seeds, toasted at home"
+    kg:
+      - "11.67 Tesco 150 g"
+      - "12.00 Sainsbury's 100 g"
+      - "7.33 Asda 150 g"
+      - "13.00 Waitrose 200 g"
+      - "8.40 Natco 250 g"
+  urucum seeds:
+    note: "urucum is annatto/achiote seed; the Ottolenghi figure is from a search-result listing, the page refused to load"
+    thin: true
+    kg:
+      - "41.10 Sussex Wholefoods Healthy Supplies 100 g"
+      - "58.33 Ottolenghi 60 g"
+  vanilla bean pod:
+    note: "each is one pod"
+    each:
+      - "2.50 Taylor & Colledge 2 pods"
+      - "3.00 Nielsen-Massey 2 pods"
+      - "3.50 Waitrose Cooks' Ingredients 2 pods"
+  vanilla essence:
+    thin: true
+    l:
+      - "26.32 Asda flavouring 38 ml"
+      - "30.26 Tesco Madagascan vanilla 38 ml"
+  vanilla or almond extract:
+    l:
+      - "35.83 Tesco Finest vanilla 60 ml"
+      - "36.84 Dr. Oetker vanilla 95 ml"
+      - "75.00 Sainsbury's Taste the Difference vanilla 38 ml"
+      - "30.26 Tesco vanilla 38 ml"
+      - "66.67 Nielsen-Massey almond 60 ml"
+  vegetable bouillon powder:
+    kg:
+      - "16.33 Marigold Morrisons 150 g"
+      - "16.67 Marigold Sainsbury's 150 g"
+      - "16.67 Marigold Tesco 150 g"
+      - "19.67 Marigold Waitrose 150 g"
+  vegetarian mincemeat:
+    note: "jarred mincemeat; the listings did not state whether the suet is vegetable"
+    kg:
+      - "4.38 Sainsbury's 411 g"
+      - "5.84 Tesco 411 g"
+      - "6.69 Tesco Finest 411 g"
+      - "6.08 Sainsbury's brandy 411 g"
+  wakame:
+    note: "dried"
+    thin: true
+    kg:
+      - "37.00 Emma Basic Real Foods 50 g"
+      - "49.82 Wel-Pac Waso 56 g"
+  wasabi paste:
+    thin: true
+    kg:
+      - "40.70 S&B 43 g"
+      - "54.65 Yutaka 43 g"
+  watermelon:
+    note: "each is one whole melon; mini/baby melons are about half the price of a full-size one"
+    each:
+      - "2.40 Tesco mini"
+      - "2.40 Sainsbury's baby"
+      - "2.28 Asda baby"
+      - "3.55 Waitrose mini"
+      - "5.50 Tesco giant"
+  wheatberries:
+    note: "sold as whole wheat grain"
+    kg:
+      - "3.12 Real Foods organic wheat grain 500 g"
+      - "2.21 Real Foods 1 kg"
+      - "3.38 Sussex Wholefoods Healthy Supplies 500 g"
+      - "2.49 Sussex Wholefoods Healthy Supplies 1 kg"
+  white chicory or endive:
+    note: "pack is one supermarket chicory pack; no listing states how many heads it holds"
+    thin: true
+    kg:
+      - "7.40 Sainsbury's white chicory 250 g"
+      - "8.00 Waitrose chicory 250 g"
+    pack:
+      - "1.85 Sainsbury's 250 g"
+      - "2.00 Waitrose 250 g"
+      - "2.25 Tesco Finest British"
+      - "2.25 Morrisons The Best"
+  whole black loomi:
+    note: "recipes count limes; no listing states a count"
+    thin: true
+    kg:
+      - "15.27 Yekta Foods Halalo 150 g"
+      - "19.39 Greenfields Halalo 180 g"
+  wholemeal spaghetti:
+    kg:
+      - "1.50 Sainsbury's 500 g"
+      - "1.50 Tesco 500 g"
+      - "3.10 Napolina Trolley 500 g"
+      - "3.30 Waitrose 500 g"
+  xanthan gum:
+    kg:
+      - "26.50 Doves Farm Tesco 100 g"
+      - "26.60 Doves Farm Asda 100 g"
+      - "28.00 Doves Farm Morrisons 100 g"
+      - "28.00 Doves Farm Sainsbury's 100 g"
+  yakitori sauce:
+    note: "Japanese grocers only; Japan House London's 200 ml at 90.00 left out as a gift-shop line"
+    thin: true
+    l:
+      - "19.44 Ebara Waso 195 ml"
+      - "14.24 Nihon Shokken Waso 210 g"
+  yellow loomi:
+    note: "listing does not state the colour; recipes count limes"
+    thin: true
+    kg:
+      - "17.45 Greenfields dried lime Halalo 200 g"

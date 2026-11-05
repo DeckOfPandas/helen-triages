@@ -307,9 +307,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   also delete any original lines that have been totally superseded by yours,
   leaving me less to pick through in the kitchen."* The folders are how she
   tracks HER work; the folder is `1-rewrite/` today.
-- **2026-09-03 — a recipe's filename is the whole title slugged, not the head
-  clause.** Helen: *"Slug the whole title"*, so two "with" dishes sharing a
-  head clause do not collide. Existing files keep their names.
+- **2026-11-03 — a food filename is the whole title slugged, not the head
+  clause, without "and" and "with".** Helen, 2026-09-03: *"Slug the whole
+  title"*, so two "with" dishes sharing a head clause do not collide; and
+  2026-11-03: *"yes please add a rule to drop filler words from slugs. Please
+  rename all current drafts."* Other small words stay, being part of a dish's
+  name (toad-in-the-hole, à la meunière); a drink's slug keeps "and" too.
+  `test_a_draft_slug_drops_and_and_with`; `envelope.slug_for`.
 - **2026-10-18 — every note an ingest adds is `{label, text}` with both
   fields set and both beginning `QQ`; the label may carry a topic, `QQ
   nutrition`.** Helen, 2026-09-04: *"It's annoying for me to remember how to
@@ -327,10 +331,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-18 — an ingest ignores a "you will need" equipment list.** Helen:
   *"the rule is "trust the cook"."* As a group it had put a cake ring on the
   shopping list.
-- **2026-10-18 — page furniture: drop what sells, keep what is written about
-  the dish.** Helen: *"Drop ads, keep essays."* Shows, ticket lines, book plugs,
-  TV listings, "next month", web pointers and wine boxes go; essays, bios and
-  boxed asides go in the body.
+- **2026-11-03 — page furniture: drop what sells; everything else written on
+  the page goes in the body.** Helen: *"Drop ads, keep essays,"* and then
+  *"Extra text can always go as body content and I'll turn it into
+  something."* Shows, ticket lines, book plugs, TV listings, "next month", web
+  pointers and wine boxes go; essays, bios, boxed asides, tips boxes and
+  tasting-panel comments go in the body, under a heading starting `QQ`, never
+  parked in a note asking where they belong.
 - **2026-10-18 — a sidebar box ingested as a recipe has no body.** Helen chose
   *"Delete the bodies"*: the body repeated the `QQ original` lines unmarked,
   and would have published the book's text.
@@ -421,6 +428,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-04, #814 — a component with ingredients and no method gets a
   `QQ - MISSING:` step, not silence.** Helen: *'Leave a QQ in there for me please
   under e.g. "Make the treacle topping"'*.
+- **2026-11-03 — a recipe the photos show only part of is left out on
+  purpose.** Helen: *"none of those are an accident -- I don't want any of
+  them. As a rule please assume recipes with lots of missing text are to be
+  deliberately excluded."* Not transcribed, not asked about, and no note
+  points at it; a step that sends the cook to such a page keeps the pointer
+  only in its `QQ original`.
 - **2026-10-04, #814 — group names are quoted.** Helen, told the difference
   between `- name: cake` and `- name: "Make the batter"` was only how the name
   is typed: *"Let's make future recipes quote group titles, so add that to the
@@ -440,9 +453,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   where the source has an intro.** Helen: *"QQ original yes, then QQ claude
   rewrite, then I'll do my own and delete the other two."* A rewrite of the
   intro, not a quip; an ingest never drafts a tagline of its own.
-- **2026-10-08 — unspecified butter is `QQ butter`.** Helen: *"Write QQ butter
-  in the ingredients list where it isn't specified."* Replaces a chat's
-  "salted, or plain in precise bakes".
+- **2026-11-03 — an unqualified milk, egg or butter takes the house default,
+  and the line says what the source printed.** Helen: *"If milk and eggs
+  aren't qualified in the source then: milk -> semi-skimmed milk, egg -> large
+  egg, butter -> salted butter UNLESS it's baking and salt is named, then for
+  each please add a note to the ingredient line item saying "The source gave
+  "butter"."* The note is written as a fragment, `note: "the source gave
+  \"butter\""` (below, §5). A bake whose recipe names salt takes unsalted butter. The size
+  goes with the count (`amount: "2 large"`). Replaces "unspecified butter is
+  `QQ butter`"; older drafts still carry that shape.
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
   rulings from two claude.ai chats that Helen confirmed as standing, each a
   yes. Its `QQ original` keeps everything the source printed.
@@ -454,6 +473,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   9 biscuits."* The recipe page counts the thing made and the shopping list
   counts batches (§8.2). One figure, never an alternative: "9 large or 16
   small biscuits" reads as nine of something called "large".
+- **2026-11-03 — a dessert, cake or bake makes the thing, sized from its
+  tin, with the source's slices in brackets.** Helen: *"I NEVER want to
+  portion desserts, cakes, biscuits etc.,"* then *"one 20-cm cake (about 10
+  slices). Let's always use that. If we don't know slices, then leave them
+  out."* So `makes: "one 20-cm cake (about 10 slices)"`, `"one 900-g loaf
+  (8–10 slices)"`, `"one 23-cm cake"` where no slices are given, `"16
+  biscuits"`. The scaler counts the whole thing and ignores the bracket.
 - **2026-10-08 — Helen's own recipes are `source: "Henry"`, `source_type:
   person`.** Confirmed as standing the same day, as the old journal recorded
   it.
@@ -506,6 +532,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   frying', because I will use different pans with different volumes."*
   Held by `test_deep_frying_oil_is_listed_without_an_amount`; `/tidy-drafts`
   drops the amount and rewords the line.
+- **2026-11-03 — oil a couple of centimetres deep is "for shallow frying", and
+  is incidental.** Helen: *"2 cm oil is shallow frying not deep frying (as
+  opposed to just "frying")."* The line says "shallow" so the cook knows the
+  depth; `_data/food/incidentals.yml` reads it as a frying use.
 - **2026-08-20, #406 — "Adapted from" prefixes published work and only
   published work.** Helen: *"Bare labels don't need 'adapted from', only work
   published by other people."* And why the prefix is always true for the rest:
@@ -813,7 +843,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   placeholder and is skipped; a digit or a quoted term may open a note, and
   `!` or `?` may close one. An exception is declared with its reason in
   `NOTE_EXCEPTIONS` (`tests/test_style.py`) or `DRINK_NOTE_EXCEPTIONS`. A food
-  ingredient's `note:` is the opposite: a lowercase fragment.
+  ingredient's `note:` is the opposite: a lowercase fragment with no full
+  stop, drafts included. Helen, 2026-11-05: *"Ingredient notes should be
+  fragments, so no capital letter and full stop. Method step notes should be
+  sentences."* A proper noun may open one (`proper_nouns` in
+  `_data/food/taxonomy.yml`).
+- **2026-11-05 — a spoon amount takes no "of".** Helen: *"Never "2 tbsp of"
+  something. Just "2 tbsp $something". Always."* "2 tbsp oil", not "2 tbsp of
+  the oil"; "of it" names the thing ("2 tsp spice mix"). A `QQ original` line
+  is the source's and is left alone. The "spoon amount with 'of'" entry in
+  `TYPOGRAPHY` (`tests/test_style.py`), on recipes and drafts.
 - **Undated — "180°C fan" is correct and is not a conversion; what is banned
   is a second, conventional-oven temperature beside it, and gas marks
   always.** Helen: *"saying 'fan' isn't a conversion."* The site is fan-oven
@@ -864,7 +903,7 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   wrong, because the cook is left guessing golden or white, soft or
   muscovado. `_QUALIFIED_BUTTER`, `_QUALIFIED_SUGAR` and `_QUALIFIED_FLOUR` in
   `tests/test_style.py`; a new name joins a list on her say. At ingest an
-  unspecified butter is `QQ butter` (§4). Butter that is only for greasing is
+  unqualified butter takes the house default with a note saying so (§4). Butter that is only for greasing is
   exempt (Helen, 2026-10-13); "plus extra for greasing" is not, because that
   line is also in the dish.
 - **Undated, #136 — ginger says fresh, ground or paste, in the ingredient list
@@ -1193,16 +1232,73 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 
 ### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
 
-- **2026-09-07, #801 — the food index has cocktails' shopping list and scaler,
-  with every feature except costing.** Helen: *"add scaler and shopping list
-  feature to food recipe shortlist page. This can be copied directly from the
-  food page — I would like all the same features. But there is no need to cost
-  the portions. When serving size is unclear, please make your best guess.
-  Group the shopping list by grocery aisle, e.g. produce, dairy, fish, meat,
-  non-perishable etc."* "The food page" was read as the cocktail page, which
-  had the feature since #546. A `serves:` recipe's box counts people, so a
-  fractional multiplier (four portions of a recipe for six) is ordinary here,
-  as it is not for drinks.
+- **2026-09-07, #801 — the food index has cocktails' shopping list and
+  scaler.** Helen: *"add scaler and shopping list feature to food recipe
+  shortlist page. This can be copied directly from the food page — I would
+  like all the same features. ... When serving size is unclear, please make
+  your best guess. Group the shopping list by grocery aisle, e.g. produce,
+  dairy, fish, meat, non-perishable etc."* "The food page" was read as the
+  cocktail page, which had the feature since #546. A `serves:` recipe's box
+  counts people, so a fractional multiplier (four portions of a recipe for
+  six) is ordinary here, as it is not for drinks.
+- **2026-11-03, #1458 — the food shortlist is costed, on a local build only,
+  as the cocktail one is.** Helen: *"Please research food items and use the
+  ranges to give approximate costs for each dish. Display local build only.
+  Display like the cocktails costings."* This replaces #801's *"there is no
+  need to cost the portions"*. `site.show_costs`, `_data/food/costs.yml`,
+  `_plugins/food_costs.rb`; the rows' prices and the total as on the drinks
+  list.
+- **2026-11-03, #1458 — a recipe's line quotes one portion of a `serves:`
+  recipe or one batch of a `makes:` one, and does not move with the box.**
+  Chosen from three shown on the shopping list ("per portion / per batch",
+  "what the line costs", "the whole recipe as written"); the drink's price
+  per glass is the precedent (§9.3.5).
+- **2026-11-03, #1458 — where anything is unpriced, a figure reads "from £X":
+  a lower bound, never withheld and never silent.** Chosen over cocktails'
+  withholding and over an unmarked sum, given that a keyword table cannot
+  price every one of the collection's ingredient names. Seasoning, a pinch
+  and an unquantified line cost nothing and do not count as unpriced. The
+  recipe page says how many are missing: "From £X a portion in ingredients,
+  not counting 2 unpriced items." — Helen: *"number 1, but with "not counting
+  X unpriced items""*.
+- **2026-11-03, #1458 — a researched food price's range is the median's
+  bracket: the middle 50% of 6+ shop prices, the range of 3–5, the mean's two
+  ends of 2.** Helen: *"2 points mean, 3-5 points median with range in
+  brackets, 6+ points median with IQR in brackets"*, then *"Please update
+  cost.yml now, using the bracketed figure we're now using in this table."*
+  No reason given. Farm Direct, her favourite shop, is one of the sources.
+- **2026-11-03, #1458 — the shop prices are kept, and `costs.yml` reads its
+  researched ranges from them.** Helen: *"Yes, add the research table as a
+  reference file that can be updated. Does costs.yml read from it? It
+  probably should do."* `_data/food/price_research.yml` holds each price
+  with its shop; a `costs.yml` unit names the food, and the build takes the
+  bracket and confidence from the list, so re-pricing is editing one list.
+  Where to look first, for every food: *"Use Ocado and Farm Direct where
+  possible, then e.g. Tesco, Asda, etc as you did before."*
+- **2026-11-04, #1468 — stock is priced as made up from cubes, never as
+  ready-made liquid stock.** Helen: *"Stock: use the stock cube price.
+  Pre-made liquid stock is invariably horrible!"* A litre's price is the
+  cube's at the packet's dilution.
+- **2026-11-04, #1468 — shop prices are what a household pays, not trade
+  prices.** Of sorrel: *"Commercial buyers can get it for about £20/kg but
+  that's not us."*
+- **2026-11-04, #1468 — a `costs.yml` keyword matches its plural, so a row is
+  written singular.** Helen: *"Please do the collapsing of the plurals
+  work."*
+- **2026-11-03, #1458 — both sites print a range as "mean (lowest–highest)",
+  everywhere a price shows.** Helen: *"For each food or bottle, please give the
+  mean price you found, with (x--y) afterwards for lowest and highest."* The
+  mean is the midpoint of the ends, which are all the tables record. A point
+  price stays one figure, and a "from" figure has no mean. And: *"Let's use
+  the same language on both sites: "Roughly X a [glass] in ingredients."
+  swapping glass for portion on the food site."* A `makes:` recipe still says
+  "a batch" (her choice, asked).
+- **2026-11-03, #1458 — each recipe page carries a cost line, local only, in
+  the drink page's layout.** Helen: *"Please also add a cost line to each
+  recipe page. Use the layout from the cocktails site -- the two horizontal
+  rules with the line in between, above IF YOU LIKED THIS. Use food site
+  styling, but the same layout code."* and *"Costs should only show on the
+  local build."* `.recipe-footer` is `.cocktail-footer` rule for rule.
 - **2026-09-07 — a scaled amount is never rounded coarser than 1 g.** Helen:
   *"For now, don't tidy/round beyond 1 g precision"*, then, unprompted: *"I
   mean don't roudn to 10 g or 5 g, round to 1g"*. Two thirds of 200 g prints
@@ -2433,7 +2529,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   locally built site, and only as an incidental — just somewhere on the recipe
   page."* `site.show_costs` is declared in `_config_local.yml` and never in
   `_config.yml`, so a production build prints no cost line at all. Locally it
-  reads "Roughly £X–£Y a glass in ingredients."
+  reads "Roughly £M (£X–£Y) a glass in ingredients." (§8.2's 2026-11-03
+  entry on "mean (lowest–highest)".)
 - **2026-09-05, #547 — `default_bottles` are pricing inputs and are never named
   on a recipe.** Helen: *"Don't name these on the recipes, but you can note
   them as inputs to the default prices."* Since 2026-09-14 (#1016) the same map
@@ -4323,6 +4420,13 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   there are a few intermediate states."* This reversed "never move a file
   between these folders unless asked" by making the word the ask. Each move is
   a commit on a branch of the private repo.
+- **2026-11-04 — a food draft that leaves the pool gets the promotion rules
+  run against it.** Helen: *"I want you to run the promotion rules against
+  drafts I progress from the main pool,"* wanting to "promote 3-keep recipes
+  ASAP" and to cook from `2-make/` "without being infuriated". `python3
+  scripts/promotion_qa.py` sorts what it finds into FIX, HELEN'S and AT
+  PROMOTION; a `2-make/` draft is also checked to render and read for sense.
+  PIPELINE.md §3.
 - **2026-09-14 — never create issues or PRs in a burst: a batch of issues is
   one issue with a checklist.** Twenty issues and two PRs in under an hour got
   the agent account flagged as spam, and GitHub hid everything it had ever
@@ -5688,6 +5792,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   just fall off at the end, being whatever temperature the pan sits at for 3
   hours"*. It is the third kind of `NO_TEMPERATURE_BECAUSE` entry: a figure
   that is right about the cut and useless in the method.
+- **2026-11-03 — chicken served whole takes `poultry.chicken`; cut-up chicken
+  does not.** Helen: *"breast, legs and thighs served whole should count,
+  diced/strips/whatever should not."* So "no figure for pieces" is a reason
+  only for chicken that has been cut up.
+- **2026-11-03 — a braise takes no temperature, whatever the meat.** Helen:
+  *"braising chicken doesn't need a temperature. Same for all other meats."*
+  The youvetsi kind of `NO_TEMPERATURE_BECAUSE` entry, made general: a braised
+  or curried cut is never wired, even when the data has its figure.
 - **Undated (August 2026) — pork "medium" and fresh ham's "hint of pink" stay
   as they are.** Both sit below the cited safety figure. They were flagged and
   deliberately not corrected: whether to serve pork pink is Helen's call, and

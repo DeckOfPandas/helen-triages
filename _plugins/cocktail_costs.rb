@@ -320,6 +320,7 @@ module HelenTriages
         # the data attributes, the index's JSON and the shopping list.
         "min_text" => format("%.2f", min),
         "max_text" => format("%.2f", max),
+        "mean_text" => format("%.2f", (min + max) / 2.0),
         # True when min and max agree to the penny -- every pour named its
         # bottle, so there is nothing to range over and the page prints one
         # figure. Computed here so the template asks a boolean, not a float.

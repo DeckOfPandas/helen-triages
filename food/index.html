@@ -425,7 +425,7 @@ permalink: /food/
 </div>
 
 {% comment %} The shopping list (#801), copied from cocktails/index.html down to the
-   class names, without costing. It appears only while the shortlisted filter
+   class names; costed on a local build only (#1458). It appears only while the shortlisted filter
    is on. A `serves:` recipe's box counts portions (people), the number
    _plugins/food_shopping.rb reads off `serves:`; a `makes:`
    recipe's box counts batches (#1297). There is no "set all": one number
@@ -451,6 +451,9 @@ permalink: /food/
      browser. The button clears them all for the next shop; filters.js shows it
      only while a row is ticked. Below the rows, and hidden it keeps its room
      (shopping-untick-held), so nothing above or under it moves. {% endcomment %}
+  {% comment %} What the shop comes to (#1458), local only: filled by filters.js
+     only where #food-cost-units is on the page. {% endcomment %}
+  <p class="shopping-list-total" hidden></p>
   <p class="shopping-list-untick-row"><button type="button" class="shopping-list-untick" hidden>Untick all</button></p>
   <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
 </section>
@@ -476,8 +479,8 @@ permalink: /food/
    above is repeated, magic-bag exemption included, or a draft's ingredients
    ride into a production build. `y` is the yield up to Helen's own words
    (`yield_lead`: "6, depending on appetite" is "6"), `k` which key it came
-   from; `w`, `h` and `m` are a `makes:` recipe's batch figures (#1297). Each
-   value goes through `jsonify`, never hand-quoted. {% endcomment %}
+   from; `w`, `h` and `m` are a `makes:` recipe's batch figures (#1297); `r`
+   a rate, behind `site.show_costs` (#1458). All through `jsonify`. {% endcomment %}
 <script type="application/json" id="recipe-ingredients">
 {
 {%- assign _first_recipe = true -%}
@@ -488,13 +491,22 @@ permalink: /food/
 {%- unless _first_recipe %},{% endunless %}{%- assign _first_recipe = false %}
 {{ recipe.url | jsonify }}:{"p":{% if recipe.portions %}{{ recipe.portions }}{% else %}null{% endif %},"y":{{ recipe.yield_lead | jsonify }},"k":{% if recipe.serves %}"serves"{% else %}"makes"{% endif %}{% if recipe.whole_recipes %},"w":true,"h":{% if recipe.half_recipe %}true{% else %}false{% endif %},"m":{% if recipe.made %}{{ recipe.made | jsonify }}{% else %}null{% endif %}{% endif %},"i":[
 {%- for ing in recipe.shopping -%}
-{% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}{% if ing.parts %},"pt":{{ ing.parts | jsonify }}{% endif %}{% if ing.fruit %},"f":{{ ing.fruit | jsonify }},"c":{{ ing.count | jsonify }}{% endif %}{% if ing.pointer %},"x":true{% endif %}}
+{% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}{% if ing.parts %},"pt":{{ ing.parts | jsonify }}{% endif %}{% if ing.fruit %},"f":{{ ing.fruit | jsonify }},"c":{{ ing.count | jsonify }}{% endif %}{% if ing.pointer %},"x":true{% endif %}{% if site.show_costs and ing.rate %},"r":{{ ing.rate | jsonify }}{% endif %}}
 {%- endfor -%}
 ]}
 {%- endif -%}
 {%- endfor %}
 }
 </script>
+
+{% comment %} What a unit is worth in grams, millilitres, pieces or packs, from
+   _data/food/costs.yml (#1458). Local only, like the rates above: without
+   this block filters.js costs nothing and draws no price. {% endcomment %}
+{% if site.show_costs %}
+<script type="application/json" id="food-cost-units">
+  {{ site.data.food.costs.units | jsonify }}
+</script>
+{% endif %}
 
 {% comment %} The aisles and their order, from _data/food/aisles.yml. Only `order` is
    emitted; the keyword table stays at build time. Adding an aisle is a YAML

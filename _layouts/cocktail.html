@@ -607,14 +607,15 @@ layout: default
           {%- else %} in a serving{% endif %}
           {%- if page.volume %} of {{ page.volume.serve_ml }} ml (undiluted){% endif %}.</p>
       {% endif %}
-      {% comment %} `min_text` / `max_text` are the printed figures, to two
-         places; `min` / `max` stay numbers on the data attributes (#1215). {% endcomment %}
+      {% comment %} `mean_text` / `min_text` / `max_text` are the printed
+         figures, to two places, as "£mean (£min–£max)", the shopping list's
+         shape; `min` / `max` stay numbers on the data attributes (#1215). {% endcomment %}
       {% if has_cost %}
         <p class="cocktail-cost"
            data-cost-min="{{ page.cost.min }}"
            data-cost-max="{{ page.cost.max }}">Roughly <span class="cocktail-cost-figure">{% if page.cost.exact
             %}&pound;{{ page.cost.min_text }}{% else
-            %}&pound;{{ page.cost.min_text }}&ndash;&pound;{{ page.cost.max_text }}{% endif %}</span> a glass in ingredients.</p>
+            %}&pound;{{ page.cost.mean_text }} (&pound;{{ page.cost.min_text }}&ndash;&pound;{{ page.cost.max_text }}){% endif %}</span> a glass in ingredients.</p>
       {% endif %}
     </div>
   {% endif %}

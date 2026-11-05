@@ -120,9 +120,6 @@ NOT_FOR_DRAFTS = {
         "an ingest writes `Estimated N mins` for an unprinted time (DECISIONS "
         "§4), so the pool is full of them on purpose; "
         "test_no_estimated_time_reaches_promotion holds them at 4-promote/",
-    "test_ingredient_notes_are_lowercase_fragments":
-        "9 drafts, and flag-only even for recipes -- Helen: 'I'll look at "
-        "violations myself because I care about tone of voice'",
     "test_ingredient_group_order_matches_title": "6 drafts; flag-only for recipes too",
     "test_spice_order_within_group": "16 drafts; content judgement, MANUAL 10",
     "test_no_oven_conversions":
@@ -184,7 +181,6 @@ NOT_FOR_DRAFTS = {
     "test_chocolate_main_ingredients_has_no_percentage": "0 drafts failing",
     "test_ingredient_group_names_do_not_repeat_for_the": "0 drafts failing",
     "test_internal_link_text_matches_target_title": "0 drafts failing",
-    "test_method_step_notes_are_sentences": "0 drafts failing",
     "test_pan_and_ingredient_sizes_use_digits":
         "0 drafts failing; test_pan_and_ingredient_sizes_use_digits_in_drafts "
         "already covers the corpus by another route",
@@ -504,6 +500,18 @@ def test_notes_are_sentences(draft):
     _st.test_notes_are_sentences(draft)
 
 
+def test_ingredient_notes_are_lowercase_fragments(draft, taxonomy):
+    """An ingredient's note is a fragment: no capital, no full stop, one
+    sentence (DECISIONS §5). The rule is the recipe version's."""
+    _tx.test_ingredient_notes_are_lowercase_fragments(draft, taxonomy)
+
+
+def test_method_step_notes_are_sentences(draft):
+    """A method step's note is a sentence: capital and full stop (DECISIONS
+    §5). The rule is the recipe version's."""
+    _st.test_method_step_notes_are_sentences(draft)
+
+
 def test_note_dicts_have_label_and_text_when_dict(draft):
     """A draft note is a `{label, text}` mapping with both keys and no others;
     either value may be the empty string.
@@ -539,6 +547,19 @@ def test_note_dicts_have_label_and_text_when_dict(draft):
                 f"{where_draft(draft)} note {i} has `{key}:` as a "
                 f"{type(note[key]).__name__}, not a string -- {note[key]!r}."
             )
+
+
+def test_a_draft_slug_drops_and_and_with(draft):
+    """A food draft's filename is its title slugged without "and" and "with"
+    (DECISIONS §4). `scripts/envelope.py`'s `FOOD_SLUG_FILLER` is the same pair.
+    Other small words stay: they are part of a dish's name (toad-in-the-hole).
+    """
+    filler = set(draft.slug.split("-")) & {"and", "with"}
+    assert not filler, (
+        f"{where_draft(draft)} has {sorted(filler)} in its filename. Rename it "
+        f"to {'-'.join(w for w in draft.slug.split('-') if w not in filler)!r}, "
+        f"and update any link to it."
+    )
 
 
 def test_a_draft_has_a_notes_slot_and_no_unlabelled_note(draft):

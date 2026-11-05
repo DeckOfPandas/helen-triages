@@ -162,7 +162,7 @@ layout: default
      _plugins/food_shopping.rb), and no count means no control. `hidden` until recipe-scale.js
      reveals it. The `data-*` word lists are _data/food YAML, never literals. {% endcomment %}
   {% if page.made and page.ingredient_groups.size > 0 %}
-    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
+    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}" data-count-nouns="{{ site.data.food.scaling.count_nouns | join: '|' | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="make fewer">&minus;</button>
       <label class="recipe-scale recipe-scale--made">
         {% if page.made.prefix != "" %}<span class="recipe-scale-prefix">{{ page.made.prefix }}</span>{% endif %}
@@ -174,7 +174,7 @@ layout: default
     </div>
     <p class="recipe-scale-note" hidden></p>
   {% elsif page.portions and page.ingredient_groups.size > 0 %}
-    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
+    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}" data-count-nouns="{{ site.data.food.scaling.count_nouns | join: '|' | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="one fewer portion">&minus;</button>
       <label class="recipe-scale">
         <input type="text" value="{{ page.portions }}" inputmode="numeric" class="recipe-scale-portions" data-portions="{{ page.portions }}" aria-label="portions to make">
@@ -362,6 +362,25 @@ layout: default
     </section>
   {% endif %}
 
+  {% comment %} What it costs (#1458), on a local build only: `site.show_costs` is
+     declared in _config_local.yml and never in _config.yml. The cocktail page's
+     footer, between two rules, above IF YOU LIKED THIS. The figure is one
+     portion, or one batch of a `makes:` recipe, filled by recipe-cost.js
+     through the shortlist's own arithmetic; it stays hidden where nothing
+     could be priced. MANUAL §8.2. {% endcomment %}
+  {% if site.show_costs and page.shopping %}
+    <div class="recipe-footer" data-recipe-cost hidden>
+      <p class="recipe-cost"></p>
+    </div>
+    <script type="application/json" id="recipe-cost-data">
+{"per":{% if page.whole_recipes %}1{% elsif page.portions %}{{ page.portions }}{% else %}0{% endif %},"batch":{% if page.whole_recipes %}true{% else %}false{% endif %},"units":{{ site.data.food.costs.units | jsonify }},"wholeMeasures":{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | jsonify }},"quarterMeasures":{{ site.data.food.scaling.quarter_step_measures | jsonify }},"i":[
+{%- for ing in page.shopping -%}
+{% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}{% if ing.parts %},"pt":{{ ing.parts | jsonify }}{% endif %}{% if ing.fruit %},"f":{{ ing.fruit | jsonify }},"c":{{ ing.count | jsonify }}{% endif %}{% if ing.pointer %},"x":true{% endif %}{% if ing.rate %},"r":{{ ing.rate | jsonify }}{% endif %}}
+{%- endfor -%}
+]}
+    </script>
+  {% endif %}
+
   {% comment %} ── If you liked this, how about … (#1090; heading final, #1088) ──
      Ranked by: the same star ingredient, then more shared mood tags, then more
      shared other tags plus main ingredients, then more shared non-larder
@@ -450,3 +469,4 @@ layout: default
 <script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-scale.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/recipe-scale.js' | relative_url }}"></script>
+{% if site.show_costs %}<script src="{{ '/assets/js/recipe-cost.js' | relative_url }}"></script>{% endif %}

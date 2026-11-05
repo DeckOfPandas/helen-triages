@@ -302,6 +302,22 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
   input.shopping-list-glasses { @extend %cocktail-number-input; }
 }
 
+// A drink's name here is the card's title, at the size of the surrounding
+// text, and a link to the drink (#1464): the face of `.drink-card-name`
+// (_cards.scss) and the hover of its link. Food's twin is
+// `.shopping-list-recipe-link` (food/_shopping-list.scss); change both.
+.shopping-list-drink-link {
+  @extend %cocktail-heading-face;
+  font-size: 1em;
+  letter-spacing: 0.03em;
+  color: $color-text;
+  text-decoration: none;
+  transition: color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { color: $color-wicked-woowoo-deep; }
+}
+
 // An ingredient that offers a choice of bottle (#818): one row each, labelled
 // with the generic, so it is visible which ingredient the buttons belong to.
 // Indented, so the rows read as belonging to the drink above.
@@ -444,15 +460,21 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
 // What the line costs — #820. Local only, like `.shopping-list-cost` above.
 // Plex and tabular, and pushed right by the `auto` margin so the prices form a
 // column you can read down to the total. Quieter than the amount: the
-// millilitres are what you shop by and the price is context.
+// millilitres are what you shop by and the price is context. It may shrink to
+// its widest part, so a narrow row puts "(£X–£Y)" under the mean rather than
+// squeezing the name (#1458).
 .shopping-list-price {
   margin-left: auto;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   padding-left: $space-sm;
   font-family: $font-label;
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
   color: $color-clear-text;
+  text-align: right;
+}
+
+.shopping-list-price-part {
   white-space: nowrap;
 }
 

@@ -772,6 +772,25 @@ test('#1286: an item that cannot be made singular safely is left as written', ()
   assert.strictEqual(foodScale.singularItem('eggs'), 'egg');
 });
 
+test('"1 lemon" doubled is "2 lemons": a count written for one goes plural', () => {
+  const NOUNS = ['lemon', 'lime', 'peach', 'apple'];
+  const many = (item) => foodScale.pluralItem(item, NOUNS);
+  assert.strictEqual(many('lemon'), 'lemons');
+  assert.strictEqual(many('lemon, zested and juiced'), 'lemons, zested and juiced');
+  assert.strictEqual(many('ripe peach, halved'), 'ripe peaches, halved');
+  assert.strictEqual(many('\n   apple, cored\n  '), '\n   apples, cored\n  ');
+  // Only a declared count noun; a mass noun or a two-thing head is left alone.
+  assert.strictEqual(many('thyme'), 'thyme');
+  assert.strictEqual(many('lemon or lime, juiced'), 'lemon or lime, juiced');
+  assert.strictEqual(foodScale.pluralItem('lemon'), 'lemon');
+  // scaleAmount says when: written for one or less, now more than one.
+  assert.strictEqual(foodScale.scaleAmount('1', 2).many, true);
+  assert.strictEqual(foodScale.scaleAmount('½', 4).many, true);
+  assert.strictEqual(foodScale.scaleAmount('½', 2).many, false);
+  assert.strictEqual(foodScale.scaleAmount('2', 2).many, false);
+  assert.strictEqual(foodScale.scaleAmount('100 g', 2).many, false);
+});
+
 test('#1286: Delia\'s pancakes -- "about 8 pancakes" is 8 pancakes, then 16', () => {
   // The spec is what _plugins/food_yield.rb returns for `makes: "about 8
   // pancakes"` (tests/test_food_yield.py pins that); the "about" is printed by

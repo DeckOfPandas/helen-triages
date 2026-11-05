@@ -435,7 +435,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 #   2. move it in a commit of its own, quoting her grant in the message;
 #   3. move it before the next agent edit, or it covers that too.
 # Grants made on parallel branches need the merge commit with both behind it.
-BASELINE_COMMIT = "48376d98"   # the 12 rewritten yield lines, read by Helen on the branch; d08fcb2c (raan, #1104) behind it
+BASELINE_COMMIT = "0c273134"   # two source lines to "Good Food", on Helen's explicit grant; 48376d98 and every earlier grant behind it
 AGENT_TRAILER = "co-authored-by: claude"
 
 
@@ -755,6 +755,25 @@ ADJUDICATED_REWRITES = {
             "Helen pasted her own rewrite, saying `rewritten: true`, and asked "
             "for it to be added to the drafts PR; the agent commit copied her "
             "value. Asked, she granted this entry."
+        ),
+        "026f3224": (
+            "3-keep/miso-blackened-cod.md, 2026-11-03. Helen set the flag "
+            "herself, editing in an agent's worktree while the agent did her "
+            "git; the agent commit carried her edit as she left it. Asked, she "
+            "granted this entry, and one for each later flip of hers that an "
+            "agent commits the same way, each quoting the commit."
+        ),
+        "094ebbab": (
+            "1-rewrite/teriyaki-marinade.md, 2026-11-03. Helen's own rewrite "
+            "and flag, made while the agent was committing other files; its "
+            "stage-everything swept them into an unrelated commit. Covered "
+            "by her standing grant under 026f3224."
+        ),
+        "fc0742e8": (
+            "2-make/crispy-whole-roast-duck.md and 2-make/new-best-ever-"
+            "lasagne-thats-actually-good-this-time.md, 2026-11-04. Helen's "
+            "own rewrites and flags, committed for her as she left them. "
+            "Covered by her standing grant under 026f3224."
         ),
     },
 }
