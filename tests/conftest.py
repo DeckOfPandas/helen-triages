@@ -548,8 +548,14 @@ def number_range_hits(text: str) -> list[str]:
     return NUMBER_RANGE.findall(ISO_DATE.sub(" ", text))
 
 
+# A markdown link's target, `](../asparagus-gruyere-quiche/)`: a slug, which
+# stays ASCII, so no spelling or accent check reads it.
+LINK_TARGET = re.compile(r"\]\([^)\s]*\)")
+
+
 def spelling_problems(text: str) -> list[str]:
     """`['demarara -> demerara', ...]` for each non-house spelling present."""
+    text = LINK_TARGET.sub("]", text)
     return [f"{pattern.strip(chr(92) + 'b')} -> {correct}"
             for pattern, correct in SPELLINGS.items()
             if re.search(pattern, text, re.I)]
@@ -664,6 +670,7 @@ def accent_problems(fields: list[tuple[str, str]], words: dict) -> list[str]:
     """Every declared unaccented spelling found in `(location, text)` pairs."""
     problems = []
     for location, text in fields:
+        text = LINK_TARGET.sub("]", text)
         for plain, accented in words.items():
             if re.search(rf"\b{re.escape(plain)}\b", text, re.I):
                 problems.append(f"{location}: '{plain}' should be '{accented}'")
