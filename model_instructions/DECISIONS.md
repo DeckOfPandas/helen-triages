@@ -166,6 +166,11 @@ stated. Italics in quotation marks are Helen's own words.
 - **2026-09-10 — no words under the wordmark.** Helen, declining a one-line
   question there (*"What shall we cook?"*): *"No words under the wordmark
   section please."*
+- **2026-11-05, #1462 A2 — neither index shows its tagline; it lives in the
+  description only.** Shown candidates for a visible line, Helen: *"let's not
+  display this tagline. It's a whole new thing and I never wanted it. Leaving
+  it in the description only is enough."* `description` in `sites.yml` stays
+  the meta description and the hidden `<h1>`'s second half.
 - **2026-09-11, #965 — the other-site row sits at the right-hand end of the
   header's second row and `??` at its left end, both on the cards' edges, at
   every width.** Helen: *"the design I would like is for the link to the other
@@ -4575,8 +4580,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   group for `pr-<number>`, so a PR can no longer cancel a waiting deploy
   (three were lost that way on 2026-10-02), and `build` runs beside `test`
   with `deploy` needing both, the same gate about two minutes sooner. Parse
-  the YAML before pushing: an invalid workflow blocks every merge, the fix
+  the YAML before pushing: an invalid workflow blocks every deploy, the fix
   included (2026-09-28, thirty-nine minutes).
+- **2026-11-05, #1462 E2 — the live site is rolled back with a revert PR,
+  never by re-running an old deploy.** Helen: *"Okay, revert PR it is."* A
+  re-run puts the old site live while `main` still holds the bad change, so
+  the next merge ships it again; a revert goes through the suite like any PR.
 
 ## §13 The visual design
 
@@ -4757,6 +4766,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   key from that list matches an entry's last word only: `plum` finds plums,
   not plum tomatoes or plum jam; `tomato` finds cherry tomatoes, not tomato
   purée. A `family_exceptions` entry matches the same way.
+- **2026-11-05, #1462 C3 — the address bar follows the filters, on both
+  indexes.** Asked whether a copied link or a bookmark should keep the
+  filters, Helen: *"No harm in retaining the ?=, correct? If I'm correct then
+  please do it."* No harm, with one change: a reload now keeps the filters
+  instead of starting clean, and × is how to start clean.
 - **2026-09-15, #1050 / #1057 / #1059 — a link that arrives at a filtered index
   lands on what it filtered.** Helen: *"load the index page filtered as
   appropriate, with the screen snapped to the returned recipes (so don't have
@@ -5211,6 +5225,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   two demo pages were reachable on the live site by URL, and nothing used
   them. Helen: *"Delete the longform demos."* The pages and their stylesheet
   are in git history if C is ever wanted back.
+- **2026-11-05, #1462 E3 — a candidates script goes once she has chosen;
+  `scripts/leopard_candidates.py` alone is kept.** Helen: *"keep leopard, as
+  the most controversial one, but delete the others."* The rest are in git
+  history.
 
 **§13.12 Decisions that are Helen's: the words.**
 
@@ -5274,12 +5292,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   "copied" are fine.** Her words at the second sitting, which listed every
   visible string rather than grepping for markers. Lines only a local build
   prints are hers to fix or not.
-- **2026-09-25, #1097 — the cocktails site's description is exactly "What to
-  drink.", full stop included.** The string is Helen's own. It is
+- **2026-11-05, #1462 A2 — the cocktails site's description is exactly "The
+  right drink in your hand.", full stop included.** Helen's own, offered as
+  "Getting the right drink in your hand." and chosen shortened: *"'The right
+  drink in your hand.' is perfect!"* It replaces "What to drink." because the
+  site is about choosing the right one, not drinking more. It is
   `description` in `_data/sites.yml`, the fallback `<meta description>` for a
   cocktails page with no tagline of its own; food's is "What to cook, not how
-  to cook". Do not lengthen it, drop the stop, or rewrite one to match the
-  other.
+  to cook". Do not rewrite one to match the other.
 
 **§13.13 The page furniture.**
 
@@ -5683,8 +5703,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   candidates: *"Internal temp: one line sticky jump bar."* A row is its label
   and figure on one line with the bar under them at full width, at every
   width. The chips wrap rather than scroll sideways (2026-10-09: *"Option A
-  please, perfect."*). The thermometer treatment lost; it is in
-  `scripts/reference_candidates.py`. Not re-opened, on purpose: the split
+  please, perfect."*). The thermometer treatment lost; its candidates script
+  is in git history. Not re-opened, on purpose: the split
   pages, no cards, one axis for the whole page.
 - **2026-10-08, #1329, #1330 — the methods page is stacked blocks grouped by
   cut, each with its oven setting; fish and shellfish are lists with no
@@ -5768,12 +5788,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   user."* All four went. The long explanation at its foot of why some rows
   decline went as well: *"the whole bottom section can go, other than see
   also."*
-- **2026-08-16, #244 — `scheduleBack`, `parseClock`, `clock`, `statedRest` and
-  `restFor` in `cook-schedule.js` are kept, with their tests, though nothing
-  calls them.** Helen's explicit instruction when the page lost its "eating
-  at" box, until she decides whether working backwards from a serving time
-  comes back; no words of hers were recorded. The next editor reconnects them
-  or deletes them together with their tests, on her say.
+- **2026-11-05, #1462 E2 — working backwards from a serving time does not come
+  back, and its code is gone.** Helen: *"delete all please. That was all a poor
+  idea on my part -- this site is not a friend!!!!"* The site says what to
+  cook and how long it takes; it does not plan the cook's day.
 - **Undated — every cooking time on the timings page is rounded to the nearest
   five minutes.** Helen: *"let's round cooking times to the nearest 5 mins to
   preserve sanity."* `round5` in `cook-schedule.js`. A figure like "1h37m" is

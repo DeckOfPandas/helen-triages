@@ -3662,18 +3662,20 @@ is not a green result.
   That is benign: the newer run carries the older merge, or Helen re-runs it
   in the Actions tab. Each pull request has its own group, `pr-<number>`, and
   never touches the deploy queue.
-- **An invalid workflow file deadlocks everything.** GitHub runs no jobs,
-  `test` never reports, and nothing can merge. The way out is a pull request
-  that repairs the workflow: a `pull_request` run reads the file from the PR's
-  own branch, so the corrected copy runs and reports.
+- **An invalid workflow file stops every deploy.** GitHub runs no jobs and
+  `test` never reports. `main` has no branch rules, so GitHub still lets a
+  pull request merge, red or silent: the suite gates the deploy, never the
+  merge, and a PR's checks are read by eye before Helen merges it. The way out
+  is a pull request that repairs the workflow: a `pull_request` run reads the
+  file from the PR's own branch, so the corrected copy runs and reports.
 - **A Dependabot PR opened while CI was broken does not re-run on its own, and
   closing and reopening it does nothing.** Comment `@dependabot rebase`.
-- **Rolling the live site back has two routes, and they are different
-  things.** Re-running the last green push run from the Actions tab builds
-  and deploys that run's commit again, through the same `test` gate, and
-  moves `main` not at all (`workflow_dispatch` is on, which also allows a
-  fresh run of `main`'s head). A revert PR moves `main` to a commit without
-  the change and deploys when Helen merges it. Which to use is her call.
+- **The live site is rolled back with a revert PR** (DECISIONS §12). It
+  moves `main` to a commit without the change, runs the suite like any PR,
+  and deploys when Helen merges it. Re-running an old green run from the
+  Actions tab would put the old site live while `main` still holds the bad
+  change, which the next merge deploys again. `workflow_dispatch` stays on
+  for a fresh run of `main`'s head.
 
 #### A public test can need private data
 
@@ -4658,9 +4660,23 @@ first render, trading a visible flip for a blank instant. A `<noscript>`
 style in `food/index.html` reveals it without scripts, so a reader with them
 off gets the alphabetical list.
 
-**Clear-all clears the address bar too.** Both clear-alls drop the query
-string with `history.replaceState`, so a reload after × does not bring back
-the filter a link arrived with.
+**The address bar says what is chosen** (DECISIONS §13.4), so a reload, a
+bookmark or a copied link shows the same list, shuffled afresh. Every
+`update()` (food) and `apply()` (cocktails) ends by writing the query with
+`HTF.filterState.buildQuery` and `replaceQuery`, which uses
+`history.replaceState`: no history entry per chip, and the fragment kept.
+
+- Food writes `star`, `tag`, `ing`, `out` and `q`; cocktails `mood` (MOOD
+  and HASSLE together), `yolo`, `ship`, `ing`, `out` and `q`. A family chip
+  is written with its suffix, `ing=garlic%20(all)`.
+- The shortlist view writes `shortlist=1`, or keeps the `shortlist=<slugs>`
+  a sent list arrived with until the reader leaves it.
+- It stays off until startup has read the query the page arrived with:
+  choosing an arriving ingredient runs `update()`, which would otherwise
+  rewrite the query before `?q=` and `?shortlist=` were read.
+- With nothing chosen the query is empty, so × clears the address bar too.
+- Arrival reads each kind back and drops a value nothing on the page offers;
+  a back navigation still restores the index memory over it (§13.7).
 
 **Two empty states, and they are different lines.** "Blank canvas." on both
 indexes says the search was too narrow; the pill's × is the way out of it.
@@ -4795,8 +4811,9 @@ and is not reachable from her browser.
       bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock
 
   Add candidate CSS keyed off `html[data-x="…"]` and a switcher, and publish
-  it as an Artifact. `scripts/reference_candidates.py`,
-  `methods_candidates.py` and `leopard_candidates.py` are worked examples.
+  it as an Artifact. `scripts/leopard_candidates.py` is the worked example,
+  and the one candidates script kept: Helen keeps it as the record of her
+  most argued-over choice. The others went once she had chosen.
 - **Syntax-check the switcher before publishing** (a script file under
   `tmp/` that passes the source to `new Function(src)`). Use `json.dumps`
   for any text going into it, and skip `type="application/json"` blocks.
@@ -4996,10 +5013,11 @@ focus. The pure half is `HTF.pageSearch` (`tests/js/page-search.test.js`).
   count line, so the reader lands on the answer and not the panel. Each
   index scrolls to whatever `location.hash` names after its reveal, except
   when going back.
-- **`?ing=`** is handed to each index's own HAS TO HAVE: food chooses the
-  picker's matching entry through the button's own click, or leaves the
-  pool on screen when none is exact; cocktails matches a pool chip whole
-  and drops a miss in silence.
+- **`?ing=`** is handed to each index's own HAS TO HAVE, one value at a
+  time: food chooses the picker's matching entry through the button's own
+  click, or leaves the pool on screen when none is exact; cocktails matches
+  a pool chip whole, or a family the picker offers, and drops a miss in
+  silence.
 
 `search.json` is generated from the same gated lists the two indexes render;
 `test_the_search_index_lists_exactly_the_published_pages` holds it to the
@@ -5077,9 +5095,7 @@ maths and `assets/js/cook-timer.js` the page wiring.
 li` reset in `_sass/food/_timings.scss`, because that rule out-specifies
 `.ct-method` and a padding on the block itself never applies.
 
-The layouts are Helen's choices from candidates pages
-(`scripts/reference_candidates.py`, `scripts/methods_candidates.py`;
-DECISIONS §14).
+The layouts are Helen's choices from candidates pages (DECISIONS §14).
 
 ### The data layer — two datasets
 
