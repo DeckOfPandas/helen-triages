@@ -23,6 +23,12 @@
     - rule: "An aside under the standing \"gf tip\" rubric is transcribed without the label: it is Good Food's tip, not gluten-free."
       helen: "Good Food tip, the magazine source I use a lot?"
       date: 2026-09-07
+    - rule: "Cite it as \"Adapted from Good Food, <Month Year>\", never \"BBC Good Food\". An issue whose footer says \"Christmas\" is the November issue."
+      helen: "\"Christmas 2026\" means \"November 2026\" -- this is always the case for Good Food, Nov not Dec."
+      date: 2026-11-03
+    - rule: "Add the recipe's author to the citation (\", <Firstname Lastname>\") where the magazine makes a fuss about them: a byline, a photo, a named feature."
+      helen: "Add Good Food recipe authors where the magazine has made a fuss about them."
+      date: 2026-11-03
 
 - name: "Delia Smith"
   match: "Delia"

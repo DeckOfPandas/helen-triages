@@ -833,13 +833,14 @@ NO_TEMPERATURE_BECAUSE = {
     "cumin-mint-lamb-skewers": "grilled shoulder chunks; lamb.roasting is joints and "
                                "lamb.slow_cooked is a whole shoulder, neither is this",
     "chicken-a-la-king": "diced breast in a sauce; no figure for pieces",
-    "chicken-cider-stew": "thighs and drumsticks braised; no figure for pieces",
-    "chicken-sorrel-potato-stew": "leg braised; no figure for pieces",
-    "indonesian-chicken-curry-gulai-ayam": "thighs in a curry; no figure for pieces",
-    "thai-green-chicken-curry": "chicken in a curry; no figure for pieces",
 
     # A cut where the figure exists and does not apply: right about the cut and
-    # useless in the method, because no step probes anything (DECISIONS §14).
+    # useless in the method, because no step probes anything. A braise of any
+    # meat is this kind (DECISIONS §14).
+    "chicken-cider-stew": "thighs and drumsticks braised; a braise takes no temperature",
+    "chicken-sorrel-potato-stew": "leg braised; a braise takes no temperature",
+    "indonesian-chicken-curry-gulai-ayam": "thighs simmered in a curry; a braise takes no temperature",
+    "thai-green-chicken-curry": "chicken simmered in a curry; a braise takes no temperature",
     # If youvetsi goes back to off-the-bone pieces, wire beef.tough_cuts in
     # and take its entry out.
     "youvetsi": "short rib blocks braised whole for 3 hrs; the meat is done when "

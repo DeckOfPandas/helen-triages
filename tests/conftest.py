@@ -536,6 +536,8 @@ SPELLINGS = {
     r"\bpuree\b": "purée",
     r"\bsaute\b": "sauté",
     r"\bbain marie\b": "bain-marie",
+    r"\brice wine vinegar\b": "rice vinegar",
+    r"\bbaking soda\b": "bicarbonate of soda",
 }
 
 DEGREELESS_TEMPERATURE = re.compile(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)")

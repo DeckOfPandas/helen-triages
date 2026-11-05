@@ -198,6 +198,9 @@ TYPOGRAPHY = [
     ("reversed link brackets", r"\([^()\n]+\)\[[^\]\n]*\]",
      "markdown links are [display text](../slug/), not (display text)[...] — "
      "the (text)[url] order never renders as a link, in any field"),
+    # DECISIONS §5. "2 tbsp of the oil", "1 tsp of it" alike: name the thing.
+    ("spoon amount with 'of'", r"\b\d[\d½¼¾⅓⅔⅛.–-]*\s*(?:tbsp|tsp)\s+of\b",
+     "a spoon amount takes no 'of': '2 tbsp oil', not '2 tbsp of the oil'"),
     ("ampersand in title", None, None),  # handled separately below
 ]
 
@@ -298,11 +301,11 @@ def test_citrus_is_measured_not_squeezed(recipe):
 # qualifiers wrap in all directions ("melted salted butter", "~2 tbsp dark
 # brown muscovado sugar"). `\b` matters: a substring check would find "salted"
 # inside "unsalted".
-_QUALIFIED_BUTTER = {"salted butter", "unsalted butter"}
+_QUALIFIED_BUTTER = {"salted butter", "unsalted butter", "clarified butter"}
 # A line that is butter for the tin and nothing else. "plus extra" means the
 # line is an ingredient of the dish too, so it does not match.
 _ONLY_FOR_GREASING = re.compile(r"^(?!.*\bplus\b).*,\s*(?:extra,\s*)?(?:for greasing|to grease)\b", re.I)
-_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour"}
+_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour", "wholemeal flour", "dark rye flour"}
 _QUALIFIED_SUGAR = {
     "golden caster sugar", "golden granulated sugar", "white caster sugar",
     "light brown soft sugar", "dark brown soft sugar",
@@ -320,7 +323,7 @@ _COMPOUND_EXCLUDE = {
     "sugar": re.compile(r"\bsugar snap\b", re.I),
     "flour": None,
     "cloves": re.compile(r"\bgarlic\b", re.I),
-    "milk": re.compile(r"\bmilk chocolate\b", re.I),
+    "milk": re.compile(r"\b(milk chocolate|malted milk powder)\b", re.I),
 }
 
 
@@ -396,7 +399,7 @@ _QUALIFIED_MUSTARD = {
     "mustard oil",
 }
 _QUALIFIED_SOY_SAUCE = {"dark soy sauce", "light soy sauce"}
-_QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste"}
+_QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste", "dried ginger"}
 
 
 def test_mustard_specifies_type(recipe):

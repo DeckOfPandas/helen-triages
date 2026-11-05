@@ -101,6 +101,8 @@
   } catch (e) {
     singulars = {};
   }
+  // The reverse, one becoming several: HTF.foodScale.pluralItem.
+  var countNouns = listFrom('data-count-nouns');
 
   function itemNodeFor(span) {
     var row = span.closest ? span.closest('li.ingredient') : null;
@@ -179,6 +181,8 @@
       write(span, result.text);
       if (result.one && item.node) {
         item.node.nodeValue = HTF.foodScale.singularItem(item.written, singulars);
+      } else if (result.many && item.node) {
+        item.node.nodeValue = HTF.foodScale.pluralItem(item.written, countNouns);
       }
       if (!result.scaled) {
         var row = span.closest ? span.closest('li.ingredient') : null;

@@ -54,7 +54,8 @@
       "Bash(sh scripts/browser/crop.sh *)",
       "Bash(sh scripts/browser/styles.sh *)",
       "Bash(sh scripts/browser/gaps.sh *)",
-      "Bash(sh scripts/browser/click-crop.sh *)"
+      "Bash(sh scripts/browser/click-crop.sh *)",
+      "Bash(sh scripts/git-diff-main-checkout.sh *)"
     ],
     "deny": [
       "Edit(//workspace/.node-runtime/**)",

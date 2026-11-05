@@ -72,8 +72,8 @@ def test_a_valid_envelope_parses_and_names_its_file(name, site, slug):
     assert env.version in inbox.SUPPORTED_VERSIONS
     assert env.site == site
     assert env.hand_back, "the hand-back list is the half Helen actually reads"
-    assert inbox.slug_for(env.fm["title"]) == slug
-    assert inbox.SLUG_OK.match(inbox.slug_for(env.fm["title"]))
+    assert inbox.slug_for(env.fm["title"], site) == slug
+    assert inbox.SLUG_OK.match(inbox.slug_for(env.fm["title"], site))
 
 
 @pytest.mark.parametrize("name,site,doc", [
@@ -495,14 +495,18 @@ def test_comment_carries_the_hand_back_list(drafts, monkeypatch, capsys):
 
 
 def test_slug_is_the_whole_title():
-    """The slug is the whole title, not its head clause.
+    """The slug is the whole title, not its head clause, and a food slug drops
+    "and" and "with" (DECISIONS §4).
 
     Two "with" dishes sharing a head clause otherwise collide, and the second
-    lands as `-2` for no reason a reader can see in the name.
+    lands as `-2` for no reason a reader can see in the name. A drink keeps
+    the words, which are usually its name.
     """
-    assert inbox.slug_for("Roast Chicken with Lemon and Thyme") == "roast-chicken-with-lemon-and-thyme"
-    assert inbox.slug_for("Crème Brûlée") == "creme-brulee"
-    assert inbox.slug_for("Anita's Attitude Adjuster") == "anitas-attitude-adjuster"
+    assert inbox.slug_for("Roast Chicken with Lemon and Thyme", "food") == "roast-chicken-lemon-thyme"
+    assert inbox.slug_for("Toad in the Hole", "food") == "toad-in-the-hole"
+    assert inbox.slug_for("Crème Brûlée", "food") == "creme-brulee"
+    assert inbox.slug_for("Gin and Tonic", "cocktail") == "gin-and-tonic"
+    assert inbox.slug_for("Anita's Attitude Adjuster", "cocktail") == "anitas-attitude-adjuster"
 
 
 def test_an_absent_drafts_repo_is_a_loud_refusal(capsys):
