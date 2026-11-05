@@ -33,9 +33,9 @@ food:
 cocktails:
   title: Helen Triages Cocktails
   word: COCKTAILS
-  # Exactly this, full stop included (#1097). Also the fallback
+  # Helen's words exactly, full stop included (#1462 A2). Also the fallback
   # <meta description> for a cocktails page with no tagline of its own.
-  description: What to drink.
+  description: The right drink in your hand.
   css: cocktails
   home: /cocktails/
   icon: glass-martini
