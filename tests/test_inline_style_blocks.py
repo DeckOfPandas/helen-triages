@@ -85,7 +85,9 @@ def _comment_faults(css: str):
 def _pages_with_inline_style():
     for path in sorted(ROOT.rglob("*.html")):
         rel = path.relative_to(ROOT)
-        if rel.parts[0] in {"tmp", "_site", "node_modules", ".git"}:
+        # `.claude` holds the agents' worktrees, each a whole checkout with its
+        # own tmp/ scratch: none of it is site source.
+        if rel.parts[0] in {"tmp", "_site", "node_modules", ".git", ".claude"}:
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         if "<style" in text:
