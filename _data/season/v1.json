@@ -1,0 +1,4640 @@
+{
+ "schema_version": 1,
+ "foods": [
+  {
+   "id": "apples",
+   "name": "Apples",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "from_store"
+   ]
+  },
+  {
+   "id": "asparagus",
+   "name": "Asparagus",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "aubergine",
+   "name": "Aubergine",
+   "aliases": [
+    "eggplant"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "avocados",
+   "name": "Avocados",
+   "aliases": [
+    "avocado",
+    "guacamole"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "bananas",
+   "name": "Bananas",
+   "aliases": [
+    "banana",
+    "plantain",
+    "plantains"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "basil",
+   "name": "Basil",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "bay",
+   "name": "Bay",
+   "aliases": [
+    "bay leaves",
+    "bay leaf"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "beef",
+   "name": "Beef",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "beetroot",
+   "name": "Beetroot",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "from_store",
+    "from_store"
+   ]
+  },
+  {
+   "id": "bilberries",
+   "name": "Bilberries",
+   "aliases": [
+    "whortleberries",
+    "blaeberries",
+    "whinberries"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "black-pepper",
+   "name": "Black pepper",
+   "aliases": [
+    "peppercorns",
+    "peppercorn"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "blackberries",
+   "name": "Blackberries",
+   "aliases": [
+    "brambles"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "blackcurrants-redcurrants",
+   "name": "Blackcurrants & Redcurrants",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "blueberries",
+   "name": "Blueberries",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "brazil-nuts",
+   "name": "Brazil nuts",
+   "aliases": [
+    "brazil nut",
+    "brazils"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "brill",
+   "name": "Brill",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "broad-beans",
+   "name": "Broad beans",
+   "aliases": [
+    "fava beans"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "broccoli",
+   "name": "Broccoli",
+   "aliases": [
+    "tenderstem",
+    "psb",
+    "purple sprouting broccoli"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "coming_in",
+    "coming_in"
+   ]
+  },
+  {
+   "id": "brown-crab",
+   "name": "Brown crab",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "brown-shrimp",
+   "name": "Brown shrimp",
+   "aliases": [
+    "prawns",
+    "shrimps",
+    "potted shrimp"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "brussels-sprouts",
+   "name": "Brussels sprouts",
+   "aliases": [
+    "sprout tops",
+    "kalettes",
+    "flower sprouts"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "cabbage",
+   "name": "Cabbage",
+   "aliases": [
+    "hispi",
+    "sweetheart cabbage",
+    "pointed cabbage",
+    "spring cabbage"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "from_store",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "cardamom",
+   "name": "Cardamom",
+   "aliases": [
+    "cardamon",
+    "cardamum"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "carrots",
+   "name": "Carrots",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "from_store",
+    "from_store",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "cashews",
+   "name": "Cashews",
+   "aliases": [
+    "cashew",
+    "cashew nuts"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "cauliflower",
+   "name": "Cauliflower",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "cavolo-nero",
+   "name": "Cavolo nero",
+   "aliases": [
+    "black kale"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "celeriac",
+   "name": "Celeriac",
+   "aliases": [
+    "celery root"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "going_out",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "celery",
+   "name": "Celery",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "ceps",
+   "name": "Ceps",
+   "aliases": [
+    "porcini",
+    "penny buns"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "chard",
+   "name": "Chard",
+   "aliases": [
+    "swiss chard",
+    "rainbow chard"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "cherries",
+   "name": "Cherries",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "chervil",
+   "name": "Chervil",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "chicken",
+   "name": "Chicken",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "chicory-radicchio",
+   "name": "Chicory & Radicchio",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "chillies",
+   "name": "Chillies",
+   "aliases": [
+    "chili",
+    "chile",
+    "chilli peppers"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out"
+   ]
+  },
+  {
+   "id": "chives",
+   "name": "Chives",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "chocolate",
+   "name": "Chocolate",
+   "aliases": [
+    "cocoa",
+    "cacao"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "cinnamon",
+   "name": "Cinnamon",
+   "aliases": [],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "clams",
+   "name": "Clams",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "cockles",
+   "name": "Cockles",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "coconuts",
+   "name": "Coconuts",
+   "aliases": [
+    "coconut"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "cod",
+   "name": "Cod",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "coffee",
+   "name": "Coffee",
+   "aliases": [
+    "espresso"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "coriander",
+   "name": "Coriander",
+   "aliases": [
+    "cilantro"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "courgette-flowers",
+   "name": "Courgette flowers",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "courgettes",
+   "name": "Courgettes",
+   "aliases": [
+    "zucchini"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "crab-apples",
+   "name": "Crab apples",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "cress",
+   "name": "Cress",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "cucumber",
+   "name": "Cucumber",
+   "aliases": [],
+   "glasshouse": true,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "cuttlefish",
+   "name": "Cuttlefish",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "going_out",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "dab",
+   "name": "Dab",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "damsons",
+   "name": "Damsons",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "dandelion",
+   "name": "Dandelion",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "dates",
+   "name": "Dates",
+   "aliases": [
+    "date",
+    "medjool"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "dill",
+   "name": "Dill",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "dover-sole",
+   "name": "Dover sole",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "dragon-fruit",
+   "name": "Dragon fruit",
+   "aliases": [
+    "dragonfruit",
+    "pitaya",
+    "pitahaya"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "duck",
+   "name": "Duck",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "edible-flowers",
+   "name": "Edible flowers",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "elderberries",
+   "name": "Elderberries",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "elderflower",
+   "name": "Elderflower",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "enoki",
+   "name": "Enoki",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "fennel",
+   "name": "Fennel",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "field-mushrooms",
+   "name": "Field mushrooms",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "figs",
+   "name": "Figs",
+   "aliases": [
+    "fig"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "garlic",
+   "name": "Garlic",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "coming_in",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "giant-puffball",
+   "name": "Giant puffball",
+   "aliases": [
+    "puffballs"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "ginger",
+   "name": "Ginger",
+   "aliases": [
+    "root ginger"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "girolles",
+   "name": "Girolles",
+   "aliases": [
+    "chanterelles"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "globe-artichokes",
+   "name": "Globe artichokes",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "goose",
+   "name": "Goose",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "gooseberries",
+   "name": "Gooseberries",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "grapefruit",
+   "name": "Grapefruit",
+   "aliases": [
+    "grapefruits"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "grapes",
+   "name": "Grapes",
+   "aliases": [
+    "grape",
+    "table grapes",
+    "dessert grapes"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "grey-mullet",
+   "name": "Grey mullet",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "grouse",
+   "name": "Grouse",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out"
+   ]
+  },
+  {
+   "id": "gurnard",
+   "name": "Gurnard",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "haddock",
+   "name": "Haddock",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "hake",
+   "name": "Hake",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "halibut",
+   "name": "Halibut",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "hare",
+   "name": "Hare",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "hazelnuts",
+   "name": "Hazelnuts",
+   "aliases": [
+    "cobnuts",
+    "filberts",
+    "cob nuts",
+    "cobnut",
+    "hazelnut"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "hedgehog-fungus",
+   "name": "Hedgehog fungus",
+   "aliases": [
+    "hedgehog mushrooms",
+    "pied de mouton"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "hen-of-the-woods",
+   "name": "Hen of the woods",
+   "aliases": [
+    "maitake"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "herring",
+   "name": "Herring",
+   "aliases": [
+    "kippers",
+    "bloaters"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "hop",
+   "name": "Hops",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "horseradish",
+   "name": "Horseradish",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "coming_in",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "from_store",
+    "from_store"
+   ]
+  },
+  {
+   "id": "jerusalem-artichokes",
+   "name": "Jerusalem artichokes",
+   "aliases": [
+    "sunchokes"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "john-dory",
+   "name": "John Dory",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "kale",
+   "name": "Kale",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "kohlrabi",
+   "name": "Kohlrabi",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "lamb",
+   "name": "Lamb",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "langoustines",
+   "name": "Langoustines",
+   "aliases": [
+    "scampi",
+    "dublin bay prawns",
+    "nephrops"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "leeks",
+   "name": "Leeks",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "lemon-sole",
+   "name": "Lemon sole",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "lemons",
+   "name": "Lemons",
+   "aliases": [
+    "lemon"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "lettuce",
+   "name": "Lettuce",
+   "aliases": [],
+   "glasshouse": true,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "from_store"
+   ]
+  },
+  {
+   "id": "limes",
+   "name": "Limes",
+   "aliases": [
+    "lime"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "ling",
+   "name": "Ling",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "lobster",
+   "name": "Lobster",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "loganberries-tayberries",
+   "name": "Loganberries & Tayberries",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "lovage",
+   "name": "Lovage",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "lychees",
+   "name": "Lychees",
+   "aliases": [
+    "lychee",
+    "litchi",
+    "litchis"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "mackerel",
+   "name": "Mackerel",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "mangetout",
+   "name": "Mangetout",
+   "aliases": [
+    "snow peas"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "mangoes",
+   "name": "Mangoes",
+   "aliases": [
+    "mango"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "marjoram-oregano",
+   "name": "Marjoram & Oregano",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "marrow",
+   "name": "Marrow",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "meadowsweet",
+   "name": "Meadowsweet",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "medlars",
+   "name": "Medlars",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "megrim",
+   "name": "Megrim",
+   "aliases": [
+    "megrim sole",
+    "cornish sole"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "mint",
+   "name": "Mint",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "monkfish",
+   "name": "Monkfish",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "morels",
+   "name": "Morels",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "mushrooms-cultivated",
+   "name": "Cultivated mushrooms",
+   "aliases": [
+    "button mushrooms",
+    "cup mushrooms",
+    "flat mushrooms"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "mussels",
+   "name": "Mussels",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "nettles",
+   "name": "Nettles",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "nutmeg",
+   "name": "Nutmeg",
+   "aliases": [
+    "mace"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "octopus",
+   "name": "Octopus",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "olives",
+   "name": "Olives",
+   "aliases": [
+    "olive",
+    "olive oil"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "onions",
+   "name": "Onions",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "from_store",
+    "from_store"
+   ]
+  },
+  {
+   "id": "oranges",
+   "name": "Oranges",
+   "aliases": [
+    "orange",
+    "clementines",
+    "satsumas",
+    "tangerines",
+    "mandarins"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "oyster-mushrooms",
+   "name": "Oyster mushrooms",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "oysters",
+   "name": "Oysters",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "pak-choi",
+   "name": "Pak choi",
+   "aliases": [
+    "bok choy"
+   ],
+   "glasshouse": true,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "great_now",
+    "great_now",
+    "great_now",
+    "from_store",
+    "from_store",
+    "from_store"
+   ]
+  },
+  {
+   "id": "papayas",
+   "name": "Papayas",
+   "aliases": [
+    "papaya",
+    "pawpaw"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "parsley",
+   "name": "Parsley",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "parsnips",
+   "name": "Parsnips",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "going_out",
+    "going_out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "partridge",
+   "name": "Partridge",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "passion-fruit",
+   "name": "Passion fruit",
+   "aliases": [
+    "passionfruit"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "peanuts",
+   "name": "Peanuts",
+   "aliases": [
+    "peanut",
+    "groundnuts"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "pears",
+   "name": "Pears",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "peas",
+   "name": "Peas",
+   "aliases": [
+    "sugar snap peas",
+    "sugar snaps",
+    "petits pois"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "peppers",
+   "name": "Peppers",
+   "aliases": [],
+   "glasshouse": true,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "pheasant",
+   "name": "Pheasant",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "pineapples",
+   "name": "Pineapples",
+   "aliases": [
+    "pineapple"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "pistachios",
+   "name": "Pistachios",
+   "aliases": [
+    "pistachio"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "plaice",
+   "name": "Plaice",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "plums",
+   "name": "Plums",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "pollock",
+   "name": "Pollock",
+   "aliases": [
+    "pollack",
+    "coley",
+    "saithe"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "pomegranates",
+   "name": "Pomegranates",
+   "aliases": [
+    "pomegranate"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "pork",
+   "name": "Pork",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "potatoes",
+   "name": "Potatoes",
+   "aliases": [
+    "spuds",
+    "jersey royals"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "pumpkin",
+   "name": "Pumpkin",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "quince",
+   "name": "Quince",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "rabbit",
+   "name": "Rabbit",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "radishes",
+   "name": "Radishes",
+   "aliases": [
+    "daikon"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out"
+   ]
+  },
+  {
+   "id": "raspberries",
+   "name": "Raspberries",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "red-mullet",
+   "name": "Red mullet",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "rhubarb",
+   "name": "Rhubarb",
+   "aliases": [
+    "rhubard"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "rice",
+   "name": "Rice",
+   "aliases": [
+    "risotto",
+    "basmati"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "rocket",
+   "name": "Rocket",
+   "aliases": [
+    "arugula",
+    "rucola"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "romanesco",
+   "name": "Romanesco",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "rosehips",
+   "name": "Rosehips",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "rosemary",
+   "name": "Rosemary",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "runner-french-beans",
+   "name": "Runner & French beans",
+   "aliases": [
+    "runner beans",
+    "green beans"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "sage",
+   "name": "Sage",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "salmon-farmed",
+   "name": "Farmed salmon",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "salsify",
+   "name": "Salsify",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "samphire",
+   "name": "Samphire",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "sardines",
+   "name": "Sardines",
+   "aliases": [
+    "pilchards"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "scallops",
+   "name": "Scallops",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "sea-bass",
+   "name": "Sea bass",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "sea-beet",
+   "name": "Sea beet",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "sea-buckthorn",
+   "name": "Sea buckthorn",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "sea-kale",
+   "name": "Sea kale",
+   "aliases": [
+    "seakale",
+    "sea-kale",
+    "crambe"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now"
+   ]
+  },
+  {
+   "id": "sea-trout",
+   "name": "Sea trout",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "shallots",
+   "name": "Shallots",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "shiitake",
+   "name": "Shiitake",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "skates-rays",
+   "name": "Skates and rays",
+   "aliases": [
+    "skate wing",
+    "skate wings"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "sloes",
+   "name": "Sloes",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "sorrel",
+   "name": "Sorrel",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "spider-crab",
+   "name": "Spider crab",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "spinach",
+   "name": "Spinach",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "sprats",
+   "name": "Sprats",
+   "aliases": [
+    "sprat",
+    "brisling"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "spring-greens",
+   "name": "Spring greens",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "coming_in",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "spring-onions",
+   "name": "Spring onions",
+   "aliases": [
+    "scallions",
+    "salad onions"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "spruce-tips",
+   "name": "Spruce tips",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "squash",
+   "name": "Squash",
+   "aliases": [
+    "butternut",
+    "butternut squash"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "from_store",
+    "from_store"
+   ]
+  },
+  {
+   "id": "squid",
+   "name": "Squid",
+   "aliases": [
+    "calamari"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "squirrel",
+   "name": "Squirrel",
+   "aliases": [
+    "grey squirrel",
+    "grey-squirrel"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "strawberries",
+   "name": "Strawberries",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "sugar-cane",
+   "name": "Sugar cane",
+   "aliases": [
+    "sugarcane",
+    "cane sugar"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "swede",
+   "name": "Swede",
+   "aliases": [
+    "rutabaga",
+    "neeps",
+    "neep"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "from_store",
+    "coming_in",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "from_store"
+   ]
+  },
+  {
+   "id": "sweet-chestnuts",
+   "name": "Sweet chestnuts",
+   "aliases": [
+    "chestnuts"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "going_out"
+   ]
+  },
+  {
+   "id": "sweetcorn",
+   "name": "Sweetcorn",
+   "aliases": [
+    "corn",
+    "corn on the cob",
+    "maize"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "tarragon",
+   "name": "Tarragon",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "tea",
+   "name": "Tea",
+   "aliases": [
+    "cornish tea",
+    "british tea",
+    "tea leaves"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "thyme",
+   "name": "Thyme",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "out"
+   ]
+  },
+  {
+   "id": "tomatoes",
+   "name": "Tomatoes",
+   "aliases": [],
+   "glasshouse": true,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "from_store",
+    "from_store",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "great_now",
+    "going_out",
+    "from_store",
+    "out"
+   ]
+  },
+  {
+   "id": "turbot",
+   "name": "Turbot",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "turkey",
+   "name": "Turkey",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "coming_in",
+    "great_now"
+   ]
+  },
+  {
+   "id": "turmeric",
+   "name": "Turmeric",
+   "aliases": [
+    "tumeric"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "turnips",
+   "name": "Turnips",
+   "aliases": [
+    "turnip tops"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "vanilla",
+   "name": "Vanilla",
+   "aliases": [
+    "vanilla pods"
+   ],
+   "glasshouse": false,
+   "never": true,
+   "months": [
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never",
+    "never"
+   ]
+  },
+  {
+   "id": "venison",
+   "name": "Venison",
+   "aliases": [
+    "deer",
+    "red deer",
+    "fallow deer"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "walnuts",
+   "name": "Walnuts",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "watercress",
+   "name": "Watercress",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "out"
+   ]
+  },
+  {
+   "id": "whelks",
+   "name": "Whelks",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "whiting",
+   "name": "Whiting",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "wild-duck",
+   "name": "Wild duck",
+   "aliases": [
+    "mallard",
+    "teal",
+    "wigeon"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "going_out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "wild-garlic",
+   "name": "Wild garlic",
+   "aliases": [
+    "ramsons"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "coming_in",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "wild-salmon",
+   "name": "Wild salmon",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "wild-strawberries",
+   "name": "Wild strawberries",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out"
+   ]
+  },
+  {
+   "id": "witch-sole",
+   "name": "Witch sole",
+   "aliases": [
+    "witch",
+    "torbay sole"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "wood-pigeon",
+   "name": "Wood pigeon",
+   "aliases": [
+    "pigeon"
+   ],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "wood-sorrel",
+   "name": "Wood sorrel",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  },
+  {
+   "id": "woodcock",
+   "name": "Woodcock",
+   "aliases": [],
+   "glasshouse": false,
+   "never": false,
+   "months": [
+    "great_now",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "out",
+    "great_now",
+    "great_now",
+    "great_now"
+   ]
+  }
+ ]
+}
