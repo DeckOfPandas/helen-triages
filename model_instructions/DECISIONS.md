@@ -134,6 +134,10 @@ stated. Italics in quotation marks are Helen's own words.
   `.devcontainer/`, so the Dockerfile cannot `COPY` the root `Gemfile`;
   widening the context would make every recipe edit change the build stamp;
   and an existing volume mounted over `BUNDLE_PATH` shadows baked gems anyway.
+- **2026-11-05, #1462 F3 — the design-review screenshot set is a committed
+  tool, `scripts/browser/capture.sh`.** Helen: *"Commit please because this
+  comes up a lot."* It is allow-listed as the exact command, on her yes of
+  2026-11-06: it takes no arguments, so it needs no rule ending ` *`.
 
 ## §2 The mono-repo shape
 
@@ -1170,6 +1174,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   a main"*). Not a main: kale with chana. Sides: the plain cauliflower cheese,
   Mum's rice salad, both sprout salads, charred baby gem, beer-braised
   lentils. Per-recipe calls, so #72 applies: they are not evened out.
+- **2026-11-05, #1462 A9 — the course labels are filters, and MOOD's
+  `drinks` and `desserts` stay as they are.** Helen: *"Course labels being
+  filters is fine with me -- 'what sides can I make' sounds like a practical
+  concern to me."* Later: *"'Desserts' and 'drinks' seem to contain the right
+  things."* So `main`, `side` and `starter` stay in PRACTICALITIES beside
+  `freezable`, and a food MOOD called `drinks` beside a drinks site is fine.
 
 ## §8 Ingredient search
 
@@ -1546,6 +1556,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-11-03, #1462 C5 — under ⅛ tsp is "a pinch".** Asked between "a
   pinch", "<⅛ tsp" and the decimal, Helen: *"Yes"* to the pinch. It applies
   wherever a food amount is printed scaled, the recipe page and the list.
+- **2026-11-05, #1462 C2 — a scaled egg prints as a fraction.** Asked how
+  three eggs at two of four portions should read, Helen: *"1 1/2 large
+  eggs."* The portion scaler does not round or refuse a whole thing; the cook
+  judges half an egg.
+- **2026-11-06, #1474 — the shopping list reads "approx" like `~`, and a
+  bracketed aside or a "per …" rate is not pluralised.** Helen chose all three
+  fixes she was offered: "approx 8 oz" totals as ~227 g; "2 oz (or 2 tbsp)"
+  and "250 g per person" print as written. `UNIT_TAIL` in
+  `assets/js/shopping-list.js`.
 
 ### §8.3 The shortlist is a view, not a facet — #918, 2026-09-10
 
@@ -1943,6 +1962,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-19 — a step may express INTO the build.** Asked whether the express ban should give way for Metexa's "express the oils of a coin-size grapefruit zest over the base of the stirring glass", Helen chose *"Allow it inside a build"*. The garnish twist is still the layout's; a step expressing into the stirring glass, mixing glass, shaker or tin is allowed.
 - **2026-10-19 — a shake means with ice, and a cook's caveat is dropped.** Helen chose *"A shake means with ice"* (IBA's "Shake well") and *"Drop 'omit if wet ice'"*.
 - **2026-10-19 — ingredients are in build order even where the source lists them otherwise.** Helen: *"Build order"*, on IBA's Old Fashioned and Mint Julep.
+- **2026-11-05, #1462 D6 — an ingredient with no `suggestion:` is never
+  backfilled with `suggestion: []`.** Helen: *"Never."* Absent and empty mean
+  the same here, and the backfill would be edits to live drinks for nothing.
 
 ### §9.3.1 The ingredient vocabulary
 
@@ -2331,11 +2353,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   other two Pusser's stay `moderately aged rum`. El Dorado 151 is on
   `not_reached_for`: she never owned one (replaces the reading of 2026-08-29
   and 2026-09-06 that the 151 was a blend).
-- **2026-09-14, #745 — Pierre Ferrand Ambré and Pierre Ferrand 1840 are
+- **2026-09-14, #745 — Pierre Ferrand Ambre and Pierre Ferrand 1840 are
   different bottles.** Helen: *"I was wrong above. Pierre Ferrand Ambré and
   Pierre Ferrand 1840 are different bottles, but both £53 and both 40 % ABV."*
   Each is declared in `bottles.yml` with its own spellings (replaces her
-  ruling of 2026-09-05, which made the 1840 an alias of the Ambré).
+  ruling of 2026-09-05, which made the 1840 an alias of the Ambre).
 - **2026-09-14, #984 — Giffard is not suggested: not for crème de menthe, not
   for crème de cacao.** Helen: *"My mistake, mint bottle for Monte Carlo is
   Briottet Creme de Menthe. Please update, and delete Giffard from our
@@ -2365,13 +2387,20 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   Bittermens, 100%."*, with no leading apostrophe on Elemakule (#879,
   2026-09-10: *"delete those two apostrophes"*).
 - **2026-09-05 — a bottle's name takes its diacritics and the plain spelling
-  is an alias: Patrón, Añejo, Pierre Ferrand Ambré.** Helen: *"It's Patron
-  with the diacritic, and Rooster Rojo Bianco."* (2026-09-02), then *"Rooster
-  Rojo Tequila Anejo, Rooster Rojo Tequila Reposado, Patron Reposado, Patron
-  Anejo -- all need diacritics."* The cognac is `Pierre Ferrand Ambré`,
-  without the category word: *"I shouldn't have given 'Cognac' in the name,
-  just Pierre Ferrand Ambré, sorry!"* The plain forms stay as aliases, so a
-  suggestion typed without accents still resolves.
+  is an alias: Patrón, Añejo.** Helen: *"It's Patron with the diacritic, and
+  Rooster Rojo Bianco."* (2026-09-02), then *"Rooster Rojo Tequila Anejo,
+  Rooster Rojo Tequila Reposado, Patron Reposado, Patron Anejo -- all need
+  diacritics."* The plain forms stay as aliases, so a suggestion typed without
+  accents still resolves.
+- **2026-11-06, #1474 — the cognac is `Pierre Ferrand Ambre`, no accent and
+  no category word; the rhums keep `Ambré`.** Helen, shown the accent list
+  catching "Pierre Ferrand Ambre" in a note: *"The correct spelling is
+  "ambre", no accent, so the bottle list is incorrect."* Earlier, 2026-09-05:
+  *"I shouldn't have given 'Cognac' in the name"*. The accented form is an
+  alias. So `ambre` is not in `_data/accented_words.yml`: Rhum JM Ambré and
+  La Favorite L'Authentique Ambré take it, and the cognac does not. The six
+  live drinks naming it were respelt under her no-flip grant for exactly that
+  change (replaces her ruling of 2026-09-05 that the cognac took the accent).
 - **2026-09-07 — the El Dorados are `El Dorado N Year Old`, for 3, 5, 8 and
   12; `El Dorado 151` is unchanged.** Asked whether renaming the 3 alone was
   intended, Helen: *"all four"*. 15 and 21 take the same form if they appear.
@@ -2413,6 +2442,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   as aliases, which govern what can be READ, so a source that still says
   Plantation resolves at ingest. Do not delete the aliases to "finish" the
   rename, and do not leave the old word in a draft because it resolves.
+- **2026-11-05, #1462 D5 — a declared bottle no drink suggests stays, for
+  now.** Shown the bottles in `bottles.yml` that no drink names, Helen: *"Keep
+  the extra bottles for now."* Unlike a garnish (§9.12, #1186), an unused
+  bottle is not deleted.
+- **2026-11-05, #1462 F1 — #1434's Monin brackets are a no-flip change, under
+  the agreed-table exception.** Helen: *"no-flip."* The table is agreed row by
+  row, the edit keeps her proofread flags, the next commit moves
+  `COCKTAIL_BASELINE_COMMIT` quoting her grant, and any draft gets its own
+  commit in the drafts repo (§4.0).
 
 ### §9.3.3 The drinks index's search
 
@@ -2618,13 +2656,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   bottles for high-volume ingredients"*. Offered a choice that sticks, she
   took *"price and the list line"*: *"choosing is how you decide what to buy,
   so the list should say what you decided."* In memory only, on purpose.
-- **2026-09-25, #749 — the build's cost line always says how long ago the
-  prices were checked, and a test fails once that date is two years old.**
-  Helen: *"Build log line always with elapsed time, and also a test that
-  shouts after two years."* `checked:` in `costs.yml`; `checked_age` in
-  `_plugins/cocktail_costs.rb`;
-  `test_the_price_check_date_is_less_than_two_years_old`. The fix for a red
-  test is re-reading the prices, never moving the date alone.
+- **2026-11-06, #749 and review E9 — the build's cost line always says how
+  long ago the prices were checked, and every test run says so once that
+  date is two years old, without failing.** Helen, first: *"Build log line
+  always with elapsed time, and also a test that shouts after two years."*
+  Shown that a failing test turns `main` red by the calendar alone and stops
+  every deploy, she chose *"Report, never fail"*. `checked:` in `costs.yml`;
+  `checked_age` in `_plugins/cocktail_costs.rb`; `_report_stale_prices` in
+  `tests/conftest.py`, which `scripts/verify.py` prints too. A `checked:` that
+  is not a date still fails (`test_the_price_check_date_is_a_date`). The
+  answer to the report is re-reading the prices, never moving the date alone.
 - **2026-09-04 — a line on the drinks shopping list gives the generic first
   with the bottle after it in brackets, on the same line, the bottle in wicked
   woowoo.** Helen: *"show generic first, with bottle on the same line in
@@ -2643,7 +2684,7 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   and one in `abv.yml`. Do not declare a bottle called Campari under a generic
   called Campari to make the lookup uniform.
 - **2026-09-05, #547 — orgeat is priced from Monin, mezcal from Del Maguey
-  Vida, cognac across Courvoisier and Pierre Ferrand Ambré, and `lightly aged
+  Vida, cognac across Courvoisier and Pierre Ferrand Ambre, and `lightly aged
   and filtered rum` across Havana Club 3 and El Dorado 3.** Helen: *"orgeat is
   always Monin"*; *"Mezcal is always Del Maguey Vida unless I discover I need
   to downgrade!!!!"*; *"Cognac is Pierre Ferrand Ambre when it matters more,
@@ -2764,6 +2805,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the two could be different, which I well might do actually, so it's
   honest.'* Two `shapes:` lines in `methods.yml`. A figure in a method step was
   not an option: the scaler does not rewrite steps.
+- **2026-11-05, #1462 A7 — "pour" as a noun in YAML comments and data strings
+  that no page displays stays.** Helen: *"Fine to leave."* The ruling above
+  covers what she reads on the site, not what maintainers read in `_data/`.
 - **2026-09-04 — a drink's millilitre total counts millilitres only: drops,
   dashes and pinches are left out.** Helen: *"Ignore drops and dashes and
   pinches in target ml."* She said it of the target-volume box, which is gone
@@ -4174,6 +4218,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   or a word added to `proper_nouns` in `_data/food/taxonomy.yml`, and whether a
   capitalised word belongs there is her call. Do not script a lowercasing
   pass to turn it green.
+- **2026-11-05, #1462 E6 — no downloadable `_site` artifact on PRs.** Helen:
+  *"No."* A branch is shown to her on a local server (§13), not as a build to
+  download.
 
 ## §11 Working practices
 
@@ -4668,6 +4715,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `sh scripts/git-clone-agent.sh <repo> <dir>`; never a symlink. Without the
   clones most of the suite is never collected and reports green, which is why
   the session-start hook names an absent clone and prints the command.
+- **2026-11-05, #1462 F5 — sessions prune merged remote branches for Helen.**
+  Helen: *"Please ask sessions to prune remote branches for me."* A branch is
+  merged when its head commit is on `origin/main`; a session lists them, says
+  which it leaves (not merged, or behind an open PR), and deletes the rest with
+  `sh scripts/git-push-agent.sh :<branch>`. Worktrees and their `tmp/` stay.
 
 ### §11.2 The record of this file being wrong
 
@@ -4903,6 +4955,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   filters, Helen: *"No harm in retaining the ?=, correct? If I'm correct then
   please do it."* No harm, with one change: a reload now keeps the filters
   instead of starting clean, and × is how to start clean.
+- **2026-11-05, #1462 E8 — a reader without JavaScript sees the food list.**
+  Asked whether the index should show its list with scripts off, Helen:
+  *"Okay yes."* Built in #1471.
 - **2026-09-15, #1050 / #1057 / #1059 — a link that arrives at a filtered index
   lands on what it filtered.** Helen: *"load the index page filtered as
   appropriate, with the screen snapped to the returned recipes (so don't have
@@ -5552,12 +5607,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   including it, because the index row carries filter attributes this page has
   no use for; the shortlist button is the index's exactly. A change to the
   index row's design is a change here too.
-- **2026-08-14 — the short-method toggle and its print "In short:" section are
-  not deployed: `short_method_enabled: false` in `_config.yml`.** Recorded as
-  Helen's decision of that date; no words of hers were kept. The flag turns
+- **2026-11-05, #1462 E4 — the short-method toggle and its print "In short:"
+  section are wanted, and stay off until the content exists:
+  `short_method_enabled: false` in `_config.yml`.** Helen: *"I want this
+  feature. I haven't written much of the content for it yet."* The flag turns
   both off whatever `method_short` holds. The key stays required and the
   rendering code stays, so do not delete either as dead, and do not turn the
-  flag on without her.
+  flag on without her (replaces the undated entry of 2026-08-14, which kept no
+  words of hers).
 - **2026-08-04, #54 — the ingredient amount's highlight and lettering cover
   the unit as well as the number.** Helen: *"Ingredient amounts currently only
   get bolder, no scratchy lettering. Please simply extend this formatting

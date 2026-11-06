@@ -27,6 +27,7 @@ argument and the rules each field is read by.
 - 2026-09-15 · §1 · Playwright, its Chromium and its system libraries are baked into the devcontainer image.
 - 2026-09-21 · §1 · run.sh rebuilds when the image does not MATCH .devcontainer/, by a content hash in an image label, not by mtime.
 - 2026-09-24 · §1 · #1191 · the gems are not baked into the image — A session's call, not Helen's ruling.
+- 2026-11-05 · §1 · #1462 · F3 — the design-review screenshot set is a committed tool, scripts/browser/capture.sh.
 - 2026-08-15 · §2 · #204 · / is a bare redirect to /food/; there is no landing page.
 - 2026-08-19 · §2 · #374 · one header and one footer for the whole site, literally the same code and assets.
 - 2026-08-26 · §2 · #487 · cocktails' $color-accent is menthe ($color-electric-absinthe-deep), not amber.
@@ -187,6 +188,7 @@ argument and the rules each field is read by.
 - 2026-10-29 · §7 · festive needs the dish to be the feast's own, whatever the page it came from.
 - 2026-10-29 · §7 · dietary restrictions are not marked — Helen: "I don't mark dietary restrictions." No tag, note, field or question for vegan, gluten-free and the like, at ingest or after; a claim …
 - 2026-10-11 · §7 · a quiche, a tarte tatin, a soufflé and a salad that is the meal are a main; a plain cauliflower cheese and a sprout salad are extras.
+- 2026-11-05 · §7 · #1462 · A9 — the course labels are filters, and MOOD's drinks and desserts stay as they are.
 - 2026-08-01 · §8 · the ingredient picker stays, and so does title search.
 - 2026-08-16 · §8 · #281 · a bad candidate in the exclude (LEAVE OUT) picker is fixed for what ships, not for the drafts.
 - 2026-09-15 · §8 · #1092 · food's HAS TO HAVE picks several ingredients, ANDed.
@@ -238,6 +240,8 @@ argument and the rules each field is read by.
 - 2026-11-03 · §8.2 · #1462 · D2 — the shopping list totals imperial measures in metric.
 - 2026-11-03 · §8.2 · #1462 · D3 — how full a spoon is does not split a row, and a can is a tin.
 - 2026-11-03 · §8.2 · #1462 · C5 — under ⅛ tsp is "a pinch" — Asked between "a pinch", "<⅛ tsp" and the decimal, Helen: "Yes" to the pinch.
+- 2026-11-05 · §8.2 · #1462 · C2 — a scaled egg prints as a fraction — Asked how three eggs at two of four portions should read, Helen: "1 1/2 large eggs." The portion scaler does not round or refuse a whole …
+- 2026-11-06 · §8.2 · #1474 · the shopping list reads "approx" like ~, and a bracketed aside or a "per …" rate is not pluralised.
 - 2026-09-10 · §8.3 · #918 · shortlisted is a view, not a filter: it never combines with another filter.
 - 2026-09-15 · §8.3 · #1093 · a shortlist link is shown, not saved, and "keep these" makes it yours.
 - 2026-10-11 · §8.3 · opening a sent shortlist link shows the index with the shopping list open.
@@ -300,6 +304,7 @@ argument and the rules each field is read by.
 - 2026-10-19 · §9.3 · a step may express INTO the build — Asked whether the express ban should give way for Metexa's "express the oils of a coin-size grapefruit zest over the base of the stirring …
 - 2026-10-19 · §9.3 · a shake means with ice, and a cook's caveat is dropped.
 - 2026-10-19 · §9.3 · ingredients are in build order even where the source lists them otherwise.
+- 2026-11-05 · §9.3 · #1462 · D6 — an ingredient with no suggestion: is never backfilled with suggestion: [].
 - 2026-08-21 · §9.3.1 · #441 · a list generic means OR, and only OR — Bali Hai takes aguardiente OR kirschwasser: either makes the drink.
 - 2026-08-23 · §9.3.1 · #441 · character lives on the recipe line, never on a bottle.
 - 2026-08-23 · §9.3.1 · #457 · suggestion is bottle names only; the reason goes in that ingredient's note.
@@ -361,18 +366,21 @@ argument and the rules each field is read by.
 - 2026-09-06 · §9.3.2 · La Favorite, no u, is a standing correction.
 - 2026-09-07 · §9.3.2 · #591 · an agricole's origin goes on the BOTTLE, as origin:.
 - 2026-09-09 · §9.3.2 · Pusser's 151 is an overproof Demerara rum, lightly aged.
-- 2026-09-14 · §9.3.2 · #745 · Pierre Ferrand Ambré and Pierre Ferrand 1840 are different bottles.
+- 2026-09-14 · §9.3.2 · #745 · Pierre Ferrand Ambre and Pierre Ferrand 1840 are different bottles.
 - 2026-09-14 · §9.3.2 · #984 · Giffard is not suggested: not for crème de menthe, not for crème de cacao.
 - 2026-08-27 · §9.3.2 · #314 · Rum Fire is its own bottle beside Wray & Nephew, and Blackwell and Myers are the markers for caramel-forward Jamaican rum.
 - 2026-08-31 · §9.3.2 · Sazerac is a rye Helen owns, declared although no drink suggests it.
 - 2026-09-04 · §9.3.2 · the bottles are Appleton Estate 8 Year Reserve, Havana Club 7 year old and 3 year old, and Rittenhouse 100; every Briottet is declared; the tiki bitters are Bittermens'.
-- 2026-09-05 · §9.3.2 · a bottle's name takes its diacritics and the plain spelling is an alias: Patrón, Añejo, Pierre Ferrand Ambré.
+- 2026-09-05 · §9.3.2 · a bottle's name takes its diacritics and the plain spelling is an alias: Patrón, Añejo.
+- 2026-11-06 · §9.3.2 · #1474 · the cognac is Pierre Ferrand Ambre, no accent and no category word; the rhums keep Ambré.
 - 2026-09-07 · §9.3.2 · the El Dorados are El Dorado N Year Old, for 3, 5, 8 and 12; El Dorado 151 is unchanged.
 - 2026-09-09 · §9.3.2 · the label's name is canonical and Helen's own wording is an alias: Dolin Rouge, Briottet Crème de Cerise, Ciroc Pineapple Flavoured Vodka.
 - 2026-09-14 · §9.3.2 · #1012 #796 · Ardbeg An Oa, Gabriel Boudier Liqueur de Gingembre and Batavia Arrack van Oosten are the bottles; the old spellings are aliases.
 - 2026-09-25 · §9.3.2 · #1108 · Away Colour takes Cruzan Single Barrel with character: blackstrap; Fanny Chu's Piña Colada takes Pedro Mandinga with character: raspadura.
 - 2026-10-07 · §9.3.2 · Barbancourt 5 Star is a rhum agricole vieux, like the 3 Star, and is the suggestion on Port au Prince (Smuggler's Cove).
 - undated · §9.3.2 · #582 · Undated, #582 — no drink writes plantation; it is always corrected to Planteray.
+- 2026-11-05 · §9.3.2 · #1462 · D5 — a declared bottle no drink suggests stays, for now.
+- 2026-11-05 · §9.3.2 · #1462 #1434 · F1 — #1434's Monin brackets are a no-flip change, under the agreed-table exception.
 - 2026-08-29 · §9.3.3 · #579 · fuzzy to find, exact-or-family to exclude; candidates rank in four bands.
 - 2026-08-29 · §9.3.3 · the whisky family chip is labelled whisk(e)y.
 - 2026-08-30 · §9.3.3 · #580 · bare water is never on a card and never in the search.
@@ -401,11 +409,11 @@ argument and the rules each field is read by.
 - 2026-09-05 · §9.3.5 · Undated — an unqualified London dry gin is priced and given its strength from Tanqueray alone; blanco tequila defaults to two bottles, and that is a real range.
 - 2026-09-06 · §9.3.5 · what a glass of each drink costs shows beside the shortlist's shopping list, on local builds only, as a quiet suffix on the drink's line; never on the cards.
 - 2026-09-07 · §9.3.5 · #818 · choosing a bottle on the shopping list rewrites the list line as well as the price, and the choice is not remembered across loads.
-- 2026-09-25 · §9.3.5 · #749 · the build's cost line always says how long ago the prices were checked, and a test fails once that date is two years old.
+- 2026-11-06 · §9.3.5 · #749 · and review E9 — the build's cost line always says how long ago the prices were checked, and every test run says so once that date is two years old, without failing.
 - 2026-09-04 · §9.3.5 · a line on the drinks shopping list gives the generic first with the bottle after it in brackets, on the same line, the bottle in wicked woowoo.
 - 2026-09-06 · §9.3.5 · the drinks shopping list shows each drink's cost, quietly, on a local build only.
 - 2026-09-05 · §9.3.5 · #547 · a generic that names one product is priced as a point and carries its own strength, with no bottle entry.
-- 2026-09-05 · §9.3.5 · #547 · orgeat is priced from Monin, mezcal from Del Maguey Vida, cognac across Courvoisier and Pierre Ferrand Ambré, and lightly aged and filtered rum across Havana Club 3 and El Dorado …
+- 2026-09-05 · §9.3.5 · #547 · orgeat is priced from Monin, mezcal from Del Maguey Vida, cognac across Courvoisier and Pierre Ferrand Ambre, and lightly aged and filtered rum across Havana Club 3 and El Dorado …
 - 2026-10-15 · §9.3.5 · #1379 · moderately aged rum is priced from Planteray 5 and Havana 7, and Helen chooses its bottle by the drink.
 - 2026-09-05 · §9.3.5 · champagne is a point price, £20 for 75 cl.
 - 2026-09-14 · §9.3.5 · #1014 · cream is £4.50 a litre and is non-alcoholic.
@@ -421,6 +429,7 @@ argument and the rules each field is read by.
 - 2026-10-04 · §9.3.6 · #1291 · the units line says "(undiluted)", after the millilitres.
 - 2026-10-04 · §9.3.6 · #1293 · above ×1 an amount in dashes or drops is struck through and starred, and the note under the scaler carries the matching star.
 - 2026-10-04 · §9.3.6 · #1294 · one spirit used twice in a drink is "the first" and "the second"; never "pour" as a noun in anything Helen reads.
+- 2026-11-05 · §9.3.6 · #1462 · A7 — "pour" as a noun in YAML comments and data strings that no page displays stays.
 - 2026-09-04 · §9.3.6 · a drink's millilitre total counts millilitres only: drops, dashes and pinches are left out.
 - 2026-10-19 · §9.3.6 · "few" is 2 — Helen chose 2 for IBA's "few dashes" and "few drops".
 - 2026-10-19 · §9.3.6 · a dry sugar measured by the spoon keeps the spoon.
@@ -637,6 +646,7 @@ argument and the rules each field is read by.
 - 2026-10-04 · §10 · #1194 · the drafts repos get no CI of their own, and the question is closed.
 - 2026-10-04 · §10 · #1194 · a published drink's note must be a filled label-and-text pair.
 - undated · §10 · Undated — test_ingredient_notes_are_lowercase_fragments flags and never rewrites.
+- 2026-11-05 · §10 · #1462 · E6 — no downloadable _site artifact on PRs.
 - 2026-08-12 · §11 · a heading lettering change applies to every heading on the whole site.
 - 2026-08-12 · §11 · #131 #128 · the CSS --modifier class naming is real BEM and stays; the full migration plan is not to be resurrected.
 - 2026-08-16 · §11 · Helen is asked each decision as it is hit, not in a batch at the end.
@@ -701,6 +711,7 @@ argument and the rules each field is read by.
 - 2026-09-24 · §11 · #577 · the size-word move on drafts is scripted, lands as its own commit in the drafts repo, and the diff of that commit is Helen's review.
 - 2026-09-21 · §11 · a SessionStart hook tells every session where it is before it assumes.
 - 2026-09-21 · §11 · the two private drafts repos may be cloned into a fresh worktree whenever wanted, with no ask.
+- 2026-11-05 · §11 · #1462 · F5 — sessions prune merged remote branches for Helen.
 - 2026-08-31 · §11.2 · #600 · a claim copied into an issue or a document is re-measured first, not carried over.
 - undated · §12 · Undated (by August 2026) — rejected tooling: jekyll-seo-tag, Stylelint, a bundler, a CSS framework, schema.org/Recipe.
 - 2026-09-12 · §12 · a red main is a deploy outage: the merging session checks the run, and nobody merges over a known-red suite.
@@ -740,6 +751,7 @@ argument and the rules each field is read by.
 - 2026-11-03 · §13 · #1462 · E5 — an index page's <title> is the site's name alone.
 - 2026-11-03 · §13 · #1462 · C1 — a bare HAS TO HAVE chip for a never_family word matches only where the word names the thing.
 - 2026-11-05 · §13 · #1462 · C3 — the address bar follows the filters, on both indexes.
+- 2026-11-05 · §13 · #1462 · E8 — a reader without JavaScript sees the food list.
 - 2026-09-15 · §13 · #1050 #1057 #1059 · / #1057 / #1059 — a link that arrives at a filtered index lands on what it filtered.
 - 2026-10-08 · §13 · #1288 · the I KNOW WHAT I WANT sections stay — Helen: "The I KNOW WHAT I WANT sections should probably go, but I'm not ready to drop their colours from my palette, and I am the main/only …
 - 2026-10-11 · §13 · #1219 · both indexes wear one filter chip: cocktails' type on food's torn tape.
@@ -850,7 +862,7 @@ argument and the rules each field is read by.
 - 2026-09-17 · §13 · #1139 · each site's icon sits small and inline with its footer column heading, at the left for food and the right for cocktails.
 - undated · §13 · #902 #915 · Undated, #902 / #915 — the footer's two licence sentences stack on narrower screens and sit close under the copyright line.
 - undated · §13 · #1005 · Undated, #1005 — the related recipes on a food recipe page are the index's own rows.
-- 2026-08-14 · §13 · the short-method toggle and its print "In short:" section are not deployed: short_method_enabled: false in _config.yml.
+- 2026-11-05 · §13 · #1462 · E4 — the short-method toggle and its print "In short:" section are wanted, and stay off until the content exists: short_method_enabled: false in _config.yml.
 - 2026-08-04 · §13 · #54 · the ingredient amount's highlight and lettering cover the unit as well as the number.
 - 2026-08-14 · §13 · #86 · a printed page looks like the site: the marks keep their colours, the page ground is not printed, and badges are the one thing taken off a recipe.
 - 2026-09-02 · §13 · the about page's <hr> is the footer's 1px dashed hairline, not an empty heading mark.
