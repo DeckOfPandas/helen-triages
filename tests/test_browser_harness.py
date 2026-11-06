@@ -77,7 +77,7 @@ def test_the_dockerfile_installs_chromium_with_its_system_dependencies():
     )
 
 
-@pytest.mark.parametrize("script", ["shoot.sh", "crop.sh"])
+@pytest.mark.parametrize("script", ["shoot.sh", "crop.sh", "capture.sh"])
 def test_the_harness_finds_playwright_through_env_sh(script):
     text = (BROWSER / script).read_text(encoding="utf-8")
     assert ". scripts/browser/env.sh" in text, (
