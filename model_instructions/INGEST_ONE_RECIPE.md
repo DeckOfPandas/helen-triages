@@ -694,12 +694,13 @@ batch comes from one of them, the index may say so once.
 **The accented spellings her house style declares:**
 
 <!-- vocab:accents start -->
-açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
-chèvre · comté · consommé · crème · crémeux · créole · crêpe · crêpes ·
-crudités · éclair · éclairs · entrecôte · flambé · fraîche · frisée · gâteau ·
-glacé · gougère · gougères · gruyère · jalapeño · jalapeños · marinière ·
-niçoise · pâté · pâtisserie · pâtissière · piña · purée · puréed · purées ·
-ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · velouté
+açaí · aïoli · béarnaise · béchamel · brûlée · cachaça · café · canapé ·
+canapés · chèvre · comté · consommé · crème · crémeux · créole · crêpe ·
+crêpes · crudités · curaçao · éclair · éclairs · entrecôte · flambé · fraîche ·
+frisée · gâteau · glacé · gougère · gougères · gruyère · jägermeister ·
+jalapeño · jalapeños · marinière · mûre · niçoise · pâté · pâtisserie ·
+pâtissière · pêche · piña · purée · puréed · purées · ragù · rösti · sauté ·
+sautés · sautéed · soufflé · soufflés · velouté
 <!-- vocab:accents end -->
 
 **And the words that keep NO accent**, which is the half worth reading twice —

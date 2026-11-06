@@ -231,9 +231,6 @@ aliases:
   vanilla bean paste: vanilla paste
   vanilla bean paste or extract: [vanilla paste, vanilla extract]
   vanilla extract or paste: [vanilla extract, vanilla paste]
-  # Another name for the same product; files print the right-hand form.
-  rice wine vinegar: rice vinegar
-  baking soda: bicarbonate of soda
   # Plurals offered beside their own singular. `singulars` cannot do this: it
   # normalises a word for matching and does not merge two entries. Singular
   # wins, so the label reads as the ingredient.
@@ -255,7 +252,6 @@ aliases:
   egg whites: egg white
   egg yolks: egg yolk
   eggs: egg
-  free-range eggs: free-range egg
   green chillies: green chilli
   leeks: leek
   lemons: lemon
@@ -273,10 +269,7 @@ aliases:
   sweet potatoes: sweet potato
   thyme sprigs: thyme sprig
   tomatoes: tomato
-  # `almond` goes the other way on purpose: the plural is what most recipes
-  # write, and what "ground almonds" and "flaked almonds" already read as.
   plums: plum
-  almond: almonds
   # "baby" is not a modifier (baby corn is not corn), so these are judged one
   # phrase at a time.
   baby carrots: carrot
@@ -294,7 +287,6 @@ aliases:
   seasonings and flavourings like chicken stock cubes: chicken stock
   tamari or dark soy sauce: [tamari, dark soy sauce]
   butter and apricot jam: [butter, apricot jam]
-  ready-rolled puff pastry: puff pastry
   all-butter puff pastry sheets: puff pastry
   filo pastry sheets: filo pastry
   lasagne sheets: lasagne
@@ -321,7 +313,6 @@ aliases:
   # Fat level and culture are not what anyone excludes. The target is `natural
   # yoghurt`, not bare `yoghurt`: sweetened and flavoured yoghurts are a
   # different answer.
-  full-fat natural bio yoghurt: natural yoghurt
   full-fat natural yoghurt: natural yoghurt
   low-fat natural yoghurt: natural yoghurt
   natural bio yoghurt: natural yoghurt
@@ -329,12 +320,10 @@ aliases:
   unsweetened natural yoghurt: natural yoghurt
   gel- or paste-based colouring if wanted: food colouring
   # Compounds and prep states from the derived vocabulary (#273).
-  almonds or whatever you prefer: almonds
   barley or brown rice miso: miso
   beef or venison stock: [beef stock, venison stock]
   black sesame seeds and fresh coriander leaves: [black sesame seeds, fresh coriander leaves]
   bone-in chicken thighs: chicken thighs
-  boneless skinless chicken breast: chicken breast
   chicken thighs and drumsticks: chicken
   coconut oil or olive oil: [coconut oil, olive oil]
   cooked and peeled beetroot: beetroot
@@ -349,8 +338,6 @@ aliases:
   grated parmesan: parmesan
   greens like broccoli and pak choi: [broccoli, pak choi]
   groundnut or canola oil: [groundnut oil, canola oil]
-  handful of fresh chives and/or parsley: [fresh chives, parsley]
-  large handful each of tarragon and flat-leaf parsley: [tarragon, flat-leaf parsley]
   lemon or 30 ml lemon juice: lemon
   roasted peanuts: peanuts
   salmon or trout fillets: [salmon, trout fillets]
@@ -362,7 +349,6 @@ aliases:
   steamed white or sticky rice: rice
   toasted sesame oil: sesame oil
   vegetable stock powder or 1 organic vegetable stock cube: vegetable stock
-  woody herb sprigs such as thyme or rosemary: [thyme, rosemary]
 
   # Compounds split only where both halves are already a known ingredient
   # somewhere in the collection (#281): a blind split on " or " makes "red"
@@ -414,9 +400,6 @@ aliases:
   juice of 2 limes: lime
   juice of ½ lemon: lemon
   zest and juice of 1 orange: orange
-  zest of 1 orange: orange
-  zest of 2 lemons: lemon
-  zest of ½ orange: orange
 
   # A leading "about" blocks the quantity strip, so these are named.
   about 2 tbsp vegetable oil: vegetable oil
@@ -425,19 +408,11 @@ aliases:
 
   # A clove of garlic is garlic. The spice "cloves" is not here and keeps its
   # own entry.
-  cloves garlic: garlic
   crushed garlic clove: garlic
-  fresh garlic cloves: garlic
   garlic clove: garlic
   garlic cloves: garlic
-  large garlic clove: garlic
-  large garlic cloves: garlic
-  medium cloves garlic: garlic
-  small garlic clove: garlic
-  small garlic cloves: garlic
 
   # An instruction that landed in `item:`: when, how much, or what to do.
-  double cream with salt: [double cream, salt]
   "dusting as preferred: icing sugar": icing sugar
   extra demerara sugar to coat: demerara sugar
   plain flour sifted with a pinch of salt: [plain flour, salt]
@@ -445,15 +420,12 @@ aliases:
   flavourings like curry powder: curry powder
   flavourings like worcestershire sauce: worcestershire sauce
   flavourings to taste like onion powder: onion powder
-  seasoning including mushroom ketchup: mushroom ketchup
 
   # Two ingredients joined by the method, not by "or". Both halves count: a
   # recipe whose only milk is behind a "dissolved in" still contains milk.
   bicarbonate of soda dissolved in 3 fl oz milk: [bicarbonate of soda, milk]
   cornstarch dissolved in 3 tbsp water: [cornstarch, water]
   water mixed with 3 tsp cornstarch: [water, cornstarch]
-  whole milk mixed with 90ml water: [whole milk, water]
-  fresh chives and/or parsley: [fresh chives, parsley]
 
   # Prep and cut that do not change what the thing is. The brown sugars are
   # deliberately not here: they are distinct products a baker chooses between.

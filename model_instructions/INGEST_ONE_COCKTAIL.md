@@ -585,9 +585,8 @@ fresh cherries
 
 **Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
 rosemary sprig with dried cranberries, or orange slice · pineapple frond ·
-kaffir lime leaves · cucumber wheels · edible violet · edible orchid ·
-mint leaf · thyme sprig · basil leaf (floated) · thin cucumber slice (floated) ·
-length of cucumber peel
+edible violet · edible orchid · mint leaf · thyme sprig · basil leaf (floated) ·
+thin cucumber slice (floated) · length of cucumber peel
 
 **Spice and other:** grated nutmeg · grated chocolate · Angostura bitters ·
 whipped cream · cinnamon stick · ginger wheel · stem ginger slice ·
@@ -1018,12 +1017,13 @@ in a cocktail recipe. A missing accent on one of these is a mechanical fault,
 and her formatter fixes it in the fields she writes:
 
 <!-- vocab:accents start -->
-açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
-chèvre · comté · consommé · crème · crémeux · créole · crêpe · crêpes ·
-crudités · éclair · éclairs · entrecôte · flambé · fraîche · frisée · gâteau ·
-glacé · gougère · gougères · gruyère · jalapeño · jalapeños · marinière ·
-niçoise · pâté · pâtisserie · pâtissière · piña · purée · puréed · purées ·
-ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · velouté
+açaí · aïoli · béarnaise · béchamel · brûlée · cachaça · café · canapé ·
+canapés · chèvre · comté · consommé · crème · crémeux · créole · crêpe ·
+crêpes · crudités · curaçao · éclair · éclairs · entrecôte · flambé · fraîche ·
+frisée · gâteau · glacé · gougère · gougères · gruyère · jägermeister ·
+jalapeño · jalapeños · marinière · mûre · niçoise · pâté · pâtisserie ·
+pâtissière · pêche · piña · purée · puréed · purées · ragù · rösti · sauté ·
+sautés · sautéed · soufflé · soufflés · velouté
 <!-- vocab:accents end -->
 
 ---
