@@ -160,7 +160,7 @@ test('litres and kilograms total with millilitres and grams', () => {
     'pearl barley'), '83 g');
 });
 
-test('tablespoons, ounces and counts are never converted into anything', () => {
+test('tablespoons and teaspoons are never converted into each other', () => {
   assert.strictEqual(textOf([
     ing('2 tbsp', 'olive oil', 'cupboard'),
     ing('1 tsp', 'olive oil', 'cupboard')
@@ -285,7 +285,7 @@ test('a real weeknight, end to end', () => {
   assert.deepStrictEqual(built[1].items.map((r) => r.text), ['67 g']);
   assert.deepStrictEqual(
     built[2].items.map((r) => r.label + ': ' + r.text),
-    ['butter beans: 2 x 400 g cans', 'orzo: 133 g', 'stock: 1 l']);
+    ['butter beans: 2 x 400 g tins', 'orzo: 133 g', 'stock: 1 l']);
 });
 
 // --- #1297: by-eye measures in whole ones, one fruit from two parts, and a
@@ -714,4 +714,84 @@ test('#1458: without the unit table, which only a local build carries, nothing i
     { aisles: AISLES })[0].items[0];
   assert.strictEqual(row.cost, undefined);
   assert.strictEqual(F.costTotal([row]), null);
+});
+
+
+// --- metric, one spelling per unit, and the pinch: #1462 D2, D3, C5 ----------
+
+test('#1462 D2: ounces and pounds total in grams, with the grams already there', () => {
+  assert.strictEqual(textOf([
+    ing('3 oz', 'butter', 'dairy'),
+    ing('100 g', 'butter', 'dairy')
+  ], 'butter'), '185 g');
+  assert.strictEqual(textOf([ing('2 lb', 'apricots', 'produce')], 'apricots'), '907 g');
+});
+
+test('#1462 D2: fluid ounces, pints and cups total in millilitres', () => {
+  assert.strictEqual(textOf([ing('½ pint', 'milk', 'dairy')], 'milk'), '284 ml');
+  assert.strictEqual(textOf([ing('1½ fl oz', 'milk', 'dairy')], 'milk'), '43 ml');
+  assert.strictEqual(textOf([ing('1¾ cups', 'buttermilk', 'dairy')], 'buttermilk'), '420 ml');
+  // Four pints is over a litre, so it is shown in litres like any other total.
+  assert.strictEqual(textOf([ing('4 pints', 'stock', 'cupboard')], 'stock'), '2.273 l');
+});
+
+test('#1462 D2: inches are centimetres, one decimal', () => {
+  assert.strictEqual(textOf([ing('2 inches', 'ginger', 'produce')], 'ginger'), '5.1 cm');
+});
+
+test('#1462 D3: how full the spoon is does not split a row', () => {
+  assert.strictEqual(textOf([
+    ing('1 heaped tbsp', 'plain flour', 'cupboard'),
+    ing('1 level tbsp', 'plain flour', 'cupboard'),
+    ing('1 rounded tbsp', 'plain flour', 'cupboard'),
+    ing('1 tbsp', 'plain flour', 'cupboard')
+  ], 'plain flour'), '4 tbsp');
+  assert.strictEqual(textOf([
+    ing('1 slightly rounded tsp', 'ground ginger', 'cupboard'),
+    ing('2 tsp, slightly rounded', 'ground ginger', 'cupboard')
+  ], 'ground ginger'), '3 tsp');
+});
+
+test('#1462 D3: a size word that is not about a spoon stays', () => {
+  assert.strictEqual(textOf([ing('1 large handful', 'spinach', 'produce')], 'spinach'),
+    '1 large handful');
+});
+
+test('#1462 D3: cans are tins, and × is x', () => {
+  assert.strictEqual(textOf([
+    ing('2 x 400 g cans', 'chopped tomatoes', 'cupboard'),
+    ing('1 × 400 g tin', 'chopped tomatoes', 'cupboard'),
+    ing('1 x 400-g tin', 'chopped tomatoes', 'cupboard')
+  ], 'chopped tomatoes'), '4 x 400 g tins');
+});
+
+test('#1462 D3: "400 g can" is one 400 g tin, and totals with "2 x 400 g tins"', () => {
+  assert.strictEqual(textOf([ing('400 g can', 'chickpeas', 'cupboard')], 'chickpeas'),
+    '1 x 400 g tin');
+  assert.strictEqual(textOf([
+    ing('400 g can', 'chickpeas', 'cupboard'),
+    ing('2 x 400 g tins', 'chickpeas', 'cupboard')
+  ], 'chickpeas'), '3 x 400 g tins');
+  assert.strictEqual(textOf([ing('150 g pack', 'feta', 'dairy', 2)], 'feta'), '2 x 150 g packs');
+  // A weight per something is a weight, not a pack.
+  assert.ok(!/x/.test(textOf([ing('250 g per person', 'potatoes', 'produce')], 'potatoes')));
+});
+
+test('#1462 D3: the recipe page keeps the unit the recipe wrote', () => {
+  // The metric table is the shopping list's alone: CANONICAL, which the
+  // recipe page's scaler shares, must not learn ounces.
+  assert.strictEqual(F.CANONICAL.oz, undefined);
+  assert.strictEqual(F.CANONICAL.cup, undefined);
+  assert.ok(F.METRIC.oz);
+});
+
+test('#1462 C5: under ⅛ tsp is a pinch, and ⅛ itself is still a spoon', () => {
+  assert.strictEqual(textOf([ing('⅛ tsp', 'cayenne', 'cupboard', 0.5)], 'cayenne'), 'a pinch');
+  assert.strictEqual(textOf([ing('¼ tsp', 'cayenne', 'cupboard', 0.5)], 'cayenne'), '⅛ tsp');
+  assert.strictEqual(textOf([ing('⅛–¼ tsp', 'cayenne', 'cupboard', 0.5)], 'cayenne'),
+    'a pinch to ⅛ tsp');
+});
+
+test('#1462 C5: a pinch is a teaspoon rule only; a tablespoon keeps its fraction', () => {
+  assert.strictEqual(textOf([ing('⅛ tbsp', 'salt', 'cupboard', 0.5)], 'salt'), '0.06 tbsp');
 });

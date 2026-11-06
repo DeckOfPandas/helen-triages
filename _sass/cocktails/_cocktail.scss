@@ -877,8 +877,10 @@ $amount-gap: 1rem;
   li {
     margin-bottom: $space-xs;
     padding-left: 0.3rem;
+    // The body face, as food's method is. Never $font-headings: Chromium does
+    // not draw Courier Prime's digits in a marker, so every step reads as a
+    // bare full stop, on screen and in print (#1454 A3).
     &::marker {
-      font-family: $font-headings;
       color: $color-clear-text;
     }
   }
@@ -992,12 +994,17 @@ $amount-gap: 1rem;
 .cocktail.is-making {
   .cocktail-tagline,
   .cocktail-chips,
-  .cocktail-section-heading--notes,
-  .notes,
+  // A note labelled with an ingredient's name (a house syrup's recipe) is part
+  // of making the drink, so it stays, with the ingredient's pointer to it;
+  // _layouts/cocktail.html marks the note and cocktail-make.js the pointer.
+  // Every other note goes.
+  .cocktail-section-heading--notes:not(.has-making-notes),
+  .notes:not(.has-making-notes),
+  .note:not(.note--for-making),
   .cocktail-type-line,
   // Only the ingredient's note: a method step's note says how to do the step,
   // and stays.
-  .cocktail-ingredient .cocktail-note,
+  .cocktail-ingredient .cocktail-note:not(.cocktail-note--for-making),
   .cocktail-suggestion,
   // The related drinks (#927): no invitation to make something else mid-build.
   .cocktail-related-section,

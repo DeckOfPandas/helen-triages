@@ -45,8 +45,15 @@
     });
   }
 
+  // "Deal again" never deals the drink already showing: a repeat moves on to
+  // the next row. One Math.random() call per deal, which
+  // tests/test_browser_smoke.py steers to deal every row in turn.
+  var last = -1;
   function deal() {
-    var row = rows[Math.floor(Math.random() * rows.length)];
+    var at = Math.floor(Math.random() * rows.length);
+    if (at === last && rows.length > 1) at = (at + 1) % rows.length;
+    last = at;
+    var row = rows[at];
     pick.innerHTML = '';
 
     // Every match of each selector, not only the first.

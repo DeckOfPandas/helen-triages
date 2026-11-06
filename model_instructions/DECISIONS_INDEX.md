@@ -32,6 +32,7 @@ argument and the rules each field is read by.
 - 2026-08-26 · §2 · #487 · cocktails' $color-accent is menthe ($color-electric-absinthe-deep), not amber.
 - 2026-09-10 · §2 · the header's second row is the door to the OTHER site: its icon, its word and an arrow.
 - 2026-09-10 · §2 · no words under the wordmark — Helen, declining a one-line question there ("What shall we cook?"): "No words under the wordmark section please."
+- 2026-11-05 · §2 · #1462 · A2 — neither index shows its tagline; it lives in the description only.
 - 2026-09-11 · §2 · #965 · the other-site row sits at the right-hand end of the header's second row and ?? at its left end, both on the cards' edges, at every width.
 - 2026-09-11 · §2 · #969 · the footer's centre column reads about / GitHub mark / copyright / licences / hearts.
 - 2026-10-21 · §2 · #1086 · the link-preview image is the wordmark, one card per site; the about page takes food's.
@@ -234,6 +235,9 @@ argument and the rules each field is read by.
 - 2026-10-30 · §8.2 · the shopping list quotes a yield's figure, never Helen's words after it; a measure after a count scales with it.
 - 2026-10-29 · §8.2 · a batch halves — Helen, on six "1 batch" recipes losing their ½: "Yes, half a batch is fine".
 - 2026-09-07 · §8.2 · #1118 · Undated, #1118 — the food scaler's box is as wide as the drink scaler's: two characters and the caret.
+- 2026-11-03 · §8.2 · #1462 · D2 — the shopping list totals imperial measures in metric.
+- 2026-11-03 · §8.2 · #1462 · D3 — how full a spoon is does not split a row, and a can is a tin.
+- 2026-11-03 · §8.2 · #1462 · C5 — under ⅛ tsp is "a pinch" — Asked between "a pinch", "<⅛ tsp" and the decimal, Helen: "Yes" to the pinch.
 - 2026-09-10 · §8.3 · #918 · shortlisted is a view, not a filter: it never combines with another filter.
 - 2026-09-15 · §8.3 · #1093 · a shortlist link is shown, not saved, and "keep these" makes it yours.
 - 2026-10-11 · §8.3 · opening a sent shortlist link shows the index with the shopping list open.
@@ -573,6 +577,8 @@ argument and the rules each field is read by.
 - 2026-09-05 · §9.13 · the drink page's title is 2.6rem on tape padded 1.6em each side.
 - 2026-09-05 · §9.13 · #710 · the drink page's mood chips are links to the filtered index, in alphabetical order.
 - 2026-09-05 · §9.13 · SHIP IT? shows in read it only; make it hides it in the stylesheet.
+- 2026-11-03 · §9.13 · #1462 · A6 — make it keeps a note an ingredient points at, and hides every other note.
+- 2026-11-03 · §9.13 · #1462 · E7 — the ship icon's CC BY credit is recorded in the README's License section, not in the SVG.
 - 2026-09-05 · §9.13 · yes² is not renamed: the drink page says the rung's own words and the card keeps the compression.
 - 2026-09-10 · §9.13 · #897 · read it / make it is under the title block's rule, at the row's left.
 - 2026-09-10 · §9.13 · the drink page's title block starts 1rem under the back arrow.
@@ -699,6 +705,7 @@ argument and the rules each field is read by.
 - 2026-09-12 · §12 · a red main is a deploy outage: the merging session checks the run, and nobody merges over a known-red suite.
 - 2026-09-16 · §12 · an agent's worktree is Helen's to keep; never remove one.
 - 2026-10-04 · §12 · #1281 · a workflow file is an ordinary PR; the Actions settings, secrets and rulesets stay Helen's.
+- 2026-11-05 · §12 · #1462 · E2 — the live site is rolled back with a revert PR, never by re-running an old deploy.
 - 2026-07-31 · §13 · the recipe page's device is one identical repeated mark (the double rule), not watercolour washes.
 - 2026-09-04 · §13 · on a heading that wraps, the mark goes under the last line only.
 - 2026-09-24 · §13 · IF YOU LIKED THIS is a first-level heading and wears the mark, like INGREDIENTS and METHOD.
@@ -728,6 +735,10 @@ argument and the rules each field is read by.
 - 2026-08-30 · §13 · #562 · the list carries no chips about how finished an entry is.
 - 2026-09-04 · §13 · the food index has no "the universe says…" line.
 - 2026-09-06 · §13 · the food index has no META FILTERS block.
+- 2026-11-03 · §13 · #1462 · D1 — a declared STAR INGREDIENT no published recipe answers is not offered on the index.
+- 2026-11-03 · §13 · #1462 · E5 — an index page's <title> is the site's name alone.
+- 2026-11-03 · §13 · #1462 · C1 — a bare HAS TO HAVE chip for a never_family word matches only where the word names the thing.
+- 2026-11-05 · §13 · #1462 · C3 — the address bar follows the filters, on both indexes.
 - 2026-09-15 · §13 · #1050 #1057 #1059 · / #1057 / #1059 — a link that arrives at a filtered index lands on what it filtered.
 - 2026-10-08 · §13 · #1288 · the I KNOW WHAT I WANT sections stay — Helen: "The I KNOW WHAT I WANT sections should probably go, but I'm not ready to drop their colours from my palette, and I am the main/only …
 - 2026-10-11 · §13 · #1219 · both indexes wear one filter chip: cocktails' type on food's torn tape.
@@ -769,6 +780,7 @@ argument and the rules each field is read by.
 - 2026-10-30 · §13 · #1448 · the pill's × is each index's only clear-all.
 - 2026-10-29 · §13 · #1441 · the pills are the site's accent, small and short, with the lettering centred.
 - 2026-10-29 · §13 · #1441 · the pills show whatever has focus — Asked whether they should step aside while a search box has focus on a phone, Helen picked "Always show".
+- 2026-11-03 · §13 · #1462 · A3 — the count says "recipes" (or "drinks") until a filter narrows the list, and "survivors" from then on.
 - 2026-09-14 · §13 · #1007 · the header's door to the other site is the bracketed word and an arrow, no icon.
 - 2026-09-15 · §13 · #1086 · below 600px the wordmark lockup is two thirds size ($wordmark-phone-scale: 0.6667).
 - 2026-09-15 · §13 · #1086 · /about/ shows both doors on one line and no ??.
@@ -801,6 +813,7 @@ argument and the rules each field is read by.
 - 2026-10-08 · §13 · #733 · choices that interact go on one page side by side.
 - 2026-10-10 · §13 · a small job whose issue names its own fix may be built once with no candidates page, and every value in it is then the session's reading of her sentence, not a pick of hers.
 - 2026-10-15 · §13 · #1394 · the runner-up long-form design, C, is let go.
+- 2026-11-05 · §13 · #1462 · E3 — a candidates script goes once she has chosen; scripts/leopard_candidates.py alone is kept.
 - 2026-09-15 · §13 · #1097 · "recipes" means recipes on both sites; "food recipes" and "cocktail recipes" name one site's; counts are sometimes "portions" / "drinks".
 - 2026-09-15 · §13 · #1086 · the cocktail scaler reads − [1] drinks +, the word after the box.
 - 2026-09-15 · §13 · #1100 · PR #1100 — the shortlist panel is a share link and nothing else.
@@ -813,7 +826,7 @@ argument and the rules each field is read by.
 - 2026-10-07 · §13 · #1088 · a capped list says "+3 more" and stops — Helen: '"+3 more" is fine, then that's it.' The "— keep typing" came off.
 - 2026-10-28 · §13 · #1288 · the dropdown's "+N more" can be pressed: under the names it goes to the index's name search, under words it shows the rest in place.
 - 2026-10-07 · §13 · #1088 · the food index with nothing chosen says "(select something)"; the estimated-portions tooltip is "(estimated)"; "copy link" / "copied" are fine.
-- 2026-09-25 · §13 · #1097 · the cocktails site's description is exactly "What to drink.", full stop included.
+- 2026-11-05 · §13 · #1462 · A2 — the cocktails site's description is exactly "The right drink in your hand.", full stop included.
 - 2026-09-07 · §13 · #783 · the footer's columns sit under the sides of the main page container.
 - 2026-09-14 · §13 · #1005 · a recipe page and a drink page carry the same controls; the scaler and "if you liked this" are on both.
 - 2026-09-14 · §13 · #1005 · food scales by portions; drinks scale by whole recipes.
@@ -894,7 +907,7 @@ argument and the rules each field is read by.
 - 2026-10-10 · §14 · a method block reads outcome first, then the method's name in small grey Courier, then the oven stages in Plex Mono; the time stays alone on the right.
 - 2026-10-10 · §14 · the oven setting is a list of short stage lines in the data, and method rows have real air between them.
 - undated · §14 · #244 · Undated, #244 — the timings page answers "how long does this take", not "what time do I put it in".
-- 2026-08-16 · §14 · #244 · scheduleBack, parseClock, clock, statedRest and restFor in cook-schedule.js are kept, with their tests, though nothing calls them.
+- 2026-11-05 · §14 · #1462 · E2 — working backwards from a serving time does not come back, and its code is gone.
 - undated · §14 · Undated — every cooking time on the timings page is rounded to the nearest five minutes.
 - undated · §14 · #412 · Undated, #412 — fish and shellfish is an entry in the timings dropdown that replaces the calculator with a static section.
 - undated · §14 · #243 · Undated, #243 — the finishing temperature sits directly under the protein heading.
@@ -924,7 +937,7 @@ argument and the rules each field is read by.
 - 2026-09-10 · §14 · the sipping shelf is deleted, page and data both.
 - 2026-09-10 · §14 · #784 · the retired rum words are a bare list: no reasons and no lines under them.
 - 2026-09-10 · §14 · #921 · "blackstrap" stays on both the retired list and the characters list, and Characters is the page's last section.
-- 2026-09-10 · §14 · #921 · links and the tab say "rum categories" and the h1 says "My Philosophy of Rum"; they disagree on purpose.
+- 2026-11-03 · §14 · #1462 · A8 — links and the tab say "rum" and the h1 says "My Philosophy of Rum"; they disagree on purpose.
 - 2026-09-10 · §14 · #921 · a rum category with no bottle shows an empty cell; "none in the house" is gone.
 - 2026-09-11 · §14 · #784 · the rum table's column headings are "category", "site display name" and "examples", all Helen's.
 - 2026-09-11 · §14 · #973 · the rum table's three column labels look the same, and pink is for bottles only.

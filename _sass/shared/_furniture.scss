@@ -64,7 +64,10 @@
   min-width: 0;
 }
 
+// The tap area is 44px tall but only 30px wide: any wider and it would reach
+// across the $space-sm gap and take the input's taps.
 .page-search-go {
+  @include tap-area(44px, 30px);
   flex: 0 0 auto;
   display: block;
   background: none;
@@ -215,8 +218,9 @@ $page-search-faux-bold: 0.05em currentColor;
   text-overflow: ellipsis;
 
   // Hover and the keyboard's row are one state: a wash of the site's accent,
-  // not a change to the words.
-  &:hover,
+  // not a change to the words. Not `:hover`: page-search.js moves `is-active`
+  // to the row under the pointer, so a hovered row and the keyboard's row
+  // can never both be lit.
   &:focus-visible,
   &.is-active {
     background: color.mix($color-accent, $color-surface, 14%);
@@ -257,7 +261,6 @@ $page-search-faux-bold: 0.05em currentColor;
   cursor: pointer;
   letter-spacing: normal;
 
-  &:hover,
   &:focus-visible,
   &.is-active {
     color: $color-accent;
@@ -297,9 +300,11 @@ $page-search-faux-bold: 0.05em currentColor;
   &.is-on { border-color: currentColor; }
 }
 
+// Taller to tap, never wider: print and pdf sit a dot apart.
 .btn-see-shortlist,
 .btn-print,
 .btn-pdf {
+  @include tap-area(40px);
   font-family: $font-headings;
   font-size: 0.78rem;
   font-weight: 700;

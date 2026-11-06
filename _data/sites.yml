@@ -33,15 +33,17 @@ food:
 cocktails:
   title: Helen Triages Cocktails
   word: COCKTAILS
-  # Exactly this, full stop included (#1097). Also the fallback
+  # Helen's words exactly, full stop included (#1462 A2). Also the fallback
   # <meta description> for a cocktails page with no tagline of its own.
-  description: What to drink.
+  description: The right drink in your hand.
   css: cocktails
   home: /cocktails/
   icon: glass-martini
   social_image: /assets/img/social/cocktails.png
   reference_links:
-    - text: rum categories
+    # Helen's word (#1462 A8), and the page's <title> too: the wayfinding
+    # label, which the h1 does not have to match.
+    - text: rum
       url: /cocktails/reference/rum-categories/
     # What each glass type holds (#295).
     - text: glasses

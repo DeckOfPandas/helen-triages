@@ -1,6 +1,7 @@
 @use "sass:color";
 @use "cocktails/cocktail" as *;
 @use "cocktails/palette" as *;
+@use "shared/rule" as *;
 @use "shared/tokens" as *;
 
 // =============================================================================
@@ -13,8 +14,11 @@
 
 // A small ringed letter in the reposado of the mark it explains, set as a
 // superscript: both parents are flex rows, so `flex-start` lifts it to the
-// top of the row and their gap spaces it.
+// top of the row and their gap spaces it. The drawn ring is 12px; the tap
+// area is 32px here, where SHIP IT?'s word is a few px away, and 44px beside
+// YOLO?, which has room (#1454 A2).
 .ship-key-open {
+  @include tap-area(32px, 32px);
   @extend %cocktail-heading-face;
   flex: none;
   align-self: flex-start;
@@ -40,6 +44,7 @@
 // Beside YOLO? the parent is a block heading, not a flex row, so the lift is
 // `vertical-align` and the space is a margin.
 .drink-field-label .ship-key-open {
+  @include tap-area(44px, 44px);
   vertical-align: top;
   margin-left: 0.2em;
 }

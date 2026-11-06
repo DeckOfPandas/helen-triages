@@ -1,3 +1,4 @@
+@use "shared/rule" as *;
 @use "shared/theme" as *;
 @use "shared/tokens" as *;
 
@@ -122,6 +123,7 @@
 // above the article, not pinned to the viewport: `main`'s padding puts it on
 // the content column's left edge, so it needs no offset of its own.
 .back-to-index {
+  @include tap-area(44px, 44px);
   display: inline-block;
   font-family: $font-headings;
   // The arrow is a drawing and holds no text, but `font-size` still sizes it:

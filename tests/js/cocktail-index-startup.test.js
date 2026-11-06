@@ -80,7 +80,8 @@ test('startup actually applied the filters rather than merely not crashing', () 
   // nothing crashed but nothing ran looks identical until you touch a control.
   const r = boot({ drinks: DRINKS });
   assert.strictEqual(r.doc.getElementById('drink-count-n').textContent, '3');
-  assert.strictEqual(r.doc.getElementById('drink-count-word').textContent, 'survivors');
+  assert.strictEqual(r.doc.getElementById('drink-count-word').textContent, 'drinks',
+    'nothing is narrowing the list, so the count says "drinks" (#1462 A3)');
   assert.deepStrictEqual(
     r.page.list.children.map(function (c) { return c.hidden; }), [false, false, false],
     'no filter is set, so every card should be visible.'
@@ -184,6 +185,8 @@ test('#1412: ?ship= from a drink page narrows the list; an unknown value is drop
   const r = boot({ drinks: SHIPS, search: '?ship=IOU' });
   assert.deepStrictEqual(visibleTitles(r.page).sort(), ['A', 'B']);
   assert.strictEqual(legendWord(r), 'IOU');
+  assert.strictEqual(r.doc.getElementById('drink-count-word').textContent, 'survivors',
+    'a filter is on, so what is left are survivors (#1462 A3)');
 
   const bad = boot({ drinks: SHIPS, search: '?ship=nonsense' });
   assert.strictEqual(visibleTitles(bad.page).length, 3);

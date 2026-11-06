@@ -307,11 +307,12 @@ test('it still gets to the end with a shortlist to render', () => {
 
 test('the count paints its number and its word into separate spans', () => {
   // The digits take `.results-count-number` and the word stays bare; the
-  // outer element still reads "N survivors".
+  // outer element still reads "N recipes", which is the word until a filter
+  // narrows the list (#1462 A3).
   const { doc } = boot();
   assert.strictEqual(doc.getElementById('recipe-count-n').textContent, '4');
-  assert.strictEqual(doc.getElementById('recipe-count-word').textContent, 'survivors');
-  assert.strictEqual(doc.getElementById('recipe-count').textContent, '4 survivors');
+  assert.strictEqual(doc.getElementById('recipe-count-word').textContent, 'recipes');
+  assert.strictEqual(doc.getElementById('recipe-count').textContent, '4 recipes');
 });
 
 test('a page with no shopping list at all still runs', () => {
@@ -1027,6 +1028,8 @@ test('#1024: ?q= fills the name box and narrows the list', () => {
   // first, and the order is what proves the query reached the script.
   assert.strictEqual(list.children[0].getAttribute('data-url'), '/food/recipes/b/',
     'the query must reach reorderForTitleSearch(), not only the box.');
+  assert.strictEqual(doc.getElementById('recipe-count-word').textContent.replace(/s$/, ''), 'survivor',
+    'a name search narrows the list, so the count says survivors (#1462 A3)');
 });
 
 // --- arriving with an ingredient, #1050 -----------------------------------------
@@ -1298,4 +1301,67 @@ test('#1297: a page without the note element still totals', () => {
   note.parentNode.removeChild(note);
   win.HTF.shortlist.toggle('/food/recipes/a/');
   assert.doesNotThrow(() => showTheList(doc));
+});
+
+
+// --- the address bar follows the filters, #1462 C3 ----------------------------
+// What is chosen is written into the query, so a reload or a copied link shows
+// the same list. replaceState is recorded and moves the stub's location, as a
+// browser's does.
+
+function recordAddressBar(win) {
+  const urls = [];
+  win.history.replaceState = (stateArg, title, url) => {
+    urls.push(url);
+    const q = url.indexOf('?');
+    const h = url.indexOf('#');
+    win.location.search = q === -1 ? '' : url.slice(q, h === -1 ? undefined : h);
+  };
+  return urls;
+}
+
+test('#1462 C3: choosing an ingredient writes it into the address bar', () => {
+  let urls;
+  const { doc } = boot({ beforeStart: (win) => { urls = recordAddressBar(win); } });
+  typeIngredient(doc, 'aubergines');
+  assert.strictEqual(urls[urls.length - 1], '/food/?ing=aubergines');
+  typeIngredient(doc, 'olive oil');
+  assert.strictEqual(urls[urls.length - 1], '/food/?ing=aubergines,olive%20oil',
+    'a second HAS TO HAVE joins the first in the link, as it does in the filter.');
+});
+
+test('#1462 C3: what the address bar wrote is what a fresh load reads back', () => {
+  const { doc, list } = boot({ search: '?ing=aubergines,olive%20oil' });
+  assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')),
+    ['/food/recipes/a/']);
+  const active = Array.from(
+    doc.getElementById('ingredient-results-pool').querySelectorAll('.btn-ingredient.active')
+  ).map((b) => b.dataset.ingredient).sort();
+  assert.deepStrictEqual(active, ['aubergines', 'olive oil'],
+    'every ingredient in the link is chosen, not only the last one.');
+});
+
+test('#1462 C3: startup reads the whole query before anything rewrites it', () => {
+  // Choosing the ingredient runs update(); were the address bar live by then,
+  // it would drop `q` before the name search had read it.
+  let urls;
+  const { doc } = boot({
+    search: '?ing=beetroot&q=beetroot',
+    beforeStart: (win) => { urls = recordAddressBar(win); }
+  });
+  assert.strictEqual(doc.getElementById('name-search-box').value, 'beetroot');
+  assert.strictEqual(urls[urls.length - 1] || '/food/?ing=beetroot&q=beetroot',
+    '/food/?ing=beetroot&q=beetroot');
+});
+
+test('#1462 C3: clearing everything empties the query and keeps the fragment', () => {
+  let urls;
+  const { doc } = boot({
+    search: '?ing=beetroot', hash: '#results',
+    beforeStart: (win) => { urls = recordAddressBar(win); }
+  });
+  // The clear-all is the pill's ×, which this harness has not built, so the
+  // chip is clicked off instead: the query goes with the last filter.
+  doc.getElementById('ingredient-results-pool').querySelector('.btn-ingredient.active').dispatch('click');
+  assert.strictEqual(urls[urls.length - 1], '/food/#results');
 });

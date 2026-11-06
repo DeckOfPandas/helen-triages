@@ -271,7 +271,7 @@ def test_the_chart_sits_below_notes_and_out_of_the_metadata(site):
 
 HASH_DUMP = re.compile(r'\{(?:&quot;|")(?:label|text)(?:&quot;|")=(?:&gt;|>)')
 NOTE_BLOCK = re.compile(
-    r'<(p|div) class="note">\s*<span class="note-label">(.*?)</span>(.*?)</\1>',
+    r'<(p|div) class="note(?: [^"]*)?"[^>]*>\s*<span class="note-label">(.*?)</span>(.*?)</\1>',
     re.S)
 NOTES_HEADING = re.compile(r"cocktail-section-heading--notes|recipe-section-notes")
 

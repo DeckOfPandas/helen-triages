@@ -160,7 +160,9 @@
   }
 }
 
+// 32px, not 44: a taller area would reach the first row of chips.
 .btn-clear-filter {
+  @include tap-area(32px);
   border: 0;
   background: none;
   padding: 0;
@@ -293,6 +295,14 @@
   // change here. Magenta is the fallback for a section with no class.
   &:hover:not(.is-on),
   &:focus-visible:not(.is-on) { color: var(--drink-btn-hover, #{$color-wicked-woowoo}); }
+
+  // Keyboard focus lights the tape as hover does, which alone would look like
+  // a chosen chip, so it also takes a ring: the shape of food's and of the
+  // scaler's (DECISIONS §14). An outline, never a border (#389).
+  &:focus-visible {
+    outline: 2px solid var(--drink-btn-hover, #{$color-wicked-woowoo});
+    outline-offset: 2px;
+  }
 }
 
 // `-word` is the hovered word once the tape has lit (#1219): the hue taken
@@ -657,6 +667,7 @@ $pool-chip-rest: color.mix($color-text, $color-bg, 73%);
 }
 
 .btn-page {
+  @include tap-area(44px);
   font-family: $font-headings;
   text-transform: lowercase;
   background: none;

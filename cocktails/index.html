@@ -1,6 +1,5 @@
 ---
 layout: default
-title: Home
 permalink: /cocktails/
 ---
 
@@ -183,17 +182,14 @@ permalink: /cocktails/
      a chosen mark's word, or a narrowing YOLO button's words (#1440).
      cocktail-index.js fills and reveals the value. {% endcomment %}
   <div class="drink-count-block">
-  {% comment %} "survivors", matching food's (#489). cocktail-index.js rewrites
-     the number and the word, so it must agree with this plural rule. {% endcomment %}
-  {% comment %} A plain paragraph, not a flex row: a flex container discards the
-     word space after the number (#675). {% endcomment %}
-  {% comment %} `id="results"` is where a search result lands (#1050), as on the
-     food index. {% endcomment %}
-  {% comment %} `.results-count-number` sets the digits in the label face
-     (_sass/shared/_results-bar.scss). A <strong>: the count is the emphasis. {% endcomment %}
-  <p class="drink-count" id="results">
+  {% comment %} "drinks" until a filter narrows the list, then "survivors"
+     (DECISIONS §13.7); cocktail-index.js rewrites both to this plural rule. A
+     plain paragraph, not a flex row, which discards the word space (#675).
+     `id="results"` is where a search result lands (#1050). The digits take
+     the label face; `role="status"` announces each new count. {% endcomment %}
+  <p class="drink-count" id="results" role="status">
     <strong class="results-count-number" id="drink-count-n">{{ all_drinks.size }}</strong>
-    <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
+    <span id="drink-count-word">drink{% unless all_drinks.size == 1 %}s{% endunless %}</span>
   </p>
   <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?{% include cocktails/ship-key.html part="button" %}<span class="drink-count-legend-value" data-ship-legend-value hidden>= <span data-ship-legend-word></span></span></span>
 
@@ -540,16 +536,19 @@ permalink: /cocktails/
   <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-search.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
+  {% comment %} Before cocktail-index.js, which restores the remembered scroll
+     and re-lands on a fragment: the dealt line adds ~120px above the panel, so
+     dealt afterwards it pushes everything down and "back" lands short (#1454
+     E4). Still before _layouts/default.html's decorations.js, which is what
+     tapes the first deal (see universe.js's header). It reads the cards and
+     nothing cocktail-index.js writes. {% endcomment %}
+  <script src="{{ '/assets/js/universe.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-index.js' | relative_url }}"></script>
   {% comment %} After cocktail-index.js: results-bar.js mirrors the count spans
      and the top `× clear all` that script builds.
      tests/test_site_config.py::test_the_results_bar_loads_after_the_index_script_on_both_indexes
      holds it. {% endcomment %}
   <script src="{{ '/assets/js/results-bar.js' | relative_url }}"></script>
-  {% comment %} After cocktail-index.js and before _layouts/default.html's
-     decorations.js: that order is what tapes the first deal (see universe.js's
-     header). {% endcomment %}
-  <script src="{{ '/assets/js/universe.js' | relative_url }}"></script>
   {% comment %} Order does not matter for this one (#849): it reads
      HTF.shortlist at run time and subscribes to an event. {% endcomment %}
   <script src="{{ '/assets/js/shortlist-export.js' | relative_url }}"></script>

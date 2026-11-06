@@ -74,12 +74,12 @@
     }
 
     // Does any entry in `list` match the picked ingredient key `key`? A
-    // curated synonym family matches on containment of any of its words
-    // (`cheese` has to reach comté); anything else matches when every word of
-    // the key prefixes some word of the entry. Prefix, not containment, or
-    // `salt` matches unsalted butter (#619); a family only containment reaches
-    // (`nuts` -> walnuts) is declared in the vocabulary's `synonyms`. Include
-    // and the exclude "(all)" umbrella both ask this one function.
+    // `synonyms` family matches on containment (`cheese` reaches comté).
+    // Otherwise every word of the key must PREFIX a word of the entry, or
+    // `salt` matches unsalted butter (#619). A one-word `never_family` key,
+    // or a `family_exceptions` entry, matches the entry's last word only:
+    // `plum` finds plums, not plum tomatoes (DECISIONS §13.4). Include and
+    // the exclude "(all)" umbrella both ask this one function.
     function entriesMatchKey(list, key) {
       var synonyms = getSynonymWords(key);
       if (synonyms) {
@@ -89,8 +89,13 @@
         });
       }
       var keyWords = getWords(key).map(normaliseIngredientWord);
+      var headOnly = keyWords.length === 1 && neverFamilySet.has(fold(keyWords[0]));
       return (list || []).some(function (entry) {
         var entryWords = getWords(entry).map(normaliseIngredientWord);
+        if (headOnly || (keyWords.length === 1 && familyExceptionSet.has(fold(String(entry).toLowerCase())))) {
+          var last = entryWords[entryWords.length - 1];
+          return !!last && last.indexOf(keyWords[0]) === 0;
+        }
         return keyWords.every(function (kw) {
           // Prefix, not containment (#619).
           return entryWords.some(function (ew) { return ew.indexOf(kw) === 0; });

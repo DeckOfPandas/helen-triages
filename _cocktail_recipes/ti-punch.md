@@ -5,6 +5,8 @@ glass:
   - "double old fashioned"
 garnish:
   - "no garnish"
+serve:
+  ice: "none"
 ingredients:
   - amount: "60 ml"
     generic: "rhum agricole blanc"
@@ -34,5 +36,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
