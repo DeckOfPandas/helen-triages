@@ -37,6 +37,7 @@ near-miss: it is `publication`.
 | `website` | …author not recorded | `Adapted from <site>` | `Adapted from indianhealthyrecipes.com` |
 | `author` | A published cook, work not recorded | `Adapted from <Name>` | `Adapted from Delia Smith` |
 | `person` | Someone Helen knows | a bare label | `Henry`, `Grandma Kath`, `Good friend Daniel` |
+| `person` | …Helen's own version of a regional dish | `Henry, <Place>-style` | `Henry, Alsace-style`, `Henry, Java-style` |
 | `place` | A place | a bare label | `France` |
 | `joke` | The experience that produced the recipe | free text | `Bitter experience` |
 | `unknown` | Nobody has established it yet | exactly `QQ` | `QQ` |

@@ -481,8 +481,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   (8–10 slices)"`, `"one 23-cm cake"` where no slices are given, `"16
   biscuits"`. The scaler counts the whole thing and ignores the bracket.
 - **2026-10-08 — Helen's own recipes are `source: "Henry"`, `source_type:
-  person`.** Confirmed as standing the same day, as the old journal recorded
-  it.
+  person`, and her own version of a regional dish is `"Henry,
+  Alsace-style"`.** Confirmed as standing the same day, as the old journal
+  recorded it; the regional shape is 2026-11-06, for the coq au Riesling,
+  the coq au vin jaune and the opor ayam. Offered `place` alone, Helen:
+  *"Place for the regionals is cute, but put me on there too please"*, and
+  she chose this shape over "after Alsace" and "Alsace, via Henry". A recipe
+  developed with her in a chat is hers.
 - **2026-10-08 — four ingest rulings apply to Difford's alone.** Saline is a
   small pinch of salt (she does not keep saline); "rich" syrup is `cane sugar
   syrup 2:1`; the glass is the "Select and pre-chill" line; "freshly squeezed"

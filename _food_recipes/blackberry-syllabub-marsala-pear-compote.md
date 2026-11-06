@@ -24,7 +24,7 @@ ingredient_groups:
     - amount: "100 g"
       item: "golden caster sugar"
     - amount: "1"
-      item: "lemon"
+      item: "lemon, zest and juice"
   - name: "pear compote"
     items:
     - amount: "8"
@@ -64,7 +64,7 @@ method_groups:
       - "Sieve (optional — I like bits), stir in the juice of ¼ lemon and the crème de mûre, and chill."
   - name: "Syllabub (on the day)"
     steps:
-      - step: "Whisk the cream, dessert wine, sugar, and the zest and juice of the second lemon to soft peaks and no further."
+      - step: "Whisk the cream, dessert wine, sugar, and the lemon zest and juice to soft peaks and no further."
         note: "The syllabub will set further on its own, and will become grainy if over-whisked."
       - "Fold in a few spoonfuls of the purée, stopping while it is still streaked, then pour into the trifle bowl. Or pour the purée into the bottom of the trifle bowl, spoon the syllabub over, then fold slightly aggressively a few times to bring some blackberry streaks upwards."
   - name: "To serve"

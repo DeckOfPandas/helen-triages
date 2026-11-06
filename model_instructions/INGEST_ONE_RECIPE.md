@@ -618,6 +618,7 @@ magazine is a `publication`.
 | `website` | author not recorded | `Adapted from indianhealthyrecipes.com` |
 | `author` | work not recorded | `Adapted from Delia Smith` |
 | `person` | someone Helen knows — a bare label | `Henry`, `Grandma Kath` |
+| `person` | Helen's own version of a regional dish | `Henry, Alsace-style` |
 | `place` | a bare label | `France` |
 | `joke` | free text | `Bitter experience` |
 | `unknown` | exactly `QQ` | `QQ` |

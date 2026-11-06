@@ -5,7 +5,7 @@ meta:
   awaiting_fix: false
   proofread: true
 tagline: "A sake, mirin and white miso sauce, thickened to a sticky glaze."
-source: "Helen"
+source: "Henry"
 source_type: person
 makes: "1 marinade for 4 portions of fish"
 prep_time: "none"
