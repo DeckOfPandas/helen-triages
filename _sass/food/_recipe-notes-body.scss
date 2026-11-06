@@ -281,15 +281,6 @@ article.recipe .recipe-body-content {
     border-bottom: 2px solid $color-border;
     white-space: nowrap;
   }
-
-  // Wraps one table, so a wide one scrolls on its own rather than widening
-  // the page.
-  .table-scroll {
-    overflow-x: auto;
-    margin: 0 0 $space-lg 0;
-
-    table { margin-bottom: 0; }
-  }
 }
 
 // --- Group Headings ----------------------------------------------------------

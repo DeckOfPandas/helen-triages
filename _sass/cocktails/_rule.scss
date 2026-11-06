@@ -35,7 +35,7 @@
   // Two near-whites, one tight pair, no softening: the same values as
   // `.drink-card-tape-word` in _cards.scss.
   --lettering-display-stroke-c: #{$color-label-stroke};
-  --lettering-display-light:    #fdfbfe;
+  --lettering-display-light:    #{$color-tape-highlight};
   --lettering-display-shadow:   rgba(5, 5, 5, 0.9);
 
   // `[ COCKTAILS ]` (`.site-logo-word`) is treated as `[ FOOD ]` is: it takes
@@ -43,8 +43,8 @@
   // here sets `--wordmark-word-stroke` or `--wordmark-word-shadow`. Only the
   // two fills are set. The card tapes keep their own two-copy pair (MANUAL
   // §9.13).
-  --wordmark-top-color:   #ECE9EA;
-  --wordmark-word-color:  #ECE9EA;
+  --wordmark-top-color:   #{$color-tape-letter};
+  --wordmark-word-color:  #{$color-tape-letter};
 }
 
 // There is no h1/h2/h3 rule here: shared/_base.scss's reads

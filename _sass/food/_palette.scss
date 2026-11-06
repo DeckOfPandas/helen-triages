@@ -87,6 +87,11 @@ $faux-bold-stroke: 0.05em;
 
 // --- Recipe Page Utilities ---------------------------------------------------
 $color-white:                #ffffff;
+// The tape lettering's fill and its highlight copy, on both sites (the same
+// two values in cocktails/_palette.scss). The fill sits below white so the
+// highlight can be a step brighter (MANUAL §13.9). Tune at /dev/emboss/.
+$color-tape-letter:          #ECE9EA;
+$color-tape-highlight:       #fdfbfe;
 // The label tier's stroke colour (food/_rule.scss). Derived from the text it
 // outlines rather than a standalone grey, so the two stay related.
 $color-label-stroke:         lightness.shift($color-text, 30%);   // 30% is Helen's pick

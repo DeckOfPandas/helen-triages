@@ -176,6 +176,8 @@ exclude:
 
 sass:
   sass_dir: _sass
+  # Whitespace out of the served CSS; the source maps still point at _sass/.
+  style: compressed
 
 plugins:
   - jekyll-sitemap
