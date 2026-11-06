@@ -1687,6 +1687,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   deriver reads a hint that names a spirit family or a spirit generic; a hint
   it cannot place still reads as nothing, and she may name the bottle or
   confirm the generic to unblock it.
+- **2026-11-05, #1462 D7 — a mood's definition in `taxonomy.yml` says what the
+  mood is today, without its history.** Helen: *"I don't need the history, it
+  can go."* A definition keeps the rule, the reasons a clause exists and her
+  rulings in her words; earlier versions, dates and counts of drinks go, and
+  the story is in git. The per-drink corrections' `why:` text is not covered.
 
 **Garnish, method and serve, ruled on while promoting.**
 

@@ -16,101 +16,68 @@ moods:
     into a sour. Either way nothing lengthens it and it is not crushed,
     swizzled or blended. Manhattan, Old Fashioned, Sazerac, Vieux Carré,
     Boulevardier, Brooklyn -- Helen: "you know, man spirits."
-    REWRITTEN 2026-08-30 AGAINST HER OWN RULINGS, and the previous rule was
-    wrong in both directions. It asked for 60% base spirit by volume with the
-    aged ingredients outnumbering the clear, which let in a swizzle over
-    crushed ice and a champagne drink while missing the Brooklyn (dry vermouth
-    and maraschino cancelled the rye) and Fancy Free (one aged ingredient).
-    THE LINE UNDER IT IS CITRUS, and Helen found it before the rule did:
-    cognac-and-fernet is a brown drink, cognac-and-lemon is a sour. Art de
-    Vivre and Legend are the first; the Sidecar, Accoutrement, Apple Cart,
-    Champs Élysées and Ginger Snap are the second. She ruled on all of them --
-    "can't tell you why but my heart is certain" -- and the rule now agrees
-    with every one.
-    THREE THINGS IT HAD TO GET RIGHT TO DO THAT. Water is excluded from the
-    volume count, being a rinse or a dilution and never the drink -- that alone
-    fixes the Sazerac, which used to need a hand-correction because its
-    discarded 60 ml dragged the fraction to 44%. Volumes are compared by SPIRIT
-    FAMILY, not by single ingredient, because the Sazerac pours equal 20 ml of
-    cognac, rye and bourbon and "the biggest pour" was being decided by YAML
-    key order -- 34 of the 114 drinks have such a tie. And whisky need only be
-    LEVEL with the leading family, since Vieux Carré and Banana Boulevardier
-    are equal-parts with vermouth.
+    THE LINE UNDER IT IS CITRUS: cognac-and-fernet is a brown drink,
+    cognac-and-lemon is a sour. Art de Vivre and Legend are the first; the
+    Sidecar, Accoutrement, Apple Cart, Champs Élysées and Ginger Snap are the
+    second, all on Helen's ruling: "can't tell you why but my heart is
+    certain".
+    HOW IT READS VOLUMES. Water is left out of the count, being a rinse or a
+    dilution and never the drink, so a Sazerac's discarded rinse cannot drag
+    it under. Volumes are compared by SPIRIT FAMILY, not by single ingredient,
+    so equal pours of cognac, rye and bourbon are one lead and not a tie that
+    YAML key order breaks. And whisky need only be LEVEL with the leading
+    family, since Vieux Carré and Banana Boulevardier are equal parts with
+    vermouth.
     THE NON-WHISKY PATH REQUIRES A BASE SPIRIT. Sweet vermouth is aged and ties
-    with the gin for the largest pour in a Negroni, which let it in until that
-    was stated; `fortified`, `amaro` and `herbal` are modifiers. Helen: "thanks
-    for knowing that Negroni is not (it's red anyway)."
+    with the gin for the largest pour in a Negroni; `fortified`, `amaro` and
+    `herbal` are modifiers. Helen: "thanks for knowing that Negroni is not
+    (it's red anyway)."
   clear: >-
     GLASSY MOUTHFEEL, LOW COMPLEXITY, NOT FILLING. HAND-ASSIGNED.
-    Helen, 2026-08-30: "Clear implies transparent (not strictly though) and
-    does not imply colourless. It is about mouthfeel (glassy), complexity
-    (low), how filling it is (not), that kind of thing."
-    THIS SAID "TRANSPARENT... USUALLY FREE OF CITRUS" FOR THIRTEEN DAYS AND
-    THAT WAS NEVER WHAT SHE MEANT. Written 2026-08-17 with the original
-    vocabulary and never revised. The whole repository was searched on
-    2026-08-30 for any record of the real meaning -- data, tests, handover, git
-    history -- and there was none. She said "we've discussed this before", and
-    she had. It left no trace.
-    WHAT THE STALE DEFINITION NEARLY COST, recorded because the near-miss is
-    the whole argument for writing this down. Reading it, I measured the tag
-    against literal transparency, found 13 of the 16 tagged drinks are not
-    transparent, called the rule broken, and proposed inverting it to "every
-    ingredient is colourless". Confidently and completely wrong -- and every
-    number in the analysis supporting it was correct. Same shape as #542: a
-    plausible reading of an incomplete record.
-    IT EXPLAINS WHAT TRANSPARENCY COULD NOT. Brooklyn is brown and IS clear;
-    the Negroni is transparent and is NOT -- four stirred things that slip
-    down, against something assertive and bitter. Espresso Martini is out for
-    being filling, not for being black. And Aviation, Corpse Reviver #2 and El
-    Mediterraneo all carry citrus and are all clear, so the "free of citrus"
-    half was wrong too.
-    Not the opposite of `strong brown drink` -- they are independent, and a
-    drink can be neither, or both: six are.
+    Helen: "Clear implies transparent (not strictly though) and does not imply
+    colourless. It is about mouthfeel (glassy), complexity (low), how filling
+    it is (not), that kind of thing."
+    NOT TRANSPARENCY, AND NOT FREE OF CITRUS, so never measure the tag against
+    either. Brooklyn is brown and IS clear; the Negroni is transparent and is
+    NOT -- four stirred things that slip down, against something assertive and
+    bitter. Espresso Martini is out for being filling, not for being black.
+    Aviation, Corpse Reviver #2 and El Mediterraneo all carry citrus and are
+    all clear.
+    Not the opposite of `strong brown drink`: the two are independent, and a
+    drink can be neither, or both.
   sharp: >-
     A base, a citrus and a sweetener, in five ingredients or fewer. Aviation,
     Bee's Knees, Sidecar, Champs Élysées, Tom Collins.
-    WAS `short and sharp` UNTIL 2026-08-30, and losing the "short" is what
-    freed it from the glass. The old rule required an UP glass, which is how a
-    drink came to be excluded from the largest genre in the book for want of a
-    word in a field: 15 drinks name no glass at all, and Biggles Sidecar --
-    cognac, lemon, sugar syrup, unmistakably this -- was one of them.
-    THE COUNT REPLACES THE GLASS, and it is Helen's own number: this
-    definition said "three to five ingredients" from the day it was written.
-    Without any bar at all the rule catches 72 of 114 drinks, which stops
-    narrowing anything; at five it catches 41 and picks up Tom Collins and
-    Daisy de Santiago, both of which previously answered no mood whatsoever.
-    It also no longer depends on the glass data, which is a good property for a
-    rule to have while that data is still being filled in (#491).
+    THE GLASS DOES NOT COUNT. A sour is a sour in any glass, and many drinks
+    name none, so the rule never reads the glass data.
+    THE INGREDIENT CAP IS WHAT MAKES IT A FILTER, and it is Helen's own number,
+    "three to five ingredients". Without a cap the rule catches most of the
+    collection and narrows nothing.
     BEING CHURNED INTO A SLUSHY DISQUALIFIES; BEING SERVED OVER CRUSHED ICE
-    DOES NOT -- Helen, 2026-09-26, on the Moscow Mule: "Moscow Mule is sharp.
-    The ginger beer probably supports this, as well as acting as a sweetener.
-    This isn't an exception to the rule -- it is perfectly consistent with how
-    I intend the rule to apply." Until then this mood shared `strong brown
-    drink`'s disqualifier, which reads `serve.ice: crushed` and the words
-    "crushed ice" -- so a mug packed with crushed ice was treated as a swizzle.
-    The two moods want two different questions, exactly as `ice` and `churned`
-    in `mood_step_words` already do: a big block of ice is how you serve a
-    strong brown drink, and crushed ice is how you serve a long sharp one.
+    DOES NOT. Helen, on the Moscow Mule: "Moscow Mule is sharp. The ginger
+    beer probably supports this, as well as acting as a sweetener. This isn't
+    an exception to the rule -- it is perfectly consistent with how I intend
+    the rule to apply." So this mood does not share `strong brown drink`'s
+    disqualifier, which reads crushed ice: a big block of ice is how you serve
+    a strong brown drink, and crushed ice is how you serve a long sharp one.
     See `mood_step_words.slushy`, which is this mood's own list.
   warming: >-
     For a cold night. Ginger, cinnamon, allspice, warm-spiced bitters.
     SPICE, NOT TEMPERATURE -- a Penicillin is warming and served cold, and the
-    collection has exactly two drinks served hot, which is too thin to be a
-    filter. Helen's word, and the right one: "warm spice" describes the
+    collection has too few drinks served hot to make that a filter. Helen's word, and the right one: "warm spice" describes the
     bottles, "warming" describes what you want.
   aperitivo: >-
     The first one, before eating. An amaro or an aromatised wine, and not
     something that would flatten your appetite.
     THE MOOD IS THE OCCASION, NOT THE FLAVOUR, and that distinction is the
-    reason this exists and `bitter` does not. Helen, 2026-08-30, on a proposed
-    set of flavour tags: "they're flat descriptors... whereas I'd hoped for
+    reason this exists and `bitter` does not. Helen, on a proposed set of
+    flavour tags: "they're flat descriptors... whereas I'd hoped for
     more evocative moods, you know, something I can offer beyond what one might
     guess from the ingredients list." A tag that means "contains Campari" is a
     worse copy of the HAS TO HAVE field; a tag that means "serve this before
     dinner" is something the ingredient list cannot say.
-    `amaro` AND `herbal` ARE ALREADY FAMILIES, so the flavour roll-up this
-    might have duplicated already exists for search and exclusion. What was
-    missing was only a word: `bitter` now aliases to `amaro`, because a family
+    `amaro` AND `herbal` ARE FAMILIES, so the flavour roll-up exists already
+    for search and exclusion. `bitter` aliases to `amaro`, because a family
     nobody spells that way is a family nobody can reach (§9.3.3).
   fruity: >-
     Contains a non-citrus fruit: pineapple, passion fruit, berries, a crème de
@@ -121,10 +88,10 @@ moods:
   sugar craving: >-
     Pudding flavours: coffee, cacao, amaretto, banana, menthe, coconut,
     vanilla, cola, chocolate bitters. About what the drink TASTES of, not how
-    much sugar is in it -- "has a sweetener" covers 68% of the book and means
-    nothing. HAND-ASSIGNED, WITH ONE SLICE DERIVED SINCE 2026-10-08: two tiki
-    markers in a drink of 90 ml or more gets it by rule, which finds 16 of her
-    46 and adds to them only. The rest stay hers to type.
+    much sugar is in it -- "has a sweetener" covers most of the book and means
+    nothing. HAND-ASSIGNED, WITH ONE SLICE DERIVED: two tiki markers in a
+    drink of 90 ml or more gets it by rule, which only ever adds to hers. The
+    rest stay hers to type.
   pudding in a glass: >-
     Rich and thick rather than merely sweet: cream, a whole egg, coconut cream.
     A White Russian, a flip, an Alexander. Declared as a spec, not an
@@ -134,31 +101,23 @@ moods:
     ones, so the rule holds for whichever mood is empty next.
   tiki: >-
     Two or more tiki markers -- orgeat, falernum, passion fruit, pineapple,
-    cinnamon syrup, grenadine, an overproof or pineapple rum -- AND complexity,
-    measured two ways: six or more ingredients, OR two "loud" ingredients that
-    each carry a flavour layer on their own.
+    cinnamon syrup, grenadine, an overproof or pineapple rum -- in four or more
+    ingredients, OR one marker in eight or more.
     COMPLEXITY IS THE DEFINITION, not a filter on it. Helen: tiki is "a complex
     drink with lots of ingredients and lots of taste layers which is why it's
-    not just a jar full of sugar". Ingredient COUNT alone got that wrong in
-    both directions -- it dropped Jungle Bird, Better and Better ("only three
-    ingredients, but they're bonkers") and Chartreuse Swizzle. Intensity
-    recovers all three and drags in nothing.
-    And it made the threshold FIRMER, which is counterintuitive: on markers
-    alone, 25 drinks sat one ingredient from flipping in; with both bars, one
-    does. Few drinks sit at two edges at once.
-    THE RULE THAT RUNS TODAY IS SIMPLER THAN THE PARAGRAPHS ABOVE, which are
-    the 2026-08-17 definition and are kept for the reasoning. Since #1187: two
-    markers and four or more ingredients. Since 2026-10-08: OR one marker and
-    eight or more -- Helen, on Three Dots and a Dash and the Difford's Fog
-    Cutter: "absolutely tiki, so if we need to change the rules to rule them in
-    then so be it." HAND-ASSIGNED AS WELL, so the rule only ever adds.
+    not just a jar full of sugar". The one-marker path is hers too, on Three
+    Dots and a Dash and the Difford's Fog Cutter: "absolutely tiki, so if we
+    need to change the rules to rule them in then so be it."
+    HAND-ASSIGNED AS WELL, so the rule only ever adds, and a drink it misses
+    keeps the tag she gives it: Better and Better is "only three ingredients,
+    but they're bonkers".
   nightcap: >-
     The last one. HAND-ASSIGNED.
   brunch: >-
     Defensible before noon. HAND-ASSIGNED.
   sunny terrace: >-
-    Long, cold, and the glass sweats. Helen's name for it, and better than the
-    "in the sun" it replaced: a place you can picture. HAND-ASSIGNED.
+    Long, cold, and the glass sweats. Helen's name for it: a place you can
+    picture. HAND-ASSIGNED.
   festive: >-
     The once-a-year one. HAND-ASSIGNED.
   signature: >-
@@ -173,22 +132,19 @@ moods:
     RISK -- how likely this is to be bad, read off `meta.ship`. This is about a
     transgression that pays off, which is a different and much rarer thing: a
     drink you have never made is chaotic, a Jägerita is wrong and right.
-    `stuff in a glass` WAS PROPOSED ALONGSIDE IT AND DROPPED, and the reasoning
-    is worth keeping because both were good. That was her and Simon's phrase
-    for the kitchen-sink drink -- the 18th Century Cocktail, arrack and cacao
-    and Lillet, a heap that happens to be a respectable classic. Genuinely a
-    different thing from this. But tagging both means deciding, per drink,
-    which flavour of odd it is, and that is the friction that makes a tagging
-    pass tiring. One tag, and it is the one that names a feeling.
+    ONE TAG FOR ODD, NOT TWO. The kitchen-sink drink -- the 18th Century
+    Cocktail, arrack and cacao and Lillet, a heap that happens to be a
+    respectable classic -- is a different thing, but a second tag for it means
+    deciding per drink which flavour of odd it is, and that friction is what
+    makes a tagging pass tiring. This is the one that names a feeling.
   ice ice baby: >-
     Wants a lot of ice -- crushed, swizzled, blended, or a big block. Read
     inverted it is also the "I don't have much ice" constraint, which is the
     same flag from the other side.
-    KNOWN SIMPLIFICATION: this fuses three different things. Frozen/blended (4
-    drinks) needs a blender, swizzled (10) needs crushed ice, a block (5) needs
-    planning -- and Helen specifically named wanting FROZEN drinks in summer as
-    its own craving. Four drinks is too thin to split today; split it when the
-    frozen set grows.
+    KNOWN SIMPLIFICATION: this fuses three different things. Frozen or blended
+    needs a blender, swizzled needs crushed ice, a block needs planning -- and
+    Helen named wanting FROZEN drinks in summer as its own craving. Split it
+    when the frozen set is big enough to be a filter of its own.
   I want to faff: >-
     Muddling, flaming, shells, blending, swizzling, or nine-plus ingredients.
     Named to pair against `no juicing` as its other end.
@@ -197,49 +153,45 @@ moods:
     complicated regardless of whether she wants the result -- so the faff can
     be the point rather than a cost the drink repays.
   no juicing: >-
-    No citrus juice at all. Helen's own framing, and better than the earlier
-    "can't be bothered to juice": it names "the urgh, juicing, urghh feeling
-    when you want a single drink on a weeknight without using 47 pieces of
-    equipment and making your worktops sticky". The low-effort end, 38 drinks.
+    No citrus juice at all. Helen's own framing: it names "the urgh, juicing,
+    urghh feeling when you want a single drink on a weeknight without using 47
+    pieces of equipment and making your worktops sticky". The low-effort end.
   no measuring: >-
     ONE RECEPTACLE, WHOLE POURS OF IT. Every measured amount is a whole-number
     multiple of the smallest one, and the whole drink is eight of those pours
     or fewer -- 1/1/1, 2/1/1, 3/2/1. Whatever is to hand does it: a jigger, an
     egg cup, a shot glass. Helen, #1127: "for drinks I can make with just one
     receptacle, if that's all I have."
-    THE CAP IS WHAT MAKES IT A FILTER. Without one the rule is 58% of the
-    collection, which test_no_mood_covers_more_than_half_the_collection refuses
-    outright -- the same bar that retired food's `one-pot` at 57%. Almost any
-    set of amounts is whole multiples of SOMETHING: the Corpse Reviver #2 is
-    integer-proportioned at 41 pours of 7.5 ml, which is not a drink anyone is
-    making with an egg cup. Helen's own caveat named the same thing before the
-    measurement did -- "some drinks may be like this but only if I make loads".
-    At eight it is 28 drinks; at six, 23; at ten, 33. She chose eight on
-    2026-09-19, over a printed list of what each catches, because eight is
-    where Anita's Attitude Adjuster (seven equal pours) sits comfortably inside.
+    THE CAP IS WHAT MAKES IT A FILTER. Without one the rule covers more than
+    half the collection, which test_no_mood_covers_more_than_half_the_collection
+    refuses. Almost any set of amounts is whole multiples of SOMETHING: the
+    Corpse Reviver #2 is integer-proportioned at 41 pours of 7.5 ml, which is
+    not a drink anyone is making with an egg cup. Helen: "some drinks may be
+    like this but only if I make loads". She chose eight, over a printed list
+    of what each cap catches, because eight is where Anita's Attitude Adjuster
+    (seven equal pours) sits comfortably inside.
     NOT MEASURED, NOT COUNTED: dashes, drops, pinches, a `to top`, a `to taste`
     and half a lime are all ignored, because none of them has a volume to be in
     proportion to. Helen, #1127: "ignore ingredients in drops, dashes, pinches,
-    etc." AND A 5 ML POUR, since 2026-09-26 (#1216), Helen: "if any amounts
-    are 5 ml, this is just a bar spoon, and doesn't count as needing to be
-    measured" -- so a bar spoon of syrup neither joins the ratio nor becomes
-    the smallest measure everything else is divided by. Exactly 5 ml, not
-    smaller: 2.5 and 7.5 are quarter- and half-jiggers. AND WATER, since
-    2026-10-08, here and in every other rule -- Helen: "dilution water just
-    isn't something I care about." A drink whose only measured line is one pour of spirit therefore
-    qualifies, and that is right rather than a loophole -- the Caipirinha is
-    45 ml of cachaça, half a lime and 20 g of palm sugar, and you measure
-    exactly one of those things.
+    etc." AND A 5 ML POUR (#1216), Helen: "if any amounts are 5 ml, this is
+    just a bar spoon, and doesn't count as needing to be measured" -- so a bar
+    spoon of syrup neither joins the ratio nor becomes the smallest measure
+    everything else is divided by. Exactly 5 ml, not smaller: 2.5 and 7.5 are
+    quarter- and half-jiggers. AND WATER, here and in every other rule --
+    Helen: "dilution water just isn't something I care about." A drink whose
+    only measured line is one pour of spirit therefore qualifies, and that is
+    right rather than a loophole -- the Caipirinha is 45 ml of cachaça, half a
+    lime and 20 g of palm sugar, and you measure exactly one of those things.
     A TOP IS AN AMOUNT, NOT AN INGREDIENT, and this is where it differs from
-    `easy peasy`, which sets a mixer aside by what it IS. Helen, 2026-09-19:
-    "No ingredient in the Aperol Spritz is a top." Its prosecco is 90 ml on the
+    `easy peasy`, which sets a mixer aside by what it IS. Helen: "No
+    ingredient in the Aperol Spritz is a top." Its prosecco is 90 ml on the
     page and belongs to the 3:2:1 as much as the Aperol does; champagne written
     `to top` is a different thing and falls out on its own for having no volume.
     The cost of the distinction is Long Island Iced Tea and Lita Grey, both
     `easy peasy` and both carrying a measured 60 ml of cola or champagne -- and
     a measured 60 ml is exactly what this tag promises you will not have to do.
   on fire: >-
-    Something is set alight. Two drinks, and narrow is the point: a two-drink
+    Something is set alight. Very few drinks, and narrow is the point: a short
     answer to "something on fire" is a good answer, not a failed filter.
   easy peasy: >-
     Equal parts of everything but the top, or three pours with no juicing and
@@ -250,8 +202,8 @@ moods:
     #845, Helen: "any cocktail with equal parts of all ingredients (bar maybe
     bitters) should get the tag 'easy peasy' once we've made it" -- so it is
     earned rather than derived, and an unmade drink does not get it however it
-    is built. She widened it on 2026-09-08 to cover the short pour-and-stir
-    drinks as well, which is what brings in the Negroni family.
+    is built. It covers the short pour-and-stir drinks as well, on her ruling,
+    which is what brings in the Negroni family.
     A TOP OR A MIXER IS SET ASIDE, along with dashes and drops. Topping a glass
     is not faff, and neither is opening a cola -- Julien Sorel and Anita's
     Attitude Adjuster are in on her ruling, and Anita's is seven equal pours.
