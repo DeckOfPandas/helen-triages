@@ -1,7 +1,7 @@
 ---
 title: "Double Chocolate Frap"
 tagline: "Nearly as good as Starbucks, but you can still fit in dinner."
-source: "Helen"
+source: "Henry"
 source_type: person
 serves: "2"
 prep_time: "5 mins"
@@ -37,6 +37,5 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
-
+  proofread: false
 ---
