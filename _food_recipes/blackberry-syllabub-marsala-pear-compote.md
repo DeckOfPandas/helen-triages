@@ -3,7 +3,7 @@ title: "Blackberry Syllabub with Marsala Pear Compote"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 tagline: "Cuddly Autumn in an unnecessarily large trifle bowl."
 source: "Henry"
 source_type: person
