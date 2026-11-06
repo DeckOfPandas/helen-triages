@@ -137,7 +137,7 @@ bottles:
   # --- brandy ------------------------------------------------------------
   "Courvoisier":                      { abv: 40,   confidence: high }
   # Two different bottles at one strength (#745).
-  "Pierre Ferrand Ambré":             { abv: 40,   confidence: high }
+  "Pierre Ferrand Ambre":             { abv: 40,   confidence: high }
   "Pierre Ferrand 1840":              { abv: 40,   confidence: high }
   "Avallen":                          { abv: 40,   confidence: high }
   "Massenez Kirsch Vieux":            { abv: 40,   confidence: medium }

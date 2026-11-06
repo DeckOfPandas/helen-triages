@@ -19,7 +19,7 @@ mood:
 ingredients:
   - amount: "45 ml"
     generic: "cognac"
-    suggestion: ["Pierre Ferrand Ambré"]
+    suggestion: ["Pierre Ferrand Ambre"]
   - amount: "15 ml"
     generic: "moderately aged Jamaican rum"
     suggestion: ["Smith & Cross"]

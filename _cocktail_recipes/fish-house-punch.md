@@ -9,7 +9,7 @@ serve:
   ice: "cubed"
 ingredients:
   - amount: "30 ml"
-    suggestion: ["Pierre Ferrand Ambré"]
+    suggestion: ["Pierre Ferrand Ambre"]
     generic: "cognac"
   - amount: "30 ml"
     generic: "lightly aged and filtered rum"

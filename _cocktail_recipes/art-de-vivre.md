@@ -21,7 +21,7 @@ mood:
 ingredients:
   - amount: "45 ml"
     generic: "cognac"
-    suggestion: ["Pierre Ferrand Ambré"]
+    suggestion: ["Pierre Ferrand Ambre"]
   - amount: "15 ml"
     generic: "mastiha liqueur"
     suggestion: ["Roots Mastiha"]
