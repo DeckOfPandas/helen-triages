@@ -3,7 +3,7 @@ title: "Blackberry Syllabub with Marsala Pear Compote"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 tagline: "Cuddly Autumn in an unnecessarily large trifle bowl."
 source: "Henry"
 source_type: person
@@ -24,7 +24,7 @@ ingredient_groups:
     - amount: "100 g"
       item: "golden caster sugar"
     - amount: "1"
-      item: "lemon"
+      item: "lemon, zest and juice"
   - name: "pear compote"
     items:
     - amount: "8"
