@@ -795,3 +795,36 @@ test('#1462 C5: under ⅛ tsp is a pinch, and ⅛ itself is still a spoon', () =
 test('#1462 C5: a pinch is a teaspoon rule only; a tablespoon keeps its fraction', () => {
   assert.strictEqual(textOf([ing('⅛ tbsp', 'salt', 'cupboard', 0.5)], 'salt'), '0.06 tbsp');
 });
+
+// --- #1474: three quirks older than #1471 ------------------------------------
+
+test('#1474: "approx" is read like a tilde, so the amount converts and totals', () => {
+  assert.strictEqual(textOf([ing('approx 8 oz', 'flaked almonds', 'cupboard')],
+    'flaked almonds'), '~227 g');
+  assert.strictEqual(textOf([ing('approx. 2 lb', 'pork belly', 'meat')], 'pork belly'),
+    '~907 g');
+  assert.strictEqual(textOf([
+    ing('Approx 100 g', 'butter', 'dairy'),
+    ing('100 g', 'butter', 'dairy')
+  ], 'butter'), '~200 g');
+});
+
+test('#1474: a word that only starts with "approx" is not an approximation', () => {
+  // The lookahead wants a space after the word, so nothing is cut out of a unit.
+  const SL = require('../../assets/js/shopping-list.js');
+  assert.strictEqual(SL.parseAmount('approximately'), null);
+});
+
+test('#1474: a bracketed alternative is not pluralised', () => {
+  assert.strictEqual(textOf([ing('2 oz (or 2 tbsp)', 'butter', 'dairy')], 'butter'),
+    '2 oz (or 2 tbsp)');
+  assert.strictEqual(textOf([ing('3 cloves (or 1 tsp paste)', 'garlic', 'produce')], 'garlic'),
+    '3 cloves (or 1 tsp paste)');
+});
+
+test('#1474: a rate is not pluralised', () => {
+  assert.strictEqual(textOf([ing('250 g per person', 'potatoes', 'produce')], 'potatoes'),
+    '250 g per person');
+  assert.strictEqual(textOf([ing('2 slices per person', 'bread', 'bakery')], 'bread'),
+    '2 slices per person');
+});

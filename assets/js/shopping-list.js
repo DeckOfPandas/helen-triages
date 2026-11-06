@@ -57,11 +57,23 @@
     return parts.join(' ');
   }
 
+  /* A tail that qualifies a unit is not the noun being counted: a bracketed
+     aside (`oz (or 2 tbsp)`) or a rate (`g per person`). foldUnit and
+     unitLabel act on the head and keep the tail as written. */
+  var UNIT_TAIL = /^(.*?\S)(\s*\([^)]*\)|\s+per\s+.+)$/;
+
+  function splitTail(unit) {
+    var match = UNIT_TAIL.exec(unit);
+    return match ? { head: match[1], tail: match[2] } : null;
+  }
+
   /* Plural unit to singular, so `1 clove` and `3 cloves` total on one line.
      Must round-trip with unitLabel, which puts the plural back for display.
      `ss` (`glass`) and short symbols are not plurals. */
   function foldUnit(unit) {
     var u = String(unit || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    var tailed = splitTail(u);
+    if (tailed) return foldUnit(tailed.head) + tailed.tail;
     if (UNIT_PLURALS[u]) return UNIT_PLURALS[u];
 
     var word = lastWord(u);
@@ -86,6 +98,8 @@
   function unitLabel(unit, quantity) {
     if (SYMBOL_UNITS[unit]) return unit;
     if (quantity <= 1 + 1e-9) return unit;
+    var tailed = splitTail(unit);
+    if (tailed) return unitLabel(tailed.head, quantity) + tailed.tail;
 
     /* Must agree with foldUnit or a unit will not survive the round trip:
        `x 400 g can` prints `x 400 g cans`, `heaped tbsp` prints unchanged. */
@@ -311,12 +325,15 @@
      loses its hyphen. */
   var NUMBER = '(?=\\d|' + VULGAR_CLASS + ')(\\d+(?:\\.\\d+)?)?(' + VULGAR_CLASS + ')?';
 
-  /* The range separator is a dash, a hyphen or ` to`, and only when a NUMBER
-     follows it: the hyphen in `2 x 400-g tins` is part of the unit. */
+  /* A leading `~`, `approx` or `approx.` marks the amount approximate, and is
+     read rather than left in the unit, so the amount still totals and
+     converts. The range separator is a dash, a hyphen or ` to`, and only when
+     a NUMBER follows it: the hyphen in `2 x 400-g tins` is part of the unit. */
   var AMOUNT = new RegExp(
-    '^\\s*(~)?\\s*' + NUMBER +
+    '^\\s*(~|approx\\.?(?=\\s))?\\s*' + NUMBER +
     '(?:\\s*(?:–|—|-|\\s+to)\\s*' + NUMBER + ')?' +
-    '\\s*(.*?)\\s*$'
+    '\\s*(.*?)\\s*$',
+    'i'
   );
 
   function numberFrom(digits, fraction) {
@@ -331,7 +348,8 @@
    * Split "22.5 ml" into a number and a unit. Null when the string is not a
    * quantity at all (`(top)`, `some`); the caller counts those entries.
    * `max` and `approx` are present only when the source said so: "30–50 g"
-   * gives {quantity: 30, max: 50}, "~2 tbsp" gives {approx: true}.
+   * gives {quantity: 30, max: 50}, "~2 tbsp" and "approx 2 tbsp" give
+   * {approx: true}.
    * @param {string} amount
    * @returns {{quantity: number, unit: string, max?: number, approx?: boolean}|null}
    */
