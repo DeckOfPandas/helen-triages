@@ -3,7 +3,7 @@ title: "Sticky Soy and Miso Dipping Sauce"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 tagline: "A sake, mirin and white miso sauce, thickened to a sticky glaze."
 source: "Henry"
 source_type: person
