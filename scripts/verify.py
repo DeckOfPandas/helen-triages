@@ -8,10 +8,15 @@
   derive_cocktail_moods.py            did a vocabulary change move a mood?
   build_ingest_vocab.py --check       are the standalone docs in step?
   check_slug_keys.py                  does every slug-keyed entry name a drink?
+  check_glass_regen.py                would regenerating the glasses change one?
 
 A check may report SKIP, which is neither a pass nor a failure (#1106). Exit
 code 2 from `check_slug_keys.py` means the drafts clone is absent and it
 verified nothing; the run stays green and the line says SKIP.
+
+pytest's line is its pass/skip count, never its last line, which is a timing
+(`--durations` in pytest.ini). conftest's "Not evidence about ..." blocks are
+printed beneath it, because a green count without them overstates the run.
 
 The JS test files are globbed here, not listed, so a new test file cannot be
 left out silently. Never run two of these at once: concurrent runs share one
@@ -21,10 +26,41 @@ from __future__ import annotations
 
 import glob
 import os
+import re
 import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# pytest's closing count: "3021 passed, 14 skipped, 2 warnings in 81.2s".
+PYTEST_COUNT = re.compile(r"\b\d+ (passed|failed|error|errors|skipped)\b")
+
+
+def summary(name: str, lines: list[str]) -> str:
+    """The one line that says how a check went."""
+    if name == "pytest":
+        for ln in reversed(lines):
+            if PYTEST_COUNT.search(ln):
+                return ln.strip("= ")
+    return lines[-1] if lines else ""
+
+
+def caveats(lines: list[str]) -> list[str]:
+    """conftest's "Not evidence about ..." blocks, each heading and its body.
+
+    A block is its heading and the indented lines under it, up to the next
+    line that is not indented.
+    """
+    out, inside = [], False
+    for ln in lines:
+        if ln.startswith("Not evidence about"):
+            out.append(ln)
+            inside = True
+        elif inside and ln.startswith("  "):
+            out.append(ln)
+        else:
+            inside = False
+    return out
 
 
 def js_suite() -> list[str]:
@@ -41,7 +77,9 @@ def js_suite() -> list[str]:
 #  the exit code that means SKIPPED rather than failed -- or None)
 def checks() -> list[tuple[str, list[str], str | None, int | None]]:
     return [
-        ("pytest", ["python3", "-m", "pytest", "-q"], None, None),
+        # No `-q` here: pytest.ini's addopts has one, and a second makes it
+        # `-qq`, which prints no pass/skip count at all.
+        ("pytest", ["python3", "-m", "pytest"], None, None),
         ("node --test", js_suite(), "# fail 0", None),
         ("moods", ["python3", "scripts/derive_cocktail_moods.py"], "0 differ",
          None),
@@ -50,6 +88,8 @@ def checks() -> list[tuple[str, list[str], str | None, int | None]]:
         # 2 means "no drafts clone, so I verified nothing" (#1106). Not a
         # failure: the private repo is absent in a fresh worktree and in CI.
         ("slug keys", ["python3", "scripts/check_slug_keys.py"], None, 2),
+        ("glass regen", ["python3", "scripts/check_glass_regen.py"],
+         "reproduces the shipped set exactly", None),
     ]
 
 
@@ -90,7 +130,9 @@ def main() -> int:
             ok = ok and " failed" not in out
 
         print("%-14s %s   %s" % (name, "PASS" if ok else "FAIL",
-                                 (lines[-1] if lines else "")[:84]))
+                                 summary(name, lines)[:84]))
+        for ln in caveats(lines):
+            print("               " + ln[:160])
         if not ok:
             failed.append(name)
             for ln in lines:
