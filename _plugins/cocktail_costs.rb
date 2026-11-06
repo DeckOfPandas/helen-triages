@@ -92,8 +92,8 @@ module HelenTriages
       }
       site.data["cocktails"]["rates"] = rates
 
-      # The log line says how old the prices are (#749). The two-year limit is
-      # tests/test_cocktails.py::test_the_price_check_date_is_less_than_two_years_old.
+      # The log line says how old the prices are (#749). The two-year report
+      # is `_report_stale_prices` in tests/conftest.py.
       Jekyll.logger.info "Costs:", "priced #{counted} drinks " \
         "(prices checked #{@costs['checked']}#{checked_age}); " \
         "rates for #{rates['generics'].size} generics, " \

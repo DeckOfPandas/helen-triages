@@ -446,6 +446,7 @@ WHOLE_COLLECTION_ONLY = {
     "test_every_card_name_join_is_reachable",
     "test_every_proposal_still_matches_a_real_step",
     "test_every_garnish_proposal_still_matches_a_real_string",
+    "test_every_declared_garnish_is_worn_by_some_drink",
     "test_no_mood_covers_more_than_half_the_collection",
     # The coverage claims -- see _exercised.
     "test_the_character_vocabulary_is_exercised",
@@ -4050,6 +4051,34 @@ def test_every_garnish_proposal_still_matches_a_real_string():
     )
 
 
+def test_every_declared_garnish_is_worn_by_some_drink():
+    """A garnish under `canonical` that no drink, published or draft, wears is
+    deleted (DECISIONS §9.12, #1186). Whole collection only.
+    """
+    _require_whole_collection("an unused garnish")
+
+    vocab = _garnish_vocab()
+    worn = set()
+    for _slug, fm in _load():
+        garnish = fm.get("garnish")
+        if isinstance(garnish, list):
+            worn |= {g for g in garnish if isinstance(g, str)}
+    assert worn, "No drink wears a garnish, so this compared nothing."
+
+    declared = set()
+    for group in (vocab.get("canonical") or {}).values():
+        if isinstance(group, list):
+            declared |= {g for g in group if isinstance(g, str)}
+    unused = sorted(declared - worn)
+    assert not unused, (
+        "garnish.yml declares garnishes no drink wears:\n  "
+        + "\n  ".join(repr(g) for g in unused)
+        + "\n\nDelete each one, and its `no_article` line if it has one. "
+          "Helen, #1186: an unused garnish goes; the next drink to want it "
+          "declares it again."
+    )
+
+
 def test_no_garnish_is_stated_as_no_garnish_and_nothing_else():
     """`["no garnish"]` means decided: this drink takes none. `[]` means nobody
     has filled it in (MANUAL §9.12.1).
@@ -6119,12 +6148,12 @@ def test_every_declared_bottle_carries_a_price():
     )
 
 
-def test_the_price_check_date_is_less_than_two_years_old():
-    """costs.yml's `checked:` date is within the last 730 days -- #749.
+def test_the_price_check_date_is_a_date():
+    """costs.yml's `checked:` is a YYYY-MM-DD date that is not in the future.
 
-    The build's `Costs:` log line reports the age; this fails once it passes
-    two years. Parsed as a date, so a `checked:` that is not one fails here
-    instead of never ageing.
+    Its AGE is reported, never failed: conftest's `_report_stale_prices` says
+    so at the end of a run once it passes two years (#749), and the build's
+    `Costs:` log line reports it too. Only a commit can break this test.
     """
     import datetime
 
@@ -6136,13 +6165,27 @@ def test_the_price_check_date_is_less_than_two_years_old():
             f"_data/cocktails/costs.yml `checked:` is {raw!r}, which is not a "
             f"YYYY-MM-DD date, so the prices cannot be said to be any age."
         )
-    age = (datetime.date.today() - checked).days
-    assert age <= 730, (
-        f"_data/cocktails/costs.yml says its prices were checked on "
-        f"{checked.isoformat()}, which is {age} days ago -- more than two "
-        f"years. Re-read the `high` rows (Master of Malt, by hand -- see the "
-        f"file's header) and move `checked:` forward."
+    assert checked <= datetime.date.today(), (
+        f"_data/cocktails/costs.yml `checked:` is {checked.isoformat()}, "
+        f"which is in the future."
     )
+
+
+def test_stale_prices_are_reported_and_fresh_ones_are_not():
+    """The two-year report speaks after 730 days and is silent before."""
+    import datetime
+
+    from conftest import PRICES_STALE_AFTER_DAYS, _report_stale_prices
+
+    checked = datetime.date.fromisoformat(str(_costs().get("checked")))
+    said = []
+    _report_stale_prices(lambda *a, **k: said.append(a[0] if a else ""),
+                         today=checked + datetime.timedelta(days=PRICES_STALE_AFTER_DAYS))
+    assert not said, f"reported at exactly two years: {said}"
+    _report_stale_prices(lambda *a, **k: said.append(a[0] if a else ""),
+                         today=checked + datetime.timedelta(days=PRICES_STALE_AFTER_DAYS + 1))
+    assert any("Not evidence about current prices" in s for s in said), said
+    assert any("move `checked:` forward" in s for s in said), said
 
 
 def test_every_bottle_price_has_a_size_and_a_confidence():
