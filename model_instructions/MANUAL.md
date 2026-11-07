@@ -4028,10 +4028,10 @@ committed on, left and deleted.
 If it blocks you, read the refusal. The commonest legitimate case is undoing
 an edit you just made, and the answer is to re-edit the file.
 
-### 11.0.0 Larger pull requests
+### 11.0.0 How big a pull request is
 
-`CLAUDE.md` states the rule: one pull request per sitting, topics kept apart
-as commits. Every merge to `main` is a deploy (§10).
+`CLAUDE.md` states the rule: one pull request per feature or obvious group of
+work, topics kept apart as commits. Every merge to `main` is a deploy (§10).
 
 ### 11.0.1 More than one agent — a worktree each
 
