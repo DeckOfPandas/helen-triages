@@ -13,7 +13,7 @@ ingredients:
     suggestion: ["Rittenhouse 100"]
   - amount: "30 ml"
     generic: "cognac"
-    suggestion: ["Pierre Ferrand Ambré"]
+    suggestion: ["Pierre Ferrand Ambre"]
   - amount: "30 ml"
     generic: "sweet vermouth"
     suggestion: ["Carpano Antica Formula"]

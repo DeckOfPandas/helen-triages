@@ -965,29 +965,39 @@ def test_deleted_data_files_stay_deleted(relpath):
     )
 
 
-def test_palette_is_the_only_place_hex_colours_are_written():
-    """No script under assets/js/ writes a hex colour; the palette is the only source.
+PALETTES = {"_sass/food/_palette.scss", "_sass/cocktails/_palette.scss"}
 
-    A script that needs a colour reads a CSS custom property at runtime. Both
-    comment kinds are stripped first, or `issue #244` in a block comment reads
-    as a three-digit colour. `_strip_js_comments` keeps line breaks because the
-    failure names `file:lineno`.
+
+def test_palette_is_the_only_place_hex_colours_are_written():
+    """No script under assets/js/ and no stylesheet under _sass/ writes a hex
+    colour, except the two palettes (MANUAL §3, review B1).
+
+    A script that needs a colour reads a CSS custom property at runtime; a
+    partial names a palette variable. Comments are stripped first, or `issue
+    #244` reads as a three-digit colour; `_strip_js_comments` handles SCSS's
+    `//` and `/* */` too, and keeps line breaks for `file:lineno`.
     """
     js_files = sorted((ROOT / "assets" / "js").glob("*.js"))
+    sass_files = sorted(p for p in (ROOT / "_sass").rglob("*.scss")
+                        if p.relative_to(ROOT).as_posix() not in PALETTES)
     assert js_files, "No scripts found — this test would pass while checking nothing."
+    assert sass_files, "No partials found — this test would pass while checking nothing."
+    for palette in PALETTES:
+        assert (ROOT / palette).is_file(), f"{palette} is gone: update PALETTES."
 
     offenders = []
-    for path in js_files:
+    for path in js_files + sass_files:
         code = _strip_js_comments(path.read_text(encoding="utf-8"))
         for i, line in enumerate(code.split("\n"), 1):
-            for match in re.finditer(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b", line):
-                offenders.append(f"{path.name}:{i} {match.group(0)}")
+            for match in re.finditer(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?(?:[0-9a-fA-F]{2})?\b", line):
+                offenders.append(f"{path.relative_to(ROOT).as_posix()}:{i} {match.group(0)}")
 
     assert not offenders, (
-        "Hex colour(s) written into JavaScript:\n  " + "\n  ".join(offenders)
-        + "\n\nColour lives in _sass/food/_palette.scss and nowhere else. A "
-          "script that needs one should read a CSS custom property at runtime, "
-          "so editing the palette actually changes the page."
+        "Hex colour(s) written outside the palettes:\n  " + "\n  ".join(offenders)
+        + "\n\nColour lives in " + " and ".join(sorted(PALETTES)) + " and "
+          "nowhere else. A partial names a palette variable; a script reads a "
+          "CSS custom property at runtime, so editing the palette actually "
+          "changes the page."
     )
 
 
@@ -2845,15 +2855,6 @@ def test_both_indexes_filter_chips_wear_the_shared_tape():
 # --- the cocktail index (#579) ------------------------------------------------
 # The food index's guards are scoped to `filters.js` by name and do not reach
 # cocktails. These are the same guards, aimed at the other page.
-
-def _strip_js_comments(js: str) -> str:
-    """Source with comments removed.
-
-    A guard that counts a token in raw source is defeated by a comment naming
-    that token.
-    """
-    return re.sub(r"//.*$", " ", re.sub(r"/\*.*?\*/", " ", js, flags=re.S), flags=re.M)
-
 
 def test_cocktail_index_js_holds_no_loose_filter_state_variables():
     """The drinks index's filter state lives in filter-state.js, like food's.

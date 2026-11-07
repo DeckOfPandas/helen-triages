@@ -106,6 +106,18 @@ $color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
 // Stays white whichever way the ground sits: it is the highlight copy of the
 // heading lettering (cocktails/_rule.scss) and the paper of a printed note.
 $color-white:      #ffffff;
+// The tape lettering's fill and its highlight copy, on both sites (the same
+// two values in food/_palette.scss). The fill sits below white so the
+// highlight can be a step brighter (MANUAL §13.9). Tune at /dev/emboss/.
+$color-tape-letter:    #ECE9EA;
+$color-tape-highlight: #fdfbfe;
+// The card name's highlight copy under the cursor: a step brighter than the
+// woowoo fill it sits behind, so it moves when that fill does.
+$color-wicked-woowoo-highlight: #FF9BE8;
+// Print's two inks, dark on paper: food's $color-text and $color-clear-text,
+// restated because this palette cannot @use the other site's.
+$color-print-ink:       #211f20;
+$color-print-ink-quiet: #4f4e4a;
 
 // shared/_base.scss reads this for a link's hover. The home colour.
 $color-mood-root:  $color-electric-absinthe-deep;

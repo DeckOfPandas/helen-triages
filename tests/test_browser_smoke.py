@@ -213,7 +213,19 @@ def _settle(page):
         done => requestAnimationFrame(() => requestAnimationFrame(done))))""")
 
 
-PAGES = ("food index", "cocktails index", "a recipe", "a drink")
+# Pages with scripts of their own and nothing to wait for but the load: the
+# cook timer and the temperature chart, the methods page's cut and weight, the
+# rum and glasses references, about, and the site's own 404 by its path.
+FIXED_PAGES = {
+    "internal temperatures": "/food/reference/internal-temperatures/",
+    "cooking methods": "/food/reference/cooking-methods-and-timings/",
+    "rum categories": "/cocktails/reference/rum-categories/",
+    "glasses": "/cocktails/reference/glasses/",
+    "about": "/about/",
+    "404": "/404.html",
+}
+
+PAGES = ("food index", "cocktails index", "a recipe", "a drink", *FIXED_PAGES)
 
 
 def _url_of(which, prod_site):
@@ -221,6 +233,13 @@ def _url_of(which, prod_site):
         return _first_page(prod_site, "food")
     if which == "a drink":
         return _first_page(prod_site, "cocktails")
+    if which in FIXED_PAGES:
+        url = FIXED_PAGES[which]
+        built = prod_site / url.strip("/")
+        assert built.is_file() or (built / "index.html").is_file(), (
+            f"the production build has no {url}: renamed or removed? Update "
+            f"FIXED_PAGES rather than letting the smoke test skip a page.")
+        return url
     return INDEXES[which.split()[0]]["url"]
 
 

@@ -561,7 +561,7 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
   //
   // The fill sits below pure white on purpose: the highlight copy in the
   // shadow has to be brighter than the letter. Tune at /dev/emboss/.
-  color: var(--wordmark-word-color, #ECE9EA);
+  color: var(--wordmark-word-color, #{$color-tape-letter});
 
   // No stroke by default: the four-copy shadow below does the work. A
   // variable so a site can supply a different treatment.
@@ -570,7 +570,7 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
   // Two pairs of copies: a tight one at the glyph edge and a wider, softer
   // one. No site overrides this fallback.
   text-shadow: var(--wordmark-word-shadow,
-                   -1.0px -1.0px 0 #fdfbfe,
+                   -1.0px -1.0px 0 #{$color-tape-highlight},
                    -1.8px -1.8px 0 rgba(253, 251, 254, 0.75),
                     1.0px  1.0px 0 rgba(5, 5, 5, 0.90),
                     1.8px  1.8px 0 rgba(5, 5, 5, 0.45));

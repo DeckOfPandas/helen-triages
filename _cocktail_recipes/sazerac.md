@@ -17,7 +17,7 @@ ingredients:
     note: "Chilled, to dilute the absinthe."
   - amount: "20 ml"
     generic: "cognac"
-    suggestion: ["Pierre Ferrand Ambré"]
+    suggestion: ["Pierre Ferrand Ambre"]
   - amount: "20 ml"
     generic: "rye"
     suggestion: ["Rittenhouse 100"]

@@ -50,6 +50,7 @@
       "Bash(sh scripts/browser/install.sh)",
       "Bash(sh scripts/browser/build.sh)",
       "Bash(sh scripts/browser/serve.sh)",
+      "Bash(sh scripts/browser/capture.sh)",
       "Bash(sh scripts/browser/shoot.sh *)",
       "Bash(sh scripts/browser/crop.sh *)",
       "Bash(sh scripts/browser/styles.sh *)",

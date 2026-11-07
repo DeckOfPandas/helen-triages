@@ -335,6 +335,33 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         _report_empty_magic_bag(terminalreporter.write_line)
     except Exception:
         pass
+    try:
+        _report_stale_prices(terminalreporter.write_line)
+    except Exception:
+        pass
+
+
+# Said at the end once costs.yml's `checked:` is over two years old (#749). A
+# report and never a failure: the calendar alone must not turn `main` red,
+# because a red `main` stops every deploy. A `checked:` that is not a date
+# still fails, in test_the_price_check_date_is_a_date.
+PRICES_STALE_AFTER_DAYS = 730
+
+
+def _report_stale_prices(write, today=None):
+    import datetime
+
+    costs = yaml.safe_load((ROOT / "_data" / "cocktails" / "costs.yml")
+                           .read_text(encoding="utf-8")) or {}
+    checked = datetime.date.fromisoformat(str(costs.get("checked")))
+    age = ((today or datetime.date.today()) - checked).days
+    if age <= PRICES_STALE_AFTER_DAYS:
+        return
+    write("")
+    write("Not evidence about current prices:", bold=True)
+    write(f"  _data/cocktails/costs.yml was checked on {checked.isoformat()}, "
+          f"{age} days ago. Re-read the `high` rows (the file's header says how)")
+    write("  and move `checked:` forward.")
 
 
 # Said at the end when the magic bag is empty (#1201): the schema tests ran

@@ -14,9 +14,9 @@
 # first sentence in the ingest document.
 ice:
   none: >-
-    Served up, in an empty glass. 79 drinks, the commonest answer by a wide
-    margin — which is a true fact about what Helen makes, and the same fact
-    that killed the `up` mood for covering half the collection.
+    Served up, in an empty glass. The commonest answer by a wide margin, which
+    is a true fact about what Helen makes, and the reason there is no `up`
+    mood: it would cover half the collection.
   cubed: >-
     Ordinary cubes, an ice-filled glass. The drink is long or it is meant to
     keep diluting.
@@ -33,11 +33,10 @@ ice:
     `strong brown drink` the way `crushed` is — a big block is precisely how
     you serve one.
   block: >-
-    A large block, in a punch bowl or a pitcher. Five drinks, all punches.
-    Distinct from `large cube` because it is a different object and a different
+    A large block, in a punch bowl or a pitcher. The punches' ice. Distinct from `large cube` because it is a different object and a different
     amount of planning.
   blended: >-
-    The ice is IN the drink, not under it. The four frozen drinks. Reads as
+    The ice is IN the drink, not under it. The frozen drinks. Reads as
     "you need a blender", which is the constraint that matters when choosing —
     and it is why the value exists even though it PRINTS NOTHING (see below).
 

@@ -288,10 +288,6 @@ article.recipe .recipe-body-content .ct-methods {
   }
 }
 
-.ct-seealso {
-  margin-top: $spacing-section-gap;
-}
-
 // A method whose rate depends on doneness shows every level, stacked (#246).
 // Each figure must not break mid-span; the stacking is between levels, not
 // inside one.

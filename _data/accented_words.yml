@@ -1,5 +1,6 @@
-# Culinary words whose correct spelling carries an accent: unaccented form to
-# accented form. `tests/test_style.py` checks recipe prose against `words`;
+# Culinary and drinks words whose correct spelling carries an accent:
+# unaccented form to accented form. `tests/test_style.py` checks recipe prose,
+# and `test_drink_accents` drink prose, against `words`;
 # slugs, filenames and the `source:` field are not checked (URLs stay ASCII, and
 # a citation is spelled as the publication spells it).
 #
@@ -13,6 +14,7 @@ words:
   bearnaise: béarnaise
   bechamel: béchamel
   brulee: brûlée
+  cachaca: cachaça
   cafe: café
   canape: canapé
   canapes: canapés
@@ -25,6 +27,7 @@ words:
   crepe: crêpe
   crepes: crêpes
   crudites: crudités
+  curacao: curaçao
   eclair: éclair
   eclairs: éclairs
   entrecote: entrecôte
@@ -36,13 +39,16 @@ words:
   gougere: gougère
   gougeres: gougères
   gruyere: gruyère
+  jagermeister: jägermeister
   jalapeno: jalapeño
   jalapenos: jalapeños
   mariniere: marinière
+  mure: mûre
   nicoise: niçoise
   pate: pâté
   patisserie: pâtisserie
   patissiere: pâtissière
+  peche: pêche
   pina: piña
   puree: purée
   pureed: puréed

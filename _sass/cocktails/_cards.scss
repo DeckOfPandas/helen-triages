@@ -126,12 +126,11 @@ $card-glass-scale: 10.4rem;
 // so the mask must lift with the field or the verdict sits on a black rectangle
 // in a magenta card. That coupling is why it is in the mixin.
 
-// The name's magenta, for the name's own hover and the card's. #FF9BE8 is the
-// highlight copy: it has to be a step brighter than the fill it sits behind
-// (MANUAL §13.9), so it moves with the fill.
+// The name's magenta, for the name's own hover and the card's, with its
+// highlight copy a step brighter than the fill (MANUAL §13.9).
 @mixin drink-card-name-under-the-cursor {
   color: $color-wicked-woowoo;
-  text-shadow: -1px -1px 0 #FF9BE8,
+  text-shadow: -1px -1px 0 $color-wicked-woowoo-highlight,
                 1px  1px 0 rgba(5, 5, 5, 0.9);
 }
 
@@ -312,12 +311,12 @@ $card-name-step: 0.86;
   text-overflow: ellipsis;
   line-height: 1;
 
-  color: #ECE9EA;
+  color: $color-tape-letter;
   // Deliberately untiered (LETTERING §7). It reads the heading tier's stroke
   // colour and nothing else: the shadow below is this element's own pair, tuned
   // at card size, and `@include lettering(heading)` would replace it.
   -webkit-text-stroke: var(--emboss-stroke-w) var(--lettering-heading-stroke-c);
-  text-shadow: -1px -1px 0 #fdfbfe,
+  text-shadow: -1px -1px 0 $color-tape-highlight,
                 1px  1px 0 rgba(5, 5, 5, 0.9);
 
   // Capitals do not sit centred in their own line box. decorations.js
@@ -532,7 +531,7 @@ $card-tagline-top: 0.584rem;
   letter-spacing: 0;
   // A fallback only: every chip carries `--mood` or `--hassle`, which set the
   // real colour below.
-  color: #ffffff;
+  color: $color-white;
   border: 0;
   padding: 0;
   flex: none;

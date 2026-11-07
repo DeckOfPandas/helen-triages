@@ -219,9 +219,9 @@ article.recipe .recipe-body-content.about-page {
   text-transform: uppercase;
   line-height: 1;
   white-space: nowrap;
-  color: var(--wordmark-word-color, #ECE9EA);
+  color: var(--wordmark-word-color, #{$color-tape-letter});
   text-shadow: var(--wordmark-word-shadow,
-                   -1.0px -1.0px 0 #fdfbfe,
+                   -1.0px -1.0px 0 #{$color-tape-highlight},
                    -1.8px -1.8px 0 rgba(253, 251, 254, 0.75),
                     1.0px  1.0px 0 rgba(5, 5, 5, 0.90),
                     1.8px  1.8px 0 rgba(5, 5, 5, 0.45));
@@ -238,7 +238,7 @@ article.recipe .recipe-body-content.about-page {
 
 .not-found-door:hover,
 .not-found-door:focus-visible {
-  .not-found-word { color: #fff; }
+  .not-found-word { color: $color-white; }
   .not-found-arrow { transform: translateX(4px); }
 }
 

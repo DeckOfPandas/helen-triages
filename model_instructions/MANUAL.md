@@ -81,14 +81,19 @@ cannot reach.
 
 #### `scripts/verify.py`
 
-Runs five checks and exits non-zero if any fails: `pytest`, the JS suite
+Runs six checks and exits non-zero if any fails: `pytest`, the JS suite
 (`node --test` over a glob of `tests/js/*.test.js`, so a new test file cannot
 be left out), `scripts/derive_cocktail_moods.py` (did a vocabulary edit move
 a cocktail's moods?), `scripts/build_ingest_vocab.py --check` (do the standalone ingest
-documents still match the data they are rendered from?) and
+documents still match the data they are rendered from?),
 `scripts/check_slug_keys.py` (does every slug-keyed entry in the public
-cocktail taxonomy name a cocktail?). The last three are the ones a session
-forgets when it runs the two suites by hand.
+cocktail taxonomy name a cocktail?) and `scripts/check_glass_regen.py` (would
+regenerating the glass icons change a shipped one? §9.15). The last four are
+the ones a session forgets when it runs the two suites by hand.
+
+pytest's line is its pass and skip count, and conftest's "Not evidence about
+…" blocks print beneath it, so a bare worktree's green run says what it did
+not check in the same place it says it passed.
 
 **A check may say `SKIP`, which is neither a pass nor a failure.**
 `check_slug_keys.py` is the one that does. `mood_include` / `mood_exclude`
@@ -161,6 +166,7 @@ see the base image or an apt package moving upstream; that wants
 | `sh scripts/browser/styles.sh <path> <selector> [width] [prop,prop,...]` | prints each matching element's box and computed styles |
 | `sh scripts/browser/gaps.sh <path> [width] [root-selector]` | walks the visible block-level descendants of `main` (or another root), printing each one's height, margins, padding and the gap to the sibling before it |
 | `python3 scripts/browser/inkbox.py <png> [gap]` | prints each band of ink in a crop with its vertical extent and centre |
+| `sh scripts/browser/capture.sh` | the whole design-review set (#1453): every page type and state of both sites at phone, iPad and desktop, into `tmp/shots/capture/` with a manifest, `index.md`; a state that fails is a FAILED row there, and the run carries on |
 
 Read the PNGs with the Read tool. Traps:
 
@@ -3623,8 +3629,8 @@ python3 scripts/build_glass_candidates.py
 ```
 
 The first normalises every source in memory and diffs against the published
-set without deleting anything. The second rebuilds the drawer on
-`/dev/glasses/` (§9.16).
+set without deleting anything; `scripts/verify.py` runs it too. The second
+rebuilds the drawer on `/dev/glasses/` (§9.16).
 
 ### 9.16 The candidate drawer — `/dev/glasses/` sections 5 and 6
 

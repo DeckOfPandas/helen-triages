@@ -1746,10 +1746,11 @@ def test_the_exclude_hover_is_actually_darker_than_the_state_it_replaces(site):
         )
         return match.group(1).strip()
 
-    resting = colour_of(r"\.btn-exclude--word-match \{[^}]*?color: ([^;]+);",
+    # Whitespace-free as well as expanded: _config.yml compresses the CSS.
+    resting = colour_of(r"\.btn-exclude--word-match\s*\{[^}]*?(?<![-\w])color:\s*([^;}]+)",
                         "the resting colour of a matched LEAVE OUT candidate")
     hover = colour_of(
-        r"\.btn-exclude:not\(\.btn-exclude--active\):hover[^{]*\{[^}]*?color: ([^;]+);",
+        r"\.btn-exclude:not\(\.btn-exclude--active\):hover[^{]*\{[^}]*?(?<![-\w])color:\s*([^;}]+)",
         "the hover colour of a LEAVE OUT pool candidate")
 
     assert _luminance(hover) < _luminance(resting), (

@@ -192,28 +192,6 @@
 }
 
 // ============================================================================
-// CATEGORY LABEL DOODLES
-// ============================================================================
-// Hand-drawn marks beside the filter labels: left and right spans hold an
-// inline SVG, the text span holds the label.
-.category-label-doodle--left,
-.category-label-doodle--right {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-
-  svg {
-    display: block;
-    width: auto;
-    height: 32px;   // matches recipe page doodle height
-  }
-}
-
-.category-label-doodle--text {
-  display: inline;
-}
-
-// ============================================================================
 // THE BLOCKY RULE ON THE INDEX
 // ============================================================================
 // The same mark as the recipe page (shared/_rule.scss, MANUAL §13.1), on the

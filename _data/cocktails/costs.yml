@@ -365,8 +365,8 @@ bottles:
     gbp: 28
     confidence: high
   # Both Pierre Ferrands are Helen's figure (#745), 70cl assumed. Only the
-  # Ambré is a `default_bottles` input.
-  "Pierre Ferrand Ambré":
+  # Ambre is a `default_bottles` input.
+  "Pierre Ferrand Ambre":
     size_ml: 700
     gbp: 53
     confidence: high
@@ -781,7 +781,7 @@ default_bottles:
   blanco tequila: ["Rooster Rojo Bianco", "Patrón Silver"]
 
   # Pierre Ferrand 1840 is declared and is not a pricing input.
-  cognac: ["Courvoisier", "Pierre Ferrand Ambré"]
+  cognac: ["Courvoisier", "Pierre Ferrand Ambre"]
 
   # The other bottles under this generic stay declared and are not inputs.
   lightly aged and filtered rum: ["Havana Club 3 year old", "El Dorado 3 Year Old"]

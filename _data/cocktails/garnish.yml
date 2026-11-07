@@ -129,8 +129,6 @@ canonical:
     # Maker's choice, one string: the cranberries are spiked on the sprig.
     - "rosemary sprig with dried cranberries, or orange slice"
     - "pineapple frond"
-    - "kaffir lime leaves"
-    - "cucumber wheels"
     - "edible violet"
     - "edible orchid"
     # The Grasshopper wears this with a mint sprig and grated nutmeg, all
@@ -140,7 +138,7 @@ canonical:
     # A floated garnish carries `(floated)` as a tail, as `(discarded)` does on
     # a twist: the head stays the thing.
     - "basil leaf (floated)"
-    # Not `cucumber wheels` above, which sit on the rim of a long drink.
+    # Floated on the drink; a cucumber wheel on the rim would be its own entry.
     - "thin cucumber slice (floated)"
     # Named to match `length of lime peel`; never expressed.
     - "length of cucumber peel"
@@ -189,8 +187,6 @@ proposals: {}
 no_article:
   - grapefruit crescents
   - raspberries
-  - kaffir lime leaves
-  - cucumber wheels
   - grated nutmeg
   - grated chocolate
   - whipped cream                       # a mass noun

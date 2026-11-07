@@ -12,7 +12,7 @@ ingredients:
     generic: "lightly aged and filtered rum"
   - amount: "22.5 ml"
     generic: "cognac"
-    suggestion: ["Pierre Ferrand Ambré"]
+    suggestion: ["Pierre Ferrand Ambre"]
   - amount: "22.5 ml"
     generic: "triple sec"
     suggestion: ["Cointreau"]

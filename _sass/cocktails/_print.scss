@@ -53,8 +53,8 @@
   // if a hue moves (`scripts/palette_measure.py --contrast <fg> <bg>`).
   //
   // The name tape is untouched: it paints its own black band (MANUAL §9.13).
-  $print-ink:        #211f20;  // = food's $color-text
-  $print-ink-quiet:  #4f4e4a;  // = food's $color-clear-text
+  $print-ink:        $color-print-ink;
+  $print-ink-quiet:  $color-print-ink-quiet;
   $print-mood:        lightness.shift($color-banging-bellini, -22%);
   $print-hassle:      lightness.shift($color-charismatic-cosmopolitan, -20%);
   $print-ship:        lightness.shift($color-raucous-reposado, -18%);

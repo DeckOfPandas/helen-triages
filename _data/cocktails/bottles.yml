@@ -391,7 +391,7 @@ bottles:
   "Courvoisier":
     generic: "cognac"
     aliases: []
-  # A different bottle from the Ambré below (#745); each keeps its own
+  # A different bottle from the Ambre below (#745); each keeps its own
   # spellings.
   "Pierre Ferrand 1840":
     generic: "cognac"
@@ -401,10 +401,11 @@ bottles:
   "Massenez Kirsch Vieux":
     generic: "eau de vie"
     aliases: ["Massenez Kirsch Vieux cherry brandy", "Massenez Kirsch"]
-  # Canonical without the word "Cognac"; the accent is part of the name.
-  "Pierre Ferrand Ambré":
+  # Canonical without the word "Cognac", and without an accent: the label
+  # says Ambre, unlike the rhums' Ambré.
+  "Pierre Ferrand Ambre":
     generic: "cognac"
-    aliases: ["Pierre Ferrand Ambre", "Pierre Ferrand ambre",
+    aliases: ["Pierre Ferrand Ambré", "Pierre Ferrand ambre",
               "Pièrre Ferrand Ambre", "Pièrre Ferrand Ambre cognac",
               "Pierre Ferrand Cognac Ambré", "Pierre Ferrand Cognac Ambre"]
   "Avallen":

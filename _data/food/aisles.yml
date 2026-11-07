@@ -46,8 +46,9 @@ never:
   - ice
 
 # The keywords. Each aisle's list is alphabetical so a keyword can be found by
-# eye; an entry is needed only where a shorter entry elsewhere would otherwise
-# claim it.
+# eye, and any group that needs a comment follows it, alphabetical under that
+# comment. An entry is needed only where a shorter entry elsewhere would
+# otherwise claim it.
 keywords:
 
   # --- produce -----------------------------------------------------------
@@ -67,6 +68,7 @@ keywords:
     - bay leaves
     - beansprouts
     - beetroot
+    - bell pepper
     - blackberries
     - blueberries
     - bok choi
@@ -104,12 +106,6 @@ keywords:
     - fresh ginger
     - galangal
     - garlic
-    # `cloves` is the spice and also the unit garlic is counted in, and the two
-    # words are the same length, so "garlic cloves" is spelled out or the
-    # tie-break sends it to the spice rack. "whole cloves" stays the spice.
-    - garlic cloves
-    - cloves garlic
-    - cloves of garlic
     - ginger
     - grapefruit
     - green beans
@@ -121,12 +117,12 @@ keywords:
     - leeks
     - lemon
     - lemon juice
+    - lemongrass
     - lemons
     - lettuce
     - lime
     - lime leaves
     - limes
-    - lemongrass
     - mint
     - mushrooms
     - nectarines
@@ -144,16 +140,15 @@ keywords:
     - pears
     - peas
     - peppers
-    - potato
-    - raspberries
-    - red pepper
-    - bell pepper
     - pineapple
     - plum
     - plums
     - pomegranate
+    - potato
     - potatoes
     - radishes
+    - raspberries
+    - red pepper
     - redcurrants
     - rhubarb
     - rocket
@@ -174,10 +169,16 @@ keywords:
     - tomatoes
     - turnips
     - watercress
+    - watermelon
+    # `cloves` is the spice and also the unit garlic is counted in, and the two
+    # words are the same length, so "garlic cloves" is spelled out or the
+    # tie-break sends it to the spice rack. "whole cloves" stays the spice.
+    - cloves garlic
+    - cloves of garlic
+    - garlic cloves
     # `french beans` are the fresh ones; `butter beans` and `white beans` are
     # tins and live in the cupboard, which the longer keyword settles.
     - french beans
-    - watermelon
 
   # --- meat --------------------------------------------------------------
   # Everything from the butcher's counter, plus the cured things beside it.
@@ -197,8 +198,8 @@ keywords:
     - ham
     - lamb
     - mince
-    - mutton
     - muntjac
+    - mutton
     - oxtail
     - pancetta
     - parma ham
@@ -467,8 +468,8 @@ keywords:
     - teriyaki sauce
     - tinned tomatoes
     - tomato paste
-    - tomato purée
     - tomato puree
+    - tomato purée
     - treacle
     - vanilla bean paste
     - vanilla essence
@@ -484,27 +485,27 @@ keywords:
     - wine vinegar
     - worcestershire sauce
     - xanthan gum
+    - yakitori sauce
+    - yeast
     # A paste or a purée is a jar, whatever it is a paste OF. Each is longer
     # than the produce word it overrides, so `garlic` stays produce.
+    - chilli paste
     - curry paste
     - garlic paste
-    - garlic purée
     - garlic puree
+    - garlic purée
     - ginger paste
     - lemongrass paste
     - miso paste
-    - chilli paste
     # `... stock` is always a tub or a cube. Longer than every meat and
     # vegetable that can precede it, including the one written as a choice.
     - beef stock
     - chicken stock
     - fish stock
-    - vegetable stock
-    - venison stock
     - stock cube
     - stock cubes
-    - yakitori sauce
-    - yeast
+    - vegetable stock
+    - venison stock
 
   # --- spices & seasonings -----------------------------------------------
   # The rack, plus salt and pepper. A DRIED herb belongs here and a fresh one
@@ -513,6 +514,7 @@ keywords:
   spices:
     - ajwain
     - allspice
+    - black pepper
     - bouquet garni
     - caraway seeds
     - cardamom
@@ -539,6 +541,7 @@ keywords:
     - flavouring
     - flavourings
     - garam masala
+    - ground black pepper
     - ground cinnamon
     - ground coriander
     - ground cumin
@@ -556,11 +559,6 @@ keywords:
     - oregano
     - paprika
     - pepper
-    - black pepper
-    - shichimi
-    - sichuan pepper
-    - white pepper
-    - ground black pepper
     - pepper flakes
     - peppercorns
     - saffron
@@ -568,11 +566,14 @@ keywords:
     - sea salt
     - seasoning
     - seasonings
+    - shichimi
+    - sichuan pepper
     - smoked paprika
     - star anise
     - sumac
     - turmeric
     - vanilla powder
+    - white pepper
     - za'atar
 
   # --- drinks ------------------------------------------------------------
