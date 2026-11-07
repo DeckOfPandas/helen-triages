@@ -675,6 +675,7 @@ argument and the rules each field is read by.
 - 2026-09-10 · §11 · a Bash command the permission checker cannot analyse is refused by guard-unanalyzable-bash.py, not put to Helen.
 - 2026-09-10 · §11 · the gh wrapper is allow-listed per subcommand, never as gh-agent.sh *, and pr merge and pr review are in the deny list.
 - 2026-09-10 · §11 · pushing runs as a separate agent account over HTTPS through wrappers; the token is never in a URL and the credential helper never in git config.
+- 2026-11-07 · §11 · #1438 · the kit, DeckOfPandas/helen-contains-claude-webdev, is a fourth repo: read it and open PRs there, never merge, never push to its main.
 - 2026-09-11 · §11 · every PR's base is main, never another PR's branch; and a PR's state is read before pushing to any branch not checked since you last looked, your own included.
 - 2026-09-11 · §11 · a routine call gets a committed wrapper under an exact or argument-checked allow rule, never <tool> *.
 - 2026-09-11 · §11 · a script in tmp/ keeps asking Helen; no allow rule covers tmp/.

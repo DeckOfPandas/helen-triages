@@ -12,29 +12,29 @@
 #   sh scripts/git-push-agent.sh :my-branch
 #
 # The last form deletes the remote branch. `repo` defaults to helen-triages;
-# the other two are helen-triages-food-private and
-# helen-triages-cocktails-private. `dir` is the checkout to push FROM (a nested
-# drafts clone) and defaults to the current directory. Nothing checks that
-# `repo` and `dir` match: pushing from a drafts clone, give both, or a drafts
+# the others are helen-triages-food-private, helen-triages-cocktails-private
+# and the kit, helen-contains-claude-webdev. `dir` is the checkout to push
+# FROM (a nested clone) and defaults to the current directory. Nothing checks
+# that `repo` and `dir` match: pushing from a nested clone, give both, or its
 # branch lands in the public repo.
 #
-# ALLOWED, with no ask, in all three repos: pushing a branch. Pushing is not
+# ALLOWED, with no ask, in all four repos: pushing a branch. Pushing is not
 # merging. A private drafts repo's `main` may be pushed to as well, for a small
 # set of changes; a bigger footprint is a PR (DECISIONS §9.1).
 #
 # REFUSES, because the allow rule in .claude/settings.json runs whatever this
 # accepts:
-#   * a destination of `main` on helen-triages, however it is spelled:
+#   * a destination of `main` on helen-triages or the kit, however it is spelled:
 #     `x:main`, `+x:main`, `x:refs/heads/main`, `x:heads/main` or `:main`
 #     (which deletes it). Git resolves every one of those to the same branch,
 #     so any destination that is `main` or ends in `/main` is refused. That
 #     push moves the public `main`, which deploys, without a PR, and
 #     guard-main-branch.py cannot see it: a push from a feature branch stands
-#     on the feature branch.
+#     on the feature branch. The kit's `main` only moves by a PR Helen merges.
 #   * a refspec without a colon, since a bare name or `HEAD` pushes to whatever
 #     the current branch is called; and one starting `-`, which git reads as
 #     an option.
-#   * a repo other than the three, and a `dir` that is absolute, contains `..`
+#   * a repo other than the four, and a `dir` that is absolute, contains `..`
 #     or starts `-`.
 #
 # HOW IT AUTHENTICATES. A plain URL, with
@@ -66,20 +66,23 @@ case "$refspec" in
   *) refuse "give the refspec as <branch>:<branch>, never a bare name or HEAD" ;;
 esac
 case "$repo" in
-  helen-triages | helen-triages-food-private | helen-triages-cocktails-private) ;;
-  *) refuse "'$repo' is not one of the three repos" ;;
+  helen-triages | helen-triages-food-private | helen-triages-cocktails-private | \
+  helen-contains-claude-webdev) ;;
+  *) refuse "'$repo' is not one of the four repos" ;;
 esac
 case "$dir" in
   /* | *..* | -*) refuse "'$dir' is outside this checkout" ;;
 esac
 
 destination="${refspec##*:}"
-if [ "$repo" = helen-triages ]; then
-  case "$destination" in
-    main | */main)
-      refuse "that pushes to helen-triages' main, which deploys. main only moves by a PR Helen merges" ;;
-  esac
-fi
+case "$repo" in
+  helen-triages | helen-contains-claude-webdev)
+    case "$destination" in
+      main | */main)
+        refuse "that pushes to $repo's main. main only moves by a PR Helen merges" ;;
+    esac
+    ;;
+esac
 
 here="$(cd "$(dirname "$0")" && pwd)"
 

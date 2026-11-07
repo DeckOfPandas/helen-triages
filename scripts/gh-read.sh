@@ -1,6 +1,6 @@
 #!/bin/sh
-# Read the GitHub REST API as DeckOfPandas-agentic-claude: GET only, the three
-# repos only. It cannot write, which is why `.claude/settings.json` can allow
+# Read the GitHub REST API as DeckOfPandas-agentic-claude: GET only, the four
+# repos only (the three, and the kit: DECISIONS §11). It cannot write, which is why `.claude/settings.json` can allow
 # `sh scripts/gh-read.sh *`; `gh-agent.sh api` cannot be allow-listed, because
 # `api` is also the door to every write the token can make, a merge included.
 # DECISIONS §11.
@@ -20,7 +20,7 @@
 #   * any other argument. `-X`, `--method`, `--input`, `-H` and `--hostname`
 #     change the method, the body or the host, and `-f`/`-F` each switch gh to
 #     POST on their own.
-#   * an endpoint not under `repos/DeckOfPandas/<one of the three>`, or
+#   * an endpoint not under `repos/DeckOfPandas/<one of the four>`, or
 #     containing `..`: the token never acts on another repository.
 #   * a jq expression, or a field list, containing `env` in any case: gh's jq
 #     can read the process environment, where gh-agent.sh puts the token.
@@ -78,8 +78,9 @@ case "$endpoint" in
   repos/DeckOfPandas/helen-triages | repos/DeckOfPandas/helen-triages/* | \
   repos/DeckOfPandas/helen-triages\?* | \
   repos/DeckOfPandas/helen-triages-food-private | repos/DeckOfPandas/helen-triages-food-private/* | \
-  repos/DeckOfPandas/helen-triages-cocktails-private | repos/DeckOfPandas/helen-triages-cocktails-private/*) ;;
-  *) refuse "'$endpoint' is not under repos/DeckOfPandas/ and one of the three repos (CLAUDE.md: never act on any other repository)" ;;
+  repos/DeckOfPandas/helen-triages-cocktails-private | repos/DeckOfPandas/helen-triages-cocktails-private/* | \
+  repos/DeckOfPandas/helen-contains-claude-webdev | repos/DeckOfPandas/helen-contains-claude-webdev/*) ;;
+  *) refuse "'$endpoint' is not under repos/DeckOfPandas/ and one of the four repos (CLAUDE.md: never act on any other repository)" ;;
 esac
 
 jq=""

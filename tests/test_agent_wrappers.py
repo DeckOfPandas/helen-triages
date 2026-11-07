@@ -83,6 +83,8 @@ COMMENTS = "repos/DeckOfPandas/helen-triages/issues/944/comments"
     ["repos/someone-else/helen-triages/issues"],
     ["repos/DeckOfPandas/helen-triages-lookalike/issues"],
     ["repos/DeckOfPandas/helen-triages/../some-other-repo/issues"],
+    ["repos/DeckOfPandas/helen-contains-claude-webdev-lookalike/pulls"],
+    ["repos/someone-else/helen-contains-claude-webdev/pulls"],
     ["/repos/DeckOfPandas/helen-triages/issues"],
     ["-X"],
     [],
@@ -105,6 +107,9 @@ def test_gh_read_refuses_anything_but_a_read_of_the_three_repos(args):
      ["repos/DeckOfPandas/helen-triages-cocktails-private/pulls"]),
     (["repos/DeckOfPandas/helen-triages/environments"],
      ["repos/DeckOfPandas/helen-triages/environments"]),
+    # The kit: Helen's standing grant to read it (DECISIONS §11).
+    (["repos/DeckOfPandas/helen-contains-claude-webdev/contents/kit/manifest"],
+     ["repos/DeckOfPandas/helen-contains-claude-webdev/contents/kit/manifest"]),
 ])
 def test_gh_read_passes_a_read_through_as_an_explicit_get(args, tail):
     lines = _accepted_lines("gh-read.sh", args)
@@ -495,6 +500,11 @@ def test_a_cwd_that_is_not_a_repository_is_skipped_rather_than_reported(tmp_path
     ["feature:x:main"],
     [":main"],
     [":heads/main"],
+    # The kit's main moves only by a PR Helen merges (DECISIONS §11).
+    ["feature:main", "helen-contains-claude-webdev", "_kit_upstream"],
+    ["feature:refs/heads/main", "helen-contains-claude-webdev", "_kit_upstream"],
+    [":main", "helen-contains-claude-webdev", "_kit_upstream"],
+    ["feature:feature", "helen-contains-claude-webdev-lookalike"],
     ["HEAD"],
     ["feature"],
     ["--force"],
@@ -516,6 +526,8 @@ def test_git_push_agent_refuses_the_public_main_and_anything_ambiguous(args):
     # A small change may go straight to a private repo's `main` (DECISIONS §9.1).
     (["content/x:main", "helen-triages-cocktails-private", "_cocktail_drafts"],
      "helen-triages-cocktails-private", "_cocktail_drafts", "content/x:main"),
+    (["feature:feature", "helen-contains-claude-webdev", "_kit_upstream"],
+     "helen-contains-claude-webdev", "_kit_upstream", "feature:feature"),
 ])
 def test_git_push_agent_pushes_a_branch_over_a_plain_url(args, repo, directory, refspec):
     lines = _accepted_lines("git-push-agent.sh", args)
@@ -551,6 +563,7 @@ def test_git_fetch_agent_refuses_outside_the_checkout_and_the_three_repos(args):
     (["_food_drafts", "helen-triages-food-private", "content/some-branch"],
      "content/some-branch"),
     (["_food_drafts", "helen-triages-food-private", "main", "--keep-head"], "main"),
+    (["_kit_upstream", "helen-contains-claude-webdev"], "main"),
 ])
 def test_git_fetch_agent_fetches_one_branch(args, ref):
     lines = _accepted_lines("git-fetch-agent.sh", args)
@@ -666,6 +679,7 @@ def test_git_drafts_commits_from_a_message_file_under_tmp():
 @pytest.mark.parametrize("args", [
     [],
     ["some-other-repo"],
+    ["helen-contains-claude-webdev-lookalike"],
     ["helen-triages-food-private", "_food_drafts", "--template=tmp/hooks"],
     ["helen-triages-food-private", "--template=tmp/hooks"],
     ["helen-triages-food-private", "/etc/elsewhere"],
@@ -678,8 +692,9 @@ def test_git_clone_agent_refuses_extra_options_and_outside_folders(args):
 @pytest.mark.parametrize("args", [
     ["helen-triages-food-private", "_food_drafts"],
     ["helen-triages-cocktails-private"],
+    ["helen-contains-claude-webdev", "_kit_upstream"],
 ])
-def test_git_clone_agent_clones_one_of_the_three(args):
+def test_git_clone_agent_clones_one_of_the_four(args):
     lines = _accepted_lines("git-clone-agent.sh", args)
     url = f"https://github.com/DeckOfPandas/{args[0]}.git"
     assert url in lines
@@ -723,6 +738,11 @@ def body_file():
     ["pr-create", "some-other-repo", "feature", "t", BODY],
     ["comment", "DeckOfPandas/helen-triages", "1", BODY],
     ["comment", "helen-triages-lookalike", "1", BODY],
+    ["pr-create", "helen-contains-claude-webdev-lookalike", "feature", "t", BODY],
+    # the kit: PRs only, so no comment and no label (DECISIONS §11)
+    ["comment", "helen-contains-claude-webdev", "1", BODY],
+    ["issue-label", "helen-contains-claude-webdev", "1", "bug"],
+    ["pr-create", "helen-contains-claude-webdev", "main", "t", BODY],
     # bodies from anywhere but a plain file under tmp/
     ["comment", "helen-triages", "1", "/etc/passwd"],
     ["comment", "helen-triages", "1", "tmp/../CLAUDE.md"],
@@ -780,6 +800,16 @@ def test_gh_write_opens_a_pr_onto_main(body_file):
     assert "base=main" in lines and "head=data/x" in lines
     assert "title=(data) a title" in lines
     assert f"body=@{BODY}" in lines
+
+
+def test_gh_write_opens_and_edits_a_pr_on_the_kit(body_file):
+    lines = _gh_write_lines(
+        ["pr-create", "helen-contains-claude-webdev", "upstream/x", "a title", BODY])
+    assert lines[3] == "repos/DeckOfPandas/helen-contains-claude-webdev/pulls"
+    assert "base=main" in lines and "head=upstream/x" in lines
+    lines = _gh_write_lines(["pr-body", "helen-contains-claude-webdev", "12", BODY])
+    assert lines[:4] == ["api", "--method", "PATCH",
+                         "repos/DeckOfPandas/helen-contains-claude-webdev/pulls/12"]
 
 
 def test_gh_write_replaces_a_pr_body_and_nothing_else(body_file):

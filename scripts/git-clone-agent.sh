@@ -1,21 +1,22 @@
 #!/bin/sh
-# Clone one of the three repos as DeckOfPandas-agentic-claude over HTTPS,
+# Clone one of the four repos as DeckOfPandas-agentic-claude over HTTPS,
 # without naming the credential and without the credential ever being in the
 # URL git stores. SSH fails in the devcontainer for want of a host key.
-# MANUAL §9.1.
+# MANUAL §9.1; the kit repo, DECISIONS §11.
 #
 # USAGE:
 #   sh scripts/git-clone-agent.sh <repo> [dir]
 #
 #   sh scripts/git-clone-agent.sh helen-triages-cocktails-private _cocktail_drafts
 #   sh scripts/git-clone-agent.sh helen-triages-food-private _food_drafts
+#   sh scripts/git-clone-agent.sh helen-contains-claude-webdev _kit_upstream
 #
-# `dir` defaults to git's own choice (the repo name). Both drafts folders are
-# gitignored in the public repo, so a clone there is invisible to it.
+# `dir` defaults to git's own choice (the repo name). The drafts folders and
+# _kit_upstream are gitignored here, so a clone there is invisible to it.
 #
 # Cloning is reading: nothing here writes to a remote.
 #
-# REFUSES anything but a repo from the three and an optional `dir` that is
+# REFUSES anything but a repo from the four and an optional `dir` that is
 # relative, has no `..` and does not start `-`. `git clone` takes
 # `--template=<dir>`, whose hooks then run, and `-c <anything>`, so passing
 # further arguments through would let the allow rule run any program.
@@ -43,8 +44,9 @@ repo="$1"
 shift
 
 case "$repo" in
-  helen-triages | helen-triages-food-private | helen-triages-cocktails-private) ;;
-  *) refuse "'$repo' is not one of the three repos" ;;
+  helen-triages | helen-triages-food-private | helen-triages-cocktails-private | \
+  helen-contains-claude-webdev) ;;
+  *) refuse "'$repo' is not one of the four repos" ;;
 esac
 if [ "$#" -eq 1 ]; then
   case "$1" in

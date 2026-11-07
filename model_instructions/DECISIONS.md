@@ -4447,6 +4447,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   every other worktree: `/workspace/.git/config` is shared by all of them and
   the script existed on one branch. So each wrapper passes it per invocation.
   Commits stay authored as Helen.
+- **2026-11-07, #1438 — the kit, `DeckOfPandas/helen-contains-claude-webdev`,
+  is a fourth repo: read it and open PRs there, never merge, never push to
+  its `main`.** Helen: *"My permissions, for good: you may read
+  DeckOfPandas/helen-contains-claude-webdev and open PRs there. Never merge,
+  and never push to its main."* Granted so this repo can take the kit's sync
+  and send its own improvements upstream. The wrappers carry it:
+  clone, fetch, push and `gh-read.sh` take the kit; `git-push-agent.sh`
+  refuses its `main` as it does ours; `gh-write.sh` gives it `pr-create` and
+  `pr-body` only, since commenting and labelling there were not granted.
 - **2026-09-11 — every PR's base is `main`, never another PR's branch; and a
   PR's `state` is read before pushing to any branch not checked since you last
   looked, your own included.** Two PRs missed the live site in one afternoon.

@@ -22,6 +22,9 @@ _food_drafts/
 _food_drafts
 _cocktail_drafts/
 _cocktail_drafts
+# A read-only clone of the kit repo, for comparing and for kit PRs (#1438).
+_kit_upstream/
+_kit_upstream
 
 # Individual pages held back the same way as the collections above — not
 # ready for a public repo, regardless of what Jekyll would or wouldn't build.

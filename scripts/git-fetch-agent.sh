@@ -1,5 +1,5 @@
 #!/bin/sh
-# Bring a drafts clone up to date as DeckOfPandas-agentic-claude, without
+# Bring a drafts or kit clone up to date as DeckOfPandas-agentic-claude, without
 # naming the credential, without the credential ever being in a URL, and
 # without standing on `main`. Fetch immediately before any run whose result you
 # will act on: a clone is stale the moment anyone merges. MANUAL §9.1.
@@ -22,7 +22,7 @@
 #
 # REFUSES, because the allow rule in .claude/settings.json runs whatever this
 # accepts: a `dir` that is absolute, contains `..` or starts `-` (it would
-# fetch into, and detach, another repo on the disk); a repo outside the three;
+# fetch into, and detach, another repo on the disk); a repo outside the four;
 # a `ref` starting `-` or containing `..`, `:` or a space (an option, or a
 # second refspec); a fourth argument other than `--keep-head`.
 #
@@ -52,8 +52,9 @@ case "$dir" in
   /* | *..* | -*) refuse "'$dir' is outside this checkout" ;;
 esac
 case "$repo" in
-  helen-triages | helen-triages-food-private | helen-triages-cocktails-private) ;;
-  *) refuse "'$repo' is not one of the three repos" ;;
+  helen-triages | helen-triages-food-private | helen-triages-cocktails-private | \
+  helen-contains-claude-webdev) ;;
+  *) refuse "'$repo' is not one of the four repos" ;;
 esac
 case "$ref" in
   -* | *..* | *:* | *" "*) refuse "'$ref' is not a branch name" ;;

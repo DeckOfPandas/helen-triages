@@ -14,7 +14,9 @@
 #   sh scripts/gh-write.sh issue-label <repo> <number> "<label>"
 #
 # <repo> is one of the three, bare: helen-triages, helen-triages-food-private,
-# helen-triages-cocktails-private. A PR's base is always main, and its head is
+# helen-triages-cocktails-private. The kit, helen-contains-claude-webdev, takes
+# pr-create and pr-body only: Helen's grant there is to read and open PRs
+# (DECISIONS §11). A PR's base is always main, and its head is
 # never main. `comment` and `issue-label` take an issue or a PR number: GitHub
 # files both under issues/. `issue-label` adds one label that already exists
 # on the repo and removes none; GitHub would otherwise create a new label.
@@ -50,6 +52,13 @@ check_repo() {
   case "$1" in
     helen-triages | helen-triages-food-private | helen-triages-cocktails-private) ;;
     *) refuse "'$1' is not one of the three repos (CLAUDE.md: never act on any other repository)" ;;
+  esac
+}
+
+check_pr_repo() {
+  case "$1" in
+    helen-contains-claude-webdev) ;;
+    *) check_repo "$1" ;;
   esac
 }
 
@@ -108,7 +117,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 case "$action" in
   pr-create)
     [ "$#" -eq 4 ] || refuse "$usage"
-    check_repo "$1"
+    check_pr_repo "$1"
     check_branch "$2"
     [ -n "$3" ] || refuse "a PR needs a title"
     check_body "$4"
@@ -118,7 +127,7 @@ case "$action" in
     ;;
   pr-body)
     [ "$#" -eq 3 ] || refuse "$usage"
-    check_repo "$1"
+    check_pr_repo "$1"
     check_number "$2"
     check_body "$3"
     set -- sh "$here/gh-agent.sh" api --method PATCH "repos/DeckOfPandas/$1/pulls/$2" \
