@@ -583,6 +583,8 @@ def test_git_fetch_agent_fetches_one_branch(args, ref):
     ["../elsewhere", "status"],
     ["_food_recipes", "status"],
     ["_food_drafts/../..", "status"],
+    ["_kit_upstream/..", "status"],
+    ["tmp/kit", "status"],
     # Verbs that discard work, talk to a remote, or change configuration.
     ["_food_drafts", "reset", "--hard"],
     ["_food_drafts", "restore", "."],
@@ -645,6 +647,8 @@ def test_git_drafts_refuses_everything_off_its_list(args):
     ["_food_drafts", "show", "--stat", "HEAD~1"],
     ["_food_drafts", "add", "--", "."],
     ["_food_drafts", "add", "--", "age-dashi.md", "4-promote/x.md"],
+    ["_kit_upstream", "status", "--short"],
+    ["_kit_upstream", "checkout", "-b", "upstream/helen-triages-improvements"],
 ])
 def test_git_drafts_runs_its_list_inside_the_named_clone(args):
     lines = _accepted_lines("git-drafts.sh", args)

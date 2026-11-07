@@ -1,6 +1,7 @@
 #!/bin/sh
 # Run a short, fixed list of git commands INSIDE one of the two nested drafts
-# repos, without a `cd` and without a `git -C` at the call site:
+# repos, or the kit's working clone `_kit_upstream` (DECISIONS §11), without a
+# `cd` and without a `git -C` at the call site:
 # guard-unanalyzable-bash.py refuses both, and a tmp/ script asks Helen on
 # every call. DECISIONS §11.
 #
@@ -17,7 +18,8 @@
 # What it accepts is a list, not a pattern, because an allow rule covers it and
 # whatever it accepts runs without asking Helen:
 #
-#   dir       `_food_drafts` or `_cocktail_drafts`, spelled exactly.
+#   dir       `_food_drafts`, `_cocktail_drafts` or `_kit_upstream`, spelled
+#             exactly.
 #   status    --short, --porcelain, --branch.
 #   diff      --stat, --shortstat, --name-only, --name-status, --cached, then
 #             plain refs and paths. NOT `--output=` (writes a file anywhere),
@@ -66,8 +68,8 @@ verb="$2"
 shift 2
 
 case "$dir" in
-  _food_drafts | _cocktail_drafts) ;;
-  *) refuse "'$dir' is not one of the two drafts folders" ;;
+  _food_drafts | _cocktail_drafts | _kit_upstream) ;;
+  *) refuse "'$dir' is not one of the two drafts folders or _kit_upstream" ;;
 esac
 
 # options_or_plain <allowed options, space separated> <args...>
