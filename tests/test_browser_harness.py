@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import pathlib
 import re
+import shutil
 import subprocess
 
 import pytest
@@ -59,7 +60,12 @@ def test_the_page_wrappers_measure_with_the_kits_tools(script):
     ["shoot.sh"],
     ["shoot.sh", "x", "food/"],
 ])
-def test_the_wrappers_refuse_bad_arguments_before_needing_a_browser(args):
-    done = subprocess.run(["sh", f"scripts/browser/{args[0]}", *args[1:]], cwd=ROOT,
+def test_the_wrappers_refuse_bad_arguments_before_needing_a_browser(tmp_path, args):
+    """Run from a copy whose env.sh fails as it does with no Playwright (CI),
+    so a refusal that comes after it fails here as well as there."""
+    shutil.copytree(BROWSER, tmp_path / "scripts" / "browser")
+    (tmp_path / "scripts" / "browser" / "env.sh").write_text(
+        'echo "no Playwright (test stub)" >&2\nexit 1\n')
+    done = subprocess.run(["sh", f"scripts/browser/{args[0]}", *args[1:]], cwd=tmp_path,
                           capture_output=True, text=True, timeout=30)
     assert done.returncode == 2, (args, done.stderr)

@@ -12,12 +12,14 @@ set -eu
 WRAPPER=crop.sh
 [ "$#" -ge 3 ] && [ "$#" -le 6 ] \
   || { echo "usage: sh scripts/browser/crop.sh <path> <selector> <name> [width] [type-into-selector] [text]" >&2; exit 2; }
+# Every argument check comes before _site.sh, which stops where there is no
+# Playwright (CI): a refusal must not depend on a browser being installed.
+[ "$#" -ne 5 ] || { echo "crop.sh: refused -- a type-into selector needs its text" >&2; exit 2; }
 . scripts/browser/_site.sh
 selector="$2"
 name="$3"
 width="${4:-1280}"
-if [ "$#" -ge 5 ]; then
-  [ "$#" -eq 6 ] || { echo "crop.sh: refused -- a type-into selector needs its text" >&2; exit 2; }
+if [ "$#" -eq 6 ]; then
   exec node tools/dev/crop.js "$base" "$name" "$selector" "$page" --width "$width" --type-into "$5" "$6"
 fi
 exec node tools/dev/crop.js "$base" "$name" "$selector" "$page" --width "$width"
