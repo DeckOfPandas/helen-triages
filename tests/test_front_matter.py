@@ -698,8 +698,9 @@ def _rewritten_at(repo, rev, relpath):
     return (data.get("meta") or {}).get("rewritten")
 
 
-def _agent_claimed_rewrites(repo, pathspec, adjudicated=frozenset()):
-    """Commits where an agent flipped `meta.rewritten` from false to true.
+def _agent_claimed_rewrites(repo, pathspec, adjudicated=frozenset(), created_offends=False):
+    """Commits where an agent flipped `meta.rewritten` from false to true,
+    a move included, and (where `created_offends`) wrote a new file saying true.
 
     `adjudicated` holds short SHAs Helen has personally ruled on -- see
     ADJUDICATED_REWRITES. They are skipped HERE rather than filtered by the
@@ -718,20 +719,45 @@ def _agent_claimed_rewrites(repo, pathspec, adjudicated=frozenset()):
 
     offenders = []
     for sha in shas:
-        files = subprocess.run(
-            ["git", "show", "--name-only", "--format=", sha, "--", pathspec],
-            cwd=repo, capture_output=True, text=True,
-        ).stdout.split()
-        for relpath in files:
-            if not relpath.endswith(".md"):
-                continue
-            before = _rewritten_at(repo, f"{sha}^", relpath)
+        for relpath, before in _files_and_befores(repo, sha, pathspec, created_offends):
             after = _rewritten_at(repo, sha, relpath)
-            if before is False and after is True:
+            if before is not True and before is not None and after is True:
                 if sha[:8] in adjudicated:
                     continue
                 offenders.append(f"{sha[:8]}  {relpath}")
     return offenders
+
+
+def _files_and_befores(repo, sha, pathspec, created_offends):
+    """Each .md the commit leaves in place, with `meta.rewritten` as it was
+    before (#1482): at the same path, or at the path it moved from -- a
+    rename, or a delete of the same filename in the same commit. A file with
+    no earlier self reads as False where `created_offends` (a drafts repo,
+    where an ingest never writes true) and None elsewhere (a promotion, whose
+    source is in the other repo)."""
+    lines = subprocess.run(
+        ["git", "show", "--name-status", "-M", "--format=", sha, "--", pathspec],
+        cwd=repo, capture_output=True, text=True,
+    ).stdout.splitlines()
+    rows = [line.split("\t") for line in lines if line.strip()]
+    deleted = {pathlib.PurePosixPath(r[1]).name: r[1] for r in rows if r[0] == "D"}
+    out = []
+    for row in rows:
+        status, relpath = row[0], row[-1]
+        if not relpath.endswith(".md") or status == "D":
+            continue
+        if status.startswith("R"):
+            before = _rewritten_at(repo, f"{sha}^", row[1])
+        elif status == "A":
+            source = deleted.get(pathlib.PurePosixPath(relpath).name)
+            if source:
+                before = _rewritten_at(repo, f"{sha}^", source)
+            else:
+                before = False if created_offends else None
+        else:
+            before = _rewritten_at(repo, f"{sha}^", relpath)
+        out.append((relpath, before))
+    return out
 
 
 # --- commits Helen has personally ruled on ------------------------------------
@@ -775,12 +801,68 @@ ADJUDICATED_REWRITES = {
             "own rewrites and flags, committed for her as she left them. "
             "Covered by her standing grant under 026f3224."
         ),
+        "46dfec2f": (
+            "Eleven 3-keep/ drafts, 2026-11-03: the recovery that rebuilt "
+            "Helen's own 22 October rewriting commits onto main after a "
+            "stalled rebase. Every flag is hers. Found when #1482 taught the "
+            "scan to follow moves; asked, she granted this entry."
+        ),
+        "ed099c19": (
+            "3-keep/trout-caesar-salad.md and 3-keep/ultimate-toad-in-the-"
+            "hole-caramelised-onion-gravy.md, 2026-11-04. Helen's folder moves "
+            "and rewrites, committed for her. Found by #1482's move-following "
+            "scan; covered by her standing grant under 026f3224."
+        ),
+        "29ff4d88": (
+            "2-make/coq-au-sauternes.md, dry-brined-roast-cockerel-crown.md "
+            "and radicchio-pear-stichelton-salad.md, 2026-11-06. Helen copied "
+            "them into 1-rewrite/ and rewrote them; the agent moved them to "
+            "2-make/ as she asked. The commit that showed #1482's gap; covered "
+            "by her standing grant under 026f3224."
+        ),
     },
 }
 
 
 def _adjudicated(repo_key):
     return frozenset(ADJUDICATED_REWRITES.get(repo_key, {}))
+
+
+def _scratch_repo(name):
+    """A fresh git repo under the project's tmp/, never the system /tmp."""
+    import shutil
+    repo = ROOT / "tmp" / name
+    shutil.rmtree(repo, ignore_errors=True)
+    repo.mkdir(parents=True)
+    for args in (["init", "-q"], ["config", "user.email", "t@example.com"],
+                 ["config", "user.name", "T"], ["config", "commit.gpgsign", "false"]):
+        subprocess.run(["git", *args], cwd=repo, check=True)
+    return repo
+
+
+def _commit(repo, files, message, removed=()):
+    for rel, flag in files.items():
+        path = repo / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"---\ntitle: \"x\"\nmeta:\n  rewritten: {flag}\n---\n")
+    for rel in removed:
+        (repo / rel).unlink()
+    subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", message], cwd=repo, check=True)
+
+
+def test_the_rewritten_scan_follows_moves_and_creations():
+    """#1482: a move with a flip, and a drafts file created saying true, are
+    both caught; a creation where the earlier self is in another repo is not."""
+    agent = "x\n\nCo-Authored-By: Claude <noreply@anthropic.com>"
+    repo = _scratch_repo("rewritten-scan-fixture")
+    _commit(repo, {"pool.md": "false", "other.md": "false"}, "ingest")
+    _commit(repo, {"2-make/pool.md": "true"}, agent, removed=["pool.md"])
+    _commit(repo, {"new.md": "true"}, agent)
+    found = {line.split()[1] for line in _agent_claimed_rewrites(repo, ".", created_offends=True)}
+    assert found == {"2-make/pool.md", "new.md"}, found
+    found = {line.split()[1] for line in _agent_claimed_rewrites(repo, ".")}
+    assert found == {"2-make/pool.md"}, found
 
 
 def test_every_adjudicated_rewrite_still_offends():
@@ -797,7 +879,7 @@ def test_every_adjudicated_rewrite_still_offends():
             "cannot be looked up. Clone it to check this."
         )
 
-    live = {line.split()[0] for line in _agent_claimed_rewrites(drafts, ".")}
+    live = {line.split()[0] for line in _agent_claimed_rewrites(drafts, ".", created_offends=True)}
     stale = sorted(_adjudicated("_food_drafts") - live)
     assert not stale, (
         f"ADJUDICATED_REWRITES names commit(s) that no longer offend: {stale}\n\n"
@@ -813,10 +895,10 @@ def test_no_agent_commit_claims_helens_rewrite():
     An assisted pass records itself with `meta.claude_rewritten` (#418).
     Helen's rulings on past violations are in ADJUDICATED_REWRITES.
 
-    Not caught: a file created by an agent already saying `rewritten: true`.
-    Only a false-to-true transition is flagged, because `before` is also None
-    for a rename or a promotion, and failing those would fail Helen's own
-    workflow.
+    A move is followed to its old path, and in the drafts a new file saying
+    `rewritten: true` counts as a flip, since an ingest never writes it (#1482).
+    A promotion into `_food_recipes/` is not: its earlier self is in the
+    drafts repo, so there is nothing here to compare.
 
     In CI `_food_drafts/` is absent (#378), so a green run there covers the
     published recipes and none of the drafts, which is where tidy-up passes
@@ -834,7 +916,7 @@ def test_no_agent_commit_claims_helens_rewrite():
     if DRAFTS_PRESENT and ALL_DRAFTS and (drafts / ".git").exists():
         offenders += [f"_food_drafts/  {line}"
                       for line in _agent_claimed_rewrites(
-                          drafts, ".", _adjudicated("_food_drafts"))]
+                          drafts, ".", _adjudicated("_food_drafts"), created_offends=True)]
 
     assert not offenders, (
         "An agent commit set `meta.rewritten: true`, which is Helen's claim "
