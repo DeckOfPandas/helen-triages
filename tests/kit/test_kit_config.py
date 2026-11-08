@@ -260,6 +260,29 @@ def test_run_sh_in_a_worktree_builds_its_kit_and_mounts_the_primary(project, kit
     assert f"-v {project}:/workspace" in run and "--name demo-primary" in run
 
 
+def test_run_sh_in_a_worktree_needs_nothing_from_the_primarys_devcontainer(project):
+    """A project adopting the kit runs the branch's run.sh from a worktree
+    while its primary checkout still holds the old .devcontainer/. run.sh
+    reads the primary's settings.local.json, but every script it runs is
+    its own."""
+    worktree = project / ".claude" / "worktrees" / "wt"
+    shutil.copytree(project / ".devcontainer", worktree / ".devcontainer")
+    (worktree / ".git").write_text("gitdir: /no/such/.git/worktrees/wt\n")
+    for name in ("read_local_token.py", "build_inputs_hash.py", "claude_code_latest.py"):
+        (project / ".devcontainer" / name).unlink()
+    (project / ".claude").mkdir(exist_ok=True)
+    (project / ".claude" / "settings.local.json").write_text('{"env": {"AGENT_GH_TOKEN": "x"}}')
+    log = project / "docker.log"
+    log.write_text("")
+    env = {"PATH": "/usr/local/bin:/usr/bin:/bin", "HOME": str(project / "home"),
+           "STUB_LOG": str(log), "PIN_CLAUDE_CODE": "9.9.9", "BASH_FUNC_docker%%": STUB}
+    done = subprocess.run(["bash", str(worktree / ".devcontainer" / "run.sh")], cwd=worktree,
+                          capture_output=True, text=True, env=env, timeout=60)
+    assert done.returncode == 0, done.stderr
+    run = next(c for c in log.read_text().splitlines() if c.startswith("docker run"))
+    assert "-e AGENT_GH_TOKEN" in run, "the primary's settings.local.json token was not passed"
+
+
 def test_kit_local_env_overrides_the_name(project):
     text = (project / ".devcontainer" / "kit.env").read_text().replace("PROJECT_NAME=demo", "PROJECT_NAME=changeme")
     (project / ".devcontainer" / "kit.local.env").write_text("# mine\nPROJECT_NAME=mine\n")

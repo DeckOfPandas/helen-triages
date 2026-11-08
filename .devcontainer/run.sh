@@ -216,10 +216,11 @@ for pair in $PORTS; do
   RUN_ARGS+=(-p "$pair")
 done
 
-# The token is read for this one `docker run` and never printed: from
-# .claude/settings.local.json if it holds one, else from this shell's own
-# environment. Neither present, the container simply has none.
-FILE_TOKEN="$(python3 .devcontainer/read_local_token.py)"
+# The token is read for this one `docker run` and never printed: from the
+# primary checkout's .claude/settings.local.json (the working directory) if it
+# holds one, else from this shell's own environment. The reader is this
+# run.sh's own copy, since a primary checkout may predate it.
+FILE_TOKEN="$(python3 "$HERE/read_local_token.py")"
 if [ -n "$FILE_TOKEN" ]; then
   export AGENT_GH_TOKEN="$FILE_TOKEN"
 fi

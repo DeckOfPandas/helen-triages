@@ -1,6 +1,6 @@
 {
   "kit_repo": "helen-contains-claude-webdev",
-  "kit_commit": "be28a3ceaf2f7994df14184ec52dbf5adc52916c",
+  "kit_commit": "61b1b2a43af37622c1b4c58c011031e5a808b4a7",
   "files": {
     ".claude/hooks/README.md": "0ba773835a2737e2b19e527596d17909426c7c401855a19b5672110434766979",
     ".claude/hooks/guard-awk.py": "3dd599df8eea1f323791bd5733302d896bd6b0813a014b24bb6783087149ad72",
@@ -31,7 +31,7 @@
     ".devcontainer/kit.local.example.env": "3c53e2c6b7561134df6a7a9a17faba8853a3123697f6bbd5903acf0cf6b669c1",
     ".devcontainer/managed-settings.json": "3cea804bfc938b171b075c79545d114f3c7fb0cc7d40a1dc25c1b5e66036126a",
     ".devcontainer/read_local_token.py": "1e474e259c7e5f9fc4642f569e95b5d9caaf1f6e490314ff02c45a6d6617f9f4",
-    ".devcontainer/run.sh": "f64c4f8709ad22ccf71514b0d5d3b7962cd51f2749cde10e0e05df5c36d00dc8",
+    ".devcontainer/run.sh": "f14b74e3fc64b1ee8007d9eac0ea513e69339bb81663cd4a1b72aa9511bc1278",
     ".devcontainer/seed_memory.py": "35b60e96694a1b8b573f0c100797d35d08918682be5419d840e42a06ff13316f",
     ".devcontainer/session-place.py": "18f588dd5729ec85d310e99fe79f9f94f8e79b0c7cfa56e103c55c27f807371c",
     ".devcontainer/set-project-name.py": "aa5fad08299d560d8161173db709f4043d290a1a87d48e1c2febbccf85c30f19",
@@ -64,7 +64,7 @@
     "tests/kit/test_github_burst.py": "6d320625733661c9be12cee9302e530e8ee32229c31cb6dd1cf38b4b144f7182",
     "tests/kit/test_hooks.py": "8ea62d040225523b1384deab32c62556eeb82063cdb5307735e63e695711c6ce",
     "tests/kit/test_kit_build.py": "5676beb9f488c1019df9c8aa5950ea3b13802b1cf2d97f733f9bc9515ea90ba9",
-    "tests/kit/test_kit_config.py": "c775bb056aeff0d2f3c0b00747fe441edcc971a99cdf448f5162813c06b413bd",
+    "tests/kit/test_kit_config.py": "df68d5f611082b561edf37cfff60949367bdf2ab8c00e428cb979d446f2aa811",
     "tests/kit/test_kit_lock.py": "057698dfb21997547eca43f8ecaf1365ed6655944984ccf5b1f001da48c8a5e2",
     "tests/kit/test_kit_manifest.py": "10c1900c447748fd26c4e2abd80d012216faf383a344f52f36ac7d38c0ba9ba9",
     "tests/kit/test_kit_sync.py": "fecd232545ff33f82f649a3c411688b77979eceb669100eff3a88ea972076b8d",
