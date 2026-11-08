@@ -1,63 +1,36 @@
 #!/bin/sh
-# Push as DeckOfPandas-agentic-claude over HTTPS, without naming the credential
-# and without the credential ever being in a URL. `origin` is SSH, which fails
-# in the devcontainer for want of a host key, so the URL is given here.
-# DECISIONS §11.
+# Push as the agent account over HTTPS, without naming the credential and
+# without it ever being in a URL. An SSH `origin` has no key in the container,
+# so the URL is built here.
 #
 # USAGE:
-#   sh scripts/git-push-agent.sh <refspec> [repo] [dir]
+#   sh scripts/git-push-agent.sh <branch>:<branch> [repo] [dir]
+#   sh scripts/git-push-agent.sh :<branch>              # delete a remote branch
 #
-#   sh scripts/git-push-agent.sh my-branch:my-branch
-#   sh scripts/git-push-agent.sh my-branch:my-branch helen-triages-food-private _food_drafts
-#   sh scripts/git-push-agent.sh :my-branch
+# `repo` defaults to the first of GH_REPOS; `dir` is the checkout to push FROM
+# and defaults to here. Nothing checks that the two match: pushing from a
+# nested clone of another repo, give both.
 #
-# The last form deletes the remote branch. `repo` defaults to helen-triages;
-# the others are helen-triages-food-private, helen-triages-cocktails-private
-# and the kit, helen-contains-claude-webdev. `dir` is the checkout to push
-# FROM (a nested clone) and defaults to the current directory. Nothing checks
-# that `repo` and `dir` match: pushing from a nested clone, give both, or its
-# branch lands in the public repo.
+# REFUSES: a destination of `main` or `master` however spelled (`x:main`,
+# `+x:main`, `x:refs/heads/main`, `:main`), unless the repo is in
+# MAIN_PUSH_REPOS; a refspec with no colon, since a bare name or HEAD pushes to
+# whatever is checked out; one starting `-`; a repo outside GH_REPOS; and a
+# `dir` that is absolute, contains `..` or starts `-`.
 #
-# ALLOWED, with no ask, in all four repos: pushing a branch. Pushing is not
-# merging. A private drafts repo's `main` may be pushed to as well, for a small
-# set of changes; a bigger footprint is a PR (DECISIONS §9.1).
-#
-# REFUSES, because the allow rule in .claude/settings.json runs whatever this
-# accepts:
-#   * a destination of `main` on helen-triages or the kit, however it is spelled:
-#     `x:main`, `+x:main`, `x:refs/heads/main`, `x:heads/main` or `:main`
-#     (which deletes it). Git resolves every one of those to the same branch,
-#     so any destination that is `main` or ends in `/main` is refused. That
-#     push moves the public `main`, which deploys, without a PR, and
-#     guard-main-branch.py cannot see it: a push from a feature branch stands
-#     on the feature branch. The kit's `main` only moves by a PR Helen merges.
-#   * a refspec without a colon, since a bare name or `HEAD` pushes to whatever
-#     the current branch is called; and one starting `-`, which git reads as
-#     an option.
-#   * a repo other than the four, and a `dir` that is absolute, contains `..`
-#     or starts `-`.
-#
-# HOW IT AUTHENTICATES. A plain URL, with
-# scripts/git-credential-agent-token.sh handed to git for this one invocation
-# by `-c`, as an absolute path resolved from this script's location. Never
-# `git config credential.helper`: the shared .git/config is read by every
-# worktree, git runs a configured helper from each worktree's top level, and a
-# helper path that exists on one branch fails on every other.
-#
-# AGENT_WRAPPER_DRY_RUN=1 prints the command instead of running it, one
-# argument per line, for tests/test_agent_wrappers.py.
-#
-# Invoked via `sh` so it needs no execute bit.
+# GitHub itself refuses a push that adds or changes a file under
+# .github/workflows/ unless the token has the `workflow` scope (README.md,
+# "GitHub agent account"). The refusal names the scope; the fix is a new token,
+# not a retry.
 set -eu
 
-refuse() {
-  echo "git-push-agent.sh: refused -- $1" >&2
-  exit 2
-}
+WRAPPER=git-push-agent.sh
+here="$(cd "$(dirname "$0")" && pwd)"
+. "$here/_github_conf.sh"
+load_conf
 
-[ "$#" -ge 1 ] || refuse "usage: sh scripts/git-push-agent.sh <branch>:<branch> [repo] [dir]"
+[ "$#" -ge 1 ] && [ "$#" -le 3 ] || refuse "usage: sh scripts/git-push-agent.sh <branch>:<branch> [repo] [dir]"
 refspec="$1"
-repo="${2:-helen-triages}"
+repo="${2:-$DEFAULT_REPO}"
 dir="${3:-.}"
 
 case "$refspec" in
@@ -65,33 +38,17 @@ case "$refspec" in
   *:*) ;;
   *) refuse "give the refspec as <branch>:<branch>, never a bare name or HEAD" ;;
 esac
-case "$repo" in
-  helen-triages | helen-triages-food-private | helen-triages-cocktails-private | \
-  helen-contains-claude-webdev) ;;
-  *) refuse "'$repo' is not one of the four repos" ;;
-esac
-case "$dir" in
-  /* | *..* | -*) refuse "'$dir' is outside this checkout" ;;
-esac
+check_repo "$repo"
+check_dir "$dir"
 
 destination="${refspec##*:}"
-case "$repo" in
-  helen-triages | helen-contains-claude-webdev)
-    case "$destination" in
-      main | */main)
-        refuse "that pushes to $repo's main. main only moves by a PR Helen merges" ;;
-    esac
-    ;;
+case "$destination" in
+  main | */main | master | */master)
+    # shellcheck disable=SC2086
+    in_list "$repo" $MAIN_PUSH_REPOS \
+      || refuse "that pushes to $repo's $destination, which only moves by a merged PR (MAIN_PUSH_REPOS in $conf_name)" ;;
 esac
 
-here="$(cd "$(dirname "$0")" && pwd)"
-
-set -- git -C "$dir" \
+run_or_print git -C "$dir" \
   -c "credential.helper=!sh '${here}/git-credential-agent-token.sh'" \
-  push "https://github.com/DeckOfPandas/${repo}.git" "$refspec"
-
-if [ -n "${AGENT_WRAPPER_DRY_RUN:-}" ]; then
-  printf '%s\n' "$@"
-  exit 0
-fi
-exec "$@"
+  push "https://github.com/$GH_OWNER/${repo}.git" "$refspec"

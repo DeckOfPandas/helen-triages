@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /usr/local/share/claude-kit/session-place.py /workspace",
+            "timeout": 20,
+            "statusMessage": "Checking this session started in the project"
+          }
+        ]
+      }
+    ]
+  }
+}

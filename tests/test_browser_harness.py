@@ -1,90 +1,65 @@
-"""The browser harness has one Playwright version, wherever it is installed.
+"""scripts/browser/: one Playwright version, and wrappers that refuse before a
+browser is needed.
 
-Playwright's version is written in .devcontainer/Dockerfile, which bakes it
-into the image under /opt/playwright, in scripts/browser/install.sh, which
-installs it into tmp/browser/ outside the image, and in requirements-test.txt
-for the Python binding. Pins drift silently, and a screenshot taken on one
-version compared with one taken on another is not the same measurement, so
-this file refuses the drift.
+The wrappers are this site's layer over the kit's tools/dev/: the
+per-worktree port, the /helen-triages base URL and the default page set. The
+measuring, and its own argument checks, are the kit's (tests/kit/).
 """
 from __future__ import annotations
 
 import pathlib
 import re
+import subprocess
 
 import pytest
 
 pytestmark = pytest.mark.shared
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-DOCKERFILE = ROOT / ".devcontainer" / "Dockerfile"
 BROWSER = ROOT / "scripts" / "browser"
-REQUIREMENTS = ROOT / "requirements-test.txt"
+WRAPPERS = ["shoot.sh", "crop.sh", "click-crop.sh", "styles.sh", "gaps.sh"]
 
 
-def _dockerfile_pin() -> str:
-    pins = re.findall(r"playwright@(\d+\.\d+\.\d+)", DOCKERFILE.read_text(encoding="utf-8"))
-    assert len(pins) == 1, f"expected one playwright@X.Y.Z in the Dockerfile, found {pins!r}"
-    return pins[0]
+def test_install_sh_pins_the_playwright_the_image_carries():
+    """install.sh is the fallback outside the image; a shot on one release
+    compared with one on another is not the same measurement."""
+    pins = re.findall(r"^version=(\d+\.\d+\.\d+)$", (BROWSER / "install.sh").read_text(encoding="utf-8"), re.M)
+    image = re.search(r"^PLAYWRIGHT_VERSION=(\S+)", (ROOT / ".devcontainer" / "kit.env").read_text(encoding="utf-8"), re.M)
+    assert len(pins) == 1 and image, (pins, image)
+    assert pins[0] == image.group(1), (
+        f"scripts/browser/install.sh pins {pins[0]} and kit.env's PLAYWRIGHT_VERSION is {image.group(1)}")
 
 
-def _install_pin() -> str:
-    pins = re.findall(r"^version=(\d+\.\d+\.\d+)$",
-                      (BROWSER / "install.sh").read_text(encoding="utf-8"), re.M)
-    assert len(pins) == 1, f"expected one version=X.Y.Z in install.sh, found {pins!r}"
-    return pins[0]
-
-
-def test_the_image_and_install_sh_pin_the_same_playwright():
-    assert _dockerfile_pin() == _install_pin(), (
-        f"the Dockerfile pins playwright {_dockerfile_pin()} and "
-        f"scripts/browser/install.sh pins {_install_pin()} -- bump both, then "
-        "rebuild the devcontainer image"
-    )
-
-
-def _pip_pin() -> str:
-    pins = re.findall(r"^playwright==(\d+\.\d+\.\d+)\s*$",
-                      REQUIREMENTS.read_text(encoding="utf-8"), re.M)
-    assert len(pins) == 1, f"expected one playwright== pin in requirements-test.txt, found {pins!r}"
-    return pins[0]
-
-
-def test_the_python_binding_and_the_npm_harness_are_the_same_playwright():
-    """The pip binding (#1200) and the npm harness pin one exact version, so
-    they resolve one Chromium revision and the image carries one browser.
-
-    npm and PyPI do not publish the same patch releases, so pick a version
-    both have. `playwright` is in dependabot.yml's ignore list because a bot
-    moves only one of the places the number lives: requirements-test.txt,
-    both Dockerfile lines, and install.sh.
-    """
-    assert _pip_pin() == _dockerfile_pin(), (
-        f"requirements-test.txt pins playwright {_pip_pin()} and the image's "
-        f"npm install pins {_dockerfile_pin()}. They must match, or the pip "
-        "binding and the screenshot harness resolve different Chromium "
-        "revisions and the image carries two browsers. Bump all four places "
-        "together -- requirements-test.txt, both Dockerfile lines, and "
-        "scripts/browser/install.sh -- then rebuild the image."
-    )
-
-
-def test_the_dockerfile_installs_chromium_with_its_system_dependencies():
-    text = DOCKERFILE.read_text(encoding="utf-8")
-    assert "playwright install --with-deps chromium" in text, (
-        "Helen asked for Playwright's dependencies in the image too; "
-        "`--with-deps` is what installs Chromium's system libraries"
-    )
-
-
-@pytest.mark.parametrize("script", ["shoot.sh", "crop.sh", "capture.sh"])
-def test_the_harness_finds_playwright_through_env_sh(script):
+@pytest.mark.parametrize("script", WRAPPERS + ["capture.sh"])
+def test_every_wrapper_finds_playwright_through_env_sh(script):
+    """env.sh prefers tmp/browser/ and falls back to the image's copy; a
+    wrapper naming a location itself would skip one of the two."""
     text = (BROWSER / script).read_text(encoding="utf-8")
-    assert ". scripts/browser/env.sh" in text, (
-        f"{script} must source env.sh, which prefers tmp/browser/ and falls "
-        "back to the image's /opt/playwright"
-    )
-    assert "tmp/browser/node_modules" not in text and "ms-playwright" not in text, (
-        f"{script} names a Playwright location itself, so it would ignore the "
-        "image's copy -- that belongs in env.sh alone"
-    )
+    assert ". scripts/browser/env.sh" in text or ". scripts/browser/_site.sh" in text, script
+    assert "tmp/browser/node_modules" not in text and "ms-playwright" not in text, script
+
+
+@pytest.mark.parametrize("script", WRAPPERS[1:])
+def test_the_page_wrappers_measure_with_the_kits_tools(script):
+    text = (BROWSER / script).read_text(encoding="utf-8")
+    assert "node tools/dev/" in text, f"{script} no longer hands off to tools/dev/"
+
+
+@pytest.mark.parametrize("args", [
+    ["crop.sh"],
+    ["crop.sh", "food/", "h1", "x"],
+    ["crop.sh", "/food/../x/", "h1", "x"],
+    ["crop.sh", "/food/", "h1", "x", "1280", ".box"],
+    ["click-crop.sh", "/food/", ".a", ".b"],
+    ["click-crop.sh", "http://evil/", ".a", ".b", "x"],
+    ["styles.sh", "/food/"],
+    ["styles.sh", "food/", "h1"],
+    ["gaps.sh"],
+    ["gaps.sh", "/a/://b/"],
+    ["shoot.sh"],
+    ["shoot.sh", "x", "food/"],
+])
+def test_the_wrappers_refuse_bad_arguments_before_needing_a_browser(args):
+    done = subprocess.run(["sh", f"scripts/browser/{args[0]}", *args[1:]], cwd=ROOT,
+                          capture_output=True, text=True, timeout=30)
+    assert done.returncode == 2, (args, done.stderr)

@@ -1,82 +1,71 @@
 """Summarise GitHub's workflow-runs JSON for `main`, read from stdin.
 
-Called only by `scripts/main-ci-status.sh`, which does the fetching. The
-parsing is a committed file, not a `--jq` expression, because a bracketed jq
-argument on a command line prompts Helen (MANUAL §1).
+USAGE:  ... | python3 scripts/main_ci_status.py <owner>/<repo>
 
-Prints the recent runs and one verdict line. Exit 0 if the latest run on `main`
-succeeded, 1 if it did not, 2 if the input could not be read.
+Called by scripts/main-ci-status.sh. Prints the recent runs and one verdict
+line. Exit 0 if the latest run on `main` succeeded, 1 if it did not, 2 if the
+answer could not be read or held no runs.
 
-Only a push to this repository's `main` is a deploy. The endpoint filters on
-`branch=main`, which also matches a pull request from a fork whose head branch
-is called `main`; those runs are listed, marked, and kept out of the verdict.
-
-A cancelled run is not a red one. Deploys share one concurrency group, so a
-deploy waiting behind another is dropped when a newer one arrives (DECISIONS
-§12). That merge is not deployed, but nothing is broken and the next push
-deploys it.
+Only a push to this repository's `main` counts. `branch=main` also matches a
+fork's pull request from a branch called `main`, and Dependabot's update runs:
+those are listed, marked, and kept out of the verdict. A cancelled run is not a red one: with a
+concurrency group, a run waiting behind another is dropped when a newer one
+arrives, and the next push runs again.
 """
 from __future__ import annotations
 
 import json
 import sys
 
-REPO = "DeckOfPandas/helen-triages"
 
-
-def is_deploy(run) -> bool:
-    """A push to this repository's `main`. A field GitHub did not send is
-    treated as matching, so an abbreviated answer is judged rather than
-    silently emptied."""
+def is_main_push(run: dict, repo: str) -> bool:
+    """A field GitHub did not send counts as matching, so an abbreviated
+    answer is judged rather than silently emptied."""
     event = run.get("event")
     source = (run.get("head_repository") or {}).get("full_name")
-    return event in (None, "push") and source in (None, REPO)
+    return event in (None, "push") and source in (None, repo)
 
 
 def main() -> int:
+    if len(sys.argv) != 2 or "/" not in sys.argv[1]:
+        print("usage: ... | python3 scripts/main_ci_status.py <owner>/<repo>", file=sys.stderr)
+        return 2
+    repo = sys.argv[1]
     try:
         runs = json.load(sys.stdin).get("workflow_runs") or []
     except (json.JSONDecodeError, ValueError, AttributeError) as exc:
-        print(f"could not read GitHub's response: {exc}", file=sys.stderr)
+        print(f"could not read GitHub's answer: {exc}", file=sys.stderr)
         return 2
 
-    deploys = [r for r in runs if is_deploy(r)]
-    if not deploys:
-        # An empty list is not "all clear": the question was not answered.
-        print("No workflow runs returned for main. This is NOT a green result:",
-              file=sys.stderr)
-        print("the check did not run, rather than running and finding nothing.",
-              file=sys.stderr)
+    pushes = [r for r in runs if is_main_push(r, repo)]
+    if not pushes:
+        print(f"No workflow runs on main came back for {repo}. This is NOT green: "
+              "the question went unanswered.", file=sys.stderr)
         return 2
 
     for run in runs:
-        conclusion = str(run.get("conclusion"))
+        mark = "" if is_main_push(run, repo) else "  [not a push to main]"
         title = (run.get("display_title") or "")[:58]
-        mark = "" if is_deploy(run) else "  [a pull request, not a deploy]"
-        print(f"{str(run.get('created_at'))[:16]}  {conclusion:10}  {title}{mark}")
+        print(f"{str(run.get('created_at'))[:16]}  {str(run.get('conclusion')):10}  {title}{mark}")
 
-    latest = deploys[0].get("conclusion")
-    unsuccessful = [r for r in deploys if r.get("conclusion") not in ("success", None)]
+    latest = pushes[0].get("conclusion")
     print()
     if latest == "success":
-        print(f"main is GREEN -- merges are deploying. "
-              f"({len(unsuccessful)} of the last {len(deploys)} runs were not successful.)")
+        failed = sum(1 for r in pushes if r.get("conclusion") not in ("success", None))
+        print(f"main is GREEN. ({failed} of the last {len(pushes)} runs were not successful.)")
         return 0
     if latest is None:
-        print("The latest run on main has not finished yet. Look again before "
-              "treating a merge as deployed.")
+        print("The latest run on main has not finished. Look again before treating "
+              "a merge as deployed.")
         return 1
     if latest == "cancelled":
-        print("The latest run on main was CANCELLED -- that merge is NOT DEPLOYED.")
-        print("This is not a red suite: a newer run took its place in the queue")
-        print("before it started (DECISIONS 12). The next push to main deploys")
-        print("it, or Helen can re-run it in the Actions tab. Report it; nothing")
-        print("needs fixing.")
+        print("The latest run on main was CANCELLED: that merge has not run, so it is "
+              "not deployed. Nothing is broken; the next push runs it, or it can be "
+              "re-run from the Actions tab. Report it.")
         return 1
-    print(f"main is {str(latest).upper()} -- THIS IS A DEPLOY OUTAGE.")
-    print("The suite gates the deploy, so every later merge builds nothing and")
-    print("ships nothing until main is green again. Report this before the work")
-    print("you came for (MANUAL 10, DECISIONS 12).")
+    print(f"main is {str(latest).upper()}. Report this before the work you came for: "
+          "where the suite gates a deploy, nothing merged after it ships until "
+          "main is green again.")
     return 1
 
 

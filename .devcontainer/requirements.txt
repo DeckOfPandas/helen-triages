@@ -1,0 +1,6 @@
+# Installed into the image because kit.env says WITH_PY_REQS=1. Exact pins
+# only: tests/kit/test_kit_config.py refuses an unpinned line. pytest and the
+# Playwright binding come from the kit's Dockerfile.
+
+# YAML, for the data and front-matter tests.
+pyyaml==6.0.3

@@ -153,8 +153,9 @@ exclude:
   # runs from the checkout and reads the finished _site, so excluding this
   # cannot affect it.
   - scripts/
-  # Project-local Node install for the JS tests. Dev-only, and large.
-  - .node-runtime/
+  # The kit's tools. No kit-owned, generated or watched path is ever part of
+  # the site; tests/kit/test_site_excludes_kit.py holds this list to the lock.
+  - tools/
   # Working notes and agent instructions — never published
   - model_instructions/
   - CLAUDE.md

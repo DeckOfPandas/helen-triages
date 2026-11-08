@@ -11,14 +11,15 @@ those break that:
   --textconv                         runs the textconv filters
 
 A permission rule matches a command's prefix, so `git diff HEAD --output=x`
-cannot be denied by one; this hook reads every word after the subcommand. Any
-prefix that could only mean one of these is refused too (`--outp=`,
-`--no-ind`, `--ext-`, `--textc`), in case a later git accepts abbreviations.
-`--text` and `--output-indicator-*` are other options and pass.
+cannot be denied by one; this hook reads every word after the subcommand. Git
+2.39 rejects abbreviations of these, but a later git may accept them, so any
+prefix that could only mean one of them is refused too (`--outp=`, `--no-ind`,
+`--ext-`, `--textc`). `--text` and `--output-indicator-*` are other options
+and pass.
 
 Refuses only after `git` and one of DIFF_COMMANDS, global options skipped.
 Unbalanced quotes fall back to splitting on whitespace rather than passing,
-since this guards a write. Tested in `tests/test_git_guards.py`.
+since this guards a write. Tested in `tests/kit/test_git_output_guard.py`.
 
 Invoked as `python3 <path>` so it needs no execute bit.
 """
@@ -60,6 +61,7 @@ def _offence(command: str) -> str | None:
         if words[i].rsplit("/", 1)[-1] != "git":
             i += 1
             continue
+        # Skip global options to reach the subcommand.
         j = i + 1
         while j < len(words) and words[j].startswith("-"):
             j += 2 if words[j] in GLOBAL_WITH_VALUE else 1
@@ -102,7 +104,7 @@ def main() -> int:
                 "which the permission checker can see. To compare two files, "
                 "commit or stage them and diff the revisions, or use the "
                 "Read tool on each. If you genuinely need one of these "
-                "options, say so and let Helen decide."
+                "options, say so and let the human decide."
             ),
         }
     }))

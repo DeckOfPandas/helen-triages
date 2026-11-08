@@ -5,7 +5,7 @@ awk is a programming language whose program arrives inline, in a quoted
 argument the permission checker cannot see into: `print > "path"` writes any
 file, `system("...")` and `"cmd" | getline` run any command, and
 `gawk -i inplace` edits in place. Python covers it, in a file the checker can
-name. DECISIONS §11.
+name.
 
 It does not tell a harmless awk from one that writes or runs something: that
 means parsing awk, and detection logic is where the next gap grows.
@@ -13,7 +13,7 @@ means parsing awk, and detection logic is where the next gap grows.
 Allowed on purpose: the word inside a quoted string or a heredoc body, and
 tokens that merely contain it (`guard-awk.py`, `hawkish.txt`), because it
 matches whole command words. `sh -c 'awk ...'` therefore passes this hook, as
-it passes guard-sed.py. Tested in `tests/test_text_tool_guards.py`.
+it passes guard-sed.py. Tested in `tests/kit/test_text_tool_guards.py`.
 
 Invoked as `python3 <path>` so it needs no execute bit.
 """
@@ -64,7 +64,7 @@ def main() -> int:
             "permissionDecision": "deny",
             "permissionDecisionReason": (
                 "BLOCKED: this command runs `awk`.\n\n"
-                "Helen's rule, 2026-09-15: no awk, in any form. awk is a "
+                "Standing rule: no awk, in any form. awk is a "
                 "programming language whose program arrives inline, where the "
                 "permission checker cannot see it write a file (`print > "
                 "\"path\"`) or run a command (`system()`). See this file's "
@@ -74,7 +74,7 @@ def main() -> int:
                 "count, a committed allow-listed wrapper or a plain `grep` may "
                 "already answer it.\n\n"
                 "If you believe this case genuinely needs awk, say so and let "
-                "Helen decide -- this hook is not the thing to route around."
+                "the human decide -- this hook is not the thing to route around."
             ),
         }
     }))

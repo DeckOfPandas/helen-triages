@@ -1,10 +1,10 @@
 #!/bin/sh
 # Show the uncommitted changes in the repository's main checkout from inside a
-# git worktree, read-only: Helen's edits in /workspace, seen from a session's
-# worktree. The main checkout is the directory that owns the shared .git, found
-# through git itself, so no path is typed on the command line. It runs exactly
-# one `git diff`, which writes nothing to either checkout, and its only output
-# goes to stdout or to a file under tmp/.
+# git worktree, read-only. The main checkout is the directory that owns the
+# shared .git, found through git itself, so no path is typed on the command
+# line. It runs exactly one `git diff`, which writes nothing to either checkout,
+# and its only output goes to stdout or to a file under tmp/, which is why
+# .claude/settings.json can allow it unasked.
 #
 # USAGE:
 #   sh scripts/git-diff-main-checkout.sh [--stat] [<path> ...]
@@ -18,9 +18,7 @@
 #
 # REFUSES: a pathspec or patch file that is empty, absolute, starts `-`,
 # contains `..` or any character outside [A-Za-z0-9._/-]; a patch file outside
-# tmp/ or that is a symlink. Tested in tests/test_agent_wrappers.py.
-#
-# Invoked via `sh` so it needs no execute bit.
+# tmp/ or that is a symlink.
 set -eu
 
 refuse() {

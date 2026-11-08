@@ -1,190 +1,237 @@
 #!/bin/bash
-# Runs the sandboxed devcontainer for this project. Save this file,
-# chmod +x it yourself, then just run it -- no arguments needed.
+# Build this project's Claude Code image when it is missing or stale, then start
+# a shell in it with only the project mounted, at /workspace.
 #
-# Reads AGENT_GH_TOKEN from .claude/settings.local.json just for the
-# duration of this one `docker run`, without ever printing it, writing it
-# anywhere else, or exporting it into your persistent shell environment.
-# AGENT_GH_TOKEN is DeckOfPandas-agentic-claude's classic repo-scoped token -- a
-# separate GitHub account, invited as a collaborator on just these three
-# repos, so it can push and open PRs under its own identity without ever
-# touching Helen's SSH keys. Builds the image itself when there isn't one,
-# and rebuilds it whenever .devcontainer/ has changed since the image was
-# built -- see the build-stamp block below.
+# USAGE:  .devcontainer/run.sh [--firewall] [--build-only] [--rebuild]
 #
-# GH_TOKEN WAS READ HERE TOO UNTIL 2026-09-09, when Helen deleted it on
-# GitHub and it stopped existing. It was her own fine-grained token and it
-# had been reduced to a subset of what AGENT_GH_TOKEN already did -- two
-# credentials where one was enough. Nothing needs adding back: every caller
-# reads AGENT_GH_TOKEN now.
-
+#   --firewall    default-deny egress except an allowlist (init-firewall.sh)
+#   --build-only  build if needed and stop; devcontainer.json runs this
+#   --rebuild     rebuild from scratch, pulling the base image again
+#
+# What goes in the image is the kit.env and Dockerfile beside this script: run
+# a worktree's copy (.claude/worktrees/<name>/.devcontainer/run.sh) to build
+# from that branch. Either way the primary clone is what gets mounted. See
+# README.md.
 set -euo pipefail
 
-# ALWAYS MOUNT THE PRIMARY CLONE, EVEN WHEN INVOKED FROM INSIDE A WORKTREE.
-# This script is a tracked file, so a copy of it sits in every worktree, and
-# `--show-toplevel` resolves to whichever one you happen to be standing in --
-# so running it from `.claude/worktrees/foo` used to mount that worktree as
-# /workspace instead of the primary checkout. `--git-common-dir` points at the
-# primary `.git` from anywhere in the worktree set.
-GIT_COMMON_DIR="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --path-format=absolute --git-common-dir)"
-REPO_ROOT="$(dirname "$GIT_COMMON_DIR")"
-cd "$REPO_ROOT"
+die() {
+  echo "run.sh: $1" >&2
+  exit 1
+}
 
-IMAGE=helen-triages-devcontainer
-
-# IS THE IMAGE BUILT FROM WHAT IS ON DISK RIGHT NOW? -- added 2026-09-21.
-# "Does the image exist" was the old check, and it is a different question.
-# Helen added packages to the Dockerfile, rebuilt, and containers kept
-# coming up without them: the rebuild and the run were of different things
-# and nothing ever compared them. An image that exists is not an image that
-# matches.
-#
-# So the image now carries a LABEL holding a hash of its build inputs, and
-# this rebuilds whenever that hash is missing or no longer matches the
-# files on disk. Three cases, one comparison: no image, an image with no
-# stamp (built before this existed, or built by hand), and a stamp that
-# disagrees with the current .devcontainer/.
-#
-# IT COMPARES CONTENT, NOT TIMESTAMPS, which is stricter than "is the
-# Dockerfile newer than the image" in both directions. `touch` alone does
-# not trigger a rebuild; reverting an edit goes back to the image that
-# matches rather than building a third thing. And mtime-vs-image-Created
-# has a trap this avoids: a fully cached rebuild keeps the CACHED layer's
-# Created date, so the image's timestamp can stay older than the Dockerfile
-# forever and the check never settles.
-#
-# EVERY file in .devcontainer/ is hashed EXCEPT the ones .dockerignore names,
-# rather than a hand-maintained list of "the files that matter" -- that list is
-# one more thing to keep in sync, and the Dockerfile's note about
-# requirements-test.txt says how that goes. Until 2026-09-24 there was no
-# exception at all, so editing this script or the README cost one rebuild; #1191
-# added `.devcontainer/.dockerignore`, which Docker already honours for the
-# context and this now honours for the hash, so the two agree by construction
-# rather than by someone remembering.
-#
-# AND IT ONLY UNDERSTANDS EXACT FILENAMES. A line in .dockerignore with a `*`,
-# a `/` or a `!` in it makes this fall back to hashing the whole directory,
-# ignore file and all. A half-understood pattern would silently shrink what the
-# stamp covers, and an image NOT rebuilt when it should be is the entire bug
-# this mechanism exists to prevent -- so the failure mode is a spurious cached
-# rebuild, never a missed one.
-#
-# What it still cannot see: `ruby:3.3-bookworm` moving upstream, or an
-# `apt-get install` resolving to newer packages than last time. The
-# Dockerfile does not pin those, so nothing on disk changes when they move.
-# `docker build --pull --no-cache` by hand is the answer when that matters.
-# (Claude Code was a third until 2026-10-04; it has its own check below.)
-STAMP_LABEL=com.deckofpandas.build-inputs
-
-BUILD_INPUTS_HASH="$(python3 .devcontainer/build_inputs_hash.py)"
-IMAGE_STAMP="$(docker image inspect --format "{{ index .Config.Labels \"$STAMP_LABEL\" }}" "$IMAGE" 2>/dev/null || true)"
-
-# AND IS IT CARRYING THE CURRENT CLAUDE CODE? -- added 2026-10-04.
-# The second thing the hash above cannot see, and the one that moves most days.
-# The Dockerfile takes the version as a build argument; this asks npm what the
-# newest is, and a second label records what the image was built with. One more
-# comparison, same shape as the stamp.
-#
-# NOT KNOWING IS NOT A REASON TO REBUILD, OR TO STOP. Offline, or the registry
-# slow, the lookup prints nothing -- and then the wanted version is whatever the
-# image already has, so the comparison passes and the container starts. Only
-# with no image at all does it fall through to `latest`, where the build needs
-# the network regardless.
-CLAUDE_CODE_LABEL=com.deckofpandas.claude-code-version
-
-IMAGE_CLAUDE_CODE="$(docker image inspect --format "{{ index .Config.Labels \"$CLAUDE_CODE_LABEL\" }}" "$IMAGE" 2>/dev/null || true)"
-[ "$IMAGE_CLAUDE_CODE" = "<no value>" ] && IMAGE_CLAUDE_CODE=""
-CLAUDE_CODE_VERSION="${PIN_CLAUDE_CODE:-$(python3 .devcontainer/claude_code_latest.py || true)}"
-[ -z "$CLAUDE_CODE_VERSION" ] && CLAUDE_CODE_VERSION="${IMAGE_CLAUDE_CODE:-latest}"
-
-if [ "$IMAGE_STAMP" != "$BUILD_INPUTS_HASH" ] || [ "$IMAGE_CLAUDE_CODE" != "$CLAUDE_CODE_VERSION" ]; then
-  if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-    echo "Image not found -- building $IMAGE (first run)..."
-  elif [ -z "$IMAGE_STAMP" ] || [ "$IMAGE_STAMP" = "<no value>" ]; then
-    echo "Image carries no build stamp (built before this check, or by hand) -- rebuilding $IMAGE..."
-  elif [ "$IMAGE_STAMP" != "$BUILD_INPUTS_HASH" ]; then
-    echo ".devcontainer/ has changed since $IMAGE was built -- rebuilding..."
-  else
-    echo "Claude Code $CLAUDE_CODE_VERSION is out and $IMAGE has ${IMAGE_CLAUDE_CODE:-an unrecorded version} -- rebuilding..."
-  fi
-  docker build -t "$IMAGE" \
-    --build-arg "CLAUDE_CODE_VERSION=$CLAUDE_CODE_VERSION" \
-    --label "$STAMP_LABEL=$BUILD_INPUTS_HASH" \
-    --label "$CLAUDE_CODE_LABEL=$CLAUDE_CODE_VERSION" \
-    -f .devcontainer/Dockerfile .devcontainer
+FIREWALL=0
+BUILD_ONLY=0
+REBUILD=0
+SHOW_HELP=0
+for arg in "$@"; do
+  case "$arg" in
+    --firewall) FIREWALL=1 ;;
+    --build-only) BUILD_ONLY=1 ;;
+    --rebuild) REBUILD=1 ;;
+    -h | --help) SHOW_HELP=1 ;;
+    *) die "unknown option '$arg' (try --help)" ;;
+  esac
+done
+if [ "$SHOW_HELP" = 1 ]; then
+  head -n 14 "${BASH_SOURCE[0]}" | tail -n +2
+  exit 0
 fi
 
-# ONE BUNDLE CACHE, AND THE NAME NO LONGER VARIES -- corrected 2026-09-21.
-# This was `helen-triages-bundle-cache-$(basename "$REPO_ROOT")`, under a
-# comment promising a volume per worktree ("opus-cocktail-data" or
-# "helen-triages"). That promise stopped being true the moment REPO_ROOT
-# started coming from `--git-common-dir` above: that always resolves to the
-# PRIMARY clone, from anywhere in the worktree set, so the basename could
-# only ever be "helen-triages" and the computation was dead cleverness under
-# a false comment. Nothing is lost -- the race it claimed to prevent is
-# already impossible, because --name below refuses a second container
-# outright. Both volumes are shared across every worktree, deliberately,
-# the same way every host-side Claude Code session shares one ~/.claude.
-BUNDLE_VOLUME=helen-triages-bundle-cache-helen-triages
+# The primary clone, even when run from inside a worktree: every worktree of a
+# repo shares one container, and the fixed --name below refuses a second. A
+# worktree made inside the container records its git dir as /workspace/.git/...,
+# which the host does not have, so git fails there and the path decides.
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if GIT_COMMON_DIR="$(git -C "$HERE" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"; then
+  REPO_ROOT="$(dirname "$GIT_COMMON_DIR")"
+else
+  case "$HERE" in
+    */.claude/worktrees/*/.devcontainer) REPO_ROOT="${HERE%/.claude/worktrees/*}" ;;
+    *) REPO_ROOT="$(dirname "$HERE")" ;;
+  esac
+fi
+cd "$REPO_ROOT"
+if [ "$HERE" != "$REPO_ROOT/.devcontainer" ]; then
+  echo "run.sh: building from $HERE, mounting $REPO_ROOT"
+fi
 
-docker volume create helen-triages-claude-config >/dev/null
-docker volume create "$BUNDLE_VOLUME" >/dev/null
+[ "$(id -u)" -ne 0 ] || die "run this as your own user, not root: the container user copies your uid"
+command -v docker >/dev/null || die "docker is not on PATH"
+command -v python3 >/dev/null || die "python3 is needed on the host for the build stamp"
 
-# A FIXED CONTAINER NAME, SO A SECOND RUN IS REFUSED RATHER THAN GRANTED.
-# `docker run` without `--name` invents a fresh one every time, so running
-# this script in two terminals cheerfully gave two containers on ONE bind
-# mount -- two Claudes editing one working tree and one branch. That is the
-# trampling host-side worktrees exist to prevent, and it happened: on
-# 2026-09-08 a session's branch moved under it four times mid-task, and an
-# uncommitted edit rode into somebody else's branch (DECISIONS.md §11).
-#
-# Docker refuses a duplicate name outright, which turns that into an error
-# at the door instead of a puzzle three hours later. It does NOT guard
-# host-versus-container -- nothing here can -- so a worktree is still the
-# answer for running several Claudes at once.
+# --- kit.env: parsed, never sourced, and every key must be a known one, so a
+# typo is an error rather than a toggle silently left at its default.
+PROJECT_NAME=""
+NODE_MAJOR=24
+WITH_RUBY=0
+RUBY_VERSION=3.3
+WITH_PLAYWRIGHT=0
+PLAYWRIGHT_VERSION=1.63.0
+WITH_PY_REQS=0
+PORTS=""
+EXTRA_ALLOWED_DOMAINS=""
+MOUNT_DOTFILES=1
 
-# Optional convenience dotfiles: mounted read-only, and only if they exist,
-# so this works whether or not you've set any of them up. Mounted at
-# alternate .host-* paths -- the container's own .bashrc (baked in at
-# build time) sources them from there, layered on top of its own
-# jekyll-local/jekyll-prod aliases rather than overwriting them.
-DOTFILE_MOUNTS=()
-[ -f "$HOME/.bashrc" ] && DOTFILE_MOUNTS+=(-v "$HOME/.bashrc:/home/helen/.host-bashrc:ro")
-[ -f "$HOME/.bash_aliases" ] && DOTFILE_MOUNTS+=(-v "$HOME/.bash_aliases:/home/helen/.host-bash_aliases:ro")
-[ -f "$HOME/.bash_profile" ] && DOTFILE_MOUNTS+=(-v "$HOME/.bash_profile:/home/helen/.host-bash_profile:ro")
-[ -f "$HOME/.gitconfig" ] && DOTFILE_MOUNTS+=(-v "$HOME/.gitconfig:/home/helen/.gitconfig:ro")
+# read_kit_file <file> <local>: with <local> = 1, only PROJECT_NAME is accepted.
+read_kit_file() {
+  local file="$1" only_name="$2" line key value
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%%#*}"
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+    [ -z "$line" ] && continue
+    case "$line" in
+      *=*) ;;
+      *) die "$file: '$line' is not KEY=value" ;;
+    esac
+    key="${line%%=*}"
+    value="${line#*=}"
+    case "$value" in
+      \"*\") value="${value#\"}"; value="${value%\"}" ;;
+      \'*\') value="${value#\'}"; value="${value%\'}" ;;
+    esac
+    [ "$only_name" = 0 ] || [ "$key" = PROJECT_NAME ] \
+      || die "$file: only PROJECT_NAME belongs here, not '$key'"
+    case "$key" in
+      PROJECT_NAME | NODE_MAJOR | WITH_RUBY | RUBY_VERSION | WITH_PLAYWRIGHT | \
+      PLAYWRIGHT_VERSION | WITH_PY_REQS | PORTS | EXTRA_ALLOWED_DOMAINS | MOUNT_DOTFILES)
+        printf -v "$key" '%s' "$value" ;;
+      *) die "$file: unknown key '$key'" ;;
+    esac
+  done < "$file"
+}
 
-# PORTS THE HOST WILL NEVER WANT -- Helen, 2026-09-09: "I'll always need to
-# build the site locally from any branch so I'd expect to do so from outside
-# the container, but inside the worktree, given it's bound... make it 4999 and
-# 5000 or something I'll never use."
-#
-# THE OLD PAIR WAS ACTIVELY IN HER WAY, not merely useless: `-p 4001:4001`
-# meant a running container HELD the host's own 4001, so her `jekyll-local`
-# could not bind it while any container was up.
-#
-# The INSIDE pair stays 4001/4002, because the image's baked-in
-# jekyll-local/jekyll-prod aliases serve there.
-#
-# THIS COMMENT USED TO SAY "the image carries no jekyll, which is the same gap
-# that stops scripts/verify.py running in the container". BOTH HALVES WERE
-# FALSE, and nobody checked for twelve days. Measured inside a real container,
-# 2026-09-21: `bundle exec jekyll --version` prints 4.4.1 and
-# `python3 scripts/verify.py` exits 0. The image does not BAKE the gem -- it
-# comes from the Gemfile via `bundle install` into the cache volume below --
-# but that is a first-run cost, not a gap, and the aliases above are exactly
-# how it gets used. Helen: "I'm pretty sure the container has Jekyll... Are you
-# not able to check?" The answer was yes, all along.
-AGENT_GH_TOKEN="$(python3 -c "import json; print(json.load(open('.claude/settings.local.json'))['env']['AGENT_GH_TOKEN'])")" \
-docker run -it --rm \
-  --name helen-triages-primary \
-  -v "$REPO_ROOT:/workspace" \
-  -v helen-triages-claude-config:/home/helen/.claude \
-  -v "$BUNDLE_VOLUME:/home/helen/.bundle-cache" \
-  "${DOTFILE_MOUNTS[@]}" \
-  -e AGENT_GH_TOKEN \
-  -p 5998:4001 \
-  -p 5999:4002 \
-  -w /workspace \
-  "$IMAGE" \
-  bash
+KIT_ENV="$HERE/kit.env"
+[ -f "$KIT_ENV" ] || die "$KIT_ENV is missing"
+read_kit_file "$KIT_ENV" 0
+# Gitignored, so a template can commit PROJECT_NAME=changeme while its own
+# checkout builds under a real name.
+KIT_LOCAL_ENV=.devcontainer/kit.local.env
+[ ! -f "$KIT_LOCAL_ENV" ] || read_kit_file "$KIT_LOCAL_ENV" 1
+
+[[ "$PROJECT_NAME" =~ ^[a-z0-9][a-z0-9_.-]*$ ]] \
+  || die "PROJECT_NAME '$PROJECT_NAME' must be lowercase letters, digits, . _ -"
+[ "$PROJECT_NAME" != changeme ] \
+  || die "set a PROJECT_NAME first: python3 .devcontainer/set-project-name.py <name>, or in $KIT_LOCAL_ENV"
+for flag in WITH_RUBY WITH_PLAYWRIGHT WITH_PY_REQS MOUNT_DOTFILES; do
+  [[ "${!flag}" =~ ^[01]$ ]] || die "$flag must be 0 or 1, not '${!flag}'"
+done
+[[ "$NODE_MAJOR" =~ ^[0-9]+$ ]] || die "NODE_MAJOR '$NODE_MAJOR' is not a number"
+[[ "$RUBY_VERSION" =~ ^[0-9]+(\.[0-9]+)*$ ]] || die "RUBY_VERSION '$RUBY_VERSION' is not a version"
+[[ "$PLAYWRIGHT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "PLAYWRIGHT_VERSION '$PLAYWRIGHT_VERSION' is not N.N.N"
+for domain in $EXTRA_ALLOWED_DOMAINS; do
+  [[ "$domain" =~ ^[A-Za-z0-9.-]+$ ]] || die "EXTRA_ALLOWED_DOMAINS: '$domain' is not a hostname"
+done
+for pair in $PORTS; do
+  [[ "$pair" =~ ^[0-9]+:[0-9]+$ ]] || die "PORTS: '$pair' is not host:container"
+done
+
+IMAGE="$PROJECT_NAME-devcontainer"
+if [ "$WITH_RUBY" = 1 ]; then
+  BASE_IMAGE="ruby:$RUBY_VERSION-slim-bookworm"
+else
+  BASE_IMAGE=debian:bookworm-slim
+fi
+USERNAME="$(id -un)"
+[[ "$USERNAME" =~ ^[a-z_][a-z0-9_-]*$ ]] || USERNAME=dev
+
+BUILD_ARGS=(
+  "BASE_IMAGE=$BASE_IMAGE"
+  "NODE_MAJOR=$NODE_MAJOR"
+  "WITH_RUBY=$WITH_RUBY"
+  "WITH_PLAYWRIGHT=$WITH_PLAYWRIGHT"
+  "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION"
+  "WITH_PY_REQS=$WITH_PY_REQS"
+  "EXTRA_ALLOWED_DOMAINS=$EXTRA_ALLOWED_DOMAINS"
+  "USERNAME=$USERNAME"
+  "USER_UID=$(id -u)"
+  "USER_GID=$(id -g)"
+)
+
+# --- Is the image built from what is on disk now, with these arguments? The
+# stamp covers both; Claude Code's version is a second label so a new release
+# rebuilds only the last layer and says so.
+STAMP_LABEL=claude-kit.build-inputs
+VERSION_LABEL=claude-kit.claude-code-version
+label() {
+  local value
+  value="$(docker image inspect --format "{{ index .Config.Labels \"$1\" }}" "$IMAGE" 2>/dev/null || true)"
+  [ "$value" = "<no value>" ] && value=""
+  printf '%s' "$value"
+}
+
+BUILD_HASH="$(python3 "$HERE/build_inputs_hash.py" "${BUILD_ARGS[*]}" "$HERE")"
+IMAGE_HASH="$(label "$STAMP_LABEL")"
+IMAGE_VERSION="$(label "$VERSION_LABEL")"
+# Not knowing the newest version is never a reason to rebuild or to stop.
+CLAUDE_CODE_VERSION="${PIN_CLAUDE_CODE:-$(python3 "$HERE/claude_code_latest.py" || true)}"
+[ -n "$CLAUDE_CODE_VERSION" ] || CLAUDE_CODE_VERSION="${IMAGE_VERSION:-latest}"
+
+if [ "$REBUILD" = 1 ] || [ "$IMAGE_HASH" != "$BUILD_HASH" ] || [ "$IMAGE_VERSION" != "$CLAUDE_CODE_VERSION" ]; then
+  EXTRA_FLAGS=()
+  if [ "$REBUILD" = 1 ]; then
+    echo "Rebuilding $IMAGE from scratch..."
+    EXTRA_FLAGS=(--no-cache --pull)
+  elif ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+    echo "Building $IMAGE (first run)..."
+  elif [ "$IMAGE_HASH" != "$BUILD_HASH" ]; then
+    echo ".devcontainer/ or kit.env has changed since $IMAGE was built -- rebuilding..."
+  else
+    echo "Claude Code $CLAUDE_CODE_VERSION is out; $IMAGE has ${IMAGE_VERSION:-an unrecorded version} -- rebuilding..."
+  fi
+  ARG_FLAGS=()
+  for build_arg in "${BUILD_ARGS[@]}"; do
+    ARG_FLAGS+=(--build-arg "$build_arg")
+  done
+  docker build -t "$IMAGE" "${EXTRA_FLAGS[@]}" "${ARG_FLAGS[@]}" \
+    --build-arg "CLAUDE_CODE_VERSION=$CLAUDE_CODE_VERSION" \
+    --label "$STAMP_LABEL=$BUILD_HASH" \
+    --label "$VERSION_LABEL=$CLAUDE_CODE_VERSION" \
+    -f "$HERE/Dockerfile" "$HERE"
+fi
+
+[ "$BUILD_ONLY" = 1 ] && exit 0
+
+# --- Run.
+RUN_ARGS=(
+  --name "$PROJECT_NAME-primary"
+  -v "$REPO_ROOT:/workspace"
+  -v "$PROJECT_NAME-claude-config:/state/claude-config"
+  -w /workspace
+)
+docker volume create "$PROJECT_NAME-claude-config" >/dev/null
+if [ "$WITH_RUBY" = 1 ]; then
+  docker volume create "$PROJECT_NAME-bundle-cache" >/dev/null
+  RUN_ARGS+=(-v "$PROJECT_NAME-bundle-cache:/state/bundle")
+fi
+
+if [ "$MOUNT_DOTFILES" = 1 ]; then
+  for dotfile in .bashrc .bash_aliases .bash_profile; do
+    [ -f "$HOME/$dotfile" ] && RUN_ARGS+=(-v "$HOME/$dotfile:/home/$USERNAME/.host-${dotfile#.}:ro")
+  done
+  [ -f "$HOME/.gitconfig" ] && RUN_ARGS+=(-v "$HOME/.gitconfig:/home/$USERNAME/.gitconfig:ro")
+fi
+
+for pair in $PORTS; do
+  RUN_ARGS+=(-p "$pair")
+done
+
+# The token is read for this one `docker run` and never printed: from
+# .claude/settings.local.json if it holds one, else from this shell's own
+# environment. Neither present, the container simply has none.
+FILE_TOKEN="$(python3 .devcontainer/read_local_token.py)"
+if [ -n "$FILE_TOKEN" ]; then
+  export AGENT_GH_TOKEN="$FILE_TOKEN"
+fi
+unset FILE_TOKEN
+if [ -n "${AGENT_GH_TOKEN+x}" ]; then
+  RUN_ARGS+=(-e AGENT_GH_TOKEN)
+fi
+
+COMMAND=(bash)
+if [ "$FIREWALL" = 1 ]; then
+  RUN_ARGS+=(--cap-add=NET_ADMIN --cap-add=NET_RAW)
+  COMMAND=(bash -c 'sudo /usr/local/bin/init-firewall.sh && exec bash')
+fi
+
+docker run -it --rm "${RUN_ARGS[@]}" "$IMAGE" "${COMMAND[@]}"

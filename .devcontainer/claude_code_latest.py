@@ -1,27 +1,12 @@
 """Print the version npm's `latest` tag names for Claude Code, e.g. `2.1.0`.
 
-`run.sh` calls this on every launch, passes the answer to `docker build` as
-`CLAUDE_CODE_VERSION`, and labels the image with it -- so a new release rebuilds
-the image the next time a container starts, and nobody edits a pin by hand.
+run.sh passes it to `docker build` as CLAUDE_CODE_VERSION and labels the image
+with it. A concrete number changes the Dockerfile's RUN text exactly when there
+is something new; a literal `latest` would be a cache hit forever.
 
-WHY THE HOST ASKS, RATHER THAN THE DOCKERFILE SAYING `latest`. Docker caches a
-`RUN` by its TEXT. `npm install -g ...@latest` reads the same on every build, so
-after the first one it is a cache hit forever and "latest" means "whatever was
-newest the day this layer was first built". A concrete version number in a build
-argument changes the text exactly when there is something new to fetch.
-
-IT FAILS QUIET, ON PURPOSE. Offline, a slow registry, a body that is not JSON, a
-version that is not three plain numbers: each prints a line on stderr, nothing
-on stdout, and exits 1. `run.sh` reads empty as "could not find out" and keeps
-the image it has. Not knowing the newest version must never stop a container
-starting.
-
-THE SHAPE CHECK IS A GUARD, NOT TIDINESS. The value lands in a `RUN` line and an
-image label, so only `N.N.N` is let through -- a registry answer cannot put
-anything else into the build.
-
-Named in `.dockerignore`: the image does not use it, so editing it costs no
-rebuild.
+It fails quiet: offline, slow, malformed or not `N.N.N`, it prints a note on
+stderr, nothing on stdout, and exits 1, and run.sh keeps the image it has. Only
+`N.N.N` is let through, because the value lands in a RUN line and a label.
 """
 from __future__ import annotations
 

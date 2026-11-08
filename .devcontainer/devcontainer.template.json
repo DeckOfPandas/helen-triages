@@ -1,0 +1,15 @@
+{
+  "name": "{{PROJECT_NAME}} (sandboxed)",
+  "initializeCommand": "bash .devcontainer/run.sh --build-only",
+  "image": "{{PROJECT_NAME}}-devcontainer",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "mounts": [
+    "source={{PROJECT_NAME}}-claude-config,target=/state/claude-config,type=volume",
+    "source={{PROJECT_NAME}}-bundle-cache,target=/state/bundle,type=volume"
+  ],
+  "remoteEnv": {
+    "AGENT_GH_TOKEN": "${localEnv:AGENT_GH_TOKEN}"
+  },
+  "updateRemoteUserUID": false
+}
