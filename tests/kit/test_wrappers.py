@@ -377,6 +377,16 @@ def test_bad_config_is_refused(project, conf):
     assert refused(run(project, "git-fetch-main.sh", conf=conf))
 
 
+def test_a_config_saved_with_windows_line_endings_is_read(project):
+    """An editor on Windows saves CRLF. Each value then ends in a carriage
+    return, which the account-name check refuses with a message about a name
+    that looks right."""
+    out = ok(run(project, "git-fetch-main.sh", conf=CONF.replace("\n", "\r\n")))
+    assert "https://github.com/acme/site.git" in out
+    out = ok(run(project, "git-push-agent.sh", "feat:main", "drafts", "sub"))
+    assert "https://github.com/acme/drafts.git" in out
+
+
 def test_shipped_config_is_the_placeholder_or_valid(kit_root, project):
     # The kit ships the placeholder; a project made from it may commit its own.
     shipped = (kit_root / "scripts" / "github.conf").read_text()

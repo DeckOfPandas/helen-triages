@@ -1,6 +1,6 @@
 {
   "kit_repo": "helen-contains-claude-webdev",
-  "kit_commit": "9493b13c98744a211ac99db014579b33c079d4fd",
+  "kit_commit": "be28a3ceaf2f7994df14184ec52dbf5adc52916c",
   "files": {
     ".claude/hooks/README.md": "0ba773835a2737e2b19e527596d17909426c7c401855a19b5672110434766979",
     ".claude/hooks/guard-awk.py": "3dd599df8eea1f323791bd5733302d896bd6b0813a014b24bb6783087149ad72",
@@ -35,7 +35,7 @@
     ".devcontainer/seed_memory.py": "35b60e96694a1b8b573f0c100797d35d08918682be5419d840e42a06ff13316f",
     ".devcontainer/session-place.py": "18f588dd5729ec85d310e99fe79f9f94f8e79b0c7cfa56e103c55c27f807371c",
     ".devcontainer/set-project-name.py": "aa5fad08299d560d8161173db709f4043d290a1a87d48e1c2febbccf85c30f19",
-    "scripts/_github_conf.sh": "3d8658c3b77f39b0174cb1f6af783eb2b7b5f5fa86a29417001e0d3d2a4ef581",
+    "scripts/_github_conf.sh": "475c0648658fc60cb7efb9cc619e068b3bf9dbb957cd9325fb67ecbfe1bbbd23",
     "scripts/check-link.sh": "f32d296eee3a7c8951bb86d78f74f4030b10f1dee51962eeae42dc6d4014f85f",
     "scripts/gh-agent.sh": "66f8c2f3b886316e0e41f3051a7cb6f7b793b8c156d16a808676cab2fcbdf305",
     "scripts/gh-read.sh": "a6f7f1ff6b6b4fbb0a0987065f7d1df7ed82c861d29af5345fcb98034310fe8d",
@@ -73,7 +73,7 @@
     "tests/kit/test_session_place.py": "b670dc0f7414ee29b095ce53eba1b85e2c5f0ef0c875ad7a69af4530322fedf9",
     "tests/kit/test_site_excludes_kit.py": "eaf259295ea1ed67d1bcbd079a28c136a702918a80365d8ecb2921554804a3d6",
     "tests/kit/test_text_tool_guards.py": "112a26370335003163c569a29a7691e3097f1db347399c5d703c001364d7c1e1",
-    "tests/kit/test_wrappers.py": "64f7b1883fdda643fc037707645030704b810a97794ec21c93256957f6827343",
+    "tests/kit/test_wrappers.py": "5cab4f1a46b0ab5700df0c98409b5a36da8b8b8ac24506c4c4c54a1dbce0d228",
     "tools/dev/crop.js": "cade5ee0f933597f0db49a6cfce91d4611d79a1789d9bd36e1362bd71503adda",
     "tools/dev/gaps.js": "04349d56cd9e45a61ece194a0f8350d6264d43d6b02c010cbbe5cdf385dd9d20",
     "tools/dev/inkbox.py": "c1b3f32fe9b20b4911778855dc62c79841e63139c574f61b2c453f08fd711686",

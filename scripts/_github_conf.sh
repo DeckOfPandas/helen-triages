@@ -55,7 +55,11 @@ load_conf() {
   conf="$(conf_path)"
   conf_name="${conf##*/}"
   [ -f "$conf" ] || refuse "$conf is missing"
+  # A Windows editor saves CRLF; without this every value ends in a CR, and
+  # the checks below refuse names that look right.
+  cr="$(printf '\r')"
   while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%"$cr"}"
     line="${line%%#*}"
     case "$line" in
       *[!\ \	]*) ;;
