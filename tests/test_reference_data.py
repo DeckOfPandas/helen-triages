@@ -838,6 +838,9 @@ NO_TEMPERATURE_BECAUSE = {
     # useless in the method, because no step probes anything. A braise of any
     # meat is this kind (DECISIONS §14).
     "chicken-cider-stew": "thighs and drumsticks braised; a braise takes no temperature",
+    "coq-au-riesling": "legs braised in Riesling; a braise takes no temperature",
+    "coq-au-sauternes": "legs braised in Sauternes; a braise takes no temperature",
+    "coq-au-vin-jaune-aux-morilles": "legs braised in vin jaune; a braise takes no temperature",
     "chicken-sorrel-potato-stew": "leg braised; a braise takes no temperature",
     "indonesian-chicken-curry-gulai-ayam": "thighs simmered in a curry; a braise takes no temperature",
     "thai-green-chicken-curry": "chicken simmered in a curry; a braise takes no temperature",

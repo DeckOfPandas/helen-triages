@@ -340,7 +340,7 @@ GETS_A_HALF_STEP = {
     "henrys-blackberry-gelato-sicilian-style", "henrys-dark-chocolate-almond-truffles",
     "jerrys-chocolate-ice-cream", "macarons", "mixed-spice-powder",
     "mrs-nicholsons-creme-patissiere",
-    "mrs-nicholsons-yorkshire-puddings",
+    "mrs-nicholsons-yorkshire-puddings", "pear-shrub",
     "sweet-potato-chocolate-brownies", "teriyaki-marinade-or-glaze", "teriyaki-sauce",
     "wagamama-teriyaki-sauce",
     "wagamama-yakitori-sauce",

@@ -146,6 +146,7 @@ keywords:
     - pomegranate
     - potato
     - potatoes
+    - radicchio
     - radishes
     - raspberries
     - red pepper
@@ -185,11 +186,13 @@ keywords:
   # `duck fat` and every `... stock` are longer keywords in the cupboard: a jar
   # of fat and a tub of stock are not meat, however they are named.
   meat:
+    - backbone
     - bacon
     - beef
     - brisket
     - chicken
     - chorizo
+    - cockerel
     - duck
     - game
     - gammon
@@ -200,6 +203,7 @@ keywords:
     - mince
     - muntjac
     - mutton
+    - neck
     - oxtail
     - pancetta
     - parma ham
@@ -292,6 +296,7 @@ keywords:
     - single cream
     - skyr
     - soured cream
+    - stichelton
     - stilton
     - whipping cream
     - whole milk
@@ -382,6 +387,7 @@ keywords:
     - demerara sugar
     - desiccated coconut
     - dijon mustard
+    - dried morels
     - dried porcini
     - dried yeast
     - duck fat
@@ -599,12 +605,15 @@ keywords:
     - porter
     - prosecco
     - red wine
+    - riesling
     - rum
     - sake
+    - sauternes
     - sherry
     - stout
     - tea
     - vermouth
+    - vin jaune
     - vodka
     - whisky
     - white wine
