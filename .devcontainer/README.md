@@ -8,7 +8,7 @@ through `/kit-sync`. What is ours here:
 
 | file | says |
 |---|---|
-| `kit.env` | Ruby 3.3 and Playwright on, PyYAML from `requirements.txt`, Node 24, and the ports: `jekyll-local`'s 4001 and `jekyll-prod`'s 4002 published on the host as 5998 and 5999 |
+| `kit.env` | Ruby 3.3 and Playwright on, PyYAML from `requirements.txt`, Node 24, and the ports: 5000 to 5010, the same inside and out; `jekyll-local` is 5000, `jekyll-prod` 5001 |
 | `project.bashrc` | the `jekyll-local` and `jekyll-prod` aliases, sourced by every shell from the bind mount |
 | `requirements.txt` | the image's Python packages, pinned |
 | `devcontainer.json` | watched, not generated: the kit's template plus VS Code's forwarded ports, `bundle install` on create and the Ruby extension |

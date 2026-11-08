@@ -38,7 +38,7 @@ COLLECTIONS = {
 }
 REPO = "DeckOfPandas/helen-triages"
 LABEL = "blocked-on-helen"
-LOCAL = "http://localhost:4001/helen-triages"
+LOCAL = "http://localhost:5000/helen-triages"
 
 PROOFREAD_TRUE = re.compile(r"^(\s*)proofread:\s*true\s*$", re.M)
 PROOFREAD_ANY = re.compile(r"^(\s*)proofread:\s*(true|false)\s*$", re.M)

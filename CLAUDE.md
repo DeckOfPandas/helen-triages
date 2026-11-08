@@ -29,13 +29,13 @@ ruling.
   install a global apt package.
 - Tidying `tmp/` waits until a job is finished, so the job is not
   interrupted.
-- Dev server `jekyll-local` (container 4001, host **5998**); production
-  `jekyll-prod` (4002, host **5999**); both need `bundle install` once per
-  fresh bundle volume. **This project overrides the kit's server rule**:
-  serve your own worktree with `bundle exec jekyll serve --config
-  _config.yml,_config_local.yml --port <4001|4002> --host 0.0.0.0
-  --destination tmp/site-<port>` and give Helen `http://localhost:5998/helen-triages/`
-  (or 5999). MANUAL §13.11.
+- **Ports 5000–5010, the same number inside the container and on Helen's
+  machine.** Dev server `jekyll-local` is 5000, production `jekyll-prod` 5001;
+  both need `bundle install` once per fresh bundle volume. Serve your own
+  worktree on the first free port from 5002 (`ss -ltn`) with `bundle exec
+  jekyll serve --config _config.yml,_config_local.yml --port <port> --host
+  0.0.0.0 --destination tmp/site-<port>` and give Helen
+  `http://localhost:<port>/helen-triages/`. MANUAL §13.11.
 
 ## The kit, here
 - `_kit_upstream/` is the working clone for kit PRs (`git-nested.sh` works in

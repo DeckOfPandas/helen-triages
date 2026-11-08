@@ -68,14 +68,13 @@ python3 scripts/verify.py    # every check below, in one command -- prefer this
 python3 -m pytest            # content and structure; one session at a time
 sh scripts/pytest.sh tests/<file>.py    # part of it, without a prompt
 node --test                  # the JS suite (§10: CI globs tests/js/*.test.js)
-jekyll-local                 # port 4001, drafts visible
-jekyll-prod                  # port 4002, exactly what deploys
+jekyll-local                 # port 5000, drafts visible
+jekyll-prod                  # port 5001, exactly what deploys
 ```
 
-Inside the container these serve on 4001 and 4002; `.devcontainer/run.sh`
-publishes them to the host as 5998 and 5999 (`PORTS` in
-`.devcontainer/kit.env`), so Helen's browser opens
-`http://localhost:5998/helen-triages/`, then `/food/` or `/cocktails/`.
+`.devcontainer/run.sh` publishes 5000 to 5010 under the same numbers on the
+host (`PORTS` in `.devcontainer/kit.env`), so Helen's browser opens
+`http://localhost:5000/helen-triages/`, then `/food/` or `/cocktails/`.
 
 **A session shows Helen its branch on a server it runs itself**, from its
 own worktree, in the background, on a free port of a pair the container binds,
@@ -4854,19 +4853,19 @@ one.
 
 **What a branch actually does, she sees on a local server the session runs**,
 never by pulling and building it herself (DECISIONS §13). Serve your own
-worktree in the background with the local config, on a free port of a pair
-the container binds, and give her the URL:
+worktree in the background with the local config, on a free port the
+container publishes, and give her the URL:
 
     bundle exec jekyll serve --config _config.yml,_config_local.yml \
       --port <port> --host 0.0.0.0 --destination tmp/site-<port>
 
 `--host 0.0.0.0` is what lets the container's forwarding reach it, and
-`--destination` keeps the build in this worktree's `tmp/`. Today the bound
-pair is 4001 (local config) / 4002 (deploy config) inside the container; which
-port that is on her machine is the container's mapping
-(`.devcontainer/devcontainer.json` forwards 4001/4002, `.devcontainer/run.sh`
-publishes them as 5998/5999). More pairs are coming. `ss -ltn` shows what is
-taken; never stop a server another session or Helen started. The harness's
+`--destination` keeps the build in this worktree's `tmp/`. The container
+publishes 5000 to 5010 under the same numbers on her machine (`PORTS` in
+`.devcontainer/kit.env`), so the URL is `http://localhost:<port>/helen-triages/`.
+5000 and 5001 are `jekyll-local` and `jekyll-prod`; a session takes the first
+free one from 5002. `ss -ltn` shows what is taken; never stop a server another
+session or Helen started. The harness's
 `scripts/browser/serve.sh` (4010 and up, 127.0.0.1 only) is for screenshots
 and is not reachable from her browser.
 

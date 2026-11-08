@@ -89,13 +89,12 @@ stated. Italics in quotation marks are Helen's own words.
 
 ## §1 How to run it
 
-- **2026-09-09 — the devcontainer publishes 4999 and 5000 outside for 4001
-  and 4002 inside.** Helen: *"I'll always need to build the site locally from
-  any branch so I'd expect to do so from outside the container, but inside the
-  worktree, given it's bound... make it 4999 and 5000 or something I'll never
-  use."* The old `-p 4001:4001` held the host's own 4001, so her
-  `jekyll-local` could not bind it. The inside pair stays because the image's
-  aliases serve there.
+- **2026-11-08 — helen-triages publishes ports 5000 to 5010, the same number
+  inside and out.** Helen: *"I'd like to pair 5000:5000, 5001:5001 and so on
+  up to 5010:5010 ... Helen Triages will use these ports going forward. Other
+  projects will use other thousands."* One block per project means no two
+  containers want the same host port, and a session can hand her any URL in
+  the block. `jekyll-local` is 5000 and `jekyll-prod` 5001.
 - **2026-09-09 — the container has a fixed name, so a second `run.sh` is
   refused.** A session's call, not Helen's ruling. Without `--name`, two
   terminals gave two containers on one bind mount, and on 2026-09-08 a
@@ -5444,8 +5443,7 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   build myself, but I kept getting tangled, so please update the rules to show
   me changes on a local server. Pairs of ports will be bound via the
   container."* The session serves its own worktree with the local config on a
-  free port of a bound pair and gives her the URL; today the pair is
-  4001/4002, and she is adding more. A candidates page still settles a choice
+  free published port and gives her the URL (§1 has the ports). A candidates page still settles a choice
   between treatments.
 - **2026-10-08, #733 — choices that interact go on one page side by side.**
   Helen asked for the fur strengths again once the base colours had dropped:

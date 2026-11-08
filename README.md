@@ -34,7 +34,7 @@ This public repo holds both the food and cocktails sides, with private repos hol
       - Reads `AGENT_GH_TOKEN` from `settings.local.json` and passes it in as an environment variable
       - Mounts ~/.gitconfig read-only
       - Mounts dotfiles if present, read-only, for quality of life
-      - Publishes container ports 4001 and 4002 on host ports 5998 and 5999, picked as I had to state something, and I'm unlikely to try and use those for anything else
+      - Publishes ports 5000 to 5010, the same number inside and out: helen-triages' block, as other projects take other thousands. `jekyll-local` is 5000, `jekyll-prod` 5001
          - Jekyll isn't in the image anyway -- `bundle install` inside the container puts it in the cache volume
 4. Run Claude inside the container, in worktrees
    - `claude --worktree NAME`
