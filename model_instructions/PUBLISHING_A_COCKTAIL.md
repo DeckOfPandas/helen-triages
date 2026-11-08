@@ -111,7 +111,7 @@ command and the rule that a server you did not start is never stopped are
      with changes in the worktree or the index. Do not reach for `-f`: forcing
      gets past it by discarding those changes, so if a copy had failed there
      would be nothing left to notice. Delete the file after the byte
-     comparison and stage the deletion: `sh scripts/git-drafts.sh
+     comparison and stage the deletion: `sh scripts/git-nested.sh
      _cocktail_drafts add -- <paths>`.
    - **`COCKTAIL_BASELINE_COMMIT` has to move, and that is Helen's to grant.**
      `test_agent_edited_drinks_are_not_marked_proofread` reads the public

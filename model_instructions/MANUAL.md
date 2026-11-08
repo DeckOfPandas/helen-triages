@@ -11,8 +11,11 @@ Section numbers are stable, because code comments and other documents point at
 them as `MANUAL §n`; a section that is now only a pointer keeps its number.
 
 - **`CLAUDE.md`** (repo root, loaded into every session) is the rules for an
-  agent: git, pushing, the token, the Bash rules, who may set which gate flag.
-  This file does not repeat them; it says how the mechanisms work.
+  agent. It imports the kit's `.claude/kit/RULES.md` (the container, the Bash
+  shapes, git, GitHub hygiene) and adds this project's: the repos, pushing,
+  who may set which gate flag, the drafts. This file does not repeat either;
+  it says how the mechanisms work. The kit is helen-contains-claude-webdev,
+  synced by `/kit-sync` (§11.0.5).
 - **`DECISIONS.md`** is the journal: one short entry per ruling of Helen's that
   is still in force, with her reason, under these same section numbers.
   **Before re-opening anything, find its entry there** — grep
@@ -62,14 +65,16 @@ All in `model_instructions/` unless a path is given.
 
 ```
 python3 scripts/verify.py    # every check below, in one command -- prefer this
-pytest                       # content and structure; one session at a time
+python3 -m pytest            # content and structure; one session at a time
+sh scripts/pytest.sh tests/<file>.py    # part of it, without a prompt
 node --test                  # the JS suite (§10: CI globs tests/js/*.test.js)
 jekyll-local                 # port 4001, drafts visible
 jekyll-prod                  # port 4002, exactly what deploys
 ```
 
 Inside the container these serve on 4001 and 4002; `.devcontainer/run.sh`
-publishes them to the host as 5998 and 5999, so Helen's browser opens
+publishes them to the host as 5998 and 5999 (`PORTS` in
+`.devcontainer/kit.env`), so Helen's browser opens
 `http://localhost:5998/helen-triages/`, then `/food/` or `/cocktails/`.
 
 **A session shows Helen its branch on a server it runs itself**, from its
@@ -117,44 +122,42 @@ collections.)
 
 #### Runtimes
 
-`.node-runtime/` and `.gh-runtime/` are gitignored and do not come with a
-worktree; run the system `node`. `gh` is installed by the devcontainer image.
-Call it through the wrappers and never name the token; `CLAUDE.md` owns those
-rules and lists every call that runs without asking. The one mechanism worth
-knowing here: `sh scripts/gh-read.sh <endpoint>` takes `--fields a,b` (one
-object), `--each a,b` (a list) or `--jq <expr>`, plus `--paginate`. Prefer
-the first two, which build the jq inside the script; a `--jq` expression
-containing a quoted `[`, `]` or `|` is refused by the unanalysable-bash hook,
-while `--jq .body` is fine.
+`node` and `gh` come with the kit's image, on `PATH`. Call GitHub through the
+kit's wrappers in `scripts/` and never name the token; the kit's
+`.claude/kit/RULES.md` owns those rules. Which repos the wrappers reach, which
+`main`s may be pushed to, which repos take PRs only and which folders are
+nested clones is `scripts/github.local.conf`, Helen's, in the main checkout;
+a worktree reads that copy through git. Until it exists every wrapper
+refuses, naming the placeholder. `sh scripts/gh-read.sh <endpoint>` takes
+`--fields a,b` (one object), `--each a,b` (a list) or `--jq <expr>`, plus
+`--paginate`. Prefer the first two: a `--jq` expression containing a quoted
+`[`, `]` or `|` is refused by the unanalysable-bash hook, while `--jq .body`
+is fine.
 
 #### The headless browser
 
-Looking is cheaper than reasoning. The devcontainer image carries Playwright
-with Chromium and WebKit (Safari's engine, for a script that launches
-`webkit` itself; the harness and the suite use Chromium) under
-`/opt/playwright`; `sh scripts/browser/install.sh`
-checks the image's copy is the pinned version and stops. Outside the image,
-or in an image built before the pin moved, it installs Playwright and
-Chromium only under `tmp/browser/`, and `scripts/browser/env.sh` prefers that
-local copy when it exists. The Python binding used by
-`tests/test_browser_smoke.py` is the same version and resolves to the same
-Chromium.
+Looking is cheaper than reasoning. The kit's image carries Playwright with
+Chromium and WebKit under `/opt/playwright` (`WITH_PLAYWRIGHT=1` in
+`.devcontainer/kit.env`); `sh scripts/browser/install.sh` checks the image's
+copy is the pinned version and stops. Outside the image, or in an image
+built before the pin moved, it installs Playwright and Chromium only under
+`tmp/browser/`, and `scripts/browser/env.sh` prefers that local copy when it
+exists. The Python binding used by `tests/test_browser_smoke.py` is the same
+version and resolves to the same Chromium.
 
-The Playwright version is pinned on one number in the Dockerfile (npm and
-pip), `install.sh` and `requirements-test.txt`.
-`tests/test_browser_harness.py` and `tests/test_devcontainer_pins.py` fail if
-they differ, and `playwright` is in `dependabot.yml`'s ignore list because a
-bot can move only one of them. Editing the pin in the Dockerfile is the whole
-of a bump: `.devcontainer/run.sh` stamps each image with a hash of
-`.devcontainer/` and rebuilds when the hash no longer matches
-(`.devcontainer/README.md`).
+The Playwright version is one number in `kit.env` (`PLAYWRIGHT_VERSION`,
+which the image's npm and pip installs both read), `install.sh` and
+`requirements-test.txt`. `tests/test_browser_harness.py` and
+`tests/test_ci_matches_container.py` fail if they differ, and `playwright` is
+in `dependabot.yml`'s ignore list because a bot can move only one of them.
+Changing `kit.env` is the whole of a bump: `.devcontainer/run.sh` rebuilds
+when its build arguments or `.devcontainer/` change. The image itself, its
+stamp and its `.dockerignore` are the kit's (`tests/kit/`).
 
-**`.devcontainer/build_inputs_hash.py` reads `.dockerignore` as exact
-filenames only, and fails wide**: a line holding `*`, `/`, `!` or `?` makes it
-hash everything, a spurious rebuild and never a missed one. Never list a file
-the Dockerfile copies (`tests/test_devcontainer_hash.py`). The stamp cannot
-see the base image or an apt package moving upstream; that wants
-`docker build --pull --no-cache` by hand.
+The wrappers below are this site's layer over the kit's `tools/dev/`: they
+add the worktree's port, the `/helen-triages` base URL and our default page
+set, and hand the measuring to `tools/dev/shoot.js`, `crop.js`, `styles.js`
+and `gaps.js`, which check their own arguments.
 
 | Command | Does |
 |---|---|
@@ -165,7 +168,7 @@ see the base image or an apt package moving upstream; that wants
 | `sh scripts/browser/click-crop.sh <path> <click-selector> <crop-selector> <name> [width]` | clicks one element once, then crops another |
 | `sh scripts/browser/styles.sh <path> <selector> [width] [prop,prop,...]` | prints each matching element's box and computed styles |
 | `sh scripts/browser/gaps.sh <path> [width] [root-selector]` | walks the visible block-level descendants of `main` (or another root), printing each one's height, margins, padding and the gap to the sibling before it |
-| `python3 scripts/browser/inkbox.py <png> [gap]` | prints each band of ink in a crop with its vertical extent and centre |
+| `python3 tools/dev/inkbox.py <png> [gap]` | prints each band of ink in a crop with its vertical extent and centre |
 | `sh scripts/browser/capture.sh` | the whole design-review set (#1453): every page type and state of both sites at phone, iPad and desktop, into `tmp/shots/capture/` with a manifest, `index.md`; a state that fails is a FAILED row there, and the run carries on |
 
 Read the PNGs with the Read tool. Traps:
@@ -298,7 +301,7 @@ drafts unpromoted for as long as needed, not a reason to promote them faster.
 **Editing a file inside `_food_drafts/` or `_cocktail_drafts/` from this
 working tree is normal**, but `git status` here never shows it and `git add`
 here cannot capture it. It is a separate, private history, reached with
-`sh scripts/git-drafts.sh` (`CLAUDE.md`). Do not "fix" the missing tracking
+`sh scripts/git-nested.sh` (`CLAUDE.md`). Do not "fix" the missing tracking
 and do not report draft edits as at-risk work in this repo.
 
 **A draft says so, on the local site only.** A cocktail draft carries a
@@ -1840,26 +1843,26 @@ fails, and is silent when both clones are present.
     sh scripts/git-fetch-agent.sh <dir> <repo> [ref] [--keep-head]
     sh scripts/git-push-agent.sh <refspec> [repo] [dir]
 
-Each takes a plain `https://github.com/DeckOfPandas/<repo>.git` URL and passes
-`scripts/git-credential-agent-token.sh` to git for that one invocation
-(`-c credential.helper=…`, an absolute path resolved from the script's own
-location). Git asks the helper when it authenticates, the helper reads the
-token from the environment and answers on a pipe, and the token is never in a
-URL and never on disk. A clone's `origin` is therefore a plain URL with no
+They are the kit's. Each takes a plain `https://github.com/DeckOfPandas/<repo>.git`
+URL and passes `scripts/git-credential-agent-token.sh` to git for that one
+invocation (`-c credential.helper=…`), so the token is never in a URL and
+never on disk. A clone's `origin` is therefore a plain URL with no
 credential: a bare `git fetch origin` inside a clone fails, which is correct;
 use the wrapper.
 
-What each accepts, and refuses with exit status 2:
+What they reach is `scripts/github.local.conf` (§1, Runtimes). Here it says:
 
-| wrapper | accepts | refuses |
-|---|---|---|
-| all three | `repo` from `helen-triages`, `helen-triages-food-private`, `helen-triages-cocktails-private` | any other repo; a `dir` that is absolute, contains `..` or starts with `-` |
-| clone | one or two arguments; `dir` defaults to the repo name | anything further (no option reaches `git clone`) |
-| fetch | `ref` defaults to `main`; `--keep-head` as the fourth argument | a `ref` starting `-` or containing `..`, `:` or a space |
-| push | `repo` defaults to `helen-triages`, `dir` to `.` | a refspec with no colon or starting `-`; a destination of `main` on `helen-triages`, however spelled (`x:main`, `x:refs/heads/main`, `:main`) |
+| key | here |
+|---|---|
+| `GH_REPOS` | `helen-triages` (the default), the two drafts repos, and the kit |
+| `MAIN_PUSH_REPOS` | the two drafts repos: a small set of changes may go straight to their `main` |
+| `PR_ONLY_REPOS` | the kit: `gh-write.sh` opens and edits PRs there, nothing else |
+| `NESTED_DIRS` | `_food_drafts` and `_cocktail_drafts`, each with its repo, and `_kit_upstream` |
 
-`AGENT_WRAPPER_DRY_RUN=1` makes each print its git command instead of running
-it; `tests/test_agent_wrappers.py` proves the refusals that way.
+Any other repo, a `dir` outside this checkout, and a push to `helen-triages`'
+or the kit's `main` however spelled are refused with exit status 2. Each
+script's header states its full grammar, and `tests/kit/test_wrappers.py`
+proves the refusals in dry-run mode.
 
 **The fetch wrapper fetches one branch and detaches onto it**, then prints the
 commit it landed on. Detaching is deliberate: a detached HEAD cannot be
@@ -1892,30 +1895,20 @@ by the primary checkout and every worktree, and git runs a configured helper
 from each worktree's own top level, so a configured path breaks every worktree
 whose branch lacks the script. The wrappers pass it per invocation instead.
 
-#### Local git inside a drafts clone — `scripts/git-drafts.sh`
+#### Local git inside a drafts clone — `scripts/git-nested.sh`
 
-    sh scripts/git-drafts.sh <dir> <verb> [args]
+    sh scripts/git-nested.sh <dir> <verb> [args]
 
-It never talks to GitHub. `dir` is `_food_drafts` or `_cocktail_drafts`,
-spelled exactly. The verbs are a list, not a pattern:
-
-| verb | accepts |
-|---|---|
-| `status` | `--short`, `--porcelain`, `--branch` |
-| `diff` | `--stat`, `--shortstat`, `--name-only`, `--name-status`, `--cached`, then plain refs and paths |
-| `log` | `--oneline`, `--stat`, `--name-only`, `-<N>`, then plain refs and paths |
-| `show` | `--stat`, `--name-only`, then plain refs |
-| `branch` | `--show-current` only |
-| `checkout` | `-b <new-branch>` only, and not `main` |
-| `add` | `--` then plain paths (`.` included) |
-| `commit` | `-F <file under tmp/>` only; refused on `main` and on a detached HEAD |
-
-"Plain" means letters, digits and `_ . / @ ~ ^ -`, not starting with `-` or
-`/` and with no `..`. Everything else is refused. The commit refusal is made
-in the script because `guard-main-branch.py` reads the command text, sees no
-`-C`, and would check the public repo's branch. The message file is given
-relative to the project root (`tmp/commit-msg.txt`); the script rewrites the
-path for the clone.
+The kit's. It never talks to GitHub. `dir` is a folder in `NESTED_DIRS`:
+`_food_drafts`, `_cocktail_drafts` or `_kit_upstream`. The verbs are a fixed
+list — `status`, `diff`, `log`, `show`, `branch --show-current`,
+`checkout -b <new>`, `add -- <paths>`, `commit -F tmp/<file>` — each with
+the few options its header names, and everything else is refused. It runs
+git with the clone's own hooks, fsmonitor and external diff turned off, so a
+clone's `.git/config` cannot make it run a program. The commit refusal on
+`main` is made in the script because `guard-main-branch.py` reads the
+command text, sees no `-C`, and would check this repo's branch. The message
+file is given relative to the project root (`tmp/commit-msg.txt`).
 
 #### A held cocktail is invisible
 
@@ -3846,55 +3839,21 @@ last is not a slash command, so it is the one a session is likeliest not to
 know exists: read it before touching a `4-promote/` or `5-final-proofread/`
 folder.
 
-**The hooks.** `.claude/settings.json` wires every file in `.claude/hooks/`.
-Each runs as `python3 <file>`, so none needs an execute bit, and each allows
-whatever it cannot read or scan, so a guard never breaks a tool call. A rule
-is not enforced merely because a document states it firmly; `CLAUDE.md` names
-the hook wherever there is one.
+**The hooks are the kit's.** `.claude/settings.json`, generated from the
+kit's `settings.kit.json` and our `settings.project.json`, wires every file
+in `.claude/hooks/`, and the kit's `.claude/hooks/README.md` says what each
+refuses and lets through; `tests/kit/` breaks each one on purpose. Each runs as
+`python3 <file>` and allows whatever it cannot read, so a guard never breaks a
+tool call. Two matter most here:
 
-| Hook | Refuses | Lets through |
-|---|---|---|
-| `guard-main-branch.py` | `git commit`, `git merge` while the targeted repo is on `main` or `master` (§11.-1) | everything else on `main` |
-| `guard-destructive-git.py` | a discard over a dirty tree; a stash drop while anything is stashed (§11.0) | the same on a clean tree; `git stash`, `stash pop`, `restore --staged` |
-| `guard-unanalyzable-bash.py` | the shapes `CLAUDE.md` lists under the Bash tool | `?`, an escaped parenthesis, `${...}`, a bare `$VAR`, a lone `NAME=value` |
-| `guard-inline-script.py` | a program given to `python -c`, or `ruby`, `node`, `perl` `-e`, at any length | a file argument; `git -c`, `sh -c`, `bash -c` |
-| `guard-sed.py`, `guard-awk.py` | a command word whose last path component is `sed`, `awk`, `gawk`, `mawk` or `nawk` | the word in quotes; a token that contains it (`guard-sed.py`) |
-| `guard-token-expansion.py` | a secret probed, printed, put in a URL or typed out | a secret consumed, not printed |
-| `guard-git-output.py` | `--output`, `--no-index`, `--ext-diff`, `--textconv` or an unambiguous prefix of one, after `git diff`, `log`, `show` and their plumbing kin | `--text`, `--output-indicator-*`; the option outside a diff command or in quotes as a pattern |
-| `guard-dev-null.py` | `/dev/null` as an argument, or glued to an option (`-o/dev/null`) | `/dev/null` after a redirection operator; `dev/null` without its leading slash, as a search pattern |
-| `session-ground-truth.py` | nothing: it reports | — |
-
-- **The two branch guards** carry an `if: Bash(git *)` filter, so they see
-  only a command that begins with `git`. The rest run on every Bash call.
-- **`guard-git-output.py`** exists because `git diff *`, `git log *` and
-  `git show *` are allowed unasked: a prefix rule cannot exclude an option
-  that comes later. To save a diff, redirect it: `git diff > tmp/x.patch`.
-- **`guard-dev-null.py`** exists because `blockReadsOutsideWorkingDirectories`
-  makes an argument of `/dev/null` prompt whatever the allow list says
-  (`Read(//dev/null)` covers the Read tool only), while a redirection is never
-  checked.
-- **`guard-unanalyzable-bash.py`** blanks quoted spans, then looks for
-  operators. `&&`, `||`, `;`, `|`, `*` and parentheses are inert in either
-  kind of quote; `$(`, a backtick and `$[` are inert only in single quotes,
-  because the shell expands them in double ones. Redirections are removed
-  first, so `2>&1` is not chaining. The quoted `[`, `]`, `|` shape applies
-  only to a command beginning `sh scripts/`. An unquoted word starting `=`
-  (`curl --proto =https`) is refused because zsh expands `=cmd` to a path.
-- **`guard-token-expansion.py`** counts as a secret any variable named
-  `TOKEN`, `SECRET`, `PASSWORD` or `PASSWD`, alone or after a `_`. It refuses
-  a default expansion of one (`${TOK:-x}`); any mention in an `echo` or
-  `printf`; one in a URL's userinfo; a literal GitHub-token-shaped string; and
-  a `gh` call, bare or through a wrapper, that mentions `env` or `$ENV`. For a
-  plain `<interpreter> <file>` command it also opens the file and applies the
-  URL and literal checks to it.
-- **`session-ground-truth.py`** is a `SessionStart` hook. It reports the
-  checkout's path, the branch, the uncommitted changes already there, the
-  position against `origin/main` as last fetched, and whether the two drafts
-  clones are present. It makes no network call. **Its first line names the
-  checkout: if that is not the worktree you are in, trust nothing else in the
-  report.** Its silence is not a guard having passed.
-`tests/test_git_guards.py`, `tests/test_text_tool_guards.py` and
-`tests/test_agent_wrappers.py` break each guard and wrapper on purpose.
+- **`session-ground-truth.py`** reports the checkout's path, the container,
+  the branch, uncommitted changes, the position against `origin/main` as last
+  fetched, how far behind the kit this checkout is, and each `NESTED_DIRS`
+  clone that is absent, with its clone command: here, the two drafts repos.
+  **Its first line names the checkout: if that is not the worktree you are
+  in, trust nothing else in the report.**
+- **`guard-github-burst.py`** spaces issue and PR creations at least five
+  minutes apart, and caps a day at 20 issues and 5 PRs (DECISIONS §11).
 
 **Branch names**: `<type>/<what-its-about>`, lowercase, hyphens, one concern.
 **Commit subjects**: `(type) lowercase description`, no full stop, saying what
@@ -3946,16 +3905,17 @@ that is not a repository, is allowed.
 
 `guard-unanalyzable-bash.py` refuses a leading `cd` and `git -C`, so no
 command reaches a nested drafts repo in a form this hook reads. Git there goes
-through **`scripts/git-drafts.sh <dir> <verb>`**, which the hook does not see,
+through **`scripts/git-nested.sh <dir> <verb>`**, which the hook does not see,
 so the wrapper refuses a commit on that repo's `main` itself. It accepts a
 list, not a pattern (its header comment is the list) and refuses push, fetch,
 reset, restore, stash and merge.
 
-**`scripts/git-fetch-main.sh`** fetches the public repository into
-`refs/remotes/origin/main` and nothing else, with no credential, and prints
-the commit it got. **`scripts/git-push-agent.sh`** refuses a destination of
-`main` on the public repository, a refspec without a colon, one starting `-`,
-and a `dir` outside the checkout; `:<branch>` deletes a remote branch.
+**`scripts/git-fetch-main.sh`** fetches the default repository (the first of
+`GH_REPOS`, here `helen-triages`) into `refs/remotes/origin/main` and nothing
+else, and prints the commit it got. **`scripts/git-push-agent.sh`** refuses a
+destination of `main` on any repo outside `MAIN_PUSH_REPOS` (here: this repo
+and the kit), a refspec without a colon, one starting `-`, and a `dir`
+outside the checkout; `:<branch>` deletes a remote branch.
 
 **It pushes to a URL, not to the `origin` remote, so `origin/<branch>` never
 moves and cannot answer "is this pushed?"** The tracking ref reads as commits
@@ -4091,6 +4051,34 @@ herself. The parser rejects and never repairs. A matching fingerprint is
 reported and not written; a matching title with a different fingerprint is
 written under its own slug. The version marker is checked against
 `SUPPORTED_VERSIONS`. An absent drafts repo is a refusal, not a clean inbox.
+
+### 11.0.5 The kit, and `/kit-sync`
+
+The container, the hooks, the GitHub and git wrappers, `tools/dev/`,
+`tools/kit/` and `tests/kit/` come from the kit,
+`DeckOfPandas/helen-contains-claude-webdev`. Its `kit/manifest` says who owns
+each path; `.claude/kit/kit.lock` records the kit commit this checkout runs
+and each kit file's sha256, and `tests/kit/test_kit_lock.py` goes red when one
+is edited here. So a change to a kit file is a PR on the kit, from the working
+clone `_kit_upstream/`, and arrives by `/kit-sync`: it reads a clean clone in
+`tmp/kit`, refuses if a locked file was edited, copies the kit's files,
+rebuilds the generated ones and rewrites the lock. Its report is the PR
+description, and says whether Helen needs `.devcontainer/run.sh` from the host.
+
+What stays ours is everything outside the manifest — the site, the drafts,
+`scripts/` other than the kit's wrappers, `scripts/browser/`, these documents
+— and four kinds of project file the sync writes once and never again:
+
+| file | holds |
+|---|---|
+| `CLAUDE.md` | this project's rules, after `@.claude/kit/RULES.md` |
+| `.claude/settings.project.json` | our allows and denies; `python3 tools/kit/build.py` merges them into `.claude/settings.json`, refusing an allow a kit deny covers |
+| `.devcontainer/kit.env`, `project.bashrc`, `requirements.txt` | the image's toggles (Ruby, Playwright, ports), the `jekyll-local`/`jekyll-prod` aliases, PyYAML |
+| `.claude/kit/watched` | kit paths we keep as ours: `.devcontainer/devcontainer.json`, which a sync reports against the kit's template and never writes |
+
+`tests/kit/test_site_excludes_kit.py` holds `_config.yml`'s `exclude:` to
+every kit, generated and watched path, so a sync can break tooling and never
+the live site.
 
 ### 11.1 A file with a colon in its name crashes the whole build
 

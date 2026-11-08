@@ -704,7 +704,7 @@ argument and the rules each field is read by.
 - 2026-09-24 · §11 · #1078 · an agent may correct or delete a recipe note that a later ruling of Helen's has made false.
 - 2026-09-29 · §11 · /opt may be read, never written, and only Helen can make the grant live.
 - 2026-09-29 · §11 · every other worktree under /workspace/.claude/worktrees/ may be read, and nothing in one may be written.
-- 2026-10-02 · §11 · git inside a drafts clone goes through sh scripts/git-drafts.sh <dir> <verb>, a fixed list of verbs.
+- 2026-10-02 · §11 · git inside a drafts clone goes through a wrapper with a fixed list of verbs: today the kit's sh scripts/git-nested.sh <dir> <verb>.
 - 2026-10-02 · §11 · this repository takes no outside contributions: a stranger's PR is not merged, and the fix ships from the agent account.
 - 2026-10-10 · §11 · $[ outside single quotes is refused by the hook: write a regex in single quotes.
 - 2026-10-11 · §11 · the journal, the manual and code comments are delete-and-replace, never append.

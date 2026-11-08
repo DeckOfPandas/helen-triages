@@ -4258,7 +4258,7 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   rule was then broken again, so the hook followed on 2026-08-20. It judges
   the repo a leading `cd` or `git -C` points at. It cannot see a push, so
   `git-push-agent.sh` itself refuses any `main` destination on `helen-triages`
-  (2026-09-11), and `git-drafts.sh` refuses a commit on a drafts repo's `main`.
+  (2026-09-11), and `git-nested.sh` refuses a commit on a drafts repo's `main`.
 - **2026-08-18 — `git reset --hard`, `git checkout --` or `git restore` over a
   dirty tree, and `git clean`, need Helen's yes every single time;
   `guard-destructive-git.py` enforces it.** A `git reset --hard origin/main`,
@@ -4458,7 +4458,7 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   container and rules are the kit's, synced by `/kit-sync`, and an
   improvement to a kit file goes back to the kit as a kit PR.** Helen ruled
   each difference after a file-by-file comparison; the kit's version won
-  everywhere except where ours went upstream first (kit PR #23). What stays
+  everywhere except where ours went upstream first (kit PR DeckOfPandas/helen-contains-claude-webdev#23). What stays
   ours is outside the manifest: the drafts, the publish gate, `verify.py`,
   `scripts/browser/`, the site scripts, these documents. Her particular
   rulings:
@@ -4493,7 +4493,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `git clone --template=` runs a directory's hooks, and `git fetch
   --upload-pack=` runs any program. Ask what an option can write as well:
   a `curl` rule was pruned on 2026-09-22 because `-o <path>` writes anywhere.
-  `tests/test_agent_wrappers.py` pins every open-ended rule.
+  `tests/kit/test_allow_list.py` pins every open-ended rule, the kit's in
+  the file and ours in `_reviewedOpenRules` in `.claude/settings.project.json`.
 - **2026-09-11 — a script in `tmp/` keeps asking Helen; no allow rule covers
   `tmp/`.** Put to her with the fact that the checker sees a script's name and
   not what it does, so such a rule would let unreviewed code read outside the
@@ -4678,14 +4679,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   it has not looked at. The folder is in `additionalDirectories`, and a
   worktree session has been refused the read all the same: that is the
   mechanism lagging the rule, so ask her for `/add-dir`.
-- **2026-10-02 — git inside a drafts clone goes through
-  `sh scripts/git-drafts.sh <dir> <verb>`, a fixed list of verbs.** With a
-  leading `cd` and `git -C` both refused, a drafts pass had no sanctioned way
-  to branch or commit there, and a `tmp/` script asked Helen on every call.
-  Shown that, Helen: *"gotcha, thanks. Yes please do it."* Each verb is
-  narrowed to what its prompt was guarding: `diff` takes five named options
-  (`--output=` writes anywhere), `checkout` only `-b <new>`, and `commit` is
-  refused on that repo's `main`, which `guard-main-branch.py` cannot see.
+- **2026-10-02 — git inside a drafts clone goes through a wrapper with a
+  fixed list of verbs: today the kit's `sh scripts/git-nested.sh <dir>
+  <verb>`.** With a leading `cd` and `git -C` both refused, a drafts pass had
+  no sanctioned way to branch or commit there, and a `tmp/` script asked
+  Helen on every call. Shown that, Helen: *"gotcha, thanks. Yes please do
+  it."* Each verb is narrowed to what its prompt was guarding, `commit` is
+  refused on that repo's `main`, and the kit's version also turns off the
+  clone's own hooks, fsmonitor and external diff. Its folders are
+  `NESTED_DIRS` in `scripts/github.local.conf` (2026-11-07, #1438).
 - **2026-10-02 — this repository takes no outside contributions: a stranger's
   PR is not merged, and the fix ships from the agent account.** Seven minutes
   after #1273 was raised, an unknown account opened #1274 from a fork with

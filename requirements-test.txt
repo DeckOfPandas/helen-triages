@@ -1,27 +1,14 @@
 # Test dependencies only. The site itself needs nothing from Python.
 #
-# PINNED EXACTLY, NOT FLOORED (#1203, 2026-09-28). These said `pytest>=8.0` and
-# `PyYAML>=6.0`, so CI installed whatever was newest on the day and the
-# devcontainer image installed whatever was newest when it was last built. The
-# two drifted silently: the image here carries pytest 9.1.1 under a `>=8.0`
-# floor, and nothing anywhere recorded which version the suite is actually
-# green on. A floor says "at least this works"; a pin says "this works", and
-# only the second is a fact somebody measured.
+# What CI installs. Exact pins, not floors: a floor lets CI and the container
+# each install whatever is newest, and then no file records the versions the
+# suite is green on (#1203).
 #
-# THIS FILE IS THE ONE PLACE. .devcontainer/Dockerfile repeats these pins by
-# hand because its build context is `.devcontainer/` itself, not the repo root,
-# so it CANNOT `COPY requirements-test.txt` -- see that file and the
-# devcontainer README for why the context is narrow. Changing the context to the
-# repo root would break the image stamp (#1180), which hashes every file in the
-# build context to decide whether to rebuild: with the repo as context, editing
-# any recipe would trigger a rebuild.
-#
-# So the duplication stays, and
-# tests/test_devcontainer_pins.py::test_the_image_installs_what_this_file_pins
-# fails if the two disagree. That is the same shape as the Playwright version,
-# which is pinned in the Dockerfile and in scripts/browser/install.sh with
-# tests/test_browser_harness.py holding them together. A "keep in sync by hand"
-# comment is a hope; a test is the sync.
+# The container installs the same versions from elsewhere: pytest from the
+# kit's .devcontainer/Dockerfile, PyYAML from .devcontainer/requirements.txt,
+# Playwright from PLAYWRIGHT_VERSION in .devcontainer/kit.env.
+# tests/test_ci_matches_container.py fails when any pair differs. pytest moves
+# with a kit sync, so it is in dependabot.yml's ignore list.
 pytest==9.1.1
 PyYAML==6.0.3
 
@@ -31,19 +18,15 @@ PyYAML==6.0.3
 # and this one is for a test that needs the suite's own Jekyll build, which
 # tests/test_rendered_pages.py already makes behind a session fixture.
 #
-# ONE NUMBER FOR BOTH, WHICH IS WHY THIS IS 1.63.0 AND NOT 1.47.x (2026-09-28).
-# The first attempt pinned this at 1.47.0 to sit beside npm 1.47.2 -- and PyPI
-# has no 1.47.2 at all, so the two could not be made to agree and each wanted
-# its own Chromium revision. 1.63.0 exists on npm and PyPI alike, so the npm pin
-# and the pip pin now name one version, resolve to the SAME Chromium, and the
-# image carries one browser instead of two.
+# ONE NUMBER FOR BOTH. npm and PyPI must both publish the version, so the two
+# bindings resolve one Chromium and the image carries one browser.
 #
-# THE NUMBER LIVES IN FOUR PLACES: here, .devcontainer/Dockerfile twice (the npm
-# install and the pip install) and scripts/browser/install.sh. Two tests hold
-# them together -- tests/test_browser_harness.py and
-# tests/test_devcontainer_pins.py -- and `playwright` is in dependabot.yml's
-# ignore list because a bot can only ever move one of the four. Bump it by hand,
-# as a set, and rebuild the image.
+# THE NUMBER LIVES IN THREE PLACES: here, PLAYWRIGHT_VERSION in
+# .devcontainer/kit.env (the image's npm and pip installs both read it), and
+# scripts/browser/install.sh. tests/test_browser_harness.py and
+# tests/test_ci_matches_container.py hold them together, and `playwright` is in
+# dependabot.yml's ignore list because a bot can move only this one. Bump the
+# three by hand, as a set, and rebuild the image.
 #
 # INSTALLING THIS PACKAGE DOES NOT INSTALL A BROWSER -- `playwright install
 # chromium` does, and that is a Dockerfile step. So CI gets the binding and no

@@ -1,130 +1,167 @@
-# Claude Code Rules for Jekyll
+# Claude Code Rules for helen-triages
 
-**This file is the RULES. It is loaded into every session, so it stays short.**
-Helen's rulings and her reasons live in `model_instructions/DECISIONS.md`, the
-journal; how the machinery works today lives in `model_instructions/MANUAL.md`.
-A `DECISIONS §n` here points you at the argument. **Do not re-open a settled
-question without reading its section there first** — that is the thing Helen
-least wants. Grep `model_instructions/DECISIONS_INDEX.md` to find it: one
-generated line per ruling.
+@.claude/kit/RULES.md
 
-Where a rule names a hook, the hook enforces it. Where a rule has no hook, the
-paragraph is the only enforcement there is.
+## This project
+The rules above come from the kit (helen-contains-claude-webdev) and change
+only through `/kit-sync`; an improvement to one is a kit PR, never an edit
+here. These are helen-triages' own. Helen's rulings and her reasons live in
+`model_instructions/DECISIONS.md`, the journal; how the machinery works today
+lives in `model_instructions/MANUAL.md`. A `DECISIONS §n` points you at the
+argument. **Do not re-open a settled question without reading its section
+there first** — that is the thing Helen least wants. Grep
+`model_instructions/DECISIONS_INDEX.md` to find it: one generated line per
+ruling.
 
-## Environment Constraints
-- OS: Ubuntu/Debian inside Windows Subsystem for Linux (WSL), in a devcontainer.
-- Environment: Local Jekyll development.
-- Target Directory: ONLY operate within this folder. Do not traverse to `../` or `/mnt/c/`.
+## Environment
+- A Jekyll site, in the kit's container on WSL. **Only operate within this
+  folder**: never `../`, `/mnt/c/`, `~`, the system `/tmp` or
+  `$CLAUDE_JOB_DIR`.
+- **Read-only exceptions: `/opt` (the image's Playwright) and
+  `/workspace/.claude/worktrees/`.** Use the second: a helper agent's
+  screenshots and scratch scripts are in its worktree's `tmp/`, and a
+  supervisor that will not open them is reporting work it has not looked at.
+  Never write in a worktree that is not yours. If the session refuses the
+  read, that is the mechanism lagging the rule: ask Helen for `/add-dir`.
+- **`Read(//dev/null)` and `Edit(//dev/null)` stay in the settings**
+  (DECISIONS §11), whatever one tool's refusal suggests.
+- NEVER run commands with `--dangerously-skip-permissions`, and never
+  install a global apt package.
+- Tidying `tmp/` waits until a job is finished, so the job is not
+  interrupted.
+- Dev server `jekyll-local` (container 4001, host **5998**); production
+  `jekyll-prod` (4002, host **5999**); both need `bundle install` once per
+  fresh bundle volume. **This project overrides the kit's server rule**:
+  serve your own worktree with `bundle exec jekyll serve --config
+  _config.yml,_config_local.yml --port <4001|4002> --host 0.0.0.0
+  --destination tmp/site-<port>` and give Helen `http://localhost:5998/helen-triages/`
+  (or 5999). MANUAL §13.11.
 
-## Critical Restrictions
-- NEVER run `rm -rf` except in tmp/ without explicit human confirmation. Not mid-job either: finish, then tidy, so the job is not interrupted.
-- NEVER alter system configurations, `.bashrc`, `.bash_profile`, `.bash_aliases`, or install global apt packages.
-- NEVER access or create `.env` files containing deployment API keys.
-- NEVER run commands using the `--dangerously-skip-permissions` flag.
-- **NEVER change file permissions without asking me first, every single time.** No `chmod`, no `chown`, no `sudo`. Ask, name the exact files, and wait -- **a blanket "yes" to one chmod is not a standing permission for the next one.** `.claude/settings.json` denies all three, but Bash cannot be perfectly path-restricted by permission patterns, so this line is the actual backstop. DECISIONS §11.
-- NEVER read, write or execute above the folder you're in. **Three exceptions, all READ-ONLY, and a note on `/dev/null`.**
-  - **`/opt`**, where the image's Playwright lives. Helen: *"Reading from /opt is fine."* `.claude/settings.json` grants it (`additionalDirectories` and a `Read` allow) and denies `Edit`. A session started before the grant needs `/add-dir /opt`.
-  - **`/workspace/.claude/worktrees/` — every other worktree.** Helen: *"You're allowed to read from other worktrees."* **Use it**: a helper agent's screenshots, scratch scripts and proofs live in its own worktree's `tmp/`, and a supervisor that will not open them is reporting work it has not looked at. Read only — never write, commit, stash or tidy in a worktree that is not yours; its branch reaches you through `git merge <branch>`. **If the session refuses the read** (`blockReadsOutsideWorkingDirectories`), that is the mechanism lagging the rule: say so and ask Helen for `/add-dir /workspace/.claude/worktrees` rather than concluding the read is forbidden.
-  - **`/workspace/.node-runtime`** (Helen's grant). **A settings edit does not reach a RUNNING session** — the working-directory set is fixed at session start, so a new grant needs `/add-dir` to go live today. DECISIONS §11.
-  - **`Read(//dev/null)` and `Edit(//dev/null)` stay in the settings. Never conclude a permission rule does nothing from one tool's refusal** — a rule and a block are different mechanisms. **In Bash, `/dev/null` goes after a redirection, never as an argument** (`> /dev/null`, not `curl -o /dev/null`): an argument prompts Helen whatever the allow list says, so `.claude/hooks/guard-dev-null.py` refuses it.
-- NEVER read, write or execute in `~` (my home directory) or anywhere outside this project folder, for any reason -- if Claude Code config/settings storage is ever needed, it belongs in this project's own `.claude/` folder, never `~/.claude/`.
-- NEVER read, write or execute using the system `/tmp` directory (an absolute path starting `/tmp`). Use this project's own `tmp/` folder for all scratch and temporary files. Settings deny this for Read/Write/Edit, but Bash cannot be perfectly path-restricted -- this rule is the backstop.
-- NEVER use `$CLAUDE_JOB_DIR` or any path under `/home/helen/.claude/jobs/` as a scratch location, even though background-job tooling suggests it by default. All scratch files belong in this project's own `tmp/` folder, always.
+## The kit, here
+- `_kit_upstream/` is the working clone for kit PRs (`git-nested.sh` works in
+  it); `tmp/kit` is the clean clone `/kit-sync` reads. Both are gitignored.
+- **`.devcontainer/devcontainer.json` is watched** (`.claude/kit/watched`):
+  ours, and a sync only reports kit changes to its template.
+- **No kit-owned, generated or watched path is ever part of the site build**;
+  `tests/kit/test_site_excludes_kit.py` holds `_config.yml`'s `exclude:` to it.
+- **`scripts/github.local.conf` is Helen's**, in the main checkout: the repos,
+  `MAIN_PUSH_REPOS`, `PR_ONLY_REPOS` and `NESTED_DIRS`. Never edit it.
+- Our allows and denies are in `.claude/settings.project.json`; each
+  open-ended one has its note in `_reviewedOpenRules`. Run
+  `python3 tools/kit/build.py` after editing it.
 
-## Build Commands
-- Dev Server: `jekyll-local`, deploying to localhost:4001
-- Prod Server: `jekyll-prod`, deploying to localhost:4002
-- Both work inside the container once `bundle install` has run, as does `python3 scripts/verify.py`.
+## Git and GitHub
+- **Four repos and no others**: `DeckOfPandas/helen-triages`,
+  `helen-triages-food-private` and `helen-triages-cocktails-private` (read,
+  raise, close, reopen, comment on, label and assign issues; open PRs), and
+  the kit, `DeckOfPandas/helen-contains-claude-webdev` (read and open PRs,
+  never push to its `main`). That is the entire permission. DECISIONS §11.
+- **MERGING IS PREVENTED BY NOTHING BUT THIS LINE, SO TREAT IT AS ABSOLUTE.**
+  `AGENT_GH_TOKEN`, the agent account's classic PAT with `repo` and
+  `workflow` scope, CAN merge. Never merge, close as merged or approve a PR.
+  Never change repository settings, secrets, Actions, webhooks or
+  collaborators. Never ask for a wider token, more scopes or a second
+  credential: if something needs one, say so and stop.
+- **Pushing runs as `DeckOfPandas-agentic-claude`; commits stay authored as
+  Helen** with the `Co-Authored-By: Claude` trailer. Read `.user.login` off
+  what a write returns rather than assume it.
+- **The two private drafts repos: a small set of changes may be pushed
+  straight to their `main`; a bigger footprint is a PR.** You still commit on
+  a branch there. **Pushing from a drafts clone, give its `dir` as well as its
+  `repo`, every time**: a drafts branch pushed at the public repo publishes
+  private recipes.
+- **ONE PR PER FEATURE OR OBVIOUS GROUP OF WORK** — not one per sitting, not
+  one per commit. Every merge to `main` is a deploy, so keep each topic its
+  own commit and say in the description what each commit is. DECISIONS §11.
+- **A RED `main` IS A DEPLOY OUTAGE, NOT A RED BUILD.** The suite gates the
+  deploy, so one red merge stops every later merge going live, silently.
+  `sh scripts/main-ci-status.sh` after any merge you make or hear of, and a
+  red one is the first thing to report. Never merge over a known-red suite.
+  If you have been told nothing about a merge, check rather than assume.
+  MANUAL §10, DECISIONS §12.
+- **Close an issue with a commit trailer, not the API, whenever a trailer can
+  do it**, and the closing line in the PR description too, one keyword per
+  issue per line, never a comma list. The API is for where a trailer cannot
+  work, such as work in a drafts repo. Read the issue list after the merge.
+- **A workflow file is an ordinary PR**, but an invalid one blocks every
+  merge: parse the YAML and run `tests/test_site_config.py` before pushing.
+- **NEVER `git reset --hard`, `git checkout --`/`git restore` over a dirty
+  tree, or `git clean -fd` without asking Helen first, every time.** Check
+  `git status` and say what it shows.
+- `gh` is `sh scripts/gh-agent.sh <args>`, which never names the token.
+  **`gh pr edit` fails on this token**: change a PR's body with
+  `sh scripts/gh-write.sh pr-body <repo> <N> tmp/<file>.md`.
 
-## Git workflow
-- If we're starting new work, and we're currently on main, please check out a new branch.
-- **Update `main` without checking it out: `sh scripts/git-fetch-main.sh`, then `git merge origin/main`.** It updates `origin/main` only and never prompts. **Never check `main` out to "fix" a refusal.** DECISIONS §1, §11.
-- Commit freely without asking.
-- **NEVER commit or merge directly onto `main`, for any reason, in ANY repo in the tree** -- including the nested private drafts repos, which are separate repos with their own `main`. `.claude/hooks/guard-main-branch.py` enforces it. Everything else on `main` is untouched: reading, fetching, branching, checking out, pushing an existing commit.
-- **THE AGREED WORKFLOW. Four steps, and only one is Helen's.**
-  1. Claude works on a branch, then **pushes it and opens the PR with no ask at all**: `sh scripts/git-push-agent.sh <branch>:<branch>`, then `sh scripts/gh-write.sh pr-create <repo> <branch> "<title>" tmp/body.md`. Always in the public repo; in the two private repos for anything but a small set of changes (below).
-  2. **Helen reviews the PR and merges it. That is all she does.** Claude opening a PR is not, and never becomes, authorization to merge it.
-  3. Claude runs `sh scripts/git-fetch-main.sh`, deletes the merged branch local and remote (`sh scripts/git-push-agent.sh :<branch>`), and branches afresh.
-  4. Repeat. Claude is never on `main`, so the hook should never actually fire.
-- **ONE PR PER FEATURE OR OBVIOUS GROUP OF WORK** -- not one per sitting, not one per commit. Helen: *"Deploys are limited, but not that badly."* Every merge to `main` is a deploy, so keep each topic its own COMMIT and say in the description what each commit is. DECISIONS §11.
-- **Pushing runs as a separate GitHub identity, `DeckOfPandas-agentic-claude`, over HTTPS — never `origin`, which is SSH and dies in the container.** You never handle the token: `sh scripts/git-push-agent.sh <branch>:<branch> [repo] [dir]`, `sh scripts/git-clone-agent.sh <repo> [dir]`, `sh scripts/git-fetch-agent.sh <dir> <repo> [ref] [--keep-head]`. **Pushing to a private repo, give its `dir` as well as its `repo`, every time**: nothing checks that they match, and a drafts branch pushed at the public repo publishes private recipes. **Never build a URL with the token in it**; `guard-token-expansion.py` refuses the shape. DECISIONS §11.
-  - **Commit AUTHORSHIP does not change.** Commits stay authored as Helen with the usual `Co-Authored-By: Claude` trailer. Do not set `user.name`/`user.email` to the bot anywhere.
-  - **Read `.user.login` off what a write returns** (`scripts/gh-write.sh` prints it) rather than assume which account GitHub recorded.
-- **Pushing needs no ask, in any of the three repos. Pushing is not merging**: the public repo's `main` only ever moves via a PR Helen merges. A commit sitting unpushed on one disk exists in exactly one place, which is the real risk.
-- **THE TWO PRIVATE DRAFTS REPOS: A SMALL SET OF CHANGES MAY BE PUSHED STRAIGHT TO THEIR `main`; A BIGGER FOOTPRINT IS A PR.** Helen: *"PRs for the main repo, pushing to main for the private repos is fine for small sets of changes. Changes with a bigger footprint should be PRs."* `sh scripts/git-push-agent.sh <branch>:main <repo> <dir>`. You still COMMIT on a branch there — the hook refuses a commit on any `main` — and if you are unsure whether a change is small, it is a PR.
-- **Every PR's base is `main`. Never stack a PR on another PR's branch, and read a PR's `state` before pushing to a branch whose state you have not checked since you last looked — including your own.** GitHub moves a stacked PR onto `main` only when its base BRANCH is deleted, and a merged PR's branch still accepts a push that reaches nothing. If a second piece needs the first, say "merge #A first" and rebase onto `main` once it has. `sh scripts/gh-read.sh repos/DeckOfPandas/<repo>/pulls/<N> --fields state,merged` answers it in one call. **Merging is Helen's, so a branch's state can change under you at any moment.** DECISIONS §11.
-- **If you have been told nothing about a merge, check rather than assume.**
-- **A RED `main` IS A DEPLOY OUTAGE, NOT A RED BUILD.** The suite gates the deploy, so one merge that turns it red stops every LATER merge going live too, silently. **A session that merges, or is told of a merge, runs `sh scripts/main-ci-status.sh`, and a red one is the first thing to report, before the work it came for.** Never merge over a known-red suite expecting the next PR to fix it. MANUAL §10, DECISIONS §12.
-- **NEVER run `git reset --hard` (or `git checkout --` / `git restore` over a dirty tree, or `git clean -fd`) without asking me first, every single time.** `.claude/hooks/guard-destructive-git.py` enforces it whenever `git status` is not clean. **Check `git status` first and say what it shows.** If something needs discarding and I am not around, `git stash -u` instead: it is reversible. DECISIONS §11.
-- **Check `git branch --show-current` immediately before every `git commit`, IN A SEPARATE TOOL CALL** — never in the same shell command as the commit, where it prints after the commit has happened. **A check that cannot stop the thing it is checking is a narration, not a check.** The question is not only "am I on `main`" but "am I still where I left off": `/workspace` is a bind mount, so another session — or Helen — switching branch moves the ground under you with no signal. Re-check after any long gap. DECISIONS §11.
-- **ALWAYS tag issues in commit messages.** `Fixes #N` / `Closes #N` for every issue a commit resolves; `Towards #N` / `See #N` in the body for one it only touches. **A commit's keyword does NOT close the issue on a PR the agent account opened — the PR description does.** So keep the commit trailers for the history, **and put every closing line in the PR description too, one keyword per issue per line, never a comma list**. Read the issue list after the merge. When summarising work, list the issue numbers involved. DECISIONS §11.
-- **A bare `#N` only resolves within its OWN repository.** Cross-repo references need the full form: `Towards DeckOfPandas/helen-triages#314`.
+## Proofreading — Helen is the last judgement before a recipe publishes
+- **If you edit a recipe file, on either site, set `meta.proofread: false` in
+  the SAME commit.** Helen proofreads every one by hand before it goes live;
+  if Claude changes the file afterwards, her proofread no longer covers what
+  is in it. **This applies to any change, including ones that look safe.**
+  The one standing exception: a tag or star change Helen has agreed row by
+  row keeps her flag, and `BASELINE_COMMIT` moves to it in the next commit.
+  DECISIONS §4.0.
+- **THE GATE FAILS CLOSED: a food or cocktail recipe publishes only if it
+  says `awaiting_fix: false` AND `proofread: true`, and a cocktail must also
+  say `rewritten: true`.** **`rewritten` is Helen's to write, like
+  `proofread`: an agent never sets it, on either site.** Either flag missing,
+  the old hyphenated `awaiting-fix`, or a quoted string: all held back, and
+  all break a test. **Never write the hyphenated form** — Liquid parses
+  `page.meta.awaiting-fix` as SUBTRACTION. The mechanism is
+  `_plugins/publish_gate.rb`, whose build-log line names the flag that held
+  each page back.
+- `tests/test_front_matter.py::test_agent_edited_recipes_are_not_marked_proofread`
+  enforces it from git history: a recipe whose newest commit carries a
+  `Co-Authored-By: Claude` trailer must say `proofread: false`. Cocktail
+  recipes have the same test.
+- **The exception is Helen's to grant, not yours.** If she has reviewed the
+  change line by line, move `BASELINE_COMMIT` (or `COCKTAIL_BASELINE_COMMIT`
+  in `tests/test_cocktails.py`) forward in a commit of its own, quoting her
+  grant, and prove it by running the test with the old value and watching it
+  name the files. **Never move it to make a red test go green.** Cheapest: if
+  she reads the rendered pages on the branch and says so, flip the flags back
+  in a second commit and move the baseline in a third.
+- **`QQ` is Helen's placeholder.** Never fix it or convert it, and never
+  delete a `QQ original` line.
+- **Promotion is Helen's to start.** Claude never decides a file is ready and
+  never moves one to the public repo unasked. `model_instructions/PIPELINE.md` §4.
 
-## Proofreading -- Helen is the last judgement before a recipe publishes
-- **If you edit a recipe file, on either site, set `meta.proofread: false` in the SAME commit.** Helen proofreads every one by hand before it goes live; if Claude changes the file afterwards, her proofread no longer covers what is in it. **This applies to any change, including ones that look safe.** The one standing exception: a tag or star change Helen has agreed row by row keeps her flag, and `BASELINE_COMMIT` moves to it in the next commit. DECISIONS §4.0.
-- **THE GATE FAILS CLOSED: a food or cocktail recipe publishes only if it says `awaiting_fix: false` AND `proofread: true`, and a cocktail must also say `rewritten: true`.** An explicit pass on each is the only thing that lets a page through. **`rewritten` is Helen's to write, like `proofread`: an agent never sets it, on either site.** Either flag missing, the old hyphenated `awaiting-fix`, or a quoted string: all held back, and all break a test, which stops the build. **Never write the hyphenated form** — Liquid parses `page.meta.awaiting-fix` as SUBTRACTION. The mechanism is `_plugins/publish_gate.rb`, and its build-log line names which flag held each page back. DECISIONS §4.0.
-- `tests/test_front_matter.py::test_agent_edited_recipes_are_not_marked_proofread` enforces it by reading git history: if a recipe's newest commit carries a `Co-Authored-By: Claude` trailer, the file must say `proofread: false`. Cocktail recipes have the same test.
-- **The exception is Helen's to grant, not yours.** If she has reviewed the change herself, line by line, then she was the last judgement even though an agent's commit wrote the bytes. Move `BASELINE_COMMIT` (or `COCKTAIL_BASELINE_COMMIT` in `tests/test_cocktails.py`) forward, in a commit of its own, quoting her grant in the commit message, and prove it afterwards by running the test with the old value and watching it name the files. **Never move it to make a red test go green.** **The cheapest shape: if she reads the rendered pages ON THE BRANCH before it merges and says so, flip the flags back in a second commit and move the baseline in a third — nothing ever leaves the live site.** DECISIONS §4.0.
-- **`QQ` is Helen's placeholder.** Never fix it or convert it, and never delete a `QQ original` line.
-- **Promotion is Helen's to start.** Helen promotes a recipe herself, or asks Claude to. Claude never decides a file is ready and never moves one to the public repo unasked. `model_instructions/PIPELINE.md` §4.
-
-## GitHub Issues and Pull Requests -- read/write, never merge, never repo settings
-- Claude may READ, RAISE, CLOSE, REOPEN, COMMENT ON, LABEL and ASSIGN issues, and OPEN pull requests, on `DeckOfPandas/helen-triages`, `helen-triages-food-private` and `helen-triages-cocktails-private`. **On the kit, `DeckOfPandas/helen-contains-claude-webdev`, Claude may READ and OPEN PRs, and never push to its `main`** (clone it into `_kit_upstream`). **Those four repositories and no others. That is the entire permission.** DECISIONS §11.
-- **One credential: `AGENT_GH_TOKEN`**, the agent account's classic PAT with `repo` and `workflow` scope, good on all three repos.
-- **A workflow file is an ordinary PR**: a change under `.github/workflows/` is pushed on a branch like any other. **The scope widens what can be pushed, not what may be touched**: the Actions *settings*, secrets and rulesets stay Helen's. An invalid workflow file blocks every merge until a PR repairs it (MANUAL §10), so parse the YAML and run `tests/test_site_config.py` before pushing one. DECISIONS §12.
-- **MERGING IS PREVENTED BY NOTHING BUT THIS LINE, SO TREAT IT AS ABSOLUTE.** A classic `repo`-scoped token held by a collaborator CAN merge. Never merge a pull request, never close one as merged, never approve one. Never change repository settings, secrets, Actions, webhooks or collaborators. Never act on any other repository. **Pushing a branch has never been, and does not become, a way to move the public repo's `main`.**
-- **NEVER CREATE ISSUES OR PRs IN A BURST.** Twenty issues and two PRs in under an hour got the agent account flagged as spam, and GitHub hid **everything it had ever written** from everyone but the account itself, while the API reported it all open and normal.
-  - **A batch of issues is ONE issue with a checklist**, never one issue per file. Creations are at least **5 minutes apart**, at most 20 issues and 5 PRs a day: the kit's `guard-github-burst.py` enforces it. DECISIONS §11.
-  - **When Helen says she cannot see something the API says exists, believe her first** and check the page logged out: `sh scripts/github-public-status.sh <url>`. A public URL returning 404 while the API returns 200 is the flag. The branches stay visible, so the way through is the compare link: `https://github.com/DeckOfPandas/<repo>/compare/main...<branch>`. Only Helen can appeal to GitHub Support.
-- **DON'T PROBE A TOKEN'S SCOPE OR ITS PRESENCE -- USE IT AND READ THE STATUS CODE.** A 401 or 403 is the answer and never renders the value. **Do not treat a 403 as a problem to route around.**
-- **Never attempt to broaden access beyond the above.** No `gh auth login`, no wider token, no extra scopes or repositories, no second credential. If something genuinely needs a permission not covered here, say so and stop -- Helen will do it by hand.
-- **Never print, echo, log or commit the token**, and never write it into a file in this repo. **NEVER PUT A SECRET'S NAME IN AN `echo` OR `printf` AT ALL -- there is no safe form and no exception to remember**, not even `${TOK:+set}` or `${#TOK}`. Using `${TOK}` where it is CONSUMED rather than printed is fine. `.claude/hooks/guard-token-expansion.py` enforces all of this. DECISIONS §11.
-- **FOR `gh`, USE THE WRAPPER AND DON'T NAME THE TOKEN AT ALL: `sh scripts/gh-agent.sh <args>`.** It deliberately does not check the credential is present -- use it and read `gh`'s own 401.
-- **CLOSE AN ISSUE WITH A COMMIT TRAILER, NOT THE API, WHENEVER A TRAILER CAN DO IT.** A trailer ties the closure to the commit that earned it. Reach for the API only where a trailer cannot work -- the clear case being work in a nested private drafts repo, since a cross-repo trailer does not close a public issue.
-- Closing an issue is a real action on a shared, outward-facing thing: **say which issues you are about to close and why before doing it**, unless Helen has just told you to close them. That applies to a trailer too -- name them before pushing, while the message can still be rewritten.
-
-## Writing -- replace, never append
-Helen: *"Through this whole project I have begged to delete and replace rather than just append!"* `tests/test_comment_rule.py` holds a comment's length and its dates, as a ratchet over what predates the rule; for everything else below, these paragraphs are the enforcement.
-- **A code comment states a constraint the code cannot show**: what must stay true, and what breaks if it does not. Present tense. **No dates, no quotations, no "used to", no account of how it was found.** One pointer (`#N`, `MANUAL §n` or `DECISIONS §n`) is enough. At most eight lines a block, fifteen for a file header.
-- **When code changes, REWRITE its comment. Never add a dated paragraph under the old one.** Delete the comment when its code goes. Before a comment names a file, a test, a function or a count, check it exists; never write a count a command can print.
-- **The story goes in the commit message**: what was tried, what broke, the measurements. Git keeps it; the file does not need to.
-- **`MANUAL.md` is the present tense**: what is true today, with no history. When something changes, rewrite the paragraph that describes it.
-- **`DECISIONS.md` holds one short entry per LIVE ruling of Helen's**: the date and issue, the ruling as a sentence, her words, her reason. **When a ruling changes, REPLACE its entry**; the old one is in git history. A bug story is not a ruling and does not go there. Then `python3 scripts/build_decisions_index.py --write`.
-- **Name files, never line numbers**, in any document or comment.
-
-## Working with Helen
-- **Ask her the decisions as you hit them, inline, not in a batch at the end**, and bring the fact that forces the decision, not options in the abstract. For anything visual, build candidates on the real page and let her look (MANUAL §13.11); do not argue for one.
-- **SHOW HER THE BRANCH ON A LOCAL SERVER; NEVER ASK HER TO PULL AND BUILD.** Helen: *"Please show me on a dev page -- this is how I would like to work from now on. I used to pull locally and build myself, but I kept getting tangled."* Serve your own worktree's branch in the background — `bundle exec jekyll serve --config _config.yml,_config_local.yml --port <port> --host 0.0.0.0 --destination tmp/site-<port>` — and give her the URL. The ports are the pairs the container binds (today only 4001/4002; she is adding more). Run `ss -ltn` first, take a free one, and **never stop a server you did not start**. MANUAL §13.11, DECISIONS §13.
-- **Do not trust a document over the code.** Verify anything you are about to act on; if they disagree, the code wins and the document gets fixed.
-- **Her hours are hers. Never suggest stopping.**
-- When you finish, say: what changed and where, the local URL serving it, what you verified and how, which issues the commits close or touch, which PRs are waiting on her to merge (in this repo and the private ones), and anything left undone and why.
-
-## Normal workflow
-- If you need a scratch temporary folder, create one in this project folder and add it to .gitignore.
-- Don't delete handover or jobs list documents.
-- **NEVER remove or tidy up an agent's worktree under `.claude/worktrees/`, even once its branch is merged and deleted.** They hold the scratch files and screenshots each helper worked from, which is the only record of HOW a piece of work was measured. `git worktree remove`, `rm -rf` on one, and `git worktree prune` are all Helen's. This does not stop you deleting a merged BRANCH — `git branch -d` refusing one a worktree holds is not a problem to solve.
-- **CLONE THE TWO PRIVATE DRAFTS REPOS INTO A FRESH WORKTREE WHENEVER YOU WANT THEM. NO ASK, ANY SESSION, ANY TIME.** Cloning is READING, and both folders are gitignored here. Never symlink them.
+## The drafts and the suite
+- **CLONE THE TWO PRIVATE DRAFTS REPOS INTO A FRESH WORKTREE WHENEVER YOU WANT
+  THEM. NO ASK.** Cloning is reading; both folders are gitignored. Never
+  symlink them.
 
       sh scripts/git-clone-agent.sh helen-triages-cocktails-private _cocktail_drafts
       sh scripts/git-clone-agent.sh helen-triages-food-private _food_drafts
 
-  **WITHOUT THEM TWO THIRDS OF THE SUITE DOES NOT EXIST**, and it reports green rather than absent, because most of the missing checks are parametrised per file, and a parametrisation with no files reports as ONE skip ("got empty parameter set"), not as hundreds of missing tests. **A green `pytest` in a bare worktree is not evidence about the cocktail recipes or the drafts** — `conftest.py` says so at the end of every such run. Fetch a clone immediately before any run whose result you will act on. MANUAL §9.1.
-- **One `pytest` at a time**, never two.
-- **THE BASH TOOL: A COMMAND'S TEXT MUST BE ITS WHOLE MEANING.** The permission checker proves, before anything runs, that a command touches only the working directory, and it can do that only when nothing is hidden from it. `.claude/hooks/guard-unanalyzable-bash.py` refuses what it cannot analyse, so the cost lands on the session and not on Helen as a prompt. **One simple command per call. When a command needs to be clever, put the cleverness in a file and run the file** (`python3 tmp/thing.py`, `sh tmp/thing.sh`) — which also leaves a record of exactly what was measured. Refused:
-  - a heredoc, `$(...)` or backticks, a pipe, chaining with `&&` / `||` / `;`;
-  - a leading `cd`, `git -C <path>`, a leading `NAME=value`;
-  - a glob in an argument (`grep -r "x" dir/`, never `dir/*.md` or `--include=*.md`);
-  - an unquoted `(` or `)`, or an unquoted lone `&`; a quoted `[`, `]` or `|` given to `sh scripts/...`;
-  - `$[` outside single quotes — **write a regex in single quotes**. `$(...)`, backticks and `$[` are NOT exempt inside DOUBLE quotes.
-  - an unquoted word starting `=` (`curl --proto '=https'`, quoted);
-  - `git diff`/`log`/`show` with `--output`, `--no-index`, `--ext-diff` or `--textconv` (`guard-git-output.py`) — redirect to `tmp/` instead.
-  - **Allowed:** redirection to a static path, `2>&1` and `>/dev/null` included; `&&`, `;`, `|` and globs inside quotes; a bare `$VAR`; lowercase `git -c key=value`.
-  - **A subagent you brief gets these rules from you.** Say in its prompt: one simple command per call, no `cd`, cleverness in a `tmp/` file.
-- **EVERY python/ruby/node/perl program goes in a file, however short** — `.claude/hooks/guard-inline-script.py` refuses every `-c`/`-e` form. A `tmp/` script **still asks Helen, on purpose**, so reach first for a committed allow-listed wrapper; a `tmp/` script is for the genuine one-off.
-- **Never `sed`** (`.claude/hooks/guard-sed.py`) and **never `awk`** (`.claude/hooks/guard-awk.py`). Use Python in a file.
-- **Git INSIDE a drafts clone is `sh scripts/git-drafts.sh <dir> <verb>`**: `status`, `diff`, `log`, `show`, `branch --show-current`, `checkout -b <new>`, `add -- <paths>`, `commit -F tmp/<file>`, and nothing else. It refuses a commit on that repo's `main`. The branch check before a commit is still its own tool call.
-- **Never build a commit message or PR body inline.** Write it to a file and pass the file: `git commit -F tmp/commit-msg.txt`, `--body-file tmp/pr-body.md`. **`gh pr edit` fails on this token** — change a PR's body with `sh scripts/gh-write.sh pr-body <repo> <N> tmp/whatever.md`.
-- **The routine calls are allow-listed, so they do not prompt.** `.claude/settings.json` allows: the `gh` wrapper's `issue list`/`view`/`comment`/`create`/`edit` and `pr list`/`view`/`diff`/`create`/`comment`/`repo clone`; **`sh scripts/gh-read.sh <endpoint> [--fields a,b | --each a,b | --jq <expr>] [--paginate]`** for every REST read (prefer `--fields`/`--each`; GET only, three repos only, and never `gh-agent.sh api` for a read, which prompts because `api` is also the door to a merge); **`sh scripts/gh-write.sh pr-create|pr-body|comment|issue-label`**; `sh scripts/github-public-status.sh <url>`; `sh scripts/check-link.sh <url>` (does a link, or a page on the dev server, resolve; never a bare `curl`); **`sh scripts/main-ci-status.sh`**; the three network wrappers; `sh scripts/git-drafts.sh`; `sh scripts/git-diff-main-checkout.sh [--stat | --patch tmp/<name>.patch]` (Helen's uncommitted edits in `/workspace`, read-only); `sh scripts/git-fetch-main.sh` then `git merge origin/main`; `git branch --show-current`; `git add -- <paths>` (the `--` is what makes it safe); `pytest` and `python3 -m pytest`; `python3 scripts/verify.py`; `node --test`; read-only git (`status`, `diff`, `log`, `show`, `blame`, `ls-tree`, `check-ignore`); `git commit -F`; and `scripts/browser/`'s `install.sh`, `build.sh`, `serve.sh`, `capture.sh`, `shoot.sh`, `crop.sh`, `styles.sh`, `gaps.sh`, `click-crop.sh`. **`pr merge` and `pr review` are in the DENY list**, and a deny cannot be overridden by an allow.
-- **AN ALLOW RULE IS ONLY AS NARROW AS WHAT IT LETS THROUGH. Before adding one, ask what the prompt was the last guard of.** A rule ending ` *` accepts ANY further argument: `git fetch --upload-pack=`, `git clone --template=` and `node --import` all RUN a program, and `curl -o <path>` WRITES a file anywhere. Prefer an exact command, or a committed wrapper that checks its own arguments and has its refusals proved in `tests/test_agent_wrappers.py`, which pins which open-ended rules exist.
-- **A COMMAND THAT BUILDS A PATH AT RUN TIME GETS A WRAPPER, NOT A PROMPT.** `-F body=@tmp/x.md`, `curl -o <file>` and their kin read or write a path the checker cannot see. The answer is the `gh-read.sh` shape: a committed script under `scripts/` that takes only arguments it understands and refuses the rest.
-- **A PROMPT HELEN HAS STOPPED READING GUARDS NOTHING -- SO EVERY BASH `description` SAYS WHAT A CALL TOUCHES.** Name what is read or written and where (*"Read-only GitHub GET: PR #1091's state. No local files read or written."*), never just the goal (*"Check whether the PR is merged"*).
+  **WITHOUT THEM TWO THIRDS OF THE SUITE DOES NOT EXIST**, and it reports
+  green rather than absent. **A green `pytest` in a bare worktree is not
+  evidence about the cocktail recipes or the drafts** — the session-start
+  hook and `conftest.py` both say so. Fetch a clone
+  (`sh scripts/git-fetch-agent.sh <dir> <repo>`) immediately before any run
+  whose result you will act on. MANUAL §9.1.
+- `python3 scripts/verify.py` is the full check before a push; part of the
+  suite is `sh scripts/pytest.sh tests/<path>`, never `pytest <args>`.
+
+## Writing — replace, never append
+Helen: *"Through this whole project I have begged to delete and replace
+rather than just append!"* `tests/test_comment_rule.py` holds a comment's
+length and its dates, as a ratchet over what predates the rule; for the rest,
+these lines are the enforcement.
+- **A comment: one pointer at most** (`#N`, `MANUAL §n` or `DECISIONS §n`),
+  no quotations, at most eight lines a block, fifteen for a file header.
+- **`MANUAL.md` is the present tense**: what is true today, with no history.
+  When something changes, rewrite the paragraph that describes it.
+- **`DECISIONS.md` holds one short entry per LIVE ruling of Helen's**: the
+  date and issue, the ruling, her words, her reason. **When a ruling changes,
+  REPLACE its entry**; a bug story is not a ruling. Then
+  `python3 scripts/build_decisions_index.py --write`.
+
+## Working with Helen
+- **Ask her the decisions as you hit them, inline**, with the fact that forces
+  each. For anything visual, build candidates on the real page and let her
+  look (MANUAL §13.11); do not argue for one.
+- When you finish, say: what changed and where, the local URL serving it,
+  what you verified and how, which issues the commits close or touch, which
+  PRs are waiting on her (here, in the private repos and in the kit), and
+  anything left undone and why.
+- Don't delete handover or jobs list documents.

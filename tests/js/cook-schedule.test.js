@@ -4,7 +4,7 @@
 // Run from the repo root with no arguments. Node's test runner discovers
 // *.test.js itself; passing this file's directory does not work the same way:
 //
-//   .node-runtime/node/bin/node --test
+//   node --test
 //
 // A wrong number here ruins a meal: it decides what time a joint goes into the
 // oven so that dinner is ready when you said it would be.

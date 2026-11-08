@@ -4,7 +4,7 @@
 //
 // Run from the repo root, with the local Node runtime:
 //
-//   .node-runtime/node/bin/node --test tests/js/*.test.js
+//   node --test tests/js/*.test.js
 'use strict';
 
 const test = require('node:test');

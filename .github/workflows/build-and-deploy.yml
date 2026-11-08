@@ -61,8 +61,8 @@ jobs:
           node-version: "24"
 
       # The glob is not optional: `node --test tests/js/` treats the directory as
-      # a single test file. `.node-runtime/` is gitignored, so CI uses its own
-      # Node.
+      # a single test file. The Node major above is kit.env's NODE_MAJOR
+      # (tests/test_ci_matches_container.py).
       - name: JavaScript tests
         run: node --test tests/js/*.test.js
 

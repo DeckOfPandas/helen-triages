@@ -3,7 +3,7 @@
 //
 // Run from the repo root, with the local Node runtime:
 //
-//   .node-runtime/node/bin/node --test tests/js/*.test.js
+//   node --test tests/js/*.test.js
 //
 // The trap: a recipe opened in a new tab has the index as its referrer and one
 // entry of session history, so history.back() does nothing and the arrow is
