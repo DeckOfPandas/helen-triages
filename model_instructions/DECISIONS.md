@@ -89,12 +89,13 @@ stated. Italics in quotation marks are Helen's own words.
 
 ## §1 How to run it
 
-- **2026-11-08 — helen-triages publishes ports 5000 to 5010, the same number
-  inside and out.** Helen: *"I'd like to pair 5000:5000, 5001:5001 and so on
-  up to 5010:5010 ... Helen Triages will use these ports going forward. Other
-  projects will use other thousands."* One block per project means no two
-  containers want the same host port, and a session can hand her any URL in
-  the block. `jekyll-local` is 5000 and `jekyll-prod` 5001.
+- **2026-11-08 — ports are the machine's to choose; the committed default is
+  5000 to 5010, the same number inside and out.** Helen asked for *"the local,
+  uncommitted override file that sets ports"*, and of the default: *"Default
+  ports can be 5000-5010, good idea."* Which host ports are free depends on
+  the machine, so `kit.local.env` may replace `kit.env`'s `PORTS`
+  (helen-contains-claude-webdev#28); a checkout without one still works.
+  `jekyll-local` is 5000 and `jekyll-prod` 5001.
 - **2026-09-09 — the container has a fixed name, so a second `run.sh` is
   refused.** A session's call, not Helen's ruling. Without `--name`, two
   terminals gave two containers on one bind mount, and on 2026-09-08 a
