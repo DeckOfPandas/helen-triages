@@ -457,6 +457,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   where the source has an intro.** Helen: *"QQ original yes, then QQ claude
   rewrite, then I'll do my own and delete the other two."* A rewrite of the
   intro, not a quip; an ingest never drafts a tagline of its own.
+- **2026-11-03 — a recipe written up in a chat, not transcribed from a page,
+  has `QQ Claude` method lines and no `QQ original`.** Helen, of the fish
+  write-ups: *"QQ Claude lines only"*; their "REMOVED:" ingredient lines and
+  "Allergy check" sections: *"leave as-is so I can decide how to amend"*. A
+  REMOVED line stays as a `QQ REMOVED:` ingredient line, the allergy check
+  stays word for word in the body under a `QQ Allergy check` heading, and the
+  write-up's notes become QQ-labelled notes. The words are already a
+  paraphrase, so there is no source text to keep beside them. Applied again to
+  the cockerel batch, 2026-11-06, whose source is Helen's (§4, "Henry").
 - **2026-11-03 — an unqualified milk, egg or butter takes the house default,
   and the line says what the source printed.** Helen: *"If milk and eggs
   aren't qualified in the source then: milk -> semi-skimmed milk, egg -> large
