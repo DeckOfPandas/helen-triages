@@ -1,7 +1,7 @@
 // Tests for assets/js/filter-state.js: the index's filter query-string grammar
 // (#40) and its filter state shape (#52). No DOM required.
 //
-// Run from the repo root: .node-runtime/node/bin/node --test
+// Run from the repo root: node --test
 'use strict';
 
 const test = require('node:test');

@@ -1,54 +1,15 @@
 #!/bin/sh
 # Print every element matching a selector's box (CSS px) and computed styles,
-# for spot-checking spacing and typography drift without squinting at two
-# screenshots. Usage:
+# through tools/dev/styles.js, for spot-checking spacing and typography drift.
 #   sh scripts/browser/styles.sh <path> <selector> [width] [prop,prop,...]
-#
-# By default: font-family, font-size, font-weight, line-height,
-# letter-spacing, text-transform, color, background-color, the four margin
-# and four padding longhands, gap, display. A comma list of lowercase-hyphen
-# property names overrides that -- e.g. `color,background-color`.
-#
-# The port comes from tmp/browser/port, written by this worktree's serve.sh;
-# see shoot.sh. 4010 only when no server is running here.
+# Without a property list: type, colour, the margin and padding longhands, gap
+# and display.
 set -eu
-
-refuse() {
-  echo "styles.sh: refused -- $1" >&2
-  exit 2
-}
-
-[ "$#" -ge 2 ] || refuse "usage: sh scripts/browser/styles.sh <path> <selector> [width] [prop,prop,...]"
-path="$1"
-selector="$2"
-width="${3:-1280}"
-props="${4:-}"
-
-case "$path" in
-  /*) ;;
-  *) refuse "'$path' must start with /" ;;
-esac
-case "$path" in
-  *..*) refuse "'$path' may not contain '..'" ;;
-  *://*) refuse "'$path' may not contain a scheme" ;;
-esac
-[ -n "$selector" ] || refuse "the selector may not be empty"
-case "$width" in
-  ''|*[!0-9]*) refuse "'$width' must be an integer" ;;
-esac
-if [ "$width" -lt 200 ] || [ "$width" -gt 2000 ]; then
-  refuse "'$width' must be between 200 and 2000"
+WRAPPER=styles.sh
+[ "$#" -ge 2 ] && [ "$#" -le 4 ] \
+  || { echo "usage: sh scripts/browser/styles.sh <path> <selector> [width] [prop,prop,...]" >&2; exit 2; }
+. scripts/browser/_site.sh
+if [ "$#" -eq 4 ]; then
+  exec node tools/dev/styles.js "$base" "$2" "$page" --width "$3" --props "$4"
 fi
-if [ -n "$props" ]; then
-  case "$props" in
-    ''|,*|*,|*,,*|*[!a-z,-]*)
-      refuse "'$props' must be a comma-separated list of lowercase-hyphen property names" ;;
-  esac
-fi
-
-port=4010
-if [ -f tmp/browser/port ]; then
-  read -r port < tmp/browser/port
-fi
-. scripts/browser/env.sh
-node scripts/browser/styles.js "http://127.0.0.1:$port/helen-triages$path" "$selector" "$width" "$props"
+exec node tools/dev/styles.js "$base" "$2" "$page" --width "${3:-1280}"

@@ -4267,7 +4267,7 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   rule was then broken again, so the hook followed on 2026-08-20. It judges
   the repo a leading `cd` or `git -C` points at. It cannot see a push, so
   `git-push-agent.sh` itself refuses any `main` destination on `helen-triages`
-  (2026-09-11), and `git-drafts.sh` refuses a commit on a drafts repo's `main`.
+  (2026-09-11), and `git-nested.sh` refuses a commit on a drafts repo's `main`.
 - **2026-08-18 — `git reset --hard`, `git checkout --` or `git restore` over a
   dirty tree, and `git clean`, need Helen's yes every single time;
   `guard-destructive-git.py` enforces it.** A `git reset --hard origin/main`,
@@ -4306,15 +4306,13 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   midnight — that's a good place to stop". Helen: *"I am aware of the time. I
   keep my own hours. Please never tell me to stop or go to bed — those things
   are up to me."*
-- **2026-08-24 — larger PRs: one PR per sitting, not one per topic, because
-  every merge to `main` is a deploy.** Helen: *"I have a soft limit on deploys
-  per hour, so I prefer larger pull requests where that's practical."* Refined
-  2026-10-10, when sessions were still opening one PR per topic: *"Please make
-  larger PRs, as we're soft-limited on deploys per hour."* Four small PRs
-  spend four deploys. Gather a session's work for one repo onto one branch,
-  keep the topics apart as commits, and say in the description what each
-  commit is. Split only where one piece must not wait for another, or she
-  asks.
+- **2026-11-07, #1438 — one PR per feature or obvious group of work: not one
+  per sitting, and not one per commit.** Helen: *"One PR per feature or
+  obvious group of work. This replaces 'one PR per sitting' in CLAUDE.md and
+  DECISIONS. Deploys are limited, but not that badly."* Every merge to `main`
+  is still a deploy, so topics that belong together share a PR, with each
+  topic its own commit and the description saying what each commit is. It
+  is also the kit's rule, in `.claude/kit/RULES.md`.
 - **2026-08-29 — an issue is closed with a commit trailer, not the API,
   whenever a trailer can do it.** Helen: *"Close #540 (via commit message if
   possible -- this is always my preference)."* A trailer ties the closure to
@@ -4456,6 +4454,40 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   every other worktree: `/workspace/.git/config` is shared by all of them and
   the script existed on one branch. So each wrapper passes it per invocation.
   Commits stay authored as Helen.
+- **2026-11-07, #1438 — the kit, `DeckOfPandas/helen-contains-claude-webdev`,
+  is a fourth repo: read it and open PRs there, never merge, never push to
+  its `main`.** Helen: *"My permissions, for good: you may read
+  DeckOfPandas/helen-contains-claude-webdev and open PRs there. Never merge,
+  and never push to its main."* Granted so this repo can take the kit's sync
+  and send its own improvements upstream. `scripts/github.local.conf`
+  carries it: the kit is in `GH_REPOS`, out of `MAIN_PUSH_REPOS`, and in
+  `PR_ONLY_REPOS`, so `gh-write.sh` gives it `pr-create` and `pr-body` only;
+  commenting, issues and labels there were not granted.
+- **2026-11-07, #1438 — this repo runs on the kit: its hooks, wrappers,
+  container and rules are the kit's, synced by `/kit-sync`, and an
+  improvement to a kit file goes back to the kit as a kit PR.** Helen ruled
+  each difference after a file-by-file comparison; the kit's version won
+  everywhere except where ours went upstream first (kit PR DeckOfPandas/helen-contains-claude-webdev#23). What stays
+  ours is outside the manifest: the drafts, the publish gate, `verify.py`,
+  `scripts/browser/`, the site scripts, these documents. Her particular
+  rulings:
+  - **`.devcontainer/devcontainer.json` is watched**: ours, and a sync only
+    reports kit changes to its template (`.claude/kit/watched`).
+  - **No kit-owned, generated or watched path is ever part of the site
+    build**; `tests/kit/test_site_excludes_kit.py` holds `_config.yml` to it.
+  - **Our comment rule does not judge the kit's files**: the kit's own rules
+    govern them, and they change only by a kit PR, so
+    `tests/test_comment_rule.py` skips every path in `kit.lock`. Long
+    comments in the kit are fixed in the kit.
+  - **The wrappers read `scripts/github.local.conf`**, which Helen keeps in
+    the main checkout; no session edits it.
+  - **The kit's container and its slim Ruby image**, our values in
+    `.devcontainer/kit.env`. *"If the gems won't build on the slim image,
+    stop and tell me rather than working around it."*
+  - **`git-drafts.sh` becomes the kit's `git-nested.sh`**, and
+    `main-ci-status.sh` the kit's; the deploy-outage wording lives in
+    `CLAUDE.md`. `github-public-status.sh` drops `DeckOfPandas-agentic`:
+    *"that account no longer matters."*
 - **2026-09-11 — every PR's base is `main`, never another PR's branch; and a
   PR's `state` is read before pushing to any branch not checked since you last
   looked, your own included.** Two PRs missed the live site in one afternoon.
@@ -4474,7 +4506,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `git clone --template=` runs a directory's hooks, and `git fetch
   --upload-pack=` runs any program. Ask what an option can write as well:
   a `curl` rule was pruned on 2026-09-22 because `-o <path>` writes anywhere.
-  `tests/test_agent_wrappers.py` pins every open-ended rule.
+  `tests/kit/test_allow_list.py` pins every open-ended rule, the kit's in
+  the file and ours in `_reviewedOpenRules` in `.claude/settings.project.json`.
 - **2026-09-11 — a script in `tmp/` keeps asking Helen; no allow rule covers
   `tmp/`.** Put to her with the fact that the checker sees a script's name and
   not what it does, so such a rule would let unreviewed code read outside the
@@ -4522,9 +4555,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   written from everyone but itself while its own API listed it all as open.
   Helen said three times that there were no PRs and was twice answered with
   API output. So: believe her first and check the page logged out
-  (`sh scripts/github-public-status.sh <url>`). Her ruling the next day:
-  separate issues are fine when she asks, one at a time, 10–30 seconds apart.
-  Branches are never hidden, so a compare link still opens a PR by hand.
+  (`sh scripts/github-public-status.sh <url>`). Branches are never hidden, so
+  a compare link still opens a PR by hand.
+- **2026-11-07, #1438 — the kit's `guard-github-burst.py` enforces the burst
+  rule, with its 5-minute gap between creations.** Helen chose it over a
+  configurable gap: *"I almost never need several issues at once, and a batch
+  is one issue with a checklist anyway."* It replaces her 2026-09-15 ruling
+  that separate issues could go 10–30 seconds apart when she asked. The hook
+  also caps a day at 20 issues and 5 PRs, and refuses a script that creates.
 - **2026-09-15 — the account GitHub recorded is read off what a write
   returns, never assumed.** Helen made a new agent account,
   `DeckOfPandas-agentic-claude`, after the first was flagged. Its first PR
@@ -4591,15 +4629,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   my own local servers, so don't do that."* A server on a port the container
   does not publish (`scripts/browser/serve.sh`'s 4010 and up) is for a
   session's screenshots, not for her: say the host port, not the inside one.
-- **2026-09-21 — the file tools may read `/workspace/.node-runtime`, and
-  nothing may write there.** Helen: *"Reading /workspace/.node-runtime is
-  fine, please modify your settings to allow it."* A `Read(...)` allow rule
-  was tried first and does not override `blockReadsOutsideWorkingDirectories`,
-  so the grant is `additionalDirectories`, which widens read and write, plus
-  an `Edit(...)` deny to narrow it back. A settings edit does not reach a
-  running session: `/add-dir` does. The deny is documented, not measured
-  (#1191, 2026-09-24): worktree isolation refuses the write first, and testing
-  further would mean writing into her Node runtime.
+- **2026-11-07, #1438 — `/workspace/.node-runtime` is retired: no directory
+  grant, no deny.** Helen: *"Retire /workspace/.node-runtime."* Node is in the
+  kit's image, at `/usr/bin`, with Playwright's modules on `NODE_PATH`, so
+  nothing reads the host runtime any more.
 - **2026-09-21 — `Read(//dev/null)` and `Edit(//dev/null)` stay in the
   settings.** Helen added them on 2026-09-15 after a `curl -o /dev/null`
   prompted her: *"add to your settings that it's fine to access."* A session
@@ -4659,14 +4692,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   it has not looked at. The folder is in `additionalDirectories`, and a
   worktree session has been refused the read all the same: that is the
   mechanism lagging the rule, so ask her for `/add-dir`.
-- **2026-10-02 — git inside a drafts clone goes through
-  `sh scripts/git-drafts.sh <dir> <verb>`, a fixed list of verbs.** With a
-  leading `cd` and `git -C` both refused, a drafts pass had no sanctioned way
-  to branch or commit there, and a `tmp/` script asked Helen on every call.
-  Shown that, Helen: *"gotcha, thanks. Yes please do it."* Each verb is
-  narrowed to what its prompt was guarding: `diff` takes five named options
-  (`--output=` writes anywhere), `checkout` only `-b <new>`, and `commit` is
-  refused on that repo's `main`, which `guard-main-branch.py` cannot see.
+- **2026-10-02 — git inside a drafts clone goes through a wrapper with a
+  fixed list of verbs: today the kit's `sh scripts/git-nested.sh <dir>
+  <verb>`.** With a leading `cd` and `git -C` both refused, a drafts pass had
+  no sanctioned way to branch or commit there, and a `tmp/` script asked
+  Helen on every call. Shown that, Helen: *"gotcha, thanks. Yes please do
+  it."* Each verb is narrowed to what its prompt was guarding, `commit` is
+  refused on that repo's `main`, and the kit's version also turns off the
+  clone's own hooks, fsmonitor and external diff. Its folders are
+  `NESTED_DIRS` in `scripts/github.local.conf` (2026-11-07, #1438).
 - **2026-10-02 — this repository takes no outside contributions: a stranger's
   PR is not merged, and the fix ships from the agent account.** Seven minutes
   after #1273 was raised, an unknown account opened #1274 from a fork with

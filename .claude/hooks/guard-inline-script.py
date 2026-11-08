@@ -5,8 +5,8 @@ Matched: `-c` after `python`, `python2` or `python3`, and `-e` after `ruby`,
 `node` or `perl`, with a program following it. There is no length or quoting
 carve-out: an inline program is opaque to the permission checker, which must
 prove before anything runs that a command reads only inside the working
-directory, so under `blockReadsOutsideWorkingDirectories` it asks Helen at any
-length, whatever the allow list says. DECISIONS §11.
+directory, so under `blockReadsOutsideWorkingDirectories` it asks the human at
+any length, whatever the allow list says.
 
 Allowed on purpose:
 
@@ -19,7 +19,7 @@ Allowed on purpose:
 
 `shlex.split`, not a regex: the program is a quoted argument, and quoting is
 what a regex gets wrong. A command that will not tokenise is allowed rather
-than guessed at. Tested in `tests/test_text_tool_guards.py`.
+than guessed at. Tested in `tests/kit/test_text_tool_guards.py`.
 
 Invoked as `python3 <path>` so it needs no execute bit.
 """
@@ -84,35 +84,23 @@ def main() -> int:
             "permissionDecisionReason": (
                 f"BLOCKED: this `{name} {flag}` program belongs in a file. "
                 "Every inline program does, however short.\n\n"
-                "Helen, 2026-09-09, for the second time in one session: "
-                "\"please please please write those long lines to files rather "
-                "than running them all together.\" And CLAUDE.md: \"when a "
-                "command needs to be clever, put the cleverness in a file and "
-                "run the file.\"\n\n"
                 "THE REASON IS NOT STYLE, AND IT IS NOT LENGTH. "
                 "`.claude/settings.json` sets "
                 "`blockReadsOutsideWorkingDirectories`. Under that block, a "
-                "command the shell parser cannot analyze asks Helen -- "
+                "command the shell parser cannot analyze asks the human -- "
                 "whatever the allow list says -- because the checker's job is "
                 "to prove, before anything runs, that the command reads only "
                 "inside the working directory, and it cannot prove that about "
                 "code it cannot see. An inline program is opaque by "
                 "construction, so it always asks. A file argument is one "
-                "static path the checker can see. A `tmp/` script still asks "
-                "Helen, on purpose, so reach first for a committed "
-                "allow-listed wrapper; a `tmp/` script is for the genuine "
-                "one-off.\n\n"
+                "static path, so it is silent.\n\n"
                 "WHAT TO DO INSTEAD -- write it with the Write tool and run "
                 "the file:\n\n"
                 "    Write  tmp/thing.py\n"
                 "    Bash   python3 tmp/thing.py\n\n"
                 "That leaves a record of exactly what was measured, which a "
-                "one-off inline program never does.\n\n"
-                "This hook had a carve-out for short single-quoted one-liners "
-                "until 2026-09-10. It was removed because it rested on a "
-                "`Bash(python3 -c ' *)` allow rule that does not exist, and "
-                "because the read block would have asked anyway. Do not "
-                "reinstate it by shortening your program."
+                "one-off inline program never does. Shortening the program "
+                "does not help: the read block asks at any length."
             ),
         }
     }))

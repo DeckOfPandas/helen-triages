@@ -1,8 +1,15 @@
-FROM ruby:3.3-bookworm
+# Claude Code sandbox image. Build it through .devcontainer/run.sh, which reads
+# kit.env and passes each toggle in as a build argument. The defaults here are
+# for a bare `docker build` and match kit.env's shipped values.
+#
+# Every ARG sits immediately above the block that uses it: Docker hands a
+# declared ARG to every later RUN, so one declared at the top would make any
+# toggle rebuild the whole image. Blocks are ordered by how often they change.
 
-# Everything below runs at IMAGE BUILD time, inside Docker's own build
-# context -- this is not your host machine, so normal apt-get/npm installs
-# here are fine and don't touch anything outside the container.
+# run.sh sets this to ruby:<version>-slim-bookworm when WITH_RUBY=1. Both are
+# Debian bookworm, so every block below works on either.
+ARG BASE_IMAGE=debian:bookworm-slim
+FROM ${BASE_IMAGE}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -13,10 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     jq \
     less \
     nano \
-    build-essential \
-    libyaml-dev \
-    libxml2-dev \
-    zlib1g-dev \
+    procps \
     iptables \
     ipset \
     iproute2 \
@@ -24,65 +28,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-venv \
-    vim \
-    libnss3 \
-    libnspr4 \
-    libdbus-1-3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libdrm2 \
-    libxkbcommon0 \
-    libatspi2.0-0 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxrandr2 \
-    libgbm1 \
-    libasound2 \
-    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
-# Node, for the `claude` CLI itself and the project's JS tests.
-#
-# 24, MATCHING CI (#1203, 2026-09-28). This said 22 while
-# .github/workflows/build-and-deploy.yml's setup-node said 24, so the JS suite
-# ran on two different majors -- here and in the gate that decides whether the
-# site deploys -- for weeks without a difference showing. That is luck, not
-# compatibility, and the version a test passed under is part of what the pass
-# means. Helen chose to move the container up rather than CI down, since the
-# workflow file is hers to edit and this is not.
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+ARG NODE_MAJOR=24
+RUN curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Playwright with headless Chromium and WebKit (Safari's engine), for
-# scripts/browser/ (MANUAL §1), with every system library both need
-# (`--with-deps` apt-installs Playwright's own list, which supersedes the
-# hand-picked libs above -- they stay, harmless).
-# Helen, 2026-09-15: "shall I pre-install Playwright (and its dependencies) into
-# this Docker image?" -- because sessions now start in fresh worktrees, and
-# tmp/browser/ belongs to one worktree, so every session that wanted a
-# screenshot downloaded a few hundred MB first.
-#
-# THE VERSION IS PINNED TWICE, HERE AND IN scripts/browser/install.sh, and
-# tests/test_browser_harness.py fails if they differ. Bumping it means editing
-# both and rebuilding this image. Until the image is rebuilt, install.sh sees
-# the old version and installs the pinned one into tmp/browser/ as before.
-#
-# Root-owned under /opt, readable by the `helen` user without any chmod; the
-# harness reads it through scripts/browser/env.sh.
-RUN mkdir -p /opt/playwright \
-    && cd /opt/playwright \
-    && npm init -y > /dev/null \
-    && npm install --no-audit --no-fund playwright@1.63.0 \
-    && PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright npx playwright install --with-deps chromium webkit \
-    && rm -rf /var/lib/apt/lists/* /root/.npm
-
-# GitHub CLI, matching the project's own `gh` usage (read/write on Issues
-# and PRs via AGENT_GH_TOKEN -- see CLAUDE.md). Said GH_TOKEN until 2026-09-28;
-# that credential was retired on 2026-09-09 and DECISIONS §11 keeps its measured
-# scope tables only as history.
+# Always present: scripts/gh-*.sh need it.
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -92,135 +45,98 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     && apt-get install -y --no-install-recommends gh \
     && rm -rf /var/lib/apt/lists/*
 
-# (Claude Code itself is installed at the BOTTOM of this file, not here -- see
-# the note there on why it wants to be the last expensive layer.)
+# Ruby itself comes from the base image; this adds what native gems compile
+# against. It fails loudly if the base has no Ruby, which means a hand build
+# set WITH_RUBY=1 without the matching BASE_IMAGE.
+ARG WITH_RUBY=0
+RUN if [ "$WITH_RUBY" = 1 ]; then \
+      command -v ruby >/dev/null \
+        || { echo "WITH_RUBY=1 but the base image has no ruby: build through run.sh" >&2; exit 1; }; \
+      apt-get update \
+      && apt-get install -y --no-install-recommends build-essential libyaml-dev libxml2-dev zlib1g-dev \
+      && rm -rf /var/lib/apt/lists/*; \
+    fi
+ENV BUNDLE_PATH=/state/bundle
 
-# Python test dependencies (tests/test_front_matter.py etc., run via pytest).
-# Hardcoded rather than COPYing requirements-test.txt, since the build
-# context here is .devcontainer/ itself, not the repo root where that file
-# lives (see README on why). --break-system-packages is safe here: this is a
-# disposable, single-purpose container image, not a shared system Python that
-# anything else depends on.
-#
-# THE SYNC IS NOW A TEST, NOT A COMMENT (#1203, 2026-09-28). This used to end
-# "keep this in sync with requirements-test.txt by hand if that file's pins
-# change", and the pins had already drifted: both files said `>=`, so this image
-# carries pytest 9.1.1 under a floor of 8.0 and CI installed whatever was newest
-# on the day. Exact pins in requirements-test.txt are the single source, and
-# tests/test_devcontainer_pins.py fails if this line disagrees with them. Same
-# shape as the Playwright version two blocks up, which is pinned twice with
-# tests/test_browser_harness.py holding the two together.
-RUN pip install --break-system-packages --no-cache-dir \
-    "pytest==9.1.1" "PyYAML==6.0.3" "playwright==1.63.0"
-
-# PLAYWRIGHT'S CHROMIUM FOR THE PYTHON BINDING, which the pip install above does
-# NOT fetch -- the package and its browsers are separate downloads (#1200).
-#
-# ONE VERSION IN ALL FOUR PLACES, AND THAT IS THE POINT OF 1.63.0 (2026-09-28).
-# The first attempt pinned pip at 1.47.0 to sit beside npm 1.47.2, and PyPI has
-# no 1.47.2 at all -- so the two lines could not be made to agree, each wanted
-# its own Chromium revision, and the image carried two browsers. Moving both to
-# 1.63.0, which exists on npm and PyPI alike, collapses that: the npm pin and the
-# pip pin now name one version and resolve to the SAME Chromium revision, so this
-# step finds what the npm step already downloaded and there is one browser in the
-# image instead of two.
-#
-# (Deliberately no `name@version` string in this comment: tests/test_browser_harness.py
-# counts the npm pins in this file and expects exactly one, which is what makes
-# the pin machine-readable. Writing the version in prose broke that test the
-# first time -- correctly.)
-#
-# The number now lives in four files -- here twice, scripts/browser/install.sh,
-# and requirements-test.txt -- and two tests hold them together:
-# tests/test_browser_harness.py (the npm pins, and now the pip pin against them)
-# and tests/test_devcontainer_pins.py (requirements-test.txt against this
-# Dockerfile). Bumping it means editing all four and rebuilding the image, which
-# is why `playwright` is in dependabot.yml's ignore list: a bot can only ever
-# move one of the four.
-#
-# --with-deps is omitted: the npm install above already apt-installed
-# Playwright's system library list, and repeating it would only re-fetch apt
-# indexes this layer then deletes.
-RUN PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright \
-    python3 -m playwright install chromium
-
-# AND WHERE TO FIND IT AT RUN TIME, not only at build time (Helen, 2026-09-29,
-# #1200). The two RUN lines above set the path for their own layer and no
-# further, so until this line the Python binding, left alone, looked in
-# ~/.cache/ms-playwright, found nothing and could not launch. Anything that
-# must prefer a worktree's own tmp/browser/ copy still sets the variable itself
-# and wins: scripts/browser/env.sh does, and so does tests/test_browser_smoke.py.
+# The npm and pip bindings are pinned to ONE version so they resolve to one
+# revision of each browser; two versions would put two of each in the image.
+# WebKit is the engine nearest Safari.
+ARG WITH_PLAYWRIGHT=0
+ARG PLAYWRIGHT_VERSION=1.63.0
+RUN if [ "$WITH_PLAYWRIGHT" = 1 ]; then \
+      mkdir -p /opt/playwright && cd /opt/playwright \
+      && npm init -y > /dev/null \
+      && npm install --no-audit --no-fund "playwright@${PLAYWRIGHT_VERSION}" \
+      && PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright npx playwright install --with-deps chromium webkit \
+      && pip install --break-system-packages --no-cache-dir "playwright==${PLAYWRIGHT_VERSION}" \
+      && rm -rf /var/lib/apt/lists/* /root/.npm; \
+    fi
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright
+ENV NODE_PATH=/opt/playwright/node_modules
 
-# Non-root user matching Helen's host uid/gid (1000), so files the
-# container creates on the bind-mounted project directory come back
-# owned by her, not root.
-RUN groupadd --gid 1000 helen \
-    && useradd --uid 1000 --gid 1000 -m -s /bin/bash helen \
-    && echo "helen ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/helen-firewall \
-    && chmod 0440 /etc/sudoers.d/helen-firewall
+# --break-system-packages is safe in a single-purpose image: nothing else
+# depends on this Python. pytest is always here because tests/kit/ ships in
+# every project made from the kit.
+RUN pip install --break-system-packages --no-cache-dir "pytest==9.1.1"
 
+ARG WITH_PY_REQS=0
+COPY requirements.txt /usr/local/share/claude-kit/requirements.txt
+RUN if [ "$WITH_PY_REQS" = 1 ]; then \
+      pip install --break-system-packages --no-cache-dir -r /usr/local/share/claude-kit/requirements.txt; \
+    fi
+
+# The host user's own name, uid and gid, so files written to the bind mount
+# come back owned by them. A base-image user already holding the uid or the
+# name is removed; an existing group with the gid is reused.
+ARG USERNAME=dev
+ARG USER_UID=1000
+ARG USER_GID=1000
+RUN set -eu; \
+    for existing in "$(getent passwd "$USER_UID" | cut -d: -f1)" "$(getent passwd "$USERNAME" | cut -d: -f1)"; do \
+      [ -n "$existing" ] && userdel -r "$existing" 2>/dev/null || true; \
+    done; \
+    getent group "$USER_GID" >/dev/null || groupadd --gid "$USER_GID" "$USERNAME"; \
+    useradd --uid "$USER_UID" --gid "$USER_GID" -m -s /bin/bash "$USERNAME"; \
+    echo "$USERNAME ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/claude-kit-firewall; \
+    chmod 0440 /etc/sudoers.d/claude-kit-firewall; \
+    mkdir -p /state/claude-config /state/bundle; \
+    chown -R "$USER_UID:$USER_GID" /state
+
+# Named volumes mount over these two, and a new volume takes the ownership the
+# image gives the path, so the chown above is what lets the user write there.
+ENV CLAUDE_CONFIG_DIR=/state/claude-config
+
+# The allowlist is fixed at build time in a root-owned file, so nothing inside
+# the container can widen it. init-firewall.sh adds its own built-in hosts.
 COPY init-firewall.sh /usr/local/bin/init-firewall.sh
-RUN chmod +x /usr/local/bin/init-firewall.sh
+ARG EXTRA_ALLOWED_DOMAINS=""
+RUN chmod 0755 /usr/local/bin/init-firewall.sh \
+    && mkdir -p /etc/claude-kit \
+    && { \
+      if [ "$WITH_RUBY" = 1 ]; then printf '%s\n' rubygems.org index.rubygems.org; fi; \
+      if [ "$WITH_PY_REQS" = 1 ]; then printf '%s\n' pypi.org files.pythonhosted.org; fi; \
+      for domain in $EXTRA_ALLOWED_DOMAINS; do printf '%s\n' "$domain"; done; \
+    } > /etc/claude-kit/allowed-domains
 
-ENV CLAUDE_CONFIG_DIR=/home/helen/.claude
-ENV BUNDLE_PATH=/home/helen/.bundle-cache
+# Managed settings apply to every Claude session in the container, wherever it
+# starts, and root owns them, so nothing inside can switch the hook off. It
+# warns a session started in a nested clone, where the project's hooks don't run.
+COPY managed-settings.json /etc/claude-code/managed-settings.json
+COPY session-place.py /usr/local/share/claude-kit/session-place.py
 
-RUN mkdir -p "$CLAUDE_CONFIG_DIR" "$BUNDLE_PATH" \
-    && chown -R helen:helen /home/helen
+# container.bashrc guards against host dotfiles that reload ~/.bashrc.
+COPY container.bashrc /usr/local/share/claude-kit/container.bashrc
+RUN cat /usr/local/share/claude-kit/container.bashrc >> "/home/$USERNAME/.bashrc" \
+    && chown "$USER_UID:$USER_GID" "/home/$USERNAME/.bashrc"
 
-# Container-local equivalents of the jekyll-local/jekyll-prod aliases from
-# Helen's host ~/.bashrc (not visible in here -- see .devcontainer/README.md
-# on why that's deliberate). --host 0.0.0.0 is the part that differs from
-# the host versions: Jekyll's default 127.0.0.1-only bind is invisible from
-# outside the container even with the port published, so these need to
-# listen on every interface to be reachable at all.
-# THE HOST FILES ARE SOURCED ONCE PER SHELL (2026-10-14). Helen's host dotfiles
-# each reload ~/.bashrc, which inside the container is THIS file, so mounting them
-# looped until Ctrl-C. The flag stops the second pass. No `export`: it is a
-# same-process re-entry guard, and an exported one would make child shells skip
-# the host aliases.
-RUN echo '' >> /home/helen/.bashrc \
-    && echo "alias jekyll-local='bundle exec jekyll serve --config _config.yml,_config_local.yml --port 4001 --host 0.0.0.0'" >> /home/helen/.bashrc \
-    && echo "alias jekyll-prod='JEKYLL_ENV=production bundle exec jekyll serve --config _config.yml --port 4002 --host 0.0.0.0'" >> /home/helen/.bashrc \
-    && echo '' >> /home/helen/.bashrc \
-    && echo '# Optional: run.sh bind-mounts Helen'"'"'s real dotfiles here (read-only,' >> /home/helen/.bashrc \
-    && echo '# only if she opted in) at alternate paths so they layer on top of the' >> /home/helen/.bashrc \
-    && echo '# aliases above instead of overwriting this file outright.' >> /home/helen/.bashrc \
-    && echo 'if [ -z "$_HOST_RC_DONE" ]; then' >> /home/helen/.bashrc \
-    && echo '  _HOST_RC_DONE=1' >> /home/helen/.bashrc \
-    && echo '  [ -f "$HOME/.host-bashrc" ] && . "$HOME/.host-bashrc"' >> /home/helen/.bashrc \
-    && echo '  [ -f "$HOME/.host-bash_aliases" ] && . "$HOME/.host-bash_aliases"' >> /home/helen/.bashrc \
-    && echo '  [ -f "$HOME/.host-bash_profile" ] && . "$HOME/.host-bash_profile"' >> /home/helen/.bashrc \
-    && echo 'fi' >> /home/helen/.bashrc \
-    && chown helen:helen /home/helen/.bashrc
-
-# CLAUDE CODE, AT WHATEVER VERSION run.sh FOUND ON NPM THIS MORNING (2026-10-04).
-# This was a bare `npm install -g` with no version, which reads as "latest" and
-# is not: Docker caches a RUN by its text, the text never changed, so the image
-# kept the version from the day the layer was first built. And the CLI could not
-# repair that itself -- it runs as helen, the global npm folder is root's, and
-# every session opened with "auto-update failed: no write permission".
-#
-# So the version is an ARGUMENT. run.sh asks the registry
-# (claude_code_latest.py), passes the number in, and labels the image with it;
-# a new release changes this RUN's text and nothing above it.
-#
-# LAST ON PURPOSE. Everything after a changed layer is rebuilt, and this one
-# changes most days. Down here a new release costs one npm install; at its old
-# place above the pip and Chromium steps it would have re-run those too.
-#
-# The default is for a build that passes no argument -- by hand, or VS Code's
-# Dev Containers. It works, and it has the old cache problem: `--no-cache`, or
-# `--build-arg CLAUDE_CODE_VERSION=<number>`, is how to move it.
+# LAST, because it changes most often. run.sh passes the version npm calls
+# latest; a literal `latest` here would be a cache hit forever. The CLI cannot
+# update itself (the npm prefix is root's and the container is --rm), so the
+# image is the update mechanism.
 ARG CLAUDE_CODE_VERSION=latest
 RUN npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
-
-# The image is the update mechanism, so the CLI is told not to try: an update
-# written inside a `--rm` container would be gone at the next start anyway.
 ENV DISABLE_AUTOUPDATER=1
 
-USER helen
+USER ${USERNAME}
 WORKDIR /workspace
-
 CMD ["/bin/bash"]

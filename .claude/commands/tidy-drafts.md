@@ -105,7 +105,7 @@ oversight:
    Read the three sections it prints: what it would change, what it is reporting
    and never touching, and what it deliberately did not look at.
 
-2. **Check whether the drafts repo is clean** (`sh scripts/git-drafts.sh
+2. **Check whether the drafts repo is clean** (`sh scripts/git-nested.sh
    _food_drafts status --short`). `_food_drafts/`
    (`helen-triages-food-private`) and `_cocktail_drafts/`
    (`helen-triages-cocktails-private`) are separate private repos with their own
@@ -121,10 +121,10 @@ oversight:
 
 3. **Branch in the drafts repo**, never commit to its `main`:
 
-       sh scripts/git-drafts.sh _food_drafts checkout -b tidy/<what-this-pass-is>
-       sh scripts/git-drafts.sh _cocktail_drafts checkout -b tidy/<what-this-pass-is>
+       sh scripts/git-nested.sh _food_drafts checkout -b tidy/<what-this-pass-is>
+       sh scripts/git-nested.sh _cocktail_drafts checkout -b tidy/<what-this-pass-is>
 
-   `scripts/git-drafts.sh` is how every local git command in a drafts repo is
+   `scripts/git-nested.sh` is how every local git command in a drafts repo is
    run; its header lists the verbs it accepts. It refuses a commit on the
    drafts repo's `main`.
 
@@ -159,9 +159,9 @@ oversight:
 7. **Commit in the drafts repo**, one commit per class if the pass was large,
    checking the branch in a call of its own first:
 
-       sh scripts/git-drafts.sh _food_drafts branch --show-current
-       sh scripts/git-drafts.sh _food_drafts add -- .
-       sh scripts/git-drafts.sh _food_drafts commit -F tmp/commit-msg.txt
+       sh scripts/git-nested.sh _food_drafts branch --show-current
+       sh scripts/git-nested.sh _food_drafts add -- .
+       sh scripts/git-nested.sh _food_drafts commit -F tmp/commit-msg.txt
 
    Tag an issue as `Towards DeckOfPandas/helen-triages#N` — a bare `#N`
    resolves against the drafts repo's own empty tracker, and a cross-repo

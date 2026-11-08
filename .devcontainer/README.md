@@ -1,250 +1,57 @@
-# Running Claude Code for this project inside Docker
+# helen-triages' container
 
-This gives Claude Code a container that can only see this project directory
-(bind-mounted at `/workspace`) — nothing else from your machine. No `~/.ssh`,
-no `~/.bashrc`, no other projects. It cannot escape that boundary through
-`cat`/`grep`/any Bash command, because those files simply do not exist
-inside the container's filesystem, mounted or otherwise.
+Claude Code runs in a container that sees only this project, bind-mounted at
+`/workspace`: no `~/.ssh`, no other projects. The container is the kit's
+(helen-contains-claude-webdev): its `Dockerfile`, `run.sh`,
+`init-firewall.sh` and the scripts beside them are kit-owned and change only
+through `/kit-sync`. What is ours here:
 
-This is not third-party guesswork -- the base approach (Dockerfile +
-optional egress firewall) mirrors Anthropic's own reference setup at
-https://github.com/anthropics/claude-code/tree/main/.devcontainer and
-https://code.claude.com/docs/en/devcontainer.md, adapted for this project's
-actual toolchain (Ruby/Jekyll + Node + Python + `gh`), and everything below
-has been built and run end-to-end, not just written.
+| file | says |
+|---|---|
+| `kit.env` | Ruby 3.3 and Playwright on, PyYAML from `requirements.txt`, Node 24, and the ports: `jekyll-local`'s 4001 and `jekyll-prod`'s 4002 published on the host as 5998 and 5999 |
+| `project.bashrc` | the `jekyll-local` and `jekyll-prod` aliases, sourced by every shell from the bind mount |
+| `requirements.txt` | the image's Python packages, pinned |
+| `devcontainer.json` | watched, not generated: the kit's template plus VS Code's forwarded ports, `bundle install` on create and the Ruby extension |
+| this README | — |
 
-There are two ways to use it: plain `docker` on the command line (no VS
-Code needed -- this matches how you already use Claude Code), or VS Code's
-Dev Containers extension, which automates the mounting/rebuild bookkeeping
-for you. Pick one; both use the same `Dockerfile`.
+`.dockerignore` (the kit's) leaves this README out of the build stamp, so
+editing it never rebuilds the image.
 
-## Phase 1: basic sandboxed container (do this first)
+## Run it
 
-### 1. Prerequisite
+From the host, in this checkout or any of its worktrees:
 
-Docker is already installed and working on this machine (`docker version`
-succeeds). If you're setting this up somewhere else, you'd want Docker
-Desktop with the WSL2 backend on Windows/WSL2, or a normal Docker Engine
-install on native Linux/macOS.
-
-### 2. Run it
-
-`.devcontainer/run.sh` handles the rest: it builds the image when there
-isn't one and rebuilds it whenever `.devcontainer/` has changed since the
-last build (see "Keeping the image and the Dockerfile in step" below),
-creates the two named volumes that persist your Claude Code
-login and gem cache across restarts, reads `AGENT_GH_TOKEN` from
-`.claude/settings.local.json` for just that one run, and drops you into
-a shell at `/workspace` as user `helen` (not root), looking at this
-actual project directory:
-
-    chmod +x .devcontainer/run.sh   # first time only
     .devcontainer/run.sh
 
-Prefer to do it by hand instead? The equivalent manual steps are:
+It builds the image when there is none and rebuilds when `.devcontainer/` or
+`kit.env` has changed, reads `AGENT_GH_TOKEN` from
+`.claude/settings.local.json` (or your shell), and drops you into
+`/workspace` as your own host user. `run.sh --help` lists its flags:
+`--rebuild` builds from scratch and pulls the base image again (for an
+upstream Ruby or apt change, which nothing on disk shows); `--firewall`
+restricts outbound traffic to an allowlist.
 
-    docker build -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
-    docker volume create helen-triages-claude-config
-    docker volume create helen-triages-bundle-cache-helen-triages
-    docker run -it --rm \
-      --name helen-triages-primary \
-      -v "$(pwd):/workspace" \
-      -v helen-triages-claude-config:/home/helen/.claude \
-      -v helen-triages-bundle-cache-helen-triages:/home/helen/.bundle-cache \
-      -p 5998:4001 -p 5999:4002 \
-      -w /workspace \
-      helen-triages-devcontainer \
-      bash
+The first time on a fresh gem volume, inside the container:
 
-(The fixed `--name` is what makes a second `run.sh` fail at the door
-rather than give two containers one bind mount. The ports publish the
-container's `jekyll-local`/`jekyll-prod` as 5998/5999 on the host, so a
-running container never holds your own 4001. The build context is `.devcontainer/` itself, not the whole repo -- the
-Dockerfile only needs `init-firewall.sh` from that folder. Your project
-files are never copied into the image; they're bind-mounted at runtime,
-so editing them doesn't require rebuilding.)
+    bundle install
 
-A hand build like that one won't carry the build stamp `run.sh` looks
-for, so the next `run.sh` will rebuild once to put it there. Harmless --
-it's a fully cached rebuild -- but that's why it happens.
+and log Claude Code in once (`claude`, then open the URL it prints in your
+host browser; on WSL2 you may be shown a code to paste back). The login lives
+in the `helen-triages-claude-config` volume, at `/state/claude-config`, so it
+survives every restart.
 
-### Keeping the image and the Dockerfile in step
+## VS Code instead
 
-The failure this guards against: you add a package to the `Dockerfile`,
-rebuild the image, and containers still come up without it, because the
-thing you rebuilt and the thing you ran were different and nothing
-compared them. **An image that exists is not an image that matches.**
+`devcontainer.json` builds through `run.sh --build-only`, so both ways use one
+image. Dev Containers: Reopen in Container.
 
-So every build through `run.sh` stamps the image with a label holding a
-SHA-256 of everything in `.devcontainer/`, and every run recomputes that
-hash and compares. It rebuilds when there's no image, when the image
-carries no stamp (built before this existed, or built by hand), or when
-the stamp disagrees with the files on disk.
+## What moved when this repo took the kit's container
 
-It compares **content, not timestamps**, which is stricter than "is the
-Dockerfile newer than the image" in both directions: `touch` alone
-doesn't trigger a rebuild, and reverting an edit goes back to the image
-that already matches rather than building a third one. Timestamps also
-have a trap this sidesteps -- a fully cached rebuild keeps the *cached*
-layer's Created date, so an image's timestamp can stay older than the
-Dockerfile forever and an mtime check would never settle.
-
-Every file in `.devcontainer/` counts except the ones `.dockerignore`
-names (this README, `run.sh`, `devcontainer.json`, `claude_code_latest.py`,
-none of which the image uses), so a new `COPY` is covered without anything
-kept in sync by hand, and editing this README costs no rebuild.
-`.dockerignore` takes exact filenames only: a line with a `*`, a `/` or a
-`!` makes `run.sh` hash the whole folder, ignore file and all -- wrong only
-in the safe direction, a spurious cached rebuild rather than a missed one.
-
-What it **can't** see: `ruby:3.3-bookworm` moving upstream, or an
-`apt-get install` resolving to newer packages than last time. Nothing on
-disk changes when those move, so nothing here notices. When that matters,
-rebuild deliberately:
-
-    docker build --pull --no-cache -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
-
-(then let the next `run.sh` re-stamp it).
-
-### Keeping Claude Code current
-
-Claude Code can't update itself in here: it runs as `helen`, the global
-npm folder belongs to root, and anything it did manage to write would be
-gone when the `--rm` container exits. So the image is the update
-mechanism, and `DISABLE_AUTOUPDATER=1` stops the CLI trying (and warning
-that it failed).
-
-Every `run.sh` asks npm which version is newest
-(`claude_code_latest.py`), and rebuilds if the image was built with a
-different one. The version goes in as a build argument, so only the
-Claude Code layer -- the last one in the Dockerfile -- is rebuilt: one
-`npm install`, not the whole image. A second label,
-`com.deckofpandas.claude-code-version`, records what the image carries.
-
-If the lookup fails (offline, registry slow) the container starts on the
-image it has. `PIN_CLAUDE_CODE=<number>` in the environment skips the
-lookup and builds that version. A hand build passes no version and gets
-`latest`, which Docker will happily serve from cache; add
-`--build-arg CLAUDE_CODE_VERSION=<number>` to move it.
-
-### 3. First-time Claude Code login (Max plan, no API key needed)
-
-Inside the container:
-
-    bundle install     # first time only, or after Gemfile.lock changes
-    claude
-
-Claude Code will print a login URL (or offer to copy it). Since the
-container has no browser of its own:
-
-- Open that URL in your **normal browser on your host machine** and sign
-  in with your Claude.ai account (the same Max subscription you already
-  use -- no API key, no extra billing).
-- After you approve, one of two things happens:
-  - It completes automatically and the terminal shows `Login successful`.
-  - The browser instead shows you a short code. If so, paste that code
-    back at the container's terminal prompt when it asks.
-- That second path (manual code paste) is common specifically on
-  WSL2 -- it's expected, not a sign anything's broken.
-
-Because `~/.claude` is a named volume (not baked into the image), this
-login persists. Next time you `docker run` the same volume, you're
-already signed in.
-
-### Optional: your own dotfiles (aliases, colours, git config)
-
-`run.sh` mounts `~/.bashrc`, `~/.bash_aliases`, `~/.bash_profile` and
-`~/.gitconfig` from your host into the container **read-only** and
-**only if each one exists** -- nothing else from your home directory,
-no exceptions, and the container can't write back to your real files
-even if something tried.
-
-Read them yourself first for anything that shouldn't be there (a
-stray token, an odd credential export) -- this only mounts what's
-already on your host, it doesn't vet it for you.
-
-The three shell files land at alternate paths (`~/.host-bashrc` etc.)
-rather than overwriting the container's own `.bashrc`, which already
-defines `jekyll-local`/`jekyll-prod`; the container's `.bashrc` sources
-yours from there afterwards, once per shell, so both sets of aliases
-coexist rather than one replacing the other. `.gitconfig` lands at its
-usual path. Verified live: baked-in and mounted aliases,
-custom `PS1`, and `.gitconfig` settings all came through together in
-the same shell.
-
-One rough edge to expect: anything your dotfiles reference that isn't
-installed in the container (a fancy prompt framework, `delta`, a
-credential helper tied to your host OS) will just silently no-op
-rather than error.
-
-### 4. Use it
-
-From here it's normal Claude Code, just running inside the container:
-edit files, run `bundle exec jekyll build`, run the JS tests
-(`node --test tests/js/*.test.js`), use `gh`/`git` as usual
-(`AGENT_GH_TOKEN` still needs to be passed in -- add `-e AGENT_GH_TOKEN`
-to the `docker run` command, sourced from your host shell, so it's never
-baked into the image or written to disk in the container; `run.sh`
-already does this). `gh` itself reads `GH_TOKEN`; `sh scripts/gh-agent.sh
-<args>` hands it over, so no command line ever names the token.
-
-Exit the container (`exit` or Ctrl+D) whenever -- `--rm` cleans up the
-container itself, but the two named volumes (login, gem cache) survive
-for next time.
-
-## Phase 2 (optional): egress firewall
-
-Phase 1 already stops Claude reading anything outside `/workspace` --
-that's a filesystem guarantee, not a network one. Phase 2 adds a second,
-independent layer: even outbound network requests get restricted to a
-specific allowlist (Anthropic's API/claude.ai, GitHub, npm, RubyGems),
-so a mistaken or malicious command can't phone home to an arbitrary
-host either.
-
-This needs two extra Linux capabilities on the container
-(`NET_ADMIN`, `NET_RAW`) to let it install `iptables` rules for itself.
-Run it once per container start, as root via `sudo` (the container user
-has passwordless sudo for exactly this one script, nothing else):
-
-    docker run -it --rm --cap-add=NET_ADMIN --cap-add=NET_RAW \
-      -v "$(pwd):/workspace" \
-      -v helen-triages-claude-config:/home/helen/.claude \
-      -v helen-triages-bundle-cache-helen-triages:/home/helen/.bundle-cache \
-      -w /workspace \
-      helen-triages-devcontainer \
-      bash -c "sudo /usr/local/bin/init-firewall.sh && exec bash"
-
-It prints what it resolved and allowed, then self-tests
-(`example.com` should fail, `api.github.com` should succeed) so you can
-see immediately if something's misconfigured rather than finding out
-later when a legitimate request mysteriously fails.
-
-If a legitimate host gets blocked (say a gem or npm dependency fetches
-from a CDN not on the list), add it to the `ALLOWED_DOMAINS` array at the
-top of `init-firewall.sh` and re-run.
-
-## Using VS Code's Dev Containers instead
-
-If you'd rather VS Code handle the mounting/volumes for you:
-`.devcontainer/devcontainer.json` is already set up to match Phase 1
-above (same volumes, same env). Install the "Dev Containers" extension,
-open this repo in VS Code, then Command Palette →
-**Dev Containers: Reopen in Container**. First-time login works the same
-way as step 3 above. The firewall (Phase 2) isn't wired into
-`devcontainer.json` by default -- add
-`"runArgs": ["--cap-add", "NET_ADMIN", "--cap-add", "NET_RAW"]` and a
-`postStartCommand` running the script if you want it there too.
-
-## What this does and doesn't protect against
-
-Does: stops Claude Code (or a mistaken command it runs) from ever seeing
-or reading `~/.ssh`, `~/.bashrc`, other projects, or anything else on
-your host outside this repo -- structurally, not by convention or
-allow-list discipline.
-
-Doesn't: this is not a defense against a genuinely malicious,
-sophisticated attack that already has code execution and specifically
-knows to look for ways out of a container (Anthropic's own docs carry
-the same caveat for their reference setup). The actual threat model this
-is built for is the same one that prompted it -- an honest mistake by
-Claude, not a targeted attack.
+- **The gem cache is a new volume**, `helen-triages-bundle-cache`, so the
+  first run needs `bundle install` once. The old
+  `helen-triages-bundle-cache-helen-triages` is unused and can be removed with
+  `docker volume rm` whenever you like.
+- **The Claude Code config volume is the same one**, mounted at
+  `/state/claude-config` instead of `/home/helen/.claude`: the login, history
+  and memory carry over.
+- The image is built on `ruby:3.3-slim-bookworm` rather than the full image.

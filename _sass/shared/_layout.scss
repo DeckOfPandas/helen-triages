@@ -125,7 +125,7 @@ $header-door-gap: 0.1rem;
 // centres boxes, and all-caps ink sits above its line box's centre. A fact
 // about the face, so in em. To re-measure, crop the whole link with
 // scripts/browser/crop.sh and compare ink bands inside that one image with
-// scripts/browser/inkbox.py; the brackets are what is aligned.
+// tools/dev/inkbox.py; the brackets are what is aligned.
 .site-nav-word {
   margin-left: 0;
   font-family: $font-headings;
@@ -209,7 +209,7 @@ $header-door-gap: 0.1rem;
   // different faces at different sizes, so equal boxes leave the ink apart.
   // Not `align-self: baseline` on both, which moves the door's row down and
   // changes the gap under the tape. To re-measure, crop `.site-header-inner`
-  // in one image and run scripts/browser/inkbox.py on it.
+  // in one image and run tools/dev/inkbox.py on it.
   position: relative;
   top: -0.12em;
 }

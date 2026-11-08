@@ -3,8 +3,8 @@
 
 The checker proves, before anything runs, that a command touches only the
 working directory, and it can do that only when the command's text is its whole
-meaning. Otherwise it prompts Helen; a denial here lands on the session
-instead, which can put the cleverness in a file and run the file. DECISIONS §11.
+meaning. Otherwise it prompts the human; a denial here lands on the session
+instead, which can put the cleverness in a file and run the file.
 
 Refused:
 
@@ -34,21 +34,23 @@ Refused:
      backslash is live and refused. `${...}` is not refused.
  12. An unquoted lone `&`: the shell backgrounds what comes before it and
      runs the rest as a second command, which the checker sees as a fragment
-     and asks Helen about. It arrives in an unquoted URL query string.
+     and asks the human about. It arrives in an unquoted URL query string.
      `&&` is shape 5; `2>&1`, `>&2` and `&>file` are redirections.
- 13. An unquoted word starting `=` and something after it: zsh expands
-     `=cmd` to that command's path, so the checker cannot know the argument.
-     It arrives as `curl --proto =https`. `--flag=value` and a quoted `'=x'`
-     pass.
+ 13. A word starting with `=` and a name: zsh expands `=cmd` to that command's
+     path, so the checker cannot know the argument. Unquoted, it arrives as
+     `curl --proto =https`. After a `|` the checker reads it as a new word
+     whatever the quoting, so a regex alternation `'a|=https'` or `"a|=cmd"`
+     is refused too. A quoted `'=https'`, `--flag=value` and a lone `=`
+     (`test a = b`) pass.
 
 Allowed on purpose, because a guard that fires on harmless commands gets
 routed around:
 
   * Redirection to a static path, `2>&1` and `>/dev/null` included: the file
     is named in the command text.
-  * Anything inside quotes, with two exceptions: shapes 2 and 11 are live
-    inside DOUBLE quotes, where the shell still expands them, and shape 7 is
-    about quoted text.
+  * Anything inside quotes, with three exceptions: shapes 2 and 11 are live
+    inside DOUBLE quotes, where the shell still expands them, shape 7 is
+    about quoted text, and shape 13's `|=name` is read inside any quotes.
   * A bare `$VAR`: too common in regexes and paths to judge, and the secret
     case belongs to `guard-token-expansion.py`.
   * An `=` that is not a leading assignment: `--flag=value`, and lowercase
@@ -93,8 +95,11 @@ _GLOB = re.compile(r"\*")
 # Neither half of `&&`, nor the `&` of `2>&1`, `<&0` or `&>file`.
 _LONE_AMPERSAND = re.compile(r"(?<![&<>])&(?![&>])")
 
-# Shape 13: a word that starts `=`, applied to quote-stripped text.
+# Shape 13. Unquoted: an `=` opening a word and followed by something, so a
+# lone `=` as in `test a = b` passes. Anywhere, quotes included: `|=` and a
+# name, which the checker reads as a new word even inside quotes.
 _EQUALS_WORD = re.compile(r"(?:^|\s)=\S")
+_EQUALS_AFTER_PIPE = re.compile(r"\|=[A-Za-z_]")
 
 # The only command shape 7 applies to: a committed wrapper run as `sh scripts/`.
 _SCRIPT_CALL = re.compile(r"^\s*sh\s+scripts/")
@@ -104,6 +109,13 @@ _SCRIPT_CALL = re.compile(r"^\s*sh\s+scripts/")
 # `git -c credential.helper=x` never reaches this, because its first token is
 # `git`, which does not match.
 _ENV_ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+
+# The remedy when a `cd` or `git -C` was reaching outside the working directory.
+_OUTSIDE = ("If the command has to act outside the working directory, it "
+            "becomes a committed script in `scripts/` with one fixed action and "
+            "validated arguments, its safety stated in its header, and an allow "
+            "rule in .claude/settings.json -- `scripts/git-diff-main-checkout.sh` "
+            "is the model. Ask the human before adding the allow rule")
 
 
 def _has_leading_env_assignment(bare: str) -> bool:
@@ -195,33 +207,30 @@ def _offence(command: str) -> tuple[str, str] | None:
 
     if _LEADING_CD.match(bare):
         return ("a leading `cd`, which breaks every prefix-based allow rule",
-                "drop it -- the Bash tool already runs in the project root, so "
-                "`grep ...` works where `cd /workspace; grep ...` matches no "
-                "allow rule and always prompts")
+                "drop it -- the Bash tool already runs in the working "
+                "directory, so `grep ...` works where `cd /workspace; grep ...` "
+                "matches no allow rule and always prompts. " + _OUTSIDE)
 
     if _GIT_DASH_C.search(bare):
         return ("`git -C <path>`, which breaks every prefix-based git allow rule",
                 "drop it -- the Bash tool already runs in the worktree root, so "
                 "`git status --short` works where "
                 "`git -C /workspace/.claude/worktrees/foo status --short` "
-                "matches no allow rule and prompts Helen. Every git allow rule "
-                "names the SUBCOMMAND (`git status *`, `git add -- *`, "
+                "matches no allow rule and prompts the human. Every git allow "
+                "rule names the SUBCOMMAND (`git status *`, `git add -- *`, "
                 "`git commit -F *`, the exact `git branch --show-current`), and "
                 "a `-C` between `git` and its subcommand makes the prefix match "
                 "fail. Lowercase `git -c key=value` is a different flag and is "
-                "not refused")
+                "not refused. " + _OUTSIDE)
 
     if _has_leading_env_assignment(bare):
         return ("a leading shell environment assignment (`NAME=value` before "
                 "the command word), which the checker cannot see through to "
                 "know what the rest of the command will do",
-                "use a committed wrapper instead -- `scripts/browser/`'s "
-                "scripts already source `scripts/browser/env.sh` themselves, "
-                "so a Playwright command never needs "
-                "`PLAYWRIGHT_BROWSERS_PATH=...`/`NODE_PATH=...` typed by hand "
-                "-- or put the whole command in a script in `tmp/` and run "
-                "the file, where the assignment sits on its own line with no "
-                "prefix at all")
+                "put the whole command in a script in `tmp/` and run the file, "
+                "where the assignment sits on its own line with no prefix at "
+                "all. Playwright needs none: the image sets NODE_PATH, and "
+                "`tools/dev/` scripts run as plain `node tools/dev/<script>`")
 
     # Redirections out of the way first, so `2>&1` is not read as chaining.
     scannable = _REDIRECT.sub(" ", bare)
@@ -237,7 +246,7 @@ def _offence(command: str) -> tuple[str, str] | None:
                 "one command per Bash call. A chained command is checked as a "
                 "whole, so it matches neither part's allow rule even when both "
                 "parts are allowed on their own. Two calls cost a round trip; "
-                "one chained call costs Helen an interruption")
+                "one chained call costs the human an interruption")
 
     if _LONE_AMPERSAND.search(bare):
         return ("an unquoted `&`, which backgrounds the first half and runs "
@@ -248,9 +257,15 @@ def _offence(command: str) -> tuple[str, str] | None:
                 "number,title`. To run something in the background, use the "
                 "Bash tool's run_in_background, never a trailing `&`")
 
+    if _EQUALS_AFTER_PIPE.search(command):
+        return ("`|=name` in an argument, which the checker reads as zsh's "
+                "`=cmd` expansion even inside quotes",
+                "keep `=` off the start of a regex alternative -- search with the "
+                "Read tool, or anchor the `=` mid-word (`proto=https`)")
+
     if _EQUALS_WORD.search(scannable):
         return ("an unquoted word starting with `=`, which zsh expands to a "
-                "command's path",
+                "command's path (`=cmd`), so the checker cannot know it",
                 "single-quote the word: `curl --proto '=https'`")
 
     # Shape 9. An unquoted parenthesis is a subshell or, as in an unquoted
@@ -280,8 +295,7 @@ def _offence(command: str) -> tuple[str, str] | None:
     ):
         return ("a quoted `[`, `]` or `|` in an argument to a scripts/ wrapper, "
                 "which Claude Code reads as a path computed at run time and "
-                "asks Helen about even though the wrapper is allow-listed "
-                "(measured 2026-09-15)",
+                "asks the human about even though the wrapper is allow-listed",
                 "for a GitHub read, name the fields instead of writing jq: "
                 "`sh scripts/gh-read.sh <endpoint> --fields state,merged_at` "
                 "for one object, `--each number,title` for a list. Otherwise "
@@ -315,20 +329,17 @@ def main() -> int:
             "permissionDecisionReason": (
                 f"BLOCKED: this command contains {shape}, so the permission "
                 "checker cannot statically analyse it.\n\n"
-                "Helen, 2026-09-10, having permitted two such calls by hand in "
-                "one session: \"can we either avoid needing to request "
-                "permission, or block the command if it can't be statically "
-                "analysed?\" This is the second half of that sentence.\n\n"
                 "WHY THIS IS A DENIAL AND NOT A PROMPT. The checker proves, "
                 "before anything runs, that a command touches only the working "
                 "directory -- and it can only do that for a command whose text "
                 "is its whole meaning. When it cannot, the cost is not a "
-                "refusal: it is an interruption, and it lands on Helen rather "
-                "than on the session that earned it. A denial lands on the "
-                "session, which can write the script and carry on.\n\n"
+                "refusal: it is an interruption, and it lands on the human "
+                "rather than on the session that earned it. A denial lands on "
+                "the session, which can write the script and carry on.\n\n"
                 f"WHAT TO DO INSTEAD -- {remedy}.\n\n"
-                "CLAUDE.md: \"When a command needs to be clever, put the "
-                "cleverness in a file and run the file.\"\n\n"
+                "CLAUDE.md: one plain command per Bash call; anything clever "
+                "goes in a script in `tmp/` with its arguments written out "
+                "literally.\n\n"
                 "Quoted text is exempt for `&&`, `||`, `;`, `|` and globs, "
                 "which are inert inside either kind of quote -- EXCEPT a "
                 "quoted `[`, `]` or `|` given to `sh scripts/...`. NOT for "

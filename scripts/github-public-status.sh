@@ -1,50 +1,32 @@
 #!/bin/sh
-# Ask github.com, logged OUT, whether a page is visible: prints the HTTP status.
-# A public URL returning 404 while the API returns 200 is how a spam flag on
-# the agent account shows: GitHub hides what the account wrote from everyone
-# else while the API reports it normal.
+# Ask github.com, logged OUT, whether a page is visible, and print the status.
+# A page that is 404 here while the API returns 200 is how a spam flag on the
+# agent account shows: GitHub hides what it wrote from everyone else.
 #
-# USAGE:
-#   sh scripts/github-public-status.sh https://github.com/DeckOfPandas/helen-triages/pull/1083
-#   sh scripts/github-public-status.sh https://github.com/DeckOfPandas-agentic-claude
+# USAGE:  sh scripts/github-public-status.sh https://github.com/<owner>/<repo>/pull/12
 #
-# Prints one line, the status: 200 is visible, 404 on something the API can see
-# is hidden. It reads no file and writes none (the body goes to /dev/null),
-# follows no redirect, and sends no credential.
-#
-# REFUSES anything but one URL on https://github.com under DeckOfPandas,
-# DeckOfPandas-agentic or DeckOfPandas-agentic-claude, with no `..`, no `@`
-# (userinfo) and only letters, digits and `._/:#?=%-`. A bare `curl` accepts
-# any URL and any option, and `-o <path>` writes a file anywhere, so no allow
-# rule for it could be narrow; this script's one argument is checked instead.
-#
-# AGENT_WRAPPER_DRY_RUN=1 prints the command instead of running it, one
-# argument per line, for tests/test_agent_wrappers.py.
+# Sends no credential, follows no redirect, writes no file. REFUSES anything
+# but one https://github.com URL under GH_OWNER or GH_AGENT_USER, with no `..`,
+# no `@` and only plain URL characters: a bare `curl -o <path>` writes anywhere,
+# so no allow rule for curl itself could be narrow.
 set -eu
 
-refuse() {
-  echo "github-public-status.sh: refused -- $1" >&2
-  exit 2
-}
+WRAPPER=github-public-status.sh
+here="$(cd "$(dirname "$0")" && pwd)"
+. "$here/_github_conf.sh"
+load_conf
 
-[ "$#" -eq 1 ] || refuse "usage: sh scripts/github-public-status.sh https://github.com/DeckOfPandas/..."
+[ "$#" -eq 1 ] || refuse "usage: sh scripts/github-public-status.sh https://github.com/$GH_OWNER/..."
 url="$1"
 
 case "$url" in
-  https://github.com/DeckOfPandas | https://github.com/DeckOfPandas/*) ;;
-  https://github.com/DeckOfPandas-agentic | https://github.com/DeckOfPandas-agentic/*) ;;
-  https://github.com/DeckOfPandas-agentic-claude | https://github.com/DeckOfPandas-agentic-claude/*) ;;
-  *) refuse "'$url' is not a github.com page under DeckOfPandas or an agent account" ;;
+  "https://github.com/$GH_OWNER" | "https://github.com/$GH_OWNER/"*) ;;
+  "https://github.com/$GH_AGENT_USER" | "https://github.com/$GH_AGENT_USER/"*) ;;
+  *) refuse "'$url' is not a github.com page under $GH_OWNER or $GH_AGENT_USER" ;;
 esac
 case "$url" in
   *..* | *@* | *[!A-Za-z0-9._/:#?=%-]*) refuse "'$url' is not a plain URL" ;;
 esac
 
-set -- curl --silent --output /dev/null --write-out '%{http_code}\n' \
+run_or_print curl --silent --output /dev/null --write-out '%{http_code}\n' \
   --max-time 20 --proto '=https' "$url"
-
-if [ -n "${AGENT_WRAPPER_DRY_RUN:-}" ]; then
-  printf '%s\n' "$@"
-  exit 0
-fi
-exec "$@"

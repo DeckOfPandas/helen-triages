@@ -3,7 +3,7 @@
 //
 // Run from the repo root, with the local Node runtime and no arguments:
 //
-//   .node-runtime/node/bin/node --test
+//   node --test
 //
 // The vocabulary and ingredient list are small and hand-built, so no test
 // depends on which recipes currently exist.

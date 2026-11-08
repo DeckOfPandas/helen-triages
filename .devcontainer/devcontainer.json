@@ -1,21 +1,17 @@
 {
   "name": "helen-triages (sandboxed)",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  "initializeCommand": "bash .devcontainer/run.sh --build-only",
+  "image": "helen-triages-devcontainer",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
   "workspaceFolder": "/workspace",
-  "remoteUser": "helen",
   "mounts": [
-    "source=helen-triages-claude-config,target=/home/helen/.claude,type=volume",
-    "source=helen-triages-bundle-cache-helen-triages,target=/home/helen/.bundle-cache,type=volume"
+    "source=helen-triages-claude-config,target=/state/claude-config,type=volume",
+    "source=helen-triages-bundle-cache,target=/state/bundle,type=volume"
   ],
-  "containerEnv": {
-    "CLAUDE_CONFIG_DIR": "/home/helen/.claude"
-  },
   "remoteEnv": {
     "AGENT_GH_TOKEN": "${localEnv:AGENT_GH_TOKEN}"
   },
+  "updateRemoteUserUID": false,
   "forwardPorts": [4001, 4002],
   "portsAttributes": {
     "4001": { "label": "jekyll-local" },

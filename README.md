@@ -27,7 +27,8 @@ This public repo holds both the food and cocktails sides, with private repos hol
 2. Check the three repos out locally
 3. Run the container (running bash):
    - `.devcontainer/run.sh`
-      - Builds the image from the Dockerfile if it doesn't exist yet, and rebuilds it if `.devcontainer/` has changed since the image was built (see "Rebuilding the image after changes" below)
+      - The container comes from the kit (helen-contains-claude-webdev); what goes in it is `.devcontainer/kit.env` (Ruby, Playwright, ports)
+      - Builds the image if it doesn't exist yet, and rebuilds it if `.devcontainer/` or `kit.env` has changed since the image was built (see "Rebuilding the image after changes" below)
       - Plenty of packages are pre-installed, including Playwright and its dependencies
       - Bind-mounts the primary checkout at /workspace, even when run from inside a worktree
       - Reads `AGENT_GH_TOKEN` from `settings.local.json` and passes it in as an environment variable
@@ -64,7 +65,7 @@ WSL leaves Zone.Identifier files behind when I copy things in from Windows. They
 
 ## Rebuilding the image after changes
 
-Since 2026-09-21 this is automatic: `run.sh` stamps each image it builds with a hash of everything in `.devcontainer/`, and rebuilds whenever that hash no longer matches the files on disk. So edit the Dockerfile and just run it:
+This is automatic: `run.sh` stamps each image it builds with a hash of `.devcontainer/` and `kit.env`'s build settings, and rebuilds whenever that hash no longer matches the files on disk. So edit `kit.env` and just run it:
    - `.devcontainer/run.sh`
 
 This exists because "does the image exist" and "does the image match the Dockerfile" are different questions, and only the second one is the one I care about -- I once added packages, rebuilt, and kept getting containers without them.
@@ -72,7 +73,7 @@ This exists because "does the image exist" and "does the image match the Dockerf
 It compares file contents, so `touch` alone doesn't trigger a rebuild and undoing an edit goes back to the image that already matches. It can't see the base image or apt packages moving upstream, though, since nothing on disk changes when they do. For that, force it by hand:
 
 ```
-docker build --pull --no-cache -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
+.devcontainer/run.sh --rebuild
 ```
 
 Or start from nothing (the container must be stopped first, see the notes at the bottom):
@@ -142,12 +143,13 @@ How I try to achieve these two aims -- work that exists because Claude read my w
 
 2. Allow-list (`.claude/settings.json`), every rule in it:
    - `sh scripts/gh-read.sh`: any REST read, GET only, my three repos only
-   - `sh scripts/gh-agent.sh` for `issue list`, `issue view`, `issue comment`, `issue create`, `issue edit`, `pr list`, `pr view`, `pr diff`, `pr create`, `pr comment` and `repo clone`
+   - Most of this list, the hooks and the wrappers now come from the kit (helen-contains-claude-webdev); ours are added in `.claude/settings.project.json`
+   - `sh scripts/gh-agent.sh` for `issue list`, `issue view`, `issue comment`, `issue create`, `issue edit`, `pr list`, `pr view`, `pr diff`, `pr create` and `pr comment`
    - `sh scripts/gh-write.sh` (open a PR, replace a PR body, comment) and `sh scripts/github-public-status.sh` (the logged-out visibility check)
    - `sh scripts/check-link.sh` (does a link, or a page on the dev server, resolve) and `sh scripts/main-ci-status.sh` (is `main` deploying)
-   - The three network wrappers: `git-push-agent.sh`, `git-fetch-agent.sh`, `git-clone-agent.sh`; and `git-drafts.sh`, the only git inside a drafts clone
+   - The three network wrappers: `git-push-agent.sh`, `git-fetch-agent.sh`, `git-clone-agent.sh`; and `git-nested.sh`, the only git inside a drafts clone
    - `git-fetch-main.sh` then `git merge origin/main`, `git branch --show-current`, `git add -- <paths>`, `git commit -F <file>`, and read-only git (`status`, `diff`, `log`, `show`, `blame`, `ls-tree`, `check-ignore`)
-   - `pytest` and `python3 -m pytest`, `node --test`, `python3 scripts/verify.py`
+   - `python3 -m pytest` bare, `sh scripts/pytest.sh` for named test files (it refuses `--basetemp` and friends), `node --test`, `python3 scripts/verify.py`
    - The browser harness: `install.sh`, `build.sh`, `serve.sh`, `shoot.sh`, `crop.sh`, `styles.sh`, `gaps.sh`, `click-crop.sh`
    - Reading and writing to `/dev/null`, as an exact path; reading under `/opt` and under `/workspace/.claude/worktrees/`
 
@@ -155,13 +157,13 @@ How I try to achieve these two aims -- work that exists because Claude read my w
    - Allow rules ending in * can obviously accept arguments that run programs (`git clone --template=`, `git fetch --upload-pack=`, `node --import`)
       - Kept to a reviewed list, mostly wrappers
       - Dry-run tests prove what each wrapper refuses
-   - `git-push-agent.sh` refuses a push to the public `main`, a bare refspec, other repos, and folders outside the checkout
+   - `git-push-agent.sh` refuses a push to the public `main` or the kit's, a bare refspec, other repos, and folders outside the checkout
    - `git-clone-agent.sh` and `git-fetch-agent.sh` refuse extra options such as `--template=` and `--upload-pack=`, which can run programs
    - `gh-read.sh` refuses every write flag, other repos, and any `--jq` expression that mentions `env`
-   - `gh-write.sh` only makes its three writes, with the base always `main`, the body a real file under `tmp/`, and my three repos only
+   - `gh-write.sh` only makes its handful of writes, with the base always `main`, the body a real file under `tmp/`, and only the repos in my `scripts/github.local.conf` (the kit gets PRs only)
    - `github-public-status.sh` only accepts my GitHub pages and sends no credential
 
-4. Tests guarding the allow list (`tests/test_agent_wrappers.py`):
+4. Tests guarding the allow list (`tests/kit/test_allow_list.py` and `tests/kit/test_wrappers.py`):
    - Every wrapper is run dry to prove what it refuses and what it passes through
    - Every allow rule that accepts arbitrary extra arguments must be on a reviewed list
    - No allow rule may open `gh ... api`, because it can merge
@@ -186,7 +188,7 @@ How I try to achieve these two aims -- work that exists because Claude read my w
    - Never `sed` (`guard-sed.py`)
    - Never `awk` (`guard-awk.py`)
    - Scratch files live only in the project's `tmp/`, never the system `/tmp`, `~`, or job directories (written rule)
-   - `blockReadsOutsideWorkingDirectories=true` blocks `Read`, `Grep` and `Glob` outside the project, with three read-only exceptions: `/opt` (the image's Playwright), `/workspace/.claude/worktrees/` (the other worktrees) and `/workspace/.node-runtime`, because these seem fair enough.
+   - `blockReadsOutsideWorkingDirectories=true` blocks `Read`, `Grep` and `Glob` outside the project, with two read-only exceptions: `/opt` (the image's Playwright) and `/workspace/.claude/worktrees/` (the other worktrees), because these seem fair enough.
 
 ### Don't print secrets (again)
 

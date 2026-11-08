@@ -1,53 +1,54 @@
 #!/usr/bin/env python3
-"""Refuse `/dev/null` given to a command as an argument rather than a redirection.
+"""Refuse `/dev/null` as a command argument; leave it alone as a redirection.
 
-With `blockReadsOutsideWorkingDirectories` on, the permission checker reads an
-argument of `/dev/null` as a path outside the working directories and asks
-Helen, and no allow rule lets it through: `Read(//dev/null)` covers the Read
-tool, not `curl -o /dev/null` or `diff a /dev/null`. A redirection is not
-checked, so `> /dev/null` and `2>/dev/null` pass. A denial lands on the
-session, which can rewrite the command; a prompt lands on Helen. DECISIONS §11.
+With `blockReadsOutsideWorkingDirectories` on, the permission checker reads
+`/dev/null` as an argument (`ls /dev/null`, `curl -o /dev/null`,
+`diff a /dev/null`) as a read outside the working directories and stops to
+ask the human. No allow rule lifts that block, `Read(//dev/null)` included.
+A redirection target (`> /dev/null`, `2>/dev/null`, `< /dev/null`) is never
+checked. So a refusal here lands on the session, which can rewrite the
+command, instead of a prompt landing on the human.
 
-Refused: a word that is `/dev/null` unless the word before it is a redirection
-operator, and an option glued to it (`-o/dev/null`, `--output=/dev/null`).
-Commands `shlex` cannot split are allowed; `guard-unanalyzable-bash.py` judges
-those. Tested in `tests/test_git_guards.py`.
+Refused: the token `/dev/null` anywhere but straight after a redirection
+operator, and an option that carries it (`-o/dev/null`, `--output=/dev/null`).
+Allowed: redirections, and `/dev/null` inside a longer quoted string such as
+a commit message. A command shlex cannot split is allowed: another guard or
+the checker has it. Tested in `tests/kit/test_text_tool_guards.py`.
 
 Invoked as `python3 <path>` so it needs no execute bit.
 """
 from __future__ import annotations
 
 import json
+import re
 import shlex
 import sys
 
-NULL = "/dev/null"
+DEV_NULL = "/dev/null"
+# shlex with punctuation_chars returns each run of these as one token, so
+# `2>/dev/null` comes out as `2`, `>`, `/dev/null`.
+REDIRECT = re.compile(r"^(?:&?>>?\|?|<|<>|>&|&>>?)$")
+HEREDOC = re.compile(
+    r"<<-?\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1.*?^\2$",
+    re.DOTALL | re.MULTILINE,
+)
 
 
-def _words(command: str) -> list[str]:
-    lexer = shlex.shlex(command, posix=True, punctuation_chars=True)
+def _argument_uses(command: str) -> list[str]:
+    lexer = shlex.shlex(HEREDOC.sub(" ", command), posix=True, punctuation_chars=True)
     lexer.whitespace_split = True
-    return list(lexer)
-
-
-def _is_redirection(word: str) -> bool:
-    # punctuation_chars splits `2>/dev/null` into `2`, `>`, `/dev/null`, so the
-    # operator arrives as a run of `<`, `>` and `&` on its own.
-    return bool(word) and set(word) <= set("<>&") and any(c in word for c in "<>")
-
-
-def _offence(command: str) -> str | None:
     try:
-        words = _words(command)
+        tokens = list(lexer)
     except ValueError:
-        return None
-    for i, word in enumerate(words):
-        if word == NULL:
-            if i == 0 or not _is_redirection(words[i - 1]):
-                return f"`{NULL}` as an argument"
-        elif word.endswith(NULL) and word.startswith("-"):
-            return f"`{word}`, an option that names {NULL}"
-    return None
+        return []
+    found = []
+    for i, token in enumerate(tokens):
+        after_redirect = i > 0 and REDIRECT.match(tokens[i - 1]) is not None
+        if token == DEV_NULL and not after_redirect:
+            found.append(token)
+        elif token.startswith("-") and token.endswith(DEV_NULL):
+            found.append(token)
+    return found
 
 
 def main() -> int:
@@ -57,8 +58,8 @@ def main() -> int:
         return 0                    # nothing to judge; never break the tool call
 
     command = (payload.get("tool_input") or {}).get("command") or ""
-    found = _offence(command)
-    if not found:
+    uses = _argument_uses(command)
+    if not uses:
         return 0
 
     print(json.dumps({
@@ -66,16 +67,22 @@ def main() -> int:
             "hookEventName": "PreToolUse",
             "permissionDecision": "deny",
             "permissionDecisionReason": (
-                f"BLOCKED: {found}.\n\n"
-                "The permission checker reads an argument of /dev/null as a "
-                "path outside the working directories and asks Helen; no "
-                "allow rule reaches past blockReadsOutsideWorkingDirectories. "
-                "A redirection is not checked.\n\n"
-                "WHAT TO DO INSTEAD: redirect -- `cmd > /dev/null 2>&1`. For "
-                "an output file, name one under tmp/ (`-o tmp/x`). To check a "
-                "link, use `sh scripts/check-link.sh <url>`. For an empty "
-                "file to compare against, write one under tmp/ with the "
-                "Write tool."
+                f"BLOCKED: `{uses[0]}` uses /dev/null as a command argument.\n\n"
+                "WHY: with blockReadsOutsideWorkingDirectories on, the "
+                "permission checker treats /dev/null as an argument as a read "
+                "outside the working directories and stops to ask the human. "
+                "No allow rule lifts that. As a redirection target it is never "
+                "checked.\n\n"
+                "WHAT TO DO INSTEAD:\n"
+                "- Discard output with `> /dev/null` or `2>/dev/null`, and "
+                "feed nothing with `< /dev/null`.\n"
+                "- Where a command wants an output file, name one under tmp/ "
+                "(`curl -o tmp/body.html`). To check a link, "
+                "`sh scripts/check-link.sh <https-url>`.\n"
+                "- Where a command needs an empty file, write one in tmp/ with "
+                "the Write tool and name that instead.\n"
+                "- Inside a committed script in scripts/, /dev/null as an "
+                "argument is fine: the checker sees only `sh scripts/<name>.sh`."
             ),
         }
     }))

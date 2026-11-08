@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Refuse any Bash command that mentions `sed`, anywhere in it, full stop.
 
-Helen's rule covers the whole tool, not only `sed -i`: a subtly wrong regex
-corrupts a file silently, with none of the visible diff an Edit call gives
-her, and Python covers everything sed does. DECISIONS §11.
+The rule covers the whole tool, not only `sed -i`: a subtly wrong regex
+corrupts a file silently, with none of the visible diff an Edit call gives the
+human, and Python covers everything sed does.
 
 A hook rather than a `deny` rule because a permission pattern matches a
 command's prefix and cannot express "anywhere in a pipeline". For the same
@@ -15,7 +15,7 @@ next gap grows.
 
 Allowed on purpose: the word inside a quoted string or a heredoc body, so a
 commit message can discuss it, and tokens that merely contain it
-(`guard-sed.py`, `processed.txt`). Tested in `tests/test_text_tool_guards.py`.
+(`guard-sed.py`, `processed.txt`). Tested in `tests/kit/test_text_tool_guards.py`.
 
 Invoked as `python3 <path>` so it needs no execute bit.
 """
@@ -72,18 +72,18 @@ def main() -> int:
             "permissionDecision": "deny",
             "permissionDecisionReason": (
                 "BLOCKED: this command mentions `sed`.\n\n"
-                "Helen's standing rule: no sed, ever, in any form -- not just "
+                "Standing rule: no sed, ever, in any form -- not just "
                 "`sed -i`. This is unconditional on purpose (see this file's "
                 "own docstring for why), so it doesn't matter whether this "
                 "particular invocation looks safe.\n\n"
                 "WHAT TO DO INSTEAD: write the transformation in Python, in "
                 "a tmp/*.py file run as a plain file argument, and run that "
                 "instead -- never `python3 -c`, which guard-inline-script.py "
-                "refuses however short (CLAUDE.md, 2026-09-10). It covers "
-                "everything sed does, more precisely, and is easier to "
-                "review.\n\n"
+                "refuses however short. For a small edit to a file, the Edit "
+                "tool is better still. Python covers everything sed does, "
+                "more precisely, and is easier to review.\n\n"
                 "If you genuinely believe this specific case needs sed, say "
-                "so and let Helen decide -- this hook is not the thing to "
+                "so and let the human decide -- this hook is not the thing to "
                 "route around."
             ),
         }

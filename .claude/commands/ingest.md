@@ -583,10 +583,10 @@ her flip it.**
 2. **Branch in the drafts repo**, never commit to its `main`. A bare `git
    checkout -b` would branch the public repo, so use the wrapper:
 
-       sh scripts/git-drafts.sh _cocktail_drafts checkout -b content/<what-this-batch-is>
-       sh scripts/git-drafts.sh _food_drafts checkout -b content/<what-this-batch-is>
+       sh scripts/git-nested.sh _cocktail_drafts checkout -b content/<what-this-batch-is>
+       sh scripts/git-nested.sh _food_drafts checkout -b content/<what-this-batch-is>
 
-   `scripts/git-drafts.sh` runs every local git command inside a drafts clone;
+   `scripts/git-nested.sh` runs every local git command inside a drafts clone;
    its header lists the verbs it accepts.
 
 3. **Open every photo.** Resolve each recipe by looking at its own file -- never
@@ -620,9 +620,9 @@ her flip it.**
 9. **Commit in the drafts repo**, checking the branch in a call of its own
    first:
 
-       sh scripts/git-drafts.sh _cocktail_drafts branch --show-current
-       sh scripts/git-drafts.sh _cocktail_drafts add -- .
-       sh scripts/git-drafts.sh _cocktail_drafts commit -F tmp/commit-msg.txt
+       sh scripts/git-nested.sh _cocktail_drafts branch --show-current
+       sh scripts/git-nested.sh _cocktail_drafts add -- .
+       sh scripts/git-nested.sh _cocktail_drafts commit -F tmp/commit-msg.txt
 
    Tag any issue the batch touches in the full form, `Towards
    DeckOfPandas/helen-triages#N`: a bare `#N` resolves against the drafts

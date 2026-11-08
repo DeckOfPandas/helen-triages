@@ -2,9 +2,9 @@
 # per ecosystem: every PR it opens is Helen's to review and merge, and a
 # monthly batch is one she can sit down with.
 #
-# A pip bump needs the devcontainer image rebuilt: requirements-test.txt pins
-# pytest, PyYAML and playwright exactly, .devcontainer/Dockerfile repeats the
-# pins by hand, and tests/test_devcontainer_pins.py fails when they differ.
+# A pip bump needs the container's copy moved too: requirements-test.txt pins
+# exactly what .devcontainer/requirements.txt, kit.env and the kit's Dockerfile
+# install, and tests/test_ci_matches_container.py fails when they differ.
 version: 2
 updates:
   # Ruby: the site itself. A Jekyll or plugin bump changes what gets built.
@@ -27,13 +27,13 @@ updates:
       pip:
         patterns: ["*"]
     ignore:
-      # Playwright moves by hand. Its version is written in
-      # requirements-test.txt, .devcontainer/Dockerfile and
-      # scripts/browser/install.sh, and Dependabot can move only the first;
-      # tests/test_browser_harness.py and tests/test_devcontainer_pins.py fail
-      # on a mismatch (#1233). It also needs an image rebuild, which no PR can
-      # perform.
+      # Playwright moves by hand: its version is also in kit.env and
+      # scripts/browser/install.sh, which Dependabot cannot move (#1233), and
+      # it needs an image rebuild, which no PR can perform.
       - dependency-name: "playwright"
+      # pytest's image pin is in the kit's Dockerfile, so it moves with a kit
+      # sync, never on its own here.
+      - dependency-name: "pytest"
 
   # GitHub Actions: a pinned-to-major action goes stale silently.
   - package-ecosystem: "github-actions"

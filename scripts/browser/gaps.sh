@@ -1,44 +1,12 @@
 #!/bin/sh
-# The vertical gap in px between consecutive visible block siblings under
-# <root-selector> (default `main`), as an indented tree to depth 4 -- each
-# line names the element's tag.class, its height, its margin/padding
-# top/bottom, and the gap to the sibling before it. Skips inline elements,
-# absolutely/fixed positioned elements, and anything under 6px in both
-# dimensions.
-# Usage: sh scripts/browser/gaps.sh <path> [width] [root-selector]
-#
-# The port comes from tmp/browser/port, written by this worktree's serve.sh;
-# see shoot.sh. 4010 only when no server is running here.
+# The vertical rhythm under an element of a served page, through
+# tools/dev/gaps.js: each visible block child's height, margins, padding and
+# gap to the sibling above, as an indented tree to depth 4.
+#   sh scripts/browser/gaps.sh <path> [width] [root-selector]
+# The root defaults to `main`.
 set -eu
-
-refuse() {
-  echo "gaps.sh: refused -- $1" >&2
-  exit 2
-}
-
-[ "$#" -ge 1 ] || refuse "usage: sh scripts/browser/gaps.sh <path> [width] [root-selector]"
-path="$1"
-width="${2:-1280}"
-root="${3:-main}"
-
-case "$path" in
-  /*) ;;
-  *) refuse "'$path' must start with /" ;;
-esac
-case "$path" in
-  *..*) refuse "'$path' may not contain '..'" ;;
-  *://*) refuse "'$path' may not contain a scheme" ;;
-esac
-case "$width" in
-  ''|*[!0-9]*) refuse "'$width' must be an integer" ;;
-esac
-if [ "$width" -lt 200 ] || [ "$width" -gt 2000 ]; then
-  refuse "'$width' must be between 200 and 2000"
-fi
-
-port=4010
-if [ -f tmp/browser/port ]; then
-  read -r port < tmp/browser/port
-fi
-. scripts/browser/env.sh
-node scripts/browser/gaps.js "http://127.0.0.1:$port/helen-triages$path" "$width" "$root"
+WRAPPER=gaps.sh
+[ "$#" -ge 1 ] && [ "$#" -le 3 ] \
+  || { echo "usage: sh scripts/browser/gaps.sh <path> [width] [root-selector]" >&2; exit 2; }
+. scripts/browser/_site.sh
+exec node tools/dev/gaps.js "$base" "${3:-main}" "$page" --width "${2:-1280}"

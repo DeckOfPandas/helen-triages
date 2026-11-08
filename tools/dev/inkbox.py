@@ -1,36 +1,57 @@
 #!/usr/bin/env python3
 """Print the INK bounding boxes of a PNG, band by band.
 
-    python3 scripts/browser/inkbox.py <file.png> [min-gap-between-bands]
+    python3 tools/dev/inkbox.py tmp/<file>.png [<min-gap>]
 
-crop.sh prints an element's BOX in CSS px, which answers "is this element on
-the cards' edge". It cannot answer "is this glass centred on that arrow",
-because that is a question about INK -- a glyph never fills its line box and a
-drawing need not fill its viewBox. This does: it decodes the PNG by hand (there
-is no PIL in the devcontainer), treats anything far from the image's most common
-colour as ink, splits the image into column bands separated by blank columns,
-and prints each band's vertical extent and centre in device pixels.
+crop.js prints an element's BOX, which answers "is this element on the
+card's edge". It cannot answer "is this icon centred on that arrow", because
+that is a question about ink: a glyph never fills its line box and a drawing
+need not fill its viewBox. This decodes the PNG by hand (standard library
+only), treats anything far from the image's most common colour as ink, splits
+the image into column bands separated by blank columns, and prints each band's
+vertical extent and centre in device pixels.
 
-Measure in one image: crop the element that contains every mark being compared
-and read their bands from that single crop. An element screenshot pads its box
-by about a pixel, so cropping two elements separately and subtracting their
-page positions is wrong by that padding, which at small sizes is most of the
-answer.
+Measure in one image: crop the element holding every mark being compared and
+read their bands from that one crop. An element screenshot pads its box by
+about a pixel, so subtracting two separate crops' page positions is wrong by
+that padding.
 
-`min-gap` is how many blank columns may sit inside one band before it is split
-into two: small (4-6) to separate a bracket from the word inside it, large (30)
-to treat a whole word as one object. Crops are at deviceScaleFactor 2, so halve
-a difference to get CSS px.
+<min-gap> (default 10) is how many blank columns may sit inside one band
+before it splits: 4-6 separates a bracket from the word inside it, 30 treats a
+word as one object. crop.js shoots at 2x, so halve a difference for CSS px.
+
+The input must be a .png under tmp/. Reads that file and writes nothing.
 """
+import re
 import struct
 import sys
 import zlib
+
+USAGE = "usage: python3 tools/dev/inkbox.py tmp/<file>.png [<min-gap>]"
+
+
+def refuse(message):
+    print(f"inkbox.py: {message}\n{USAGE}", file=sys.stderr)
+    sys.exit(2)
+
+
+def parse(argv):
+    if not 1 <= len(argv) <= 2:
+        refuse("give one .png under tmp/, and optionally a minimum gap")
+    path = argv[0]
+    if not re.fullmatch(r"tmp/[A-Za-z0-9._/-]+\.png", path) or ".." in path:
+        refuse(f"'{path}' must be a .png under tmp/")
+    gap = argv[1] if len(argv) == 2 else "10"
+    if not gap.isdigit() or not 0 <= int(gap) <= 1000:
+        refuse(f"the minimum gap must be a whole number from 0 to 1000, not '{gap}'")
+    return path, int(gap)
 
 
 def read_png(path):
     with open(path, "rb") as fh:
         data = fh.read()
-    assert data[:8] == b"\x89PNG\r\n\x1a\n", "not a png"
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        refuse(f"'{path}' is not a PNG")
     pos = 8
     idat = b""
     width = height = depth = ctype = None
@@ -48,7 +69,8 @@ def read_png(path):
             idat += body
         elif kind == b"IEND":
             break
-    assert depth == 8, f"only 8-bit supported, got {depth}"
+    if depth != 8:
+        refuse(f"only 8-bit PNGs are read, and this one is {depth}-bit")
     channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[ctype]
     raw = zlib.decompress(idat)
     stride = width * channels
@@ -87,9 +109,7 @@ def luminance(px):
     return 0.299 * px[0] + 0.587 * px[1] + 0.114 * px[2]
 
 
-def main():
-    path = sys.argv[1]
-    min_gap = int(sys.argv[2]) if len(sys.argv) > 2 else 10
+def bands(path, min_gap):
     w, h, channels, ctype, palette, buf = read_png(path)
     stride = w * channels
 
@@ -98,18 +118,14 @@ def main():
         if ctype == 3:
             j = buf[i] * 3
             return palette[j], palette[j + 1], palette[j + 2]
-        if channels == 1:
-            v = buf[i]
-            return v, v, v
-        if channels == 2:
-            v = buf[i]
-            return v, v, v
+        if channels in (1, 2):
+            return buf[i], buf[i], buf[i]
         return buf[i], buf[i + 1], buf[i + 2]
 
     # The ground is the most common colour; ink is anything far from it.
     counts = {}
-    for y in range(0, h, max(1, h // 40) or 1):
-        for x in range(0, w, max(1, w // 40) or 1):
+    for y in range(0, h, max(1, h // 40)):
+        for x in range(0, w, max(1, w // 40)):
             c = pixel(x, y)
             counts[c] = counts.get(c, 0) + 1
     ground = max(counts, key=counts.get)
@@ -119,34 +135,30 @@ def main():
         return abs(luminance(pixel(x, y)) - gl) > 40
 
     cols = [any(is_ink(x, y) for y in range(h)) for x in range(w)]
-    bands = []
-    start = None
+    found, start = [], None
     for x, ink in enumerate(cols):
         if ink and start is None:
             start = x
         elif not ink and start is not None:
-            bands.append((start, x - 1))
+            found.append((start, x - 1))
             start = None
     if start is not None:
-        bands.append((start, w - 1))
-
+        found.append((start, w - 1))
     merged = []
-    for b in bands:
+    for b in found:
         if merged and b[0] - merged[-1][1] <= min_gap:
             merged[-1] = (merged[-1][0], b[1])
         else:
             merged.append(b)
 
-    print(f"{path}: {w}x{h} ground={ground} bands={len(merged)}")
+    lines = [f"{path}: {w}x{h} ground={ground} bands={len(merged)}"]
     for x0, x1 in merged:
-        top = bot = None
-        for y in range(h):
-            if any(is_ink(x, y) for x in range(x0, x1 + 1)):
-                if top is None:
-                    top = y
-                bot = y
-        print(f"  x {x0:4d}-{x1:4d}  y {top:4d}-{bot:4d}  "
-              f"centre {(top + bot) / 2:7.1f}  height {bot - top + 1:4d}")
+        rows = [y for y in range(h) if any(is_ink(x, y) for x in range(x0, x1 + 1))]
+        top, bot = rows[0], rows[-1]
+        lines.append(f"  x {x0:4d}-{x1:4d}  y {top:4d}-{bot:4d}  "
+                     f"centre {(top + bot) / 2:7.1f}  height {bot - top + 1:4d}")
+    return lines
 
 
-main()
+if __name__ == "__main__":
+    print("\n".join(bands(*parse(sys.argv[1:]))))

@@ -1,32 +1,19 @@
-"""Print one sha256 of everything in .devcontainer/ the image is built from.
+"""Print one sha256 of everything the image is built from.
 
-`run.sh` stamps each image it builds with this and rebuilds when the stamp no
-longer matches -- see the long comment there for why the check compares content
-and not timestamps.
+That is every file in the build context except those `.dockerignore` names,
+plus the build arguments run.sh passes as this script's one optional argument.
+run.sh labels each image with the result and rebuilds when it stops matching:
+content, not timestamps, so `touch` costs nothing and reverting an edit returns
+to the image that already matches.
 
-IN ITS OWN FILE SINCE 2026-09-24 (#1191), for one reason: it is now worth
-testing. It used to be a `find | sort | sha256sum` pipeline inline in run.sh,
-which nothing could exercise without running the whole container launcher.
-`tests/test_devcontainer_hash.py` drives this directly.
+`.dockerignore` is read as EXACT FILENAMES ONLY. Any line carrying `*`, `/`,
+`!` or `?` makes this hash the whole directory instead, with a note on stderr:
+a spurious cached rebuild is harmless, and a missed rebuild is the bug.
 
-PYTHON RATHER THAN SHELL, and not by preference: the shell version wanted a
-temporary file to filter, and `mktemp` writes to the system /tmp, which
-CLAUDE.md forbids outright. Nothing here writes anywhere at all.
+USAGE:  python3 build_inputs_hash.py [<build args> [<context dir>]]
 
-WHAT IT EXCLUDES, and how getting that wrong stays safe. Files named in
-`.devcontainer/.dockerignore` are left out, so the hash covers what Docker
-actually receives and editing the README or run.sh costs no rebuild. It
-understands EXACT FILENAMES ONLY: if any line there carries a `*`, `/`, `!` or
-`?`, the WHOLE directory is hashed instead, ignore file included, with a note on
-stderr. A half-understood pattern would silently shrink what the stamp covers,
-and an image NOT rebuilt when it should be is the bug the stamp exists to
-prevent -- so the failure mode is a spurious cached rebuild, never a missed one.
-
-The ignore file is itself always hashed when it is understood: changing what is
-excluded changes what the image is built from, so the stamp must move with it.
-
-Run from the repo root (run.sh cd's there first). Prints the hash on stdout and
-nothing else, so it can be captured directly.
+The context defaults to .devcontainer, relative to the current directory.
+Prints the hash and nothing else on stdout.
 """
 from __future__ import annotations
 
@@ -35,9 +22,6 @@ import sys
 from pathlib import Path
 
 CONTEXT = Path(".devcontainer")
-# Anything that makes a line more than a plain filename. `?` is included here
-# though the hash never globs, because Docker WOULD treat it as a pattern, and
-# the point is that the two agree.
 NOT_A_PLAIN_NAME = set("*/!?")
 
 
@@ -62,21 +46,25 @@ def exclusions(context: Path) -> set[str]:
     return names
 
 
-def build_inputs_hash(context: Path = CONTEXT) -> str:
+def build_inputs_hash(context: Path = CONTEXT, build_args: str = "") -> str:
     skip = exclusions(context)
     digest = hashlib.sha256()
-    # Sorted by path so the answer does not depend on directory order, and the
-    # path goes into the hash as well as the bytes: moving a file to a new name
-    # changes what Docker sees, so it must change the stamp.
+    # Sorted, and the path hashed with the bytes: a rename changes what Docker
+    # receives, so it must change the stamp.
     for path in sorted(p for p in context.rglob("*") if p.is_file()):
         if path.name in skip and path.parent == context:
             continue
-        digest.update(path.as_posix().encode("utf-8"))
+        digest.update(path.relative_to(context).as_posix().encode("utf-8"))
         digest.update(b"\0")
         digest.update(hashlib.sha256(path.read_bytes()).hexdigest().encode("ascii"))
         digest.update(b"\0")
+    digest.update(b"build-args\0")
+    digest.update(build_args.encode("utf-8"))
     return digest.hexdigest()
 
 
 if __name__ == "__main__":
-    print(build_inputs_hash())
+    print(build_inputs_hash(
+        context=Path(sys.argv[2]) if len(sys.argv) > 2 else CONTEXT,
+        build_args=sys.argv[1] if len(sys.argv) > 1 else "",
+    ))

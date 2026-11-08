@@ -40,7 +40,7 @@ BROWSER_DIRS = (
     pathlib.Path("/opt/playwright/ms-playwright"),
 )
 
-# The harness's own viewports (scripts/browser/shoot.js), not re-invented.
+# tools/dev/shoot.js's narrow and desktop viewports, not re-invented.
 VIEWPORTS = {
     360: dict(viewport={"width": 360, "height": 780}, device_scale_factor=2,
               is_mobile=True, has_touch=True),

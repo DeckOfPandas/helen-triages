@@ -2,8 +2,9 @@
 
 The three are one rule: an inline program in a quoted argument is opaque to the
 permission checker, whether it is spelled `sed 's/a/b/'`, `awk '{print}'` or
-`python3 -c '...'`. Each hook is run here through the same JSON the harness
-hands it (#1198).
+`python3 -c '...'`. guard-dev-null.py is here too: it refuses `/dev/null` as
+an argument, which the checker reads as a path outside the project. Each hook
+is run here through the same JSON the harness hands it.
 """
 from __future__ import annotations
 
@@ -13,9 +14,7 @@ import subprocess
 
 import pytest
 
-pytestmark = pytest.mark.shared
-
-HOOKS = pathlib.Path(__file__).resolve().parents[1] / ".claude" / "hooks"
+HOOKS = pathlib.Path(__file__).resolve().parents[2] / ".claude" / "hooks"
 
 
 def _denied(hook: str, command: str) -> bool:
@@ -136,7 +135,7 @@ def test_guard_inline_script_has_no_length_or_quoting_carve_out(command):
 
     Pinned against reinstatement: there is no length at which an opaque
     command stops being opaque, and a carve-out for short single-quoted
-    one-liners still prompts Helen on every one.
+    one-liners still prompts the human on every one.
     """
     assert _denied("guard-inline-script.py", command), (
         f"allowed {command!r} -- a length or quoting carve-out is back"
@@ -193,7 +192,49 @@ def test_guard_inline_script_refusal_names_the_file_shape_to_use():
     )
 
 
-def test_all_three_guards_are_wired_into_settings():
+@pytest.mark.parametrize("command", [
+    "ls -l /dev/null",
+    "curl -o /dev/null https://example.org",
+    "curl --output /dev/null https://example.org",
+    "curl -o/dev/null https://example.org",
+    "curl --output=/dev/null https://example.org",
+    "diff tmp/a.txt /dev/null",
+    "cat '/dev/null'",
+    "cp /dev/null tmp/empty.txt",
+    "grep x file /dev/null 2>/dev/null",
+])
+def test_guard_dev_null_refuses_it_as_an_argument(command):
+    assert _denied("guard-dev-null.py", command), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    "grep -rn x tests/ > /dev/null",
+    "grep -rn x tests/ 2>/dev/null",
+    "grep -rn x tests/ 2> /dev/null",
+    "grep -rn x tests/ >>/dev/null",
+    "grep -rn x tests/ &>/dev/null",
+    "python3 tmp/x.py < /dev/null",
+    "python3 tmp/x.py >/dev/null 2>&1",
+    "git commit -m 'a script may write to /dev/null'",
+    "grep -rn dev/null .claude/hooks/",
+    "python3 .claude/hooks/guard-dev-null.py",
+    "sh scripts/check-link.sh https://example.org",
+])
+def test_guard_dev_null_leaves_redirections_and_prose_alone(command):
+    assert not _denied("guard-dev-null.py", command), f"refused {command!r}"
+
+
+def test_guard_dev_null_allows_what_it_cannot_parse():
+    assert not _denied("guard-dev-null.py", "ls '/dev/null")
+
+
+def test_guard_dev_null_refusal_says_what_to_do_instead():
+    reason = _denied_reason("guard-dev-null.py", "curl -o /dev/null https://example.org")
+    assert reason is not None
+    assert "> /dev/null" in reason and "tmp/" in reason, reason
+
+
+def test_the_command_text_guards_are_wired_into_settings():
     settings = json.loads((HOOKS.parent / "settings.json").read_text(encoding="utf-8"))
     entries = [
         hook
@@ -201,7 +242,8 @@ def test_all_three_guards_are_wired_into_settings():
         if entry.get("matcher") == "Bash"
         for hook in entry["hooks"]
     ]
-    for name in ("guard-sed.py", "guard-awk.py", "guard-inline-script.py"):
+    for name in ("guard-sed.py", "guard-awk.py", "guard-inline-script.py", "guard-unanalyzable-bash.py",
+                 "guard-dev-null.py"):
         wired = [h for h in entries if h["command"].endswith(f'/.claude/hooks/{name}"')]
         assert wired, f"{name} exists but no PreToolUse hook runs it"
         # Ungated: an `if` is a prefix match, and an interpreter can appear

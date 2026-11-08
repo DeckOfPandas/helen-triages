@@ -1,0 +1,33 @@
+{
+  "_about": "helen-triages' additions to the kit's .claude/kit/settings.kit.json. python3 tools/kit/build.py merges the two into .claude/settings.json: lists are joined, a kit value cannot be changed, and an allow rule a deny covers is refused. Keys starting with _ never reach settings.json. DECISIONS §11.",
+  "_reviewedOpenRules": {
+    "Bash(sh scripts/browser/shoot.sh *)": "A label and site paths, passed to tools/dev/shoot.js, which checks both and writes only tmp/shots/. The script sets the base URL from tmp/browser/port; no argument reaches node or the shell.",
+    "Bash(sh scripts/browser/crop.sh *)": "Passed to tools/dev/crop.js, which checks label, selector, page and its --width/--engine/--click/--type-into options and writes only tmp/shots/.",
+    "Bash(sh scripts/browser/styles.sh *)": "Passed to tools/dev/styles.js, which checks selector, page and --props/--width/--engine and writes nothing.",
+    "Bash(sh scripts/browser/gaps.sh *)": "Passed to tools/dev/gaps.js, which checks selector, page and --width/--depth/--engine and writes nothing.",
+    "Bash(sh scripts/browser/click-crop.sh *)": "Passed to tools/dev/crop.js as its selectors, label, page, --width and --click, which crop.js checks; writes only tmp/shots/."
+  },
+  "permissions": {
+    "allow": [
+      "Read(//dev/null)",
+      "Edit(//dev/null)",
+      "Read(//workspace/.claude/worktrees/**)",
+      "Read(//opt/**)",
+      "Bash(python3 scripts/verify.py)",
+      "Bash(node --test)",
+      "Bash(sh scripts/browser/install.sh)",
+      "Bash(sh scripts/browser/build.sh)",
+      "Bash(sh scripts/browser/serve.sh)",
+      "Bash(sh scripts/browser/capture.sh)",
+      "Bash(sh scripts/browser/shoot.sh *)",
+      "Bash(sh scripts/browser/crop.sh *)",
+      "Bash(sh scripts/browser/styles.sh *)",
+      "Bash(sh scripts/browser/gaps.sh *)",
+      "Bash(sh scripts/browser/click-crop.sh *)"
+    ],
+    "deny": [
+      "Edit(//opt/**)",
+      "Bash(.gh-runtime/bin/gh pr merge *)"
+    ]
+  }
+}

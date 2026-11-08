@@ -1,21 +1,25 @@
 #!/bin/sh
-# Screenshot one element of a served page at 2x, for looking closely.
-# Usage: sh scripts/browser/crop.sh <path> <css-selector> <name> [viewport-width] [type-into-selector] [text]
-# Output: tmp/shots/crop-<name>.png
+# Screenshot one element of a served page at 2x, through tools/dev/crop.js.
+#   sh scripts/browser/crop.sh <path> <selector> <name> [width] [type-into-selector] [text]
+# Output: tmp/shots/crop-<name>.png, and the element's box in CSS px.
 #
-# The last two type <text> into the element <type-into-selector> before the
-# shot, for a control that only shows itself once somebody has typed, such as
-# the search box's dropdown (#1050):
+# The last two type <text> into <type-into-selector> before the shot, for a
+# control that only shows once somebody has typed, such as the search box's
+# dropdown (#1050):
 #   sh scripts/browser/crop.sh /food/recipes/caramel/ .page-search-results dropdown 1280 .page-search-input ch
-# The dropdown hangs outside the box, so crop `.page-search-results` itself;
-# `.page-search` is the box alone.
-#
-# The port comes from tmp/browser/port, written by this worktree's serve.sh;
-# see shoot.sh. 4010 only when no server is running here.
-port=4010
-if [ -f tmp/browser/port ]; then
-  read -r port < tmp/browser/port
+# The dropdown hangs outside the box, so crop `.page-search-results` itself.
+set -eu
+WRAPPER=crop.sh
+[ "$#" -ge 3 ] && [ "$#" -le 6 ] \
+  || { echo "usage: sh scripts/browser/crop.sh <path> <selector> <name> [width] [type-into-selector] [text]" >&2; exit 2; }
+# Every argument check comes before _site.sh, which stops where there is no
+# Playwright (CI): a refusal must not depend on a browser being installed.
+[ "$#" -ne 5 ] || { echo "crop.sh: refused -- a type-into selector needs its text" >&2; exit 2; }
+. scripts/browser/_site.sh
+selector="$2"
+name="$3"
+width="${4:-1280}"
+if [ "$#" -eq 6 ]; then
+  exec node tools/dev/crop.js "$base" "$name" "$selector" "$page" --width "$width" --type-into "$5" "$6"
 fi
-mkdir -p tmp/shots
-. scripts/browser/env.sh
-node scripts/browser/crop.js "http://127.0.0.1:$port/helen-triages$1" "$2" "tmp/shots/crop-$3.png" "$4" "$5" "$6"
+exec node tools/dev/crop.js "$base" "$name" "$selector" "$page" --width "$width"

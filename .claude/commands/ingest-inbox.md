@@ -33,8 +33,8 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
 2. **Branch in the drafts repo**, never commit to its `main`. A bare `git
    checkout -b` would branch the public repo, so use the wrapper:
 
-       sh scripts/git-drafts.sh _food_drafts checkout -b content/inbox-<YYYY-MM-DD>
-       sh scripts/git-drafts.sh _cocktail_drafts checkout -b content/inbox-<YYYY-MM-DD>
+       sh scripts/git-nested.sh _food_drafts checkout -b content/inbox-<YYYY-MM-DD>
+       sh scripts/git-nested.sh _cocktail_drafts checkout -b content/inbox-<YYYY-MM-DD>
 
 3. **Dry run, and read the plan.** The default writes nothing.
 
@@ -110,9 +110,9 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
    the message can still be rewritten. Check the branch in a call of its own
    first:
 
-       sh scripts/git-drafts.sh _cocktail_drafts branch --show-current
-       sh scripts/git-drafts.sh _cocktail_drafts add -- <paths>
-       sh scripts/git-drafts.sh _cocktail_drafts commit -F tmp/commit-msg.txt
+       sh scripts/git-nested.sh _cocktail_drafts branch --show-current
+       sh scripts/git-nested.sh _cocktail_drafts add -- <paths>
+       sh scripts/git-nested.sh _cocktail_drafts commit -F tmp/commit-msg.txt
 
    Then push, per `CLAUDE.md`, with no ask:
 

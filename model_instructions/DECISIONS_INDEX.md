@@ -658,7 +658,7 @@ argument and the rules each field is read by.
 - 2026-08-20 · §11 · main is updated without ever checking it out: sh scripts/git-fetch-main.sh, then git merge origin/main.
 - 2026-08-20 · §11 · the branch check before a commit is its own tool call: a check that cannot stop the thing it is checking is a narration, not a check.
 - 2026-08-20 · §11 · never tell Helen to stop, remark on the time, or suggest something wait until tomorrow.
-- 2026-08-24 · §11 · larger PRs: one PR per sitting, not one per topic, because every merge to main is a deploy.
+- 2026-11-07 · §11 · #1438 · one PR per feature or obvious group of work: not one per sitting, and not one per commit.
 - 2026-08-29 · §11 · an issue is closed with a commit trailer, not the API, whenever a trailer can do it.
 - 2026-08-29 · §11 · /tidy-drafts fixes a draft's formatting and never a judgement, on both sites.
 - 2026-09-01 · §11 · a title that differs from its slug is not a finding on a draft.
@@ -676,6 +676,8 @@ argument and the rules each field is read by.
 - 2026-09-10 · §11 · a Bash command the permission checker cannot analyse is refused by guard-unanalyzable-bash.py, not put to Helen.
 - 2026-09-10 · §11 · the gh wrapper is allow-listed per subcommand, never as gh-agent.sh *, and pr merge and pr review are in the deny list.
 - 2026-09-10 · §11 · pushing runs as a separate agent account over HTTPS through wrappers; the token is never in a URL and the credential helper never in git config.
+- 2026-11-07 · §11 · #1438 · the kit, DeckOfPandas/helen-contains-claude-webdev, is a fourth repo: read it and open PRs there, never merge, never push to its main.
+- 2026-11-07 · §11 · #1438 · this repo runs on the kit: its hooks, wrappers, container and rules are the kit's, synced by /kit-sync, and an improvement to a kit file goes back to the kit as a kit PR.
 - 2026-09-11 · §11 · every PR's base is main, never another PR's branch; and a PR's state is read before pushing to any branch not checked since you last looked, your own included.
 - 2026-09-11 · §11 · a routine call gets a committed wrapper under an exact or argument-checked allow rule, never <tool> *.
 - 2026-09-11 · §11 · a script in tmp/ keeps asking Helen; no allow rule covers tmp/.
@@ -685,6 +687,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §11 · #1008 · Claude moves a draft between the staging folders on Helen's word: rewrite, make, keep, ready or bin, followed by a slug.
 - 2026-11-04 · §11 · a food draft that leaves the pool gets the promotion rules run against it.
 - 2026-09-14 · §11 · never create issues or PRs in a burst: a batch of issues is one issue with a checklist.
+- 2026-11-07 · §11 · #1438 · the kit's guard-github-burst.py enforces the burst rule, with its 5-minute gap between creations.
 - 2026-09-15 · §11 · the account GitHub recorded is read off what a write returns, never assumed.
 - 2026-09-15 · §11 · a command that builds a path at run time gets a committed wrapper, not a prompt.
 - 2026-09-15 · §11 · never awk (nor gawk, mawk, nawk); guard-awk.py refuses them as command words.
@@ -693,7 +696,7 @@ argument and the rules each field is read by.
 - 2026-09-15 · §11 · an unquoted ( or ) in a Bash command is refused by the hook.
 - 2026-09-15 · §11 · #1112 · on a PR the agent account opened, the PR description closes the issues, not the commit trailers: one closing keyword per issue per line, never a comma list.
 - 2026-10-21 · §11 · dev servers are shared work: a session starts one when Helen asks, from its own worktree, and says the URL she can open.
-- 2026-09-21 · §11 · the file tools may read /workspace/.node-runtime, and nothing may write there.
+- 2026-11-07 · §11 · #1438 · /workspace/.node-runtime is retired: no directory grant, no deny.
 - 2026-09-21 · §11 · Read(//dev/null) and Edit(//dev/null) stay in the settings.
 - 2026-09-21 · §11 · git -C <path> is refused wherever it appears; write the bare command.
 - 2026-09-21 · §11 · Claude runs only in the container, never on the host.
@@ -702,7 +705,7 @@ argument and the rules each field is read by.
 - 2026-09-24 · §11 · #1078 · an agent may correct or delete a recipe note that a later ruling of Helen's has made false.
 - 2026-09-29 · §11 · /opt may be read, never written, and only Helen can make the grant live.
 - 2026-09-29 · §11 · every other worktree under /workspace/.claude/worktrees/ may be read, and nothing in one may be written.
-- 2026-10-02 · §11 · git inside a drafts clone goes through sh scripts/git-drafts.sh <dir> <verb>, a fixed list of verbs.
+- 2026-10-02 · §11 · git inside a drafts clone goes through a wrapper with a fixed list of verbs: today the kit's sh scripts/git-nested.sh <dir> <verb>.
 - 2026-10-02 · §11 · this repository takes no outside contributions: a stranger's PR is not merged, and the fix ships from the agent account.
 - 2026-10-10 · §11 · $[ outside single quotes is refused by the hook: write a regex in single quotes.
 - 2026-10-11 · §11 · the journal, the manual and code comments are delete-and-replace, never append.

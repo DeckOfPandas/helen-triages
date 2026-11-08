@@ -22,6 +22,10 @@ _food_drafts/
 _food_drafts
 _cocktail_drafts/
 _cocktail_drafts
+# The kit's working clone, for kit PRs (DECISIONS §11). The clone the sync
+# reads is tmp/kit, under tmp/ below.
+_kit_upstream/
+_kit_upstream
 
 # Individual pages held back the same way as the collections above — not
 # ready for a public repo, regardless of what Jekyll would or wouldn't build.
@@ -40,14 +44,9 @@ __pycache__/
 .venv/
 *.pyc
 
-# Node (local runtime only, for `node --test` -- not part of the site or its
-# build; downloaded from nodejs.org, extracted here rather than installed
-# system-wide, so it stays out of version control)
+# Host-only runtimes from before the container; retired, and kept out of git
+# wherever an old checkout still has them.
 .node-runtime/
-
-# GitHub CLI (local install only, so Claude can read/act on Issues and PRs
-# without a global apt package or sudo -- downloaded from cli.github.com's
-# GitHub releases, extracted here, not part of the site or its build)
 .gh-runtime/
 
 # OS
@@ -60,6 +59,12 @@ tmp/
 htf-sublime.sublime-project
 htf-sublime.sublime-workspace
 
-# Claude
+# Claude, and the kit's local files: the token, Helen's GitHub config, and a
+# kit.env kept out of git. tests/kit/test_kit_config.py requires these.
 .claude/settings.local.json
+.claude/worktrees/
+scripts/github.local.conf
+.devcontainer/kit.local.env
+.env
+.env.*
 
