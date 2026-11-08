@@ -146,7 +146,7 @@ name you give is a courtesy rather than a contract.
 | `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
-| the yield's number | **`serves:` opens with a number of people; `makes:` opens with a count of a named thing**: "one 20-cm cake (about 10 slices)", "2 loaf cakes", "950 ml", "1 batch" for a sauce or spice blend. The source's other words follow the figure: "4, depending on appetite". **One figure, not an alternative:** "9 large or 16 small biscuits" reads as nine of something called "large", so write the one the source leads with ("9 biscuits"). **`makes` is never read as people** however numeric it looks. **A dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets**: `"one 20-cm cake (about 10 slices)"`, `"one 900-g loaf (8–10 slices)"`; with no slices given, `"one 23-cm cake"`. Never portions as the count. Helen: *"one 20-cm cake (about 10 slices). Let's always use that. If we don't know slices, then leave them out."* **Where the source prints no figure, write `"QQ"`** and put a suggested one in your list (for a bake, the thing its tin makes: "one 20-cm cake"); never a guessed number in the file. There is no `serves_estimate` field: it is retired, and the suite refuses it. |
+| the yield's number | **`serves:` opens with a number of people; `makes:` opens with a count of a named thing**: "one 20-cm cake (about 10 slices)", "2 loaf cakes", "950 ml", "1 batch" for a sauce or spice blend. The source's other words follow the figure: "4, depending on appetite". **One figure, not an alternative:** "9 large or 16 small biscuits" reads as nine of something called "large", so write the one the source leads with ("9 biscuits"). **`makes` is never read as people** however numeric it looks. **A dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets**: `"one 20-cm cake (about 10 slices)"`, `"one 900-g loaf (8–10 slices)"`; with no slices given, `"one 23-cm cake"`. Never portions as the count. Helen: *"one 20-cm cake (about 10 slices). Let's always use that. If we don't know slices, then leave them out."* **The figure is a whole number**: `"About 2500 ml"`, never `"About 2.5 litres"` or `"2½ litres"`, which leave the scaler nothing to count. **Where the source prints no figure, write `"QQ"`** and put a suggested one in your list (for a bake, the thing its tin makes: "one 20-cm cake"); never a guessed number in the file. There is no `serves_estimate` field: it is retired, and the suite refuses it. |
 | `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. **Not in the source? Estimate it, as `"Estimated 20 mins"`, and say so in your list** — Helen: *"I would like "Estimated 10 mins" to be written, then our tidying scripts block promotion for recipes with estimated times."* Her repository refuses to promote a recipe whose time still says `Estimated`, so a guess never publishes. Write `"QQ"` only where you cannot estimate at all. `cook_time: "None"` for a genuinely uncooked dish. |
 | `main_ingredients` | Section 4. Lowercase, a flat list. |
 | `star_ingredient` | Section 4. **Optional** — leave it out rather than force one. |
@@ -289,6 +289,11 @@ method:
   instead of "mins", same missing degree sign. Do not tidy it. It is there so
   Helen can check your rewrite against what it came from.
 - **`QQ Claude` is your rewrite**, and it is held to normal house style.
+
+**A recipe developed in this chat, not transcribed from a page, has `QQ
+Claude` lines only** — there is no source text to keep beside them. Its
+notes are QQ-labelled notes, and an allergy check goes in the body under a
+`QQ Allergy check` heading, word for word. Helen: *"QQ Claude lines only"*.
 
 `QQ` is Helen's marker for "not yet in my voice". It stays on the file
 indefinitely; she takes it off one step at a time as she reads. Never remove
@@ -623,6 +628,12 @@ magazine is a `publication`.
 | `joke` | free text | `Bitter experience` |
 | `unknown` | exactly `QQ` | `QQ` |
 
+**A recipe developed with Helen in this chat is hers**: `source: "Henry"`
+(her own name for herself), `source_type: person` — and `"Henry,
+Alsace-style"` when it is her version of a regional dish. Never `"Helen"`,
+and never a `place` alone: *"Place for the regionals is cute, but put me on
+there too please."*
+
 **The date is what separates a `publication` from a `website`.** A publication
 must carry one; a website must not. A year alone is a complete date. Some
 titles are genuinely both — *Good Food* has a print issue and a site — so **if
@@ -679,6 +690,9 @@ batch comes from one of them, the index may say so once.
   `item: "lemon, juiced"` (or lime, or orange); a `QQ Claude` step says
   "¼ lemon, juiced". Helen: *"I hate the word "squeeze"! Let's always use
   "1/4 lemon, juiced"."* The verb is fine: "squeeze out the gelatine".
+- **A spoon amount takes no "of"**: "2 tbsp oil", never "2 tbsp of the oil",
+  in an ingredient line and a `QQ Claude` step alike. Helen: *"Never "2 tbsp
+  of" something. Just "2 tbsp $something". Always."*
 - **A space between a number and its unit**, imperial included: `15 ml`,
   `400 g`, `20 cm`, `9 in`, `2 tbsp`. Not `15ml`. A temperature takes none:
   `180°C`.

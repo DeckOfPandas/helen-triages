@@ -80,6 +80,7 @@ argument and the rules each field is read by.
 - 2026-10-07 · §4 · a source's bottle goes in that pour's note as "Originally X.", never in suggestion.
 - 2026-10-08 · §4 · a cocktail's tagline is a bare QQ at ingest; nothing is drafted.
 - 2026-10-08 · §4 · a food tagline at ingest is the method's pair on one line, where the source has an intro.
+- 2026-11-03 · §4 · a recipe written up in a chat, not transcribed from a page, has QQ Claude method lines and no QQ original.
 - 2026-11-03 · §4 · an unqualified milk, egg or butter takes the house default, and the line says what the source printed.
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.

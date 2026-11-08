@@ -331,7 +331,9 @@ else has already done (MANUAL §9.1).
   of people, or `makes:` with a count of a named thing -- `"one 20-cm cake
   (about 10 slices)"`, `"2 loaf cakes"`, `"About 750 ml"`, `"1 batch"` for a
   sauce or a spice blend. Any words the source adds follow the figure
-  (`"4, depending on appetite"`). **One figure, never an alternative**: "9
+  (`"4, depending on appetite"`). **The figure is a whole number**:
+  `"About 2500 ml"`, never `"About 2.5 litres"`, which leaves the shopping
+  list nothing to count. **One figure, never an alternative**: "9
   large or 16 small biscuits" reads as nine "large", so it is `"9 biscuits"`.
   `ruby scripts/food_yield.rb "<line>"` says how a line reads. **A dessert, cake
   or bake makes the thing, sized from its tin, with the source's slices in
@@ -410,6 +412,13 @@ else has already done (MANUAL §9.1).
   to house style like any other prose.
 
   She keeps both so she can judge the rewrite rather than trust it blind.
+
+  **A write-up developed in a chat, not transcribed from a page, is the one
+  exception: `QQ Claude` lines only**, because there is no source text to
+  keep. Its notes become QQ-labelled notes, a "REMOVED:" line stays as a `QQ
+  REMOVED:` ingredient line, an "Allergy check" goes in the body word for
+  word under a `QQ Allergy check` heading, and the source is `"Henry"`
+  (DECISIONS §4).
 
   **One source step is one `QQ original`, however many actions it holds, and
   a dense one gets several `QQ Claude` lines under it** (DECISIONS §4). Helen:
