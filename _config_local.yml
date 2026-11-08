@@ -1,15 +1,15 @@
 # Local overrides, never deployed.
-#   bundle exec jekyll serve --config _config.yml,_config_local.yml --port 4001
+#   bundle exec jekyll serve --config _config.yml,_config_local.yml --port 5000
 #
 # baseurl is deliberately not overridden: local and production use the same
-# path, so the local URL is http://localhost:4001/helen-triages/
+# path, so the local URL is http://localhost:5000/helen-triages/
 
 # Show recipes still carrying the source's wording on the index. See
 # _config.yml.
 show_source_wording: true
 
 # No "pdf" link on the working view (#86): nothing Jekyll does creates the
-# PDFs, so the link would 404 here. It is on at localhost:4002; to make it
+# PDFs, so the link would 404 here. It is on at localhost:5001; to make it
 # work there as well as show, render into that build:
 #
 #   python3 scripts/generate_pdfs.py --site _site_prod

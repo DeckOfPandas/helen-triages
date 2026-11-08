@@ -12,10 +12,10 @@
     "AGENT_GH_TOKEN": "${localEnv:AGENT_GH_TOKEN}"
   },
   "updateRemoteUserUID": false,
-  "forwardPorts": [4001, 4002],
+  "forwardPorts": [5000, 5001],
   "portsAttributes": {
-    "4001": { "label": "jekyll-local" },
-    "4002": { "label": "jekyll-prod" }
+    "5000": { "label": "jekyll-local" },
+    "5001": { "label": "jekyll-prod" }
   },
   "postCreateCommand": "bundle install",
   "customizations": {

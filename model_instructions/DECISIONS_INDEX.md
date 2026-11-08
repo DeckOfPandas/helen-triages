@@ -21,7 +21,7 @@ argument and the rules each field is read by.
 - 2026-09-09 · §0 · there are three instruction documents and no fourth: a separate ARCHITECTURE log was offered and declined.
 - 2026-09-29 · §0 · #1252 · a layout's comments are a few present-tense lines ending in a MANUAL §n / DECISIONS §n (#N) pointer; the reasoning lives in the documents.
 - 2026-10-11 · §0 · there is no claude.ai Project: a web chat is given three GitHub URLs.
-- 2026-09-09 · §1 · the devcontainer publishes 4999 and 5000 outside for 4001 and 4002 inside.
+- 2026-11-08 · §1 · ports are the machine's to choose; the committed default is 5000 to 5010, the same number inside and out.
 - 2026-09-09 · §1 · the container has a fixed name, so a second run.sh is refused.
 - 2026-09-09 · §1 · worktrees are made on the host, never inside the container; enter-worktree.sh was rejected.
 - 2026-09-15 · §1 · Playwright, its Chromium and its system libraries are baked into the devcontainer image.

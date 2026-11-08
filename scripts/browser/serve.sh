@@ -6,7 +6,7 @@
 # tmp/browser/port for the other harness scripts to read. A fixed port, in a
 # container running several worktrees' sessions, makes the second server fail
 # to bind and that session's screenshots measure somebody else's build. 4010
-# and up avoids jekyll-local's 4001 and jekyll-prod's 4002.
+# and up is outside the published 5000-5010, which Helen's browser reaches.
 set -e
 mkdir -p tmp/serve
 if [ ! -e tmp/serve/helen-triages ]; then
