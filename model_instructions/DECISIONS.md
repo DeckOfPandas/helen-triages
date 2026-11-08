@@ -4466,6 +4466,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
     reports kit changes to its template (`.claude/kit/watched`).
   - **No kit-owned, generated or watched path is ever part of the site
     build**; `tests/kit/test_site_excludes_kit.py` holds `_config.yml` to it.
+  - **Our comment rule does not judge the kit's files**: the kit's own rules
+    govern them, and they change only by a kit PR, so
+    `tests/test_comment_rule.py` skips every path in `kit.lock`. Long
+    comments in the kit are fixed in the kit.
   - **The wrappers read `scripts/github.local.conf`**, which Helen keeps in
     the main checkout; no session edits it.
   - **The kit's container and its slim Ruby image**, our values in

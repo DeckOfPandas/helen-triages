@@ -3,11 +3,13 @@ ratchet: a comment block is at most eight lines (fifteen at the head of a
 file), and a comment carries no date.
 
 Whole-line comments only. Not read: a Python docstring, a JSDoc `@param` or
-`@returns` line, and a shell script's header, which is its manual.
+`@returns` line, a shell script's header, which is its manual, and any file
+the kit owns (`.claude/kit/kit.lock`), which the kit's own rules govern.
 `KNOWN_LONG` and `KNOWN_DATED` are the exceptions, as a count per file, each
 with its reason. A count never rises: shorten the comment, or put the story
 in the commit message.
 """
+import json
 import re
 import subprocess
 from pathlib import Path
@@ -23,6 +25,9 @@ MARKUP = {".html"}
 # Recipes and documents are prose; fixtures and the image are not ours to trim.
 NOT_SCANNED = ("_food_recipes/", "_cocktail_recipes/", "model_instructions/",
                "tests/fixtures/", ".devcontainer/", "assets/vendor/")
+# The kit's files can change only by a kit PR, so they are the kit's to trim.
+KIT_LOCK = ROOT / ".claude" / "kit" / "kit.lock"
+KIT_OWNED = set(json.loads(KIT_LOCK.read_text(encoding="utf-8"))["files"]) if KIT_LOCK.is_file() else set()
 DATE = re.compile(r"\b20\d\d-\d\d-\d\d\b")
 BLOCK_LINES, HEADER_LINES = 8, 15
 
@@ -84,8 +89,8 @@ def _scan():
     found = {}
     for name in listed:
         path = ROOT / name
-        if (not name or name.startswith(NOT_SCANNED) or not path.is_file()
-                or path.suffix not in HASH | SLASH | MARKUP):
+        if (not name or name.startswith(NOT_SCANNED) or name in KIT_OWNED
+                or not path.is_file() or path.suffix not in HASH | SLASH | MARKUP):
             continue
         lines = path.read_text(encoding="utf-8").split("\n")
         long_blocks, dated, start, prev = [], [], None, None
@@ -117,6 +122,15 @@ def test_the_scan_reads_comments_in_every_kind_of_file():
             f"no {suffix} file was scanned: `git ls-files` returned nothing "
             "the comment rule could read"
         )
+
+
+def test_the_kits_files_are_left_to_the_kit_and_ours_are_still_read():
+    """The exemption is the lock's list, never a folder: our own files beside
+    the kit's (scripts/browser/, the site scripts) are still held to the rule."""
+    assert KIT_OWNED, "no .claude/kit/kit.lock files: the exemption would be silent"
+    found = _scan()
+    assert not any(name in KIT_OWNED for name in found)
+    assert "scripts/browser/shoot.sh" in found and "scripts/verify.py" in found
 
 
 def test_no_comment_block_is_longer_than_the_rule_allows():
