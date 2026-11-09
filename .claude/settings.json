@@ -125,6 +125,7 @@
       "Bash(sh scripts/check-link.sh *)",
       "Bash(sh scripts/main-ci-status.sh)",
       "Bash(sh scripts/main-ci-status.sh *)",
+      "Bash(sh scripts/kit-ports.sh)",
       "Bash(sh scripts/git-nested.sh *)",
       "Bash(sh scripts/gh-agent.sh issue list *)",
       "Bash(sh scripts/gh-agent.sh issue view *)",

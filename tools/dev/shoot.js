@@ -8,10 +8,10 @@
 // --click clicks the first visible element with that exact text, in order;
 // --type then types into the first visible text or search input. Each line
 // says `ok`, or `OVERFLOW` with the elements sticking out furthest: 360 is
-// where a layout that fits 390 most often starts to scroll sideways.
-// tools/dev/slice-png.js cuts a tall shot into readable pieces.
-// Needs WITH_PLAYWRIGHT=1 in kit.env; the image's NODE_PATH resolves
-// `require('playwright')`.
+// where a layout that fits 390 most often starts to scroll sideways. Sticky
+// elements are unstuck first, so a full-page shot shows them where they sit.
+// tools/dev/slice-png.js cuts a tall shot into readable pieces. Needs
+// WITH_PLAYWRIGHT=1 in kit.env; the image's NODE_PATH resolves `playwright`.
 const fs = require('fs');
 const path = require('path');
 
@@ -64,6 +64,16 @@ function overflow(width) {
   return { docW, wide: wide.slice(0, 8) };
 }
 
+// Runs in the page. A full-page shot is one tall viewport, so a sticky element
+// is drawn wherever the page was scrolled to, often over the content.
+function unstick() {
+  for (const el of document.querySelectorAll('body *')) {
+    if (getComputedStyle(el).position === 'sticky') {
+      el.style.setProperty('position', 'static', 'important');
+    }
+  }
+}
+
 function usage(message) {
   console.error(`shoot.js: ${message}\nusage: node tools/dev/shoot.js <base-url> <label> [--engine chromium|webkit] [--scheme light|dark] [--click <text>]... [--type <text>] <page>...`);
   process.exit(2);
@@ -98,6 +108,7 @@ function usage(message) {
           await box.pressSequentially(opts.type, { delay: 20 });
           await page.waitForTimeout(400);
         }
+        await page.evaluate(unstick);
         await page.waitForTimeout(300);
         const report = await page.evaluate(overflow, width);
         await page.screenshot({ path: file, fullPage: true });
