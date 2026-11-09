@@ -1,33 +1,17 @@
-// Screenshot pages of a running site, full page, at narrow-phone (360),
-// phone (390) and desktop (1280) widths. 360 is the narrowest phone in common
-// use, and where a layout that fits 390 most often starts to scroll sideways.
-//
-// USAGE:
+// Screenshot pages of a running site, full page, at 360, 390 and 1280 px.
 //   node tools/dev/shoot.js <base-url> <label> [--engine chromium|webkit] [--scheme light|dark] [--click <text>]... [--type <text>] <page>...
-//
 //   node tools/dev/shoot.js http://127.0.0.1:9000/mysite before --scheme dark . about/
-//   node tools/dev/shoot.js http://127.0.0.1:9000 safari --engine webkit .
 //   node tools/dev/shoot.js http://127.0.0.1:9000 menu --click "Menu" .
-//   node tools/dev/shoot.js http://127.0.0.1:9000 typed --type search-term .
-//
-// A page is relative to the base URL, and `.` is the base itself. A page
-// may not start with `/`: the permission checker reads such an argument as
-// an absolute file path and stops the command to ask.
-//
-// Shots land in tmp/shots/<label>-<width>-<scheme>-<page>.png, with
-// -webkit after the width for WebKit, the engine nearest Safari. Each --click
-// clicks the first visible element with that exact text, in order, before the
-// shot; --type then types its text into the first visible text or search
-// input. Tall pages come out tall: tools/dev/slice-png.js cuts them into
-// readable pieces.
-//
-// Each shot's line says `ok`, or `OVERFLOW` when the page is wider than the
-// viewport (sideways scrolling on a phone), followed by the elements that
-// stick out furthest.
-//
-// Needs WITH_PLAYWRIGHT=1 in kit.env. The image sets NODE_PATH to
-// /opt/playwright/node_modules, so `require('playwright')` resolves with no
-// prefix on the command.
+// A page is relative to the base URL (`.` is the base) and never starts with
+// `/`, which the permission checker reads as an absolute path and asks about.
+// Shots land in tmp/shots/<label>-<width>[-webkit]-<scheme>-<page>.png. Each
+// --click clicks the first visible element with that exact text, in order;
+// --type then types into the first visible text or search input. Each line
+// says `ok`, or `OVERFLOW` with the elements sticking out furthest: 360 is
+// where a layout that fits 390 most often starts to scroll sideways.
+// tools/dev/slice-png.js cuts a tall shot into readable pieces.
+// Needs WITH_PLAYWRIGHT=1 in kit.env; the image's NODE_PATH resolves
+// `require('playwright')`.
 const fs = require('fs');
 const path = require('path');
 

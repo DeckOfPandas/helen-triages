@@ -1,20 +1,12 @@
 // Print the vertical rhythm under one element: each visible block child's
 // tag.class, height, margins and padding, and the gap in px to the sibling
-// above it, as an indented tree. For "why is this gap bigger than that one".
-//
-// USAGE:
+// above it, as an indented tree. Writes nothing.
 //   node tools/dev/gaps.js <base-url> <root-selector> [<page>] [--width <px>] [--depth <n>] [--engine chromium|webkit]
-//
-//   node tools/dev/gaps.js http://127.0.0.1:9000 main
 //   node tools/dev/gaps.js http://127.0.0.1:9000 .card about/ --width 390 --depth 2
-//
-// <page> is relative to the base URL (`.` by default) and may not start with
-// `/`: the permission checker reads that as an absolute path and asks.
-// Absolutely and fixed positioned children, `display: none`, inline elements
-// and anything under 6x6 px are skipped. --depth is 1 to 8, default 4.
-// Writes nothing.
-//
-// Needs WITH_PLAYWRIGHT=1 in kit.env (see tools/dev/shoot.js).
+// <page> is relative to the base URL (`.` by default) and never starts with
+// `/` (see shoot.js). Skipped: absolute and fixed children, `display: none`,
+// inline elements and anything under 6x6 px. --depth is 1 to 8, default 4.
+// Needs WITH_PLAYWRIGHT=1 in kit.env.
 const USAGE = 'usage: node tools/dev/gaps.js <base-url> <root-selector> [<page>] [--width <px>] [--depth <n>] [--engine chromium|webkit]';
 
 function usage(message) {

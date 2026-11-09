@@ -1,2 +1,3 @@
+- [Read other worktrees](read-other-worktrees.md) — reading .claude/worktrees/* is allowed; just do it, never ask
 - [Relative paths, no cd](relative-paths-no-cd.md) — Bash commands use cwd-relative paths; no `cd` prefix, no absolute /workspace paths
 - [Static commands in scripts](static-commands-in-scripts.md) — complex Bash goes in a tmp/ script with literal args; never expand variables into commands

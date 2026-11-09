@@ -72,7 +72,8 @@ PORTS=""
 EXTRA_ALLOWED_DOMAINS=""
 MOUNT_DOTFILES=1
 
-# read_kit_file <file> <local>: with <local> = 1, only PROJECT_NAME is accepted.
+# read_kit_file <file> <local>: with <local> = 1, only PROJECT_NAME and PORTS
+# are accepted, the two that can differ between machines.
 read_kit_file() {
   local file="$1" only_name="$2" line key value
   while IFS= read -r line || [ -n "$line" ]; do
@@ -90,8 +91,8 @@ read_kit_file() {
       \"*\") value="${value#\"}"; value="${value%\"}" ;;
       \'*\') value="${value#\'}"; value="${value%\'}" ;;
     esac
-    [ "$only_name" = 0 ] || [ "$key" = PROJECT_NAME ] \
-      || die "$file: only PROJECT_NAME belongs here, not '$key'"
+    [ "$only_name" = 0 ] || [ "$key" = PROJECT_NAME ] || [ "$key" = PORTS ] \
+      || die "$file: only PROJECT_NAME and PORTS belong here, not '$key'"
     case "$key" in
       PROJECT_NAME | NODE_MAJOR | WITH_RUBY | RUBY_VERSION | WITH_PLAYWRIGHT | \
       PLAYWRIGHT_VERSION | WITH_PY_REQS | PORTS | EXTRA_ALLOWED_DOMAINS | MOUNT_DOTFILES)
@@ -105,7 +106,8 @@ KIT_ENV="$HERE/kit.env"
 [ -f "$KIT_ENV" ] || die "$KIT_ENV is missing"
 read_kit_file "$KIT_ENV" 0
 # Gitignored, so a template can commit PROJECT_NAME=changeme while its own
-# checkout builds under a real name.
+# checkout builds under a real name, and a machine can publish its own PORTS.
+# A key set here replaces kit.env's.
 KIT_LOCAL_ENV=.devcontainer/kit.local.env
 [ ! -f "$KIT_LOCAL_ENV" ] || read_kit_file "$KIT_LOCAL_ENV" 1
 
@@ -215,6 +217,8 @@ fi
 for pair in $PORTS; do
   RUN_ARGS+=(-p "$pair")
 done
+# Sessions cannot read kit.local.env, so the pairs in force reach them here.
+RUN_ARGS+=(-e "KIT_PORTS=$PORTS")
 
 # The token is read for this one `docker run` and never printed: from the
 # primary checkout's .claude/settings.local.json (the working directory) if it

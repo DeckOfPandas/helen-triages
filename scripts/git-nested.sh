@@ -12,7 +12,8 @@
 #
 # What it accepts is a list, not a pattern, because an allow rule runs it unasked:
 #
-#   dir       a folder named in NESTED_DIRS in the GitHub config, holding .git.
+#   dir       a folder path named in NESTED_DIRS in the GitHub config, holding
+#             .git: `_drafts`, or a clone inside a clone, `site/_drafts`.
 #   status    --short, --porcelain, --branch.
 #   diff      --stat, --shortstat, --name-only, --name-status, --cached, then
 #             plain refs and paths.
@@ -125,8 +126,9 @@ case "$verb" in
       *) refuse "'$file' is not under tmp/" ;;
     esac
     [ -f "$file" ] && [ ! -L "$file" ] || refuse "'$file' is not a regular file"
-    # git -C resolves the message from inside the clone, one level down.
-    set -- -F "../$file"
+    # git -C resolves the message from inside the clone, at any depth, so it
+    # gets the checkout's absolute path.
+    set -- -F "$(pwd)/$file"
     ;;
   *)
     refuse "'$verb' is not one of status, diff, log, show, branch, checkout, add, commit"

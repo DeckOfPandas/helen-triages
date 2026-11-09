@@ -291,11 +291,43 @@ def test_kit_local_env_overrides_the_name(project):
     assert "--name mine-primary" in next(c for c in calls if c.startswith("docker run"))
 
 
-def test_kit_local_env_takes_only_the_name(project):
+def test_kit_local_env_ports_replace_kit_envs(project):
+    text = (project / ".devcontainer" / "kit.env").read_text().replace('PORTS=""', 'PORTS="5998:4000"')
+    (project / ".devcontainer" / "kit.local.env").write_text('PORTS="6000:6000 6001:6001"\n')
+    done, calls = run_sh(project, kit_env_text=text)
+    assert done.returncode == 0, done.stderr
+    run = next(c for c in calls if c.startswith("docker run"))
+    assert "-p 6000:6000" in run and "-p 6001:6001" in run and "5998" not in run
+    assert "-e KIT_PORTS=6000:6000 6001:6001" in run
+
+
+def test_run_sh_passes_kit_envs_ports_when_there_is_no_local_file(project):
+    text = (project / ".devcontainer" / "kit.env").read_text().replace('PORTS=""', 'PORTS="5998:4000"')
+    done, calls = run_sh(project, kit_env_text=text)
+    assert done.returncode == 0, done.stderr
+    assert "-e KIT_PORTS=5998:4000" in next(c for c in calls if c.startswith("docker run"))
+
+
+def test_kit_local_env_validates_its_ports(project):
+    (project / ".devcontainer" / "kit.local.env").write_text('PORTS="80"\n')
+    done, calls = run_sh(project)
+    assert done.returncode == 1 and "host:container" in done.stderr
+    assert calls == []
+
+
+def test_kit_local_env_takes_only_the_name_and_ports(project):
     (project / ".devcontainer" / "kit.local.env").write_text("WITH_RUBY=1\n")
     done, calls = run_sh(project)
-    assert done.returncode == 1 and "only PROJECT_NAME" in done.stderr
+    assert done.returncode == 1 and "only PROJECT_NAME and PORTS" in done.stderr
     assert calls == []
+
+
+def test_the_local_example_is_all_comments(kit_root):
+    """Copied as it stands, it changes nothing: every setting is a line to
+    uncomment."""
+    lines = (kit_root / ".devcontainer" / "kit.local.example.env").read_text().splitlines()
+    assert all(not line.strip() or line.startswith("#") for line in lines)
+    assert any(line.startswith("#PORTS=") for line in lines)
 
 
 @pytest.mark.parametrize("edit,message", [

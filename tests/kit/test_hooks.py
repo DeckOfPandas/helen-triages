@@ -174,6 +174,17 @@ def test_ground_truth_names_an_absent_nested_clone_and_how_to_clone_it(hooks, re
     assert "_scratch" not in report
 
 
+def test_ground_truth_names_an_absent_clone_inside_a_clone(hooks, repo):
+    (repo / "scripts").mkdir()
+    (repo / "scripts" / "github.local.conf").write_text(
+        'GH_REPOS="site drafts"\nNESTED_DIRS="site:site site/_drafts:drafts"\n')
+    (repo / "site").mkdir()
+    git(repo / "site", "init", "-q")
+    report = _ground_truth(hooks, repo)
+    assert "nested: site/_drafts ABSENT" in report
+    assert "sh scripts/git-clone-agent.sh drafts site/_drafts" in report
+
+
 def test_ground_truth_is_quiet_when_every_nested_clone_is_there(hooks, repo):
     (repo / "scripts").mkdir()
     (repo / "scripts" / "github.local.conf").write_text('NESTED_DIRS="_drafts:drafts"\n')
