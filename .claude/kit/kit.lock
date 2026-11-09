@@ -1,6 +1,6 @@
 {
   "kit_repo": "helen-contains-claude-webdev",
-  "kit_commit": "cc4de7e4a26d855320c4e85d704e047efaf8fcdd",
+  "kit_commit": "73de449aca580363c860bd021f7b8bbb940ffb02",
   "files": {
     ".claude/hooks/README.md": "0ba773835a2737e2b19e527596d17909426c7c401855a19b5672110434766979",
     ".claude/hooks/guard-awk.py": "3dd599df8eea1f323791bd5733302d896bd6b0813a014b24bb6783087149ad72",
@@ -14,7 +14,7 @@
     ".claude/hooks/guard-token-expansion.py": "bb28b5c7ac48f08bb524b43c20bf2e8101b1ff3f4162a28e760c25e5ad3e881b",
     ".claude/hooks/guard-unanalyzable-bash.py": "377ac9e5c05bd5aa428627b84700ec285280d61cd35b38dc2fd31a736abae7e8",
     ".claude/hooks/session-ground-truth.py": "045cd18469d446395877d7fee184ca0c5b9c51e63257839fafea9c60a24c18c6",
-    ".claude/kit/RULES.md": "da9286d4d82ce5bddb77fc740316cb6defa63a499e21c2aa5bb82828e16215d7",
+    ".claude/kit/RULES.md": "7564c2436b0e407ab66dee41f1db0439b6588b3d32e12f972116b736a85ba8c1",
     ".claude/kit/settings.kit.json": "db1beee308c92af041bce71603d7b01fb05291f30c2cd88b6079bd336f9a6290",
     ".claude/memory-seed/MEMORY.md": "e4e3cb50ca0e053ae3b73487147d3a99ed0cf56104c0f6b2bf675d27989dd8c5",
     ".claude/memory-seed/read-other-worktrees.md": "aac1ef2a18ed6a1eeafbb3a196c9c2dc5b78b51f392954ff4b895d4c92dacda6",
