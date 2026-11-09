@@ -108,8 +108,13 @@ def test_the_twenty_first_issue_in_a_day_is_refused_but_a_pr_passes(guard, proje
     assert not denied(check(guard, project, config, CREATE_PR))
 
 
-def test_the_sixth_pr_in_a_day_is_refused_but_an_issue_passes(guard, project, config):
+def test_the_sixth_pr_in_a_day_passes(guard, project, config):
     seed(config, *[HOUR + n * 60 for n in range(5)], kind="PR")
+    assert not denied(check(guard, project, config, CREATE_PR))
+
+
+def test_the_twenty_first_pr_in_a_day_is_refused_but_an_issue_passes(guard, project, config):
+    seed(config, *[HOUR + n * 60 for n in range(20)], kind="PR")
     assert "PR" in reason(check(guard, project, config, CREATE_PR))
     assert not denied(check(guard, project, config, CREATE_ISSUE))
 
