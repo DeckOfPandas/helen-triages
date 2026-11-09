@@ -402,6 +402,19 @@
           add(chipValue, [raw, entry].concat(coveredBy(chipValue)));
         });
       });
+
+      // A declared bottle is a way in to its category's chip even where no
+      // drink names it, so "angostura" reaches `aromatic bitters` (#1434). It
+      // only joins a chip the drinks already earned; it never makes one.
+      Object.keys(bottles.bottles || {}).forEach(function (name) {
+        if (isDeclared(name)) return;
+        var bottle = bottles.bottles[name] || {};
+        var aliases = (bottle.aliases || []).filter(function (a) { return !isDeclared(a); });
+        [].concat(bottle.generic || []).forEach(function (generic) {
+          var chip = byValue[chipKeyOf(generic)];
+          if (chip) add(chip.value, [name].concat(aliases));
+        });
+      });
       return Object.keys(byValue).map(function (k) { return byValue[k]; })
         .sort(function (a, b) {
           return a.value.toLowerCase().localeCompare(b.value.toLowerCase());

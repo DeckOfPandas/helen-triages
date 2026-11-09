@@ -2494,7 +2494,9 @@ the pool, ranking, families and the two matching rules (pure, tested);
   module here; in `filters.js`, at render time, on food.
 - **One chip per category, wearing the card's name**; a bottle is a way in to
   its category, not a chip beside it, which needs the pool built per
-  ingredient from `data-ing`.
+  ingredient from `data-ing`. Every bottle declared in `bottles.yml` is also
+  a way in to its generic's chip when no drink names it ("angostura" finds
+  `aromatic bitters`), but it never makes a chip of its own.
 - **The picker answers from the first character** (`search.min_query_chars` in
   `ingredients.yml`) and offers every candidate, with no cap, as food's does.
   Short queries produce long lists; that is chosen. DECISIONS §9.3.3.
