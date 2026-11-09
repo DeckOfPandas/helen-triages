@@ -37,7 +37,10 @@ conf_path() {
     printf '%s' "$here/github.local.conf"
     return
   fi
-  common="$(git -C "$here" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+  # git-remote-https hands the credential helper the pushing repo's GIT_DIR,
+  # relative to a nested clone, which would hide this checkout's own.
+  common="$(unset GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR GIT_INDEX_FILE
+    git -C "$here" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
   if [ -n "$common" ] && [ -f "$(dirname "$common")/scripts/github.local.conf" ]; then
     printf '%s' "$(dirname "$common")/scripts/github.local.conf"
     return
@@ -105,14 +108,28 @@ load_conf() {
     in_list "$repo" $GH_REPOS || refuse "$conf_name:PR_ONLY_REPOS names '$repo', which is not in GH_REPOS"
     ! in_list "$repo" $MAIN_PUSH_REPOS || refuse "$conf_name:'$repo' is in both PR_ONLY_REPOS and MAIN_PUSH_REPOS"
   done
-  # An entry is `folder` or `folder:repo`; the repo is only for
-  # session-ground-truth.py's clone hint. NESTED_DIRS leaves holding folders only.
+  # An entry is `path` or `path:repo`; the repo is only for
+  # session-ground-truth.py's clone hint. NESTED_DIRS leaves holding paths only.
+  # A path is folder names joined by `/`, each one plain and not starting `.`
+  # or `-`, so it can name neither `..`, `.git`, an option nor anywhere outside.
   folders=""
   for entry in $NESTED_DIRS; do
     dir="${entry%%:*}"
     case "$dir" in
-      -* | .* | *[!A-Za-z0-9._-]*) refuse "$conf_name:NESTED_DIRS '$dir' is not one folder name in this checkout" ;;
+      "" | /* | */ | *//* | *[!A-Za-z0-9._/-]*)
+        refuse "$conf_name:NESTED_DIRS '$dir' is not a folder path in this checkout" ;;
     esac
+    rest="$dir"
+    while [ -n "$rest" ]; do
+      part="${rest%%/*}"
+      case "$part" in
+        -* | .*) refuse "$conf_name:NESTED_DIRS '$dir' has a folder name starting '-' or '.'" ;;
+      esac
+      case "$rest" in
+        */*) rest="${rest#*/}" ;;
+        *) rest="" ;;
+      esac
+    done
     case "$entry" in
       *:*)
         # shellcheck disable=SC2086

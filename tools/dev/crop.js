@@ -1,24 +1,15 @@
-// Screenshot one element of a running site at 2x, for looking closely, and
-// print its box in CSS px from the page's top-left.
-//
-// USAGE:
+// Screenshot one element of a running site at 2x, and print its box in CSS px
+// from the page's top-left.
 //   node tools/dev/crop.js <base-url> <label> <selector> [<page>] [--width <px>] [--engine chromium|webkit] [--click <selector>] [--type-into <selector> <text>]
-//
-//   node tools/dev/crop.js http://127.0.0.1:9000 header .site-header
 //   node tools/dev/crop.js http://127.0.0.1:9000 menu nav about/ --width 390
-//   node tools/dev/crop.js http://127.0.0.1:9000 open-menu .menu-panel . --click .menu-button
+//   node tools/dev/crop.js http://127.0.0.1:9000 open .menu-panel . --click .menu-button
 //   node tools/dev/crop.js http://127.0.0.1:9000 dropdown .search-results . --type-into .search-input ch
-//
-// The shot lands in tmp/shots/crop-<label>.png. <page> is relative to the
-// base URL (`.` by default) and may not start with `/`: the permission checker
-// reads that as an absolute path and asks. --click clicks the first match for
-// its selector before the shot, for a control that reveals or changes
-// something. --type-into then types <text> into the first match for its
-// selector, for something that only shows once somebody has typed, such as a
-// search dropdown. A dropdown usually hangs outside its box, so crop the
-// dropdown's own selector.
-//
-// Needs WITH_PLAYWRIGHT=1 in kit.env (see tools/dev/shoot.js).
+// The shot is tmp/shots/crop-<label>.png. <page> is relative to the base URL
+// (`.` by default) and never starts with `/` (see shoot.js). --click clicks
+// the first match for its selector before the shot, for a control that
+// reveals something; --type-into then types <text> into the first match for
+// its selector. A dropdown hangs outside its box: crop its own selector.
+// Needs WITH_PLAYWRIGHT=1 in kit.env.
 const fs = require('fs');
 const path = require('path');
 

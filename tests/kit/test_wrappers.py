@@ -404,21 +404,39 @@ def test_local_config_replaces_the_committed_one(project):
     assert "https://github.com/acme/site.git" in out
 
 
-def test_a_worktree_reads_the_main_checkouts_local_config(tmp_path, kit_root):
+def _main_with_worktree(tmp_path: Path, kit_root: Path) -> Path:
+    """A main checkout whose github.local.conf only it has, and its worktree wt/."""
     git = ["git", "-c", "user.name=t", "-c", "user.email=t@t"]
     main = tmp_path / "main"
     shutil.copytree(kit_root / "scripts", main / "scripts")
     (main / "scripts" / "github.conf").write_text("GH_OWNER=your-org\nGH_REPOS=a\nGH_AGENT_USER=b\n")
     (main / "scripts" / "github.local.conf").unlink(missing_ok=True)
-    (main / ".gitignore").write_text("scripts/github.local.conf\n")
+    (main / ".gitignore").write_text("scripts/github.local.conf\n_drafts/\n")
     subprocess.run([*git, "init", "-q"], cwd=main, check=True)
     subprocess.run([*git, "add", "."], cwd=main, check=True)
     subprocess.run([*git, "commit", "-qm", "x"], cwd=main, check=True)
     subprocess.run([*git, "worktree", "add", "-q", str(main / "wt")], cwd=main, check=True)
     (main / "scripts" / "github.local.conf").write_text(CONF)
     assert not (main / "wt" / "scripts" / "github.local.conf").exists()
-    out = ok(run(main / "wt", "git-fetch-main.sh"))
+    return main / "wt"
+
+
+def test_a_worktree_reads_the_main_checkouts_local_config(tmp_path, kit_root):
+    out = ok(run(_main_with_worktree(tmp_path, kit_root), "git-fetch-main.sh"))
     assert "https://github.com/acme/site.git" in out
+
+
+def test_credential_helper_in_a_nested_clone_of_a_worktree(tmp_path, kit_root):
+    # A push from a nested clone runs the helper there, with GIT_DIR=.git.
+    wt = _main_with_worktree(tmp_path, kit_root)
+    subprocess.run(["git", "init", "-q", str(wt / "_drafts")], check=True)
+    done = subprocess.run(
+        ["sh", str(wt / "scripts" / "git-credential-agent-token.sh"), "get"],
+        cwd=wt / "_drafts", capture_output=True, text=True,
+        env={"PATH": "/usr/bin:/bin", "AGENT_GH_TOKEN": "not-a-real-token", "GIT_DIR": ".git",
+             "GIT_CEILING_DIRECTORIES": str(tmp_path)},
+    )
+    assert done.stdout.splitlines() == ["username=acme-bot", "password=not-a-real-token"], done.stderr
 
 
 def test_credential_helper(project):

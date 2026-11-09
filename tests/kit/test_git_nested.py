@@ -24,11 +24,26 @@ def nested(project: Path, *args: str):
     (["branch", "--show-current"], ["branch", "--show-current"]),
     (["checkout", "-b", "tidy/x"], ["checkout", "-b", "tidy/x"]),
     (["add", "--", ".", "a/b.md"], ["add", "--", ".", "a/b.md"]),
-    (["commit", "-F", "tmp/body.md"], ["commit", "-F", "../tmp/body.md"]),
 ])
 def test_accepted_calls_run_with_hooks_off(project, args, tail):
     out = ok(nested(project, "_drafts", *args))
     assert out == ["git", *SAFE, *tail]
+
+
+def test_commit_message_path_is_absolute(project):
+    # git -C reads -F from inside the clone, so a relative path would miss it.
+    out = ok(nested(project, "_drafts", "commit", "-F", "tmp/body.md"))
+    assert out[:-1] == ["git", *SAFE, "commit", "-F"]
+    assert Path(out[-1]).is_absolute()
+    assert Path(out[-1]).resolve() == (project / "tmp" / "body.md").resolve()
+
+
+def test_a_clone_inside_a_clone(project):
+    conf = CONF + 'NESTED_DIRS="site site/_drafts:drafts"\n'
+    out = ok(run(project, "git-nested.sh", "site/_drafts", "status", conf=conf))
+    assert out == ["git", "-c", "core.hooksPath=/dev/null", "-c", "core.fsmonitor=false",
+                   "-C", "site/_drafts", "status"]
+    assert refused(run(project, "git-nested.sh", "site/other", "status", conf=conf))
 
 
 @pytest.mark.parametrize("args", [
@@ -64,8 +79,9 @@ def test_refused_with_no_nested_dirs(project):
     assert refused(run(project, "git-nested.sh", "_drafts", "status"))
 
 
-@pytest.mark.parametrize("value", ['"../x"', '".git"', '"-x"', '"a/b"',
-                                   '"_x:nope"', '"../x:site"', '":site"'])
+@pytest.mark.parametrize("value", ['"../x"', '".git"', '"-x"', '"_x:nope"', '"../x:site"', '":site"',
+                                   '"/a"', '"a/"', '"a//b"', '"a/../b"', '"a/.."', '"a/.git"',
+                                   '"a/-x"', '"a/b$c"', '"a/b:nope"'])
 def test_bad_nested_dirs_are_refused(project, value):
     assert refused(run(project, "git-nested.sh", "x", "status", conf=CONF + f"NESTED_DIRS={value}\n"))
 
@@ -79,9 +95,9 @@ def test_a_folder_may_name_the_repo_it_clones(project):
 
 # --- for real, against a nested repo ------------------------------------------------
 
-def live(project: Path, *args: str):
-    (project / "scripts" / "github.conf").write_text(NESTED_CONF)
-    return subprocess.run(["sh", "scripts/git-nested.sh", "_drafts", *args], cwd=project,
+def live(project: Path, *args: str, dir: str = "_drafts"):
+    (project / "scripts" / "github.conf").write_text(CONF + 'NESTED_DIRS="_drafts site/_drafts"\n')
+    return subprocess.run(["sh", "scripts/git-nested.sh", dir, *args], cwd=project,
                           capture_output=True, text=True, timeout=30,
                           env={"PATH": "/usr/local/bin:/usr/bin:/bin", "HOME": str(project),
                                "GIT_CEILING_DIRECTORIES": str(project.parent),
@@ -118,3 +134,15 @@ def test_commit_on_a_branch_runs_no_hook(project, clone):
     assert not (project / "hook-ran").exists()
     log = live(project, "log", "--oneline", "-1")
     assert "hello" in log.stdout
+
+
+def test_commit_in_a_clone_inside_a_clone(project):
+    deep = project / "site" / "_drafts"
+    deep.mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=deep, check=True)
+    (deep / "a.md").write_text("a\n")
+    assert live(project, "checkout", "-b", "work", dir="site/_drafts").returncode == 0
+    assert live(project, "add", "--", "a.md", dir="site/_drafts").returncode == 0
+    done = live(project, "commit", "-F", "tmp/body.md", dir="site/_drafts")
+    assert done.returncode == 0, done.stderr
+    assert "hello" in live(project, "log", "--oneline", "-1", dir="site/_drafts").stdout
