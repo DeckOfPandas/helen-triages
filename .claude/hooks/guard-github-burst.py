@@ -36,7 +36,7 @@ import time
 
 MIN_GAP = 5 * 60
 MAX_ISSUES_PER_DAY = 20
-MAX_PRS_PER_DAY = 5
+MAX_PRS_PER_DAY = 20
 DAY = 24 * 60 * 60
 CREATION_LOG = os.path.join("claude-kit", "github-creations.log")
 
