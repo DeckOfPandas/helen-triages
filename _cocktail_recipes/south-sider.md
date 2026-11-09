@@ -15,7 +15,6 @@ ingredients:
     generic: "sweet vermouth"
   - amount: "1 dash"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
   - amount: "2 drops"
     generic: "Créole bitters"
     suggestion: ["Peychaud's"]

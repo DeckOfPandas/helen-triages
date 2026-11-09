@@ -24,7 +24,6 @@ ingredients:
     suggestion: []
   - amount: "1 dash"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 serve:
   ice: "none"
 method:

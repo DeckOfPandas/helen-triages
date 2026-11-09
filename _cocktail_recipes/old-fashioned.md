@@ -24,7 +24,6 @@ ingredients:
     as: "muddle"
   - amount: "2 dashes"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
   - amount: "2 dashes"
     generic: "water"
     suggestion: []

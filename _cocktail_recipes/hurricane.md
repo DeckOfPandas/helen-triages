@@ -25,7 +25,6 @@ ingredients:
     generic: "cane sugar syrup 2:1"
   - amount: "5 ml"
     generic: "passion fruit syrup"
-    suggestion: ["Monin Passion Fruit"]
 method:
   - "Blend all ingredients until smooth."
 mood:

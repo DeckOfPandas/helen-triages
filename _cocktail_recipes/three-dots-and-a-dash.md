@@ -29,6 +29,7 @@ ingredients:
     note: "Traditionally Demerara-style."
   - amount: "7.5 ml"
     generic: "falernum"
+    suggestion: ["John D Taylor's Velvet Falernum"]
   - amount: "7.5 ml"
     generic: "allspice dram"
     suggestion: ["Bitter Truth Pimento Dram"]
@@ -44,7 +45,6 @@ ingredients:
     suggestion: []
   - amount: "1 dash"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 serve:
   ice: "blended"
 method:

@@ -381,7 +381,7 @@ argument and the rules each field is read by.
 - 2026-10-07 · §9.3.2 · Barbancourt 5 Star is a rhum agricole vieux, like the 3 Star, and is the suggestion on Port au Prince (Smuggler's Cove).
 - undated · §9.3.2 · #582 · Undated, #582 — no drink writes plantation; it is always corrected to Planteray.
 - 2026-11-05 · §9.3.2 · #1462 · D5 — a declared bottle no drink suggests stays, for now.
-- 2026-11-05 · §9.3.2 · #1462 #1434 · F1 — #1434's Monin brackets are a no-flip change, under the agreed-table exception.
+- 2026-11-09 · §9.3.2 · #1434 · no drink names a Monin syrup or Angostura, and every falernum names John D Taylor's.
 - 2026-08-29 · §9.3.3 · #579 · fuzzy to find, exact-or-family to exclude; candidates rank in four bands.
 - 2026-08-29 · §9.3.3 · the whisky family chip is labelled whisk(e)y.
 - 2026-08-30 · §9.3.3 · #580 · bare water is never on a card and never in the search.
@@ -391,6 +391,7 @@ argument and the rules each field is read by.
 - 2026-10-15 · §9.3.3 · #1376 · "rhum agricole (all)" is a search-only button over both agricoles, and typing "rhum" lists the clairins straight after the agricole chips.
 - 2026-08-29 · §9.3.3 · a family is reached by its other spellings, and the button always carries the family's canonical name.
 - 2026-09-02 · §9.3.3 · #653 · HAS TO HAVE and LEAVE OUT mark the same chips: a prefix match of any word is marked in both pools, a substring match in neither.
+- 2026-11-09 · §9.3.3 · #1434 · a declared bottle finds its category even where no drink names it.
 - 2026-09-06 · §9.3.4 · #297 · a drink page states units of alcohol, not ABV.
 - 2026-09-06 · §9.3.4 · #297 · a strength belongs to a bottle and lives in abv.yml, never on a category, in bottles.yml or in costs.yml.
 - 2026-09-06 · §9.3.4 · #713 #753 · the units line says "Roughly" on every drink, and its words are Helen's.

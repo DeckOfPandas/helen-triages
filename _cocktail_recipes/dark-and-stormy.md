@@ -26,7 +26,6 @@ ingredients:
     generic: "cane sugar syrup 2:1"
   - amount: "2 dashes"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
   - amount: "90 ml"
     generic: "ginger beer"
 serve:

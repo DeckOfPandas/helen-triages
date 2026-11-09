@@ -558,6 +558,26 @@ test('but the bottle still FINDS the category -- the way in survives', () => {
   assert.deepStrictEqual(S.search('taylor', pool).results.map((r) => r.entry), ['falernum']);
 });
 
+// #1434: the drinks stopped naming Angostura, and typing it must still reach
+// the bitters. A declared bottle joins its category's chip from bottles.yml.
+const ANGO = CS.create(VOCAB, { bottles: { Angostura: {
+  generic: 'aromatic bitters', aliases: ['Angostura bitters'] } } });
+
+test('a declared bottle finds its category when no drink names it', () => {
+  const pool = ANGO.buildPool([attr('aromatic bitters'), attr('lime juice')]);
+  assert.deepStrictEqual(labels(pool), ['aromatic bitters', 'lime juice']);
+  assert.deepStrictEqual(ANGO.search('angostura', pool).results.map((r) => r.entry),
+    ['aromatic bitters']);
+  assert.deepStrictEqual(ANGO.search('ango', pool).results.map((r) => r.entry),
+    ['aromatic bitters']);
+});
+
+test('but a declared bottle never makes a chip its drinks did not earn', () => {
+  const pool = ANGO.buildPool([attr('lime juice')]);
+  assert.deepStrictEqual(labels(pool), ['lime juice']);
+  assert.deepStrictEqual(ANGO.search('angostura', pool).results, []);
+});
+
 test('a bottle with no category beside it is still offered', () => {
   // Nothing else in the group, so the bottle is all there is to name the pour.
   const pool = S.buildPool([attr('Rutte')]);

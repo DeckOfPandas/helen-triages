@@ -2460,11 +2460,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   now.** Shown the bottles in `bottles.yml` that no drink names, Helen: *"Keep
   the extra bottles for now."* Unlike a garnish (§9.12, #1186), an unused
   bottle is not deleted.
-- **2026-11-05, #1462 F1 — #1434's Monin brackets are a no-flip change, under
-  the agreed-table exception.** Helen: *"no-flip."* The table is agreed row by
-  row, the edit keeps her proofread flags, the next commit moves
-  `COCKTAIL_BASELINE_COMMIT` quoting her grant, and any draft gets its own
-  commit in the drafts repo (§4.0).
+- **2026-11-09, #1434 — no drink names a Monin syrup or Angostura, and every
+  falernum names John D Taylor's.** Helen on #1434: *"Where these are called
+  for, I never use anything else, so there's no point saying it over and over
+  again!"* Shown the rows, she kept the falernum: *"please always suggest
+  "John D Taylor's" for a velvet falernum ingredient line."* and *"All yes to
+  the rest. Keep live recipes live."* So the bottles stay declared (D5 above),
+  a falernum line with no suggestion gains Taylor's, and the live drinks kept
+  their proofread flags under her grant (#1462 F1: *"no-flip."*).
+  `test_every_falernum_suggests_john_d_taylors` holds it.
 
 ### §9.3.3 The drinks index's search
 
@@ -2538,6 +2542,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   decides it once for both pools, and
   `test_the_word_match_mark_survives_in_both_pickers` fails if a section
   cancels the mark.
+- **2026-11-09, #1434 — a declared bottle finds its category even where no
+  drink names it.** Helen: *"Please allow "angostura" in the search to return
+  "aromatic bitters"."* Built as the general rule rather than one alias:
+  every bottle in `bottles.yml` and its aliases are hidden terms of their
+  generic's chip, which the drinks must still have earned.
 
 ### §9.3.4 Units of alcohol — #297, built 2026-09-06
 

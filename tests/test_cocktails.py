@@ -1156,7 +1156,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # test with the old value, which must name only the granted files, then move
 # it in a commit of its own quoting her grant (DECISIONS §4.0). A grant covers
 # that commit and nothing after; parallel grants need the merge behind both.
-COCKTAIL_BASELINE_COMMIT = "bbb00759"   # the Pierre Ferrand Ambre respelling, on Helen's word; f0df1672 and every earlier grant behind it
+COCKTAIL_BASELINE_COMMIT = "5b251b49"   # #1434's brackets, on Helen's word; bbb00759 and every earlier grant behind it
 
 
 def _newest_commit_per_published_drink():
@@ -3301,6 +3301,32 @@ def test_no_drink_writes_plantation():
           "gets WRITTEN into a drink, not what can be read."
     )
     assert checked, "No drinks were scanned at all, so this compared nothing."
+
+
+def test_every_falernum_suggests_john_d_taylors():
+    """A falernum line always suggests John D Taylor's Velvet Falernum -- #1434.
+
+    Helen's one falernum: unlike the Monin syrups and Angostura, which she
+    also always uses but which go unnamed, this one is always named.
+    """
+    taylor = "John D Taylor's Velvet Falernum"
+    seen = 0
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            generic = item.get("generic")
+            if "falernum" not in (generic if isinstance(generic, list) else [generic]):
+                continue
+            seen += 1
+            if item.get("suggestion") != [taylor]:
+                bad.append(f"{slug}: suggestion = {item.get('suggestion')!r}")
+    assert not bad, (
+        "Falernum lines not suggesting John D Taylor's:\n  " + "\n  ".join(bad)
+        + f'\n\nWrite `suggestion: ["{taylor}"]` (DECISIONS §9.3.2).'
+    )
+    assert seen, "No falernum line was found at all, so this checked nothing."
 
 
 def test_a_qq_note_carries_a_qq_label():

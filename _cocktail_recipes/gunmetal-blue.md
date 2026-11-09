@@ -18,7 +18,6 @@ ingredients:
     generic: "peach brandy"
   - amount: "7.5 ml"
     generic: "cinnamon syrup"
-    suggestion: ["Monin Cinnamon"]
   - amount: "7.5 ml"
     generic: "gentian liqueur"
     suggestion: ["Suze"]

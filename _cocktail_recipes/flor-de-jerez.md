@@ -29,7 +29,6 @@ ingredients:
     generic: "cane sugar syrup 2:1"
   - amount: "1 dash"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 serve:
   ice: "none"
 method:

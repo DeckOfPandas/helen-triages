@@ -25,7 +25,7 @@ ingredients:
     suggestion: ["Cointreau"]
   - amount: "10 ml"
     generic: "falernum"
-    suggestion: []
+    suggestion: ["John D Taylor's Velvet Falernum"]
   - amount: "20 ml"
     generic: "lime juice"
     suggestion: []
