@@ -21,11 +21,10 @@ project. A project's own rules, and any it sets against these, are in its
 - **Scratch files go in this project's `tmp/`** (gitignored), never the system
   `/tmp`, never `~`, and never `$CLAUDE_JOB_DIR` or the jobs folder that
   background-job tooling suggests.
-- **Show me a branch on a server; never ask me to pull and build.** Read the
-  pairs in force with `echo "$KIT_PORTS"` (`host:container`; `run.sh` sets it
-  from `kit.local.env` or `kit.env`; empty, read `PORTS` in
-  `.devcontainer/kit.env`; `printenv` is blocked, since the environment holds
-  the token), run `ss -ltn` and take a free container port, serve your own worktree in the background on
+- **Show me a branch on a server; never ask me to pull and build.**
+  `sh scripts/kit-ports.sh` lists the `host:container` pairs in force and
+  whether each container port is free. Take a free one, serve your own
+  worktree in the background on
   `0.0.0.0:<container port>`, and give me `http://localhost:<host port>/`, plus
   the `baseurl` from `_config.yml` for a Jekyll site. Never stop a server you
   did not start. No free pair means I can't reach it: ask me to add one.
