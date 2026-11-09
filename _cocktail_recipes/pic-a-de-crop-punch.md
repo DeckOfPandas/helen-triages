@@ -43,7 +43,6 @@ ingredients:
     generic: "cane sugar syrup 2:1"
   - amount: "2 dashes"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
   - amount: "30 ml"
     generic: "soda water"
 serve:

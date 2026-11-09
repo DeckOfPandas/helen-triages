@@ -15,6 +15,7 @@ ingredients:
     generic: "lime juice"
   - amount: "15 ml"
     generic: "falernum"
+    suggestion: ["John D Taylor's Velvet Falernum"]
   - amount: "15 ml"
     generic: "cranberry juice"
   - amount: "4 drops"

@@ -28,7 +28,6 @@ ingredients:
     generic: "orgeat"
   - amount: "1 dash"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 method:
   - "Squeeze a lime wedge into a shaker and drop it in."
   - "Short shake the remaining ingredients with three ice cubes."

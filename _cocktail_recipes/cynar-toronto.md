@@ -15,7 +15,6 @@ ingredients:
     generic: "cane sugar syrup 2:1"
   - amount: "2 drops"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 method:
   - "Stir all ingredients with ice."
   - "Strain."

@@ -23,11 +23,11 @@ ingredients:
     generic: "lime juice"
   - amount: "15 ml"
     generic: "falernum"
+    suggestion: ["John D Taylor's Velvet Falernum"]
   - amount: "7.5 ml"
     generic: "honey water 2:1"
   - amount: "2 dashes"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 serve:
   ice: "none"
 method:

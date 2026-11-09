@@ -31,7 +31,6 @@ ingredients:
     suggestion: ["Peychaud's"]
   - amount: "1 dash"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 method:
   - "Ice the old fashioned glass."
   - "Dilute the absinthe with the water, then use it to rinse the glass."

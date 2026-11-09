@@ -20,7 +20,6 @@ ingredients:
     generic: "cane sugar syrup 2:1"
   - amount: "3 drops"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 method:
   - "Shake all ingredients with ice for at least 30 seconds."
   - "Strain."

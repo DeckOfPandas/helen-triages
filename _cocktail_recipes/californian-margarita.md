@@ -26,7 +26,7 @@ ingredients:
     suggestion: []
   - amount: "7.5 ml"
     generic: "falernum"
-    suggestion: []
+    suggestion: ["John D Taylor's Velvet Falernum"]
   - amount: "1 small pinch"
     generic: "salt"
     suggestion: []

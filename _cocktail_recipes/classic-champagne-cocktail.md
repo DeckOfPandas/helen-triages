@@ -13,7 +13,6 @@ ingredients:
     note: "No less than this if using Pierre Ferrand 1840 at 45% ABV."
   - amount: "3 dashes"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
   - amount: "30 ml"
     generic: "cognac"
     suggestion: ["Pierre Ferrand 1840"]

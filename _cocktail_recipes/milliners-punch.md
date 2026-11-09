@@ -43,7 +43,6 @@ ingredients:
     suggestion: []
   - amount: "3 drops"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
   - amount: "25 ml"
     generic: "overproof Jamaican rum, unaged"
     as: "shell"

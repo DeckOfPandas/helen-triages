@@ -24,7 +24,6 @@ ingredients:
     generic: "lemon juice"
   - amount: "10 ml"
     generic: "cane sugar syrup 2:1"
-    suggestion: ["Monin Pure Cane Sugar"]
 method:
   - "Make the tea. Leave to cool completely."
   - "Shake all ingredients other than the tea with ice."

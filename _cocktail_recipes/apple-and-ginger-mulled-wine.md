@@ -25,7 +25,6 @@ ingredients:
     generic: "apple juice"
   - amount: "2 dashes"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 method:
   - "Make the tea first."
   - "Add all ingredients in the order given."

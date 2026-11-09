@@ -20,6 +20,7 @@ ingredients:
     generic: "grenadine"
   - amount: "2.5 ml"
     generic: "falernum"
+    suggestion: ["John D Taylor's Velvet Falernum"]
   - amount: "2 dashes"
     generic: "orange bitters"
 method:

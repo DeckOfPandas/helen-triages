@@ -29,7 +29,6 @@ ingredients:
     generic: "Cynar"
   - amount: "5 ml"
     generic: "cinnamon syrup"
-    suggestion: ["Monin Cinnamon"]
 serve:
   ice: "none"
 method:

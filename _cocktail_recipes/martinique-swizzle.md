@@ -34,7 +34,6 @@ ingredients:
     generic: "absinthe"
   - amount: "2 dashes"
     generic: "aromatic bitters"
-    suggestion: ["Angostura"]
 serve:
   ice: "crushed"
 method:

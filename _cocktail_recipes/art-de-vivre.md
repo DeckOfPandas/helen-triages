@@ -29,7 +29,6 @@ ingredients:
     generic: "fernet"
   - amount: "5 ml"
     generic: "cane sugar syrup 2:1"
-    suggestion: ["Monin Pure Cane Sugar"]
   - amount: "1 dash"
     generic: "chocolate bitters"
 serve:
