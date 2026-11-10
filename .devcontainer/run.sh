@@ -2,11 +2,12 @@
 # Build this project's Claude Code image when it is missing or stale, then start
 # a shell in it with only the project mounted, at /workspace.
 #
-# USAGE:  .devcontainer/run.sh [--firewall] [--build-only] [--rebuild]
+# USAGE:  .devcontainer/run.sh [--no-firewall] [--build-only] [--rebuild]
 #
-#   --firewall    default-deny egress except an allowlist (init-firewall.sh)
-#   --build-only  build if needed and stop; devcontainer.json runs this
-#   --rebuild     rebuild from scratch, pulling the base image again
+#   (default)      egress denied except to an allowlist (init-firewall.sh)
+#   --no-firewall  open egress, for this run only (--firewall is a no-op)
+#   --build-only   build if needed and stop; devcontainer.json runs this
+#   --rebuild      rebuild from scratch, pulling the base image again
 #
 # What goes in the image is the kit.env and Dockerfile beside this script: run
 # a worktree's copy (.claude/worktrees/<name>/.devcontainer/run.sh) to build
@@ -19,13 +20,14 @@ die() {
   exit 1
 }
 
-FIREWALL=0
+FIREWALL=1
 BUILD_ONLY=0
 REBUILD=0
 SHOW_HELP=0
 for arg in "$@"; do
   case "$arg" in
     --firewall) FIREWALL=1 ;;
+    --no-firewall) FIREWALL=0 ;;
     --build-only) BUILD_ONLY=1 ;;
     --rebuild) REBUILD=1 ;;
     -h | --help) SHOW_HELP=1 ;;
@@ -33,7 +35,7 @@ for arg in "$@"; do
   esac
 done
 if [ "$SHOW_HELP" = 1 ]; then
-  head -n 14 "${BASH_SOURCE[0]}" | tail -n +2
+  head -n 15 "${BASH_SOURCE[0]}" | tail -n +2
   exit 0
 fi
 
@@ -67,6 +69,8 @@ WITH_RUBY=0
 RUBY_VERSION=3.3
 WITH_PLAYWRIGHT=0
 PLAYWRIGHT_VERSION=1.63.0
+WITH_AUDIVERIS=0
+AUDIVERIS_VERSION=5.11.0
 WITH_PY_REQS=0
 PORTS=""
 EXTRA_ALLOWED_DOMAINS=""
@@ -95,7 +99,8 @@ read_kit_file() {
       || die "$file: only PROJECT_NAME and PORTS belong here, not '$key'"
     case "$key" in
       PROJECT_NAME | NODE_MAJOR | WITH_RUBY | RUBY_VERSION | WITH_PLAYWRIGHT | \
-      PLAYWRIGHT_VERSION | WITH_PY_REQS | PORTS | EXTRA_ALLOWED_DOMAINS | MOUNT_DOTFILES)
+      PLAYWRIGHT_VERSION | WITH_AUDIVERIS | AUDIVERIS_VERSION | WITH_PY_REQS | PORTS | \
+      EXTRA_ALLOWED_DOMAINS | MOUNT_DOTFILES)
         printf -v "$key" '%s' "$value" ;;
       *) die "$file: unknown key '$key'" ;;
     esac
@@ -115,12 +120,13 @@ KIT_LOCAL_ENV=.devcontainer/kit.local.env
   || die "PROJECT_NAME '$PROJECT_NAME' must be lowercase letters, digits, . _ -"
 [ "$PROJECT_NAME" != changeme ] \
   || die "set a PROJECT_NAME first: python3 .devcontainer/set-project-name.py <name>, or in $KIT_LOCAL_ENV"
-for flag in WITH_RUBY WITH_PLAYWRIGHT WITH_PY_REQS MOUNT_DOTFILES; do
+for flag in WITH_RUBY WITH_PLAYWRIGHT WITH_AUDIVERIS WITH_PY_REQS MOUNT_DOTFILES; do
   [[ "${!flag}" =~ ^[01]$ ]] || die "$flag must be 0 or 1, not '${!flag}'"
 done
 [[ "$NODE_MAJOR" =~ ^[0-9]+$ ]] || die "NODE_MAJOR '$NODE_MAJOR' is not a number"
 [[ "$RUBY_VERSION" =~ ^[0-9]+(\.[0-9]+)*$ ]] || die "RUBY_VERSION '$RUBY_VERSION' is not a version"
 [[ "$PLAYWRIGHT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "PLAYWRIGHT_VERSION '$PLAYWRIGHT_VERSION' is not N.N.N"
+[[ "$AUDIVERIS_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "AUDIVERIS_VERSION '$AUDIVERIS_VERSION' is not N.N.N"
 for domain in $EXTRA_ALLOWED_DOMAINS; do
   [[ "$domain" =~ ^[A-Za-z0-9.-]+$ ]] || die "EXTRA_ALLOWED_DOMAINS: '$domain' is not a hostname"
 done
@@ -143,6 +149,8 @@ BUILD_ARGS=(
   "WITH_RUBY=$WITH_RUBY"
   "WITH_PLAYWRIGHT=$WITH_PLAYWRIGHT"
   "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION"
+  "WITH_AUDIVERIS=$WITH_AUDIVERIS"
+  "AUDIVERIS_VERSION=$AUDIVERIS_VERSION"
   "WITH_PY_REQS=$WITH_PY_REQS"
   "EXTRA_ALLOWED_DOMAINS=$EXTRA_ALLOWED_DOMAINS"
   "USERNAME=$USERNAME"
