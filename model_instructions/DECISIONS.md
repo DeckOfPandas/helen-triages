@@ -793,7 +793,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   entry is a dish she cooks from memory, and the list is what makes it
   findable and shoppable. No method is demanded.
   `test_ingredients_is_a_non_empty_list`.
-
+- **2026-11-11 — a food recipe's address goes in an optional `source_url`, and
+  the source text links to it.** Helen, on a website recipe whose link had
+  nowhere to go: *"Don't we have something in source? If not then please make
+  an appropriate shape and document it."* The drinks' shape (#454) was taken
+  whole, so the two sites read the same: `source` says who, `source_url` says
+  where. SOURCE_ATTRIBUTION_SPEC.md rule 4.
 ## §5 House style
 
 - **2026-08-21, #413 — en dashes are scoped by what a reader SEES.** Helen, on

@@ -69,7 +69,9 @@ layout: default
        below Notes, and the method step that needs it links to it. {% endcomment %}
   </ul>
 
-  {% if page.source %}<p class="recipe-source">Source: {{ page.source }}</p>{% endif %}
+  {% comment %} `source` says who and `source_url` says where, as on a drink page
+     (SOURCE_ATTRIBUTION_SPEC.md, rule 4). {% endcomment %}
+  {% if page.source %}<p class="recipe-source">Source: {% if page.source_url %}<a href="{{ page.source_url }}">{{ page.source }}</a>{% else %}{{ page.source }}{% endif %}</p>{% endif %}
   {% if page.meta.date_ingested %}<p class="recipe-source">Date added: {{ page.meta.date_ingested }}</p>{% endif %}
 
   <div class="recipe-badges">

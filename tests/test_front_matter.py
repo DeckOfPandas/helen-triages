@@ -378,7 +378,7 @@ def test_group_names_omit_leading_article(recipe):
 # Top-level string scalars only. A `meta:` boolean is never in this list:
 # quoting `proofread: true` makes it the string "true", which the publish gate
 # and every `is True` check read as not set.
-SCALAR_STRING_FIELDS = ["title", "tagline", "source", "prep_time",
+SCALAR_STRING_FIELDS = ["title", "tagline", "source", "source_url", "prep_time",
                          "cook_time", "star_ingredient", "makes", "serves"]
 
 

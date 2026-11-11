@@ -576,6 +576,7 @@ meta:                            # exactly these three, in this order -- §4.0.
 tagline: "It's fun to have a one-pot stew that is bright and acidic..."
 source: "Adapted from Good Food, January 2026"
 source_type: publication         # required; SOURCE_ATTRIBUTION_SPEC.md
+source_url: "https://..."        # optional: the recipe's address, linking `source`
 serves: "4"                      # xor makes: -- never both. Quoted. Opens
                                  # with a number; makes: with a count
 prep_time: "20 mins"
@@ -633,7 +634,9 @@ gap it used to paper over.
 `tests/test_source_attribution.py` enforces it over recipes and drafts. The
 rule most likely to catch you: the date is what separates a `publication`
 from a `website` — no date, it is the website. `source_type` renders nowhere,
-so it is in `INVISIBLE_KEYS` (§4.0).
+so it is in `INVISIBLE_KEYS` (§4.0). The optional `source_url` holds the
+recipe's address, and the page makes the source text a link to it, as a drink
+page does (the spec's rule 4).
 
 **The staging folders inside the drafts repos are Helen's.** They record where
 she is with a recipe, which no flag can say; `PIPELINE.md` §3 names them and
