@@ -1,17 +1,18 @@
 ---
-title: "Ginger Snap"
+title: "Ginger Cognac Sour"
 tagline: "Warms cockles. Note to self: find out what those are, then hope they like ginger."
 glass:
   - "coupe"
 garnish:
-  - "no garnish"
+  - "grated cinnamon"
 meta:
   made_before: true
-  ship: "meh"
+  ship: "yes"
   rewritten: true
   awaiting_fix: false
   proofread: true
 mood:
+  - "sharp"
   - "warming"
   - "sugar craving"
   - "tiki"
@@ -19,8 +20,8 @@ mood:
 ingredients:
   - amount: "45 ml"
     generic: "cognac"
-    suggestion: ["Pierre Ferrand Ambre"]
-  - amount: "15 ml"
+    suggestion: ["Courvoisier"]
+  - amount: "10 ml"
     generic: "moderately aged Jamaican rum"
     suggestion: ["Smith & Cross"]
   - amount: "15 ml"
@@ -28,19 +29,21 @@ ingredients:
     suggestion: ["Rhum Clément Créole Shrubb"]
   - amount: "22.5 ml"
     generic: "lemon juice"
-  - amount: "7.5 ml"
-    generic: "cinnamon syrup"
-  - amount: "7.5 ml"
+    suggestion: []
+  - amount: "15 ml"
     generic: "ginger syrup"
-    note: "Or ginger liqueur for a stronger taste."
+    suggestion: ["Monin Gingembre"]
+  - amount: "1 small pinch"
+    generic: "salt"
+    suggestion: []
 serve:
   ice: "none"
 method:
   - "Shake all ingredients with ice."
   - "Strain."
 notes:
-  - label: ""
-    text: ""
+  - label: "Sugar"
+    text: "Dear Helen. A little more sugar would help the blend. Try one of: 1. 20 ml Shrubb. 2. 17.5–20 ml ginger syrup. 3. Add 5 ml demerara sugar syrup 2:1. Or if you try Pierre Ferrand Ambre instead of Courvoisier it may not need any extra sugar."
 source: ""
 source_url: ""
 ---
