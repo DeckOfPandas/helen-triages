@@ -116,12 +116,15 @@ source must not.
 **4. `source` says who; `source_url` says where.** Name a site by its bare
 domain or its name, `kitchenofdebjani.com`, never `https://kitchenofdebjani.com/`.
 The recipe's own address, where there is one, goes in the optional
-`source_url:`, a full `https://` address in double quotes, and
-`_layouts/recipe.html` makes the source text a link to it, as a drink page
-does. With no address the key is left out, not left empty. Helen, 2026-11-11,
-for a website recipe whose link had nowhere to go: *"please make an
-appropriate shape and document it."* Enforced: `_bad_link` in
-`tests/test_source_attribution.py`.
+`source_url:`, a full `https://` address in double quotes. On the page the
+word `recipe` in `, recipe <person>` is the link, so a site naming its cook
+reads "Adapted from Desert Island Dishes, <u>recipe</u> Margie Nomura"; any
+other source with an address is linked whole, as on a drink page. With no
+address the key is left out, not left empty. Helen, 2026-11-11, for a website
+recipe whose link had nowhere to go: *"please make an appropriate shape and
+document it"*, then, marking the word on the page, *"I showed in the food
+recipe line where I want the link."* The source itself stays plain text.
+Enforced: `_bad_link` in `tests/test_source_attribution.py`.
 
 ```yaml
 source: "Adapted from Desert Island Dishes, recipe Margie Nomura"

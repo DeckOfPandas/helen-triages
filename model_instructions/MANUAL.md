@@ -635,8 +635,8 @@ gap it used to paper over.
 rule most likely to catch you: the date is what separates a `publication`
 from a `website` — no date, it is the website. `source_type` renders nowhere,
 so it is in `INVISIBLE_KEYS` (§4.0). The optional `source_url` holds the
-recipe's address, and the page makes the source text a link to it, as a drink
-page does (the spec's rule 4).
+recipe's address. The page links the word `recipe` in a site's `, recipe
+<person>`, and links any other source whole (the spec's rule 4).
 
 **The staging folders inside the drafts repos are Helen's.** They record where
 she is with a recipe, which no flag can say; `PIPELINE.md` §3 names them and

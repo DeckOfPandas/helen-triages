@@ -71,9 +71,13 @@ layout: default
        below Notes, and the method step that needs it links to it. {% endcomment %}
   </ul>
 
-  {% comment %} `source` says who and `source_url` says where, as on a drink page
-     (SOURCE_ATTRIBUTION_SPEC.md, rule 4). {% endcomment %}
-  {% if page.source %}<p class="recipe-source">Source: {% if page.source_url %}<a href="{{ page.source_url }}">{{ page.source }}</a>{% else %}{{ page.source }}{% endif %}</p>{% endif %}
+  {% comment %} `source` says who and `source_url` says where (SOURCE_ATTRIBUTION_SPEC.md,
+     rule 4). A site naming its cook always says ", recipe ", and that word is
+     the link; any other source with an address is linked whole. {% endcomment %}
+  {% if page.source %}
+    {% capture _recipe_link %}, <a href="{{ page.source_url }}">recipe</a> {% endcapture %}
+    <p class="recipe-source">Source: {% if page.source_url and page.source contains ", recipe " %}{{ page.source | replace_first: ", recipe ", _recipe_link }}{% elsif page.source_url %}<a href="{{ page.source_url }}">{{ page.source }}</a>{% else %}{{ page.source }}{% endif %}</p>
+  {% endif %}
   {% if page.meta.date_ingested %}<p class="recipe-source">Date added: {{ page.meta.date_ingested }}</p>{% endif %}
 
   <div class="recipe-badges">
