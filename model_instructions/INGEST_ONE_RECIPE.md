@@ -119,8 +119,8 @@ ingredient_groups:
     - amount: "2 large"
       item: "onions, sliced"
 method:
-  - "QQ original Heat the oven to 180C fan and grease a 20cm tin."
-  - "QQ Claude Heat the oven to 180°C fan. Grease a 20 cm tin."
+  - "QQ original Grease a 20cm tin and bake at 180C fan for 25 minutes."
+  - "QQ Claude Grease a 20 cm tin. Bake at 180°C fan, 25 mins."
 method_short:
   - ""
 notes:
@@ -330,6 +330,13 @@ scaffolding. What goes is the explanation of why, the reassurance, and the
 remedy for a problem the instruction already prevents.
 
 A step may be two short sentences. It is often better as two.
+
+**No "heat the oven" step.** The temperature goes in the step where the oven
+is first used: "Roast at 180°C fan for 10 mins". A later step in the same oven
+names no figure unless it changes. Helen: *"I HATE having a "heat the oven"
+step. I mean, like, duhhh. … mention the temperature the first time it's
+used."* The grill is the same: "grill on its highest setting for 5 mins". The
+`QQ original` keeps the source's own step, preheat and all.
 
 ### One `QQ original` per source step; split the rewrite where it is dense
 

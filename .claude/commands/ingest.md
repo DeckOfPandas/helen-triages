@@ -403,8 +403,8 @@ else has already done (MANUAL §9.1).
 - **EVERY METHOD STEP IS A PAIR.**
 
       method:
-        - "QQ original Heat the oven to 180C fan and grease a 20cm tin."
-        - "QQ Claude Heat the oven to 180°C fan and grease a 20 cm tin."
+        - "QQ original Grease a 20cm tin and bake at 180C fan for 25 minutes."
+        - "QQ Claude Grease a 20 cm tin. Bake at 180°C fan, 25 mins."
 
   `QQ original` is **verbatim** -- the source's own punctuation, its "minutes",
   its degree-sign habits. Never tidy or house-style one; it will read as broken
@@ -457,6 +457,11 @@ else has already done (MANUAL §9.1).
     she cut it. She kept "still be slightly sticky inside" a few lines
     earlier, because that one changes what the cook does next (keep it in the
     oven, don't panic) and the ending flourish didn't.
+  - **No "heat the oven" step.** The temperature goes where the oven is first
+    used ("Roast at 180°C fan for 10 mins"), and a later step in the same oven
+    names no figure unless it changes; the grill likewise ("grill on its
+    highest setting"). Helen: *"I HATE having a "heat the oven" step. I mean,
+    like, duhhh."* DECISIONS §4.
 
   None of this is a licence to write a `QQ Claude` line closer to her *voice*
   in the Tier 3 sense -- it's still her call when a step needs her own
