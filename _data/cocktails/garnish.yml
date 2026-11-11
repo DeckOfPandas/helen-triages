@@ -146,6 +146,7 @@ canonical:
   spice_and_other:
     - "grated nutmeg"
     - "grated chocolate"
+    - "grated cinnamon"
     # A garnish here, not a pour: dashed over the top with no count.
     - "Angostura bitters"
     # A mass noun, so it is in `no_article` below.
@@ -189,6 +190,7 @@ no_article:
   - raspberries
   - grated nutmeg
   - grated chocolate
+  - grated cinnamon
   - whipped cream                       # a mass noun
   - desiccated coconut                  # a mass noun
   - cocoa powder                        # a mass noun
