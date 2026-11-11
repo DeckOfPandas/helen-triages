@@ -3,7 +3,7 @@ title: "Miso Cod Ramen"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 tagline: "Use the marinade in [Miso Blackened Cod](../miso-blackened-cod/) if you prefer it."
 source: "Adapted from Feed Your Soul, Wagamama"
 source_type: book
