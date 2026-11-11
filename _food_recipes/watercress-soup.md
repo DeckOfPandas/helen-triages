@@ -3,14 +3,14 @@ title: "Watercress Soup"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 tagline: "Serve with bacon dumplings, you know, or don't, whatever."
 source: "Adapted from Good Food, May 2015"
 source_type: publication
 serves: "6"
 prep_time: "30 mins"
 cook_time: "30 mins"
-main_ingredients: ["watercress", "butter", "garlic", "onions", "floury potatoes", "fresh horseradish", "vegetable stock"]
+main_ingredients: ["watercress", "salted butter", "garlic cloves", "onions", "floury potatoes", "fresh horseradish", "vegetable stock"]
 tags: ["soup", "starter"]
 ingredient_groups:
   - name: "soup"
@@ -39,7 +39,4 @@ method_groups:
     - "Divide between bowls, drizzle with olive oil, and top with the reserved watercress and plenty of black pepper."
 method_short:
   - ""
-notes:
-  - label: ""
-    text: ""
 ---

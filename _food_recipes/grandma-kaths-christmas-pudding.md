@@ -3,14 +3,14 @@ title: "Grandma Kath's Christmas Pudding"
 meta:
   rewritten: false
   awaiting_fix: false
-  proofread: true
+  proofread: false
 tagline: "The original. [Stella and Henry's version](../stella-henrys-christmas-pudding/) grew over time, but let's not call it better."
 source: "Grandma Kath"
 source_type: person
 makes: "One 1-litre pudding"
 prep_time: "Minimum 60 mins, more if you drink [Ginger Cognac Sour](../../../cocktails/recipes/ginger-cognac-sour/)s or [Cherry Bakewell](../../../cocktails/recipes/cherry-bakewell/)s"
 cook_time: "8+ hrs, then 2–3 hrs on the day"
-main_ingredients: ["breadcrumbs", "suet", "apple", "sultanas", "raisins", "currants", "mixed peel", "soft dark brown sugar", "lemon", "orange", "ginger", "allspice", "almonds", "eggs", "brandy", "old ale"]
+main_ingredients: ["breadcrumbs", "suet", "apple", "sultanas", "raisins", "currants", "mixed peel", "dark brown soft sugar", "lemon", "orange", "fresh ginger", "allspice", "almonds", "egg", "brandy", "old ale"]
 star_ingredient: "fruit"
 tags: ["dessert", "festive", "make-ahead"]
 ingredient_groups:
@@ -31,13 +31,13 @@ ingredient_groups:
     - amount: "1 oz"
       item: "mixed peel"
     - amount: "2 oz"
-      item: "soft dark brown sugar"
+      item: "dark brown soft sugar"
     - amount: "¼"
       item: "lemon, juiced"
     - amount: "¼"
       item: "orange, juiced"
     - amount: "½ oz"
-      item: "ginger, chopped"
+      item: "fresh ginger, chopped"
       note: "or 2 tsp (3.6 g) ground ginger"
     - amount: "1 tsp"
       item: "allspice"
@@ -56,7 +56,4 @@ method:
   - "Steam again 2–3 hours on day of use"
 method_short:
   - ""
-notes:
-  - label: ""
-    text: ""
 ---

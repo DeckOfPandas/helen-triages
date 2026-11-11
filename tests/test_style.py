@@ -399,7 +399,8 @@ _QUALIFIED_MUSTARD = {
     "mustard oil",
 }
 _QUALIFIED_SOY_SAUCE = {"dark soy sauce", "light soy sauce"}
-_QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste", "dried ginger"}
+_QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste", "dried ginger",
+                     "stem ginger"}
 
 
 def test_mustard_specifies_type(recipe):

@@ -935,11 +935,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   unqualified butter takes the house default with a note saying so (§4). Butter that is only for greasing is
   exempt (Helen, 2026-10-13); "plus extra for greasing" is not, because that
   line is also in the dish.
-- **Undated, #136 — ginger says fresh, ground or paste, in the ingredient list
-  as well as in `main_ingredients`.** Helen's call; no words of hers were
-  recorded. A prep word alone does not say which kind was used: "grated
-  ginger" fails and "grated fresh ginger" passes.
-  `test_ginger_specifies_fresh_ground_or_paste`.
+- **#136, 2026-11-11 — ginger says fresh, ground, paste, dried or stem, in the
+  ingredient list as well as in `main_ingredients`.** A prep word alone does
+  not say which kind was used: "grated ginger" fails and "grated fresh
+  ginger" passes. Stem ginger joined on 2026-11-11, asked whether Stella and
+  Henry's "stem ginger in syrup" should be declared: *"Yes, declare it"*; a
+  root ginger is "fresh ginger". `test_ginger_specifies_fresh_ground_or_paste`.
 - **Undated — cardamom is always green or black, and always pods, powder or
   seeds.** Helen's rule; no words of hers were recorded. Both halves are
   required: "cardamom pods" and "green cardamom" each fail. The singular forms

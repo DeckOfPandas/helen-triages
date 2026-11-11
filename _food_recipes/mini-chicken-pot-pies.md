@@ -3,7 +3,7 @@ title: "Mini Chicken Pot Pies"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 tagline: "Cute little pies. Or one giant pie depending on your ad hoc surface-area:volume preferences."
 source: "Adapted from Desert Island Dishes, recipe Margie Nomura"
 source_type: website
@@ -11,7 +11,7 @@ source_url: "https://desertislanddishes.co/chicken-mini-pot-pies/"
 serves: "4"
 prep_time: "40 mins"
 cook_time: "35 mins"
-main_ingredients: ["chicken", "pancetta", "leeks", "red onion", "garlic", "tarragon", "chicken stock", "milk", "butter", "sweetcorn", "puff pastry", "parmesan"]
+main_ingredients: ["chicken", "pancetta", "leeks", "red onion", "garlic cloves", "tarragon", "chicken stock", "semi-skimmed milk", "salted butter", "sweetcorn", "puff pastry", "parmesan"]
 tags: ["main", "freezable", "carbs party"]
 star_ingredient: "poultry"
 ingredient_groups:
@@ -44,7 +44,7 @@ ingredient_groups:
       note: "leftover roast chicken"
     - amount: "160 g"
       item: "canned sweetcorn, drained"
-  - name: "pies"
+  - name: "assembly"
     items:
     - amount: "500 g"
       item: "puff pastry"
@@ -64,7 +64,7 @@ method_groups:
     - "Stir in the flour and fry for a few minutes to cook it out."
     - "Whisk in the hot stock and the milk until smooth. Simmer gently until thickened, 5 mins."
     - "Stir in the tarragon, chicken, sweetcorn and pancetta. Season."
-  - name: "pies"
+  - name: "assembly"
     steps:
     - "Spoon the filling into four ramekins."
     - "Cut four long strips of pastry about 2 cm wide, and four circles about 2 cm wider than the ramekins."

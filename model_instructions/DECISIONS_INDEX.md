@@ -149,7 +149,7 @@ argument and the rules each field is read by.
 - 2026-10-19 · §5 · a title keeps its accents, and gains any the house list declares.
 - 2026-08-10 · §5 · within one ingredient group the base spices run coriander, cumin, turmeric, fennel, and the warm spices follow in any order.
 - 2026-08-10 · §5 · #74 · butter is always "salted butter" or "unsalted butter", and sugar and flour each have a closed list of allowed names.
-- undated · §5 · #136 · Undated, #136 — ginger says fresh, ground or paste, in the ingredient list as well as in main_ingredients.
+- 2026-11-11 · §5 · #136 · ginger says fresh, ground, paste, dried or stem, in the ingredient list as well as in main_ingredients.
 - undated · §5 · Undated — cardamom is always green or black, and always pods, powder or seeds.
 - 2026-08-12 · §5 · #167 · milk names its type from the source, and "milk (any kind)" is a real answer for a recipe that does not care.
 - undated · §5 · #139 · Undated, #139 — dark-family chocolate carries its cacao percentage on the ingredient list and never in main_ingredients.

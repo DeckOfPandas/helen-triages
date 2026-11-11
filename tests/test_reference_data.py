@@ -823,6 +823,7 @@ NO_TEMPERATURE_BECAUSE = {
     # Not the dish. The protein is a stock, a garnish or an accompaniment.
     "pancetta-white-bean-stew": "pancetta is cured and diced, not a cut cooked to a temperature",
     "smoked-mackerel-pate": "the mackerel arrives smoked; nothing is cooked",
+    "mini-chicken-pot-pies": "the chicken goes in already cooked (leftover roast)",
     "toad-in-the-hole": "sausages; pork.roasting is loin and leg joints, "
                         "pork.slow_cooked is shoulder and belly, and neither is "
                         "a thing you probe — found by the star_ingredient net, "

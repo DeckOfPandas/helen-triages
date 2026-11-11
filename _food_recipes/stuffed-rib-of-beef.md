@@ -3,7 +3,7 @@ title: "Stuffed Rib of Beef"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 tagline: "Gordon Ramsay calls this “spectacular”. Good enough for me."
 source: "Adapted from Gordon Ramsay"
 source_type: author
@@ -64,7 +64,4 @@ method_groups:
       - "Untie the beef, slice away the rib bones, and carve. Serve with the stuffing and vegetables."
 method_short:
   - ""
-notes:
-  - label: ""
-    text: ""
 ---
