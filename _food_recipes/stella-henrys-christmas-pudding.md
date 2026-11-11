@@ -3,7 +3,7 @@ title: "Stella and Henry's Christmas Pudding"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 tagline: "This is [Grandma Kath's Christmas Pudding](../grandma-kaths-christmas-pudding/) with a few sidegrades."
 source: "Stella and Henry, after Grandma Kath"
 source_type: person

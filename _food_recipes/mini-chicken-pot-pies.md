@@ -3,7 +3,7 @@ title: "Mini Chicken Pot Pies"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 tagline: "Cute little pies. Or one giant pie depending on your ad hoc surface-area:volume preferences."
 source: "Adapted from Desert Island Dishes, recipe Margie Nomura"
 source_type: website

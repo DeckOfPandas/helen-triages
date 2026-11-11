@@ -3,7 +3,7 @@ title: "Watercress Soup"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 tagline: "Serve with bacon dumplings, you know, or don't, whatever."
 source: "Adapted from Good Food, May 2015"
 source_type: publication
