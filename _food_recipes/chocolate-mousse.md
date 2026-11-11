@@ -34,11 +34,11 @@ method:
   - "Whisk yolks until pale and fluffy."
   - "Beat the cream until stiff peaks form, being careful not to over-whip."
   - "Beat the egg whites, adding the sugar a little at a time, until stiff peaks form."
-  - "Fold the egg yolks into the cream using a rubber spatula, 8 folds max. Some streaks are fine."
-  - "Check the chocolate temperature. It should still be runny but warm (min 35°C). Pour the chocolate into the cream/yolk mixture. Fold through, 8 folds max."
-  - "Add ¼ of the beaten egg whites to the chocolate mixture to loosen it. Fold through to incorporate, 10 folds max."
+  - "Fold the egg yolks into the cream using a rubber spatula, eight folds max. Some streaks are fine."
+  - "Check the chocolate temperature. It should still be runny but warm (min 35°C). Pour the chocolate into the cream/yolk mixture. Fold through, eight folds max."
+  - "Add ¼ of the beaten egg whites to the chocolate mixture to loosen it. Fold through to incorporate, ten folds max."
   - "Pour the chocolate mixture into the remaining egg whites. Fold through until incorporated with no white patches, 12 folds max."
-  - "Divide between 4 small pots. Refrigerate for at least 6 hours, preferably overnight."
+  - "Divide between four small pots. Refrigerate for at least 6 hours, preferably overnight."
   - "Top with whipped cream and chocolate shavings just before serving."
 method_short:
   - |
@@ -53,6 +53,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---
