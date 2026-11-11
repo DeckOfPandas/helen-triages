@@ -187,13 +187,46 @@ _WELL_FORMED_TARGET = re.compile(r"^[a-z0-9-]+/?$")
 # page ignores an unknown protein silently, so a typo there shows no error.
 _REFERENCE_TARGET = re.compile(r"^\.\./reference/[a-z0-9-]+/(\?protein=[a-z-]+)?$")
 
+# A third: a recipe linking to a drink, `](../../../cocktails/recipes/<slug>/)`,
+# which climbs to the site root and so resolves from a draft and a published
+# recipe alike (MANUAL §4, "Cross-recipe links").
+DRINK_TARGET = re.compile(r"^\.\./\.\./cocktails/recipes/([a-z0-9-]+)/$")
+
+
+def drink_slugs_linked(document):
+    return [m.group(1) for t in ANY_RELATIVE_LINK.findall(document.raw)
+            if (m := DRINK_TARGET.match(t))]
+
+
+def test_drink_links_are_read_from_their_one_shape():
+    from types import SimpleNamespace
+    raw = ("[a](../../../cocktails/recipes/cherry-bakewell/)s "
+           "[b](../../cocktails/recipes/x/) [c](../../../cocktails/drafts/y/) "
+           "[d](../soup/)")
+    assert drink_slugs_linked(SimpleNamespace(raw=raw)) == ["cherry-bakewell"]
+
+
+PUBLISHED_DRINKS = {p.stem for p in (ROOT / "_cocktail_recipes").glob("*.md")}
+
+
+def test_drink_links_name_a_published_drink(recipe):
+    """A published recipe may link only to a published drink: the page is
+    public, and a drafts slug would print an unpublished drink's name on it.
+    """
+    missing = [s for s in drink_slugs_linked(recipe) if s not in PUBLISHED_DRINKS]
+    assert not missing, (
+        f"{where(recipe)} links to drink(s) {missing}, which are not in "
+        f"_cocktail_recipes/. Promote the drink first, or take the link out."
+    )
+
 
 def test_internal_links_are_well_formed(recipe):
-    """No `](../...)` link has a target other than a plain `slug`, `slug/`
-    or a reference page: the shapes the two tests above cannot see.
+    """No `](../...)` link has a target other than a plain `slug`, `slug/`,
+    a reference page or a drink: the shapes the two tests above cannot see.
     """
     bad = [t for t in ANY_RELATIVE_LINK.findall(recipe.raw)
-           if not _WELL_FORMED_TARGET.match(t) and not _REFERENCE_TARGET.match(t)]
+           if not _WELL_FORMED_TARGET.match(t) and not _REFERENCE_TARGET.match(t)
+           and not DRINK_TARGET.match(t)]
     assert not bad, (
         f"{where(recipe)} has internal link(s) in an unrecognised shape: "
         f"{bad!r}.\nCross-recipe links must be [text](../slug/) -- check "
