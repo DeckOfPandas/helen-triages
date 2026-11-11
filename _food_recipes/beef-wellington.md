@@ -3,7 +3,7 @@ title: "Beef Wellington"
 tagline: "The ultimate showstopper. Two days of love for ten minutes of glory."
 source: "Adapted from Gordon Ramsay's Ultimate Cookery Course"
 source_type: book
-serves: "4"
+serves: "4–6"
 prep_time: "1 hr 30 mins, plus overnight chilling"
 cook_time: "15–20 mins"
 main_ingredients: ["beef fillet", "puff pastry", "wild mushrooms", "Parma ham", "Dijon mustard", "egg yolks", "red wine", "shallots", "beef stock"]
