@@ -691,17 +691,10 @@ def test_prose_abbreviates_minutes_only(draft):
 
 
 def test_numbers_in_prose(draft):
-    """`4-promote/` only: elsewhere most drafts still hold unread Claude
-    rewrites, and each is fixed as Helen stages it (DECISIONS §5)."""
-    if "4-promote" not in draft.path.parts:
-        return
     _st.test_numbers_in_prose(draft)
 
 
 def test_a_time_after_its_verb_takes_for(draft):
-    """`4-promote/` only, for the reason test_numbers_in_prose gives."""
-    if "4-promote" not in draft.path.parts:
-        return
     _st.test_a_time_after_its_verb_takes_for(draft)
 
 

@@ -889,8 +889,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   wider"."* And: *""2 bay leaves" and "10 dried rose petals" etc are behaving
   like ingredient lines and should stay as numbers."* So a measurement and a
   count of an ingredient keep the numeral; a count of anything else (servings,
-  folds, pots, circles) is a word. Held on published recipes and on
-  `4-promote/` only: the rest of the pool is fixed as she stages each draft.
+  folds, pots, circles) is a word. A label keeps its numeral ("step 2",
+  "gas mark 5"). Held on every recipe and draft: *"Please apply the new rules
+  to all the drafts, otherwise I'll be distracted when I rewrite and cook
+  them."* A `QQ original` line keeps the source's own numbers.
   `test_numbers_in_prose` (`tests/test_style.py`).
 - **2026-11-11 — a time straight after its verb takes "for".** Helen:
   *""roast about 15 mins" should become "roast for about 15 mins". "add the
