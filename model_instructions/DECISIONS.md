@@ -882,6 +882,23 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   and "roughly" become "about". A bracket that says more ("about 150 g
   each", "or 400 g frozen", "about 60 ml juice") stays in the item.
   `test_weight_is_in_the_amount_not_the_item` (`tests/test_style.py`).
+- **2026-11-11 — numbers in prose: words up to ten, numerals from 11.**
+  Helen: *"numbers up to ten in prose are written out, and numbers 11 and
+  above are numerals. When numbers are behaving like "2 cm" or "5 g" then
+  those should be numerals. The example is "four circles about 2 cm
+  wider"."* And: *""2 bay leaves" and "10 dried rose petals" etc are behaving
+  like ingredient lines and should stay as numbers."* So a measurement and a
+  count of an ingredient keep the numeral; a count of anything else (servings,
+  folds, pots, circles) is a word. Held on published recipes and on
+  `4-promote/` only: the rest of the pool is fixed as she stages each draft.
+  `test_numbers_in_prose` (`tests/test_style.py`).
+- **2026-11-11 — a time straight after its verb takes "for".** Helen:
+  *""roast about 15 mins" should become "roast for about 15 mins". "add the
+  garlic and cook a few mins more" needs "for a few mins". Sometimes I drop
+  the "for", like "fry to soften, about 10 mins.""* Her own pattern sets the
+  time off with a comma after the end point; a time that follows the verb
+  directly needs the "for". Scoped as the numbers rule above.
+  `test_a_time_after_its_verb_takes_for` (`tests/test_style.py`).
 - **Undated — "180°C fan" is correct and is not a conversion; what is banned
   is a second, conventional-oven temperature beside it, and gas marks
   always.** Helen: *"saying 'fan' isn't a conversion."* The site is fan-oven

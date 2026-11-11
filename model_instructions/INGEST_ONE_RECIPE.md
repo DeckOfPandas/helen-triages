@@ -693,6 +693,12 @@ batch comes from one of them, the index may say so once.
 - **A spoon amount takes no "of"**: "2 tbsp oil", never "2 tbsp of the oil",
   in an ingredient line and a `QQ Claude` step alike. Helen: *"Never "2 tbsp
   of" something. Just "2 tbsp $something". Always."*
+- **Numbers in a `QQ Claude` line: words up to ten, numerals from 11**, except
+  a measurement or a count of an ingredient, which keeps its numeral: "four
+  circles about 2 cm wider", "stuff with 2 bay leaves", "serves six".
+- **A time straight after its verb takes "for"**: "roast for about 15 mins",
+  "cook for a few mins more". Set off after the end point with a comma, it
+  takes none: "fry to soften, about 10 mins".
 - **A space between a number and its unit**, imperial included: `15 ml`,
   `400 g`, `20 cm`, `9 in`, `2 tbsp`. Not `15ml`. A temperature takes none:
   `180°C`.
@@ -840,7 +846,7 @@ method:
   - "QQ original Meanwhile, melt the butter in a large frying pan over medium heat. Once the butter has melted and is foaming, add the sage leaves and fry them for 30 seconds or so until they are crisp, then remove them to a plate lined with kitchen paper."
   - "QQ Claude Meanwhile melt the butter over medium heat. Fry the sage in the foaming butter, 30 seconds, until crisp. Drain on kitchen paper."
   - "QQ original Add the minced garlic to the butter and cook for about 30 seconds until fragrant, being careful not to let it burn or it will turn bitter."
-  - "QQ Claude Add the garlic and cook 30 seconds, until fragrant."
+  - "QQ Claude Add the garlic and cook for 30 seconds, until fragrant."
 method_short:
   - ""
 notes:

@@ -109,6 +109,123 @@ def test_prose_abbreviates_minutes_only(recipe):
     )
 
 
+# --- numbers in prose: words up to ten, numerals from 11 ---------------------
+# DECISIONS §5. A measurement keeps its numeral ("2 cm", "5 g", "8+ hours"), and
+# so does a count of an ingredient ("2 bay leaves"), which reads as an
+# ingredient line; a count of anything else is a word ("four circles"). An
+# ingredient is one of the recipe's own ingredient names, or a phrase declared
+# in NUMBER_EXCEPTIONS. Not `method_short` (her shorthand) nor an ingredient's
+# note, which is an ingredient line itself.
+_PROSE_UNITS = (
+    r"(?:g|kg|mg|ml|l|litres?|cl|cm|mm|m|inch(?:es)?|in|oz|lb|fl oz|tbsp|tsp"
+    r"|mins?|hours?|hrs?|seconds?|days?|weeks?|months?|years?|nights?"
+    r"|°C|°|x|×|per cent|degrees?|pints?|cups?)")
+_BARE_COUNT = re.compile(
+    r"(?<![\d.,/:–\-½¼¾⅓⅔#\w])(10|[1-9])"
+    r"(?![\d/:½¼¾⅓⅔+%\w\"]|[.,]\d|\s*[–-]\s*\d|\s*(?:or|to)\s+\d"
+    rf"|-?\s*(?:(?:more|full|whole|extra)\s+)?{_PROSE_UNITS}\b)")
+_RANGE_BEFORE = re.compile(r"\d[½¼¾⅓⅔]?\s+(?:or|to)\s+$")
+# "at least 1 hour, preferably 2": the unit is understood from just before.
+_UNIT_JUST_BEFORE = re.compile(rf"\d\s*{_PROSE_UNITS}\b[^.;]{{0,25}}$")
+_BIG_NUMBER_WORD = re.compile(
+    r"\b(eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen"
+    r"|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\b", re.I)
+_NOT_AN_INGREDIENT_WORD = {"small", "medium", "large", "extra", "fresh", "dried",
+                           "whole", "ground", "and", "the", "for", "with", "of"}
+NUMBER_EXCEPTIONS = {
+    "10 dried rose petals": "chai-spice-powder: an ingredient its list leaves out",
+}
+
+
+def _ingredient_words(recipe) -> set[str]:
+    words = set()
+    for item in recipe.ingredient_items:
+        name = re.split(r"[,(]", str(item))[0].lower()
+        words.update(w.rstrip("s") for w in re.findall(r"[a-zà-ÿ]+", name))
+    return words - _NOT_AN_INGREDIENT_WORD
+
+
+def _copy_prose(recipe):
+    return [(loc, re.sub(r"\]\([^)]*\)", "]", text))
+            for loc, text in checkable_prose(recipe)
+            if not loc.startswith(("method_short", "note on '"))]
+
+
+def number_style_problems(recipe) -> list[str]:
+    ingredients = _ingredient_words(recipe)
+    problems = []
+    for location, text in _copy_prose(recipe):
+        for m in _BARE_COUNT.finditer(text):
+            before = text[:m.start()]
+            if _RANGE_BEFORE.search(before) or _UNIT_JUST_BEFORE.search(before):
+                continue
+            following = text[m.start():m.end() + 40]
+            if any(following.startswith(p) for p in NUMBER_EXCEPTIONS):
+                continue
+            phrase = re.split(r"[,.;:()]", following[len(m.group(1)):])[0]
+            after = re.findall(r"[a-zà-ÿ]+", phrase.lower())[:3]
+            if any(w.rstrip("s") in ingredients for w in after):
+                continue
+            problems.append(f"{location}: …{text[max(0, m.start() - 25):m.end() + 20]}… "
+                            f"— write {m.group(1)!r} as a word")
+        for m in _BIG_NUMBER_WORD.finditer(text):
+            problems.append(f"{location}: {m.group(0)!r} — 11 and over take numerals")
+    return problems
+
+
+def test_numbers_in_prose(recipe):
+    """Up to ten in words, 11 and over in numerals; measurements and
+    ingredient counts in numerals ("four circles about 2 cm wider")."""
+    problems = number_style_problems(recipe)
+    assert not problems, (
+        f"{where(recipe)} breaks the numbers rule:\n  " + "\n  ".join(problems)
+    )
+
+
+def test_no_number_exception_is_stale():
+    """A NUMBER_EXCEPTIONS phrase must still be in some recipe's prose.
+
+    Does not skip without the drafts: an exemption naming a published recipe
+    is checked in CI too, so name one there (PARTIAL_IN_CI).
+    """
+    text = "\n".join(t for r in ALL_RECIPES + ALL_DRAFTS for _, t in r.prose)
+    stale = [p for p in NUMBER_EXCEPTIONS if p not in text]
+    assert not stale, f"NUMBER_EXCEPTIONS names prose no recipe has: {stale}"
+
+
+# --- a time straight after its verb takes "for" ------------------------------
+# DECISIONS §5. "roast for about 15 mins", "cook for a few mins more"; a time
+# after a comma, following the end point, takes none: "fry to soften, about
+# 10 mins". The verbs are the ones a time follows in a method.
+_TIME_PHRASE = (
+    r"(?:about |around |roughly |at least |up to |another |a further )?"
+    r"(?:\d[\d½–-]*\s*(?:mins?|hours?|seconds?)\b|a few (?:mins|minutes|hours|seconds)\b"
+    r"|an? (?:minute|hour)\b|half an hour\b)")
+_TIMED_VERB = (
+    r"(?:roast|bake|cook|fry|simmer|boil|rest|stir|steam|grill|toast|soften|sauté"
+    r"|poach|braise|stew|leave|chill|marinate|cool|whisk|beat|knead|prove|rise"
+    r"|blanch|stand|sit|soak|reduce|heat|brown|sear|char|blitz|blend|mix|microwave"
+    r"|smoke|infuse|steep|freeze|caramelise|sweat|wilt|bubble|continue|it|them)")
+_TIME_WITHOUT_FOR = re.compile(rf"\b{_TIMED_VERB}\s+{_TIME_PHRASE}", re.I)
+
+
+def missing_for_problems(recipe) -> list[str]:
+    return [f"{location}: …{m.group(0)}…"
+            for location, text in _copy_prose(recipe)
+            for m in _TIME_WITHOUT_FOR.finditer(text)]
+
+
+def test_a_time_after_its_verb_takes_for(recipe):
+    """"roast for about 15 mins", never "roast about 15 mins"."""
+    problems = missing_for_problems(recipe)
+    assert not problems, (
+        f"{where(recipe)} puts a time straight after its verb with no 'for':\n  "
+        + "\n  ".join(problems)
+        + "\nWrite 'roast for about 15 mins', or set the time off after the end "
+          "point: 'fry to soften, about 10 mins'."
+    )
+
+
 # --- method-step notes read as sentences, unlike ingredient notes -----------
 # #174. A note on a `method`/`method_groups` step is an aside in sentence form:
 # capital first letter, trailing full stop. The opposite of an ingredient
