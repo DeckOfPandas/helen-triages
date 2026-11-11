@@ -1,0 +1,77 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://deckofpandas.github.io/is-it-rhubarb-yet/season/v1.schema.json",
+ "title": "Is It Rhubarb Yet? season file, version 1",
+ "description": "Every food and never-food with its UK season as one state per month, January first. Built from _data/foods.yml and _data/never.yml by tools/season-json.js.",
+ "type": "object",
+ "required": [
+  "schema_version",
+  "foods"
+ ],
+ "additionalProperties": false,
+ "properties": {
+  "schema_version": {
+   "description": "Changes only when a field is removed or its meaning changes; such a change is published at a new path, /season/v<n>.json.",
+   "const": 1
+  },
+  "foods": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "object",
+    "required": [
+     "id",
+     "name",
+     "aliases",
+     "glasshouse",
+     "never",
+     "months"
+    ],
+    "additionalProperties": false,
+    "properties": {
+     "id": {
+      "description": "The food's slug: its page is /<id>/.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+     },
+     "name": {
+      "type": "string",
+      "minLength": 1
+     },
+     "aliases": {
+      "description": "Other names the food is asked for by. Each belongs to one food.",
+      "type": "array",
+      "items": {
+       "type": "string",
+       "minLength": 1
+      }
+     },
+     "glasshouse": {
+      "description": "True when one of the food's rings is grown under glass. A month supplied only from glass reads from_store.",
+      "type": "boolean"
+     },
+     "never": {
+      "description": "True for a food never in season in the UK; every month reads never.",
+      "type": "boolean"
+     },
+     "months": {
+      "description": "January to December. coming_in: a few about before the season proper, a lull between two seasons included. great_now: in season. going_out: a few about after it, or a few about with no season proper either side. from_store: only from storage or under glass. out: none. never: never in season here.",
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": {
+       "enum": [
+        "coming_in",
+        "great_now",
+        "going_out",
+        "from_store",
+        "out",
+        "never"
+       ]
+      }
+     }
+    }
+   }
+  }
+ }
+}

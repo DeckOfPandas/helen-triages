@@ -1060,6 +1060,31 @@ cream cheese). Butter is `butter` in a draft, where a `QQ butter` line still
 earns it, and `salted butter` or `unsalted butter` in a published recipe. Lowercase; `test_no_main_ingredient_spelling_collisions`
 enforces consistent spelling across recipes and drafts.
 
+### 6.1 Seasons: the copy of Rhubarb's season file
+
+`_data/season/v1.json` is a committed copy of Is It Rhubarb Yet?'s
+`/season/v1.json`, and `_data/season/v1.schema.json` is its contract. The
+build never fetches it, so a Rhubarb outage cannot stop a deploy here.
+`python3 scripts/refresh_season.py` refreshes the copy by hand (or
+`--from-dir` from a local Rhubarb build); the result ships as a PR.
+
+**The schema is checked by `scripts/season_schema.py`, not by the
+`jsonschema` package.** Claude chose this when Helen left it to Claude (#1475):
+
+- It supports exactly the keywords the schema uses and refuses a schema that
+  names any other, so a schema that grows cannot be half-checked. Rhubarb's
+  `tools/schema-check.js` is its twin and refuses the same way.
+- `jsonschema` brings several packages, one of them compiled. Every test pin
+  must match the container's (`tests/test_ci_matches_container.py`), so adding
+  it means a pin in two files and an image rebuild.
+
+**Switch to `jsonschema` when** the schema needs a keyword the checker refuses
+and that keyword is more than a few lines to add (`$ref`, `oneOf`, `anyOf`,
+`format`), or a third reader of the file appears. To switch: pin it in
+`requirements-test.txt` and `.devcontainer/requirements.txt`, rebuild the
+image, call it in place of `validate` in `scripts/refresh_season.py` and
+`tests/test_season.py`, and delete `scripts/season_schema.py`.
+
 ---
 
 ## 7. Taxonomy (food)
