@@ -129,6 +129,7 @@ argument and the rules each field is read by.
 - 2026-08-26 · §4.3 · a magic-bag entry always has a tagline: line, and its value may be empty.
 - undated · §4.3 · Undated — a magic-bag entry's minimum is an ingredients list.
 - 2026-11-11 · §4.3 · a food recipe's address goes in an optional source_url, and the source text links to it.
+- 2026-11-11 · §4.3 · a prep or cook time may link to a drink.
 - 2026-08-21 · §5 · #413 · en dashes are scoped by what a reader SEES.
 - 2026-10-30 · §5 · citrus is never "a squeeze": it is "¼ lemon, juiced".
 - 2026-10-18 · §5 · on food, the formatter reaches a QQ line; it still never rewords one.

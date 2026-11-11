@@ -799,6 +799,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   an appropriate shape and document it."* The drinks' shape (#454) was taken
   whole, so the two sites read the same: `source` says who, `source_url` says
   where. SOURCE_ATTRIBUTION_SPEC.md rule 4.
+- **2026-11-11 — a prep or cook time may link to a drink.** Helen's Christmas
+  pudding prep time is *"minimum 60 mins, more if you drink"* two named
+  drinks, each a link, so both time cells render as markdown, as the tagline
+  does. MANUAL §4, "Cross-recipe links".
 ## §5 House style
 
 - **2026-08-21, #413 — en dashes are scoped by what a reader SEES.** Helen, on

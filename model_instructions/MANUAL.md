@@ -716,7 +716,12 @@ takes `proofread` down with it.
   `test_a_group_named_to_something_is_its_own_heading` pins the table.
 - **Cross-recipe links are markdown and relative**: `[text](../slug/)`. Front
   matter is never run through Liquid, so a root-relative link cannot pick up
-  the baseurl.
+  the baseurl. The tagline, `prep_time` and `cook_time` are rendered as
+  markdown, so each may carry one. A link to a drink climbs to the site root,
+  `[Cherry Bakewell](../../../cocktails/recipes/cherry-bakewell/)`, which
+  resolves from a draft and a published recipe alike; it must name a
+  published drink, or the production build's link check fails once the
+  recipe publishes.
 - **`notes:` items are `{label, text}`, both keys always present**, on both
   sites and in both drafts repos; a bare string is refused everywhere
   (`test_note_dicts_have_label_and_text_when_dict` on drafts). An empty

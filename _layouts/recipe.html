@@ -49,11 +49,13 @@ layout: default
   <ul class="recipe-meta">
     {% if page.serves %}<li><strong>Serves</strong><span>{{ page.serves }}</span></li>{% endif %}
     {% if page.makes %}<li><strong>Makes</strong><span>{{ page.makes }}</span></li>{% endif %}
-    {% if page.prep_time %}<li><strong>Prep</strong><span>{{ page.prep_time }}</span></li>{% endif %}
+    {% comment %} The two times are markdown, like the tagline, so one may carry a
+       relative link to another page (MANUAL §4). {% endcomment %}
+    {% if page.prep_time %}<li><strong>Prep</strong><span>{{ page.prep_time | markdownify | remove: '<p>' | remove: '</p>' | strip }}</span></li>{% endif %}
     {% comment %} A wired recipe's cook time hands off to its own temperatures: the clock
        figure answers "when do I start?", never "when is it ready?". Added by the
-       layout rather than typed into cook_time, so no markup lives in a metadata
-       field and every wired recipe says it the same way. {% endcomment %}
+       layout rather than typed into cook_time, so every wired recipe says it the
+       same way. {% endcomment %}
     {% if page.cook_time %}
       <li>
         <strong>Cook</strong>
@@ -61,7 +63,7 @@ layout: default
            measures the inside of the meat, not the oven. The metadata box keeps the
            "but check" hedge because it qualifies the cook time beside it; body copy
            uses the shorter "(check internal temperatures chart)". {% endcomment %}
-        <span>{{ page.cook_time }}{% if _temp_spectrum or _internal_temp %}, but check <a href="#doneness">internal temperatures chart</a>{% endif %}</span>
+        <span>{{ page.cook_time | markdownify | remove: '<p>' | remove: '</p>' | strip }}{% if _temp_spectrum or _internal_temp %}, but check <a href="#doneness">internal temperatures chart</a>{% endif %}</span>
       </li>
     {% endif %}
     {% comment %} No internal-temp cell in this grid: it is read once, while deciding whether
