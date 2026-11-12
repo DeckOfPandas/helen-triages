@@ -712,6 +712,7 @@ LINK_WITH_TEXT = re.compile(r"\[([^\]]+)\]\(\.\./([a-z0-9-]+)/\)")
 _LINK_TEXT_EXTRA_WORD_EXCEPTIONS = {
     ("chinese five-spice powder", "five-spice-powder"): {"chinese"},
     ("garam masala powder", "garam-masala-powder"): {"powder"},
+    ("stella and henry's version", "stella-henrys-christmas-pudding"): {"version"},
 }
 
 

@@ -435,7 +435,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 #   2. move it in a commit of its own, quoting her grant in the message;
 #   3. move it before the next agent edit, or it covers that too.
 # Grants made on parallel branches need the merge commit with both behind it.
-BASELINE_COMMIT = "8d41e1e7"   # Wellington, mousse and ramen re-proofread on Helen's grant; 3511fce7 and every earlier grant behind it
+BASELINE_COMMIT = "0706b4b6"   # Grandma Kath's rewritten flag, Helen's one-off; the merge 6fa32c0e and every earlier grant behind it
 AGENT_TRAILER = "co-authored-by: claude"
 
 
@@ -819,6 +819,14 @@ ADJUDICATED_REWRITES = {
             "them into 1-rewrite/ and rewrote them; the agent moved them to "
             "2-make/ as she asked. The commit that showed #1482's gap; covered "
             "by her standing grant under 026f3224."
+        ),
+    },
+    "_food_recipes": {
+        "2d97c96a": (
+            "grandma-kaths-christmas-pudding.md, 2026-11-12. Promoted saying "
+            "rewritten: false, which would have published it unlisted on the "
+            "index and search. Asked, Helen had the agent set it true as a "
+            "one-off."
         ),
     },
 }
