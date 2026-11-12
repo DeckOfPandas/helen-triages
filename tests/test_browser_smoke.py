@@ -420,8 +420,8 @@ TICK_LAYOUT = """() => [...document.querySelectorAll('.ingredients li.ingredient
 
 
 def _recipe_pages_by_grouping(prod_site):
-    """One published recipe whose ingredients are in groups (an indent to hang
-    the boxes in) and one whose are not (they hang in the page's margin)."""
+    """One published recipe whose ingredients are in groups and one whose are
+    not: both lists are indented, and the boxes hang in that indent."""
     grouped = flat = None
     for path in sorted(prod_site.glob("food/recipes/*/index.html")):
         text = path.read_text(encoding="utf-8")

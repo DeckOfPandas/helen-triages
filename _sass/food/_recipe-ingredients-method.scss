@@ -7,8 +7,8 @@
 // =============================================================================
 
 // --- Lists & Content Typography ----------------------------------------------
-// Both lists sit flush at the page's left edge, on the same axis as the section
-// headings above them.
+// Ingredient lines sit indented, grouped or not, and the tick boxes
+// (_ingredient-ticks.scss) hang in that gutter (DECISIONS §8.2).
 .ingredients,
 .method-full {
   padding-left: 0;
@@ -16,6 +16,10 @@
   // article.recipe sets 300 for the page's prose; the two lists are read at
   // arm's length, so they take Selawik's real 400 face.
   font-weight: 400;
+}
+
+.ingredients {
+  padding-left: $space-xxl;
 }
 
 // No bullet: the highlighted amounts are the column the eye runs down.
@@ -28,15 +32,6 @@
   margin-bottom: $space-md;
   line-height: 1.5;
   position: relative;
-}
-
-// --- Group indent ------------------------------------------------------------
-// A hanging label: the group heading stays flush and its list indents, so the
-// group reads as a block. The adjacent-sibling selector is safe because
-// _layouts/recipe.html emits a heading for every group once there is more than
-// one (an unnamed group falls back to "For the base:").
-.recipe-group-heading + .ingredients {
-  padding-left: $space-xxl;
 }
 
 // The number column plus the gap between the number and the step's text.

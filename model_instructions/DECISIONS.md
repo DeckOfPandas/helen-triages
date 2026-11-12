@@ -1494,7 +1494,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   line, behind a TICK BOXES OFF / ON button under INGREDIENTS.** Chosen from
   three candidates on the page: *"option c please"*. The boxes hang left of the
   lines and move none of them: *"don't move the ingredients when you show the
-  tickboxes"*. "On" is the raw hot pink, not the darkened link pink, by
+  tickboxes"*. Every ingredient list is indented, grouped or not, and the
+  boxes sit in that gutter: *"please put the indentation of the ingredient
+  lines back where it was, i.e. further to the right. Then the tickboxes can
+  sit in that gutter."* "On" is the raw hot pink, not the darkened link pink, by
   choice: *"I know it doesn't pass contrast tests, but this is an exception I
   choose."* Off by default and never remembered, as make it is (§9).
 - **2026-11-12 — a recipe written in imperial measures has an IMPERIAL /

@@ -64,8 +64,8 @@ $tick-on: $color-dazzling-dragonfruit;
 
 // --- The boxes ---------------------------------------------------------------
 // Built the first time the button is turned on, hidden again when it is off,
-// ticks kept. Each hangs to the left of its line, in a group's indent or the
-// page's margin, so showing them moves no ingredient.
+// ticks kept. Each hangs to the left of its line, in the ingredient list's
+// indent, so showing them moves no ingredient.
 .ingredient-tick { display: none; }
 
 .recipe.is-ticking {
