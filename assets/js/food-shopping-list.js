@@ -362,24 +362,27 @@
   }
 
   /** What a list of rows comes to (#1458): the priced rows summed, and how
-   * many rows could not be priced, wholly or in part. null where no row was
-   * priced at all. */
+   * many rows could not be priced, wholly or in part, with their labels in
+   * `unpricedNames` (#1486). null where no row was priced at all. */
   function costTotal(rows) {
     var min = 0;
     var max = 0;
     var priced = 0;
-    var unpriced = 0;
+    var names = [];
     (rows || []).forEach(function (row) {
       var cost = row && row.cost;
       if (!cost) return;
-      if (cost.unpriced) { unpriced += 1; return; }
+      if (cost.unpriced) { names.push(row.label); return; }
       min += cost.min;
       max += cost.max;
       priced += 1;
-      if (cost.partial) unpriced += 1;
+      if (cost.partial) names.push(row.label);
     });
     if (!priced) return null;
-    var sum = { min: min, max: max, partial: unpriced > 0, unpriced: unpriced };
+    var unpriced = names.length;
+    var sum = {
+      min: min, max: max, partial: unpriced > 0, unpriced: unpriced, unpricedNames: names
+    };
     sum.text = moneyText(sum);
     return sum;
   }
@@ -398,7 +401,8 @@
     var sum = costTotal(rows);
     if (!sum) return null;
     var each = {
-      min: sum.min / per, max: sum.max / per, partial: sum.partial, unpriced: sum.unpriced
+      min: sum.min / per, max: sum.max / per, partial: sum.partial, unpriced: sum.unpriced,
+      unpricedNames: sum.unpricedNames
     };
     each.text = moneyText(each);
     return each;
@@ -417,6 +421,19 @@
     var opts = options || {};
     var aisles = opts.aisles && opts.aisles.length
       ? opts.aisles
+  /** ", not counting 2 unpriced items (cockerel carcass and kombu)" for a
+   * cost with unpriced rows, naming them (#1486); "" where there are none. */
+  function unpricedText(cost) {
+    if (!cost || !cost.partial) return '';
+    var names = (cost.unpricedNames || []).filter(Boolean);
+    var n = cost.unpriced;
+    var said = ', not counting ' + n + (n === 1 ? ' unpriced item' : ' unpriced items');
+    if (!names.length) return said;
+    var list = names.length === 1 ? names[0]
+      : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+    return said + ' (' + list + ')';
+  }
+
       : [{ key: 'other', label: 'other' }];
 
     var known = {};
@@ -638,3 +655,4 @@
     SIZE_UNITS: SIZE_UNITS
   };
 });
+    unpricedText: unpricedText,

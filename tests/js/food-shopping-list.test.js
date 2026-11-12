@@ -699,6 +699,27 @@ test('#1458: a recipe costs per portion, or per batch with per = 1, and keeps "f
   assert.strictEqual(partial.partial, true);
   // The recipe page says "not counting 1 unpriced item" from this count.
   assert.strictEqual(partial.unpriced, 1);
+  assert.deepStrictEqual(partial.unpricedNames, ['kohlrabi']);
+});
+
+test('#1486: the cost line names what it could not price', () => {
+  const o = { aisles: AISLES, costUnits: UNITS };
+  const flour = { amount: '500 g', name: 'flour', aisle: 'cupboard', rate: FLOUR };
+  const one = F.recipeCost([flour,
+    { amount: '1', name: 'cockerel carcass', aisle: 'produce' }], 1, o);
+  assert.strictEqual(F.unpricedText(one), ', not counting 1 unpriced item (cockerel carcass)');
+  const three = F.recipeCost([flour,
+    { amount: '200 g', name: 'kohlrabi', aisle: 'produce' },
+    { amount: '1', name: 'cockerel carcass', aisle: 'produce' },
+    { amount: '10 g', name: 'kombu', aisle: 'produce' }], 1, o);
+  assert.strictEqual(F.unpricedText(three),
+    ', not counting 3 unpriced items (cockerel carcass, kohlrabi and kombu)');
+  // A row priced only in part is named too: it is part of the "from".
+  const part = F.recipeCost([flour,
+    { amount: '2 bags', name: 'flour', aisle: 'cupboard', rate: FLOUR }], 1, o);
+  assert.strictEqual(F.unpricedText(part), ', not counting 1 unpriced item (flour)');
+  assert.strictEqual(F.unpricedText(F.recipeCost([flour], 1, o)), '');
+  assert.strictEqual(F.unpricedText(null), '');
 });
 
 test('#1458: no portion count, or no unit table, is no recipe figure at all', () => {
