@@ -83,6 +83,7 @@ argument and the rules each field is read by.
 - 2026-11-03 · §4 · a recipe written up in a chat, not transcribed from a page, has QQ Claude method lines and no QQ original.
 - 2026-11-03 · §4 · an unqualified milk, egg or butter takes the house default, and the line says what the source printed.
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
+- 2026-11-11 · §4 · a rewrite has no "heat the oven" step; the temperature goes where the oven is first used.
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
 - 2026-10-28 · §4 · makes: is written as a count of a named thing.
 - 2026-11-03 · §4 · a dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets.

@@ -478,6 +478,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
   rulings from two claude.ai chats that Helen confirmed as standing, each a
   yes. Its `QQ original` keeps everything the source printed.
+- **2026-11-11 — a rewrite has no "heat the oven" step; the temperature goes
+  where the oven is first used.** Helen: *"I HATE having a "heat the oven"
+  step. I mean, like, duhhh. … mention the temperature the first time it's
+  used."* So "Roast at 180°C fan for 10 mins", and a later step in the same
+  oven names no figure unless it changes. The grill is the same: "grill on
+  its highest setting for 5 mins". The `QQ original` keeps the source's step.
 - **2026-10-29 — an unheaded first ingredient group is named for the dish or
   its main component, unasked.** Helen: *"hopefully this would be obvious,
   like "for the beef", or "for the pie"?"* The name is read after "For the".
