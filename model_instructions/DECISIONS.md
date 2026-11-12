@@ -1615,8 +1615,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-11-06, #1474 — the shopping list reads "approx" like `~`, and a
   bracketed aside or a "per …" rate is not pluralised.** Helen chose all three
   fixes she was offered: "approx 8 oz" totals as ~227 g; "2 oz (or 2 tbsp)"
-  and "250 g per person" print as written. `UNIT_TAIL` in
-  `assets/js/shopping-list.js`.
+  prints as written. `UNIT_TAIL` in `assets/js/shopping-list.js`.
+- **2026-11-11, #1481 — a per-person amount becomes the total for the people
+  chosen, "per person" dropped.** "250 g per person" for four is 1 kg on the
+  shopping list, and on the recipe page once the box moves off the recipe's
+  own count. Helen ticked it over "stay as written". With no count of people
+  (no `serves:`) it prints as written and is never multiplied by the scale.
+  `perPerson` in `assets/js/food-shopping-list.js`.
 
 ### §8.3 The shortlist is a view, not a facet — #918, 2026-09-10
 

@@ -843,6 +843,33 @@ test('#1474: a bracketed alternative is not pluralised', () => {
     '3 cloves (or 1 tsp paste)');
 });
 
+test('#1481: a per-person amount is the total for the people chosen', () => {
+  const potatoes = (people, scale) => F.build([{
+    amount: '250 g per person', name: 'potatoes', aisle: 'produce', scale, people
+  }], { aisles: AISLES })[0].items[0].text;
+  assert.strictEqual(potatoes(4, 1), '1 kg');
+  // The people, not the scale, decide: doubling a recipe for 4 is 8 people.
+  assert.strictEqual(potatoes(8, 2), '2 kg');
+  assert.strictEqual(potatoes(3, 1), '750 g');
+  assert.strictEqual(potatoes(1, 0.25), '250 g');
+});
+
+test('#1481: with no count of people, a per-person amount is as written, never multiplied', () => {
+  const row = F.build([{
+    amount: '250 g per person', name: 'potatoes', aisle: 'produce', scale: 2
+  }], { aisles: AISLES })[0].items[0];
+  assert.strictEqual(row.text, '250 g per person');
+});
+
+test('#1481: only "per person" and its kin are read as a rate per person', () => {
+  assert.strictEqual(F.perPerson('250 g per person'), '250 g');
+  assert.strictEqual(F.perPerson('2 slices per portion'), '2 slices');
+  assert.strictEqual(F.perPerson('90 g Per Head'), '90 g');
+  assert.strictEqual(F.perPerson('250 g'), null);
+  assert.strictEqual(F.perPerson('1 per cent fat'), null);
+  assert.strictEqual(F.perPerson(undefined), null);
+});
+
 test('#1474: a rate is not pluralised', () => {
   assert.strictEqual(textOf([ing('250 g per person', 'potatoes', 'produce')], 'potatoes'),
     '250 g per person');

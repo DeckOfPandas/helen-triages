@@ -1378,6 +1378,8 @@ function renderResultsPool() {
     return ((RECIPES[url] || {}).i || []).map(function (ing) {
       return {
         amount: ing.a, name: ing.n, aisle: ing.s, scale: scale,
+        // How many people a per-person amount is for (#1481), at this scale.
+        people: !isBatch(url) && hasPortions(url) ? RECIPES[url].p * scale : null,
         recipe: url, parts: ing.pt, fruit: ing.f, count: ing.c, pointer: ing.x,
         rate: ing.r
       };

@@ -27,6 +27,7 @@
   var entries = (data.i || []).map(function (ing) {
     return {
       amount: ing.a, name: ing.n, aisle: ing.s, scale: 1, recipe: url,
+      people: data.batch ? null : Number(data.per),
       parts: ing.pt, fruit: ing.f, count: ing.c, pointer: ing.x, rate: ing.r
     };
   });

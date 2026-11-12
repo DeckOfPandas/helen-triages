@@ -5,7 +5,8 @@
 // DOM half. The amount parsing is shopping-list.js's: there is one parser.
 //
 // Each entry arrives with a `scale` (portions wanted over portions made, or
-// whole batches); filters.js chooses it and this file only multiplies.
+// whole batches) and `people` (the portions wanted, or none); filters.js
+// chooses both and this file only multiplies.
 //
 // Nothing is rounded coarser than a gram: two thirds of 200 g is 133 g.
 // Spoons and counts keep cook's fractions. A sub-gram total keeps a decimal
@@ -210,6 +211,7 @@
         name: name,
         aisle: entry.aisle,
         scale: entry.scale,
+        people: entry.people,
         // #1458. Resolved at build by _plugins/food_costs.rb; absent when
         // the page carries no costs.
         rate: entry.rate,
@@ -311,6 +313,17 @@
       ' (' + lo + '–£' + Number(cost.max).toFixed(2) + ')';
   }
 
+  /* "250 g per person" is an amount for each person, not for the recipe
+     (#1481): with a count of people it becomes their total, "per person"
+     dropped; with none it is printed as written and never multiplied. Returns
+     the amount alone ("250 g"), or null for any other amount. */
+  var PER_PERSON = /^(.*\S)\s+per\s+(?:person|portion|head|serving)$/i;
+
+  function perPerson(amount) {
+    var m = PER_PERSON.exec(String(amount === undefined || amount === null ? '' : amount).trim());
+    return m ? m[1] : null;
+  }
+
   /* "2 x 400 g cans" totals as 2 of the unit `x 400 g can`: that is 400 g
      apiece, whatever the container is called. Read off the unit's own words
      so no can, tin or pack size needs a row in costs.yml. */
@@ -408,19 +421,6 @@
     return each;
   }
 
-  /** Total up a shortlist of recipes, grouped by aisle.
-   * @param {Array} entries - { amount, name, aisle, scale, recipe? } per ingredient, plus the marks `reunite` reads
-   * @param {Object} [options]
-   * @param {Array} [options.wholeMeasures] - `half_step_measures` and `half_step_counts`, bought in whole ones
-   * @param {Array} [options.quarterMeasures] - `quarter_step_measures`, bought in whole ones too
-   * @param {Array} [options.countNouns] - `count_nouns` in scaling.yml: a row label may change number
-   * @param {Array} [options.aisles] - [{key, label}] in display order; an unknown aisle falls to the last
-   * @param {Object} [options.costUnits] - `units` from _data/food/costs.yml; absent, no row is costed
-   * @returns {Array} [{ key, label, items: [{ key, label, text, aside, totals, unquantified, recipes, cost? }] }] */
-  function build(entries, options) {
-    var opts = options || {};
-    var aisles = opts.aisles && opts.aisles.length
-      ? opts.aisles
   /** ", not counting 2 unpriced items (cockerel carcass and kombu)" for a
    * cost with unpriced rows, naming them (#1486); "" where there are none. */
   function unpricedText(cost) {
@@ -434,6 +434,19 @@
     return said + ' (' + list + ')';
   }
 
+  /** Total up a shortlist of recipes, grouped by aisle.
+   * @param {Array} entries - { amount, name, aisle, scale, recipe? } per ingredient, plus the marks `reunite` reads
+   * @param {Object} [options]
+   * @param {Array} [options.wholeMeasures] - `half_step_measures` and `half_step_counts`, bought in whole ones
+   * @param {Array} [options.quarterMeasures] - `quarter_step_measures`, bought in whole ones too
+   * @param {Array} [options.countNouns] - `count_nouns` in scaling.yml: a row label may change number
+   * @param {Array} [options.aisles] - [{key, label}] in display order; an unknown aisle falls to the last
+   * @param {Object} [options.costUnits] - `units` from _data/food/costs.yml; absent, no row is costed
+   * @returns {Array} [{ key, label, items: [{ key, label, text, aside, totals, unquantified, recipes, cost? }] }] */
+  function build(entries, options) {
+    var opts = options || {};
+    var aisles = opts.aisles && opts.aisles.length
+      ? opts.aisles
       : [{ key: 'other', label: 'other' }];
 
     var known = {};
@@ -489,7 +502,15 @@
       var scale = (typeof entry.scale === 'number' && entry.scale > 0)
         ? entry.scale : 1;
 
-      var parsed = parseAmount(entry.amount);
+      // A per-person amount is that many people's worth, or as written (#1481).
+      var each = perPerson(entry.amount);
+      var parsed = null;
+      if (each === null) {
+        parsed = parseAmount(entry.amount);
+      } else if (entry.people > 0) {
+        parsed = parseAmount(each);
+        scale = entry.people;
+      }
       if (!parsed) {
         var text = String(entry.amount || '').trim();
         /* No amount at all is still an ingredient: counted under `''`, which
@@ -646,13 +667,14 @@
     costTotal: costTotal,
     moneyText: moneyText,
     recipeCost: recipeCost,
+    unpricedText: unpricedText,
     totalText: totalText,
     parenText: parenText,
     amountNumber: amountNumber,
     CANONICAL: CANONICAL,
     METRIC: METRIC,
     shoppingUnit: shoppingUnit,
-    SIZE_UNITS: SIZE_UNITS
+    SIZE_UNITS: SIZE_UNITS,
+    perPerson: perPerson
   };
 });
-    unpricedText: unpricedText,
