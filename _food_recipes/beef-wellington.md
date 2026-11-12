@@ -3,7 +3,7 @@ title: "Beef Wellington"
 tagline: "The ultimate showstopper. Two days of love for ten minutes of glory."
 source: "Adapted from Gordon Ramsay's Ultimate Cookery Course"
 source_type: book
-serves: "4"
+serves: "4–6"
 prep_time: "1 hr 30 mins, plus overnight chilling"
 cook_time: "15–20 mins"
 main_ingredients: ["beef fillet", "puff pastry", "wild mushrooms", "Parma ham", "Dijon mustard", "egg yolks", "red wine", "shallots", "beef stock"]
@@ -84,7 +84,7 @@ notes:
   - label: "In-oven heat probe"
     text: "Do not attempt this without a meat thermometer unless you have deep pockets and nerves of steel. I use an in-oven meat probe."
   - label: "Portion size"
-    text: "In theory this serves 4, but fillet is rich...and also expensive. Two Wellingtons may feed 6 comfortably if there are generous sides. Helen, Simon, Patrick and Lauren once happily shared just one, but then there were two different kinds of potato Dauphinoise on the table at the time, so."
+    text: "In theory this serves four, but fillet is rich...and also expensive. Two Wellingtons may feed six comfortably if there are generous sides. Helen, Simon, Patrick and Lauren once happily shared just one, but then there were two different kinds of potato Dauphinoise on the table at the time, so."
 meta:
   rewritten: true
   awaiting_fix: false

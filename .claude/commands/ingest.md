@@ -388,6 +388,11 @@ else has already done (MANUAL §9.1).
   `scripts/tidy_drafts.py --only units` is the same rule for a drafts pass.
   On food the formatting reaches `QQ` lines too, so Helen rewrites from house
   style; a `QQ original` still keeps every word the source printed.
+- **A `QQ Claude` line's numbers and times** (DECISIONS §5): words up to ten,
+  numerals from 11, but a measurement or an ingredient count keeps its numeral
+  ("four circles about 2 cm wider", "2 bay leaves"). A time straight after its
+  verb takes "for" ("roast for about 15 mins"); one set off by a comma after
+  the end point takes none ("fry to soften, about 10 mins").
 - **The citation**, per `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`. For
   food that is `source` + `source_type`; a dated magazine is a `publication`, an
   undated one is a `website`, and that distinction catches everyone out. For

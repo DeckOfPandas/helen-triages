@@ -693,6 +693,14 @@ def test_prose_abbreviates_minutes_only(draft):
     _st.test_prose_abbreviates_minutes_only(draft)
 
 
+def test_numbers_in_prose(draft):
+    _st.test_numbers_in_prose(draft)
+
+
+def test_a_time_after_its_verb_takes_for(draft):
+    _st.test_a_time_after_its_verb_takes_for(draft)
+
+
 # --- taxonomy and links (test_taxonomy.py) -----------------------------------
 
 def test_tags_are_declared(draft, taxonomy):
