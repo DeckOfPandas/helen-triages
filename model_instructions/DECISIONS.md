@@ -2233,7 +2233,7 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   not replaceable, and calling it a type of rhum agricole isn't at all
   useful"*. It sits with the liqueurs and not under rum (decided on her
   question, 2026-08-17), so "no rum tonight" does not drop a drink whose only
-  rum is a little of it (Ginger Snap, Accoutrement). The same shape as Strega
+  rum is a little of it (Accoutrement). The same shape as Strega
   and Bénédictine.
 - **2026-09-05, #314 — `navy`, `overproof navy` and `black` are not rum
   categories and are retired for good.** Helen: *"there is no such thing as
