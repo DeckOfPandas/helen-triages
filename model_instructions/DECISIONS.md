@@ -1497,6 +1497,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   tickboxes"*. "On" is the raw hot pink, not the darkened link pink, by
   choice: *"I know it doesn't pass contrast tests, but this is an exception I
   choose."* Off by default and never remembered, as make it is (§9).
+- **2026-11-12 — a recipe written in imperial measures has an IMPERIAL /
+  METRIC switch under INGREDIENTS, imperial by default.** Helen: *"Please add
+  a second toggle, only to recipes that use imperial units, to switch between:
+  imperial [toggle] metric, where imperial is the default. I cook in oz, but
+  shop in g!"* Metric is the shopping list's own conversion (#1462 D2), so the
+  page and the list agree. Ounces, pounds, fluid ounces and pints put the
+  switch on a recipe; a cup or an inch alone does not, though it converts with
+  the rest. Not remembered, as the tick boxes are not: both choices are a
+  session's.
 - **2026-10-09, #1297 — the shopping list reads the zest and the juice of one
   lemon as one lemon.** Helen: *'I would like to cleverly combine e.g. "zest
   of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the shopping list.'*
@@ -1606,7 +1615,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   metric.** Asked about ounces and cups on the list (36 lines, 14 recipes),
   Helen: *"Convert to metric for the shopping list please."* Ounces and pounds
   become grams, fluid ounces, pints and cups millilitres, inches centimetres.
-  The recipe page keeps the unit the recipe was written in.
+  The recipe page keeps the unit the recipe was written in, until the reader
+  turns its METRIC switch on (2026-11-12, below).
 - **2026-11-03, #1462 D3 — how full a spoon is does not split a row, and a can
   is a tin.** Helen: *"Yes ignore rounded, heaped etc. Cans and tins are one
   word (tins)."* So `heaped tbsp` totals with `tbsp`; "400 g can" is one

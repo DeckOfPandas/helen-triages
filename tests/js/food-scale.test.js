@@ -816,6 +816,35 @@ test('#1286: Delia\'s pancakes -- "about 8 pancakes" is 8 pancakes, then 16', ()
   assert.strictEqual(reads(mode, press(mode, 8, 1, 2)), '24 pancakes');
 });
 
+test('metric: imperial measures print as the shopping list totals them', () => {
+  const metric = { metric: true };
+  assert.strictEqual(at('4 oz', 1, metric), '113 g');
+  assert.strictEqual(at('½ lb', 1, metric), '227 g');
+  assert.strictEqual(at('½ pint', 1, metric), '284 ml');
+  assert.strictEqual(at('3 fl oz', 1, metric), '85 ml');
+  assert.strictEqual(at('~8 oz', 1, metric), '~227 g');
+  // Scaled first, then converted: 4 oz for twice as many.
+  assert.strictEqual(at('4 oz', 2, metric), '227 g');
+  // Off, the unit stays as written.
+  assert.strictEqual(at('4 oz', 2), '8 oz');
+  // Metric measures and spoons are untouched by it.
+  assert.strictEqual(at('2 tbsp', 1, metric), '2 tbsp');
+  assert.strictEqual(at('200 g', 1, metric), '200 g');
+});
+
+test('metric: which amounts are imperial, and which the switch rewrites', () => {
+  const { isImperial, hasMetric } = foodScale;
+  ['4 oz', '½ lb', '3 fl oz', '½ pint', '2 pints'].forEach((a) =>
+    assert.strictEqual(isImperial(a), true, a));
+  // A cup or an inch alone does not put the switch on a recipe...
+  ['1 cup', '2 inches', '200 g', '2 tbsp', 'pinch', ''].forEach((a) =>
+    assert.strictEqual(isImperial(a), false, a));
+  // ...but is converted with the rest when it is on.
+  assert.strictEqual(hasMetric('1 cup'), true);
+  assert.strictEqual(hasMetric('2 tbsp'), false);
+  assert.strictEqual(hasMetric('1 tbsp (1 oz)'), true);
+});
+
 test('#1286: a reading the box cannot use gives no mode at all', () => {
   // recipe-scale.js leaves the control hidden rather than show one that
   // cannot work.

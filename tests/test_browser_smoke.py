@@ -20,6 +20,7 @@ import functools
 import http.server
 import os
 import pathlib
+import re
 import threading
 import urllib.parse
 
@@ -468,4 +469,63 @@ def test_tick_boxes_appear_beside_the_lines_and_move_none(chromium, visit, prod_
     v.page.locator(".ingredients li.ingredient").first.click(position={"x": 5, "y": 5})
     assert v.page.locator(".ingredients li.ingredient.is-ticked").count() == 1, (
         f"{url}: tapping the first line did not tick it")
+    assert not v.errors, f"{url}: " + "\n  ".join(v.errors)
+
+
+# --- The IMPERIAL / METRIC switch (MANUAL §8.2) ------------------------------
+
+AMOUNTS = """() => [...document.querySelectorAll('.ingredient-amount-number')]
+  .map(s => s.textContent.trim())"""
+
+IMPERIAL_AMOUNT = re.compile(r"\d\s*(oz|lb|fl oz|pints?)$")
+
+
+def _recipe_page_by_imperial(prod_site, imperial):
+    """A published, scalable recipe with an amount in ounces (or not)."""
+    for path in sorted(prod_site.glob("food/recipes/*/index.html")):
+        text = path.read_text(encoding="utf-8")
+        if "recipe-scale-portions" not in text:
+            continue
+        if bool(re.search(r"\d (oz|lb)\s*</span>", text)) == imperial:
+            return "/" + str(path.parent.relative_to(prod_site)) + "/"
+    raise AssertionError(f"no recipe built with imperial={imperial}")
+
+
+@pytest.mark.parametrize("width", sorted(VIEWPORTS))
+def test_metric_switch_converts_the_imperial_amounts_and_back(chromium, visit, prod_site, width):
+    """Helen: "imperial [toggle] metric, where imperial is the default. I cook
+    in oz, but shop in g!" Metric holds when the recipe is scaled, and switching
+    back puts the recipe's own words back."""
+    url = _recipe_page_by_imperial(prod_site, True)
+    v = visit(url, width)
+    v.page.wait_for_load_state("networkidle")
+    _settle(v.page)
+    switch = v.page.locator(".ingredient-units")
+    assert switch.get_attribute("aria-checked") == "false"
+    written = v.page.evaluate(AMOUNTS)
+    assert any(IMPERIAL_AMOUNT.search(a) for a in written), f"{url}: {written}"
+
+    switch.click()
+    assert switch.get_attribute("aria-checked") == "true"
+    metric = v.page.evaluate(AMOUNTS)
+    left = [a for a in metric if IMPERIAL_AMOUNT.search(a)]
+    assert not left, f"{url}: still imperial with metric on: {left}"
+
+    v.page.locator(".recipe-scale-plus").click()
+    scaled = v.page.evaluate(AMOUNTS)
+    assert not [a for a in scaled if IMPERIAL_AMOUNT.search(a)], f"{url}: {scaled}"
+    assert scaled != metric, f"{url}: scaling did nothing with metric on"
+    v.page.locator(".recipe-scale-minus").click()
+
+    switch.click()
+    assert v.page.evaluate(AMOUNTS) == written, f"{url}: switching back is not as written"
+    assert v.overflow() is None, f"{url} at {width}px scrolls sideways"
+    assert not v.errors, f"{url}: " + "\n  ".join(v.errors)
+
+
+def test_metric_switch_is_only_on_imperial_recipes(chromium, visit, prod_site):
+    url = _recipe_page_by_imperial(prod_site, False)
+    v = visit(url)
+    v.page.wait_for_load_state("networkidle")
+    assert v.page.locator(".ingredient-units").count() == 0, f"{url} has the switch"
     assert not v.errors, f"{url}: " + "\n  ".join(v.errors)

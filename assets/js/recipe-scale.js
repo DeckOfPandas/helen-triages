@@ -3,8 +3,8 @@
 // in tests/js/food-scale.test.js; this file holds none of it.
 //
 // The written amounts are stashed on first run and every redraw scales from
-// those; scaling the displayed text would compound. At the recipe's own count
-// the original text goes back byte for byte, not a re-rendering of it.
+// those; scaling the displayed text would compound. At the recipe's own count,
+// metric switch off, the original text goes back byte for byte.
 //
 // `.ingredient-amount-number` holds a decoration slot and then the amount as
 // text. Only the text nodes are read and replaced.
@@ -26,16 +26,19 @@
   var minus = control && control.querySelector('.recipe-scale-minus');
   var plus = control && control.querySelector('.recipe-scale-plus');
   var note = article.querySelector('.recipe-scale-note');
-  if (!control || !input || !minus || !plus || !note) return;
+  var whole = !!(control && input && minus && plus && note);
 
   /* Portions, or the thing made (#1286). A `makes:` recipe's input carries
      `data-made`, the build's reading of that line as JSON, and the box then
      counts the thing made, never portions. What differs between the two is
      the MODE, which is HTF.foodScale's. A `data-made` that cannot be read
-     leaves the control hidden. */
-  var word = control.querySelector('.recipe-scale-word');
+     leaves the control hidden; a recipe with no control still gets the
+     metric switch, at its own amounts. */
+  var word = whole ? control.querySelector('.recipe-scale-word') : null;
   var mode = null;
-  if (input.hasAttribute('data-made')) {
+  if (!whole) {
+    mode = null;
+  } else if (input.hasAttribute('data-made')) {
     try {
       mode = HTF.foodScale.yieldMode(
         JSON.parse(input.getAttribute('data-made')),
@@ -47,8 +50,7 @@
     var people = parseInt(input.getAttribute('data-portions'), 10);
     if (people > 0) mode = HTF.foodScale.portionsMode(people);
   }
-  if (!mode) return;
-  var base = mode.base;
+  var base = mode ? mode.base : 1;
 
   var spans = Array.prototype.slice.call(
     article.querySelectorAll('.ingredient-amount-number')
@@ -75,10 +77,14 @@
 
   var original = spans.map(textOf);
 
+  /* Imperial measures in grams and millilitres (MANUAL §8.2), set by
+     ingredient-units.js through HTF.recipeScale. Off: as written. */
+  var metric = false;
+
   /* The word lists are the build's: _layouts/recipe.html joins each with `|`
      onto the control. Absent, a list is empty. */
   function listFrom(attribute) {
-    return (control.getAttribute(attribute) || '').split('|')
+    return ((control && control.getAttribute(attribute)) || '').split('|')
       .map(function (word) { return word.trim(); })
       .filter(function (word) { return word !== ''; });
   }
@@ -97,7 +103,7 @@
      has no such node and is left alone. */
   var singulars = {};
   try {
-    singulars = JSON.parse(control.getAttribute('data-singulars') || '{}') || {};
+    singulars = JSON.parse((control && control.getAttribute('data-singulars')) || '{}') || {};
   } catch (e) {
     singulars = {};
   }
@@ -171,18 +177,22 @@
   }
 
   function apply(wanted) {
-    var n = mode.clamp(wanted);
+    var n = mode ? mode.clamp(wanted) : base;
     var factor = n / base;
     var still = [];
+    var options = { halfStep: words.halfStep, quarterStep: words.quarterStep,
+      trailing: words.trailing, metric: metric };
 
     spans.forEach(function (span, index) {
       var item = items[index];
       if (item.node) item.node.nodeValue = item.written;
       if (n === base) {
-        write(span, original[index]);
+        write(span, metric && HTF.foodScale.hasMetric(original[index])
+          ? HTF.foodScale.scaleAmount(original[index], 1, options).text
+          : original[index]);
         return;
       }
-      var result = HTF.foodScale.scaleAmount(original[index], factor, words);
+      var result = HTF.foodScale.scaleAmount(original[index], factor, options);
       write(span, result.text);
       if (result.one && item.node) {
         item.node.nodeValue = HTF.foodScale.singularItem(item.written, singulars);
@@ -212,6 +222,7 @@
     });
 
     last = n;
+    if (!mode) return;
     put(input, mode.box(n));
     /* The word after the box agrees with the number in it -- "1 waffle",
        "2 × 8-inch cakes", "2 litres". Portions returns null: that word is the
@@ -251,6 +262,15 @@
     return function () { apply(mode.step(last, delta)); };
   }
 
+  HTF.recipeScale = {
+    imperial: original.some(HTF.foodScale.isImperial),
+    setMetric: function (on) {
+      metric = !!on;
+      apply(last);
+    }
+  };
+
+  if (!mode) return;
   input.value = mode.box(base);
   control.hidden = false;
 

@@ -16,12 +16,15 @@
   var rows = article ? article.querySelectorAll('.ingredients li.ingredient') : [];
   if (!section || !rows.length) return;
 
-  var bar = document.createElement('div');
-  bar.className = 'ingredient-ticks';
+  // A row it shares with the metric switch (ingredient-units.js).
+  var bar = section.querySelector('.ingredient-switches');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.className = 'ingredient-switches';
+  }
   var button = document.createElement('button');
   button.type = 'button';
   button.className = 'ingredient-ticks-pill';
-  bar.appendChild(button);
 
   var on = false;
 
@@ -60,5 +63,6 @@
   button.addEventListener('click', function () { set(!on); });
 
   set(false);
-  section.appendChild(bar);
+  bar.insertBefore(button, bar.firstChild);
+  if (!bar.parentNode) section.appendChild(bar);
 })();

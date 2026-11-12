@@ -32,7 +32,42 @@
   var parenText = foodShoppingList.parenText;
   // The same unit fold and size words the shopping list applies.
   var CANONICAL = foodShoppingList.CANONICAL;
+  var METRIC = foodShoppingList.METRIC;
   var SIZE_UNITS = foodShoppingList.SIZE_UNITS;
+
+  /* With `metric`, imperial measures fold to grams, millilitres and
+     centimetres by the shopping list's own table, so the page and the list
+     give the same figure. */
+  function foldFor(unit, metric) {
+    return CANONICAL[unit] || (metric ? METRIC[unit] : undefined);
+  }
+
+  /* The imperial weights and volumes that put the IMPERIAL / METRIC switch on
+     a recipe (MANUAL §8.2). A cup or an inch alone does not: they are measures a
+     British cook does not weigh. */
+  var IMPERIAL = { oz: true, lb: true, 'fl oz': true, pint: true };
+
+  function unitOf(amount) {
+    var parsed = parseAmount(String(amount === undefined || amount === null ? '' : amount));
+    if (!parsed) return null;
+    var split = splitParenthetical(parsed.unit);
+    return split.lo === undefined ? parsed.unit : split.unit;
+  }
+
+  function isImperial(amount) {
+    return IMPERIAL[unitOf(amount)] === true;
+  }
+
+  /* Whether the metric switch rewrites this amount: its own unit or its
+     bracket's is in METRIC. */
+  function hasMetric(amount) {
+    var unit = unitOf(amount);
+    if (unit === null) return false;
+    if (METRIC[unit]) return true;
+    var parsed = parseAmount(String(amount));
+    var split = splitParenthetical(parsed.unit);
+    return split.lo !== undefined && !!METRIC[split.unit2];
+  }
 
   /* A measure taken by hand or eye scales to the nearest half, never less
      than a half (#1125): 1 pinch ×3 is 3, ×1.5 is 1½, ×2/3 is ½. Which
@@ -151,8 +186,8 @@
 
   /* The bracket that restates an amount, scaled by the same factor:
      "(about 25 g)" x½ is "(about 12.5 g)". */
-  function scaledParen(split, factor) {
-    var pcanon = CANONICAL[split.unit2];
+  function scaledParen(split, factor, metric) {
+    var pcanon = foldFor(split.unit2, metric);
     var pf = pcanon ? pcanon.factor : 1;
     var paren = {
       unit: pcanon ? pcanon.unit : split.unit2,
@@ -166,8 +201,9 @@
   /**
    * @param {string} amount - as the recipe wrote it: "200 g", "30–50 g", "2 large"
    * @param {number} factor - portions wanted over portions the recipe makes
-   * @param {{halfStep?: string[], quarterStep?: string[]}} [options] - the
-   *        `half_step_measures` and `quarter_step_measures` of scaling.yml
+   * @param {{halfStep?: string[], quarterStep?: string[], metric?: boolean}}
+   *        [options] - the `half_step_measures` and `quarter_step_measures` of
+   *        scaling.yml; `metric` prints imperial measures in metric
    * @returns {{text: string, scaled: boolean}} an amount with no count in it
    *        comes back as written with `scaled: false`
    */
@@ -184,7 +220,8 @@
 
     var split = splitParenthetical(parsed.unit);
     var unitWritten = split.lo === undefined ? parsed.unit : split.unit;
-    var paren = split.lo === undefined ? null : scaledParen(split, factor);
+    var metric = !!(options && options.metric);
+    var paren = split.lo === undefined ? null : scaledParen(split, factor, metric);
 
     /* A stepped measure is matched on the unit without its bracket, and the
        bracket is scaled exactly beside it: "1 bunch (25 g)" halves to
@@ -198,7 +235,7 @@
       if (paren) stepped.text += ' ' + parenText(paren);
       return stepped;
     }
-    var canon = CANONICAL[unitWritten];
+    var canon = foldFor(unitWritten, metric);
     var unit = canon ? canon.unit : unitWritten;
     var f = canon ? canon.factor : 1;
 
@@ -452,6 +489,8 @@
 
   return {
     scaleAmount: scaleAmount,
+    isImperial: isImperial,
+    hasMetric: hasMetric,
     scaleLeadingMeasure: scaleLeadingMeasure,
     noteName: noteName,
     singularItem: singularItem,

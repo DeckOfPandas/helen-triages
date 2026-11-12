@@ -1290,11 +1290,20 @@ The rulings behind every rule here are in DECISIONS §8.2.
 | `assets/js/food-scale.js` | one amount at a factor, and the scaler's stepping modes. Pure |
 | `assets/js/recipe-scale.js` | the recipe page's DOM half |
 | `assets/js/ingredient-ticks.js`, `_sass/food/_ingredient-ticks.scss` | the recipe page's TICK BOXES OFF / ON button and a box per ingredient line, hung left of the line so none moves (#1504) |
+| `assets/js/ingredient-units.js`, `_sass/food/_ingredient-units.scss` | the IMPERIAL / METRIC switch, on a recipe with an amount in `oz`, `lb`, `fl oz` or `pint` (`isImperial` in `food-scale.js`) |
 | `assets/js/filters.js` | the shopping list's DOM half: the rows, their words, the painting |
 
 A tick box is the first child of its `<li>`, and `recipe-scale.js` steps over
 `.ingredient-tick` when it looks for a line's text, so the two work together.
 `tests/test_browser_smoke.py` holds the boxes to moving no line.
+
+The button and the metric switch share one row, `.ingredient-switches`,
+which whichever script runs first makes. The switch converts nothing itself:
+it calls `HTF.recipeScale.setMetric`, and `recipe-scale.js` redraws every
+amount with `scaleAmount(..., {metric: true})`, so metric holds at any scale
+and switching back restores the recipe's own text. A recipe with no scaler
+(no `serves:` or `makes:`) still gets the switch, at its own amounts.
+Imperial is the default and nothing is remembered.
 
 The two Ruby readers have no Jekyll in them, so `scripts/food_yield.rb` can
 run them and `tests/test_food_yield.py` checks every shape without a build.
@@ -1438,8 +1447,9 @@ recipe's scale: portions wanted over portions made, or the batch count.
   more is shown in the bigger unit. On the shopping list only, imperial
   measures fold too (`METRIC`, DECISIONS §8.2): `oz` and `lb` to grams,
   `fl oz`, `pint` (British, 568 ml) and `cup` (American, 240 ml) to
-  millilitres, `inch` to centimetres. The recipe page shares `CANONICAL`,
-  never `METRIC`, so a recipe keeps the unit it was written in. Spoons, counts
+  millilitres, `inch` to centimetres. The recipe page folds by `METRIC` only
+  while its METRIC switch is on, so by default a recipe keeps the unit it was
+  written in. Spoons, counts
   and measures by eye are never converted: two units of one ingredient print
   as `2 sprigs + 10 g`.
 - **One spelling per unit on the list** (`shoppingUnit`): a spoon's fullness

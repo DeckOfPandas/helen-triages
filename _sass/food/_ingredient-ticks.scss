@@ -12,9 +12,14 @@
 // (shared/_rule.scss), so the two cannot drift.
 $tick-on: $color-dazzling-dragonfruit;
 
-// Pulled up into the heading row's bottom margin, so the button belongs to
-// the heading above it rather than to the first group.
-.ingredient-ticks {
+// The row under INGREDIENTS that holds this button and the metric switch
+// (_ingredient-units.scss). Pulled up into the heading row's bottom margin,
+// so it belongs to the heading above it rather than to the first group.
+.ingredient-switches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: $space-xl;
   margin: (-$space-xl) 0 $space-lg;
 }
 
@@ -88,6 +93,6 @@ $tick-on: $color-dazzling-dragonfruit;
 }
 
 @media print {
-  .ingredient-ticks,
+  .ingredient-switches,
   .ingredient-tick { display: none !important; }
 }
