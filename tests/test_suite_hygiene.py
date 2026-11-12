@@ -135,6 +135,8 @@ SKIPS_WITHOUT_DRAFTS = {
 # other half would be a bad trade. Each says so in its own docstring.
 PARTIAL_IN_CI = {
     "test_no_main_ingredient_spelling_collisions",
+    "test_main_ingredients_use_the_lists_own_number",
+    "test_no_ingredient_is_two_chips_by_number",
     "test_no_recipe_uses_the_retired_instructions_field",
     # Reads the published half from this repo's history and the draft half from
     # _food_drafts/'s own. In CI it checks the recipes and none of the drafts,

@@ -357,6 +357,190 @@ def test_no_main_ingredient_spelling_collisions():
     )
 
 
+# --- singular and plural: the list's own word, one chip (DECISIONS §6) -------
+
+def _number_twins(word: str) -> set[str]:
+    """The other-number spellings of `word`: lime/limes, leaf/leaves."""
+    w = word.lower()
+    out = {w + "s", w + "es"}
+    if w.endswith("ies"):
+        out |= {w[:-3] + "y", w[:-2]}
+    if w.endswith("ves"):
+        out.add(w[:-3] + "f")
+    if w.endswith("es"):
+        out.add(w[:-2])
+    if w.endswith("s"):
+        out.add(w[:-1])
+    if w.endswith("y"):
+        out.add(w[:-1] + "ies")
+    if w.endswith("f"):
+        out.add(w[:-1] + "ves")
+    return out - {w}
+
+
+def _phrase_in(text: str, phrase: str) -> bool:
+    return re.search(rf"(?<![\w-]){re.escape(phrase)}(?![\w-])", text) is not None
+
+
+def main_ingredients_off_the_list(fm) -> list[tuple[str, str]]:
+    """`[(entry, the list's word)]` for an entry the ingredient list writes in
+    the other number: `lime` beside "2 limes, juiced". An entry found anywhere
+    in a line passes; the other number must end a line's name, before its first
+    comma, so "walnut halves" leaves `walnuts` alone.
+    Whole eggs follow the count instead (`test_main_ingredients_egg_count_agrees`).
+    """
+    names, lines = [], []
+    for group in fm.get("ingredient_groups") or []:
+        for it in group.get("items") or []:
+            if isinstance(it, dict):
+                text = re.sub(r"^QQ\s+", "", str(it.get("item", "")))
+                lines.append(text.lower())
+                names.append(re.sub(r"\([^)]*\)", " ", text).split(",")[0].strip().lower())
+    out = []
+    for entry in (str(m) for m in fm.get("main_ingredients") or []):
+        low = entry.lower()
+        if re.fullmatch(r"eggs?", low) or any(_phrase_in(n, low) for n in lines):
+            continue
+        for twin in sorted(_number_twins(low)):
+            if any(re.search(rf"(?<![\w-]){re.escape(twin)}$", n) for n in names):
+                out.append((entry, twin))
+                break
+    return out
+
+
+@pytest.mark.parametrize("main,items,want", [
+    (["lime"], ["limes, juiced"], [("lime", "limes")]),
+    (["bay leaves"], ["bay leaf"], [("bay leaves", "bay leaf")]),
+    (["red chilli"], ["juice of 2 limes", "red chillies"], [("red chilli", "red chillies")]),
+    (["limes"], ["juice of 2 limes"], []),
+    (["walnuts"], ["walnut halves"], []),
+    (["anchovies"], ["salted anchovy fillets, chopped"], []),
+    (["eggs"], ["egg"], []),
+    (["egg yolks"], ["egg yolk, plus 2 egg yolks for glazing"], []),
+    (["egg yolks"], ["egg yolk"], [("egg yolks", "egg yolk")]),
+])
+def test_main_ingredients_off_the_list_on_fixtures(main, items, want):
+    fm = {"main_ingredients": main,
+          "ingredient_groups": [{"items": [{"item": i} for i in items]}]}
+    assert main_ingredients_off_the_list(fm) == want
+
+
+def test_main_ingredients_use_the_lists_own_number():
+    """An entry is written as the ingredient list writes it (DECISIONS §6).
+    Recipes, drafts and the magic bag, like the collision check above, and
+    partial in CI the same way."""
+    from conftest import ALL_DRAFTS, ALL_MAGIC_BAG
+
+    assert ALL_RECIPES, "No published recipes loaded, so this checked nothing."
+    bad = [f"{r.slug}: {e!r} -> {t!r}"
+           for r in ALL_RECIPES + ALL_DRAFTS + ALL_MAGIC_BAG
+           for e, t in main_ingredients_off_the_list(r.fm)]
+    assert not bad, (
+        "main_ingredients entries in the other number from their own "
+        "ingredient list:\n  " + "\n  ".join(bad)
+        + "\n\nWrite the list's word. The picker merges the two numbers into "
+          "one chip through `aliases` in _data/food/ingredient_words.yml."
+    )
+
+
+def _picker_words() -> dict:
+    path = ROOT / "_data" / "food" / "ingredient_words.yml"
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def _chips(entry: str, words: dict) -> list[str]:
+    """The include picker's chip(s) for one entry: leading modifiers stripped,
+    then one alias hop, as `normaliseEntry` and `applyAlias` do in
+    assets/js/ingredient-search.js. Entries carry no quantity or measure."""
+    mods = {_fold(m) for m in words.get("modifiers") or []}
+    parts = entry.split()
+    while len(parts) > 1 and _fold(parts[0]) in mods:
+        parts = parts[1:]
+    stripped = " ".join(parts)
+    aliases = {_fold(k): v for k, v in (words.get("aliases") or {}).items()}
+    target = aliases.get(_fold(stripped), stripped)
+    return [str(t) for t in (target if isinstance(target, list) else [target])]
+
+
+def _singular_key(chip: str, words: dict) -> str:
+    sing = {_fold(k): _fold(v) for k, v in (words.get("singulars") or {}).items()}
+    out = []
+    for w in _fold(chip).split():
+        if w in sing:
+            w = sing[w]
+        elif w.endswith("ies") and len(w) > 4:
+            w = w[:-3] + "y"
+        elif re.search(r"(ch|sh|x|o)es$", w):
+            w = w[:-2]
+        elif len(w) > 3 and w.endswith("s") and not w.endswith("ss"):
+            w = w[:-1]
+        out.append(w)
+    return " ".join(out)
+
+
+def number_split_chips(entries: list[str], words: dict) -> list[list[str]]:
+    """Groups of two or more chips that differ only by number or case."""
+    from collections import defaultdict
+    groups = defaultdict(set)
+    for entry in entries:
+        for chip in _chips(entry, words):
+            groups[_singular_key(chip, words)].add(chip)
+    return sorted(sorted(g) for g in groups.values() if len(g) > 1)
+
+
+def test_number_split_chips_on_fixtures():
+    words = {"modifiers": ["fresh"], "singulars": {"leaves": "leaf"},
+             "aliases": {"limes": "lime"}}
+    assert number_split_chips(["bay leaves", "bay leaf"], words) == [["bay leaf", "bay leaves"]]
+    assert number_split_chips(["fresh pears", "pear"], words) == [["pear", "pears"]]
+    assert number_split_chips(["limes", "lime", "fresh lime"], words) == []
+    assert number_split_chips(["Little Gem lettuce", "little gem lettuce"], words)
+
+
+def test_no_ingredient_is_two_chips_by_number():
+    """`lime` and `limes` are one chip: the plural is aliased to the singular
+    (Singular wins). Corpus-wide like the collision check above, and partial
+    in CI the same way."""
+    from conftest import ALL_DRAFTS, ALL_MAGIC_BAG
+
+    words = _picker_words()
+    entries = [str(e) for r in ALL_RECIPES + ALL_DRAFTS + ALL_MAGIC_BAG
+               for e in r.fm.get("main_ingredients") or []]
+    assert entries, "No main_ingredients loaded, so this checked nothing."
+    split = number_split_chips(entries, words)
+    assert not split, (
+        "The ingredient picker shows these as separate chips:\n  "
+        + "\n  ".join(" / ".join(g) for g in split)
+        + "\n\nAlias the plural to the singular in `aliases` in "
+          "_data/food/ingredient_words.yml. Leave the recipes as their lists "
+          "write them."
+    )
+
+
+def test_a_number_alias_still_matches_its_plural_recipes():
+    """The include side matches a chip against each row's RAW entries, by word
+    prefix after `singulars` (#762), so `bay leaf` finds "bay leaves" only
+    because `leaves: leaf` is a singular. A plural alias whose singular is not
+    a prefix of it would build a chip that misses half its recipes."""
+    words = _picker_words()
+    sing = {_fold(k): _fold(v) for k, v in (words.get("singulars") or {}).items()}
+
+    def norm(text):
+        return [sing.get(w, w) for w in _fold(text).split()]
+
+    bad = []
+    for key, target in (words.get("aliases") or {}).items():
+        if isinstance(target, list) or _singular_key(key, words) != _singular_key(str(target), words):
+            continue
+        if not all(any(ew.startswith(kw) for ew in norm(key)) for kw in norm(str(target))):
+            bad.append(f"{key} -> {target}")
+    assert not bad, (
+        "These plural aliases make a chip that does not match the plural "
+        "entries it absorbs:\n  " + "\n  ".join(bad)
+        + "\nAdd the plural word to `singulars` in _data/food/ingredient_words.yml."
+    )
+
+
 def test_incidental_not_in_main_ingredients(recipe):
     """An item marked `incidental: true` (MANUAL §4) is a cooking fluid or
     tin-and-pan fat, not a recipe component, so it is not also listed in

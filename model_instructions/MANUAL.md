@@ -618,6 +618,7 @@ checked.
 | `meta:` is `rewritten`, `awaiting_fix`, `proofread`, in that order, real booleans, nothing else | `test_meta_block_is_exactly_the_three_flags_in_order` |
 | A draft's `meta:` sits directly under `title:`; `tidy_drafts.py --site food --only order --apply` moves it | `test_meta_sits_directly_under_the_title` (`tests/test_drafts.py`) |
 | A draft's `main_ingredients` name its herbs (bay included), citrus, cream and wine, and a bake's flour, butter, eggs and sugar, bar garnishes, washes, options and alternatives (DECISIONS §6) | `test_main_ingredients_name_what_the_dish_tastes_of` (`tests/test_drafts.py`) |
+| A `main_ingredients` entry is singular or plural as its ingredient list is, and every plural has an alias making it one chip with its singular (§6) | `test_main_ingredients_use_the_lists_own_number`, `test_no_ingredient_is_two_chips_by_number` (`tests/test_taxonomy.py`) |
 | Citrus is "¼ lemon, juiced", never "a squeeze" | `test_citrus_is_measured_not_squeezed` (`tests/test_style.py`) |
 | Retired keys stay retired | `RETIRED`, which says what replaced each |
 | `serves:` opens with a number, or `makes:` with a count `food_yield.rb` reads (a draft's `QQ` excepted) | `tests/test_food_shopping.py` |
@@ -1067,6 +1068,13 @@ Cheeses use the bare name where it stands alone (cheddar, feta, comté); keep
 cream cheese). Butter is `butter` in a draft, where a `QQ butter` line still
 earns it, and `salted butter` or `unsalted butter` in a published recipe. Lowercase; `test_no_main_ingredient_spelling_collisions`
 enforces consistent spelling across recipes and drafts.
+
+**Singular or plural is the ingredient list's**: `limes` beside "2 limes,
+juiced", `bay leaf` beside one bay leaf, and whole eggs by the count
+(`test_main_ingredients_use_the_lists_own_number`). The picker shows the two
+numbers as one chip, the singular, through a plural alias in
+`_data/food/ingredient_words.yml`; `test_no_ingredient_is_two_chips_by_number`
+names one that is missing. Both run across recipes, drafts and the magic bag.
 
 ---
 

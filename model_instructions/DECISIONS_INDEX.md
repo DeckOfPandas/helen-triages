@@ -165,6 +165,7 @@ argument and the rules each field is read by.
 - 2026-10-21 · §6 · a bake lists its flour, butter, eggs and sugar, and a savoury dish lists the herbs, citrus, cream or wine it tastes of.
 - 2026-10-22 · §6 · a draft's main_ingredients says butter, and a QQ butter line still earns it; a published recipe's says salted butter or unsalted butter.
 - 2026-10-30 · §6 · bay leaves are a herb, and every citrus line is listed, a quarter lemon in a glaze included; a draft test holds §6.
+- 2026-11-12 · §6 · an entry is written in the number its ingredient list uses, and the picker merges the two numbers into one chip.
 - 2026-08-01 · §7 · "declared" and "filterable" are the same thing: a tag shown on the page with no filter button was proposed and rejected.
 - 2026-08-02 · §7 · one-pot and scalable are retired, freezable is kept, and breakfast, extras, festive and starter are practicalities, not moods.
 - 2026-08-09 · §7 · something unusual is retired — Culturally relative, not a real craving, and barely used.
