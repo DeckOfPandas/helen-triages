@@ -1490,6 +1490,19 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   "batches" as well as portions, which suggests it isn't doing anything
   useful."* It could only ever set the portions rows. Each recipe keeps its
   own box. The cocktails list keeps its "set all", having no batches.
+- **2026-11-12, #1472 — a stock line's hint says how much of each product
+  makes its volume of water, for all six brands, behind a tap.** Helen: *"I
+  would actually like this the other way round if possible -- where a recipe
+  wants 500 ml stock, I'd like to know how many cubes/tsp to add to 500 ml
+  water. And please include Marigold Bouillon powder too."* Bay's Kitchen and
+  M&S concentrate were hers from the issue. Asked which to name, she chose
+  all six (Kallo, Knorr cube and pot, Oxo, Marigold, Bay's Kitchen, M&S); asked
+  where, *"Behind a tap"*.
+- **2026-11-12, #1498 — a ground spice's hint gives its weight to grind your
+  own, not a count of seeds, sticks or pods.** Helen: *"Default to weight
+  instead of seeds, sticks and pods. Take classic figures for fresh ginger."*
+  So ginger also gives 1 tbsp grated fresh per ¼ tsp ground. Nutmeg also
+  says how much of a nutmeg, the "about half" of her issue comment.
 - **2026-10-09, #1297 — the shopping list reads the zest and the juice of one
   lemon as one lemon.** Helen: *'I would like to cleverly combine e.g. "zest
   of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the shopping list.'*

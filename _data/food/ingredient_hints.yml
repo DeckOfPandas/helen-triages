@@ -1,0 +1,117 @@
+# The tap-to-open hints on a recipe's ingredient lines: how much stock
+# product makes a line's stock, and what a ground spice weighs. Read by
+# assets/js/food-hints.js. Stock figures are the packets' own; each product's
+# source is in MANUAL §8.2.
+
+# --- Stock (#1472) -----------------------------------------------------------
+# A line whose item says "stock" and whose amount is a volume gets the hint:
+# for that much boiling water, how much of each product. `water_ml` is the
+# water one `unit` of the product makes; `flavours` are the stocks it comes
+# as. A line naming no flavour lists every product at its first flavour.
+# A line naming a flavour no product here comes in (lamb, ham) gets none.
+stock:
+  flavours: [chicken, vegetable, beef, fish]
+  # Words that name a stock this list cannot make: no hint.
+  other_flavours: [lamb, ham, pork, duck, turkey, game, venison, veal, dashi, mushroom]
+  # Words that mean the line is the product, not the stock.
+  not_stock: [stock cube, stock cubes, stock pot, stock pots, stockpot, stock powder]
+  products:
+    - name: Kallo
+      unit: cube
+      flavours: { chicken: 500, vegetable: 500, beef: 500 }
+    - name: Knorr
+      unit: cube
+      flavours: { chicken: 450, vegetable: 450, beef: 450, fish: 450 }
+    - name: Knorr
+      unit: Stock Pot
+      flavours: { chicken: 500, vegetable: 500, beef: 500, fish: 500 }
+    - name: Oxo
+      unit: cube
+      flavours: { chicken: 190, vegetable: 190, beef: 190 }
+    # Vegetable bouillon, shown for chicken and beef too: it stands in for
+    # either, and Helen asked for it by name.
+    - name: Marigold bouillon
+      unit: level tsp
+      flavours: { vegetable: 250, chicken: 250, beef: 250 }
+    - name: Bay's Kitchen
+      unit: tbsp
+      flavours: { chicken: 100, vegetable: 100, beef: 100 }
+    - name: M&S concentrate
+      unit: tsp
+      flavours: { chicken: 142, beef: 114 }
+
+# --- Ground spices (#1498) ---------------------------------------------------
+# A line of a ground spice in tsp or tbsp gets its weight, so whole spice can
+# be weighed out and ground: Helen chose weight over seeds, sticks and pods.
+# `match` are the item's words for the GROUND spice; `unless`
+# are words that make it some other form. `g_per_tsp` is USDA FoodData
+# Central's level teaspoon. `whole` names what to grind. `fresh_tbsp_per_tsp`
+# (ginger only) is the classic 1 tbsp grated fresh per ¼ tsp ground;
+# `per_whole_tsp` (nutmeg only) is the teaspoons one whole nutmeg grates to.
+spices:
+  - name: cinnamon
+    match: [ground cinnamon, cinnamon powder, cinnamon]
+    unless: [stick, sticks, bark, quill, whole]
+    g_per_tsp: 2.6
+    whole: cinnamon stick
+  - name: cumin
+    match: [ground cumin, cumin powder]
+    unless: [seed, seeds, whole]
+    g_per_tsp: 2.1
+    whole: cumin seeds
+  - name: coriander
+    match: [ground coriander, coriander powder]
+    unless: [seed, seeds, whole, leaf, leaves, fresh]
+    g_per_tsp: 1.8
+    whole: coriander seeds
+  - name: ginger
+    match: [ground ginger, dried ginger, ginger powder, ginger]
+    unless: [fresh, grated, root, stem, crystallised, preserved, piece, knob, thumb, nuts, paste, minced, chopped, sliced, julienned, pickled]
+    g_per_tsp: 1.8
+    fresh_tbsp_per_tsp: 4
+  - name: nutmeg
+    match: [ground nutmeg, grated nutmeg, nutmeg]
+    unless: [whole]
+    g_per_tsp: 2.2
+    whole: whole nutmeg
+    per_whole_tsp: 2.5
+  - name: cloves
+    match: [ground cloves, ground clove, clove powder]
+    unless: [whole, garlic]
+    g_per_tsp: 2.1
+    whole: whole cloves
+  - name: allspice
+    match: [ground allspice, allspice]
+    unless: [berries, berry, whole]
+    g_per_tsp: 1.9
+    whole: allspice berries
+  - name: cardamom
+    match: [ground cardamom, cardamom powder]
+    unless: [pod, pods, seed, seeds, whole]
+    g_per_tsp: 2.0
+    whole: cardamom seeds, out of their pods
+  - name: black pepper
+    match: [ground black pepper]
+    unless: [whole, peppercorns]
+    g_per_tsp: 2.3
+    whole: black peppercorns
+  - name: white pepper
+    match: [ground white pepper]
+    unless: [whole, peppercorns]
+    g_per_tsp: 2.4
+    whole: white peppercorns
+  - name: fennel
+    match: [ground fennel, fennel powder]
+    unless: [seed, seeds, whole, bulb, fronds]
+    g_per_tsp: 2.0
+    whole: fennel seeds
+  - name: fenugreek
+    match: [ground fenugreek, fenugreek powder]
+    unless: [seed, seeds, whole, leaves, methi]
+    g_per_tsp: 3.7
+    whole: fenugreek seeds
+  - name: mace
+    match: [ground mace]
+    unless: [blade, blades, whole]
+    g_per_tsp: 1.7
+    whole: mace blades

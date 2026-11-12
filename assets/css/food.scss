@@ -58,6 +58,7 @@
 @use "food/recipe-ingredients-method";
 @use "food/recipe-notes-body";
 @use "food/recipe-annotations";
+@use "food/ingredient-hints";
 // The shortlist (#546). After recipe-list: it reads that file's
 // $recipe-title-size and $recipe-title-line-height.
 @use "food/shortlist";

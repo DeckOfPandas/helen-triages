@@ -154,7 +154,7 @@
   function nameFor(row) {
     var copy = row.cloneNode(true);
     Array.prototype.slice.call(
-      copy.querySelectorAll('.ingredient-amount, .ingredient-annotation')
+      copy.querySelectorAll('.ingredient-amount, .ingredient-annotation, .ingredient-hint')
     ).forEach(function (el) { el.parentNode.removeChild(el); });
     return HTF.foodScale.noteName(copy.textContent, words);
   }

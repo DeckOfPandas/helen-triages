@@ -20,6 +20,7 @@ import functools
 import http.server
 import os
 import pathlib
+import re
 import threading
 import urllib.parse
 
@@ -405,3 +406,45 @@ def test_no_footer_label_breaks_inside_itself(chromium, visit, url):
             broken.append(f"{width}px: {text!r} on {lines} lines")
     assert not broken, (
         f"{url}: a footer label wraps inside itself:\n  " + "\n  ".join(broken[:12]))
+
+
+# --- The stock and spice hints (MANUAL §8.2) ----------------------------------
+
+STOCK_LINE = re.compile(r"\d (?:ml|litres?)</span></span>\s*(?:chicken|vegetable|beef) stock")
+
+def _recipe_with_stock_line(prod_site):
+    """A published, scalable recipe with a line like "500 ml chicken stock"."""
+    for path in sorted(prod_site.glob("food/recipes/*/index.html")):
+        text = path.read_text(encoding="utf-8")
+        if "recipe-scale-portions" in text and STOCK_LINE.search(text):
+            return "/" + str(path.parent.relative_to(prod_site)) + "/"
+    raise AssertionError("no scalable recipe with a stock line built")
+
+
+@pytest.mark.parametrize("width", sorted(VIEWPORTS))
+def test_a_stock_hint_opens_and_follows_the_scaler(chromium, visit, prod_site, width):
+    """Helen: "where a recipe wants 500 ml stock, I'd like to know how many
+    cubes/tsp to add to 500 ml water", behind a tap. The hint is shut until
+    tapped, names the line's own volume, and follows the scaler while open."""
+    url = _recipe_with_stock_line(prod_site)
+    v = visit(url, width)
+    v.page.wait_for_load_state("networkidle")
+    _settle(v.page)
+    toggles = v.page.locator(".ingredient-hint-toggle")
+    assert toggles.count() >= 1, f"{url}: no hint button"
+    stock = v.page.locator("li.ingredient:has(.ingredient-hint-toggle)", has_text="stock").first
+    hint = stock.locator(".ingredient-hint")
+    assert hint.is_hidden(), f"{url}: the hint is open before a tap"
+
+    stock.locator(".ingredient-hint-toggle").click()
+    assert hint.is_visible(), f"{url}: tapping did not open the hint"
+    amount = stock.locator(".ingredient-amount-number").inner_text().strip()
+    before = hint.inner_text()
+    assert f"In {amount} of boiling water" in before, f"{url}: {amount!r} not in {before!r}"
+    assert "Kallo" in before and "Marigold" in before, f"{url}: {before!r}"
+
+    v.page.locator(".recipe-scale-plus").click()
+    after = hint.inner_text()
+    assert after != before, f"{url}: the open hint did not follow the scaler"
+    assert v.overflow() is None, f"{url} at {width}px scrolls sideways with a hint open"
+    assert not v.errors, f"{url}: " + "\n  ".join(v.errors)

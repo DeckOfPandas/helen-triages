@@ -1,0 +1,66 @@
+@use "food/palette" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
+// =============================================================================
+// THE STOCK AND SPICE HINTS ON INGREDIENT LINES (MANUAL §8.2)
+// =============================================================================
+// assets/js/recipe-hints.js puts a small ⓘ after a stock line or a ground
+// spice; a tap opens the hint beneath the line, quiet like an ingredient
+// note. Hot pink on hover and when open, as the tick boxes are.
+.ingredient-hint-toggle {
+  @include tap-area(32px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15em;
+  height: 1.15em;
+  margin-left: 0.45em;
+  padding: 0;
+  vertical-align: -0.12em;
+  font-family: $font-headings;
+  font-size: 0.85em;
+  font-weight: 700;
+  line-height: 1;
+  color: $color-clear-text;
+  background: none;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  cursor: pointer;
+
+  &::before { content: 'i'; }
+
+  &:hover,
+  &:focus-visible,
+  &[aria-expanded="true"] { color: $color-dazzling-dragonfruit; }
+}
+
+.ingredient-hint {
+  display: block;
+  margin: 0.35em 0 0.5em;
+  padding-left: 0.8em;
+  border-left: 2px solid $color-dazzling-dragonfruit;
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: $color-clear-text;
+
+  &[hidden] { display: none; }
+}
+
+.ingredient-hint-title {
+  display: block;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.ingredient-hint-line {
+  display: inline;
+
+  & + &::before { content: ' · '; }
+}
+
+@media print {
+  .ingredient-hint-toggle,
+  .ingredient-hint { display: none !important; }
+}
