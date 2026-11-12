@@ -10,7 +10,7 @@ source_type: website
 serves: "2"
 prep_time: "5 mins"
 cook_time: "20 mins"
-main_ingredients: ["trout", "romaine lettuce", "parmesan", "anchovies", "rye bread", "mayonnaise", "garlic cloves", "red wine vinegar"]
+main_ingredients: ["trout", "romaine lettuce", "parmesan", "anchovies", "rye bread", "mayonnaise", "garlic clove", "red wine vinegar"]
 star_ingredient: "oily fish"
 internal_temp_ref: fish.general
 tags: ["salad", "main"]

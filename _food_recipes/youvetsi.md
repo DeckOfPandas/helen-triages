@@ -6,7 +6,7 @@ source_type: book
 serves: "6"
 prep_time: "30 mins"
 cook_time: "3 hrs 30 mins"
-main_ingredients: ["beef short rib", "orzo", "passata", "red wine", "halloumi", "beef stock"]
+main_ingredients: ["beef short rib", "orzo", "passata", "red wine", "halloumi", "beef stock", "fresh thyme"]
 star_ingredient: "beef"
 tags: ["one-handed food", "carbs party", "main"]
 ingredient_groups:
