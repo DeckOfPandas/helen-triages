@@ -1289,7 +1289,12 @@ The rulings behind every rule here are in DECISIONS §8.2.
 | `assets/js/food-shopping-list.js` | the list's totals, `build()`, and `totalText`, the one formatter for a scaled food amount. Pure |
 | `assets/js/food-scale.js` | one amount at a factor, and the scaler's stepping modes. Pure |
 | `assets/js/recipe-scale.js` | the recipe page's DOM half |
+| `assets/js/ingredient-ticks.js`, `_sass/food/_ingredient-ticks.scss` | the recipe page's TICK BOXES OFF / ON button and a box per ingredient line, hung left of the line so none moves (#1504) |
 | `assets/js/filters.js` | the shopping list's DOM half: the rows, their words, the painting |
+
+A tick box is the first child of its `<li>`, and `recipe-scale.js` steps over
+`.ingredient-tick` when it looks for a line's text, so the two work together.
+`tests/test_browser_smoke.py` holds the boxes to moving no line.
 
 The two Ruby readers have no Jekyll in them, so `scripts/food_yield.rb` can
 run them and `tests/test_food_yield.py` checks every shape without a build.

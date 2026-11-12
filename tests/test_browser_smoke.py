@@ -405,3 +405,67 @@ def test_no_footer_label_breaks_inside_itself(chromium, visit, url):
             broken.append(f"{width}px: {text!r} on {lines} lines")
     assert not broken, (
         f"{url}: a footer label wraps inside itself:\n  " + "\n  ".join(broken[:12]))
+
+
+# --- Tick boxes on a recipe's ingredients (#1504) ------------------------------
+
+TICK_LAYOUT = """() => [...document.querySelectorAll('.ingredients li.ingredient')].map(li => {
+  const r = li.getBoundingClientRect();
+  const box = li.querySelector('input.ingredient-tick');
+  const b = box && box.checkVisibility() ? box.getBoundingClientRect() : null;
+  return {left: Math.round(r.left), top: Math.round(r.top + window.scrollY), width: Math.round(r.width),
+          box: b && {left: b.left, right: b.right}};
+})"""
+
+
+def _recipe_pages_by_grouping(prod_site):
+    """One published recipe whose ingredients are in groups (an indent to hang
+    the boxes in) and one whose are not (they hang in the page's margin)."""
+    grouped = flat = None
+    for path in sorted(prod_site.glob("food/recipes/*/index.html")):
+        text = path.read_text(encoding="utf-8")
+        if 'class="ingredients"' not in text:
+            continue
+        url = "/" + str(path.parent.relative_to(prod_site)) + "/"
+        if "recipe-group-heading" in text:
+            grouped = grouped or url
+        else:
+            flat = flat or url
+    assert grouped and flat, f"no grouped ({grouped}) or ungrouped ({flat}) recipe built"
+    return {"grouped": grouped, "ungrouped": flat}
+
+
+@pytest.mark.parametrize("width", sorted(VIEWPORTS))
+@pytest.mark.parametrize("kind", ["grouped", "ungrouped"])
+def test_tick_boxes_appear_beside_the_lines_and_move_none(chromium, visit, prod_site, kind, width):
+    """#1504. Helen: "don't move the ingredients when you show the tickboxes".
+    Each box hangs left of its line and stays on screen; a tap on a line ticks
+    it; the button says TICK BOXES OFF, then ON."""
+    url = _recipe_pages_by_grouping(prod_site)[kind]
+    v = visit(url, width)
+    v.page.wait_for_load_state("networkidle")
+    _settle(v.page)
+    button = v.page.locator(".ingredient-ticks-pill")
+    assert button.inner_text().strip().lower() == "tick boxes off"
+    before = v.page.evaluate(TICK_LAYOUT)
+    assert before, f"{url}: no ingredient lines"
+
+    button.click()
+    _settle(v.page)
+    assert button.inner_text().strip().lower() == "tick boxes on"
+    after = v.page.evaluate(TICK_LAYOUT)
+    problems = []
+    for i, (b, a) in enumerate(zip(before, after)):
+        if (b["left"], b["top"], b["width"]) != (a["left"], a["top"], a["width"]):
+            problems.append(f"line {i} moved: {b} -> {a}")
+        if not a["box"]:
+            problems.append(f"line {i} has no visible box")
+        elif a["box"]["left"] < 0 or a["box"]["right"] > a["left"]:
+            problems.append(f"line {i}'s box is not left of its line, on screen: {a['box']}")
+    assert not problems, f"{url} at {width}px:\n  " + "\n  ".join(problems[:10])
+    assert v.overflow() is None, f"{url} at {width}px scrolls sideways with the boxes on"
+
+    v.page.locator(".ingredients li.ingredient").first.click(position={"x": 5, "y": 5})
+    assert v.page.locator(".ingredients li.ingredient.is-ticked").count() == 1, (
+        f"{url}: tapping the first line did not tick it")
+    assert not v.errors, f"{url}: " + "\n  ".join(v.errors)

@@ -104,6 +104,11 @@
   // The reverse, one becoming several: HTF.foodScale.pluralItem.
   var countNouns = listFrom('data-count-nouns');
 
+  // A line's tick box (ingredient-ticks.js) is never its text.
+  function isTick(node) {
+    return node.classList && node.classList.contains('ingredient-tick');
+  }
+
   function itemNodeFor(span) {
     var row = span.closest ? span.closest('li.ingredient') : null;
     if (!row) return null;
@@ -111,7 +116,7 @@
       var node = row.childNodes[i];
       if (node.nodeType === 3) {
         if (node.nodeValue.trim() !== '') return node;
-      } else if (node.nodeType === 1) {
+      } else if (node.nodeType === 1 && !isTick(node)) {
         var cls = ' ' + (node.className || '') + ' ';
         if (cls.indexOf(' ingredient-amount ') === -1) return null;
       }
@@ -133,7 +138,7 @@
       var node = row.childNodes[i];
       if (node.nodeType === 3) {
         if (node.nodeValue.trim() !== '') return node;
-      } else if (node.nodeType === 1) {
+      } else if (node.nodeType === 1 && !isTick(node)) {
         return null;
       }
     }

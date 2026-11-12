@@ -1490,6 +1490,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   "batches" as well as portions, which suggests it isn't doing anything
   useful."* It could only ever set the portions rows. Each recipe keeps its
   own box. The cocktails list keeps its "set all", having no batches.
+- **2026-11-12, #1504 — a recipe page can show a tick box on every ingredient
+  line, behind a TICK BOXES OFF / ON button under INGREDIENTS.** Chosen from
+  three candidates on the page: *"option c please"*. The boxes hang left of the
+  lines and move none of them: *"don't move the ingredients when you show the
+  tickboxes"*. "On" is the raw hot pink, not the darkened link pink, by
+  choice: *"I know it doesn't pass contrast tests, but this is an exception I
+  choose."* Off by default and never remembered, as make it is (§9).
 - **2026-10-09, #1297 — the shopping list reads the zest and the juice of one
   lemon as one lemon.** Helen: *'I would like to cleverly combine e.g. "zest
   of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the shopping list.'*
