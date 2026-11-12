@@ -252,7 +252,8 @@ TRUSTED_DYNAMIC = (
     # `site.show_drafts`, which only _config_local.yml sets, so its href never
     # reaches a production build.
     re.compile(r"^\{\{\s*drink\.url\s*\|\s*relative_url\s*\}\}$"),
-    # A drink's source link (_layouts/cocktail.html). Unlike the rest, this is
+    # A drink's or a recipe's source link (_layouts/cocktail.html,
+    # _layouts/recipe.html). Unlike the rest, this is
     # unchecked, not checked elsewhere: `source_url` is an external address in
     # front matter, out of scope as a literal `http://` href is. A dead one
     # rots silently; checking it would take a network call.

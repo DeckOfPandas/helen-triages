@@ -4,6 +4,7 @@ GitHub issue #406. Every ruling below is Helen's.
 
 **If you are ingesting food recipes, this is the contract.** Every recipe
 carries two front matter keys, `source` and `source_type`, and they must agree.
+A third, `source_url`, is optional: rule 4.
 
 ```yaml
 source: "Adapted from Gordon Ramsay's Ultimate Cookery Course"
@@ -112,10 +113,24 @@ recipe on it. Without the separator the two shapes are identical. Enforced: a
 `website` source containing a comma must contain `, recipe `, and a `book`
 source must not.
 
-**4. Name a site by its bare domain or its name, not a full URL.**
-`kitchenofdebjani.com`, not `https://kitchenofdebjani.com/`. `_layouts/recipe.html`
-prints the source as plain text, not a link, so a protocol and a trailing
-slash are noise on the page. By hand.
+**4. `source` says who; `source_url` says where.** Name a site by its bare
+domain or its name, `kitchenofdebjani.com`, never `https://kitchenofdebjani.com/`.
+The recipe's own address, where there is one, goes in the optional
+`source_url:`, a full `https://` address in double quotes. On the page the
+word `recipe` in `, recipe <person>` is the link, so a site naming its cook
+reads "Adapted from Desert Island Dishes, <u>recipe</u> Margie Nomura"; any
+other source with an address is linked whole, as on a drink page. With no
+address the key is left out, not left empty. Helen, 2026-11-11, for a website
+recipe whose link had nowhere to go: *"please make an appropriate shape and
+document it"*, then, marking the word on the page, *"I showed in the food
+recipe line where I want the link."* The source itself stays plain text.
+Enforced: `_bad_link` in `tests/test_source_attribution.py`.
+
+```yaml
+source: "Adapted from Desert Island Dishes, recipe Margie Nomura"
+source_type: website
+source_url: "https://desertislanddishes.co/chicken-mini-pot-pies/"
+```
 
 **5. No publishers.** A citation names the source, not who printed it.
 `(Hodder & Stoughton)` and anything like it comes out. The test rejects any
@@ -179,5 +194,6 @@ the same commit. See CLAUDE.md.
 2. Dated magazine → `publication`. Undated → `website`. No exceptions.
 3. Write `source` in that type's shape, and `source_type` beside it.
 4. Published work gets `Adapted from`. People, places, jokes and `QQ` do not.
-5. Site before person, separated by `, recipe `. Bare domain, no `https://`.
+5. Site before person, separated by `, recipe `. Bare domain, no `https://`:
+   the recipe's address, if you have it, goes in `source_url`.
 6. A book names its author. No publishers.

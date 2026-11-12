@@ -793,7 +793,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   entry is a dish she cooks from memory, and the list is what makes it
   findable and shoppable. No method is demanded.
   `test_ingredients_is_a_non_empty_list`.
-
+- **2026-11-11 — a food recipe's address goes in an optional `source_url`, and
+  the word "recipe" is the link.** Helen, on a website recipe whose link had
+  nowhere to go: *"Don't we have something in source? If not then please make
+  an appropriate shape and document it."* The drinks' keys (#454) were taken
+  whole: `source` says who, `source_url` says where. She then marked the word
+  on the page: *"I showed in the food recipe line where I want the link."* A
+  site naming its cook always says `, recipe `, so that word carries it; a
+  source without it is linked whole. SOURCE_ATTRIBUTION_SPEC.md rule 4.
+- **2026-11-11 — a prep or cook time may link to a drink.** Helen's Christmas
+  pudding prep time is *"minimum 60 mins, more if you drink"* two named
+  drinks, each a link, so both time cells render as markdown, as the tagline
+  does. MANUAL §4, "Cross-recipe links".
 ## §5 House style
 
 - **2026-08-21, #413 — en dashes are scoped by what a reader SEES.** Helen, on

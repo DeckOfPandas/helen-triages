@@ -12,6 +12,7 @@ which collection it is in.
 from __future__ import annotations
 
 import re
+from types import SimpleNamespace
 
 import pytest
 
@@ -225,6 +226,52 @@ def test_recipe_citation_follows_the_spec(recipe, rule):
     source, kind = _citation(recipe)
     problem = rule(source, kind)
     assert problem is None, f"{where(recipe)}\n\n{problem}"
+
+
+URL = re.compile(r"https?://\S+\Z")
+URL_IN_SOURCE = re.compile(r"https?://|www\.")
+
+
+def _bad_link(document):
+    """`source` says who and `source_url` says where (the spec's rule 4).
+
+    `source_url` is optional; where present it is one full address, because
+    the page makes the source a link to it. A URL in `source` prints as text.
+    """
+    source = str(document.fm.get("source") or "")
+    if URL_IN_SOURCE.search(source):
+        return (f"`source` holds an address: {source!r}.\nName the site in "
+                f"`source` and put the address in `source_url`. See {SPEC}.")
+    if "source_url" not in document.fm:
+        return None
+    url = document.fm["source_url"]
+    if not isinstance(url, str) or not URL.match(url.strip()):
+        return (f"`source_url: {url!r}` is not a full address. Write "
+                f"`https://...`, or leave the key out where there is none.")
+    return None
+
+
+@pytest.mark.parametrize("fm,ok", [
+    ({"source": "Adapted from Example"}, True),
+    ({"source": "Adapted from Example", "source_url": "https://example.com/a/"}, True),
+    ({"source": "Adapted from https://example.com/a/"}, False),
+    ({"source": "Adapted from www.example.com"}, False),
+    ({"source": "Adapted from Example", "source_url": ""}, False),
+    ({"source": "Adapted from Example", "source_url": "example.com/a/"}, False),
+    ({"source": "Adapted from Example", "source_url": "https://a.com/ b"}, False),
+])
+def test_the_link_rule_tells_good_from_bad(fm, ok):
+    assert (_bad_link(SimpleNamespace(fm=fm)) is None) is ok
+
+
+def test_recipe_source_url_holds_the_address(recipe):
+    problem = _bad_link(recipe)
+    assert problem is None, f"{where(recipe)}\n\n{problem}"
+
+
+def test_draft_source_url_holds_the_address(draft):
+    problem = _bad_link(draft)
+    assert problem is None, f"{where_draft(draft)}\n\n{problem}"
 
 
 @pytest.mark.parametrize("rule", RULE_FUNCS, ids=RULE_IDS)
