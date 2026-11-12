@@ -1289,7 +1289,7 @@ The rulings behind every rule here are in DECISIONS §8.2.
 | `assets/js/food-shopping-list.js` | the list's totals, `build()`, and `totalText`, the one formatter for a scaled food amount. Pure |
 | `assets/js/food-scale.js` | one amount at a factor, and the scaler's stepping modes. Pure |
 | `assets/js/recipe-scale.js` | the recipe page's DOM half |
-| `assets/js/food-hints.js`, `assets/js/recipe-hints.js`, `_data/food/ingredient_hints.yml`, `_sass/food/_ingredient-hints.scss` | the stock and spice hints behind an ⓘ on an ingredient line |
+| `assets/js/food-hints.js`, `assets/js/recipe-hints.js`, `_data/food/ingredient_hints.yml`, `_sass/food/_ingredient-hints.scss` | the stock and spice hints, a ship-key box behind a ringed i on an ingredient line |
 | `assets/js/filters.js` | the shopping list's DOM half: the rows, their words, the painting |
 
 The two Ruby readers have no Jekyll in them, so `scripts/food_yield.rb` can
@@ -1695,13 +1695,14 @@ a range of one (`yieldBox`: 5 is `2–3`, `125 ml` is `62–63 ml`, `64+` is
 
 #### The stock and spice hints
 
-A small ⓘ after an ingredient line opens a hint beneath it (DECISIONS §8.2).
-The figures are `_data/food/ingredient_hints.yml`, emitted on every recipe
-page as `#ingredient-hints-data`; the words are `assets/js/food-hints.js`
-(pure, `tests/js/food-hints.test.js`); `assets/js/recipe-hints.js` finds the
-lines and draws them. A hint is worked out from the amount as it reads when
-opened, so it follows the scaler, and an open one is redrawn when that
-amount changes.
+The cocktails' ship key (§9.13), in food's colours (DECISIONS §8.2): a small
+ringed i, set as a superscript after an ingredient line, opens a modal
+`<dialog>` saying how much, closed by its ×, Escape or the backdrop. The
+figures are `_data/food/ingredient_hints.yml`, emitted on every recipe page
+as `#ingredient-hints-data`; the words are `assets/js/food-hints.js` (pure,
+`tests/js/food-hints.test.js`); `assets/js/recipe-hints.js` builds the one box
+and fills it from the line that opened it, reading the amount as it reads
+then, so it follows the scaler and the metric switch.
 
 - **Stock:** an item that says `stock` (not a cube, pot or powder) with a
   volume (ml, litres, pints) gets, for that much boiling water, how much of
@@ -1721,7 +1722,8 @@ amount changes.
   2½ tsp). Spices with no whole form (paprika, blends) get none.
 
 `tests/test_ingredient_hints.py` holds the data's shape and the six brands;
-`tests/test_browser_smoke.py` opens a stock hint and scales under it.
+`tests/test_browser_smoke.py` opens a stock hint, closes it, scales, and
+opens it again.
 
 #### Ticking rows off
 

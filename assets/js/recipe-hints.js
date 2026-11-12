@@ -1,11 +1,12 @@
-/* The tap-to-open hints on a recipe's ingredient lines (MANUAL §8.2): a small
-   ⓘ after a stock line or a ground spice, opening the hint beneath it. The
-   words are HTF.foodHints'; this file finds the lines and draws them.
+/* The stock and spice hints on a recipe's ingredient lines (MANUAL §8.2), in
+   the cocktails' ship-key pattern (ship-key.js): a small ringed i after the
+   line opens a modal box saying how much, closed by its ×, Escape or a click
+   on the backdrop. The words are HTF.foodHints'; this file finds the lines,
+   builds the one box, and fills it from the line that opened it.
 
-   The hint is worked out from the amount as it reads when opened, so it
-   follows the scaler and the metric switch, and an open hint is redrawn when
-   that amount changes. Built here, not in the layout, so a reader without the
-   script sees no button. A tap on the button never ticks the line. */
+   A hint reads the line's amount as it is when opened, so it follows the
+   scaler and the metric switch. Built here, not in the layout, so a browser
+   without the script or without `showModal` shows no button. */
 (function () {
   'use strict';
 
@@ -21,6 +22,37 @@
     return;
   }
 
+  var dialog = document.createElement('dialog');
+  if (typeof dialog.showModal !== 'function') return;
+  dialog.className = 'ingredient-hint';
+  dialog.id = 'ingredient-hint';
+  dialog.setAttribute('aria-labelledby', 'ingredient-hint-title');
+
+  function el(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  var body = el('div', 'ingredient-hint-body');
+  var form = el('form', 'ingredient-hint-close-form');
+  form.method = 'dialog';
+  var close = el('button', 'ingredient-hint-close', '×');
+  close.setAttribute('aria-label', 'close');
+  form.appendChild(close);
+  var title = el('h2', 'ingredient-hint-title');
+  title.id = 'ingredient-hint-title';
+  var content = el('div', 'ingredient-hint-content');
+  body.appendChild(form);
+  body.appendChild(title);
+  body.appendChild(content);
+  dialog.appendChild(body);
+
+  dialog.addEventListener('click', function (event) {
+    if (event.target === dialog) dialog.close();
+  });
+
   function amountOf(row) {
     var span = row.querySelector('.ingredient-amount-number');
     if (!span) return '';
@@ -34,7 +66,7 @@
   function itemOf(row) {
     var copy = row.cloneNode(true);
     Array.prototype.forEach.call(copy.querySelectorAll(
-      '.ingredient-amount, .ingredient-annotation, .ingredient-hint-toggle, .ingredient-hint, input'
+      '.ingredient-amount, .ingredient-annotation, .ingredient-hint-open, input'
     ), function (n) { n.parentNode.removeChild(n); });
     return copy.textContent.replace(/\s+/g, ' ').trim();
   }
@@ -46,62 +78,45 @@
       HTF.foodHints.spiceHint(amount, item, data);
   }
 
-  var count = 0;
-
-  function wire(row) {
-    if (!hintFor(row)) return;
-    count += 1;
-    var id = 'ingredient-hint-' + count;
-
-    var button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'ingredient-hint-toggle';
-    button.setAttribute('aria-expanded', 'false');
-    button.setAttribute('aria-controls', id);
-    button.setAttribute('aria-label', 'how much');
-
-    var panel = document.createElement('span');
-    panel.className = 'ingredient-hint';
-    panel.id = id;
-    panel.hidden = true;
-
-    function draw() {
-      var hint = hintFor(row);
-      panel.textContent = '';
-      if (!hint) return;
-      var title = document.createElement('span');
-      title.className = 'ingredient-hint-title';
-      title.textContent = hint.title;
-      panel.appendChild(title);
-      hint.lines.forEach(function (line) {
-        var part = document.createElement('span');
-        part.className = 'ingredient-hint-line';
-        part.textContent = line;
-        panel.appendChild(part);
+  function fill(row, hint) {
+    title.textContent = (amountOf(row) + ' ' + itemOf(row)).trim();
+    content.textContent = '';
+    content.appendChild(el('p', 'ingredient-hint-lead', hint.title));
+    if (hint.rows.length) {
+      var list = el('dl', 'ingredient-hint-list');
+      hint.rows.forEach(function (r) {
+        var line = el('div', 'ingredient-hint-row');
+        line.appendChild(el('dt', null, r.amount));
+        line.appendChild(el('dd', null, r.what));
+        list.appendChild(line);
       });
+      content.appendChild(list);
     }
-
-    button.addEventListener('click', function (event) {
-      event.stopPropagation();
-      var open = panel.hidden;
-      if (open) draw();
-      panel.hidden = !open;
-      button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    hint.lines.forEach(function (text) {
+      content.appendChild(el('p', 'ingredient-hint-line', text));
     });
-
-    panel.addEventListener('click', function (event) { event.stopPropagation(); });
-
-    var note = row.querySelector('.ingredient-annotation');
-    row.insertBefore(button, note);
-    row.appendChild(panel);
-
-    var span = row.querySelector('.ingredient-amount-number');
-    if (span && window.MutationObserver) {
-      new MutationObserver(function () {
-        if (!panel.hidden) draw();
-      }).observe(span, { childList: true, characterData: true, subtree: true });
-    }
   }
 
-  Array.prototype.forEach.call(article.querySelectorAll('.ingredients li.ingredient'), wire);
+  var wired = 0;
+  Array.prototype.forEach.call(article.querySelectorAll('.ingredients li.ingredient'), function (row) {
+    if (!hintFor(row)) return;
+    wired += 1;
+    // The i is drawn by CSS, so no text read off the line ever carries it.
+    var button = el('button', 'ingredient-hint-open');
+    button.type = 'button';
+    button.setAttribute('aria-haspopup', 'dialog');
+    button.setAttribute('aria-controls', 'ingredient-hint');
+    button.setAttribute('aria-label', 'how much');
+    button.addEventListener('click', function (event) {
+      // A tap here opens the box and never ticks the line (ingredient-ticks.js).
+      event.stopPropagation();
+      var hint = hintFor(row);
+      if (!hint) return;
+      fill(row, hint);
+      dialog.showModal();
+    });
+    row.insertBefore(button, row.querySelector('.ingredient-annotation'));
+  });
+
+  if (wired) document.body.appendChild(dialog);
 })();

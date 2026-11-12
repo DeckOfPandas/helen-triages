@@ -424,27 +424,29 @@ def _recipe_with_stock_line(prod_site):
 @pytest.mark.parametrize("width", sorted(VIEWPORTS))
 def test_a_stock_hint_opens_and_follows_the_scaler(chromium, visit, prod_site, width):
     """Helen: "where a recipe wants 500 ml stock, I'd like to know how many
-    cubes/tsp to add to 500 ml water", behind a tap. The hint is shut until
-    tapped, names the line's own volume, and follows the scaler while open."""
+    cubes/tsp to add to 500 ml water", in the ship key's pattern. The box is
+    shut until the i is tapped, names the line's own volume, closes on its ×,
+    and opened again after scaling, names the new volume."""
     url = _recipe_with_stock_line(prod_site)
     v = visit(url, width)
     v.page.wait_for_load_state("networkidle")
     _settle(v.page)
-    toggles = v.page.locator(".ingredient-hint-toggle")
-    assert toggles.count() >= 1, f"{url}: no hint button"
-    stock = v.page.locator("li.ingredient:has(.ingredient-hint-toggle)", has_text="stock").first
-    hint = stock.locator(".ingredient-hint")
-    assert hint.is_hidden(), f"{url}: the hint is open before a tap"
+    stock = v.page.locator("li.ingredient:has(.ingredient-hint-open)", has_text="stock").first
+    box = v.page.locator("dialog#ingredient-hint")
+    assert box.count() == 1, f"{url}: no hint box"
+    assert not box.is_visible(), f"{url}: the hint box is open before a tap"
 
-    stock.locator(".ingredient-hint-toggle").click()
-    assert hint.is_visible(), f"{url}: tapping did not open the hint"
+    stock.locator(".ingredient-hint-open").click()
+    assert box.is_visible(), f"{url}: tapping the i did not open the box"
     amount = stock.locator(".ingredient-amount-number").inner_text().strip()
-    before = hint.inner_text()
+    before = box.inner_text()
     assert f"In {amount} of boiling water" in before, f"{url}: {amount!r} not in {before!r}"
     assert "Kallo" in before and "Marigold" in before, f"{url}: {before!r}"
+    assert v.overflow() is None, f"{url} at {width}px scrolls sideways with the box open"
+    box.locator(".ingredient-hint-close").click()
+    assert not box.is_visible(), f"{url}: the × did not close the box"
 
     v.page.locator(".recipe-scale-plus").click()
-    after = hint.inner_text()
-    assert after != before, f"{url}: the open hint did not follow the scaler"
-    assert v.overflow() is None, f"{url} at {width}px scrolls sideways with a hint open"
+    stock.locator(".ingredient-hint-open").click()
+    assert box.inner_text() != before, f"{url}: the box did not follow the scaler"
     assert not v.errors, f"{url}: " + "\n  ".join(v.errors)

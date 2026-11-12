@@ -2295,6 +2295,13 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "the second is wrapping prose inside a dialog capped at the viewport "
         "less 1rem. Measured at 360px with every line on one row."
     ),
+    ".ingredient-hint-list": (
+        "`auto 1fr`, the ship key's two columns on food: a stock amount beside "
+        "its product. The widest first cell is `2 level tsp`, about 90px; the "
+        "second is a short product name inside a dialog capped at the viewport "
+        "less 1rem. test_a_stock_hint_opens_and_follows_the_scaler opens it at "
+        "360px and checks the page does not scroll sideways."
+    ),
     ".ship-key-band": (
         "`1fr auto` (#1440): a YOLO button's rows, then its bar and name. The "
         "name is capped at 5.2rem and wraps, so the second track is about "

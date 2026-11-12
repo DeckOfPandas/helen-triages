@@ -1497,7 +1497,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   water. And please include Marigold Bouillon powder too."* Bay's Kitchen and
   M&S concentrate were hers from the issue. Asked which to name, she chose
   all six (Kallo, Knorr cube and pot, Oxo, Marigold, Bay's Kitchen, M&S); asked
-  where, *"Behind a tap"*.
+  where, *"Behind a tap"*, and then, of the first build, *"please use the same
+  pattern as the YOLO / ship explainer on the cocktails site"*: a ringed i
+  opening a modal box. The spice hints share it.
 - **2026-11-12, #1498 — a ground spice's hint gives its weight to grind your
   own, not a count of seeds, sticks or pods.** Helen: *"Default to weight
   instead of seeds, sticks and pods. Take classic figures for fresh ginger."*

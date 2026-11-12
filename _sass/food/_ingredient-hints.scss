@@ -5,62 +5,129 @@
 // =============================================================================
 // THE STOCK AND SPICE HINTS ON INGREDIENT LINES (MANUAL §8.2)
 // =============================================================================
-// assets/js/recipe-hints.js puts a small ⓘ after a stock line or a ground
-// spice; a tap opens the hint beneath the line, quiet like an ingredient
-// note. Hot pink on hover and when open, as the tick boxes are.
-.ingredient-hint-toggle {
-  @include tap-area(32px);
+// The cocktails' ship key, in food's colours (cocktails/_ship-key.scss, rule
+// for rule where it can be): a small ringed i, set as a superscript after the
+// line, opens a modal box. assets/js/recipe-hints.js builds both.
+
+// The ring is 12px and its tap area 32px, as the ship key's beside SHIP IT?.
+// The letter is drawn here, so no text read off the line carries it.
+.ingredient-hint-open {
+  @include tap-area(32px, 32px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.15em;
-  height: 1.15em;
-  margin-left: 0.45em;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-left: 0.3em;
   padding: 0;
-  vertical-align: -0.12em;
+  vertical-align: super;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: none;
+  color: $color-clear-text;
   font-family: $font-headings;
-  font-size: 0.85em;
+  font-size: 0.5rem;
   font-weight: 700;
   line-height: 1;
-  color: $color-clear-text;
-  background: none;
-  border: 1.5px solid currentColor;
-  border-radius: 50%;
   cursor: pointer;
 
   &::before { content: 'i'; }
 
   &:hover,
-  &:focus-visible,
-  &[aria-expanded="true"] { color: $color-dazzling-dragonfruit; }
+  &:focus-visible { color: $color-dazzling-dragonfruit; }
 }
 
+// No padding on the dialog itself: recipe-hints.js reads a click whose target
+// is the dialog as a click on the backdrop.
 .ingredient-hint {
-  display: block;
-  margin: 0.35em 0 0.5em;
-  padding-left: 0.8em;
-  border-left: 2px solid $color-dazzling-dragonfruit;
-  font-size: 0.82rem;
-  font-style: italic;
-  line-height: 1.5;
-  color: $color-clear-text;
+  padding: 0;
+  max-width: min(24rem, calc(100vw - 1rem));
+  border: 2px solid $color-dazzling-dragonfruit;
+  background: $color-surface;
+  color: $color-text;
 
-  &[hidden] { display: none; }
+  &::backdrop { background: rgba($color-bg, 0.72); }
 }
 
+.ingredient-hint-body {
+  position: relative;
+  padding: $space-lg $space-xl $space-xl;
+}
+
+.ingredient-hint-close-form {
+  position: absolute;
+  top: $space-xs;
+  right: $space-xs;
+  margin: 0;
+}
+
+.ingredient-hint-close {
+  padding: $space-xs $space-sm;
+  border: 0;
+  background: none;
+  color: $color-clear-text;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: $color-dazzling-dragonfruit; }
+}
+
+// Room on the right for the ×.
 .ingredient-hint-title {
-  display: block;
-  font-style: normal;
+  margin: 0 $space-xl $space-md 0;
+  font-family: $font-headings;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ingredient-hint-lead {
+  margin: 0 0 $space-sm;
+  font-size: 0.95rem;
   font-weight: 600;
 }
 
-.ingredient-hint-line {
-  display: inline;
+// Amount, then product, the ship key's two columns.
+.ingredient-hint-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: $space-md;
+  row-gap: $space-xs;
+  margin: 0;
+}
 
-  & + &::before { content: ' · '; }
+.ingredient-hint-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+
+  dt {
+    font-family: $font-headings;
+    font-weight: 700;
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.ingredient-hint-line {
+  margin: $space-xs 0 0;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 400px) {
+  .ingredient-hint-body { padding-left: $space-lg; padding-right: $space-lg; }
 }
 
 @media print {
-  .ingredient-hint-toggle,
+  .ingredient-hint-open,
   .ingredient-hint { display: none !important; }
 }

@@ -34,7 +34,7 @@ const DATA = {
 
 function stock(amount, item) {
   const h = stockHint(amount, item, DATA);
-  return h && [h.title].concat(h.lines);
+  return h && [h.title].concat(h.rows.map((r) => r.amount + ' ' + r.what));
 }
 
 function spice(amount, item) {
