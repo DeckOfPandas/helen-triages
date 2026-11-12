@@ -1,9 +1,9 @@
 ---
 title: "Grandma Kath's Christmas Pudding"
 meta:
-  rewritten: false
+  rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 tagline: "The original. [Stella and Henry's version](../stella-henrys-christmas-pudding/) grew over time, but let's not call it better."
 source: "Grandma Kath"
 source_type: person
