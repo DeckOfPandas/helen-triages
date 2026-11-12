@@ -215,6 +215,7 @@ argument and the rules each field is read by.
 - 2026-11-04 · §8.2 · #1468 · a costs.yml keyword matches its plural, so a row is written singular.
 - 2026-11-03 · §8.2 · #1458 · both sites print a range as "mean (lowest–highest)", everywhere a price shows.
 - 2026-11-03 · §8.2 · #1458 · each recipe page carries a cost line, local only, in the drink page's layout.
+- 2026-11-12 · §8.2 · on a recipe with body text, the cost line sits under NOTES, above the body.
 - 2026-09-07 · §8.2 · a scaled amount is never rounded coarser than 1 g.
 - 2026-09-07 · §8.2 · the shopping list has ten aisles, in shop order: produce, meat, fish, dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks, other.
 - 2026-09-07 · §8.2 · within an aisle the shopping list is alphabetical.

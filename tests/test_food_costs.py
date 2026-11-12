@@ -237,6 +237,25 @@ def test_prices_reach_the_page_only_behind_show_costs():
         _assert_gated(layout, marker, "_layouts/recipe.html")
 
 
+def test_the_cost_line_sits_above_a_recipes_body_text():
+    """Helen, of the ganache: "I think it should sit below NOTES as everything
+    else. Please do this every time a recipe page has body content." The one
+    captured block is printed before the body where there is body text, and
+    after GOES WITH only where there is none; a body that is only whitespace
+    is none."""
+    layout = (ROOT / "_layouts" / "recipe.html").read_text(encoding="utf-8")
+    body = layout.index('<div class="recipe-body-content">')
+    before_body = layout.rindex("{{ _cost_block }}", 0, body)
+    assert "{% if _has_body %}" in layout[before_body - 40:before_body], (
+        "the cost line is not printed straight before a recipe's body text")
+    assert "{% assign _body = content | strip %}" in layout, (
+        "the body test does not strip whitespace, so every recipe counts as having body text")
+    goes_with = layout.index("Goes with&hellip;")
+    after = layout.index("{% unless _has_body %}{{ _cost_block }}{% endunless %}")
+    assert after > goes_with, "without body text, the cost line is not after GOES WITH"
+    assert layout.count("{{ _cost_block }}") == 2, "the cost line is printed other than twice"
+
+
 def _assert_gated(text: str, marker: str, where: str) -> None:
     """`marker` sits inside an open `{% if site.show_costs ... %}` block."""
     at = text.index(marker)
