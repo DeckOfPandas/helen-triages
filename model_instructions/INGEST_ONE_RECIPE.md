@@ -221,6 +221,65 @@ vinegar type, mustard type, chocolate percentage. The answer is printed on the
 page in front of you, and one left off costs her a trip back to a source she
 may no longer have. If the source is silent, write what it says and no more.
 
+**Write the qualifier in the house's own words.** These are the only names her
+suite accepts for these ingredients in a published recipe, and a fact in other
+words ("soft dark brown sugar", "root ginger", "rice wine vinegar") is one she
+has to correct after her proofread. Translate the source's words to the
+house's name where they mean the same thing: root ginger is `fresh ginger`,
+soft dark brown sugar is `dark brown soft sugar`, rice wine vinegar is `rice
+vinegar`. Use the same names in `main_ingredients` (`ground cinnamon`, `fresh
+ginger`), except butter, which is plain `butter` there (§4). Garlic says its
+form: cloves, head, paste, purée, powder or granulated. The lists ignore case,
+so a proper noun keeps its capital (`Dijon mustard`, `English mustard`), and
+milk's `any kind` is written `milk (any kind)`, only where the source says any
+milk will do.
+
+<!-- vocab:qualifiers start -->
+**Butter:** `clarified butter` · `salted butter` · `unsalted butter`
+
+**Flour:** `dark rye flour` · `gluten-free flour` · `plain flour` ·
+`rice flour` · `self-raising flour` · `wholemeal flour`
+
+**Sugar:** `coconut palm sugar` · `dark brown muscovado sugar` ·
+`dark brown soft sugar` · `demerara sugar` · `golden caster sugar` ·
+`golden granulated sugar` · `icing sugar` · `light brown muscovado sugar` ·
+`light brown soft sugar` · `palm sugar` · `white caster sugar`
+
+**Milk:** `almond milk` · `any kind` · `buttermilk` · `coconut milk` ·
+`condensed milk` · `evaporated milk` · `goat's milk` · `oat milk` ·
+`semi-skimmed milk` · `skimmed milk` · `soya milk` ·
+`sweetened condensed milk` · `whole milk`
+
+**Ginger:** `dried ginger` · `fresh ginger` · `ginger paste` · `ground ginger` ·
+`stem ginger`
+
+**Nutmeg:** `ground nutmeg` · `whole nutmeg`
+
+**Cinnamon:** `cinnamon stick` · `cinnamon sticks` · `ground cinnamon`
+
+**Cloves:** `ground cloves` · `whole cloves`
+
+**Vanilla:** `vanilla essence` · `vanilla extract` · `vanilla pod`
+
+**Cardamom:** `black cardamom pod` · `black cardamom pods` ·
+`black cardamom powder` · `black cardamom seed` · `black cardamom seeds` ·
+`green cardamom pod` · `green cardamom pods` · `green cardamom powder` ·
+`green cardamom seed` · `green cardamom seeds`
+
+**Mustard:** `dijon mustard` · `english mustard` · `english mustard powder` ·
+`french mustard` · `mustard oil` · `whole mustard seeds` · `wholegrain mustard`
+
+**Soy sauce:** `dark soy sauce` · `light soy sauce`
+
+**Vinegar:** `apple cider vinegar` · `balsamic vinegar` · `malt vinegar` ·
+`red wine vinegar` · `rice vinegar` · `sherry vinegar` · `white wine vinegar`
+
+**Chocolate:** `dark chocolate` · `milk chocolate` · `unsweetened chocolate` ·
+`very dark chocolate` · `white chocolate`
+
+**Loomi:** `black loomi` · `white loomi` · `yellow loomi`
+<!-- vocab:qualifiers end -->
+
 **Milk, eggs and butter have house defaults, and the line says when one was
 used.** Where the source prints them unqualified: milk is `semi-skimmed milk`,
 an egg is large (with the count: `amount: "2 large"`), and butter is `salted
