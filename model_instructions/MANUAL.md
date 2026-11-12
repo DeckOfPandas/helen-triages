@@ -5138,6 +5138,7 @@ the two sites, which is why the footer links are the only way in.
 
 - A row is its label and its figure on one line and the bar under them at
   the column's full width, the same at every width.
+- A section's cross-links (`.tc-crosslink`) each take their own line.
 - A figure is the two numbers its bar is drawn from, never the data's
   display string, so no row says where to probe.
 - A gridline sits on every multiple of five: the tens, which the ticks

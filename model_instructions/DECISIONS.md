@@ -6022,6 +6022,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   35°C edge (2026-10-09: *"The scientist in me is upset by the x axis
   lines"*): each is its own stop, from the same `$tc-min`/`$tc-max`
   arithmetic as the ticks and the bars.
+- **2026-10-30, #1450 — a section's cross-links each take their own line,
+  left-aligned, at every width.** Helen: *"I don't see why we shouldn't do
+  each on its own line at all screen widths."*
 - **2026-10-09 — on the methods page the weight sits under the dropdown, the
   four birds read "(whole)", and times are compact (`4h50m – 5h30m`).** Helen:
   *"So the user is saying 'I have chicken, 3 kg'."* Of the times: *"Collapse

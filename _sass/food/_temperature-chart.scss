@@ -437,13 +437,14 @@ article.recipe .tc-contents ~ .recipe-section-heading {
   }
 }
 
-// Each chart's link through to its timings or methods table. The class is on
-// the <a>, inside a .tc-crosslink-line paragraph under the heading (#240).
-//
-// The resets are redundant there and kept on purpose: inside a
-// .recipe-section-heading the link would inherit uppercase, letter-spacing,
-// -webkit-text-stroke and text-shadow, and it is one edit away from that.
+// Each chart's links to its timings table or another section, in a
+// .tc-crosslink-line under the heading (#240), each on its own line at every
+// width so they share a left edge (#1450); fit-content keeps the tap area to
+// the words. The resets are kept on purpose: inside a .recipe-section-heading
+// the link would inherit its uppercase, tracking, stroke and shadow.
 .tc-crosslink {
+  display: block;
+  width: fit-content;
   font-family: $font-body;
   font-size: 0.8rem;
   text-transform: none;
@@ -459,7 +460,6 @@ article.recipe .tc-contents ~ .recipe-section-heading {
   margin: 0;
 }
 
-// Two links on one line.
 .tc-crosslink + .tc-crosslink {
-  margin-left: $space-lg;
+  margin-top: $space-xs;
 }
