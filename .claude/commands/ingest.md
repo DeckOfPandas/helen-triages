@@ -388,6 +388,11 @@ else has already done (MANUAL §9.1).
   `scripts/tidy_drafts.py --only units` is the same rule for a drafts pass.
   On food the formatting reaches `QQ` lines too, so Helen rewrites from house
   style; a `QQ original` still keeps every word the source printed.
+- **A `QQ Claude` line's numbers and times** (DECISIONS §5): words up to ten,
+  numerals from 11, but a measurement or an ingredient count keeps its numeral
+  ("four circles about 2 cm wider", "2 bay leaves"). A time straight after its
+  verb takes "for" ("roast for about 15 mins"); one set off by a comma after
+  the end point takes none ("fry to soften, about 10 mins").
 - **The citation**, per `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`. For
   food that is `source` + `source_type`; a dated magazine is a `publication`, an
   undated one is a `website`, and that distinction catches everyone out. For
@@ -403,8 +408,8 @@ else has already done (MANUAL §9.1).
 - **EVERY METHOD STEP IS A PAIR.**
 
       method:
-        - "QQ original Heat the oven to 180C fan and grease a 20cm tin."
-        - "QQ Claude Heat the oven to 180°C fan and grease a 20 cm tin."
+        - "QQ original Grease a 20cm tin and bake at 180C fan for 25 minutes."
+        - "QQ Claude Grease a 20 cm tin. Bake at 180°C fan, 25 mins."
 
   `QQ original` is **verbatim** -- the source's own punctuation, its "minutes",
   its degree-sign habits. Never tidy or house-style one; it will read as broken
@@ -457,6 +462,11 @@ else has already done (MANUAL §9.1).
     she cut it. She kept "still be slightly sticky inside" a few lines
     earlier, because that one changes what the cook does next (keep it in the
     oven, don't panic) and the ending flourish didn't.
+  - **No "heat the oven" step.** The temperature goes where the oven is first
+    used ("Roast at 180°C fan for 10 mins"), and a later step in the same oven
+    names no figure unless it changes; the grill likewise ("grill on its
+    highest setting"). Helen: *"I HATE having a "heat the oven" step. I mean,
+    like, duhhh."* DECISIONS §4.
 
   None of this is a licence to write a `QQ Claude` line closer to her *voice*
   in the Tier 3 sense -- it's still her call when a step needs her own

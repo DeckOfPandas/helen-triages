@@ -83,6 +83,7 @@ argument and the rules each field is read by.
 - 2026-11-03 · §4 · a recipe written up in a chat, not transcribed from a page, has QQ Claude method lines and no QQ original.
 - 2026-11-03 · §4 · an unqualified milk, egg or butter takes the house default, and the line says what the source printed.
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
+- 2026-11-11 · §4 · a rewrite has no "heat the oven" step; the temperature goes where the oven is first used.
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
 - 2026-10-28 · §4 · makes: is written as a count of a named thing.
 - 2026-11-03 · §4 · a dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets.
@@ -128,6 +129,8 @@ argument and the rules each field is read by.
 - 2026-10-04 · §4.3 · #1201 · the magic-bag schema is tested through a committed fixture entry, not by asserting the collection is non-empty.
 - 2026-08-26 · §4.3 · a magic-bag entry always has a tagline: line, and its value may be empty.
 - undated · §4.3 · Undated — a magic-bag entry's minimum is an ingredients list.
+- 2026-11-11 · §4.3 · a food recipe's address goes in an optional source_url, and the word "recipe" is the link.
+- 2026-11-11 · §4.3 · a prep or cook time may link to a drink.
 - 2026-08-21 · §5 · #413 · en dashes are scoped by what a reader SEES.
 - 2026-10-30 · §5 · citrus is never "a squeeze": it is "¼ lemon, juiced".
 - 2026-10-18 · §5 · on food, the formatter reaches a QQ line; it still never rewords one.
@@ -140,6 +143,8 @@ argument and the rules each field is read by.
 - 2026-11-05 · §5 · a spoon amount takes no "of" — Helen: "Never "2 tbsp of" something.
 - 2026-11-05 · §5 · a scaled amount of one or less is singular: "½ bunch".
 - 2026-11-05 · §5 · a weight goes in the amount's bracket, never the item.
+- 2026-11-11 · §5 · numbers in prose: words up to ten, numerals from 11.
+- 2026-11-11 · §5 · a time straight after its verb takes "for".
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.

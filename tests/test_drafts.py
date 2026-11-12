@@ -173,6 +173,9 @@ NOT_FOR_DRAFTS = {
         "(#577, option 1); what the script refuses -- an `or` remainder, "
         "`baby` -- needs an eye",
     "test_internal_recipe_links_resolve": "GAP, mechanical; 7 drafts",
+    "test_drink_links_name_a_published_drink":
+        "a draft may link to a drink still in _cocktail_drafts/; "
+        "test_drink_links_resolve_in_drafts accepts both",
     "test_main_ingredients_egg_count_agrees": "GAP; 3 drafts",
 
     # -- Clean across the drafts when listed, so twinning one is free.
@@ -690,6 +693,14 @@ def test_prose_abbreviates_minutes_only(draft):
     _st.test_prose_abbreviates_minutes_only(draft)
 
 
+def test_numbers_in_prose(draft):
+    _st.test_numbers_in_prose(draft)
+
+
+def test_a_time_after_its_verb_takes_for(draft):
+    _st.test_a_time_after_its_verb_takes_for(draft)
+
+
 # --- taxonomy and links (test_taxonomy.py) -----------------------------------
 
 def test_tags_are_declared(draft, taxonomy):
@@ -749,4 +760,18 @@ def test_internal_recipe_links_resolve_in_drafts(draft):
     assert not broken, (
         f"{where_draft(draft)} links to recipe slug(s) {broken}, which "
         f"exist in neither _food_recipes/ nor _food_drafts/."
+    )
+
+
+def test_drink_links_resolve_in_drafts(draft):
+    """A draft's drink link names a drink that exists, published or drafted.
+    Publishing needs it published: test_drink_links_name_a_published_drink.
+    """
+    from conftest import ROOT
+    known = _tx.PUBLISHED_DRINKS | {
+        p.stem for p in (ROOT / "_cocktail_drafts").rglob("*.md")}
+    broken = [s for s in _tx.drink_slugs_linked(draft) if s not in known]
+    assert not broken, (
+        f"{where_draft(draft)} links to drink(s) {broken}, which exist in "
+        f"neither _cocktail_recipes/ nor _cocktail_drafts/."
     )

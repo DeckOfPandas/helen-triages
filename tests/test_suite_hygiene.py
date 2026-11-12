@@ -145,6 +145,8 @@ PARTIAL_IN_CI = {
     # and fail; it keeps running because the declared exemption names a
     # published recipe.
     "test_no_note_exception_is_stale",
+    # The same for NUMBER_EXCEPTIONS, whose one phrase is in a published recipe.
+    "test_no_number_exception_is_stale",
 }
 
 

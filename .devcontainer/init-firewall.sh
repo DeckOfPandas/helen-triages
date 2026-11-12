@@ -1,8 +1,8 @@
 #!/bin/bash
 # Default-deny outbound traffic, then allow only the hosts Claude Code and the
 # GitHub tooling need, plus /etc/claude-kit/allowed-domains (written at build
-# time from kit.env's toggles and EXTRA_ALLOWED_DOMAINS). run.sh --firewall
-# runs this as root before the shell starts.
+# time from kit.env's toggles and EXTRA_ALLOWED_DOMAINS). run.sh runs this as
+# root before the shell starts, unless given --no-firewall.
 #
 # It takes no arguments on purpose: the user may run it through sudo, so an
 # argument would let anything inside the container widen its own allowlist.

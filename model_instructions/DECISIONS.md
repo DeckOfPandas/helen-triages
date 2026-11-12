@@ -478,6 +478,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
   rulings from two claude.ai chats that Helen confirmed as standing, each a
   yes. Its `QQ original` keeps everything the source printed.
+- **2026-11-11 — a rewrite has no "heat the oven" step; the temperature goes
+  where the oven is first used.** Helen: *"I HATE having a "heat the oven"
+  step. I mean, like, duhhh. … mention the temperature the first time it's
+  used."* So "Roast at 180°C fan for 10 mins", and a later step in the same
+  oven names no figure unless it changes. The grill is the same: "grill on
+  its highest setting for 5 mins". The `QQ original` keeps the source's step.
 - **2026-10-29 — an unheaded first ingredient group is named for the dish or
   its main component, unasked.** Helen: *"hopefully this would be obvious,
   like "for the beef", or "for the pie"?"* The name is read after "For the".
@@ -793,7 +799,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   entry is a dish she cooks from memory, and the list is what makes it
   findable and shoppable. No method is demanded.
   `test_ingredients_is_a_non_empty_list`.
-
+- **2026-11-11 — a food recipe's address goes in an optional `source_url`, and
+  the word "recipe" is the link.** Helen, on a website recipe whose link had
+  nowhere to go: *"Don't we have something in source? If not then please make
+  an appropriate shape and document it."* The drinks' keys (#454) were taken
+  whole: `source` says who, `source_url` says where. She then marked the word
+  on the page: *"I showed in the food recipe line where I want the link."* A
+  site naming its cook always says `, recipe `, so that word carries it; a
+  source without it is linked whole. SOURCE_ATTRIBUTION_SPEC.md rule 4.
+- **2026-11-11 — a prep or cook time may link to a drink.** Helen's Christmas
+  pudding prep time is *"minimum 60 mins, more if you drink"* two named
+  drinks, each a link, so both time cells render as markdown, as the tagline
+  does. MANUAL §4, "Cross-recipe links".
 ## §5 House style
 
 - **2026-08-21, #413 — en dashes are scoped by what a reader SEES.** Helen, on
@@ -882,6 +899,25 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   and "roughly" become "about". A bracket that says more ("about 150 g
   each", "or 400 g frozen", "about 60 ml juice") stays in the item.
   `test_weight_is_in_the_amount_not_the_item` (`tests/test_style.py`).
+- **2026-11-11 — numbers in prose: words up to ten, numerals from 11.**
+  Helen: *"numbers up to ten in prose are written out, and numbers 11 and
+  above are numerals. When numbers are behaving like "2 cm" or "5 g" then
+  those should be numerals. The example is "four circles about 2 cm
+  wider"."* And: *""2 bay leaves" and "10 dried rose petals" etc are behaving
+  like ingredient lines and should stay as numbers."* So a measurement and a
+  count of an ingredient keep the numeral; a count of anything else (servings,
+  folds, pots, circles) is a word. A label keeps its numeral ("step 2",
+  "gas mark 5"). Held on every recipe and draft: *"Please apply the new rules
+  to all the drafts, otherwise I'll be distracted when I rewrite and cook
+  them."* A `QQ original` line keeps the source's own numbers.
+  `test_numbers_in_prose` (`tests/test_style.py`).
+- **2026-11-11 — a time straight after its verb takes "for".** Helen:
+  *""roast about 15 mins" should become "roast for about 15 mins". "add the
+  garlic and cook a few mins more" needs "for a few mins". Sometimes I drop
+  the "for", like "fry to soften, about 10 mins.""* Her own pattern sets the
+  time off with a comma after the end point; a time that follows the verb
+  directly needs the "for". Scoped as the numbers rule above.
+  `test_a_time_after_its_verb_takes_for` (`tests/test_style.py`).
 - **Undated — "180°C fan" is correct and is not a conversion; what is banned
   is a second, conventional-oven temperature beside it, and gas marks
   always.** Helen: *"saying 'fan' isn't a conversion."* The site is fan-oven
@@ -2223,7 +2259,7 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   not replaceable, and calling it a type of rhum agricole isn't at all
   useful"*. It sits with the liqueurs and not under rum (decided on her
   question, 2026-08-17), so "no rum tonight" does not drop a drink whose only
-  rum is a little of it (Ginger Snap, Accoutrement). The same shape as Strega
+  rum is a little of it (Accoutrement). The same shape as Strega
   and Bénédictine.
 - **2026-09-05, #314 — `navy`, `overproof navy` and `black` are not rum
   categories and are retired for good.** Helen: *"there is no such thing as

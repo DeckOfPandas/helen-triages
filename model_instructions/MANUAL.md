@@ -576,6 +576,7 @@ meta:                            # exactly these three, in this order -- §4.0.
 tagline: "It's fun to have a one-pot stew that is bright and acidic..."
 source: "Adapted from Good Food, January 2026"
 source_type: publication         # required; SOURCE_ATTRIBUTION_SPEC.md
+source_url: "https://..."        # optional: the recipe's address, linking `source`
 serves: "4"                      # xor makes: -- never both. Quoted. Opens
                                  # with a number; makes: with a count
 prep_time: "20 mins"
@@ -633,7 +634,9 @@ gap it used to paper over.
 `tests/test_source_attribution.py` enforces it over recipes and drafts. The
 rule most likely to catch you: the date is what separates a `publication`
 from a `website` — no date, it is the website. `source_type` renders nowhere,
-so it is in `INVISIBLE_KEYS` (§4.0).
+so it is in `INVISIBLE_KEYS` (§4.0). The optional `source_url` holds the
+recipe's address. The page links the word `recipe` in a site's `, recipe
+<person>`, and links any other source whole (the spec's rule 4).
 
 **The staging folders inside the drafts repos are Helen's.** They record where
 she is with a recipe, which no flag can say; `PIPELINE.md` §3 names them and
@@ -713,7 +716,12 @@ takes `proofread` down with it.
   `test_a_group_named_to_something_is_its_own_heading` pins the table.
 - **Cross-recipe links are markdown and relative**: `[text](../slug/)`. Front
   matter is never run through Liquid, so a root-relative link cannot pick up
-  the baseurl.
+  the baseurl. The tagline, `prep_time` and `cook_time` are rendered as
+  markdown, so each may carry one. A link to a drink climbs to the site root,
+  `[Cherry Bakewell](../../../cocktails/recipes/cherry-bakewell/)`, which
+  resolves from a draft and a published recipe alike; it must name a
+  published drink, or the production build's link check fails once the
+  recipe publishes.
 - **`notes:` items are `{label, text}`, both keys always present**, on both
   sites and in both drafts repos; a bare string is refused everywhere
   (`test_note_dicts_have_label_and_text_when_dict` on drafts). An empty

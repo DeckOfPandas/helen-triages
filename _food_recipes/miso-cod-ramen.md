@@ -59,7 +59,7 @@ method_groups:
       - "Mix the marinade, coat the cod, and chill for at least 30 mins."
   - name: "ramen"
     steps:
-      - "Pan-fry the cod skin-side down in 2 tbsp hot oil for 2–3 mins, turn, and cook 2–3 mins more. Set aside."
+      - "Pan-fry the cod skin-side down in 2 tbsp hot oil for 2–3 mins, turn, and cook for 2–3 mins more. Set aside."
       - "Cook the noodles in salted water according to the packet."
       - "Stir-fry the pak choi in the remaining oil until it starts to wilt. Add the stock, soy, oyster and fish sauces and heat through."
       - "Divide the noodles between bowls and add the broth. Top with the pak choi and cod. Garnish with spring onion and menma."

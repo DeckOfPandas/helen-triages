@@ -35,7 +35,7 @@ method:
   - "QQ original Meanwhile, melt the butter in a large frying pan over medium heat. Once the butter has melted and is foaming, add the sage leaves and fry them for 30 seconds or so until they are crisp, then remove them to a plate lined with kitchen paper."
   - "QQ Claude Meanwhile melt the butter over medium heat. Fry the sage in the foaming butter, 30 seconds, until crisp. Drain on kitchen paper."
   - "QQ original Add the minced garlic to the butter and cook for about 30 seconds until fragrant, being careful not to let it burn or it will turn bitter."
-  - "QQ Claude Add the garlic and cook 30 seconds, until fragrant."
+  - "QQ Claude Add the garlic and cook for 30 seconds, until fragrant."
 method_short:
   - ""
 notes:

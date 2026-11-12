@@ -119,8 +119,8 @@ ingredient_groups:
     - amount: "2 large"
       item: "onions, sliced"
 method:
-  - "QQ original Heat the oven to 180C fan and grease a 20cm tin."
-  - "QQ Claude Heat the oven to 180°C fan. Grease a 20 cm tin."
+  - "QQ original Grease a 20cm tin and bake at 180C fan for 25 minutes."
+  - "QQ Claude Grease a 20 cm tin. Bake at 180°C fan, 25 mins."
 method_short:
   - ""
 notes:
@@ -145,6 +145,7 @@ name you give is a courtesy rather than a contract.
 | `title` | The dish's name. **`and`, never `&`.** Keep the source's own name unless it is unusable. **Keep its accents, and add any §6 lists that it lacks**: "Rich ragu" is titled "Rich Ragù". Helen: *"Accents in titles should be preserved, or added if missing."* |
 | `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
+| `source_url` | Optional, section 5: the recipe's own web address, where it has one. Leave the key out otherwise. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
 | the yield's number | **`serves:` opens with a number of people; `makes:` opens with a count of a named thing**: "one 20-cm cake (about 10 slices)", "2 loaf cakes", "950 ml", "1 batch" for a sauce or spice blend. The source's other words follow the figure: "4, depending on appetite". **One figure, not an alternative:** "9 large or 16 small biscuits" reads as nine of something called "large", so write the one the source leads with ("9 biscuits"). **`makes` is never read as people** however numeric it looks. **A dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets**: `"one 20-cm cake (about 10 slices)"`, `"one 900-g loaf (8–10 slices)"`; with no slices given, `"one 23-cm cake"`. Never portions as the count. Helen: *"one 20-cm cake (about 10 slices). Let's always use that. If we don't know slices, then leave them out."* **The figure is a whole number**: `"About 2500 ml"`, never `"About 2.5 litres"` or `"2½ litres"`, which leave the scaler nothing to count. **Where the source prints no figure, write `"QQ"`** and put a suggested one in your list (for a bake, the thing its tin makes: "one 20-cm cake"); never a guessed number in the file. There is no `serves_estimate` field: it is retired, and the suite refuses it. |
 | `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. **Not in the source? Estimate it, as `"Estimated 20 mins"`, and say so in your list** — Helen: *"I would like "Estimated 10 mins" to be written, then our tidying scripts block promotion for recipes with estimated times."* Her repository refuses to promote a recipe whose time still says `Estimated`, so a guess never publishes. Write `"QQ"` only where you cannot estimate at all. `cook_time: "None"` for a genuinely uncooked dish. |
@@ -330,6 +331,13 @@ scaffolding. What goes is the explanation of why, the reassurance, and the
 remedy for a problem the instruction already prevents.
 
 A step may be two short sentences. It is often better as two.
+
+**No "heat the oven" step.** The temperature goes in the step where the oven
+is first used: "Roast at 180°C fan for 10 mins". A later step in the same oven
+names no figure unless it changes. Helen: *"I HATE having a "heat the oven"
+step. I mean, like, duhhh. … mention the temperature the first time it's
+used."* The grill is the same: "grill on its highest setting for 5 mins". The
+`QQ original` keeps the source's own step, preheat and all.
 
 ### One `QQ original` per source step; split the rewrite where it is dense
 
@@ -639,6 +647,11 @@ must carry one; a website must not. A year alone is a complete date. Some
 titles are genuinely both — *Good Food* has a print issue and a site — so **if
 you have no date, it is the website.**
 
+**`source` says who; `source_url` says where.** Name a site in `source`, never
+by its address. When the recipe is on the web, its full address goes in
+`source_url: "https://..."`, and the page links the source to it. With no
+address, leave the key out rather than writing it empty.
+
 **A book must name its author**, in one shape or the other. There is no
 authorless-book form: Helen's ruling is *"I can't imagine knowing the name of a
 book but not its author."* If you have a title and no author, you are probably
@@ -693,6 +706,12 @@ batch comes from one of them, the index may say so once.
 - **A spoon amount takes no "of"**: "2 tbsp oil", never "2 tbsp of the oil",
   in an ingredient line and a `QQ Claude` step alike. Helen: *"Never "2 tbsp
   of" something. Just "2 tbsp $something". Always."*
+- **Numbers in a `QQ Claude` line: words up to ten, numerals from 11**, except
+  a measurement or a count of an ingredient, which keeps its numeral: "four
+  circles about 2 cm wider", "stuff with 2 bay leaves", "serves six".
+- **A time straight after its verb takes "for"**: "roast for about 15 mins",
+  "cook for a few mins more". Set off after the end point with a comma, it
+  takes none: "fry to soften, about 10 mins".
 - **A space between a number and its unit**, imperial included: `15 ml`,
   `400 g`, `20 cm`, `9 in`, `2 tbsp`. Not `15ml`. A temperature takes none:
   `180°C`.
@@ -840,7 +859,7 @@ method:
   - "QQ original Meanwhile, melt the butter in a large frying pan over medium heat. Once the butter has melted and is foaming, add the sage leaves and fry them for 30 seconds or so until they are crisp, then remove them to a plate lined with kitchen paper."
   - "QQ Claude Meanwhile melt the butter over medium heat. Fry the sage in the foaming butter, 30 seconds, until crisp. Drain on kitchen paper."
   - "QQ original Add the minced garlic to the butter and cook for about 30 seconds until fragrant, being careful not to let it burn or it will turn bitter."
-  - "QQ Claude Add the garlic and cook 30 seconds, until fragrant."
+  - "QQ Claude Add the garlic and cook for 30 seconds, until fragrant."
 method_short:
   - ""
 notes:
