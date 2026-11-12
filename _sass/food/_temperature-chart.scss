@@ -34,11 +34,11 @@ $tc-max: 100;
 $tc-hue: $color-blinging-blackberry;
 
 $tc-bar-height: 0.85rem;
-// The bar starts at the top of its track and all the air is below it, so a
-// bar groups with the caption above it and not with the next row's.
-$tc-bar-gap-below: 0.95rem;
+// The bar sits right under its caption and all the air is below it, so a bar
+// groups with the caption above it and not with the next row's (#1500).
+$tc-bar-gap-below: 1.6rem;
 $tc-track-height: $tc-bar-height + $tc-bar-gap-below;
-$tc-track-gap-above: 0.2rem;
+$tc-track-gap-above: 0;
 // Headroom above the rows for the threshold's own label.
 $tc-threshold-height: 1.35rem;
 

@@ -6022,6 +6022,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   35°C edge (2026-10-09: *"The scientist in me is upset by the x axis
   lines"*): each is its own stop, from the same `$tc-min`/`$tc-max`
   arithmetic as the ticks and the bars.
+- **2026-11-12, #1500 — a bar sits right under its own label, with all the
+  air below it.** Chosen from three candidates on the page (spacing, banding,
+  hairlines): *"rows a"*. Every chart, the recipe page's included.
 - **2026-10-30, #1450 — a section's cross-links each take their own line,
   left-aligned, at every width.** Helen: *"I don't see why we shouldn't do
   each on its own line at all screen widths."*
