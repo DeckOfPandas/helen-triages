@@ -701,7 +701,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   from food drafts to published."* Promotion into the collection and the gate
   opening are two different moments: the recipe sits in `_food_recipes/`, off
   the live site, until she reads the built page and flips the flag herself.
-  Mechanical suite failures on the copy are fixed and said afterwards.
+  Mechanical suite failures are fixed in `3-keep/`, before her proofread
+  (2026-11-12, PIPELINE.md §3); any that still reach the copy flip the flag.
+- **2026-11-12 — food's `rewritten` is not a publish-gate leg: a recipe
+  saying `false` publishes, and is left off the food index and search.** Helen:
+  *"That rule changed because I wanted to publish some recipes that weren't
+  ready simply because I wanted to cook from them and didn't have a local
+  build available!"* So promotion says so when a food draft still says
+  `rewritten: false`, and she sets it, or asks for it set (Grandma Kath's
+  pudding, as a one-off), or leaves it unlisted on purpose. MANUAL §4.0.
 - **2026-10-21 — a tag or star change Helen has agreed with a session row by
   row needs no flip.** Helen: *"No need to flip the proofread flag for tag
   changes agreed interactively -- new official ruling."* Her row-by-row answer
@@ -4588,13 +4596,18 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   there are a few intermediate states."* This reversed "never move a file
   between these folders unless asked" by making the word the ask. Each move is
   a commit on a branch of the private repo.
-- **2026-11-04 — a food draft that leaves the pool gets the promotion rules
-  run against it.** Helen: *"I want you to run the promotion rules against
-  drafts I progress from the main pool,"* wanting to "promote 3-keep recipes
-  ASAP" and to cook from `2-make/` "without being infuriated". `python3
-  scripts/promotion_qa.py` sorts what it finds into FIX, HELEN'S and AT
-  PROMOTION; a `2-make/` draft is also checked to render and read for sense.
-  PIPELINE.md §3.
+- **2026-11-12 — the suite holds a food draft in `3-keep/` or `4-promote/`
+  to every published-recipe rule; the rules only Helen settles bite at
+  `4-promote/`.** Helen: *"After I make recipes, I'll likely rewrite slightly
+  based on my experience, moving them to 3-keep, and it's at that point I'd
+  like to run all the checks. Then when those are in and all questions are
+  answered, drafts can move to 4-promote, intending that all that happens is
+  one proofread from me and only ad hoc fixes we missed."* Five recipes met
+  twenty published-only failures after her proofread, which cost a second
+  OK. A draft leaving the pool still gets `python3 scripts/promotion_qa.py`
+  (*"I want you to run the promotion rules against drafts I progress from
+  the main pool"*, 2026-11-04), which sorts FIX, HELEN'S and AT 3-KEEP; a
+  `2-make/` draft is also checked to render and read for sense. PIPELINE.md §3.
 - **2026-09-14 — never create issues or PRs in a burst: a batch of issues is
   one issue with a checklist.** Twenty issues and two PRs in under an hour got
   the agent account flagged as spam, and GitHub hid everything it had ever
