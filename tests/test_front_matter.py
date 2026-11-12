@@ -821,6 +821,14 @@ ADJUDICATED_REWRITES = {
             "by her standing grant under 026f3224."
         ),
     },
+    "_food_recipes": {
+        "2d97c96a": (
+            "grandma-kaths-christmas-pudding.md, 2026-11-12. Promoted saying "
+            "rewritten: false, which would have published it unlisted on the "
+            "index and search. Asked, Helen had the agent set it true as a "
+            "one-off."
+        ),
+    },
 }
 
 
