@@ -277,28 +277,31 @@ permalink: /food/reference/internal-temperatures/
         {% comment %} Every span below is computed from the data, not typed; see
            _includes/food/temp_span.html for why the obvious
            `| map: "out_at_min" | sort | first` silently returns nils here. {% endcomment %}
-        {% include food/temp_span.html label="Tuna" doneness=t.fish.tuna.doneness %}
-        {% include food/temp_span.html label="Salmon" doneness=t.fish.salmon.doneness %}
-        {% include food/temp_span.html label="Steak" doneness=t.steak.doneness %}
-        {% include food/temp_span.html label="Beef roast" doneness=t.beef.tender_roast.doneness %}
+        {% comment %} Each row links up to its own section (#1501): `anchor` is the
+           node's chart_anchor, which tests/test_reference_data.py holds to an id
+           on this page. {% endcomment %}
+        {% include food/temp_span.html label="Tuna" doneness=t.fish.tuna.doneness anchor=t.fish.tuna.chart_anchor %}
+        {% include food/temp_span.html label="Salmon" doneness=t.fish.salmon.doneness anchor=t.fish.salmon.chart_anchor %}
+        {% include food/temp_span.html label="Steak" doneness=t.steak.doneness anchor=t.steak.chart_anchor %}
+        {% include food/temp_span.html label="Beef roast" doneness=t.beef.tender_roast.doneness anchor=t.beef.tender_roast.chart_anchor %}
         {% comment %} One venison row, not two: loin and haunch carry identical out-at figures,
            and this chart plots out-at spans, so a second row would draw a bar exactly
            on top of the first. What separates the two cuts is carryover, which the
            section above shows. The list runs by lower bound. {% endcomment %}
-        {% include food/temp_span.html label="Venison roast" doneness=t.venison.loin.doneness %}
-        {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness %}
-        {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness %}
+        {% include food/temp_span.html label="Venison roast" doneness=t.venison.loin.doneness anchor=t.venison.loin.chart_anchor %}
+        {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness anchor=t.lamb.roasting.chart_anchor %}
+        {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness anchor=t.pork.roasting.chart_anchor %}
 
         {% comment %} The single-figure rows go through temp_row.html like every other row: it
            builds the figure from the numbers on whichever key the node carries
            (endpoint, target, tender_at) and says "tender at" for the last. {% endcomment %}
-        {% include food/temp_row.html label="Fish, chefs" spec=t.fish.general_chefs %}
-        {% include food/temp_row.html label="Fish, general" spec=t.fish.general %}
-        {% include food/temp_row.html label="Poultry (whole)" spec=t.poultry.chicken %}
-        {% include food/temp_row.html label="Duck (whole)" spec=t.poultry.duck %}
-        {% include food/temp_span.html label="Duck breast" doneness=t.poultry.duck_breast_separate.doneness %}
-        {% include food/temp_row.html label="Cured ham" spec=t.ham.cured %}
-        {% include food/temp_row.html label="Slow-cooked" spec=t.beef.tough_cuts %}
+        {% include food/temp_row.html label="Fish, chefs" spec=t.fish.general_chefs anchor=t.fish.general_chefs.chart_anchor %}
+        {% include food/temp_row.html label="Fish, general" spec=t.fish.general anchor=t.fish.general.chart_anchor %}
+        {% include food/temp_row.html label="Poultry (whole)" spec=t.poultry.chicken anchor=t.poultry.chicken.chart_anchor %}
+        {% include food/temp_row.html label="Duck (whole)" spec=t.poultry.duck anchor=t.poultry.duck.chart_anchor %}
+        {% include food/temp_span.html label="Duck breast" doneness=t.poultry.duck_breast_separate.doneness anchor=t.poultry.duck_breast_separate.chart_anchor %}
+        {% include food/temp_row.html label="Cured ham" spec=t.ham.cured anchor=t.ham.cured.chart_anchor %}
+        {% include food/temp_row.html label="Slow-cooked" spec=t.beef.tough_cuts anchor=t.beef.tough_cuts.chart_anchor %}
       </div>
       {{ axis }}
     </div>

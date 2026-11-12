@@ -924,6 +924,7 @@ argument and the rules each field is read by.
 - 2026-10-09 · §14 · a chart figure is numbers only, and no chart has a note under it.
 - 2026-10-16 · §14 · chart gridlines sit on every multiple of five: the tens labelled, the fives between them paler and unlabelled, at every width.
 - 2026-11-12 · §14 · #1500 · a bar sits right under its own label, with all the air below it.
+- 2026-11-12 · §14 · #1501 · each row of the ALL chart links up to its own section; the whole row is the link, and hovering anywhere on it turns the label hot pink.
 - 2026-10-30 · §14 · #1450 · a section's cross-links each take their own line, left-aligned, at every width.
 - 2026-10-09 · §14 · on the methods page the weight sits under the dropdown, the four birds read "(whole)", and times are compact (4h50m – 5h30m).
 - 2026-10-09 · §14 · the slow-cooked cuts are one chart section of their own.

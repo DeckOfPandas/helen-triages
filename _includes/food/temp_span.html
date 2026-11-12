@@ -4,6 +4,8 @@
    Parameters
    label     the protein's name
    doneness  a doneness hash from _data/food/internal_temperatures.yml
+   anchor    optional: the node's `chart_anchor`, so the label links up to
+             its own section (#1501)
 
    Not `| map: "out_at_min" | sort | first`: `doneness` is a hash, and
    iterating a hash in Liquid yields [key, value] pairs, so `map` returns a
@@ -25,7 +27,7 @@
 {% comment %} The row carries its span and the value sits outside the track, as in
    temp_row.html; see there for why. {% endcomment %}
 <div class="tc-row" style="--a:{{ lo }}; --b:{{ hi }};">
-  <div class="tc-row-label">{{ include.label }}</div>
+  <div class="tc-row-label">{% if include.anchor %}<a class="tc-row-link" href="#{{ include.anchor }}">{{ include.label }}</a>{% else %}{{ include.label }}{% endif %}</div>
   <div class="tc-track">
     <div class="tc-out-at" style="--a:{{ lo }}; --b:{{ hi }};"></div>
   </div>

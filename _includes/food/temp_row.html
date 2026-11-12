@@ -1,9 +1,7 @@
-{% comment %} One row of the temperature charts, drawn from
-   _data/food/internal_temperatures.yml.
-
-   Parameters
-   label   the row's name, already human-readable
-   spec    a node holding out_at_min/out_at_max, and optionally rested_min/max
+{% comment %} One row of the temperature charts, from _data/food/internal_temperatures.yml.
+   Parameters: `label`, the row's name; `spec`, a node holding out_at_min/max
+   and optionally rested_min/max; `anchor`, optional, the node's chart_anchor,
+   which makes the row a link up to its section (#1501).
 
    This file only hands over numbers: the stylesheet turns °C into a position,
    so the axis re-scales from $tc-min/$tc-max in
@@ -62,7 +60,7 @@
    row differently can place its words from the row. The bars carry their own
    pair. {% endcomment %}
 <div class="tc-row{% if include.suggested %} tc-row--suggested{% endif %}" style="--a:{{ from }}; --b:{{ right }};">
-  <div class="tc-row-label">{{ include.label }}{% if include.suggested %}<span class="tc-suggested" title="What this recipe suggests">this recipe</span>{% endif %}</div>
+  <div class="tc-row-label">{% if include.anchor %}<a class="tc-row-link" href="#{{ include.anchor }}">{{ include.label }}</a>{% else %}{{ include.label }}{% endif %}{% if include.suggested %}<span class="tc-suggested" title="What this recipe suggests">this recipe</span>{% endif %}</div>
   <div class="tc-track">
     <div class="tc-out-at" style="--a:{{ from }}; --b:{{ to }};"></div>
 
