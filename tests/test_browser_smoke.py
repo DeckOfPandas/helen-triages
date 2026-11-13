@@ -20,6 +20,7 @@ import functools
 import http.server
 import os
 import pathlib
+import re
 import threading
 import urllib.parse
 
@@ -405,3 +406,47 @@ def test_no_footer_label_breaks_inside_itself(chromium, visit, url):
             broken.append(f"{width}px: {text!r} on {lines} lines")
     assert not broken, (
         f"{url}: a footer label wraps inside itself:\n  " + "\n  ".join(broken[:12]))
+
+
+# --- The stock and spice hints (MANUAL §8.2) ----------------------------------
+
+STOCK_LINE = re.compile(r"\d (?:ml|litres?)</span></span>\s*(?:chicken|vegetable|beef) stock")
+
+def _recipe_with_stock_line(prod_site):
+    """A published, scalable recipe with a line like "500 ml chicken stock"."""
+    for path in sorted(prod_site.glob("food/recipes/*/index.html")):
+        text = path.read_text(encoding="utf-8")
+        if "recipe-scale-portions" in text and STOCK_LINE.search(text):
+            return "/" + str(path.parent.relative_to(prod_site)) + "/"
+    raise AssertionError("no scalable recipe with a stock line built")
+
+
+@pytest.mark.parametrize("width", sorted(VIEWPORTS))
+def test_a_stock_hint_opens_and_follows_the_scaler(chromium, visit, prod_site, width):
+    """Helen: "where a recipe wants 500 ml stock, I'd like to know how many
+    cubes/tsp to add to 500 ml water", in the ship key's pattern. The box is
+    shut until the i is tapped, names the line's own volume, closes on its ×,
+    and opened again after scaling, names the new volume."""
+    url = _recipe_with_stock_line(prod_site)
+    v = visit(url, width)
+    v.page.wait_for_load_state("networkidle")
+    _settle(v.page)
+    stock = v.page.locator("li.ingredient:has(.ingredient-hint-open)", has_text="stock").first
+    box = v.page.locator("dialog#ingredient-hint")
+    assert box.count() == 1, f"{url}: no hint box"
+    assert not box.is_visible(), f"{url}: the hint box is open before a tap"
+
+    stock.locator(".ingredient-hint-open").click()
+    assert box.is_visible(), f"{url}: tapping the i did not open the box"
+    amount = stock.locator(".ingredient-amount-number").inner_text().strip()
+    before = box.inner_text()
+    assert f"In {amount} of boiling water" in before, f"{url}: {amount!r} not in {before!r}"
+    assert "Kallo" in before and "Marigold" in before, f"{url}: {before!r}"
+    assert v.overflow() is None, f"{url} at {width}px scrolls sideways with the box open"
+    box.locator(".ingredient-hint-close").click()
+    assert not box.is_visible(), f"{url}: the × did not close the box"
+
+    v.page.locator(".recipe-scale-plus").click()
+    stock.locator(".ingredient-hint-open").click()
+    assert box.inner_text() != before, f"{url}: the box did not follow the scaler"
+    assert not v.errors, f"{url}: " + "\n  ".join(v.errors)

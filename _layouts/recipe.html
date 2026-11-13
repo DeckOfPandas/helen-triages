@@ -483,3 +483,8 @@ layout: default
 <script src="{{ '/assets/js/food-scale.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/recipe-scale.js' | relative_url }}"></script>
 {% if site.show_costs %}<script src="{{ '/assets/js/recipe-cost.js' | relative_url }}"></script>{% endif %}
+{% comment %} The stock and spice hints (MANUAL §8.2): their data, then the words, then
+   the wiring. {% endcomment %}
+<script type="application/json" id="ingredient-hints-data">{{ site.data.food.ingredient_hints | jsonify }}</script>
+<script src="{{ '/assets/js/food-hints.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/recipe-hints.js' | relative_url }}"></script>

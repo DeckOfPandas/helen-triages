@@ -1289,6 +1289,7 @@ The rulings behind every rule here are in DECISIONS §8.2.
 | `assets/js/food-shopping-list.js` | the list's totals, `build()`, and `totalText`, the one formatter for a scaled food amount. Pure |
 | `assets/js/food-scale.js` | one amount at a factor, and the scaler's stepping modes. Pure |
 | `assets/js/recipe-scale.js` | the recipe page's DOM half |
+| `assets/js/food-hints.js`, `assets/js/recipe-hints.js`, `_data/food/ingredient_hints.yml`, `_sass/food/_ingredient-hints.scss` | the stock and spice hints, a ship-key box behind a ringed i on an ingredient line |
 | `assets/js/filters.js` | the shopping list's DOM half: the rows, their words, the painting |
 
 The two Ruby readers have no Jekyll in them, so `scripts/food_yield.rb` can
@@ -1694,6 +1695,38 @@ a range of one (`yieldBox`: 5 is `2–3`, `125 ml` is `62–63 ml`, `64+` is
 - A recipe loses its half step through a rule, never by being named.
 - `tests/test_food_yield.py` names the published recipes offered a half
   step, and fails a published `makes:` it cannot read.
+
+#### The stock and spice hints
+
+The cocktails' ship key (§9.13), in food's colours (DECISIONS §8.2): a small
+ringed i, set as a superscript after an ingredient line, opens a modal
+`<dialog>` saying how much, closed by its ×, Escape or the backdrop. The
+figures are `_data/food/ingredient_hints.yml`, emitted on every recipe page
+as `#ingredient-hints-data`; the words are `assets/js/food-hints.js` (pure,
+`tests/js/food-hints.test.js`); `assets/js/recipe-hints.js` builds the one box
+and fills it from the line that opened it, reading the amount as it reads
+then, so it follows the scaler and the metric switch.
+
+- **Stock:** an item that says `stock` (not a cube, pot or powder) with a
+  volume (ml, litres, pints) gets, for that much boiling water, how much of
+  each product: cubes and spoons to the nearest half. Only the products that
+  come in the line's first named flavour are listed; no flavour lists every
+  product, and a flavour none comes in (`other_flavours`: lamb, ham…) gets no
+  hint. Figures, each the packet's own: Kallo cube 500 ml; Knorr cube 450 ml;
+  Knorr Stock Pot 500 ml; Oxo cube 190 ml; Marigold bouillon 1 level tsp per
+  250 ml (4 per litre, every variant); Bay's Kitchen 1 tbsp per 100 ml;
+  M&S concentrate 4 tsp chicken, 5 tsp beef, per pint. Knorr is the only
+  fish stock.
+- **Ground spices:** a spice in `match` and not `unless`, in tsp or tbsp, one
+  spice to the line, gets its weight (USDA FoodData Central's level teaspoon)
+  and what whole spice to weigh out and grind. By weight, not by seeds,
+  sticks or pods. Ginger adds the classic fresh figure, 1 tbsp grated per
+  ¼ tsp ground; nutmeg adds how much of a nutmeg (one grates to about
+  2½ tsp). Spices with no whole form (paprika, blends) get none.
+
+`tests/test_ingredient_hints.py` holds the data's shape and the six brands;
+`tests/test_browser_smoke.py` opens a stock hint, closes it, scales, and
+opens it again.
 
 #### Ticking rows off
 
