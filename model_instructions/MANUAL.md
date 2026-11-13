@@ -3316,8 +3316,8 @@ Five named questions, in Helen's order:
 - **A card's ship mark is a sixth control with no section** (#1412): a
   `<button>` that sets `state.ship` to its exact `data-ship`, ANDed with
   YOLO?. `× clear ship` (`#clear-ship`) appears under the legend. `?ship=`
-  sets it from a drink page's SHIP IT? link; a value no card carries is
-  dropped.
+  sets it from a drink page's SHIP IT? link or a related card's ship mark
+  (#1433); a value no card carries is dropped.
 - **The count row's legend names the ship values showing**: `ship it? = <card
   word>` while a mark is chosen, or else a narrowing YOLO button's words
   (`= yes², yes`), from its `data-ship-words` (#1440). At 600px and under the
