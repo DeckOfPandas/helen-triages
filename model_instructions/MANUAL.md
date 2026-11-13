@@ -3720,6 +3720,12 @@ modules and each module's docstring says what it covers. The rule for a red
   cocktail is therefore checked everywhere, CI included. The data files and
   collections are parsed once per run (`_parsed`, `_scan`): copy before
   changing anything a loader returned.
+- **Food's `recipe` fixture is every published recipe plus the drafts in
+  `3-keep/` and `4-promote/`** (`STAGED_DRAFTS` in `tests/conftest.py`), so a
+  rule written for a published recipe reaches a staged draft with no extra
+  code; the rules in `HELENS_RULES` reach `4-promote/` only. A rule that scans
+  the raw file reads `checkable_raw(recipe)`, which blanks a draft's `QQ`
+  lines. `draft` is every draft. PIPELINE.md §3.
 - **The staleness half of a guard is unanswerable on a partial corpus**: a
   cocktail merely absent looks exactly like one fixed. A check that hangs on a
   shrink-only registry, or a mood's share of the book, calls

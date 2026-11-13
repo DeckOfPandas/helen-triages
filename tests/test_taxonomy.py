@@ -13,7 +13,7 @@ import re
 import pytest
 import yaml
 
-from conftest import ALL_RECIPES, ROOT, is_qq, where
+from conftest import ALL_RECIPES, ROOT, STAGED_DRAFTS, checkable_raw, is_qq, where
 
 pytestmark = pytest.mark.food
 
@@ -123,7 +123,7 @@ def test_no_oven_conversions(recipe):
     A conventional temperature left in place is 20 degrees too hot in this
     kitchen.
     """
-    hits = re.findall(r"[^\s]*\s*(?:non-fan|conventional|gas mark \d|gas \d)[^,.\"]{0,10}", recipe.raw, re.I)
+    hits = re.findall(r"[^\s]*\s*(?:non-fan|conventional|gas mark \d|gas \d)[^,.\"]{0,10}", checkable_raw(recipe), re.I)
     assert not hits, (
         f"{where(recipe)} contains oven conversion(s): {hits}.\n"
         f"This site is fan-oven only, one temperature: '180°C fan', never "
@@ -136,11 +136,14 @@ def test_no_oven_conversions(recipe):
 
 LINK = re.compile(r"\]\(\.\./([a-z0-9-]+)/\)")
 PUBLISHED = {r.slug for r in ALL_RECIPES}
+# A staged draft may link another staged draft: they are promoted together.
+PUBLISHED_OR_STAGED = PUBLISHED | {d.slug for d in STAGED_DRAFTS}
 
 
 def test_internal_recipe_links_resolve(recipe):
     """A link to an unpublished recipe is a 404 on a live site."""
-    broken = [slug for slug in LINK.findall(recipe.raw) if slug not in PUBLISHED]
+    targets = PUBLISHED if recipe in ALL_RECIPES else PUBLISHED_OR_STAGED
+    broken = [slug for slug in LINK.findall(recipe.raw) if slug not in targets]
     assert not broken, (
         f"{where(recipe)} links to recipe slug(s) {broken}, which are not in "
         f"_food_recipes/.\n"

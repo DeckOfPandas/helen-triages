@@ -57,6 +57,7 @@ from test_source_attribution import VALID_TYPES                 # noqa: E402
 from test_standalone_docs import (                              # noqa: E402
     COCKTAIL_DOC, FOOD_DOC, _food_taxonomy,
 )
+import test_style                                               # noqa: E402
 from test_style import _accented_words                          # noqa: E402
 
 WIDTH = 80
@@ -171,6 +172,30 @@ def _no_accents() -> str:
         (SHARED_DATA_DIR / "accented_words.yml").read_text(encoding="utf-8")
     ) or {}
     return _dots(data.get("no_accent") or [])
+
+
+QUALIFIER_LISTS = {
+    "butter": "_QUALIFIED_BUTTER", "flour": "_QUALIFIED_FLOUR",
+    "sugar": "_QUALIFIED_SUGAR", "milk": "_QUALIFIED_MILK",
+    "ginger": "_QUALIFIED_GINGER", "nutmeg": "_QUALIFIED_NUTMEG",
+    "cinnamon": "_QUALIFIED_CINNAMON", "cloves": "_QUALIFIED_CLOVES",
+    "vanilla": "_QUALIFIED_VANILLA", "cardamom": "_QUALIFIED_CARDAMOM",
+    "mustard": "_QUALIFIED_MUSTARD", "soy_sauce": "_QUALIFIED_SOY_SAUCE",
+    "vinegar": "_QUALIFIED_VINEGAR", "chocolate": "_ALL_CHOCOLATE_TYPES",
+    "loomi": "_QUALIFIED_LOOMI",
+}
+
+
+def _qualifiers() -> str:
+    """The names a published recipe may give each qualified ingredient.
+
+    Each list is the closed set its rule in tests/test_style.py accepts, read
+    by name; this file says only which lists to print and in what order. A
+    lowercase entry that is a proper noun in prose (`english mustard`) prints
+    as the test holds it, because the match ignores case.
+    """
+    return _grouped({k: sorted(getattr(test_style, v))
+                     for k, v in QUALIFIER_LISTS.items()}, tick=True)
 
 
 def _wrong_glass_spellings() -> dict:
@@ -340,6 +365,7 @@ def renderers() -> dict:
         "to_serve": _to_serve,
         "sources": _sources,
         "food_sources": _food_source_rulings,
+        "qualifiers": _qualifiers,
     }
     for group in _food_taxonomy()["tags"]:
         out[f"tags:{group}"] = (lambda g: lambda: _tags(g))(group)
@@ -356,7 +382,7 @@ def required_blocks() -> dict:
     tags = {f"tags:{group}" for group in _food_taxonomy()["tags"]}
     return {
         FOOD_DOC: tags | {"stars", "source_types", "accents", "no_accent",
-                          "food_sources"},
+                          "food_sources", "qualifiers"},
         COCKTAIL_DOC: {
             "glass", "glass_corrections", "garnish", "method", "measures",
             "accents", "generics", "serve_ice", "to_serve", "sources",

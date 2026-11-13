@@ -47,8 +47,8 @@ flowchart TD
         POOL["pool (root)<br/>ingested, not yet hers"]:::helen
         RW["1-rewrite/ (both)<br/>picked; she rewrites next"]:::helen
         MK["2-make/ (both)<br/>readable enough to make"]:::helen
-        KP["3-keep/ (both)<br/>made and liked;<br/>not rewriting yet"]:::helen
-        PR["4-promote/ (both)<br/>her words are in; waiting on<br/>the mechanical pass and her proofread"]:::helen
+        KP["3-keep/ (both)<br/>made, liked, lightly rewritten;<br/>food: every check runs here"]:::helen
+        PR["4-promote/ (both)<br/>her words are in; food: checks green,<br/>questions answered, one proofread to go"]:::helen
     end
 
     POOL -->|"rewrite ‹slug›"| RW
@@ -59,7 +59,7 @@ flowchart TD
     KP -->|"ready ‹slug›"| PR
     MK -->|"bin ‹slug›"| BIN["deleted"]:::machine
 
-    PR --> MP["MECHANICAL PASS (Claude)<br/>suite green · no gate flag touched ·<br/>canonical bottles · one list of judgements ·<br/>a cocktail that needs Helen moves to 5-final-proofread/ ·<br/>then the word: final: ‹slugs›"]:::claude
+    PR --> MP["MECHANICAL PASS (Claude)<br/>food: done in 3-keep/, so only what slipped ·<br/>suite green · no gate flag touched ·<br/>canonical bottles · one list of judgements ·<br/>a cocktail that needs Helen moves to 5-final-proofread/ ·<br/>then the word: final: ‹slugs›"]:::claude
     MP --> PF["HELEN PROOFREADS THE RENDERED PAGE<br/>jekyll-local /…/drafts/‹folder›/‹slug›/<br/>rewritten: true (hers) · proofread: true"]:::helen
     PF --> PROMO["PROMOTION (Helen, or Claude when she asks)<br/>re-check the gate · copy · byte-compare ·<br/>delete from private · baseline commit · PR"]:::claude
     PROMO --> MERGE["Helen merges → deploy"]:::helen
@@ -147,8 +147,8 @@ one stage on both sites.
 | pool (the root) | ✓ | ✓ | ingested; nobody has touched it since |
 | `1-rewrite/` | ✓ | ✓ | she has picked it and will rewrite it next |
 | `2-make/` | ✓ | ✓ | readable enough to make from |
-| `3-keep/` | ✓ | ✓ | made and liked, and she is not rewriting it yet |
-| `4-promote/` | ✓ | ✓ | her words are in; waiting on the mechanical pass, then her proofread |
+| `3-keep/` | ✓ | ✓ | made and liked, perhaps lightly rewritten from cooking it. Food: the suite holds it to every published-recipe rule, so the mechanical fixes and her questions happen here |
+| `4-promote/` | ✓ | ✓ | her words are in. Food: checks green and every question answered, so what is left is one proofread and any fix that slipped through; cocktails: waiting on the mechanical pass, then her proofread |
 | `5-final-proofread/` | — | ✓ | staged for promotion and bounced back: something in it needs Helen and no agent can supply it |
 
 Every folder holds a `.gitkeep`, so it exists when empty, and
@@ -174,8 +174,8 @@ the chat or in an issue, each followed by one or more slugs:
 |---|---|
 | `rewrite ‹slug›` | moves it to `1-rewrite/` |
 | `make ‹slug›` | moves it to `2-make/` |
-| `keep ‹slug›` | moves it to `3-keep/`: made it, want it, not rewriting it now |
-| `ready ‹slug›` | moves it to `4-promote/` and starts the mechanical pass (§4): made it, rewritten it, it ships. Also the way out of `5-final-proofread/` once she has ruled |
+| `keep ‹slug›` | moves it to `3-keep/`: made it, want it. Food: runs `promotion_qa.py`, fixes every FIX, and brings the HELEN'S list (below) |
+| `ready ‹slug›` | moves it to `4-promote/`: made it, rewritten it, questions answered, it ships. Food: her proofread is next; cocktails: starts the mechanical pass (§4). Also the way out of `5-final-proofread/` once she has ruled |
 | `bin ‹slug›` | deletes it from the private repo: made and disliked |
 
 "I've tried it and want to keep it" is `keep` when she is not rewriting now
@@ -184,16 +184,24 @@ and `ready` when the words are already hers. A `3-keep/` file can later become
 repo, pushed, and one line in the reply. She can still move files by hand; the
 words exist so she does not have to.
 
-**A food draft that leaves the pool gets the promotion rules run against it.**
-Helen: *"I want you to run the promotion rules against drafts I progress from
-the main pool."* Whenever a draft lands in `1-rewrite/`, `2-make/`, `3-keep/`
-or `4-promote/`, by her word or her hand, run `python3 scripts/promotion_qa.py
-<folder or path>`. It applies every per-recipe rule the published collection
-is held to, in place, and sorts the findings: **FIX** (mechanical: fix it, in a
-commit of its own), **HELEN'S** (a `QQ`, and the flag-only rules: bring them
-in one list) and **AT PROMOTION** (settled by the promotion copy: leave them).
-A `2-make/` draft is also checked to render on the local server, and read for
-sense, because she cooks from it.
+**A food draft is held to the published rules from `3-keep/` on, so her
+proofread is the last step and not a step before more fixes.** Helen: *"it's
+at that point I'd like to run all the checks. Then when those are in and all
+questions are answered, drafts can move to 4-promote, intending that all that
+happens is one proofread from me and only ad hoc fixes we missed."* The suite
+enforces it: food's `recipe` fixture includes every draft in `3-keep/` and
+`4-promote/` (MANUAL §10), and the rules only Helen can settle (`HELENS_RULES`
+in `tests/conftest.py`: a `QQ`, an estimated time, the tagline, group and
+spice order) are enforced in `4-promote/` only.
+
+Whenever a draft lands in `1-rewrite/`, `2-make/`, `3-keep/` or `4-promote/`,
+by her word or her hand, run `python3 scripts/promotion_qa.py <folder or
+path>`. It applies the same rules, in place, and sorts the findings: **FIX**
+(mechanical: fix it, in a commit of its own), **HELEN'S** (bring them in one
+list) and **AT 3-KEEP** (the empty note pair, `claude_rewritten`, a link to
+another draft: fine until `3-keep/`, a FIX there). A `2-make/` draft is also
+checked to render on the local server, and read for sense, because she cooks
+from it.
 
 **Run `python3 scripts/verify.py` before every push to a drafts repo.** The
 private repos have no CI (#1194), and CI on the public repo checks out the
@@ -218,11 +226,14 @@ Six steps, the same on both sites. This is the short version;
 `PUBLISHING_A_COCKTAIL.md` has each step in full under the same number.
 
 1. **Helen says `ready ‹slug›`** or moves the file into `4-promote/` herself,
-   and sets `rewritten: true` herself. An agent never writes that flag, on
-   either site; on a cocktail it is a leg of the publish gate. A file here
-   that still says `rewritten: false` will not publish: say so and let her
-   set it.
-2. **Claude runs the mechanical pass**, touching no gate flag: makes the suite
+   and sets `rewritten: true` herself. An agent writes that flag only when she
+   asks, as a recorded one-off. On a cocktail it is a leg of the publish
+   gate, and `rewritten: false` will not publish. On food it is not: the page
+   publishes and is left off the index and search, which is how she cooks
+   from an unfinished recipe on the live site (MANUAL §4.0). Either way, say
+   so and let her choose.
+2. **Claude runs the mechanical pass**, touching no gate flag. On food it was
+   done in `3-keep/` (§3), so this is only what slipped through. It makes the suite
    green (spellings the vocabularies declare, missing keys, dashes, canonical
    bottle names, list-shaped `suggestion`s) and never changes a tagline, a
    note's words, a method's words or an amount (the full step has the one

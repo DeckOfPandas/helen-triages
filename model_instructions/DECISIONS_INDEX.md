@@ -116,6 +116,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §4.0 · #1008 · after an agent touches a published file, what happens next comes in three sizes, and the choice is Helen's.
 - 2026-09-14 · §4.0 · #1008 · a flip to proofread: false on a published file raises an issue labelled blocked-on-helen.
 - 2026-09-14 · §4.0 · an agent asked to promote a food draft copies it and never sets rewritten or proofread.
+- 2026-11-12 · §4.0 · food's rewritten is not a publish-gate leg: a recipe saying false publishes, and is left off the food index and search.
 - 2026-10-21 · §4.0 · a tag or star change Helen has agreed with a session row by row needs no flip.
 - 2026-09-20 · §4.0 · there is no per-recipe exemption list: HELEN_CLEARED is deleted and is not rebuilt in that shape.
 - 2026-10-08 · §4.0 · #1089 · if Helen reads the rendered pages on the branch and says so, the flags go back in a second commit and the baseline moves in a third.
@@ -696,7 +697,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §11 · #1008 · the drafts staging folders are 1-rewrite/, 2-make/, 3-keep/, 4-promote/, the same four in both drafts repos.
 - 2026-10-11 · §11 · 0-not-made/ in the cocktails drafts repo is a temporary bucket for drinks Helen has never made.
 - 2026-09-14 · §11 · #1008 · Claude moves a draft between the staging folders on Helen's word: rewrite, make, keep, ready or bin, followed by a slug.
-- 2026-11-04 · §11 · a food draft that leaves the pool gets the promotion rules run against it.
+- 2026-11-12 · §11 · the suite holds a food draft in 3-keep/ or 4-promote/ to every published-recipe rule; the rules only Helen settles bite at 4-promote/.
 - 2026-09-14 · §11 · never create issues or PRs in a burst: a batch of issues is one issue with a checklist.
 - 2026-11-07 · §11 · #1438 · the kit's guard-github-burst.py enforces the burst rule, with its 5-minute gap between creations.
 - 2026-09-15 · §11 · the account GitHub recorded is read off what a write returns, never assumed.
