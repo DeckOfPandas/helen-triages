@@ -11,7 +11,7 @@ serves: "7"
 prep_time: "45 mins"
 cook_time: "1 hr 45 mins"
 internal_temp_ref: beef.tender_roast
-main_ingredients: ["rib of beef", "baby spinach", "portobello mushrooms", "tarragon", "breadcrumbs", "lemon thyme", "English mustard powder", "carrots", "parsnips", "egg yolks"]
+main_ingredients: ["rib of beef", "baby spinach", "portobello mushrooms", "tarragon", "breadcrumbs", "lemon thyme", "English mustard powder", "carrots", "parsnips", "egg yolk"]
 star_ingredient: "beef"
 tags: ["showstopper", "fiddly and fun", "main", "knife and fork"]
 ingredient_groups:

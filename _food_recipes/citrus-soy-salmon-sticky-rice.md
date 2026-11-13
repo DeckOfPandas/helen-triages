@@ -6,7 +6,7 @@ source_type: publication
 serves: "6"
 prep_time: "20 mins"
 cook_time: "30 mins"
-main_ingredients: ["salmon", "sticky rice", "edamame", "light soy sauce", "oyster sauce", "lime", "fresh ginger", "sesame seeds", "cucumber", "coriander", "Greek yoghurt", "spring onions"]
+main_ingredients: ["salmon", "sticky rice", "edamame", "light soy sauce", "oyster sauce", "limes", "fresh ginger", "sesame seeds", "cucumbers", "coriander", "Greek yoghurt", "spring onions"]
 star_ingredient: "oily fish"
 internal_temp_ref: fish.salmon
 doneness: medium

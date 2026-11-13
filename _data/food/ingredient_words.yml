@@ -231,40 +231,61 @@ aliases:
   vanilla bean paste: vanilla paste
   vanilla bean paste or extract: [vanilla paste, vanilla extract]
   vanilla extract or paste: [vanilla extract, vanilla paste]
-  # Plurals offered beside their own singular. `singulars` cannot do this: it
-  # normalises a word for matching and does not merge two entries. Singular
-  # wins, so the label reads as the ingredient.
+  # Plurals offered beside their own singular: a recipe writes the number its
+  # ingredient list does (DECISIONS §6), and this makes the two one chip.
+  # `singulars` cannot: it normalises a word for matching and does not merge
+  # two entries. Singular wins, so the label reads as the ingredient.
+  # test_no_ingredient_is_two_chips_by_number finds a missing one.
+  anchovies: anchovy
   apples: apple
   aubergines: aubergine
+  avocados: avocado
+  baby gem lettuces: baby gem lettuce
   banana shallots: banana shallot
   bananas: banana
+  bay leaves: bay leaf
+  beef fillets: beef fillet
   beef short ribs: beef short rib
   beetroots: beetroot
   black cardamom pods: black cardamom pod
+  blood oranges: blood orange
+  bramley apples: Bramley apple
   carrots: carrot
   celery sticks: celery stick
   chicken breasts: chicken breast
+  chicken legs: chicken leg
   chicken stock cubes: chicken stock cube
+  chicken thighs: chicken thigh
   cinnamon sticks: cinnamon stick
+  clementines: clementine
+  coriander seeds: coriander seed
   courgettes: courgette
   cucumbers: cucumber
+  duck breasts: duck breast
   eating apples: eating apple
   egg whites: egg white
   egg yolks: egg yolk
   eggs: egg
   green chillies: green chilli
+  green peppers: green pepper
   leeks: leek
   lemons: lemon
   limes: lime
-  little gem lettuces: little gem lettuce
+  little gem lettuces: Little Gem lettuce
   mashed potatoes: mashed potato
+  meringues: meringue
   onions: onion
   oranges: orange
+  peaches: peach
+  pears: pear
   potatoes: potato
+  radishes: radish
   red chillies: red chilli
   red onions: red onion
   red peppers: red pepper
   ripe avocados: ripe avocado
+  shallots: shallot
+  sirloin steaks: sirloin steak
   spring onions: spring onion
   sweet potatoes: sweet potato
   thyme sprigs: thyme sprig
@@ -323,7 +344,7 @@ aliases:
   barley or brown rice miso: miso
   beef or venison stock: [beef stock, venison stock]
   black sesame seeds and fresh coriander leaves: [black sesame seeds, fresh coriander leaves]
-  bone-in chicken thighs: chicken thighs
+  bone-in chicken thighs: chicken thigh
   chicken thighs and drumsticks: chicken
   coconut oil or olive oil: [coconut oil, olive oil]
   cooked and peeled beetroot: beetroot
@@ -375,7 +396,7 @@ aliases:
   pork or turkey mince: [pork, turkey mince]
   rice or cider vinegar: [rice, cider vinegar]
   rock sugar or caster sugar: [rock sugar, caster sugar]
-  shallots or onions: [shallots, onion]
+  shallots or onions: [shallot, onion]
   soy sauce or tamari: [soy sauce, tamari]
   sugar or honey: [sugar, honey]
   sunflower oil or butter: [sunflower oil, butter]

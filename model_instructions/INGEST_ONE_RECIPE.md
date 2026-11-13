@@ -609,6 +609,10 @@ cheese`, `cream cheese`). Butter is `butter` here, whatever the ingredient
 line says (the kind is settled at promotion). Leave out frying and greasing
 oil.
 
+**Singular or plural as the ingredient list has it**: `limes` when the line
+says "2 limes, juiced", `lime` when it says "1 lime"; `bay leaf` for one bay
+leaf. Whole eggs follow the count: `egg` for one, `eggs` for more.
+
 ---
 
 ## 5. Citation — `source` and `source_type` must agree

@@ -1048,6 +1048,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   garnish or wash, an optional line, one of two alternatives, a serving
   group, and a savoury dish's flour, butter, eggs and sugar: the lines the
   2026-10-21 sweep left out on purpose. Drafts only.
+- **2026-11-12 — an entry is written in the number its ingredient list uses,
+  and the picker merges the two numbers into one chip.** Helen asked that
+  *"Spellings need to be consistent"*, and settled which spelling: *"Match
+  whatever is in the ingredients list."* So `limes` beside "2 limes, juiced"
+  and `bay leaf` beside one bay leaf; whole eggs still follow the count. A
+  plural is aliased to its singular in `ingredient_words.yml`, which is safe
+  where #762's corn flour was not because the singular is a prefix of the
+  plural (or a `singulars` word), and `test_a_number_alias_still_matches_its_plural_recipes`
+  holds that.
 
 ## §7 Taxonomy (food)
 
