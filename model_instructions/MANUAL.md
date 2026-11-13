@@ -1556,7 +1556,9 @@ no price. DECISIONS §8.2.
   `serves:` recipe or one batch of a `makes:` one (`.shopping-list-cost`),
   priced from the recipe as written and fixed whatever the box says.
 - **The recipe page** says the same figure in the drink page's footer
-  layout, between two rules above IF YOU LIKED THIS: "Roughly £M (£X–£Y) a
+  layout, between two rules, under NOTES (and DONENESS where there is one):
+  before the recipe's body text where it has some (DECISIONS §8.2),
+  otherwise after GOES WITH, above IF YOU LIKED THIS. "Roughly £M (£X–£Y) a
   portion in ingredients.", or "From £X a portion in ingredients, not
   counting n unpriced items (a, b and c)." naming each row it could not price
   (`unpricedText`; `.recipe-footer`, `.recipe-cost`). The footer,

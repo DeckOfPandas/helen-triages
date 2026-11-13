@@ -1372,6 +1372,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   rules with the line in between, above IF YOU LIKED THIS. Use food site
   styling, but the same layout code."* and *"Costs should only show on the
   local build."* `.recipe-footer` is `.cocktail-footer` rule for rule.
+- **2026-11-12 — on a recipe with body text, the cost line sits under NOTES,
+  above the body.** Helen, of the ganache, where it had fallen below the Tips
+  and GOES WITH: *"I think it should sit below NOTES as everything else.
+  Please do this every time a recipe page has body content."* A recipe with
+  no body text keeps it after GOES WITH.
 - **2026-09-07 — a scaled amount is never rounded coarser than 1 g.** Helen:
   *"For now, don't tidy/round beyond 1 g precision"*, then, unprompted: *"I
   mean don't roudn to 10 g or 5 g, round to 1g"*. Two thirds of 200 g prints
