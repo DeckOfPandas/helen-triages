@@ -267,12 +267,13 @@ TRUSTED_DYNAMIC = (
     # tests/test_site_config.py).
     re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?mood="
                r"\{\{\s*m\s*\|\s*url_encode\s*\}\}#filter-\{\{\s*chip\s*\}\}$"),
-    # A drink page's SHIP IT? word, linking to the index filtered to that ship
-    # value (#1412). Same `index_home`; `?ship=` does not change the page
-    # fetched, a value no card carries is dropped by cocktail-index.js, and
-    # `#results` is the count line's id on the index.
+    # A drink page's SHIP IT? word and its related cards' ship marks, linking to
+    # the index filtered to that ship value (#1412, #1433). Same `index_home`;
+    # `?ship=` does not change the page fetched, `#results` is the count line's
+    # id on the index, and test_every_related_cards_ship_filters_the_index_to_its_value
+    # (tests/test_rendered_pages.py) checks each value is one an index card carries.
     re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?ship="
-               r"\{\{\s*page_ship\s*\|\s*url_encode\s*\}\}#results$"),
+               r"\{\{\s*(page|rel)_ship\s*\|\s*url_encode\s*\}\}#results$"),
     # A temperature chart label linking up to its own section (#1501). The
     # include is handed a node's `chart_anchor`, and
     # test_chart_anchors_point_at_sections_that_exist (tests/test_reference_data.py)

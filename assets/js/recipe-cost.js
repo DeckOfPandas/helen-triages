@@ -27,6 +27,7 @@
   var entries = (data.i || []).map(function (ing) {
     return {
       amount: ing.a, name: ing.n, aisle: ing.s, scale: 1, recipe: url,
+      people: data.batch ? null : Number(data.per),
       parts: ing.pt, fruit: ing.f, count: ing.c, pointer: ing.x, rate: ing.r
     };
   });
@@ -39,12 +40,10 @@
   if (!each) return;
 
   // "Roughly £4.09 (£2.26–£5.91) a portion in ingredients.", the drink page's
-  // sentence; "From £2.19 a portion in ingredients, not counting 2 unpriced
-  // items." where some line could not be priced.
+  // sentence; "From £1.43 a batch in ingredients, not counting 1 unpriced
+  // item (cockerel carcass)." where some line could not be priced (#1486).
   var figure = each.text.replace(/^from /, '');
-  var missing = each.partial
-    ? ', not counting ' + each.unpriced + (each.unpriced === 1 ? ' unpriced item' : ' unpriced items')
-    : '';
+  var missing = HTF.foodShoppingList.unpricedText(each);
   line.textContent = '';
   line.appendChild(document.createTextNode(each.partial ? 'From ' : 'Roughly '));
   var span = document.createElement('span');

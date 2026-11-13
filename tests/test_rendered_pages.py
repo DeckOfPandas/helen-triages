@@ -16,6 +16,7 @@ import pathlib
 import re
 import shutil
 import subprocess
+import urllib.parse
 
 import pytest
 import yaml
@@ -2545,6 +2546,41 @@ def test_every_published_drink_page_offers_four_other_published_drinks(prod_site
         "the related-drinks row (#927) is wrong on these pages:\n  "
         + "\n  ".join(problems[:20])
     )
+
+
+RELATED_SHIP = re.compile(r'<(a|span) class="drink-card-ship"(?: href="([^"]*)")?')
+INDEX_SHIP = re.compile(r'<li[^>]*\sdata-ship="([^"]*)"')
+
+
+def test_every_related_cards_ship_filters_the_index_to_its_value(prod_site):
+    """#1433. A related card's ship mark is a link to the index filtered to that
+    ship, as the index card's button and the page's SHIP IT? are. The index
+    silently drops a value no card carries, so each must be one it lists.
+    """
+    index = (prod_site / "cocktails" / "index.html").read_text(encoding="utf-8")
+    on_index = {html_module.unescape(v) for v in INDEX_SHIP.findall(index)}
+    assert len(on_index) > 2, f"only {sorted(on_index)} ship values on the index"
+
+    pages = _drink_pages(prod_site)
+    assert len(pages) > 20, f"only {len(pages)} drink pages in the production build"
+    problems = []
+    for page in pages:
+        section = RELATED_SECTION.search(page.read_text(encoding="utf-8"))
+        if not section:
+            continue  # the test above reports a missing row
+        marks = RELATED_SHIP.findall(section.group(1))
+        if len(marks) != 4:
+            problems.append(f"{page.parent.name}: {len(marks)} ship marks, expected 4")
+        for tag, href in marks:
+            match = re.fullmatch(r"/helen-triages/cocktails/\?ship=([^#&]+)#results", href or "")
+            if tag != "a" or not match:
+                problems.append(f"{page.parent.name}: a ship mark that is <{tag} href={href!r}>")
+                continue
+            value = urllib.parse.unquote_plus(html_module.unescape(match.group(1)))
+            if value not in on_index:
+                problems.append(f"{page.parent.name}: ?ship={value!r} is on no index card")
+    assert not problems, (
+        "related cards' ship marks (#1433):\n  " + "\n  ".join(problems[:20]))
 
 
 # --- the same row on a recipe page: three recipes (#1005) ---------------------

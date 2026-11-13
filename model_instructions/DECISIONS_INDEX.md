@@ -215,6 +215,7 @@ argument and the rules each field is read by.
 - 2026-11-04 · §8.2 · #1468 · a costs.yml keyword matches its plural, so a row is written singular.
 - 2026-11-03 · §8.2 · #1458 · both sites print a range as "mean (lowest–highest)", everywhere a price shows.
 - 2026-11-03 · §8.2 · #1458 · each recipe page carries a cost line, local only, in the drink page's layout.
+- 2026-11-12 · §8.2 · on a recipe with body text, the cost line sits under NOTES, above the body.
 - 2026-09-07 · §8.2 · a scaled amount is never rounded coarser than 1 g.
 - 2026-09-07 · §8.2 · the shopping list has ten aisles, in shop order: produce, meat, fish, dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks, other.
 - 2026-09-07 · §8.2 · within an aisle the shopping list is alphabetical.
@@ -230,6 +231,8 @@ argument and the rules each field is read by.
 - 2026-10-07 · §8.2 · a makes: range starts from its lower number.
 - 2026-10-09 · §8.2 · #1297 · on the shopping list a makes: recipe counts batches, in words; a serves: recipe counts portions.
 - 2026-11-02 · §8.2 · #1457 · the food shopping list has no "set all to N portions" box.
+- 2026-11-12 · §8.2 · #1472 · a stock line's hint says how much of each product makes its volume of water, for all six brands, behind a tap.
+- 2026-11-12 · §8.2 · #1498 · a ground spice's hint gives its weight to grind your own, not a count of seeds, sticks or pods.
 - 2026-10-09 · §8.2 · #1297 · the shopping list reads the zest and the juice of one lemon as one lemon.
 - 2026-10-10 · §8.2 · #1125 #1297 · on a recipe page a handful, sprig or bunch scales to the nearest quarter; a pinch, dash, splash, knob, drop, twist, lot or pat to the nearest half.
 - 2026-10-10 · §8.2 · #1297 · on the shopping list a by-eye measure is bought as the next whole one, with the recipes' figure in brackets, stepped as the recipe page steps it.
@@ -248,6 +251,7 @@ argument and the rules each field is read by.
 - 2026-11-03 · §8.2 · #1462 · C5 — under ⅛ tsp is "a pinch" — Asked between "a pinch", "<⅛ tsp" and the decimal, Helen: "Yes" to the pinch.
 - 2026-11-05 · §8.2 · #1462 · C2 — a scaled egg prints as a fraction — Asked how three eggs at two of four portions should read, Helen: "1 1/2 large eggs." The portion scaler does not round or refuse a whole …
 - 2026-11-06 · §8.2 · #1474 · the shopping list reads "approx" like ~, and a bracketed aside or a "per …" rate is not pluralised.
+- 2026-11-11 · §8.2 · #1481 · a per-person amount becomes the total for the people chosen, "per person" dropped.
 - 2026-09-10 · §8.3 · #918 · shortlisted is a view, not a filter: it never combines with another filter.
 - 2026-09-15 · §8.3 · #1093 · a shortlist link is shown, not saved, and "keep these" makes it yours.
 - 2026-10-11 · §8.3 · opening a sent shortlist link shows the index with the shopping list open.

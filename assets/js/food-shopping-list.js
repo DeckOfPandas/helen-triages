@@ -5,7 +5,8 @@
 // DOM half. The amount parsing is shopping-list.js's: there is one parser.
 //
 // Each entry arrives with a `scale` (portions wanted over portions made, or
-// whole batches); filters.js chooses it and this file only multiplies.
+// whole batches) and `people` (the portions wanted, or none); filters.js
+// chooses both and this file only multiplies.
 //
 // Nothing is rounded coarser than a gram: two thirds of 200 g is 133 g.
 // Spoons and counts keep cook's fractions. A sub-gram total keeps a decimal
@@ -210,6 +211,7 @@
         name: name,
         aisle: entry.aisle,
         scale: entry.scale,
+        people: entry.people,
         // #1458. Resolved at build by _plugins/food_costs.rb; absent when
         // the page carries no costs.
         rate: entry.rate,
@@ -311,6 +313,17 @@
       ' (' + lo + '–£' + Number(cost.max).toFixed(2) + ')';
   }
 
+  /* "250 g per person" is an amount for each person, not for the recipe
+     (#1481): with a count of people it becomes their total, "per person"
+     dropped; with none it is printed as written and never multiplied. Returns
+     the amount alone ("250 g"), or null for any other amount. */
+  var PER_PERSON = /^(.*\S)\s+per\s+(?:person|portion|head|serving)$/i;
+
+  function perPerson(amount) {
+    var m = PER_PERSON.exec(String(amount === undefined || amount === null ? '' : amount).trim());
+    return m ? m[1] : null;
+  }
+
   /* "2 x 400 g cans" totals as 2 of the unit `x 400 g can`: that is 400 g
      apiece, whatever the container is called. Read off the unit's own words
      so no can, tin or pack size needs a row in costs.yml. */
@@ -362,24 +375,27 @@
   }
 
   /** What a list of rows comes to (#1458): the priced rows summed, and how
-   * many rows could not be priced, wholly or in part. null where no row was
-   * priced at all. */
+   * many rows could not be priced, wholly or in part, with their labels in
+   * `unpricedNames` (#1486). null where no row was priced at all. */
   function costTotal(rows) {
     var min = 0;
     var max = 0;
     var priced = 0;
-    var unpriced = 0;
+    var names = [];
     (rows || []).forEach(function (row) {
       var cost = row && row.cost;
       if (!cost) return;
-      if (cost.unpriced) { unpriced += 1; return; }
+      if (cost.unpriced) { names.push(row.label); return; }
       min += cost.min;
       max += cost.max;
       priced += 1;
-      if (cost.partial) unpriced += 1;
+      if (cost.partial) names.push(row.label);
     });
     if (!priced) return null;
-    var sum = { min: min, max: max, partial: unpriced > 0, unpriced: unpriced };
+    var unpriced = names.length;
+    var sum = {
+      min: min, max: max, partial: unpriced > 0, unpriced: unpriced, unpricedNames: names
+    };
     sum.text = moneyText(sum);
     return sum;
   }
@@ -398,10 +414,24 @@
     var sum = costTotal(rows);
     if (!sum) return null;
     var each = {
-      min: sum.min / per, max: sum.max / per, partial: sum.partial, unpriced: sum.unpriced
+      min: sum.min / per, max: sum.max / per, partial: sum.partial, unpriced: sum.unpriced,
+      unpricedNames: sum.unpricedNames
     };
     each.text = moneyText(each);
     return each;
+  }
+
+  /** ", not counting 2 unpriced items (cockerel carcass and kombu)" for a
+   * cost with unpriced rows, naming them (#1486); "" where there are none. */
+  function unpricedText(cost) {
+    if (!cost || !cost.partial) return '';
+    var names = (cost.unpricedNames || []).filter(Boolean);
+    var n = cost.unpriced;
+    var said = ', not counting ' + n + (n === 1 ? ' unpriced item' : ' unpriced items');
+    if (!names.length) return said;
+    var list = names.length === 1 ? names[0]
+      : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+    return said + ' (' + list + ')';
   }
 
   /** Total up a shortlist of recipes, grouped by aisle.
@@ -472,7 +502,15 @@
       var scale = (typeof entry.scale === 'number' && entry.scale > 0)
         ? entry.scale : 1;
 
-      var parsed = parseAmount(entry.amount);
+      // A per-person amount is that many people's worth, or as written (#1481).
+      var each = perPerson(entry.amount);
+      var parsed = null;
+      if (each === null) {
+        parsed = parseAmount(entry.amount);
+      } else if (entry.people > 0) {
+        parsed = parseAmount(each);
+        scale = entry.people;
+      }
       if (!parsed) {
         var text = String(entry.amount || '').trim();
         /* No amount at all is still an ingredient: counted under `''`, which
@@ -629,12 +667,14 @@
     costTotal: costTotal,
     moneyText: moneyText,
     recipeCost: recipeCost,
+    unpricedText: unpricedText,
     totalText: totalText,
     parenText: parenText,
     amountNumber: amountNumber,
     CANONICAL: CANONICAL,
     METRIC: METRIC,
     shoppingUnit: shoppingUnit,
-    SIZE_UNITS: SIZE_UNITS
+    SIZE_UNITS: SIZE_UNITS,
+    perPerson: perPerson
   };
 });
