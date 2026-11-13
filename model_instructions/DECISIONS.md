@@ -1491,8 +1491,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   useful."* It could only ever set the portions rows. Each recipe keeps its
   own box. The cocktails list keeps its "set all", having no batches.
 - **2026-11-12, #1504 — a recipe page can show a tick box on every ingredient
-  line, behind a TICK BOXES OFF / ON button under INGREDIENTS.** Chosen from
-  three candidates on the page: *"option c please"*. The boxes hang left of the
+  line, behind a TICK BOXES OFF / ON switch under INGREDIENTS.** Chosen from
+  three candidates on the page: *"option c please"*. The switch is the metric
+  one's twin: *"I would like a toggle, the same as for imperial <-> metric next
+  to it. The left side should say "TICK BOXES OFF" and the right side should
+  say "TICK BOXES ON"."* Where the two do not fit on one line, the metric
+  switch takes the next. In both, *"the centres of the words and toggle should
+  be horizontally aligned"*. The boxes hang left of the
   lines and move none of them: *"don't move the ingredients when you show the
   tickboxes"*. Every ingredient list is indented, grouped or not, and the
   boxes sit in that gutter: *"please put the indentation of the ingredient

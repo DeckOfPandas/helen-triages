@@ -1289,16 +1289,23 @@ The rulings behind every rule here are in DECISIONS §8.2.
 | `assets/js/food-shopping-list.js` | the list's totals, `build()`, and `totalText`, the one formatter for a scaled food amount. Pure |
 | `assets/js/food-scale.js` | one amount at a factor, and the scaler's stepping modes. Pure |
 | `assets/js/recipe-scale.js` | the recipe page's DOM half |
-| `assets/js/ingredient-ticks.js`, `_sass/food/_ingredient-ticks.scss` | the recipe page's TICK BOXES OFF / ON button and a box per ingredient line, hung left of the line so none moves (#1504) |
-| `assets/js/ingredient-units.js`, `_sass/food/_ingredient-units.scss` | the IMPERIAL / METRIC switch, on a recipe with an amount in `oz`, `lb`, `fl oz` or `pint` (`isImperial` in `food-scale.js`) |
+| `assets/js/ingredient-ticks.js`, `_sass/food/_ingredient-ticks.scss` | the recipe page's TICK BOXES OFF / ON switch and a box per ingredient line, hung left of the line so none moves (#1504) |
+| `assets/js/ingredient-units.js` | the IMPERIAL / METRIC switch, on a recipe with an amount in `oz`, `lb`, `fl oz` or `pint` (`isImperial` in `food-scale.js`) |
+| `_sass/food/_ingredient-switches.scss` | both switches' look and the row they share |
 | `assets/js/filters.js` | the shopping list's DOM half: the rows, their words, the painting |
 
 A tick box is the first child of its `<li>`, and `recipe-scale.js` steps over
 `.ingredient-tick` when it looks for a line's text, so the two work together.
 `tests/test_browser_smoke.py` holds the boxes to moving no line.
 
-The button and the metric switch share one row, `.ingredient-switches`,
-which whichever script runs first makes. The switch converts nothing itself:
+The two switches are one design, `button.ingredient-switch[role=switch]`: a
+word, a track and a word, the chosen word bold, the state in `aria-checked`.
+The track is placed on the capitals' middle with the `cap` unit, not by
+flex centring, whose line-box middle sits low and differs between Chromium
+and WebKit. They share one row, `.ingredient-switches`, which whichever
+script runs first makes; where both do not fit, the metric switch takes a
+line of its own, and neither breaks inside itself. Ticking on turns the
+track and its ON word the raw hot pink. The metric switch converts nothing itself:
 it calls `HTF.recipeScale.setMetric`, and `recipe-scale.js` redraws every
 amount with `scaleAmount(..., {metric: true})`, so metric holds at any scale
 and switching back restores the recipe's own text. A recipe with no scaler

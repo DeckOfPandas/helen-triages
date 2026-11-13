@@ -5,61 +5,17 @@
 // =============================================================================
 // TICK BOXES ON A RECIPE'S INGREDIENTS (#1504)
 // =============================================================================
-// assets/js/ingredient-ticks.js builds the TICK BOXES OFF / ON button under
-// INGREDIENTS and the boxes. "On" is the raw hot pink, $color-dazzling-
-// dragonfruit, not the darkened link pink: Helen's exception to the contrast
-// rule (DECISIONS §8). The box is the shopping list's own mixin
-// (shared/_rule.scss), so the two cannot drift.
+// assets/js/ingredient-ticks.js builds the TICK BOXES OFF / ON switch
+// (_ingredient-switches.scss) and the boxes. "On" is the raw hot pink,
+// $color-dazzling-dragonfruit, not the darkened link pink: Helen's exception
+// to the contrast rule (DECISIONS §8). The box is the shopping list's own
+// mixin (shared/_rule.scss), so the two cannot drift.
 $tick-on: $color-dazzling-dragonfruit;
 
-// The row under INGREDIENTS that holds this button and the metric switch
-// (_ingredient-units.scss). Pulled up into the heading row's bottom margin,
-// so it belongs to the heading above it rather than to the first group.
-.ingredient-switches {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  column-gap: $space-xl;
-  margin: (-$space-xl) 0 $space-lg;
-}
-
-.ingredient-ticks-pill {
-  @include tap-area(44px);
-  font-family: $font-headings;
-  font-size: 0.78rem;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
-  -webkit-text-stroke: 0;
-  text-shadow: none;
-  color: $color-clear-text;
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-
-  // A little box before the words, filled when on: the thing it turns on.
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 0.9em;
-    height: 0.9em;
-    margin-right: 0.45em;
-    vertical-align: -0.12em;
-    border: 1.5px solid currentColor;
-    border-radius: 2px;
-  }
-
-  &:hover,
-  &:focus-visible,
-  &.is-on { color: $tick-on; }
-
-  &.is-on {
-    font-weight: 700;
-
-    &::before { background: currentColor; }
-  }
+// On, the switch's track and its ON word take that pink.
+.ingredient-ticks[aria-checked="true"] {
+  .ingredient-switch-track,
+  .ingredient-switch-on { color: $tick-on; }
 }
 
 // --- The boxes ---------------------------------------------------------------

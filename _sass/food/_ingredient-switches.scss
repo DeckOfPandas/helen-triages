@@ -1,0 +1,81 @@
+@use "food/palette" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
+// =============================================================================
+// THE SWITCHES UNDER INGREDIENTS (MANUAL §8.2)
+// =============================================================================
+// TICK BOXES OFF / ON (assets/js/ingredient-ticks.js) and IMPERIAL / METRIC
+// (assets/js/ingredient-units.js) are one switch: a word, a track, a word,
+// with the chosen word bold and the knob slid to it. Each script builds its
+// own `button.ingredient-switch[role=switch]`; `aria-checked` is the state.
+
+// The row they share. Pulled up into the heading's bottom margin, so it belongs
+// to INGREDIENTS rather than to the first group. A switch that does not fit
+// beside the other takes a line of its own; none ever breaks inside itself.
+.ingredient-switches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-md $space-xl;
+  margin: (-$space-xl) 0 $space-lg;
+}
+
+.ingredient-switch {
+  @include tap-area(44px);
+  display: inline-block;
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  color: $color-clear-text;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: $color-dazzling-dragonfruit; }
+}
+
+.ingredient-switch-off { font-weight: 700; }
+
+.ingredient-switch[aria-checked="true"] {
+  .ingredient-switch-off { font-weight: 400; }
+  .ingredient-switch-on { font-weight: 700; }
+  .ingredient-switch-track::after { transform: translateX(1em); }
+}
+
+// The track's middle sits on the capitals' middle: its foot goes on the
+// baseline, lowered by half its height and raised by half a cap height. The
+// line box's middle is not the capitals' and differs between engines.
+.ingredient-switch-track {
+  position: relative;
+  display: inline-block;
+  vertical-align: -0.25em;
+  vertical-align: calc(0.5cap - 0.6em);
+  margin: 0 0.55em;
+  width: 2.2em;
+  height: 1.2em;
+  box-sizing: border-box;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: calc(0.2em - 1.5px);
+    width: 0.8em;
+    height: 0.8em;
+    margin-top: -0.4em;
+    border-radius: 50%;
+    background: currentColor;
+    transition: transform 0.15s ease;
+  }
+}

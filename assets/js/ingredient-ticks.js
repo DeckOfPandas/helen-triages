@@ -1,9 +1,8 @@
-/* The recipe page's tick boxes (#1504): a TICK BOXES OFF / ON button under
-   INGREDIENTS puts a box beside every ingredient line, to tick off as it goes
-   in. Off by default and never remembered, like cocktails' make it; a page
-   that is not ticking prints and reads exactly as before. The button is built
-   here, not in the layout: it does nothing without this script, so a reader
-   without it never sees it.
+/* The recipe page's tick boxes (#1504): a TICK BOXES OFF / ON switch under
+   INGREDIENTS, the metric switch's twin (_ingredient-switches.scss), puts a
+   box beside every ingredient line, to tick off as it goes in. Off by default
+   and never remembered, like cocktails' make it. The switch is built here,
+   not in the layout, so a reader without this script never sees it.
 
    A box is the first child of its <li>; recipe-scale.js steps over
    `.ingredient-tick` when it looks for a line's own text. Tapping anywhere on a
@@ -24,7 +23,16 @@
   }
   var button = document.createElement('button');
   button.type = 'button';
-  button.className = 'ingredient-ticks-pill';
+  button.className = 'ingredient-switch ingredient-ticks';
+  button.setAttribute('role', 'switch');
+  button.setAttribute('aria-label', 'tick boxes');
+  [['off', 'tick boxes off'], ['track', null], ['on', 'tick boxes on']].forEach(function (pair) {
+    var part = document.createElement('span');
+    part.className = 'ingredient-switch-' + pair[0];
+    if (pair[1]) part.textContent = pair[1];
+    else part.setAttribute('aria-hidden', 'true');
+    button.appendChild(part);
+  });
 
   var on = false;
 
@@ -55,9 +63,7 @@
     on = value;
     if (on) Array.prototype.forEach.call(rows, boxFor);
     article.classList.toggle('is-ticking', on);
-    button.textContent = on ? 'tick boxes on' : 'tick boxes off';
-    // The words carry the state, so there is no aria-pressed to say it twice.
-    button.classList.toggle('is-on', on);
+    button.setAttribute('aria-checked', on ? 'true' : 'false');
   }
 
   button.addEventListener('click', function () { set(!on); });

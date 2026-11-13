@@ -3,9 +3,10 @@
    written, is the default and nothing is remembered. Metric is the shopping
    list's conversion, applied by recipe-scale.js, so it holds at any scale.
 
-   It shares a row with the tick boxes' button (ingredient-ticks.js): whichever
-   script runs first makes `.ingredient-switches`. Built here, not in the
-   layout, so a reader without the script never sees it. */
+   It shares a row, and its look, with the tick boxes' switch
+   (ingredient-ticks.js, _ingredient-switches.scss): whichever script runs
+   first makes `.ingredient-switches`. Built here, not in the layout, so a
+   reader without the script never sees it. */
 (function () {
   'use strict';
 
@@ -24,18 +25,14 @@
 
   var button = document.createElement('button');
   button.type = 'button';
-  button.className = 'ingredient-units';
+  button.className = 'ingredient-switch ingredient-units';
   button.setAttribute('role', 'switch');
   button.setAttribute('aria-label', 'metric');
-  ['imperial', null, 'metric'].forEach(function (text) {
+  [['off', 'imperial'], ['track', null], ['on', 'metric']].forEach(function (pair) {
     var part = document.createElement('span');
-    if (text) {
-      part.className = 'ingredient-units-word ingredient-units-' + text;
-      part.textContent = text;
-    } else {
-      part.className = 'ingredient-units-track';
-      part.setAttribute('aria-hidden', 'true');
-    }
+    part.className = 'ingredient-switch-' + pair[0];
+    if (pair[1]) part.textContent = pair[1];
+    else part.setAttribute('aria-hidden', 'true');
     button.appendChild(part);
   });
 
@@ -44,7 +41,6 @@
   function set(value) {
     metric = value;
     button.setAttribute('aria-checked', metric ? 'true' : 'false');
-    button.classList.toggle('is-metric', metric);
     scale.setMetric(metric);
   }
 

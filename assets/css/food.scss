@@ -56,8 +56,9 @@
 // box-tint variables are defined there and used by the files after it.
 @use "food/recipe-header";
 @use "food/recipe-ingredients-method";
+// Before ingredient-ticks, whose ON colour overrides a switch's.
+@use "food/ingredient-switches";
 @use "food/ingredient-ticks";
-@use "food/ingredient-units";
 @use "food/recipe-notes-body";
 @use "food/recipe-annotations";
 // The shortlist (#546). After recipe-list: it reads that file's

@@ -418,6 +418,16 @@ TICK_LAYOUT = """() => [...document.querySelectorAll('.ingredients li.ingredient
           box: b && {left: b.left, right: b.right}};
 })"""
 
+# Each switch under INGREDIENTS on one line: its words and track share a row,
+# and nothing pokes past the page's right edge.
+SWITCH_LINES = """() => [...document.querySelectorAll('.ingredient-switch')].flatMap(s => {
+  const parts = [...s.children].map(p => p.getBoundingClientRect());
+  const mid = r => (r.top + r.bottom) / 2;
+  const level = parts.every(r => Math.abs(mid(r) - mid(parts[0])) < 3);
+  const right = s.getBoundingClientRect().right;
+  return level && right <= document.documentElement.clientWidth ? [] : [s.textContent];
+})"""
+
 
 def _recipe_pages_by_grouping(prod_site):
     """One published recipe whose ingredients are in groups and one whose are
@@ -441,19 +451,23 @@ def _recipe_pages_by_grouping(prod_site):
 def test_tick_boxes_appear_beside_the_lines_and_move_none(chromium, visit, prod_site, kind, width):
     """#1504. Helen: "don't move the ingredients when you show the tickboxes".
     Each box hangs left of its line and stays on screen; a tap on a line ticks
-    it; the button says TICK BOXES OFF, then ON."""
+    it; the switch reads TICK BOXES OFF, a track, TICK BOXES ON, and turns on."""
     url = _recipe_pages_by_grouping(prod_site)[kind]
     v = visit(url, width)
     v.page.wait_for_load_state("networkidle")
     _settle(v.page)
-    button = v.page.locator(".ingredient-ticks-pill")
-    assert button.inner_text().strip().lower() == "tick boxes off"
+    switch = v.page.locator(".ingredient-ticks[role=switch]")
+    assert switch.get_attribute("aria-checked") == "false"
+    broken = v.page.evaluate(SWITCH_LINES)
+    assert not broken, f"{url} at {width}px: a switch breaks inside itself: {broken}"
+    assert switch.locator(".ingredient-switch-off").inner_text().lower() == "tick boxes off"
+    assert switch.locator(".ingredient-switch-on").inner_text().lower() == "tick boxes on"
     before = v.page.evaluate(TICK_LAYOUT)
     assert before, f"{url}: no ingredient lines"
 
-    button.click()
+    switch.click()
     _settle(v.page)
-    assert button.inner_text().strip().lower() == "tick boxes on"
+    assert switch.get_attribute("aria-checked") == "true"
     after = v.page.evaluate(TICK_LAYOUT)
     problems = []
     for i, (b, a) in enumerate(zip(before, after)):
