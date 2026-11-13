@@ -116,6 +116,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §4.0 · #1008 · after an agent touches a published file, what happens next comes in three sizes, and the choice is Helen's.
 - 2026-09-14 · §4.0 · #1008 · a flip to proofread: false on a published file raises an issue labelled blocked-on-helen.
 - 2026-09-14 · §4.0 · an agent asked to promote a food draft copies it and never sets rewritten or proofread.
+- 2026-11-12 · §4.0 · food's rewritten is not a publish-gate leg: a recipe saying false publishes, and is left off the food index and search.
 - 2026-10-21 · §4.0 · a tag or star change Helen has agreed with a session row by row needs no flip.
 - 2026-09-20 · §4.0 · there is no per-recipe exemption list: HELEN_CLEARED is deleted and is not rebuilt in that shape.
 - 2026-10-08 · §4.0 · #1089 · if Helen reads the rendered pages on the branch and says so, the flags go back in a second commit and the baseline moves in a third.
@@ -165,6 +166,7 @@ argument and the rules each field is read by.
 - 2026-10-21 · §6 · a bake lists its flour, butter, eggs and sugar, and a savoury dish lists the herbs, citrus, cream or wine it tastes of.
 - 2026-10-22 · §6 · a draft's main_ingredients says butter, and a QQ butter line still earns it; a published recipe's says salted butter or unsalted butter.
 - 2026-10-30 · §6 · bay leaves are a herb, and every citrus line is listed, a quarter lemon in a glaze included; a draft test holds §6.
+- 2026-11-12 · §6 · an entry is written in the number its ingredient list uses, and the picker merges the two numbers into one chip.
 - 2026-08-01 · §7 · "declared" and "filterable" are the same thing: a tag shown on the page with no filter button was proposed and rejected.
 - 2026-08-02 · §7 · one-pot and scalable are retired, freezable is kept, and breakfast, extras, festive and starter are practicalities, not moods.
 - 2026-08-09 · §7 · something unusual is retired — Culturally relative, not a real craving, and barely used.
@@ -215,6 +217,7 @@ argument and the rules each field is read by.
 - 2026-11-04 · §8.2 · #1468 · a costs.yml keyword matches its plural, so a row is written singular.
 - 2026-11-03 · §8.2 · #1458 · both sites print a range as "mean (lowest–highest)", everywhere a price shows.
 - 2026-11-03 · §8.2 · #1458 · each recipe page carries a cost line, local only, in the drink page's layout.
+- 2026-11-12 · §8.2 · on a recipe with body text, the cost line sits under NOTES, above the body.
 - 2026-09-07 · §8.2 · a scaled amount is never rounded coarser than 1 g.
 - 2026-09-07 · §8.2 · the shopping list has ten aisles, in shop order: produce, meat, fish, dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks, other.
 - 2026-09-07 · §8.2 · within an aisle the shopping list is alphabetical.
@@ -232,6 +235,8 @@ argument and the rules each field is read by.
 - 2026-11-02 · §8.2 · #1457 · the food shopping list has no "set all to N portions" box.
 - 2026-11-12 · §8.2 · #1504 · a recipe page can show a tick box on every ingredient line, behind a TICK BOXES OFF / ON switch under INGREDIENTS.
 - 2026-11-12 · §8.2 · a recipe written in imperial measures has an IMPERIAL / METRIC switch under INGREDIENTS, imperial by default.
+- 2026-11-12 · §8.2 · #1472 · a stock line's hint says how much of each product makes its volume of water, for all six brands, behind a tap.
+- 2026-11-12 · §8.2 · #1498 · a ground spice's hint gives its weight to grind your own, not a count of seeds, sticks or pods.
 - 2026-10-09 · §8.2 · #1297 · the shopping list reads the zest and the juice of one lemon as one lemon.
 - 2026-10-10 · §8.2 · #1125 #1297 · on a recipe page a handful, sprig or bunch scales to the nearest quarter; a pinch, dash, splash, knob, drop, twist, lot or pat to the nearest half.
 - 2026-10-10 · §8.2 · #1297 · on the shopping list a by-eye measure is bought as the next whole one, with the recipes' figure in brackets, stepped as the recipe page steps it.
@@ -250,6 +255,7 @@ argument and the rules each field is read by.
 - 2026-11-03 · §8.2 · #1462 · C5 — under ⅛ tsp is "a pinch" — Asked between "a pinch", "<⅛ tsp" and the decimal, Helen: "Yes" to the pinch.
 - 2026-11-05 · §8.2 · #1462 · C2 — a scaled egg prints as a fraction — Asked how three eggs at two of four portions should read, Helen: "1 1/2 large eggs." The portion scaler does not round or refuse a whole …
 - 2026-11-06 · §8.2 · #1474 · the shopping list reads "approx" like ~, and a bracketed aside or a "per …" rate is not pluralised.
+- 2026-11-11 · §8.2 · #1481 · a per-person amount becomes the total for the people chosen, "per person" dropped.
 - 2026-09-10 · §8.3 · #918 · shortlisted is a view, not a filter: it never combines with another filter.
 - 2026-09-15 · §8.3 · #1093 · a shortlist link is shown, not saved, and "keep these" makes it yours.
 - 2026-10-11 · §8.3 · opening a sent shortlist link shows the index with the shopping list open.
@@ -693,7 +699,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §11 · #1008 · the drafts staging folders are 1-rewrite/, 2-make/, 3-keep/, 4-promote/, the same four in both drafts repos.
 - 2026-10-11 · §11 · 0-not-made/ in the cocktails drafts repo is a temporary bucket for drinks Helen has never made.
 - 2026-09-14 · §11 · #1008 · Claude moves a draft between the staging folders on Helen's word: rewrite, make, keep, ready or bin, followed by a slug.
-- 2026-11-04 · §11 · a food draft that leaves the pool gets the promotion rules run against it.
+- 2026-11-12 · §11 · the suite holds a food draft in 3-keep/ or 4-promote/ to every published-recipe rule; the rules only Helen settles bite at 4-promote/.
 - 2026-09-14 · §11 · never create issues or PRs in a burst: a batch of issues is one issue with a checklist.
 - 2026-11-07 · §11 · #1438 · the kit's guard-github-burst.py enforces the burst rule, with its 5-minute gap between creations.
 - 2026-09-15 · §11 · the account GitHub recorded is read off what a write returns, never assumed.

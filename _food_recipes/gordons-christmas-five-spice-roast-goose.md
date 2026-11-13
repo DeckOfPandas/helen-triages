@@ -6,7 +6,7 @@ source_type: author
 serves: "6"
 prep_time: "35 mins"
 cook_time: "2–3 hrs depending on weight"
-main_ingredients: ["whole goose", "lemons", "limes", "five-spice powder", "honey", "fresh thyme"]
+main_ingredients: ["whole goose", "lemons", "limes", "five-spice powder", "honey", "fresh thyme", "fresh parsley", "sage"]
 star_ingredient: "poultry"
 internal_temp_ref: poultry.goose
 tags: ["festive", "showstopper", "main", "knife and fork"]

@@ -6,7 +6,7 @@ source_type: person
 makes: "1 batch"
 prep_time: "5 mins"
 cook_time: "2 mins"
-main_ingredients: ["cinnamon sticks", "star anise", "fennel seed", "Sichuan peppercorn", "whole cloves"]
+main_ingredients: ["cinnamon sticks", "star anise", "fennel seeds", "Sichuan peppercorns", "whole cloves"]
 star_ingredient:
 tags: ["extras"]
 ingredient_groups:

@@ -618,6 +618,7 @@ checked.
 | `meta:` is `rewritten`, `awaiting_fix`, `proofread`, in that order, real booleans, nothing else | `test_meta_block_is_exactly_the_three_flags_in_order` |
 | A draft's `meta:` sits directly under `title:`; `tidy_drafts.py --site food --only order --apply` moves it | `test_meta_sits_directly_under_the_title` (`tests/test_drafts.py`) |
 | A draft's `main_ingredients` name its herbs (bay included), citrus, cream and wine, and a bake's flour, butter, eggs and sugar, bar garnishes, washes, options and alternatives (DECISIONS §6) | `test_main_ingredients_name_what_the_dish_tastes_of` (`tests/test_drafts.py`) |
+| A `main_ingredients` entry is singular or plural as its ingredient list is, and every plural has an alias making it one chip with its singular (§6) | `test_main_ingredients_use_the_lists_own_number`, `test_no_ingredient_is_two_chips_by_number` (`tests/test_taxonomy.py`) |
 | Citrus is "¼ lemon, juiced", never "a squeeze" | `test_citrus_is_measured_not_squeezed` (`tests/test_style.py`) |
 | Retired keys stay retired | `RETIRED`, which says what replaced each |
 | `serves:` opens with a number, or `makes:` with a count `food_yield.rb` reads (a draft's `QQ` excepted) | `tests/test_food_shopping.py` |
@@ -1068,6 +1069,13 @@ cream cheese). Butter is `butter` in a draft, where a `QQ butter` line still
 earns it, and `salted butter` or `unsalted butter` in a published recipe. Lowercase; `test_no_main_ingredient_spelling_collisions`
 enforces consistent spelling across recipes and drafts.
 
+**Singular or plural is the ingredient list's**: `limes` beside "2 limes,
+juiced", `bay leaf` beside one bay leaf, and whole eggs by the count
+(`test_main_ingredients_use_the_lists_own_number`). The picker shows the two
+numbers as one chip, the singular, through a plural alias in
+`_data/food/ingredient_words.yml`; `test_no_ingredient_is_two_chips_by_number`
+names one that is missing. Both run across recipes, drafts and the magic bag.
+
 ---
 
 ## 7. Taxonomy (food)
@@ -1292,6 +1300,7 @@ The rulings behind every rule here are in DECISIONS §8.2.
 | `assets/js/ingredient-ticks.js`, `_sass/food/_ingredient-ticks.scss` | the recipe page's TICK BOXES OFF / ON switch and a box per ingredient line, hung left of the line so none moves (#1504) |
 | `assets/js/ingredient-units.js` | the IMPERIAL / METRIC switch, on a recipe with an amount in `oz`, `lb`, `fl oz` or `pint` (`isImperial` in `food-scale.js`) |
 | `_sass/food/_ingredient-switches.scss` | both switches' look and the row they share |
+| `assets/js/food-hints.js`, `assets/js/recipe-hints.js`, `_data/food/ingredient_hints.yml`, `_sass/food/_ingredient-hints.scss` | the stock and spice hints, a ship-key box behind a ringed i on an ingredient line |
 | `assets/js/filters.js` | the shopping list's DOM half: the rows, their words, the painting |
 
 A tick box is the first child of its `<li>`, and `recipe-scale.js` steps over
@@ -1578,9 +1587,12 @@ no price. DECISIONS §8.2.
   `serves:` recipe or one batch of a `makes:` one (`.shopping-list-cost`),
   priced from the recipe as written and fixed whatever the box says.
 - **The recipe page** says the same figure in the drink page's footer
-  layout, between two rules above IF YOU LIKED THIS: "Roughly £M (£X–£Y) a
+  layout, between two rules, under NOTES (and DONENESS where there is one):
+  before the recipe's body text where it has some (DECISIONS §8.2),
+  otherwise after GOES WITH, above IF YOU LIKED THIS. "Roughly £M (£X–£Y) a
   portion in ingredients.", or "From £X a portion in ingredients, not
-  counting n unpriced items." (`.recipe-footer`, `.recipe-cost`). The footer,
+  counting n unpriced items (a, b and c)." naming each row it could not price
+  (`unpricedText`; `.recipe-footer`, `.recipe-cost`). The footer,
   `#recipe-cost-data` and `assets/js/recipe-cost.js` are all behind
   `site.show_costs`; the script calls `recipeCost`, the function the
   shortlist calls, and leaves the footer hidden, rules and all, where
@@ -1713,6 +1725,38 @@ a range of one (`yieldBox`: 5 is `2–3`, `125 ml` is `62–63 ml`, `64+` is
 - A recipe loses its half step through a rule, never by being named.
 - `tests/test_food_yield.py` names the published recipes offered a half
   step, and fails a published `makes:` it cannot read.
+
+#### The stock and spice hints
+
+The cocktails' ship key (§9.13), in food's colours (DECISIONS §8.2): a small
+ringed i, set as a superscript after an ingredient line, opens a modal
+`<dialog>` saying how much, closed by its ×, Escape or the backdrop. The
+figures are `_data/food/ingredient_hints.yml`, emitted on every recipe page
+as `#ingredient-hints-data`; the words are `assets/js/food-hints.js` (pure,
+`tests/js/food-hints.test.js`); `assets/js/recipe-hints.js` builds the one box
+and fills it from the line that opened it, reading the amount as it reads
+then, so it follows the scaler and the metric switch.
+
+- **Stock:** an item that says `stock` (not a cube, pot or powder) with a
+  volume (ml, litres, pints) gets, for that much boiling water, how much of
+  each product: cubes and spoons to the nearest half. Only the products that
+  come in the line's first named flavour are listed; no flavour lists every
+  product, and a flavour none comes in (`other_flavours`: lamb, ham…) gets no
+  hint. Figures, each the packet's own: Kallo cube 500 ml; Knorr cube 450 ml;
+  Knorr Stock Pot 500 ml; Oxo cube 190 ml; Marigold bouillon 1 level tsp per
+  250 ml (4 per litre, every variant); Bay's Kitchen 1 tbsp per 100 ml;
+  M&S concentrate 4 tsp chicken, 5 tsp beef, per pint. Knorr is the only
+  fish stock.
+- **Ground spices:** a spice in `match` and not `unless`, in tsp or tbsp, one
+  spice to the line, gets its weight (USDA FoodData Central's level teaspoon)
+  and what whole spice to weigh out and grind. By weight, not by seeds,
+  sticks or pods. Ginger adds the classic fresh figure, 1 tbsp grated per
+  ¼ tsp ground; nutmeg adds how much of a nutmeg (one grates to about
+  2½ tsp). Spices with no whole form (paprika, blends) get none.
+
+`tests/test_ingredient_hints.py` holds the data's shape and the six brands;
+`tests/test_browser_smoke.py` opens a stock hint, closes it, scales, and
+opens it again.
 
 #### Ticking rows off
 
@@ -3337,8 +3381,8 @@ Five named questions, in Helen's order:
 - **A card's ship mark is a sixth control with no section** (#1412): a
   `<button>` that sets `state.ship` to its exact `data-ship`, ANDed with
   YOLO?. `× clear ship` (`#clear-ship`) appears under the legend. `?ship=`
-  sets it from a drink page's SHIP IT? link; a value no card carries is
-  dropped.
+  sets it from a drink page's SHIP IT? link or a related card's ship mark
+  (#1433); a value no card carries is dropped.
 - **The count row's legend names the ship values showing**: `ship it? = <card
   word>` while a mark is chosen, or else a narrowing YOLO button's words
   (`= yes², yes`), from its `data-ship-words` (#1440). At 600px and under the
@@ -3698,6 +3742,12 @@ modules and each module's docstring says what it covers. The rule for a red
   cocktail is therefore checked everywhere, CI included. The data files and
   collections are parsed once per run (`_parsed`, `_scan`): copy before
   changing anything a loader returned.
+- **Food's `recipe` fixture is every published recipe plus the drafts in
+  `3-keep/` and `4-promote/`** (`STAGED_DRAFTS` in `tests/conftest.py`), so a
+  rule written for a published recipe reaches a staged draft with no extra
+  code; the rules in `HELENS_RULES` reach `4-promote/` only. A rule that scans
+  the raw file reads `checkable_raw(recipe)`, which blanks a draft's `QQ`
+  lines. `draft` is every draft. PIPELINE.md §3.
 - **The staleness half of a guard is unanswerable on a partial corpus**: a
   cocktail merely absent looks exactly like one fixed. A check that hangs on a
   shrink-only registry, or a mood's share of the book, calls

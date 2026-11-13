@@ -701,7 +701,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   from food drafts to published."* Promotion into the collection and the gate
   opening are two different moments: the recipe sits in `_food_recipes/`, off
   the live site, until she reads the built page and flips the flag herself.
-  Mechanical suite failures on the copy are fixed and said afterwards.
+  Mechanical suite failures are fixed in `3-keep/`, before her proofread
+  (2026-11-12, PIPELINE.md §3); any that still reach the copy flip the flag.
+- **2026-11-12 — food's `rewritten` is not a publish-gate leg: a recipe
+  saying `false` publishes, and is left off the food index and search.** Helen:
+  *"That rule changed because I wanted to publish some recipes that weren't
+  ready simply because I wanted to cook from them and didn't have a local
+  build available!"* So promotion says so when a food draft still says
+  `rewritten: false`, and she sets it, or asks for it set (Grandma Kath's
+  pudding, as a one-off), or leaves it unlisted on purpose. MANUAL §4.0.
 - **2026-10-21 — a tag or star change Helen has agreed with a session row by
   row needs no flip.** Helen: *"No need to flip the proofread flag for tag
   changes agreed interactively -- new official ruling."* Her row-by-row answer
@@ -1048,6 +1056,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   garnish or wash, an optional line, one of two alternatives, a serving
   group, and a savoury dish's flour, butter, eggs and sugar: the lines the
   2026-10-21 sweep left out on purpose. Drafts only.
+- **2026-11-12 — an entry is written in the number its ingredient list uses,
+  and the picker merges the two numbers into one chip.** Helen asked that
+  *"Spellings need to be consistent"*, and settled which spelling: *"Match
+  whatever is in the ingredients list."* So `limes` beside "2 limes, juiced"
+  and `bay leaf` beside one bay leaf; whole eggs still follow the count. A
+  plural is aliased to its singular in `ingredient_words.yml`, which is safe
+  where #762's corn flour was not because the singular is a prefix of the
+  plural (or a `singulars` word), and `test_a_number_alias_still_matches_its_plural_recipes`
+  holds that.
 
 ## §7 Taxonomy (food)
 
@@ -1330,9 +1347,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   withholding and over an unmarked sum, given that a keyword table cannot
   price every one of the collection's ingredient names. Seasoning, a pinch
   and an unquantified line cost nothing and do not count as unpriced. The
-  recipe page says how many are missing: "From £X a portion in ingredients,
-  not counting 2 unpriced items." — Helen: *"number 1, but with "not counting
-  X unpriced items""*.
+  recipe page says how many are missing and names them: "From £1.43 a batch
+  in ingredients, not counting 1 unpriced item (cockerel carcass)." — Helen:
+  *"number 1, but with "not counting X unpriced items""*; the names on
+  2026-11-08, #1486.
 - **2026-11-03, #1458 — a researched food price's range is the median's
   bracket: the middle 50% of 6+ shop prices, the range of 3–5, the mean's two
   ends of 2.** Helen: *"2 points mean, 3-5 points median with range in
@@ -1371,6 +1389,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   rules with the line in between, above IF YOU LIKED THIS. Use food site
   styling, but the same layout code."* and *"Costs should only show on the
   local build."* `.recipe-footer` is `.cocktail-footer` rule for rule.
+- **2026-11-12 — on a recipe with body text, the cost line sits under NOTES,
+  above the body.** Helen, of the ganache, where it had fallen below the Tips
+  and GOES WITH: *"I think it should sit below NOTES as everything else.
+  Please do this every time a recipe page has body content."* A recipe with
+  no body text keeps it after GOES WITH.
 - **2026-09-07 — a scaled amount is never rounded coarser than 1 g.** Helen:
   *"For now, don't tidy/round beyond 1 g precision"*, then, unprompted: *"I
   mean don't roudn to 10 g or 5 g, round to 1g"*. Two thirds of 200 g prints
@@ -1514,6 +1537,21 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   switch on a recipe; a cup or an inch alone does not, though it converts with
   the rest. Not remembered, as the tick boxes are not: both choices are a
   session's.
+- **2026-11-12, #1472 — a stock line's hint says how much of each product
+  makes its volume of water, for all six brands, behind a tap.** Helen: *"I
+  would actually like this the other way round if possible -- where a recipe
+  wants 500 ml stock, I'd like to know how many cubes/tsp to add to 500 ml
+  water. And please include Marigold Bouillon powder too."* Bay's Kitchen and
+  M&S concentrate were hers from the issue. Asked which to name, she chose
+  all six (Kallo, Knorr cube and pot, Oxo, Marigold, Bay's Kitchen, M&S); asked
+  where, *"Behind a tap"*, and then, of the first build, *"please use the same
+  pattern as the YOLO / ship explainer on the cocktails site"*: a ringed i
+  opening a modal box. The spice hints share it.
+- **2026-11-12, #1498 — a ground spice's hint gives its weight to grind your
+  own, not a count of seeds, sticks or pods.** Helen: *"Default to weight
+  instead of seeds, sticks and pods. Take classic figures for fresh ginger."*
+  So ginger also gives 1 tbsp grated fresh per ¼ tsp ground. Nutmeg also
+  says how much of a nutmeg, the "about half" of her issue comment.
 - **2026-10-09, #1297 — the shopping list reads the zest and the juice of one
   lemon as one lemon.** Helen: *'I would like to cleverly combine e.g. "zest
   of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the shopping list.'*
@@ -1639,8 +1677,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-11-06, #1474 — the shopping list reads "approx" like `~`, and a
   bracketed aside or a "per …" rate is not pluralised.** Helen chose all three
   fixes she was offered: "approx 8 oz" totals as ~227 g; "2 oz (or 2 tbsp)"
-  and "250 g per person" print as written. `UNIT_TAIL` in
-  `assets/js/shopping-list.js`.
+  prints as written. `UNIT_TAIL` in `assets/js/shopping-list.js`.
+- **2026-11-11, #1481 — a per-person amount becomes the total for the people
+  chosen, "per person" dropped.** "250 g per person" for four is 1 kg on the
+  shopping list, and on the recipe page once the box moves off the recipe's
+  own count. Helen ticked it over "stay as written". With no count of people
+  (no `serves:`) it prints as written and is never multiplied by the scale.
+  `perPerson` in `assets/js/food-shopping-list.js`.
 
 ### §8.3 The shortlist is a view, not a facet — #918, 2026-09-10
 
@@ -4613,13 +4656,18 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   there are a few intermediate states."* This reversed "never move a file
   between these folders unless asked" by making the word the ask. Each move is
   a commit on a branch of the private repo.
-- **2026-11-04 — a food draft that leaves the pool gets the promotion rules
-  run against it.** Helen: *"I want you to run the promotion rules against
-  drafts I progress from the main pool,"* wanting to "promote 3-keep recipes
-  ASAP" and to cook from `2-make/` "without being infuriated". `python3
-  scripts/promotion_qa.py` sorts what it finds into FIX, HELEN'S and AT
-  PROMOTION; a `2-make/` draft is also checked to render and read for sense.
-  PIPELINE.md §3.
+- **2026-11-12 — the suite holds a food draft in `3-keep/` or `4-promote/`
+  to every published-recipe rule; the rules only Helen settles bite at
+  `4-promote/`.** Helen: *"After I make recipes, I'll likely rewrite slightly
+  based on my experience, moving them to 3-keep, and it's at that point I'd
+  like to run all the checks. Then when those are in and all questions are
+  answered, drafts can move to 4-promote, intending that all that happens is
+  one proofread from me and only ad hoc fixes we missed."* Five recipes met
+  twenty published-only failures after her proofread, which cost a second
+  OK. A draft leaving the pool still gets `python3 scripts/promotion_qa.py`
+  (*"I want you to run the promotion rules against drafts I progress from
+  the main pool"*, 2026-11-04), which sorts FIX, HELEN'S and AT 3-KEEP; a
+  `2-make/` draft is also checked to render and read for sense. PIPELINE.md §3.
 - **2026-09-14 — never create issues or PRs in a burst: a batch of issues is
   one issue with a checklist.** Twenty issues and two PRs in under an hour got
   the agent account flagged as spam, and GitHub hid everything it had ever

@@ -51,6 +51,9 @@
     if (people > 0) mode = HTF.foodScale.portionsMode(people);
   }
   var base = mode ? mode.base : 1;
+  // The box counts people, not batches: a per-person amount can be totalled.
+  var byPeople = !!mode && !input.hasAttribute('data-made') &&
+    !!HTF.foodShoppingList;
 
   var spans = Array.prototype.slice.call(
     article.querySelectorAll('.ingredient-amount-number')
@@ -192,7 +195,11 @@
           : original[index]);
         return;
       }
-      var result = HTF.foodScale.scaleAmount(original[index], factor, options);
+      // "250 g per person" for n people is n people's worth (#1481).
+      var each = byPeople && HTF.foodShoppingList.perPerson(original[index]);
+      var result = each
+        ? HTF.foodScale.scaleAmount(each, n, options)
+        : HTF.foodScale.scaleAmount(original[index], factor, options);
       write(span, result.text);
       if (result.one && item.node) {
         item.node.nodeValue = HTF.foodScale.singularItem(item.written, singulars);

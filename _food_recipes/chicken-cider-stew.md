@@ -6,7 +6,7 @@ source_type: website
 serves: "4"
 prep_time: "15 mins"
 cook_time: "1 hr"
-main_ingredients: ["chicken thighs and drumsticks", "cider", "cooking apples", "crème fraîche", "turnip", "green beans"]
+main_ingredients: ["chicken thighs and drumsticks", "cider", "cooking apples", "crème fraîche", "turnips", "green beans", "tarragon"]
 star_ingredient: "poultry"
 tags: ["one-handed food", "virtuous", "freezable", "make-ahead", "main"]
 ingredient_groups:

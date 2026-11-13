@@ -259,8 +259,10 @@ else has already done (MANUAL §9.1).
 
 ## TIER 1 -- do it at ingest, unasked, both sites
 
-- **Every qualifier the source states.** Sugar, butter, flour, milk, eggs,
-  garlic, ginger, chocolate, mustard, vinegar. Source silent → `QQ`, never a
+- **Every qualifier the source states, in the house's name for it**: root
+  ginger is `fresh ginger`, soft dark brown sugar is `dark brown soft sugar`
+  (`INGEST_ONE_RECIPE.md` §2 prints every list). Sugar, butter, flour, milk,
+  eggs, garlic, ginger, chocolate, mustard, vinegar. Source silent → `QQ`, never a
   default -- **except milk, eggs and butter, which have house defaults**:
   `semi-skimmed milk`, a large egg (`amount: "2 large"`), `salted butter`, or
   `unsalted butter` in a bake whose recipe names salt. Each such line gets

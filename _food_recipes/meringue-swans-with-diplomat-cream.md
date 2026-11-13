@@ -6,7 +6,7 @@ source_type: joke
 makes: "10–12 swans"
 prep_time: "1 hr"
 cook_time: "1 hr 15 mins plus at least 1 hr cooling"
-main_ingredients: ["egg whites", "white caster sugar", "icing sugar", "whole milk", "egg yolks", "cornflour", "gelatine", "double cream", "vanilla pod"]
+main_ingredients: ["egg whites", "white caster sugar", "icing sugar", "whole milk", "egg yolks", "cornflour", "gelatine", "double cream", "vanilla pod", "unsalted butter", "lemon juice"]
 star_ingredient: "eggs"
 tags: ["dessert", "showstopper", "make-ahead", "fiddly and fun"]
 ingredient_groups:

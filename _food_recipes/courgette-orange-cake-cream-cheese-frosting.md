@@ -6,7 +6,7 @@ source_type: website
 makes: "one 1-kg loaf cake (12 slices)"
 prep_time: "10 mins"
 cook_time: "50 mins"
-main_ingredients: ["courgette", "orange", "sultanas", "cream cheese", "pistachios", "light brown soft sugar", "icing sugar", "self-raising flour", "eggs"]
+main_ingredients: ["courgettes", "orange", "sultanas", "cream cheese", "pistachios", "light brown soft sugar", "icing sugar", "self-raising flour", "eggs"]
 star_ingredient:
 tags: ["bakes", "freezable"]
 ingredient_groups:

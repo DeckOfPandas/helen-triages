@@ -132,9 +132,11 @@ $recipe-title-line-height: 1.3;
 // --- the cost line (#1458), local only ----------------------------------------
 // The drink page's footer, rule for rule (`.cocktail-footer`,
 // `.cocktail-cost` and `.cocktail-related-section` in cocktails/_cocktail.scss):
-// a rule, the line, and a rule over IF YOU LIKED THIS. The second rule is
-// drawn only under a shown footer, so a production page, which has none,
-// keeps its own layout. Change both sites together.
+// a rule, the line, and a rule over what comes next: IF YOU LIKED THIS, or a
+// recipe's body text (DECISIONS §8.2). The footer's data <script> sits
+// between, hence `+ script +`. The second rule is drawn only under a shown
+// footer, so a production page keeps its own layout. Change both sites
+// together.
 .recipe-footer {
   margin-top: $spacing-section-gap;
   padding-top: $space-lg;
@@ -153,13 +155,18 @@ $recipe-title-line-height: 1.3;
   }
 }
 
-.recipe-footer:not([hidden]) ~ .recipe-related-section {
+.recipe-footer:not([hidden]) + script + .recipe-related-section,
+.recipe-footer:not([hidden]) + script + .recipe-body-content {
   margin-top: 3.5rem;
   padding-top: 1.25rem;
   border-top: 1px solid $color-border;
 
-  // The section's own padding already holds the heading off the rule.
-  .recipe-section-heading { margin-top: 0; }
+  // The padding already holds the first heading off the rule.
+  > .recipe-section-heading:first-child { margin-top: 0; }
+}
+
+.recipe-footer:not([hidden]) + script + .recipe-related-section .recipe-section-heading {
+  margin-top: 0;
 }
 
 // `.recipe-list` starts `visibility: hidden` and a recipe page never loads the

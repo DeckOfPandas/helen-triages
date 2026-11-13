@@ -6,7 +6,7 @@ source_type: person
 serves: "4–6"
 prep_time: "30 mins plus 30 mins resting"
 cook_time: "1 hr"
-main_ingredients: ["asparagus", "gruyère", "eggs", "double cream", "parmesan", "onion"]
+main_ingredients: ["asparagus", "gruyère", "eggs", "double cream", "parmesan", "onion", "plain flour", "unsalted butter"]
 star_ingredient:
 tags: ["bakes", "cheese-tastic", "make-ahead", "one-handed food", "fiddly and fun", "main", "herbivore-ish"]
 ingredient_groups:

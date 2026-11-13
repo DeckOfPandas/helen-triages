@@ -15,7 +15,7 @@ import re
 
 import pytest
 
-from conftest import where, checkable_raw, checkable_prose
+from conftest import where, checkable_raw, checkable_prose, is_qq
 # The corpus-agnostic rules live in conftest so the cocktails suite reaches them
 # without importing the food suite (#670). Other modules import several of
 # these names from HERE, so the imports below are also this module's exports.
@@ -1185,6 +1185,8 @@ def test_oven_temperature_says_fan(recipe):
     """
     bad = []
     for step in recipe.method_steps:
+        if is_qq(step):
+            continue
         # Markdown links are unwrapped first. _INTERNAL_TEMP_RE reads the words
         # immediately before the figure, and a linked temperature (#260) puts a
         # "[" in that gap: "reads [74–75°C](#doneness)" would otherwise count

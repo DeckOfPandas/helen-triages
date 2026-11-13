@@ -323,7 +323,29 @@ layout: default
     {% include food/doneness_chart.html node=_temp_spectrum single=_internal_temp suggested=page.doneness %}
   {% endif %}
 
-  {% if content != '' %}
+  {% comment %} What it costs (#1458), on a local build only: `site.show_costs` is
+     declared in _config_local.yml and never in _config.yml. Filled by
+     recipe-cost.js; hidden where nothing could be priced. It sits under the
+     last of NOTES and DONENESS: before a recipe's body text where there is
+     some, otherwise after GOES WITH. MANUAL §8.2. {% endcomment %}
+  {% capture _cost_block %}{% if site.show_costs and page.shopping %}
+    <div class="recipe-footer" data-recipe-cost hidden>
+      <p class="recipe-cost"></p>
+    </div>
+    <script type="application/json" id="recipe-cost-data">
+{"per":{% if page.whole_recipes %}1{% elsif page.portions %}{{ page.portions }}{% else %}0{% endif %},"batch":{% if page.whole_recipes %}true{% else %}false{% endif %},"units":{{ site.data.food.costs.units | jsonify }},"wholeMeasures":{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | jsonify }},"quarterMeasures":{{ site.data.food.scaling.quarter_step_measures | jsonify }},"i":[
+{%- for ing in page.shopping -%}
+{% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}{% if ing.parts %},"pt":{{ ing.parts | jsonify }}{% endif %}{% if ing.fruit %},"f":{{ ing.fruit | jsonify }},"c":{{ ing.count | jsonify }}{% endif %}{% if ing.pointer %},"x":true{% endif %}{% if ing.rate %},"r":{{ ing.rate | jsonify }}{% endif %}}
+{%- endfor -%}
+]}
+    </script>
+  {% endif %}{% endcapture %}
+
+  {% assign _has_body = false %}
+  {% assign _body = content | strip %}
+  {% if _body != '' %}{% assign _has_body = true %}{% endif %}
+  {% if _has_body %}
+  {{ _cost_block }}
   <div class="recipe-body-content">
     {{ content }}
   </div>
@@ -370,24 +392,7 @@ layout: default
     </section>
   {% endif %}
 
-  {% comment %} What it costs (#1458), on a local build only: `site.show_costs` is
-     declared in _config_local.yml and never in _config.yml. The cocktail page's
-     footer, between two rules, above IF YOU LIKED THIS. The figure is one
-     portion, or one batch of a `makes:` recipe, filled by recipe-cost.js
-     through the shortlist's own arithmetic; it stays hidden where nothing
-     could be priced. MANUAL §8.2. {% endcomment %}
-  {% if site.show_costs and page.shopping %}
-    <div class="recipe-footer" data-recipe-cost hidden>
-      <p class="recipe-cost"></p>
-    </div>
-    <script type="application/json" id="recipe-cost-data">
-{"per":{% if page.whole_recipes %}1{% elsif page.portions %}{{ page.portions }}{% else %}0{% endif %},"batch":{% if page.whole_recipes %}true{% else %}false{% endif %},"units":{{ site.data.food.costs.units | jsonify }},"wholeMeasures":{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | jsonify }},"quarterMeasures":{{ site.data.food.scaling.quarter_step_measures | jsonify }},"i":[
-{%- for ing in page.shopping -%}
-{% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}{% if ing.parts %},"pt":{{ ing.parts | jsonify }}{% endif %}{% if ing.fruit %},"f":{{ ing.fruit | jsonify }},"c":{{ ing.count | jsonify }}{% endif %}{% if ing.pointer %},"x":true{% endif %}{% if ing.rate %},"r":{{ ing.rate | jsonify }}{% endif %}}
-{%- endfor -%}
-]}
-    </script>
-  {% endif %}
+  {% unless _has_body %}{{ _cost_block }}{% endunless %}
 
   {% comment %} ── If you liked this, how about … (#1090; heading final, #1088) ──
      Ranked by: the same star ingredient, then more shared mood tags, then more
@@ -478,5 +483,10 @@ layout: default
 <script src="{{ '/assets/js/food-scale.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/recipe-scale.js' | relative_url }}"></script>
 {% if site.show_costs %}<script src="{{ '/assets/js/recipe-cost.js' | relative_url }}"></script>{% endif %}
+{% comment %} The stock and spice hints (MANUAL §8.2): their data, then the words, then
+   the wiring. {% endcomment %}
+<script type="application/json" id="ingredient-hints-data">{{ site.data.food.ingredient_hints | jsonify }}</script>
+<script src="{{ '/assets/js/food-hints.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/recipe-hints.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/ingredient-ticks.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/ingredient-units.js' | relative_url }}"></script>

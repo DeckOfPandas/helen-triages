@@ -243,6 +243,26 @@ def _load(directory: Path) -> list[Recipe]:
 
 ALL_RECIPES = _load(RECIPES_DIR)
 ALL_DRAFTS = _load(DRAFTS_DIR)
+# A draft in 3-keep/ or 4-promote/ is held to every published-recipe rule, so
+# the fixes land before Helen's proofread, not after it. The rules only she can
+# settle bite at 4-promote/; in 3-keep/ scripts/promotion_qa.py lists them as
+# questions. PIPELINE.md §3.
+STAGED_FOLDERS = ("3-keep", "4-promote")
+HELENS_RULES = frozenset({
+    "test_no_qq_placeholder", "test_no_estimated_timings",
+    "test_tagline_is_not_blank", "test_ingredient_group_order_matches_title",
+    "test_ingredient_notes_are_lowercase_fragments",
+    "test_spice_order_within_group",
+})
+
+
+def _folder(draft) -> str:
+    parts = draft.path.relative_to(DRAFTS_DIR).parts
+    return parts[0] if len(parts) > 1 else ""
+
+
+STAGED_DRAFTS = [d for d in ALL_DRAFTS if _folder(d) in STAGED_FOLDERS]
+PROMOTING_DRAFTS = [d for d in STAGED_DRAFTS if _folder(d) == "4-promote"]
 ALL_MAGIC_BAG = _load(MAGIC_BAG_DIR)
 # Raises at import if the file is gone, which is the point: the fixture is what
 # stands between this spec and testing nothing.
@@ -269,12 +289,16 @@ NO_DRAFTS_REASON = (
 def pytest_generate_tests(metafunc):
     """Parametrise any test that asks for `recipe`, `draft` or `magic_bag`.
 
-    `recipe` and `draft` are separate fixtures over separate lists
-    (ALL_RECIPES, ALL_DRAFTS), so a recipe-only rule is never silently
-    enforced against a draft, or the reverse.
+    `recipe` is every published recipe plus STAGED_DRAFTS (HELENS_RULES:
+    PROMOTING_DRAFTS only); `draft` is every draft. A pool or 1-rewrite/ or
+    2-make/ draft is never held to a published-recipe rule.
     """
     if "recipe" in metafunc.fixturenames:
-        metafunc.parametrize("recipe", ALL_RECIPES, ids=[r.slug for r in ALL_RECIPES])
+        staged = (PROMOTING_DRAFTS if metafunc.definition.name in HELENS_RULES
+                  else STAGED_DRAFTS)
+        metafunc.parametrize("recipe", ALL_RECIPES + staged,
+                             ids=[r.slug for r in ALL_RECIPES]
+                             + [f"staged:{_folder(d)}/{d.slug}" for d in staged])
     if "draft" in metafunc.fixturenames:
         if not ALL_DRAFTS:
             UNCREATED.append(metafunc.definition.name)

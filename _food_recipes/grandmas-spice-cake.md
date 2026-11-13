@@ -6,7 +6,7 @@ source_type: person
 makes: "one 7-inch round cake"
 prep_time: "10 mins"
 cook_time: "35 mins"
-main_ingredients: ["salted butter", "demerara sugar", "golden syrup", "self-raising flour", "ground ginger", "mixed spice powder"]
+main_ingredients: ["salted butter", "demerara sugar", "golden syrup", "self-raising flour", "ground ginger", "mixed spice powder", "egg"]
 star_ingredient:
 tags: ["bakes"]
 ingredient_groups:

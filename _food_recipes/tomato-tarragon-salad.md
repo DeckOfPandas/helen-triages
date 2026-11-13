@@ -6,7 +6,7 @@ source_type: website
 serves: "6"
 prep_time: "15 mins plus 20 mins chilling"
 cook_time: "None"
-main_ingredients: ["plum tomatoes", "tarragon", "flat-leaf parsley", "Worcestershire sauce", "balsamic vinegar", "Dijon mustard", "shallots"]
+main_ingredients: ["plum tomatoes", "tarragon", "flat-leaf parsley", "Worcestershire sauce", "balsamic vinegar", "Dijon mustard", "shallots", "lemon"]
 star_ingredient:
 tags: ["no-cook", "salad", "side", "starter"]
 ingredient_groups:
