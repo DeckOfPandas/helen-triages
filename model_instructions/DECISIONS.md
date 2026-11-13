@@ -1330,9 +1330,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   withholding and over an unmarked sum, given that a keyword table cannot
   price every one of the collection's ingredient names. Seasoning, a pinch
   and an unquantified line cost nothing and do not count as unpriced. The
-  recipe page says how many are missing: "From £X a portion in ingredients,
-  not counting 2 unpriced items." — Helen: *"number 1, but with "not counting
-  X unpriced items""*.
+  recipe page says how many are missing and names them: "From £1.43 a batch
+  in ingredients, not counting 1 unpriced item (cockerel carcass)." — Helen:
+  *"number 1, but with "not counting X unpriced items""*; the names on
+  2026-11-08, #1486.
 - **2026-11-03, #1458 — a researched food price's range is the median's
   bracket: the middle 50% of 6+ shop prices, the range of 3–5, the mean's two
   ends of 2.** Helen: *"2 points mean, 3-5 points median with range in
@@ -1614,8 +1615,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-11-06, #1474 — the shopping list reads "approx" like `~`, and a
   bracketed aside or a "per …" rate is not pluralised.** Helen chose all three
   fixes she was offered: "approx 8 oz" totals as ~227 g; "2 oz (or 2 tbsp)"
-  and "250 g per person" print as written. `UNIT_TAIL` in
-  `assets/js/shopping-list.js`.
+  prints as written. `UNIT_TAIL` in `assets/js/shopping-list.js`.
+- **2026-11-11, #1481 — a per-person amount becomes the total for the people
+  chosen, "per person" dropped.** "250 g per person" for four is 1 kg on the
+  shopping list, and on the recipe page once the box moves off the recipe's
+  own count. Helen ticked it over "stay as written". With no count of people
+  (no `serves:`) it prints as written and is never multiplied by the scale.
+  `perPerson` in `assets/js/food-shopping-list.js`.
 
 ### §8.3 The shortlist is a view, not a facet — #918, 2026-09-10
 

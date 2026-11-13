@@ -699,6 +699,27 @@ test('#1458: a recipe costs per portion, or per batch with per = 1, and keeps "f
   assert.strictEqual(partial.partial, true);
   // The recipe page says "not counting 1 unpriced item" from this count.
   assert.strictEqual(partial.unpriced, 1);
+  assert.deepStrictEqual(partial.unpricedNames, ['kohlrabi']);
+});
+
+test('#1486: the cost line names what it could not price', () => {
+  const o = { aisles: AISLES, costUnits: UNITS };
+  const flour = { amount: '500 g', name: 'flour', aisle: 'cupboard', rate: FLOUR };
+  const one = F.recipeCost([flour,
+    { amount: '1', name: 'cockerel carcass', aisle: 'produce' }], 1, o);
+  assert.strictEqual(F.unpricedText(one), ', not counting 1 unpriced item (cockerel carcass)');
+  const three = F.recipeCost([flour,
+    { amount: '200 g', name: 'kohlrabi', aisle: 'produce' },
+    { amount: '1', name: 'cockerel carcass', aisle: 'produce' },
+    { amount: '10 g', name: 'kombu', aisle: 'produce' }], 1, o);
+  assert.strictEqual(F.unpricedText(three),
+    ', not counting 3 unpriced items (cockerel carcass, kohlrabi and kombu)');
+  // A row priced only in part is named too: it is part of the "from".
+  const part = F.recipeCost([flour,
+    { amount: '2 bags', name: 'flour', aisle: 'cupboard', rate: FLOUR }], 1, o);
+  assert.strictEqual(F.unpricedText(part), ', not counting 1 unpriced item (flour)');
+  assert.strictEqual(F.unpricedText(F.recipeCost([flour], 1, o)), '');
+  assert.strictEqual(F.unpricedText(null), '');
 });
 
 test('#1458: no portion count, or no unit table, is no recipe figure at all', () => {
@@ -820,6 +841,33 @@ test('#1474: a bracketed alternative is not pluralised', () => {
     '2 oz (or 2 tbsp)');
   assert.strictEqual(textOf([ing('3 cloves (or 1 tsp paste)', 'garlic', 'produce')], 'garlic'),
     '3 cloves (or 1 tsp paste)');
+});
+
+test('#1481: a per-person amount is the total for the people chosen', () => {
+  const potatoes = (people, scale) => F.build([{
+    amount: '250 g per person', name: 'potatoes', aisle: 'produce', scale, people
+  }], { aisles: AISLES })[0].items[0].text;
+  assert.strictEqual(potatoes(4, 1), '1 kg');
+  // The people, not the scale, decide: doubling a recipe for 4 is 8 people.
+  assert.strictEqual(potatoes(8, 2), '2 kg');
+  assert.strictEqual(potatoes(3, 1), '750 g');
+  assert.strictEqual(potatoes(1, 0.25), '250 g');
+});
+
+test('#1481: with no count of people, a per-person amount is as written, never multiplied', () => {
+  const row = F.build([{
+    amount: '250 g per person', name: 'potatoes', aisle: 'produce', scale: 2
+  }], { aisles: AISLES })[0].items[0];
+  assert.strictEqual(row.text, '250 g per person');
+});
+
+test('#1481: only "per person" and its kin are read as a rate per person', () => {
+  assert.strictEqual(F.perPerson('250 g per person'), '250 g');
+  assert.strictEqual(F.perPerson('2 slices per portion'), '2 slices');
+  assert.strictEqual(F.perPerson('90 g Per Head'), '90 g');
+  assert.strictEqual(F.perPerson('250 g'), null);
+  assert.strictEqual(F.perPerson('1 per cent fat'), null);
+  assert.strictEqual(F.perPerson(undefined), null);
 });
 
 test('#1474: a rate is not pluralised', () => {

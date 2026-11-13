@@ -1558,7 +1558,8 @@ no price. DECISIONS §8.2.
 - **The recipe page** says the same figure in the drink page's footer
   layout, between two rules above IF YOU LIKED THIS: "Roughly £M (£X–£Y) a
   portion in ingredients.", or "From £X a portion in ingredients, not
-  counting n unpriced items." (`.recipe-footer`, `.recipe-cost`). The footer,
+  counting n unpriced items (a, b and c)." naming each row it could not price
+  (`unpricedText`; `.recipe-footer`, `.recipe-cost`). The footer,
   `#recipe-cost-data` and `assets/js/recipe-cost.js` are all behind
   `site.show_costs`; the script calls `recipeCost`, the function the
   shortlist calls, and leaves the footer hidden, rules and all, where
