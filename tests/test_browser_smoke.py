@@ -587,3 +587,119 @@ def test_a_stock_hint_opens_and_follows_the_scaler(chromium, visit, prod_site, w
     stock.locator(".ingredient-hint-open").click()
     assert box.inner_text() != before, f"{url}: the box did not follow the scaler"
     assert not v.errors, f"{url}: " + "\n  ".join(v.errors)
+
+
+# --- The keyboard (#1479) -----------------------------------------------------
+
+# The focused element: where it is, and whether a reader can see it.
+FOCUSED = """() => {
+  const el = document.activeElement;
+  if (!el || el === document.body) return null;
+  const r = el.getBoundingClientRect();
+  return {
+    tag: el.tagName, cls: String(el.getAttribute('class') || ''),
+    text: el.textContent.trim().slice(0, 40), id: el.id,
+    seen: el.checkVisibility() && r.width > 0 && r.height > 0 &&
+          r.bottom > 0 && r.top < window.innerHeight &&
+          r.right > 0 && r.left < window.innerWidth,
+    inDialog: el.closest('dialog') ? el.closest('dialog').id : null,
+  };
+}"""
+
+CHIPS = """s => [...document.querySelectorAll(s)]
+  .filter(e => e.checkVisibility()).slice(0, 6).map(e => e.textContent.trim().slice(0, 40))"""
+
+
+@pytest.mark.parametrize("width", sorted(VIEWPORTS))
+def test_tab_walks_the_food_index_chips_in_order_on_screen(chromium, visit, width):
+    """From the first filter chip, Tab lands on each next chip in turn, and
+    each is on screen when it has focus."""
+    index = INDEXES["food"]
+    v = visit(index["url"], width)
+    v.wait_for_script(index["canary"])
+    _settle(v.page)
+    chips = v.page.evaluate(CHIPS, index["filters"])
+    assert len(chips) >= 3, f"{index['url']} at {width}px: only {chips} visible"
+
+    v.page.locator(index["filters"]).filter(has_text=chips[0]).first.focus()
+    reached = [v.page.evaluate(FOCUSED)]
+    for _ in range(len(chips) - 1):
+        v.page.keyboard.press("Tab")
+        reached.append(v.page.evaluate(FOCUSED))
+    unseen = [f for f in reached if not (f and f["seen"])]
+    assert not unseen, f"at {width}px, focus went somewhere unseen: {unseen}"
+    assert [f["text"] for f in reached] == chips, (
+        f"at {width}px, Tab did not walk the chips in order:\n"
+        f"  expected {chips}\n  reached  {[f['text'] for f in reached]}")
+    assert not v.errors, "\n  ".join(v.errors)
+
+
+@pytest.mark.parametrize("width", sorted(VIEWPORTS))
+def test_the_search_dropdown_follows_the_arrow_keys(chromium, visit, width):
+    """Typing opens the dropdown; ArrowDown marks each option in turn on screen,
+    the box keeps focus and names it; Escape shuts the dropdown."""
+    v = visit("/food/", width)
+    v.wait_for_script(INDEXES["food"]["canary"])
+    box = v.page.locator(".page-search-input")
+    panel = v.page.locator("#page-search-results")
+    box.focus()
+    v.page.keyboard.type("chick")
+    panel.wait_for(state="visible", timeout=10_000)
+    options = v.page.locator("#page-search-results [role=option]")
+    assert options.count() >= 2, f"at {width}px: {options.count()} options for 'chick'"
+
+    for n in range(2):
+        v.page.keyboard.press("ArrowDown")
+        option = options.nth(n)
+        assert box.get_attribute("aria-activedescendant") == option.get_attribute("id"), (
+            f"at {width}px, ArrowDown {n + 1} did not mark option {n + 1}")
+        assert "is-active" in (option.get_attribute("class") or "")
+        assert option.is_visible() and option.bounding_box()["y"] < VIEWPORTS[width]["viewport"]["height"]
+        focused = v.page.evaluate(FOCUSED)
+        assert focused and "page-search-input" in focused["cls"], f"focus left the box: {focused}"
+
+    v.page.keyboard.press("Escape")
+    assert panel.is_hidden(), f"at {width}px, Escape did not shut the dropdown"
+    assert box.get_attribute("aria-expanded") == "false"
+    assert not v.errors, "\n  ".join(v.errors)
+
+
+def _drink_with_ship_key(prod_site):
+    for path in sorted((prod_site / "cocktails" / "recipes").glob("*/index.html")):
+        if 'class="ship-key-open"' in path.read_text(encoding="utf-8"):
+            return "/" + str(path.parent.relative_to(prod_site)) + "/"
+    raise AssertionError("no drink page carries the ship key's (i)")
+
+
+DIALOGS = {
+    "ship key": ("ship-key", ".ship-key-open", _drink_with_ship_key),
+    "stock hint": ("ingredient-hint", "li.ingredient .ingredient-hint-open", _recipe_with_stock_line),
+}
+
+
+@pytest.mark.parametrize("width", sorted(VIEWPORTS))
+@pytest.mark.parametrize("which", sorted(DIALOGS))
+def test_a_dialog_opened_from_the_keyboard_gives_focus_back(chromium, visit, prod_site, which, width):
+    """Enter on the (i) opens its box with focus inside it; Escape closes it
+    and focus is back on the (i) that opened it."""
+    dialog_id, opener, find = DIALOGS[which]
+    url = find(prod_site)
+    v = visit(url, width)
+    v.page.wait_for_load_state("networkidle")
+    _settle(v.page)
+    button = v.page.locator(opener).first
+    dialog = v.page.locator(f"dialog#{dialog_id}")
+    button.focus()
+    v.page.keyboard.press("Enter")
+    assert dialog.is_visible(), f"{url} at {width}px: Enter on the (i) did not open the {which}"
+    inside = v.page.evaluate(FOCUSED)
+    assert inside and inside["inDialog"] == dialog_id, (
+        f"{url} at {width}px: focus is not inside the {which}: {inside}")
+    assert inside["seen"], f"{url} at {width}px: the focused control is off screen: {inside}"
+
+    v.page.keyboard.press("Escape")
+    assert not dialog.is_visible(), f"{url} at {width}px: Escape did not close the {which}"
+    assert button.evaluate("b => b === document.activeElement"), (
+        f"{url} at {width}px: focus did not go back to the (i): "
+        f"{v.page.evaluate(FOCUSED)}")
+    assert not v.errors, f"{url}: " + "\n  ".join(v.errors)

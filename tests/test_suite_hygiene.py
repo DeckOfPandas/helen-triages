@@ -128,6 +128,7 @@ SKIPS_WITHOUT_DRAFTS = {
     "test_accents_in_drafts",
     "test_pan_and_ingredient_sizes_use_digits_in_drafts",
     "test_pantry_entries_are_actually_used",
+    "test_every_alias_key_is_reachable",
 }
 
 # Reads recipes AND drafts. Deliberately does NOT skip: the published half is

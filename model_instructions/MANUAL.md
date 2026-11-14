@@ -1198,6 +1198,15 @@ quantity → measure phrase → modifiers, then `aliases`. So "juice of 2 lemons
 is an `aliases` job, not a phrase. Every strip is a no-op on a clean entry,
 which is what lets both pickers go through `buildMasterList`.
 
+**A dead alias is reported, not failed.** An alias key fires only when a
+string after the strips is exactly that key.
+`tests/test_food_alias_reach.py` hands `tests/js/alias-reach.js` every
+string the index gives the pickers, from the recipes and the drafts, through
+the real pipeline with the aliases taken out. Any key nothing reaches is
+listed at the end of the run, under "Alias keys nothing reaches", because a
+fix to a recipe line can retire an alias and must not turn main red. Without
+the drafts clone it skips.
+
 **A picked entry matches a row by word prefix, not containment**
 (`entriesMatchKey`): every word of the key must start some word of the row's
 entry, so `salt` does not match "unsalted butter". A `synonyms` family is the

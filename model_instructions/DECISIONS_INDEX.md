@@ -662,6 +662,7 @@ argument and the rules each field is read by.
 - 2026-10-04 · §10 · #1194 · a published drink's note must be a filled label-and-text pair.
 - undated · §10 · Undated — test_ingredient_notes_are_lowercase_fragments flags and never rewrites.
 - 2026-11-05 · §10 · #1462 · E6 — no downloadable _site artifact on PRs.
+- 2026-11-12 · §10 · #1480 · a food alias key that nothing reaches is reported, not failed.
 - 2026-08-12 · §11 · a heading lettering change applies to every heading on the whole site.
 - 2026-08-12 · §11 · #131 #128 · the CSS --modifier class naming is real BEM and stays; the full migration plan is not to be resurrected.
 - 2026-08-16 · §11 · Helen is asked each decision as it is hit, not in a batch at the end.
