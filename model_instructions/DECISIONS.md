@@ -6070,6 +6070,19 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   35°C edge (2026-10-09: *"The scientist in me is upset by the x axis
   lines"*): each is its own stop, from the same `$tc-min`/`$tc-max`
   arithmetic as the ticks and the bars.
+- **2026-11-12, #1500 — a bar sits right under its own label, with all the
+  air below it.** Chosen from three candidates on the page (spacing, banding,
+  hairlines): *"rows a"*. Every chart, the recipe page's included.
+- **2026-11-12, #1501 — each row of the ALL chart links up to its own
+  section; the whole row is the link, and hovering anywhere on it turns the
+  label hot pink.** Chosen from three (an arrow, a dotted rule, the whole row):
+  *"links c"*, then *"don't add the arrow to the link on hover -- mouseover in
+  hot pink"* and *"mouseover for the whole row"*. At rest the label keeps its
+  ink: *"I don't want e.g. DUCK BREAST to become a pink link."* The hover is
+  the raw `$color-recipe-link-hover`, not the darkened link pink.
+- **2026-10-30, #1450 — a section's cross-links each take their own line,
+  left-aligned, at every width.** Helen: *"I don't see why we shouldn't do
+  each on its own line at all screen widths."*
 - **2026-10-09 — on the methods page the weight sits under the dropdown, the
   four birds read "(whole)", and times are compact (`4h50m – 5h30m`).** Helen:
   *"So the user is saying 'I have chicken, 3 kg'."* Of the times: *"Collapse

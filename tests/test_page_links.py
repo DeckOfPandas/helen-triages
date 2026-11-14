@@ -274,6 +274,12 @@ TRUSTED_DYNAMIC = (
     # (tests/test_rendered_pages.py) checks each value is one an index card carries.
     re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?ship="
                r"\{\{\s*(page|rel)_ship\s*\|\s*url_encode\s*\}\}#results$"),
+    # A temperature chart label linking up to its own section (#1501). The
+    # include is handed a node's `chart_anchor`, and
+    # test_chart_anchors_point_at_sections_that_exist (tests/test_reference_data.py)
+    # and test_chart_anchor_fragments_exist_on_the_temperatures_page hold every
+    # one to an id on that page.
+    re.compile(r"^#\{\{\s*include\.anchor\s*\}\}$"),
 )
 
 
@@ -324,6 +330,10 @@ def _scan() -> dict:
 
             if target.startswith("#"):
                 frag = target[1:]
+                # A Liquid fragment is unreadable here; only an allow-listed
+                # one, checked elsewhere, passes.
+                if "{" in frag and any(p.match(raw.strip()) for p in TRUSTED_DYNAMIC):
+                    continue
                 if frag and frag not in _ids_visible_from(f):
                     problems["bad_fragment"].append(
                         f'{source_label}: href="{raw}" -- no id="{frag}" reachable '

@@ -34,11 +34,11 @@ $tc-max: 100;
 $tc-hue: $color-blinging-blackberry;
 
 $tc-bar-height: 0.85rem;
-// The bar starts at the top of its track and all the air is below it, so a
-// bar groups with the caption above it and not with the next row's.
-$tc-bar-gap-below: 0.95rem;
+// The bar sits right under its caption and all the air is below it, so a bar
+// groups with the caption above it and not with the next row's (#1500).
+$tc-bar-gap-below: 1.6rem;
 $tc-track-height: $tc-bar-height + $tc-bar-gap-below;
-$tc-track-gap-above: 0.2rem;
+$tc-track-gap-above: 0;
 // Headroom above the rows for the threshold's own label.
 $tc-threshold-height: 1.35rem;
 
@@ -437,13 +437,14 @@ article.recipe .tc-contents ~ .recipe-section-heading {
   }
 }
 
-// Each chart's link through to its timings or methods table. The class is on
-// the <a>, inside a .tc-crosslink-line paragraph under the heading (#240).
-//
-// The resets are redundant there and kept on purpose: inside a
-// .recipe-section-heading the link would inherit uppercase, letter-spacing,
-// -webkit-text-stroke and text-shadow, and it is one edit away from that.
+// Each chart's links to its timings table or another section, in a
+// .tc-crosslink-line under the heading (#240), each on its own line at every
+// width so they share a left edge (#1450); fit-content keeps the tap area to
+// the words. The resets are kept on purpose: inside a .recipe-section-heading
+// the link would inherit its uppercase, tracking, stroke and shadow.
 .tc-crosslink {
+  display: block;
+  width: fit-content;
   font-family: $font-body;
   font-size: 0.8rem;
   text-transform: none;
@@ -459,7 +460,36 @@ article.recipe .tc-contents ~ .recipe-section-heading {
   margin: 0;
 }
 
-// Two links on one line.
 .tc-crosslink + .tc-crosslink {
-  margin-left: $space-lg;
+  margin-top: $space-xs;
+}
+
+// --- A row that links up to its section (#1501) ------------------------------
+// The ALL chart's rows. The label keeps its ink at rest, and the whole row is
+// the link: the label's ::after covers the row, above the track's bars, so a
+// mouse anywhere on it turns the label hot pink, $color-recipe-link-hover,
+// Helen's choice over the darkened link pink. The shared a:hover
+// (shared/_base.scss) is re-declared for the same reason _recipe-header.scss's
+// article link rule gives.
+.tc-row:has(.tc-row-link) { position: relative; }
+
+.tc-row-link {
+  color: inherit;
+  text-decoration: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+
+  &:focus-visible { outline: none; }
+  &:focus-visible::after {
+    outline: 2px solid $color-recipe-link-hover;
+    outline-offset: 2px;
+  }
 }

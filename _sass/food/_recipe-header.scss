@@ -61,8 +61,9 @@ article.recipe .method-short {
 // $color-mood-root) would otherwise win. The :not() list is load-bearing:
 // this rule is (0,2,1) and would repaint each excluded class's own (0,1,0)
 // rule: the taxonomy badges are links (#40), and so are two action controls
-// (#1058), the see-shortlist link and pdf above the head's rule.
-article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
+// (#1058), the see-shortlist link and pdf above the head's rule, and a
+// temperature chart's label, which keeps its ink (#1501).
+article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf, .tc-row-link) {
   color: $color-recipe-link;
   font-weight: 600;
 

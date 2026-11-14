@@ -5186,8 +5186,14 @@ the two sites, which is why the footer links are the only way in.
 **The charts page.** Every figure is a div-based chart drawn by
 `_includes/food/temp_row.html` from the data.
 
-- A row is its label and its figure on one line and the bar under them at
-  the column's full width, the same at every width.
+- A row is its label and its figure on one line and the bar right under them
+  at the column's full width, with the air below the bar so it groups with
+  its own label (`$tc-bar-gap-below`), the same at every width.
+- Each ALL-chart row is a link up to its section: `temp_row.html` and
+  `temp_span.html` take an `anchor`, the node's `chart_anchor`. The label's
+  `::after` covers the row above the bars, so hovering anywhere on the row
+  turns the label hot pink; at rest it keeps its ink.
+- A section's cross-links (`.tc-crosslink`) each take their own line.
 - A figure is the two numbers its bar is drawn from, never the data's
   display string, so no row says where to probe.
 - A gridline sits on every multiple of five: the tens, which the ticks
