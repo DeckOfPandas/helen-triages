@@ -1311,9 +1311,9 @@ The two switches are one design, `button.ingredient-switch[role=switch]`: a
 word, a track and a word, the chosen word bold, the state in `aria-checked`.
 The track is placed on the capitals' middle with the `cap` unit, not by
 flex centring, whose line-box middle sits low and differs between Chromium
-and WebKit. They share one row, `.ingredient-switches`, which whichever
-script runs first makes; where both do not fit, the metric switch takes a
-line of its own, and neither breaks inside itself. Ticking on turns the
+and WebKit. They share one block, `.ingredient-switches`, which whichever
+script runs first makes, ticks first: each switch has a line of its own at
+every width, and neither breaks inside itself. Ticking on turns the
 track and its ON word the raw hot pink. The metric switch converts nothing itself:
 it calls `HTF.recipeScale.setMetric`, and `recipe-scale.js` redraws every
 amount with `scaleAmount(..., {metric: true})`, so metric holds at any scale

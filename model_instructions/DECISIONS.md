@@ -1518,8 +1518,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   three candidates on the page: *"option c please"*. The switch is the metric
   one's twin: *"I would like a toggle, the same as for imperial <-> metric next
   to it. The left side should say "TICK BOXES OFF" and the right side should
-  say "TICK BOXES ON"."* Where the two do not fit on one line, the metric
-  switch takes the next. In both, *"the centres of the words and toggle should
+  say "TICK BOXES ON"."* Each has a line of its own at every width: *"Please
+  add the linebreak at all widths, so tickbox switch on one line, imperial
+  switch on the next line."* In both, *"the centres of the words and toggle should
   be horizontally aligned"*. The boxes hang left of the
   lines and move none of them: *"don't move the ingredients when you show the
   tickboxes"*. Every ingredient list is indented, grouped or not, and the
