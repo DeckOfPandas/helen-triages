@@ -363,6 +363,31 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         _report_stale_prices(terminalreporter.write_line)
     except Exception:
         pass
+    try:
+        _report_dead_aliases(terminalreporter.write_line)
+    except Exception:
+        pass
+
+
+# Filled by tests/test_food_alias_reach.py when it runs: alias keys no
+# ingredient string reaches (#1480). Reported, never failed, because fixing a
+# recipe line can retire an alias and the calendar of edits must not turn main
+# red. Silent when the test did not run or found none.
+DEAD_ALIASES: list[str] = []
+
+
+def _report_dead_aliases(write, dead=None):
+    dead = DEAD_ALIASES if dead is None else dead
+    if not dead:
+        return
+    write("")
+    write(f"Alias keys nothing reaches ({len(dead)}):", bold=True)
+    write("  _data/food/ingredient_words.yml `aliases:` keys that no recipe or "
+          "draft line produces")
+    write("  after the strips, so they never fire. Delete each, or check the "
+          "line it was for:")
+    for key in dead:
+        write(f"    {key}")
 
 
 # Said at the end once costs.yml's `checked:` is over two years old (#749). A

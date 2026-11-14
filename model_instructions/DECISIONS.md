@@ -4349,6 +4349,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-11-05, #1462 E6 — no downloadable `_site` artifact on PRs.** Helen:
   *"No."* A branch is shown to her on a local server (§13), not as a build to
   download.
+- **2026-11-12, #1480 — a food alias key that nothing reaches is reported,
+  not failed.** The issue asked: report or fail? Helen chose report. A fix
+  to a recipe line can retire an alias, and that must not turn `main` red
+  and stop the deploy. The list prints at the end of a run with the drafts
+  present, under "Alias keys nothing reaches".
 
 ## §11 Working practices
 
