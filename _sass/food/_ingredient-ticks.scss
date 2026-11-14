@@ -1,0 +1,54 @@
+@use "food/palette" as *;
+@use "shared/rule" as *;
+@use "shared/tokens" as *;
+
+// =============================================================================
+// TICK BOXES ON A RECIPE'S INGREDIENTS (#1504)
+// =============================================================================
+// assets/js/ingredient-ticks.js builds the TICK BOXES OFF / ON switch
+// (_ingredient-switches.scss) and the boxes. "On" is the raw hot pink,
+// $color-dazzling-dragonfruit, not the darkened link pink: Helen's exception
+// to the contrast rule (DECISIONS §8). The box is the shopping list's own
+// mixin (shared/_rule.scss), so the two cannot drift.
+$tick-on: $color-dazzling-dragonfruit;
+
+// On, the switch's track and its ON word take that pink.
+.ingredient-ticks[aria-checked="true"] {
+  .ingredient-switch-track,
+  .ingredient-switch-on { color: $tick-on; }
+}
+
+// --- The boxes ---------------------------------------------------------------
+// Built the first time the button is turned on, hidden again when it is off,
+// ticks kept. Each hangs to the left of its line, in the ingredient list's
+// indent, so showing them moves no ingredient.
+.ingredient-tick { display: none; }
+
+.recipe.is-ticking {
+  .ingredients li.ingredient { cursor: pointer; }
+
+  .ingredient-tick {
+    @include shopping-tick($color-clear-text, $tick-on, $color-bg, $color-bg);
+    display: block;
+    position: absolute;
+    left: -1.6em;
+    top: 0.22em;
+  }
+
+  // Struck through and dimmed, the shopping list's ticked row (#1457).
+  // The amount is its own box, which a line-through does not reach into.
+  li.is-ticked {
+    color: $color-clear-text;
+
+    &,
+    .ingredient-amount-number { text-decoration: line-through; }
+
+    .highlighter-slot,
+    .ingredient-annotation { opacity: 0.45; }
+  }
+}
+
+@media print {
+  .ingredient-switches,
+  .ingredient-tick { display: none !important; }
+}

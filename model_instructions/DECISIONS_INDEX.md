@@ -233,6 +233,8 @@ argument and the rules each field is read by.
 - 2026-10-07 · §8.2 · a makes: range starts from its lower number.
 - 2026-10-09 · §8.2 · #1297 · on the shopping list a makes: recipe counts batches, in words; a serves: recipe counts portions.
 - 2026-11-02 · §8.2 · #1457 · the food shopping list has no "set all to N portions" box.
+- 2026-11-12 · §8.2 · #1504 · a recipe page can show a tick box on every ingredient line, behind a TICK BOXES OFF / ON switch under INGREDIENTS.
+- 2026-11-12 · §8.2 · a recipe written in imperial measures has an IMPERIAL / METRIC switch under INGREDIENTS, imperial by default.
 - 2026-11-12 · §8.2 · #1472 · a stock line's hint says how much of each product makes its volume of water, for all six brands, behind a tap.
 - 2026-11-12 · §8.2 · #1498 · a ground spice's hint gives its weight to grind your own, not a count of seeds, sticks or pods.
 - 2026-10-09 · §8.2 · #1297 · the shopping list reads the zest and the juice of one lemon as one lemon.

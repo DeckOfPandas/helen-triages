@@ -1,0 +1,74 @@
+/* The recipe page's tick boxes (#1504): a TICK BOXES OFF / ON switch under
+   INGREDIENTS, the metric switch's twin (_ingredient-switches.scss), puts a
+   box beside every ingredient line, to tick off as it goes in. Off by default
+   and never remembered, like cocktails' make it. The switch is built here,
+   not in the layout, so a reader without this script never sees it.
+
+   A box is the first child of its <li>; recipe-scale.js steps over
+   `.ingredient-tick` when it looks for a line's own text. Tapping anywhere on a
+   line ticks it, except a link, which still goes where it says. */
+(function () {
+  'use strict';
+
+  var article = document.querySelector('article.recipe');
+  var section = article && article.querySelector('.recipe-section-ingredients');
+  var rows = article ? article.querySelectorAll('.ingredients li.ingredient') : [];
+  if (!section || !rows.length) return;
+
+  // A row it shares with the metric switch (ingredient-units.js).
+  var bar = section.querySelector('.ingredient-switches');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.className = 'ingredient-switches';
+  }
+  var button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'ingredient-switch ingredient-ticks';
+  button.setAttribute('role', 'switch');
+  button.setAttribute('aria-label', 'tick boxes');
+  [['off', 'tick boxes off'], ['track', null], ['on', 'tick boxes on']].forEach(function (pair) {
+    var part = document.createElement('span');
+    part.className = 'ingredient-switch-' + pair[0];
+    if (pair[1]) part.textContent = pair[1];
+    else part.setAttribute('aria-hidden', 'true');
+    button.appendChild(part);
+  });
+
+  var on = false;
+
+  function boxFor(row) {
+    var box = row.querySelector('input.ingredient-tick');
+    if (box) return box;
+    var copy = row.cloneNode(true);
+    Array.prototype.forEach.call(copy.querySelectorAll('.ingredient-annotation'), function (n) {
+      n.parentNode.removeChild(n);
+    });
+    box = document.createElement('input');
+    box.type = 'checkbox';
+    box.className = 'ingredient-tick';
+    box.setAttribute('aria-label', copy.textContent.replace(/\s+/g, ' ').trim());
+    box.addEventListener('change', function () {
+      row.classList.toggle('is-ticked', box.checked);
+    });
+    row.insertBefore(box, row.firstChild);
+    row.addEventListener('click', function (event) {
+      if (!on || event.target === box || event.target.closest('a')) return;
+      box.checked = !box.checked;
+      row.classList.toggle('is-ticked', box.checked);
+    });
+    return box;
+  }
+
+  function set(value) {
+    on = value;
+    if (on) Array.prototype.forEach.call(rows, boxFor);
+    article.classList.toggle('is-ticking', on);
+    button.setAttribute('aria-checked', on ? 'true' : 'false');
+  }
+
+  button.addEventListener('click', function () { set(!on); });
+
+  set(false);
+  bar.insertBefore(button, bar.firstChild);
+  if (!bar.parentNode) section.appendChild(bar);
+})();

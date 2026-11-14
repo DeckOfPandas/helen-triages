@@ -1513,6 +1513,30 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   "batches" as well as portions, which suggests it isn't doing anything
   useful."* It could only ever set the portions rows. Each recipe keeps its
   own box. The cocktails list keeps its "set all", having no batches.
+- **2026-11-12, #1504 — a recipe page can show a tick box on every ingredient
+  line, behind a TICK BOXES OFF / ON switch under INGREDIENTS.** Chosen from
+  three candidates on the page: *"option c please"*. The switch is the metric
+  one's twin: *"I would like a toggle, the same as for imperial <-> metric next
+  to it. The left side should say "TICK BOXES OFF" and the right side should
+  say "TICK BOXES ON"."* Where the two do not fit on one line, the metric
+  switch takes the next. In both, *"the centres of the words and toggle should
+  be horizontally aligned"*. The boxes hang left of the
+  lines and move none of them: *"don't move the ingredients when you show the
+  tickboxes"*. Every ingredient list is indented, grouped or not, and the
+  boxes sit in that gutter: *"please put the indentation of the ingredient
+  lines back where it was, i.e. further to the right. Then the tickboxes can
+  sit in that gutter."* "On" is the raw hot pink, not the darkened link pink, by
+  choice: *"I know it doesn't pass contrast tests, but this is an exception I
+  choose."* Off by default and never remembered, as make it is (§9).
+- **2026-11-12 — a recipe written in imperial measures has an IMPERIAL /
+  METRIC switch under INGREDIENTS, imperial by default.** Helen: *"Please add
+  a second toggle, only to recipes that use imperial units, to switch between:
+  imperial [toggle] metric, where imperial is the default. I cook in oz, but
+  shop in g!"* Metric is the shopping list's own conversion (#1462 D2), so the
+  page and the list agree. Ounces, pounds, fluid ounces and pints put the
+  switch on a recipe; a cup or an inch alone does not, though it converts with
+  the rest. Not remembered, as the tick boxes are not: both choices are a
+  session's.
 - **2026-11-12, #1472 — a stock line's hint says how much of each product
   makes its volume of water, for all six brands, behind a tap.** Helen: *"I
   would actually like this the other way round if possible -- where a recipe
@@ -1637,7 +1661,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   metric.** Asked about ounces and cups on the list (36 lines, 14 recipes),
   Helen: *"Convert to metric for the shopping list please."* Ounces and pounds
   become grams, fluid ounces, pints and cups millilitres, inches centimetres.
-  The recipe page keeps the unit the recipe was written in.
+  The recipe page keeps the unit the recipe was written in, until the reader
+  turns its METRIC switch on (2026-11-12, below).
 - **2026-11-03, #1462 D3 — how full a spoon is does not split a row, and a can
   is a tin.** Helen: *"Yes ignore rounded, heaped etc. Cans and tins are one
   word (tins)."* So `heaped tbsp` totals with `tbsp`; "400 g can" is one

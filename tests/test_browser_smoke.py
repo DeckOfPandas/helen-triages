@@ -408,6 +408,143 @@ def test_no_footer_label_breaks_inside_itself(chromium, visit, url):
         f"{url}: a footer label wraps inside itself:\n  " + "\n  ".join(broken[:12]))
 
 
+# --- Tick boxes on a recipe's ingredients (#1504) ------------------------------
+
+TICK_LAYOUT = """() => [...document.querySelectorAll('.ingredients li.ingredient')].map(li => {
+  const r = li.getBoundingClientRect();
+  const box = li.querySelector('input.ingredient-tick');
+  const b = box && box.checkVisibility() ? box.getBoundingClientRect() : null;
+  return {left: Math.round(r.left), top: Math.round(r.top + window.scrollY), width: Math.round(r.width),
+          box: b && {left: b.left, right: b.right}};
+})"""
+
+# Each switch under INGREDIENTS on one line: its words and track share a row,
+# and nothing pokes past the page's right edge.
+SWITCH_LINES = """() => [...document.querySelectorAll('.ingredient-switch')].flatMap(s => {
+  const parts = [...s.children].map(p => p.getBoundingClientRect());
+  const mid = r => (r.top + r.bottom) / 2;
+  const level = parts.every(r => Math.abs(mid(r) - mid(parts[0])) < 3);
+  const right = s.getBoundingClientRect().right;
+  return level && right <= document.documentElement.clientWidth ? [] : [s.textContent];
+})"""
+
+
+def _recipe_pages_by_grouping(prod_site):
+    """One published recipe whose ingredients are in groups and one whose are
+    not: both lists are indented, and the boxes hang in that indent."""
+    grouped = flat = None
+    for path in sorted(prod_site.glob("food/recipes/*/index.html")):
+        text = path.read_text(encoding="utf-8")
+        if 'class="ingredients"' not in text:
+            continue
+        url = "/" + str(path.parent.relative_to(prod_site)) + "/"
+        if "recipe-group-heading" in text:
+            grouped = grouped or url
+        else:
+            flat = flat or url
+    assert grouped and flat, f"no grouped ({grouped}) or ungrouped ({flat}) recipe built"
+    return {"grouped": grouped, "ungrouped": flat}
+
+
+@pytest.mark.parametrize("width", sorted(VIEWPORTS))
+@pytest.mark.parametrize("kind", ["grouped", "ungrouped"])
+def test_tick_boxes_appear_beside_the_lines_and_move_none(chromium, visit, prod_site, kind, width):
+    """#1504. Helen: "don't move the ingredients when you show the tickboxes".
+    Each box hangs left of its line and stays on screen; a tap on a line ticks
+    it; the switch reads TICK BOXES OFF, a track, TICK BOXES ON, and turns on."""
+    url = _recipe_pages_by_grouping(prod_site)[kind]
+    v = visit(url, width)
+    v.page.wait_for_load_state("networkidle")
+    _settle(v.page)
+    switch = v.page.locator(".ingredient-ticks[role=switch]")
+    assert switch.get_attribute("aria-checked") == "false"
+    broken = v.page.evaluate(SWITCH_LINES)
+    assert not broken, f"{url} at {width}px: a switch breaks inside itself: {broken}"
+    assert switch.locator(".ingredient-switch-off").inner_text().lower() == "tick boxes off"
+    assert switch.locator(".ingredient-switch-on").inner_text().lower() == "tick boxes on"
+    before = v.page.evaluate(TICK_LAYOUT)
+    assert before, f"{url}: no ingredient lines"
+
+    switch.click()
+    _settle(v.page)
+    assert switch.get_attribute("aria-checked") == "true"
+    after = v.page.evaluate(TICK_LAYOUT)
+    problems = []
+    for i, (b, a) in enumerate(zip(before, after)):
+        if (b["left"], b["top"], b["width"]) != (a["left"], a["top"], a["width"]):
+            problems.append(f"line {i} moved: {b} -> {a}")
+        if not a["box"]:
+            problems.append(f"line {i} has no visible box")
+        elif a["box"]["left"] < 0 or a["box"]["right"] > a["left"]:
+            problems.append(f"line {i}'s box is not left of its line, on screen: {a['box']}")
+    assert not problems, f"{url} at {width}px:\n  " + "\n  ".join(problems[:10])
+    assert v.overflow() is None, f"{url} at {width}px scrolls sideways with the boxes on"
+
+    v.page.locator(".ingredients li.ingredient").first.click(position={"x": 5, "y": 5})
+    assert v.page.locator(".ingredients li.ingredient.is-ticked").count() == 1, (
+        f"{url}: tapping the first line did not tick it")
+    assert not v.errors, f"{url}: " + "\n  ".join(v.errors)
+
+
+# --- The IMPERIAL / METRIC switch (MANUAL §8.2) ------------------------------
+
+AMOUNTS = """() => [...document.querySelectorAll('.ingredient-amount-number')]
+  .map(s => s.textContent.trim())"""
+
+IMPERIAL_AMOUNT = re.compile(r"\d\s*(oz|lb|fl oz|pints?)$")
+
+
+def _recipe_page_by_imperial(prod_site, imperial):
+    """A published, scalable recipe with an amount in ounces (or not)."""
+    for path in sorted(prod_site.glob("food/recipes/*/index.html")):
+        text = path.read_text(encoding="utf-8")
+        if "recipe-scale-portions" not in text:
+            continue
+        if bool(re.search(r"\d (oz|lb)\s*</span>", text)) == imperial:
+            return "/" + str(path.parent.relative_to(prod_site)) + "/"
+    raise AssertionError(f"no recipe built with imperial={imperial}")
+
+
+@pytest.mark.parametrize("width", sorted(VIEWPORTS))
+def test_metric_switch_converts_the_imperial_amounts_and_back(chromium, visit, prod_site, width):
+    """Helen: "imperial [toggle] metric, where imperial is the default. I cook
+    in oz, but shop in g!" Metric holds when the recipe is scaled, and switching
+    back puts the recipe's own words back."""
+    url = _recipe_page_by_imperial(prod_site, True)
+    v = visit(url, width)
+    v.page.wait_for_load_state("networkidle")
+    _settle(v.page)
+    switch = v.page.locator(".ingredient-units")
+    assert switch.get_attribute("aria-checked") == "false"
+    written = v.page.evaluate(AMOUNTS)
+    assert any(IMPERIAL_AMOUNT.search(a) for a in written), f"{url}: {written}"
+
+    switch.click()
+    assert switch.get_attribute("aria-checked") == "true"
+    metric = v.page.evaluate(AMOUNTS)
+    left = [a for a in metric if IMPERIAL_AMOUNT.search(a)]
+    assert not left, f"{url}: still imperial with metric on: {left}"
+
+    v.page.locator(".recipe-scale-plus").click()
+    scaled = v.page.evaluate(AMOUNTS)
+    assert not [a for a in scaled if IMPERIAL_AMOUNT.search(a)], f"{url}: {scaled}"
+    assert scaled != metric, f"{url}: scaling did nothing with metric on"
+    v.page.locator(".recipe-scale-minus").click()
+
+    switch.click()
+    assert v.page.evaluate(AMOUNTS) == written, f"{url}: switching back is not as written"
+    assert v.overflow() is None, f"{url} at {width}px scrolls sideways"
+    assert not v.errors, f"{url}: " + "\n  ".join(v.errors)
+
+
+def test_metric_switch_is_only_on_imperial_recipes(chromium, visit, prod_site):
+    url = _recipe_page_by_imperial(prod_site, False)
+    v = visit(url)
+    v.page.wait_for_load_state("networkidle")
+    assert v.page.locator(".ingredient-units").count() == 0, f"{url} has the switch"
+    assert not v.errors, f"{url}: " + "\n  ".join(v.errors)
+
+
 # --- The stock and spice hints (MANUAL §8.2) ----------------------------------
 
 STOCK_LINE = re.compile(r"\d (?:ml|litres?)</span></span>\s*(?:chicken|vegetable|beef) stock")
