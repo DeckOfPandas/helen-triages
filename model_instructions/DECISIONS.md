@@ -616,13 +616,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   build, which is fine."* Not `Unknown` and not blank: the first reads as a
   finished answer and the second as nothing to see. Each of the pair requires
   the other. Do not guess a citation to get past it.
-- **2026-08-21, #406 — a `book` source names its author, as `<title>,
-  <author>` or `<Author>'s <title>`; there is no authorless form and no
-  exception list.** Helen: *"I can't imagine knowing the name of a book but
-  not its author."* `Adapted from Wagamama Feed Your Soul` had passed on two
-  published pages. The one book that seemed to have no author was not a book:
-  *"it's from Good Food, from a special one-off section"*, so it is a dateless
-  `website`. If a book seems authorless, check it is a book, then ask her.
+- **2026-11-19 (replacing 2026-08-21, #406) — a `book` source names its
+  author, as `<title>, <author>` or `<Author>'s <title>`, unless it is a
+  collection.** Helen, 2026-08-21: *"I can't imagine knowing the name of a
+  book but not its author."* `Adapted from Wagamama Feed Your Soul` had passed
+  on two published pages, and the one book that seemed authorless was a
+  magazine's one-off section, so a dateless `website`. Then, of *The Great
+  British Bake Off: Celebrations*, 2026-11-19: *"No author -- it's a
+  collection."* A collection is cited by its title. Any other authorless book:
+  check it is a book, then ask her.
 - **2026-09-11, #406 — `source: "unknown"` is the closed answer, and only
   Helen closes it.** Helen, with the apple coleslaw ready to publish and its
   source still `QQ`: *"Please write 'unknown' for the source on coleslaw."*

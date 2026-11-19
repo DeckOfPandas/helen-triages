@@ -106,7 +106,7 @@ argument and the rules each field is read by.
 - 2026-08-20 · §4 · #406 · "Adapted from" prefixes published work and only published work.
 - 2026-08-20 · §4 · #406 · a source with no date is a website; a publication is a print issue and always carries one.
 - 2026-08-20 · §4 · #406 · a source nobody has established is source: "QQ" with source_type: unknown, and on a published recipe it is meant to break the build.
-- 2026-08-21 · §4 · #406 · a book source names its author, as <title>, <author> or <Author>'s <title>; there is no authorless form and no exception list.
+- 2026-11-19 · §4 · #406 · (replacing 2026-08-21, #406) — a book source names its author, as <title>, <author> or <Author>'s <title>, unless it is a collection.
 - 2026-09-11 · §4 · #406 · source: "unknown" is the closed answer, and only Helen closes it.
 - 2026-08-20 · §4 · #406 · a citation names its source and never its publisher.
 - undated · §4 · #69 #68 · Undated, #69, #68 — ingredient groups are ordered by title relevance: the group named for the dish leads; within a group, ingredients follow call order.

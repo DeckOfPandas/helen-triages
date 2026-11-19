@@ -52,12 +52,16 @@ near-miss: it is `publication`.
 Both shapes carry the author. Use whichever reads as English: `Delia Smith's
 Book of Cakes`, never `Book of Cakes, Delia Smith`.
 
-**There is no authorless-book form and no exception list.** Helen: *"I can't
-imagine knowing the name of a book but not its author."* `Adapted from
+**The one authorless book is a collection**, a book of many cooks' recipes
+with no author on the cover, such as *The Great British Bake Off:
+Celebrations*. It is cited by its title alone, usually "via" where it was
+read: `Adapted from The Great British Bake Off: Celebrations, via Good Food,
+December 2015`. Helen: *"No author -- it's a collection."* Otherwise, *"I
+can't imagine knowing the name of a book but not its author."* `Adapted from
 Wagamama Feed Your Soul` is a publisher glued to a title with the author
 nowhere, and it is wrong. If a book seems to have no author, first check that
 it is a book: a one-off section of a magazine is not one, and with no date it
-is a `website` (rule 2). Ask Helen before accommodating it.
+is a `website` (rule 2). Ask Helen before accommodating anything else.
 
 The test accepts a comma followed by text, or a possessive followed by text. A
 title that merely contains a possessive (`The Baker's Year`) satisfies it
