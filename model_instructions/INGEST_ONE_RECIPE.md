@@ -720,6 +720,11 @@ Alsace-style"` when it is her version of a regional dish. Never `"Helen"`,
 and never a `place` alone: *"Place for the regionals is cute, but put me on
 there too please."*
 
+**A magazine's issue is the one Helen names** — her folder or message says
+"Good Food 2015-11", so it is November 2015, whatever a page's footer shows.
+Helen: *"issue details should always follow the folder I send you the recipe
+in, no need to guess"*.
+
 **The date is what separates a `publication` from a `website`.** A publication
 must carry one; a website must not. A year alone is a complete date. Some
 titles are genuinely both — *Good Food* has a print issue and a site — so **if

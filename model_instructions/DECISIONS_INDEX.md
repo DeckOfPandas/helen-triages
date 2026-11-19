@@ -154,6 +154,7 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
+- 2026-11-19 · §5 · a magazine's issue is the one Helen's folder names.
 - 2026-11-19 · §5 · nigella.com's single oven figure is conventional; the fan figure is 20 lower.
 - 2026-11-19 · §5 · a nigella.com recipe cites the book its page is "Featured in".
 - 2026-10-30 · §5 · where a source prints metric and imperial, keep the metric, bakes included; ounces only where it gives nothing else.

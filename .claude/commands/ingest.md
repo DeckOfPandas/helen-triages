@@ -400,6 +400,8 @@ else has already done (MANUAL §9.1).
   ("four circles about 2 cm wider", "2 bay leaves"). A time straight after its
   verb takes "for" ("roast for about 15 mins"); one set off by a comma after
   the end point takes none ("fry to soften, about 10 mins").
+- **A magazine's issue is the one Helen's folder names** (`Good Food
+  2015-11` is November 2015): never read it off a footer (DECISIONS §5).
 - **The citation**, per `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`. For
   food that is `source` + `source_type`; a dated magazine is a `publication`, an
   undated one is a `website`, and that distinction catches everyone out. For

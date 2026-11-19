@@ -975,6 +975,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
   conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
   says "170°C fan"; the `QQ original` keeps the printed figure.
+- **2026-11-19 — a magazine's issue is the one Helen's folder names.** Helen:
+  *"issue details should always follow the folder I send you the recipe in,
+  no need to guess"*. A folder `Good Food 2015-11` is `Good Food, November
+  2015`, whatever a page's footer shows or hides.
 - **2026-11-19 — nigella.com's single oven figure is conventional; the fan
   figure is 20 lower.** Her answers for Ham in Coca Cola (240 → 220°C fan,
   180 → 160°C fan) and Christmas Chutney (140 → 120°C fan) were each 20 below,
