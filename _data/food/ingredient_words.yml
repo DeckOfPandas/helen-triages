@@ -269,6 +269,7 @@ aliases:
   eggs: egg
   green chillies: green chilli
   green peppers: green pepper
+  hispi cabbages: hispi cabbage
   leeks: leek
   lemons: lemon
   limes: lime
@@ -291,6 +292,7 @@ aliases:
   sweet potatoes: sweet potato
   thyme sprigs: thyme sprig
   tomatoes: tomato
+  whole cloves: whole clove
   plums: plum
   pomegranates: pomegranate
   # "baby" is not a modifier (baby corn is not corn), so these are judged one
