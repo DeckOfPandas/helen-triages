@@ -732,6 +732,8 @@ fruit_prices:
   # Estimates (#1302): the slice is the `orange` row divided by eight.
   orange slice:      { gbp_min: 0.04, gbp_max: 0.07, basis: "per slice: GBP 0.35-0.55 an orange, about 8 slices", confidence: low }
   maraschino cherry: { gbp_min: 0.05, gbp_max: 0.25, basis: "per cherry: GBP 2 / jar of about 40 to GBP 10-12 / 400 g Luxardo jar of about 50", confidence: low }
+  clementine:     { gbp_min: 0.15, gbp_max: 0.35, basis: "placeholder, not shop-checked: a net of clementines", confidence: low }
+  bay leaves:     { gbp_min: 0.05, gbp_max: 0.15, basis: "per leaf; placeholder, not shop-checked", confidence: low }
 
 # --- weighed solids, priced per kilogram ---
 # A pour written `N g` of a generic with a row here costs N/1000 of the row
@@ -742,6 +744,7 @@ fruit_prices:
 # weighed generic with no row makes the drink withhold its whole figure.
 weight_prices:
   honey:               { gbp_per_kg_min: 9.00, gbp_per_kg_max: 18.00, basis: "GBP 3-6 / 340 g jar (supermarket clear honey to Acacia)", confidence: medium }
+  dark brown soft sugar: { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   golden caster sugar: { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   palm sugar:          { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
 
@@ -877,6 +880,7 @@ generics:
   # bottle.
   champagne:          { gbp_per_litre_min: 26.67, gbp_per_litre_max: 26.67, basis: "Heidsieck Blue Top, GBP 20 / 75cl", confidence: high }
   prosecco:           { gbp_per_litre_min: 10.67, gbp_per_litre_max: 18.67, basis: "GBP 8-14 / 75cl", confidence: medium }
+  cider:              { gbp_per_litre_min: 3.00,  gbp_per_litre_max: 6.00,  basis: "placeholder, not shop-checked: supermarket dry cider", confidence: low }
   red wine:           { gbp_per_litre_min: 9.33,  gbp_per_litre_max: 16.00, basis: "GBP 7-12 / 75cl", confidence: medium }
   white wine:         { gbp_per_litre_min: 9.33,  gbp_per_litre_max: 16.00, basis: "GBP 7-12 / 75cl, same range as red wine, not separately checked", confidence: low }
   sloe gin:           { gbp_per_litre_min: 32.00, gbp_per_litre_max: 44.00, basis: "GBP 16-22 / 50cl", confidence: medium }
@@ -934,6 +938,7 @@ generics:
   vanilla extract:    { gbp_per_litre_min: 80.00, gbp_per_litre_max: 160.00, basis: "GBP 3-6 / 38ml; not shop-checked", confidence: low }
   espresso:           { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 18.00, basis: "18g @ GBP 15-25/kg -> ~30ml", confidence: medium }
   black tea:          { gbp_per_litre_min: 0.30,  gbp_per_litre_max: 0.80, basis: "one bag per ~250ml", confidence: medium }
+  apple and ginger tea: { gbp_per_litre_min: 0.40, gbp_per_litre_max: 1.00, basis: "one herbal bag per ~250ml; placeholder, not shop-checked", confidence: low }
   fruit purée:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 4-7 / 500ml", confidence: low }
   egg white:          { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 12.00, basis: "GBP 0.30 per egg, ~30ml white", confidence: medium }
 

@@ -317,6 +317,7 @@ generics:
   # through costs.yml `top_up_ml`, never as a measured volume.
   champagne:          { abv: 12,   confidence: high }
   prosecco:           { abv: 11,   confidence: high }
+  cider:              { abv: 5,    confidence: low, qq: "placeholder: dry ciders run about 4.5-6%; check the bottle Helen uses" }
   red wine:           { abv: 13,   confidence: medium }
   # Helen confirmed the 12.5.
   white wine:         { abv: 12.5, confidence: medium }
@@ -361,6 +362,7 @@ non_alcoholic:
   - water
   - cola
   - black tea
+  - apple and ginger tea
   - espresso
   - coconut cream
   - "Coco mix"
