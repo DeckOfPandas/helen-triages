@@ -551,7 +551,7 @@ def test_sugar_specifies_type(recipe):
 _QUALIFIED_MUSTARD = {
     "english mustard", "english mustard powder", "dijon mustard",
     "french mustard", "wholegrain mustard", "whole mustard seeds",
-    "mustard oil",
+    "white mustard seeds", "mustard oil",
 }
 _QUALIFIED_SOY_SAUCE = {"dark soy sauce", "light soy sauce"}
 _QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste", "dried ginger",

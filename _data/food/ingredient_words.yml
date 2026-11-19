@@ -262,6 +262,7 @@ aliases:
   courgettes: courgette
   cucumbers: cucumber
   duck breasts: duck breast
+  ducks: duck
   eating apples: eating apple
   egg whites: egg white
   egg yolks: egg yolk
@@ -291,6 +292,7 @@ aliases:
   thyme sprigs: thyme sprig
   tomatoes: tomato
   plums: plum
+  pomegranates: pomegranate
   # "baby" is not a modifier (baby corn is not corn), so these are judged one
   # phrase at a time.
   baby carrots: carrot
