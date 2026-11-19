@@ -745,6 +745,7 @@ fruit_prices:
 weight_prices:
   honey:               { gbp_per_kg_min: 9.00, gbp_per_kg_max: 18.00, basis: "GBP 3-6 / 340 g jar (supermarket clear honey to Acacia)", confidence: medium }
   dark brown soft sugar: { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
+  white sugar:         { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   golden caster sugar: { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   palm sugar:          { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
 
