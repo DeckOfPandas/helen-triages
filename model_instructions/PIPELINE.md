@@ -144,6 +144,7 @@ one stage on both sites.
 | folder | food | cocktails | means |
 |---|---|---|---|
 | `0-not-made/` | — | ✓ | temporary: drinks she has never made, wishlisted ones included. Not a stage, and no test requires it |
+| `0-christmas/` | ✓ | — | temporary: food she is planning for the family Christmases of 2026. Not a stage, and no test requires it |
 | pool (the root) | ✓ | ✓ | ingested; nobody has touched it since |
 | `1-rewrite/` | ✓ | ✓ | she has picked it and will rewrite it next |
 | `2-make/` | ✓ | ✓ | readable enough to make from |

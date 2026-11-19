@@ -30,6 +30,17 @@
       helen: "Add Good Food recipe authors where the magazine has made a fuss about them."
       date: 2026-11-03
 
+- name: "Nigella Lawson"
+  match: "Nigella Lawson"
+  oven: conventional
+  rulings:
+    - rule: "nigella.com labels its fan figure (180°C/160°C Fan) where it gives one; where it prints a single figure with its gas mark (240°C/gas mark 9), that is conventional, so the fan figure is 20 lower: the rewrite says 220°C fan."
+      helen: "Yes"
+      date: 2026-11-19
+    - rule: "A nigella.com page names the book it is \"Featured in\": cite that book, \"Adapted from <Book>, Nigella Lawson\", source_type book."
+      helen: "Citation."
+      date: 2026-11-19
+
 - name: "Delia Smith"
   match: "Delia"
   units: imperial

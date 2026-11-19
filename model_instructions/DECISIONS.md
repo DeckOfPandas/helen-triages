@@ -495,7 +495,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-11-19 — `cook_time` leaves out cooling: "X mins, plus overnight
   cooling".** Helen, of a meringue left overnight in a switched-off oven:
   *"Don't add the cooling time to the cook time -- say "X mins, plus
-  overnight cooling"."*
+  overnight cooling"."* Where the oven goes off as the dish goes in, *"No
+  cooking, then overnight cooling"*: `"None, plus overnight cooling"`.
+- **2026-11-19 — caster sugar a source leaves unqualified is golden, except
+  in a meringue or a pale icing or cream, where it is white.** Helen:
+  *"Golden for everything unspecified, other than meringue or light icing
+  etc."* The line says what the source printed (`note: "the source gave
+  \"caster sugar\""`), as milk, eggs and butter do (below).
 - **2026-10-29 — an unheaded first ingredient group is named for the dish or
   its main component, unasked.** Helen: *"hopefully this would be obvious,
   like "for the beef", or "for the pie"?"* The name is read after "For the".
@@ -511,6 +517,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   out."* So `makes: "one 20-cm cake (about 10 slices)"`, `"one 900-g loaf
   (8–10 slices)"`, `"one 23-cm cake"` where no slices are given, `"16
   biscuits"`. The scaler counts the whole thing and ignores the bracket.
+  A pudding or trifle is sized from its basin or bowl, with the source's
+  servings in the bracket: `"one 1.1-litre pudding (serves 4–6)"`, `"one
+  20-cm trifle (serves 8–10)"`. Helen, 2026-11-19: *"Yes, and please
+  document."*
 - **2026-10-08 — Helen's own recipes are `source: "Henry"`, `source_type:
   person`, and her own version of a regional dish is `"Henry,
   Alsace-style"`.** Confirmed as standing the same day, as the old journal
@@ -954,6 +964,14 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
   conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
   says "170°C fan"; the `QQ original` keeps the printed figure.
+- **2026-11-19 — nigella.com's single oven figure is conventional; the fan
+  figure is 20 lower.** Her answers for Ham in Coca Cola (240 → 220°C fan,
+  180 → 160°C fan) and Christmas Chutney (140 → 120°C fan) were each 20 below,
+  and asked whether that is the rule for the site, Helen: *"Yes."*
+- **2026-11-19 — a nigella.com recipe cites the book its page is "Featured
+  in".** Offered a note or the citation, Helen: *"Citation."* So `"Adapted
+  from Nigella Christmas, Nigella Lawson"`, `source_type: book`. Both rulings
+  are in `sources.yml`.
 - **2026-10-30 — where a source prints metric and imperial, keep the metric,
   bakes included; ounces only where it gives nothing else.** Helen chose
   *"Metric when both printed"*, making general what she ruled for Good Food on

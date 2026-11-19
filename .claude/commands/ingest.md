@@ -265,7 +265,9 @@ else has already done (MANUAL §9.1).
   eggs, garlic, ginger, chocolate, mustard, vinegar. Source silent → `QQ`, never a
   default -- **except milk, eggs and butter, which have house defaults**:
   `semi-skimmed milk`, a large egg (`amount: "2 large"`), `salted butter`, or
-  `unsalted butter` in a bake whose recipe names salt. Each such line gets
+  `unsalted butter` in a bake whose recipe names salt; unqualified caster
+  sugar is `golden caster sugar`, or `white caster sugar` in a meringue or a
+  pale icing or cream. Each such line gets
   `note: "the source gave \"butter\""` in the source's own word: an
   ingredient note is a lowercase fragment, no full stop. Helen: *"If
   milk and eggs aren't qualified in the source then: milk -> semi-skimmed
@@ -290,7 +292,8 @@ else has already done (MANUAL §9.1).
   on her list. Helen: *"I would like "Estimated 10 mins" to be written, then
   our tidying scripts block promotion for recipes with estimated times."*
   `test_no_estimated_time_reaches_promotion` fails on one in `4-promote/`.
-  Cooling is never in `cook_time`: `"20 mins, plus overnight cooling"`.
+  Cooling is never in `cook_time`: `"20 mins, plus overnight cooling"`, or
+  `"None, plus overnight cooling"` where the oven is off before it cooks.
 - **What is never transcribed**: a nutrition box and its badges (*"Drop them
   and add clear instructions for ingestion to ignore these"*); a "you will
   need" equipment list (*"the rule is "trust the cook""*); anything on the page
