@@ -295,6 +295,10 @@ line item saying "The source gave "butter"."* Where the source does say —
 "unsalted butter", "medium eggs", "whole milk" — that is reading, and you
 write it, with no note.
 
+**A 2-lb loaf tin is written one way**: "2-lb (900 g) loaf tin, about 25 x
+12.5 x 8 cm", in the `QQ Claude` line (the `QQ original` keeps the source's
+words).
+
 **Caster sugar has a house default too**: unqualified, it is `golden caster
 sugar`, except in a meringue or a pale icing or cream, where it is `white
 caster sugar`, and the line says what the source printed (`note: "the source
@@ -647,7 +651,7 @@ correctly leaves it blank.** A plain sponge, a dressing, a spice blend has no
 hero. Egg as a binder or a leavening mechanism is not `eggs`; a dish that is
 literally about the egg is. `chocolate` is a dish that tastes of chocolate,
 cocoa powder alone included; cocoa as a colour is not. Squash and potatoes
-count as `root veg`. Goose is `game`, not `poultry`. `greens`
+count as `root veg`. Goose is `poultry`. `greens`
 is leaves, brassicas and beans eaten whole in the pod (kale, cabbage, sprouts,
 broccoli, cauliflower, chard, spinach; green, fine and runner beans,
 mangetout, sugar snaps); a tomato, courgette, pepper or leek dish has no star,

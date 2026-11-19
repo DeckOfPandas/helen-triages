@@ -506,6 +506,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   1 vanilla pod, either way.** Helen: *"Add vanilla bean paste (plus a
   conversion to and from pods -- 1 tsp = 1 pod"*. `_QUALIFIED_VANILLA` in
   `tests/test_style.py`; no hint on the page yet.
+- **2026-11-19 — a 2-lb loaf tin is written "2-lb (900 g) loaf tin, about
+  25 x 12.5 x 8 cm".** Helen: *"if this version here is more full then use
+  this one everywhere."* In `QQ Claude` lines and published methods; a `QQ
+  original` keeps the source's words.
 - **2026-11-19 — a teaspoon is 5 ml and a tablespoon 15 ml, on both sites.**
   Helen: *"for cocktails the standard I believe is 5 ml. Let's use that
   everywhere, but log my info in case we change our minds."* Her info: a UK
@@ -1144,8 +1148,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   and legumes categories"*, choosing an automatic word list and the one
   `greens` badge. `star_also` in `_data/food/taxonomy.yml` holds the list;
   shelled beans stay `legumes`. And: *"Potatoes are root veg."*
-- **2026-11-19 — goose is `game`, not `poultry`.** Helen, of the nigella.com
-  roast goose: *"Goose is game -- please write that down somewhere."*
+- **2026-11-19 — goose is `poultry`.** Helen: *"Goose is poultry, I was wrong
+  earlier. Please fix here and everywhere."* (Replaces the same day's
+  "goose is game".)
 - **2026-10-21 — `knife and fork` and `herbivore-ish` are moods.** The audit
   found 39 draft mains with no mood: plainly cooked centrepieces, and
   vegetables as the main event. On the first Helen ruled out "proper dinner"

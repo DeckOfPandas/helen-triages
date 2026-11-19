@@ -88,6 +88,7 @@ argument and the rules each field is read by.
 - 2026-11-19 · §4 · cook_time leaves out cooling: "X mins, plus overnight cooling".
 - 2026-11-19 · §4 · caster sugar a source leaves unqualified is golden, except in a meringue or a pale icing or cream, where it is white.
 - 2026-11-19 · §4 · vanilla bean paste is a house vanilla, and 1 tsp of it is 1 vanilla pod, either way.
+- 2026-11-19 · §4 · a 2-lb loaf tin is written "2-lb (900 g) loaf tin, about 25 x 12.5 x 8 cm".
 - 2026-11-19 · §4 · a teaspoon is 5 ml and a tablespoon 15 ml, on both sites.
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
 - 2026-10-28 · §4 · makes: is written as a count of a named thing.
@@ -181,7 +182,7 @@ argument and the rules each field is read by.
 - 2026-10-30 · §7 · cocoa powder alone earns chocolate where the dish tastes of chocolate.
 - 2026-10-21 · §7 · legumes and mushrooms are star ingredients, and greens means leaves and brassicas.
 - 2026-10-29 · §7 · beans eaten whole in the pod are greens, and the legumes filter finds them too; potatoes are root veg.
-- 2026-11-19 · §7 · goose is game, not poultry — Helen, of the nigella.com roast goose: "Goose is game -- please write that down somewhere."
+- 2026-11-19 · §7 · goose is poultry — Helen: "Goose is poultry, I was wrong earlier.
 - 2026-10-21 · §7 · knife and fork and herbivore-ish are moods.
 - 2026-08-09 · §7 · #72 · per-recipe tag calls stand and are not "fixed" for consistency.
 - 2026-08-12 · §7 · #187 · eggs is a star ingredient only where the dish is about the egg.
