@@ -267,9 +267,9 @@ milk will do.
 `green cardamom pod` · `green cardamom pods` · `green cardamom powder` ·
 `green cardamom seed` · `green cardamom seeds`
 
-**Mustard:** `dijon mustard` · `english mustard` · `english mustard powder` ·
-`french mustard` · `mustard oil` · `white mustard seeds` ·
-`whole mustard seeds` · `wholegrain mustard`
+**Mustard:** `black mustard seeds` · `dijon mustard` · `english mustard` ·
+`english mustard powder` · `french mustard` · `mustard oil` ·
+`white mustard seeds` · `whole mustard seeds` · `wholegrain mustard`
 
 **Soy sauce:** `dark soy sauce` · `light soy sauce`
 
