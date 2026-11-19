@@ -148,7 +148,7 @@ name you give is a courtesy rather than a contract.
 | `source_url` | Optional, section 5: the recipe's own web address, where it has one. Leave the key out otherwise. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
 | the yield's number | **`serves:` opens with a number of people; `makes:` opens with a count of a named thing**: "one 20-cm cake (about 10 slices)", "2 loaf cakes", "950 ml", "1 batch" for a sauce or spice blend. The source's other words follow the figure: "4, depending on appetite". **One figure, not an alternative:** "9 large or 16 small biscuits" reads as nine of something called "large", so write the one the source leads with ("9 biscuits"). **`makes` is never read as people** however numeric it looks. **A dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets**: `"one 20-cm cake (about 10 slices)"`, `"one 900-g loaf (8–10 slices)"`; with no slices given, `"one 23-cm cake"`. Never portions as the count. Helen: *"one 20-cm cake (about 10 slices). Let's always use that. If we don't know slices, then leave them out."* **The figure is a whole number**: `"About 2500 ml"`, never `"About 2.5 litres"` or `"2½ litres"`, which leave the scaler nothing to count. **Where the source prints no figure, write `"QQ"`** and put a suggested one in your list (for a bake, the thing its tin makes: "one 20-cm cake"); never a guessed number in the file. There is no `serves_estimate` field: it is retired, and the suite refuses it. |
-| `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. **Not in the source? Estimate it, as `"Estimated 20 mins"`, and say so in your list** — Helen: *"I would like "Estimated 10 mins" to be written, then our tidying scripts block promotion for recipes with estimated times."* Her repository refuses to promote a recipe whose time still says `Estimated`, so a guess never publishes. Write `"QQ"` only where you cannot estimate at all. `cook_time: "None"` for a genuinely uncooked dish. |
+| `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. **Not in the source? Estimate it, as `"Estimated 20 mins"`, and say so in your list** — Helen: *"I would like "Estimated 10 mins" to be written, then our tidying scripts block promotion for recipes with estimated times."* Her repository refuses to promote a recipe whose time still says `Estimated`, so a guess never publishes. Write `"QQ"` only where you cannot estimate at all. `cook_time: "None"` for a genuinely uncooked dish. **Cooling is never part of `cook_time`**: it follows the figure, `"20 mins, plus overnight cooling"`. |
 | `main_ingredients` | Section 4. Lowercase, a flat list. |
 | `star_ingredient` | Section 4. **Optional** — leave it out rather than force one. |
 | `tags` | Section 4. Only from the declared list. |
@@ -267,7 +267,8 @@ milk will do.
 `green cardamom seed` · `green cardamom seeds`
 
 **Mustard:** `dijon mustard` · `english mustard` · `english mustard powder` ·
-`french mustard` · `mustard oil` · `whole mustard seeds` · `wholegrain mustard`
+`french mustard` · `mustard oil` · `white mustard seeds` ·
+`whole mustard seeds` · `wholegrain mustard`
 
 **Soy sauce:** `dark soy sauce` · `light soy sauce`
 
@@ -391,12 +392,14 @@ remedy for a problem the instruction already prevents.
 
 A step may be two short sentences. It is often better as two.
 
-**No "heat the oven" step.** The temperature goes in the step where the oven
-is first used: "Roast at 180°C fan for 10 mins". A later step in the same oven
-names no figure unless it changes. Helen: *"I HATE having a "heat the oven"
-step. I mean, like, duhhh. … mention the temperature the first time it's
-used."* The grill is the same: "grill on its highest setting for 5 mins". The
-`QQ original` keeps the source's own step, preheat and all.
+**Never write "preheat the oven".** The temperature goes in the step where the
+oven is first used: "Roast at 180°C fan for 10 mins". A later step in the same
+oven names no figure unless it changes. Helen: *"I dislike "Preheat the oven",
+so please never write it. Just include the correct oven temperature in the
+prose at the cook step. Trust the cook."* The grill is the same: "grill on its
+highest setting for 5 mins". The `QQ original` keeps the source's own step,
+preheat and all, and **a source step that only heats the oven gets no `QQ
+Claude` line at all**.
 
 ### One `QQ original` per source step; split the rewrite where it is dense
 
@@ -415,8 +418,12 @@ verbatim, then a `QQ Claude` line for each thing a cook would stop and do.
 - **Never the other direction, and never a new order.** Two source steps are
   never merged under one `QQ original`, and nothing moves ahead of what the
   source put before it.
-- **`method_groups` is grouping, not splitting.** A source step sits whole,
-  with all its `QQ Claude` lines, inside the group it belongs to.
+- **`method_groups` is grouping, not splitting.** A source step sits whole
+  inside the group it belongs to. **The one exception is a step that
+  straddles two phases** (cool the cake, then ice it): its `QQ original`
+  stays whole in the earlier group, and the `QQ Claude` lines for the later
+  phase open the next group. Helen: *"consider if these should be split into
+  separate steps, which could then be split over the sections."*
 
 ### `method_groups` — split the phases here, or nobody ever will
 
@@ -489,8 +496,8 @@ is correct for plenty of recipes.
   convert. Helen's ruling, and a source in §5's list may say otherwise.
 - **Never merge or reorder steps, and never cut a `QQ original`.** A source
   step is one `QQ original`, with one `QQ Claude` line or, where it is dense,
-  several (§3). A step that straddles two phases stays whole in the earlier
-  method group.
+  several (§3). A step that straddles two phases keeps its `QQ original` in
+  the earlier method group; its later `QQ Claude` lines may open the next.
 - **Times that disagree: `cook_time` takes the header's**, the method keeps
   its own, and a `QQ` note names the mismatch.
 - **A clear typo in the ingredient list is fixed in `item:`** ("oregano
@@ -632,7 +639,7 @@ correctly leaves it blank.** A plain sponge, a dressing, a spice blend has no
 hero. Egg as a binder or a leavening mechanism is not `eggs`; a dish that is
 literally about the egg is. `chocolate` is a dish that tastes of chocolate,
 cocoa powder alone included; cocoa as a colour is not. Squash and potatoes
-count as `root veg`. `greens`
+count as `root veg`. Goose is `game`, not `poultry`. `greens`
 is leaves, brassicas and beans eaten whole in the pod (kale, cabbage, sprouts,
 broccoli, cauliflower, chard, spinach; green, fine and runner beans,
 mangetout, sugar snaps); a tomato, courgette, pepper or leek dish has no star,

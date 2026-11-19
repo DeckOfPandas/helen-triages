@@ -478,12 +478,24 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
   rulings from two claude.ai chats that Helen confirmed as standing, each a
   yes. Its `QQ original` keeps everything the source printed.
-- **2026-11-11 — a rewrite has no "heat the oven" step; the temperature goes
-  where the oven is first used.** Helen: *"I HATE having a "heat the oven"
-  step. I mean, like, duhhh. … mention the temperature the first time it's
-  used."* So "Roast at 180°C fan for 10 mins", and a later step in the same
-  oven names no figure unless it changes. The grill is the same: "grill on
-  its highest setting for 5 mins". The `QQ original` keeps the source's step.
+- **2026-11-19 — a rewrite never says "preheat the oven"; the temperature goes
+  where the oven is first used.** Helen, 2026-11-11: *"I HATE having a "heat
+  the oven" step. I mean, like, duhhh."*; 2026-11-19: *"I dislike "Preheat
+  the oven", so please never write it. Just include the correct oven
+  temperature in the prose at the cook step. Trust the cook."* So "Roast at
+  180°C fan for 10 mins", and a later step in the same oven names no figure
+  unless it changes; the grill likewise. The `QQ original` keeps the source's
+  step, and a source step that only heats the oven has no `QQ Claude` line.
+- **2026-11-19 — a source step that straddles two phases may have its `QQ
+  Claude` lines split across the method groups.** Helen, of a step that cools
+  a cake and then ices it: *"consider if these should be split into separate
+  steps, which could then be split over the sections."* The `QQ original`
+  stays whole in the earlier group; the lines for the later phase open the
+  next group.
+- **2026-11-19 — `cook_time` leaves out cooling: "X mins, plus overnight
+  cooling".** Helen, of a meringue left overnight in a switched-off oven:
+  *"Don't add the cooling time to the cook time -- say "X mins, plus
+  overnight cooling"."*
 - **2026-10-29 — an unheaded first ingredient group is named for the dish or
   its main component, unasked.** Helen: *"hopefully this would be obvious,
   like "for the beef", or "for the pie"?"* The name is read after "For the".
@@ -1099,6 +1111,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   and legumes categories"*, choosing an automatic word list and the one
   `greens` badge. `star_also` in `_data/food/taxonomy.yml` holds the list;
   shelled beans stay `legumes`. And: *"Potatoes are root veg."*
+- **2026-11-19 — goose is `game`, not `poultry`.** Helen, of the nigella.com
+  roast goose: *"Goose is game -- please write that down somewhere."*
 - **2026-10-21 — `knife and fork` and `herbivore-ish` are moods.** The audit
   found 39 draft mains with no mood: plainly cooked centrepieces, and
   vegetables as the main event. On the first Helen ruled out "proper dinner"

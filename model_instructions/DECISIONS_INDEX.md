@@ -83,7 +83,9 @@ argument and the rules each field is read by.
 - 2026-11-03 · §4 · a recipe written up in a chat, not transcribed from a page, has QQ Claude method lines and no QQ original.
 - 2026-11-03 · §4 · an unqualified milk, egg or butter takes the house default, and the line says what the source printed.
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
-- 2026-11-11 · §4 · a rewrite has no "heat the oven" step; the temperature goes where the oven is first used.
+- 2026-11-19 · §4 · a rewrite never says "preheat the oven"; the temperature goes where the oven is first used.
+- 2026-11-19 · §4 · a source step that straddles two phases may have its QQ Claude lines split across the method groups.
+- 2026-11-19 · §4 · cook_time leaves out cooling: "X mins, plus overnight cooling".
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
 - 2026-10-28 · §4 · makes: is written as a count of a named thing.
 - 2026-11-03 · §4 · a dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets.
@@ -173,6 +175,7 @@ argument and the rules each field is read by.
 - 2026-10-30 · §7 · cocoa powder alone earns chocolate where the dish tastes of chocolate.
 - 2026-10-21 · §7 · legumes and mushrooms are star ingredients, and greens means leaves and brassicas.
 - 2026-10-29 · §7 · beans eaten whole in the pod are greens, and the legumes filter finds them too; potatoes are root veg.
+- 2026-11-19 · §7 · goose is game, not poultry — Helen, of the nigella.com roast goose: "Goose is game -- please write that down somewhere."
 - 2026-10-21 · §7 · knife and fork and herbivore-ish are moods.
 - 2026-08-09 · §7 · #72 · per-recipe tag calls stand and are not "fixed" for consistency.
 - 2026-08-12 · §7 · #187 · eggs is a star ingredient only where the dish is about the egg.
