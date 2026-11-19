@@ -38,6 +38,10 @@ from test_cocktails import (  # noqa: E402
 )
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
+# A source step that does nothing but heat the oven: its figure belongs to the
+# step that cooks, so it gets no `QQ Claude` line (DECISIONS §4).
+PREHEAT_ONLY = re.compile(
+    r"QQ original\s+(?:\w+,\s+)?(?:pre-?heat|heat)\s+(?:the\s+)?oven\b[^.]*\.?\s*$", re.I)
 FOOD = ROOT / "_food_drafts"
 COCKTAILS = ROOT / "_cocktail_drafts"
 
@@ -296,17 +300,20 @@ def check_food(path, fm, rep, ctx):
     claudes = [s for s in steps if s.startswith("QQ Claude")]
     plain = [s for s in steps if s.startswith("QQ PLACEHOLDER")]
 
-    # One `QQ original` per source step, then one or more `QQ Claude` lines
-    # (DECISIONS §4). Read per group, since a run never crosses a group.
-    runs = [steps] + [
-        [s.get("step") if isinstance(s, dict) else s for s in (g.get("steps") or [])]
-        for g in (fm.get("method_groups") or []) if isinstance(g, dict)]
-    for run in runs:
-        run = [s for s in run if isinstance(s, str)]
+    # One `QQ original` per source step, then one or more `QQ Claude` lines,
+    # which may run on into the next method group; a preheat-only original
+    # stands alone (DECISIONS §4). So the groups are read as one sequence.
+    grouped = [s.get("step") if isinstance(s, dict) else s
+               for g in (fm.get("method_groups") or []) if isinstance(g, dict)
+               for s in (g.get("steps") or [])]
+    for run in ([steps], [grouped]):
+        run = [s for s in run[0] if isinstance(s, str)]
         if not any(s.startswith("QQ original") for s in run):
             continue
         for i, s in enumerate(run):
             nxt = run[i + 1] if i + 1 < len(run) else ""
+            if PREHEAT_ONLY.match(s):
+                continue
             if s.startswith("QQ original") and not nxt.startswith("QQ Claude"):
                 rep.add("A `QQ original` WITH NO `QQ Claude` UNDER IT",
                         repr(s[:60]), slug)
