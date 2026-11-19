@@ -370,6 +370,15 @@ def test_food_prose_outside_a_qq_is_still_fixed(food):
     )
 
 
+def test_accents_reach_link_text_and_never_the_link_target():
+    """An accented slug is a different address: `../potato-rösti/` is a 404."""
+    line = 'tagline: "Lovely with [potato rosti](../potato-rosti/), or plain rosti."'
+    got, changed = tidy_drafts.fix_accents(line, Path("x.md"))
+    assert got == ('tagline: "Lovely with [potato rösti](../potato-rosti/), '
+                   'or plain rösti."'), got
+    assert changed == ["rosti -> rösti"], changed
+
+
 # ---- The unit space (DECISIONS §5) ----
 # One fixture carrying every shape the rule meets: a food `amount:`, an `item:`
 # with a unit mid-phrase, a `QQ Claude` and a `QQ original` line that are both
