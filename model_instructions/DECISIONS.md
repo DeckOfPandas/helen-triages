@@ -502,6 +502,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   *"Golden for everything unspecified, other than meringue or light icing
   etc."* The line says what the source printed (`note: "the source gave
   \"caster sugar\""`), as milk, eggs and butter do (below).
+- **2026-11-19 — `vanilla bean paste` is a house vanilla, and 1 tsp of it is
+  1 vanilla pod, either way.** Helen: *"Add vanilla bean paste (plus a
+  conversion to and from pods -- 1 tsp = 1 pod"*. `_QUALIFIED_VANILLA` in
+  `tests/test_style.py`; no hint on the page yet.
+- **2026-11-19 — a teaspoon is 5 ml and a tablespoon 15 ml, on both sites.**
+  Helen: *"for cocktails the standard I believe is 5 ml. Let's use that
+  everywhere, but log my info in case we change our minds."* Her info: a UK
+  teaspoon is 6 ml, a US one 5 ml, and *"1 tbsp = 2 tsp for both"*; asked,
+  the house's 15 ml tablespoon is 3 teaspoons. `_data/food/costs.yml` and
+  `measures:` in `_data/cocktails/ingredients.yml` hold the figures; a
+  cocktail still writes millilitres, never `tsp`.
 - **2026-10-29 — an unheaded first ingredient group is named for the dish or
   its main component, unasked.** Helen: *"hopefully this would be obvious,
   like "for the beef", or "for the pie"?"* The name is read after "For the".
@@ -1280,6 +1291,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   concern to me."* Later: *"'Desserts' and 'drinks' seem to contain the right
   things."* So `main`, `side` and `starter` stay in PRACTICALITIES beside
   `freezable`, and a food MOOD called `drinks` beside a drinks site is fine.
+- **2026-11-19 — a non-alcoholic drink is a food recipe tagged `drinks`; an
+  alcoholic one is a cocktail.** Helen, of a mince pie tea: *"Mince Pie Tea
+  should live on the food site. I don't know what the rule is here.
+  Non-alcoholic vs alcoholic isn't quite right, but probably near enough."*
+  A rough line, to be revisited when a drink sits badly on it.
 
 ## §8 Ingredient search
 

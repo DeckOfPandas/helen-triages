@@ -629,7 +629,8 @@ def test_mixed_spice_and_five_spice_say_powder(recipe):
 _QUALIFIED_NUTMEG = {"whole nutmeg", "ground nutmeg"}
 _QUALIFIED_CINNAMON = {"cinnamon stick", "cinnamon sticks", "ground cinnamon"}
 _QUALIFIED_CLOVES = {"whole cloves", "ground cloves"}
-_QUALIFIED_VANILLA = {"vanilla extract", "vanilla essence", "vanilla pod"}
+_QUALIFIED_VANILLA = {"vanilla extract", "vanilla essence", "vanilla pod",
+                      "vanilla bean paste"}
 
 
 def test_nutmeg_cinnamon_cloves_vanilla_specify_type(recipe):

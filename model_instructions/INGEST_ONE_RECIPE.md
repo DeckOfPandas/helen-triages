@@ -259,7 +259,8 @@ milk will do.
 
 **Cloves:** `ground cloves` · `whole cloves`
 
-**Vanilla:** `vanilla essence` · `vanilla extract` · `vanilla pod`
+**Vanilla:** `vanilla bean paste` · `vanilla essence` · `vanilla extract` ·
+`vanilla pod`
 
 **Cardamom:** `black cardamom pod` · `black cardamom pods` ·
 `black cardamom powder` · `black cardamom seed` · `black cardamom seeds` ·
@@ -577,7 +578,8 @@ Meanings you would not guess:
 - **`freezable`** and **`make-ahead`** are separate axes. Neither implies the
   other.
 - **`drinks`** is anything drinkable that is not a cocktail — a cordial, a hot
-  chocolate, a frappé.
+  chocolate, a frappé, a spiced tea. The rough line is alcohol: a drink with
+  none is a food recipe, a drink with some goes to the cocktails site.
 - **`virtuous`** is narrow: lean protein, or genuinely veg-forward with a wine
   or citrus sauce doing the work. Not "contains a vegetable".
 - **`herbivore-ish`** — a main where a vegetable, a pulse or a mushroom is the

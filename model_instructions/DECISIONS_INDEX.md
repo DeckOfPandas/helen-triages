@@ -87,6 +87,8 @@ argument and the rules each field is read by.
 - 2026-11-19 · §4 · a source step that straddles two phases may have its QQ Claude lines split across the method groups.
 - 2026-11-19 · §4 · cook_time leaves out cooling: "X mins, plus overnight cooling".
 - 2026-11-19 · §4 · caster sugar a source leaves unqualified is golden, except in a meringue or a pale icing or cream, where it is white.
+- 2026-11-19 · §4 · vanilla bean paste is a house vanilla, and 1 tsp of it is 1 vanilla pod, either way.
+- 2026-11-19 · §4 · a teaspoon is 5 ml and a tablespoon 15 ml, on both sites.
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
 - 2026-10-28 · §4 · makes: is written as a count of a named thing.
 - 2026-11-03 · §4 · a dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets.
@@ -203,6 +205,7 @@ argument and the rules each field is read by.
 - 2026-10-29 · §7 · dietary restrictions are not marked — Helen: "I don't mark dietary restrictions." No tag, note, field or question for vegan, gluten-free and the like, at ingest or after; a claim …
 - 2026-10-11 · §7 · a quiche, a tarte tatin, a soufflé and a salad that is the meal are a main; a plain cauliflower cheese and a sprout salad are extras.
 - 2026-11-05 · §7 · #1462 · A9 — the course labels are filters, and MOOD's drinks and desserts stay as they are.
+- 2026-11-19 · §7 · a non-alcoholic drink is a food recipe tagged drinks; an alcoholic one is a cocktail.
 - 2026-08-01 · §8 · the ingredient picker stays, and so does title search.
 - 2026-08-16 · §8 · #281 · a bad candidate in the exclude (LEAVE OUT) picker is fixed for what ships, not for the drafts.
 - 2026-09-15 · §8 · #1092 · food's HAS TO HAVE picks several ingredients, ANDed.
