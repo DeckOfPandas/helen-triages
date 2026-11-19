@@ -592,9 +592,10 @@ edible violet · edible orchid · mint leaf · thyme sprig · basil leaf (floate
 thin cucumber slice (floated) · length of cucumber peel
 
 **Spice and other:** grated nutmeg · grated chocolate · grated cinnamon ·
-Angostura bitters · whipped cream · cinnamon stick · ginger wheel ·
-stem ginger slice · skewered crystallised ginger · desiccated coconut ·
-star anise (floated) · skewered green olive · skewered black olives ·
+a whisper of cinnamon or a twist of lime · Angostura bitters · whipped cream ·
+cinnamon stick · ginger wheel · stem ginger slice ·
+skewered crystallised ginger · desiccated coconut · star anise (floated) ·
+skewered green olive · skewered black olives ·
 small stuffed dead Norwegian Blue · three coffee beans · cocoa powder ·
 icing sugar · ice cone
 <!-- vocab:garnish end -->
