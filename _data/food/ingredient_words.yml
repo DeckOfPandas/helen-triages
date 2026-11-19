@@ -261,6 +261,7 @@ aliases:
   coriander seeds: coriander seed
   courgettes: courgette
   cucumbers: cucumber
+  chicken livers: chicken liver
   duck breasts: duck breast
   ducks: duck
   eating apples: eating apple
@@ -273,6 +274,7 @@ aliases:
   leeks: leek
   lemons: lemon
   limes: lime
+  lobsters: lobster
   little gem lettuces: Little Gem lettuce
   mashed potatoes: mashed potato
   meringues: meringue
@@ -294,6 +296,7 @@ aliases:
   tomatoes: tomato
   whole cloves: whole clove
   plums: plum
+  preserved lemons: preserved lemon
   pomegranates: pomegranate
   # "baby" is not a modifier (baby corn is not corn), so these are judged one
   # phrase at a time.
