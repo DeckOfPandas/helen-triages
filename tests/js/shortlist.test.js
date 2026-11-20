@@ -723,6 +723,18 @@ test('#1521: one recipe in two lists; each list says only for itself', () => {
   assert.strictEqual(s.inAny('/dal/'), false);
 });
 
+test('#1521: total() counts each recipe once, however many lists it is on', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  assert.strictEqual(s.total(), 0);
+  s.toggle('/dal/');
+  s.toggle('/soup/');
+  const other = s.create('Weeknights');
+  s.toggleIn(other, '/dal/');
+  s.toggleIn(other, '/stew/');
+  assert.strictEqual(s.total(), 3);
+});
+
 test('#1521: portions, batches, glasses and ticks are each list\'s own', () => {
   const { HTF } = pageWith();
   const s = HTF.shortlist;

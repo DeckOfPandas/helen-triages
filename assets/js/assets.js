@@ -528,6 +528,15 @@ window.HTF = window.HTF || {};
         return read().lists.some(function (l) { return l.entries.indexOf(url) !== -1; });
       },
 
+      /** @returns {number} recipes on any list, each counted once */
+      total: function () {
+        var seen = [];
+        read().lists.forEach(function (l) {
+          l.entries.forEach(function (url) { if (seen.indexOf(url) === -1) seen.push(url); });
+        });
+        return seen.length;
+      },
+
       /** Every list with something on it, for the export block.
           @returns {{name:string, keys:string[]}[]} */
       exportLists: function () {

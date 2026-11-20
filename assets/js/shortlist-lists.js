@@ -1,6 +1,6 @@
 // shortlist-lists.js
-// The index's list chooser (#1521): which list the shortlist view shows, and
-// new, rename and delete beside it. One script for both indexes; it finds
+// The index's list chooser (#1521): which list the shortlist view shows,
+// rename and delete beside it, and "+ new list" under it. One script for both indexes; it finds
 // `[data-shortlist-lists]` (_includes/shortlist-lists.html). MANUAL §8.9.
 //
 // It changes the store and dispatches `htf:shortlist-change`; each index
@@ -23,6 +23,7 @@
   var input = root.querySelector('[data-shortlist-lists-name]');
   var error = root.querySelector('[data-shortlist-lists-error]');
   var actions = root.querySelector('[data-shortlist-lists-actions]');
+  var newRow = root.querySelector('[data-shortlist-lists-new-row]');
   var mode = null;   // 'new' or 'rename' while the form is open
 
   function announce() {
@@ -48,6 +49,7 @@
     mode = which;
     form.hidden = false;
     actions.hidden = true;
+    newRow.hidden = true;
     error.hidden = true;
     input.value = which === 'rename' ? store.activeName() : '';
     input.setAttribute('aria-label', which === 'rename' ? 'New name for this list' : 'Name for the new list');
@@ -59,6 +61,7 @@
     mode = null;
     form.hidden = true;
     actions.hidden = false;
+    newRow.hidden = false;
   }
 
   select.addEventListener('change', function () {

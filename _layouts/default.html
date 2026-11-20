@@ -309,6 +309,7 @@
      pages. Below {{ content }} is safe for this script: nothing calls into it
      at parse time, the store it needs (HTF.shortlist) is in assets.js in the
      head, and its own wiring waits for DOMContentLoaded. {% endcomment %}
+  {% if page.site_key %}{% include shortlist-picker.html %}{% endif %}
   <script src="{{ '/assets/js/shortlist.js' | relative_url }}"></script>
 
   {% comment %} The wordmark deliberately differs from page headings (#477);

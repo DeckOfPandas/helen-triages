@@ -47,21 +47,23 @@
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 
-  /* Every count on the page, from one place.
+  /* Every count on the page, from one place. Both count each recipe once,
+     however many lists it is on.
 
-     `[data-shortlist-count]` is how many of the ACTIVE list there are to see
-     on this page, not how many the store holds (#847): a key can outlive its
-     page, and the index's view can only show this page's rows.
-     `[data-shortlist-total]` is the active list's own count, for the "see
-     shortlist (N)" link (_includes/page-actions.html), which opens that list
-     on the index and shows only while it has something on it (#1210). */
+     `[data-shortlist-count]` is how many there are to see on this page, not
+     how many the store holds (#847): a key can outlive its page, and the
+     index can only show this page's rows. `[data-shortlist-total]` is the
+     store's own count, for the "see shortlist (N)" link
+     (_includes/page-actions.html), shown only while it is above 0 (#1210). */
   function paintCounts() {
-    var n = controls().filter(function (btn) {
-      return store.has(btn.dataset.shortlistKey);
-    }).length;
-    all('[data-shortlist-count]').forEach(function (el) { el.textContent = String(n); });
+    var seen = [];
+    controls().forEach(function (btn) {
+      var key = btn.dataset.shortlistKey;
+      if (seen.indexOf(key) === -1 && store.inAny(key)) seen.push(key);
+    });
+    all('[data-shortlist-count]').forEach(function (el) { el.textContent = String(seen.length); });
 
-    var total = store.count();
+    var total = store.total();
     all('[data-shortlist-total]').forEach(function (el) { el.textContent = String(total); });
     all('.btn-see-shortlist').forEach(function (link) { link.hidden = total === 0; });
   }
@@ -74,7 +76,8 @@
   }
 
   // --- The picker ------------------------------------------------------------
-  // One element for the page, moved under whichever control opened it.
+  // One element for the page, cloned from _includes/shortlist-picker.html's
+  // <template> and moved under whichever control opened it.
 
   var picker = null;
   var openFor = null;   // the control it is open under
@@ -86,35 +89,30 @@
     return node;
   }
 
+  /* @returns {boolean} false where the page carries no template */
   function buildPicker() {
-    picker = el('div', 'shortlist-picker');
-    picker.setAttribute('role', 'dialog');
+    var template = document.getElementById('shortlist-picker-template');
+    if (!template || !template.content) return false;
+    picker = template.content.firstElementChild.cloneNode(true);
     picker.hidden = true;
 
-    var lists = el('ul', 'shortlist-picker-lists');
-    picker.appendChild(lists);
-
-    var newBtn = el('button', 'shortlist-picker-new', '+ new list…');
-    newBtn.type = 'button';
-    picker.appendChild(newBtn);
-
-    var form = el('form', 'shortlist-picker-form');
-    form.hidden = true;
-    var input = el('input', 'shortlist-picker-name');
-    input.type = 'text';
+    var lists = picker.querySelector('.shortlist-picker-lists');
+    var newBtn = picker.querySelector('.shortlist-picker-new');
+    var form = picker.querySelector('.shortlist-picker-form');
+    var input = picker.querySelector('.shortlist-picker-name');
+    var error = picker.querySelector('.shortlist-picker-error');
     input.maxLength = store.NAME_MAX;
-    input.setAttribute('aria-label', 'New list name');
-    input.setAttribute('autocomplete', 'off');
-    var add = el('button', 'shortlist-picker-add', 'add');
-    add.type = 'submit';
-    form.appendChild(input);
-    form.appendChild(add);
-    picker.appendChild(form);
 
-    var error = el('p', 'shortlist-picker-error');
-    error.setAttribute('role', 'alert');
-    error.hidden = true;
-    picker.appendChild(error);
+    picker.querySelector('.shortlist-picker-close').addEventListener('click', function () {
+      closePicker(true);
+    });
+
+    picker.querySelector('.shortlist-picker-cancel').addEventListener('click', function () {
+      form.hidden = true;
+      error.hidden = true;
+      newBtn.hidden = false;
+      newBtn.focus();
+    });
 
     lists.addEventListener('change', function (ev) {
       var box = ev.target;
@@ -159,6 +157,7 @@
     });
 
     document.body.appendChild(picker);
+    return true;
   }
 
   /* The lists, as tick boxes, for the control it is open under. */
@@ -174,7 +173,7 @@
       box.dataset.listId = list.id;
       box.checked = store.hasIn(list.id, key);
       label.appendChild(box);
-      label.appendChild(document.createTextNode(' ' + list.name));
+      label.appendChild(el('span', 'shortlist-list-name', list.name));
       li.appendChild(label);
       lists.appendChild(li);
     });
@@ -195,7 +194,7 @@
   }
 
   function openPicker(btn) {
-    if (!picker) buildPicker();
+    if (!picker && !buildPicker()) return;
     if (openFor) openFor.setAttribute('aria-expanded', 'false');
     openFor = btn;
     btn.setAttribute('aria-expanded', 'true');

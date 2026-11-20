@@ -58,6 +58,16 @@
 // Only a local build emits the element (cocktails/index.html).
 .btn-drafts-toggle { @extend .btn-shortlist-only; }
 
+// The list chooser's and the picker's pills (#1521, shared/_shortlist-lists.scss):
+// this pill's shape and hover, and its on state while pressed.
+.btn-shortlist-lists {
+  @extend .btn-shortlist-only;
+
+  &:active { border-color: $color-wicked-woowoo; }
+}
+
+:root { --shortlist-on: #{$color-wicked-woowoo}; }
+
 .drafts-toggle-row {
   margin: (-$space-sm) 0 $space-lg;
 }
