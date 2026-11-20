@@ -234,7 +234,9 @@
      dropped by apply() the moment the view goes. null when none is showing. */
   var sharedKeys = null;
   var sharedUnmatched = [];
+  var sharedName = '';   // the link's `list=` (#1521); '' for a nameless link
   var sharedNote = document.querySelector('[data-shared-shortlist]');
+  var listChooser = document.querySelector('[data-shortlist-lists]');
 
   // Declared here rather than beside the code that builds them, so apply() can
   // never read them before they exist. Populated further down.
@@ -681,7 +683,8 @@
     if (!sharedKeys) return;
     var text = sharedNote.querySelector('[data-shared-shortlist-text]');
     if (text) {
-      text.textContent = 'a shared shortlist (' + sharedKeys.length + ')' +
+      text.textContent = 'a shared shortlist' + (sharedName ? ', ' + sharedName : '') +
+        ' (' + sharedKeys.length + ')' +
         (sharedUnmatched.length ? '; not found: ' + sharedUnmatched.join(', ') : '');
     }
     var keep = sharedNote.querySelector('[data-shared-shortlist-keep]');
@@ -794,6 +797,8 @@
       var ownView = !!state.shortlisted && !sharedKeys;
       shortlistOnlyBtn.classList.toggle('is-on', ownView);
       shortlistOnlyBtn.setAttribute('aria-pressed', ownView ? 'true' : 'false');
+      // The list chooser (#1521) belongs to your own shortlist view.
+      if (listChooser) listChooser.hidden = !ownView;
     }
     syncSharedNote();
 
@@ -825,7 +830,7 @@
     if (!addressBarLive) return;
     var FS = HTF.filterState;
     if (state.shortlisted) {
-      FS.replaceQuery(sharedKeys ? FS.shortlistQuery(arrivedSharedSlugs) : 'shortlist=1');
+      FS.replaceQuery(sharedKeys ? FS.shortlistQuery(arrivedSharedSlugs, sharedName) : 'shortlist=1');
       return;
     }
     FS.replaceQuery(FS.buildQuery([
@@ -1015,8 +1020,9 @@
   /* Dispatched by shortlist.js when a card's own toggle changes. */
   document.addEventListener('htf:shortlist-change', apply);
 
-  /* Keep these (#1093): merges the shared list into this browser's shortlist
-     and shows it; the change event repaints the toggles. */
+  /* Keep these (#1093, #1521): merges the shared list into the list of its
+     name, made if there is none, and shows that list; the change event
+     repaints the toggles. */
   var sharedKeep = sharedNote && sharedNote.querySelector('[data-shared-shortlist-keep]');
   if (sharedKeep) {
     sharedKeep.addEventListener('click', function () {
@@ -1024,7 +1030,7 @@
       var keys = sharedKeys;
       sharedKeys = null;
       sharedUnmatched = [];
-      HTF.shortlist.addAll(keys);
+      HTF.shortlist.keep(sharedName, keys);
       document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
         detail: { key: null, on: true, kept: keys.length }
       }));
@@ -1379,6 +1385,7 @@
     resetControls();
     if (arrivedShortlist.slugs.length) {
       arrivedSharedSlugs = arrivedShortlist.slugs;
+      sharedName = HTF.shortlist.cleanName(arrivedShortlist.name);
       var resolvedShared = HTF.shortlist.resolveSlugs(arrivedShortlist.slugs,
         model.map(function (d) { return d.url || ''; }));
       sharedKeys = resolvedShared.keys;

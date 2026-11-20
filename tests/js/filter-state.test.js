@@ -142,18 +142,18 @@ test('parseName does not leak into parseQuery', () => {
 // parsed, never substring-matched.
 
 test('parseShortlist: ?shortlist=1 is the own list, with no slugs', () => {
-  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1'), { own: true, slugs: [] });
-  assert.deepStrictEqual(FS.parseShortlist('?mood=sharp&shortlist=1'), { own: true, slugs: [] });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1'), { own: true, slugs: [], name: '' });
+  assert.deepStrictEqual(FS.parseShortlist('?mood=sharp&shortlist=1'), { own: true, slugs: [], name: '' });
 });
 
 test('parseShortlist: a list of slugs is a sent list, in link order, once each', () => {
   assert.deepStrictEqual(FS.parseShortlist('?shortlist=negroni,aviation,negroni'),
-    { own: false, slugs: ['negroni', 'aviation'] });
+    { own: false, slugs: ['negroni', 'aviation'], name: '' });
 });
 
 test('parseShortlist: a slug beginning with 1 is a slug, not the own-list flag', () => {
   assert.deepStrictEqual(FS.parseShortlist('?shortlist=10-minute-dal'),
-    { own: false, slugs: ['10-minute-dal'] });
+    { own: false, slugs: ['10-minute-dal'], name: '' });
 });
 
 test('parseShortlist: anything that is not [a-z0-9-] is dropped, not matched', () => {
@@ -161,11 +161,11 @@ test('parseShortlist: anything that is not [a-z0-9-] is dropped, not matched', (
   // Jekyll-written URL segment, which carries no other character.
   assert.deepStrictEqual(
     FS.parseShortlist('?shortlist=Dal,%3Cscript%3E,../x,,-lead,moules%20mariniere'),
-    { own: false, slugs: ['dal'] });
+    { own: false, slugs: ['dal'], name: '' });
 });
 
 test('parseShortlist: nothing, an empty value, or no parameter is neither', () => {
-  const none = { own: false, slugs: [] };
+  const none = { own: false, slugs: [], name: '' };
   assert.deepStrictEqual(FS.parseShortlist(''), none);
   assert.deepStrictEqual(FS.parseShortlist(undefined), none);
   assert.deepStrictEqual(FS.parseShortlist('?shortlist='), none);
@@ -174,20 +174,77 @@ test('parseShortlist: nothing, an empty value, or no parameter is neither', () =
 });
 
 test('parseShortlist: the last shortlist parameter wins', () => {
-  assert.deepStrictEqual(FS.parseShortlist('?shortlist=dal&shortlist=1'), { own: true, slugs: [] });
-  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1&shortlist=dal'), { own: false, slugs: ['dal'] });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=dal&shortlist=1'), { own: true, slugs: [], name: '' });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1&shortlist=dal'), { own: false, slugs: ['dal'], name: '' });
 });
 
 test('shortlistQuery writes what parseShortlist reads back', () => {
   const q = FS.shortlistQuery(['negroni', 'Aviation', 'negroni']);
   assert.strictEqual(q, 'shortlist=negroni,aviation');
-  assert.deepStrictEqual(FS.parseShortlist('?' + q), { own: false, slugs: ['negroni', 'aviation'] });
+  assert.deepStrictEqual(FS.parseShortlist('?' + q), { own: false, slugs: ['negroni', 'aviation'], name: '' });
 });
 
 test('shortlistQuery leaves out what the parser would drop, and is empty for nothing', () => {
   assert.strictEqual(FS.shortlistQuery(['1', 'a b', '']), '');
   assert.strictEqual(FS.shortlistQuery([]), '');
   assert.strictEqual(FS.shortlistQuery(undefined), '');
+});
+
+// --- named lists and the block (#1521) ----------------------------------------
+
+test('#1521: a sent list carries its name in `list`, and the name round-trips', () => {
+  const q = FS.shortlistQuery(['dal', 'trifle'], 'Sunday lunch & co');
+  assert.strictEqual(q, 'shortlist=dal,trifle&list=Sunday%20lunch%20%26%20co');
+  assert.deepStrictEqual(FS.parseShortlist('?' + q),
+    { own: false, slugs: ['dal', 'trifle'], name: 'Sunday lunch & co' });
+  // Either order, and `+` is a space as everywhere else in this grammar.
+  assert.strictEqual(FS.parseShortlist('?list=Week+nights&shortlist=dal').name, 'Week nights');
+});
+
+test('#1521: a name means nothing without slugs, and an empty name is none', () => {
+  assert.strictEqual(FS.parseShortlist('?shortlist=1&list=Friday').name, '');
+  assert.strictEqual(FS.parseShortlist('?list=Friday').name, '');
+  assert.strictEqual(FS.shortlistQuery(['dal'], '  '), 'shortlist=dal');
+  assert.strictEqual(FS.shortlistQuery([], 'Friday'), '');
+});
+
+test('#1521: the block is a line per list with something on it, "Name: link"', () => {
+  const block = FS.shortlistBlock('https://x.test/food/', [
+    { name: 'Sunday lunch', slugs: ['lasagne', 'trifle'] },
+    { name: 'Empty', slugs: [] },
+    { name: 'Weeknights', slugs: ['dal'] }
+  ]);
+  assert.strictEqual(block,
+    'Sunday lunch: https://x.test/food/?shortlist=lasagne,trifle&list=Sunday%20lunch\n' +
+    'Weeknights: https://x.test/food/?shortlist=dal&list=Weeknights');
+  assert.strictEqual(FS.shortlistBlock('https://x.test/food/', []), '');
+});
+
+test('#1521: the block reads back as it was written', () => {
+  const lists = [
+    { name: 'Sunday lunch', slugs: ['lasagne', 'trifle'] },
+    { name: 'Odd: name?', slugs: ['dal'] }
+  ];
+  assert.deepStrictEqual(
+    FS.parseShortlistBlock(FS.shortlistBlock('https://x.test/food/', lists)), lists);
+});
+
+test('#1521: a pasted block survives what a message app does to it', () => {
+  // Blank lines, CRLF, indents, a bare link, a link with words after it, an
+  // older nameless link with a label in front, and lines with no link at all.
+  const text = '\r\n  My lists, from Helen\r\n' +
+    '  Sunday: https://x.test/food/?shortlist=lasagne&list=Sunday  \r\n\r\n' +
+    'https://x.test/food/?shortlist=dal,soup&list=Weeknights see you\n' +
+    'Picnic - https://x.test/food/?shortlist=scotch-eggs\n' +
+    'https://x.test/food/?shortlist=1\n' +
+    'https://x.test/food/?tag=soup\n';
+  assert.deepStrictEqual(FS.parseShortlistBlock(text), [
+    { name: 'Sunday', slugs: ['lasagne'] },
+    { name: 'Weeknights', slugs: ['dal', 'soup'] },
+    { name: 'Picnic', slugs: ['scotch-eggs'] }
+  ]);
+  assert.deepStrictEqual(FS.parseShortlistBlock(''), []);
+  assert.deepStrictEqual(FS.parseShortlistBlock(undefined), []);
 });
 
 test('parseShortlist does not leak into parseQuery', () => {

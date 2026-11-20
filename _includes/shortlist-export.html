@@ -1,0 +1,24 @@
+{% comment %} Share, save or restore the shortlists (#1100, #1521), the same on
+   both indexes. The block is a line per list, "Name: link"; a link opens the
+   index showing that list without saving it (#1093). Restore takes a pasted
+   block and saves every list in it. Ships `hidden`, and shortlist-export.js
+   reveals it. The first hint's words are Helen's (PR #1100). {% endcomment %}
+<details class="shortlist-export" id="shortlist-export"
+         data-shortlist-export-panel hidden>
+  <summary>Share or save the shortlists</summary>
+  <div class="shortlist-export-lists" data-shortlist-export-lists hidden>
+    <p class="shortlist-export-hint">Loading this shows recipes without saving them.</p>
+    <textarea class="shortlist-share-block" data-shortlist-share rows="3"
+              readonly spellcheck="false" aria-label="A link to each shortlist, one per line"></textarea>
+    <button type="button" class="btn-shortlist-copy" data-shortlist-share-copy hidden>
+      copy all
+    </button>
+  </div>
+  <p class="shortlist-export-hint">To restore them, paste a copied block here.</p>
+  <textarea class="shortlist-share-block" data-shortlist-restore rows="3"
+            spellcheck="false" aria-label="Paste copied shortlists here"></textarea>
+  <button type="button" class="btn-shortlist-copy" data-shortlist-restore-go>
+    restore
+  </button>
+  <p class="shortlist-restore-result" data-shortlist-restore-result role="status" hidden></p>
+</details>

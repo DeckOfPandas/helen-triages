@@ -207,6 +207,7 @@ permalink: /cocktails/
   <button type="button" class="btn-clear-filter drink-count-clear-ship" id="clear-ship" hidden>&times; clear ship</button>
   </div>
   {% include cocktails/ship-key.html part="dialog" %}
+  {% include shortlist-lists.html %}
 
   {% comment %} The results pill, the same include as food/index.html's; "top"
      returns to the first section, YOLO?, as there is no STAR here. {% endcomment %}
@@ -437,18 +438,7 @@ permalink: /cocktails/
     <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
   </section>
 
-  {% comment %} Share or save the shortlist: one link and nothing else (#1100).
-     food/index.html carries the identical block. The words are Helen's. {% endcomment %}
-  <details class="shortlist-export" id="shortlist-export"
-           data-shortlist-export-panel hidden>
-    <summary>Share or save the shortlist</summary>
-    <p class="shortlist-export-hint">Loading this shows recipes without saving them.</p>
-    <input type="text" class="shortlist-share-link" data-shortlist-share
-           readonly spellcheck="false" aria-label="A link to this shortlist">
-    <button type="button" class="btn-shortlist-copy" data-shortlist-share-copy hidden>
-      copy link
-    </button>
-  </details>
+  {% include shortlist-export.html %}
 
   {% comment %} The data blocks below are read by cocktail-index.js at startup,
      each by its id. {% endcomment %}
@@ -549,8 +539,9 @@ permalink: /cocktails/
      tests/test_site_config.py::test_the_results_bar_loads_after_the_index_script_on_both_indexes
      holds it. {% endcomment %}
   <script src="{{ '/assets/js/results-bar.js' | relative_url }}"></script>
-  {% comment %} Order does not matter for this one (#849): it reads
-     HTF.shortlist at run time and subscribes to an event. {% endcomment %}
+  {% comment %} Order does not matter for these two (#849): they read
+     HTF.shortlist at run time and subscribe to an event. {% endcomment %}
+  <script src="{{ '/assets/js/shortlist-lists.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/shortlist-export.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/ship-key.js' | relative_url }}"></script>
 

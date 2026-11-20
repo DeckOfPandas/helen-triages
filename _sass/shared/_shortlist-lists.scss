@@ -1,0 +1,126 @@
+@use "shared/theme" as *;
+@use "shared/tokens" as *;
+
+// THE PICKER AND THE LIST CHOOSER (#1521), on both sites.
+//
+// In shared/ for the reason shared/_shortlist-export.scss is: one block of
+// markup, one script, two palettes. Colours are palette-contract names only,
+// so each site's ground and ink come through. The words are the label face,
+// as chrome; the list names are the body face, as content.
+
+// --- The picker --------------------------------------------------------------
+// Opened by any `.btn-shortlist`, built and placed by shortlist.js: absolute
+// in the document, under the control, its right edge on the control's.
+.shortlist-picker {
+  position: absolute;
+  z-index: 50;
+  min-width: 12rem;
+  max-width: calc(100vw - 16px);
+  box-sizing: border-box;
+  padding: $space-sm $space-md;
+  background: $color-surface;
+  color: $color-text;
+  border: 1.5px solid $color-border;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  text-align: left;
+}
+
+.shortlist-picker-lists {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// A row tall enough to hit with a thumb.
+.shortlist-picker-list label {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  min-height: 2.25rem;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.shortlist-picker-list input { flex-shrink: 0; margin: 0; }
+
+.shortlist-picker-new,
+.shortlist-picker-add,
+.btn-shortlist-lists {
+  font-family: $font-label;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+  background: none;
+  border: 1px solid $color-border;
+  padding: $space-xs $space-sm;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: $color-text; }
+}
+
+.shortlist-picker-new {
+  margin-top: $space-xs;
+  border: 0;
+  padding-left: 0;
+}
+
+.shortlist-picker-form {
+  display: flex;
+  gap: $space-xs;
+  margin-top: $space-xs;
+}
+
+.shortlist-picker-name,
+.shortlist-lists-name,
+.shortlist-lists-select {
+  min-width: 0;
+  font: inherit;
+  font-size: 1rem;   // 16px: below it, iOS zooms the page on focus
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  padding: $space-xs $space-sm;
+}
+
+.shortlist-picker-name { flex: 1; }
+
+.shortlist-picker-error,
+.shortlist-lists-error {
+  margin: $space-xs 0 0;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
+// --- The chooser -------------------------------------------------------------
+// Under the shortlisted pill while your own list shows. Wraps on a phone.
+.shortlist-lists {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-sm;
+  margin: 0 0 $space-lg;
+}
+
+.shortlist-lists-label {
+  font-family: $font-label;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
+.shortlist-lists-select { max-width: 100%; }
+
+.shortlist-lists-actions,
+.shortlist-lists-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-xs;
+}
+
+// `hidden` must win over the display above.
+.shortlist-lists[hidden],
+.shortlist-lists-actions[hidden],
+.shortlist-lists-form[hidden],
+.shortlist-picker-form[hidden] { display: none; }
+
+.shortlist-lists-error { flex-basis: 100%; margin: 0; }

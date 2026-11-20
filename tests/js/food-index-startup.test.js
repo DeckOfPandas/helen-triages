@@ -39,8 +39,9 @@ const SCRIPTS = [
   // at once here: this sandbox has no IntersectionObserver, which is the path
   // a browser without the API takes.
   'results-bar.js',
-  // #849. Nobody's dependency; listed because the test at the foot of this
-  // file asserts this array is the template's script list.
+  // #849, #1521. Nobody's dependencies; listed because the test at the foot
+  // of this file asserts this array is the template's script list.
+  'shortlist-lists.js',
   'shortlist-export.js'
 ];
 

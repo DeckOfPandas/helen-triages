@@ -48,7 +48,9 @@ document.addEventListener('DOMContentLoaded', function () {
      into this browser's next visit. null when no shared list is showing. */
   var sharedKeys = null;
   var sharedUnmatched = [];
+  var sharedName = '';   // the link's `list=` (#1521); '' for a nameless link
   var sharedNote = document.querySelector('[data-shared-shortlist]');
+  var listChooser = document.querySelector('[data-shortlist-lists]');
   // The one clear-all is the results pill's × (_includes/results-pill.html,
   // #1448): this script sets its visibility and wires its click, and
   // results-bar.js shows it whenever that visibility says there is something
@@ -610,6 +612,8 @@ function renderResultsPool() {
     var own = !!state.shortlisted && !sharedKeys;
     shortlistOnlyBtn.classList.toggle('is-on', own);
     shortlistOnlyBtn.setAttribute('aria-pressed', own ? 'true' : 'false');
+    // The list chooser (#1521) belongs to your own shortlist view.
+    if (listChooser) listChooser.hidden = !own;
   }
 
   /* The note over a shared list, and its "keep these" (#1342). */
@@ -619,7 +623,8 @@ function renderResultsPool() {
     if (!sharedKeys) return;
     var text = sharedNote.querySelector('[data-shared-shortlist-text]');
     if (text) {
-      text.textContent = 'a shared shortlist (' + sharedKeys.length + ')' +
+      text.textContent = 'a shared shortlist' + (sharedName ? ', ' + sharedName : '') +
+        ' (' + sharedKeys.length + ')' +
         (sharedUnmatched.length ? '; not found: ' + sharedUnmatched.join(', ') : '');
     }
     var keep = sharedNote.querySelector('[data-shared-shortlist-keep]');
@@ -837,7 +842,7 @@ function renderResultsPool() {
     if (!addressBarLive) return;
     if (state.shortlisted) {
       FilterState.replaceQuery(sharedKeys
-        ? FilterState.shortlistQuery(arrivedSharedSlugs) : 'shortlist=1');
+        ? FilterState.shortlistQuery(arrivedSharedSlugs, sharedName) : 'shortlist=1');
       return;
     }
     FilterState.replaceQuery(FilterState.buildQuery([
@@ -1605,9 +1610,10 @@ function renderResultsPool() {
     update(true);
   });
 
-  /* Keep these (#1093): merges the shared list into this browser's shortlist
-     (addAll never un-marks anything), then shows that shortlist. The change
-     event repaints every row's toggle. */
+  /* Keep these (#1093, #1521): merges the shared list into the list of its
+     name, made if there is none (the active list for a nameless link), never
+     un-marking anything, then shows that list. The change event repaints
+     every row's toggle. */
   var sharedKeep = sharedNote && sharedNote.querySelector('[data-shared-shortlist-keep]');
   if (sharedKeep) {
     sharedKeep.addEventListener('click', function () {
@@ -1615,7 +1621,7 @@ function renderResultsPool() {
       var keys = sharedKeys;
       sharedKeys = null;
       sharedUnmatched = [];
-      HTF.shortlist.addAll(keys);
+      HTF.shortlist.keep(sharedName, keys);
       document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
         detail: { key: null, on: true, kept: keys.length }
       }));
@@ -1736,6 +1742,7 @@ function renderResultsPool() {
     restored = null;
     if (arrivedShortlist.slugs.length) {
       arrivedSharedSlugs = arrivedShortlist.slugs;
+      sharedName = HTF.shortlist.cleanName(arrivedShortlist.name);
       var resolvedShared = HTF.shortlist.resolveSlugs(arrivedShortlist.slugs,
         items.map(function (li) { return li.dataset.url || ''; }));
       sharedKeys = resolvedShared.keys;

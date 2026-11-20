@@ -1,0 +1,19 @@
+{% comment %} The list chooser (#1521), the same on both indexes: which list the
+   shortlist view shows, with new, rename and delete. Ships `hidden`; the
+   index script shows it while your own shortlist view is on, and
+   shortlist-lists.js fills and wires it. {% endcomment %}
+<div class="shortlist-lists" data-shortlist-lists hidden>
+  <label class="shortlist-lists-label" for="shortlist-lists-select">list</label>
+  <select class="shortlist-lists-select" id="shortlist-lists-select" data-shortlist-lists-select></select>
+  <span class="shortlist-lists-actions" data-shortlist-lists-actions>
+    <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="new">new</button>
+    <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="rename">rename</button>
+    <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="delete">delete</button>
+  </span>
+  <form class="shortlist-lists-form" data-shortlist-lists-form hidden>
+    <input type="text" class="shortlist-lists-name" data-shortlist-lists-name autocomplete="off">
+    <button type="submit" class="btn-shortlist-lists">save</button>
+    <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="cancel">cancel</button>
+    <span class="shortlist-lists-error" data-shortlist-lists-error role="alert" hidden></span>
+  </form>
+</div>

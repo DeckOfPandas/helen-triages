@@ -102,19 +102,23 @@
   //   ?shortlist=negroni,aviation   a shortlist someone sent, by slug
   // A slug is [a-z0-9-] and nothing else; anything outside that is dropped,
   // because a link is untrusted input. `1` alone is the own-list flag, never a
-  // slug. The last `shortlist` parameter wins.
-  // -> { own: boolean, slugs: string[] }; never both.
+  // slug. The last `shortlist` parameter wins. `&list=<name>` names a sent
+  // list (#1521); the store cleans the name before it keeps one.
+  // -> { own: boolean, slugs: string[], name: string }; never own and slugs.
   var SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
 
   function parseShortlist(search) {
     var body = String(search == null ? '' : search).replace(/^[?#]/, '');
-    var out = { own: false, slugs: [] };
+    var out = { own: false, slugs: [], name: '' };
+    var name = '';
     body.split('&').forEach(function (chunk) {
       var eq = chunk.indexOf('=');
       if (eq === -1) return;
-      if (decodeValue(chunk.slice(0, eq)) !== 'shortlist') return;
+      var key = decodeValue(chunk.slice(0, eq));
+      if (key === 'list') { name = decodeValue(chunk.slice(eq + 1)).trim(); return; }
+      if (key !== 'shortlist') return;
       var raw = chunk.slice(eq + 1);
-      out = { own: false, slugs: [] };
+      out = { own: false, slugs: [], name: '' };
       if (decodeValue(raw).trim() === '1') { out.own = true; return; }
       raw.split(',').forEach(function (rawValue) {
         var slug = decodeValue(rawValue).trim().toLowerCase();
@@ -122,19 +126,51 @@
         if (out.slugs.indexOf(slug) === -1) out.slugs.push(slug);
       });
     });
+    if (out.slugs.length) out.name = name;
     return out;
   }
 
-  // The query string parseShortlist reads back as these slugs. Slugs failing
-  // the same test are left out, so a link this writes is always one this
-  // reads. '' for an empty list.
-  function shortlistQuery(slugs) {
+  // The query string parseShortlist reads back as these slugs, and the name
+  // when there is one. Slugs failing the same test are left out, so a link
+  // this writes is always one this reads. '' for an empty list.
+  function shortlistQuery(slugs, name) {
     var kept = [];
     (Array.isArray(slugs) ? slugs : []).forEach(function (s) {
       var slug = String(s).trim().toLowerCase();
       if (SLUG_RE.test(slug) && slug !== '1' && kept.indexOf(slug) === -1) kept.push(slug);
     });
-    return kept.length ? 'shortlist=' + kept.join(',') : '';
+    if (!kept.length) return '';
+    var label = String(name == null ? '' : name).trim();
+    return 'shortlist=' + kept.join(',') +
+      (label ? '&list=' + encodeURIComponent(label) : '');
+  }
+
+  // Every list as one block to copy (#1521): a line each, "Name: link". The
+  // link carries the name, so the label in front is for the eye. `base` is
+  // the index's own address, no query.
+  function shortlistBlock(base, lists) {
+    return (Array.isArray(lists) ? lists : []).map(function (l) {
+      var query = shortlistQuery(l.slugs, l.name);
+      return query ? l.name + ': ' + base + '?' + query : '';
+    }).filter(Boolean).join('\n');
+  }
+
+  // The block read back: every line with a `shortlist=` link in it, wherever
+  // the link sits on the line and whatever is around it. A line's name is
+  // its link's `list`, else the words before the link, else ''.
+  // -> [{ name, slugs }], in block order, lists with no good slug left out.
+  function parseShortlistBlock(text) {
+    var out = [];
+    String(text == null ? '' : text).split(/\r?\n/).forEach(function (line) {
+      var at = line.search(/\S*\?\S*shortlist=/);
+      if (at === -1) return;
+      var link = line.slice(at).split(/\s/)[0];
+      var parsed = parseShortlist(link.slice(link.indexOf('?')));
+      if (!parsed.slugs.length) return;
+      var label = line.slice(0, at).replace(/[\s:\u2013\u2014-]+$/, '').trim();
+      out.push({ name: parsed.name || label, slugs: parsed.slugs });
+    });
+    return out;
   }
 
   // The address bar's query, so a copied link or a reload shows the same list
@@ -469,6 +505,8 @@
     parseShip: parseShip,
     parseShortlist: parseShortlist,
     shortlistQuery: shortlistQuery,
+    shortlistBlock: shortlistBlock,
+    parseShortlistBlock: parseShortlistBlock,
     buildQuery: buildQuery,
     replaceQuery: replaceQuery,
     isFamilyValue: isFamilyValue,

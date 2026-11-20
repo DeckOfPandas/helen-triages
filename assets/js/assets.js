@@ -193,206 +193,220 @@ window.HTF = window.HTF || {};
     }
   };
 
-  // --- The shortlist ---------------------------------------------------------
-  // Recipes and drinks marked to come back to, held in this browser only (#546).
-  // - localStorage, not sessionStorage: the list must outlive the tab.
-  // - One store per site, keyed by HTF.site: both sites share one origin.
+  // --- The shortlists: named lists, in this browser only. MANUAL §8.9 -------
+  // - One localStorage record per site, keyed by HTF.site: both sites share
+  //   one origin. Every list, with its counts and ticks, is in that record.
   // - An entry is a collection URL (`page.url` in Liquid, NOT `relative_url`):
   //   a baseurl prefix would empty every stored list the day baseurl changed.
-  // - The in-memory copy is the source of truth, not a cache: when setItem
-  //   throws, the list still works until the page closes.
+  // - The in-memory copy is the source of truth: when setItem throws, the
+  //   lists still work until the page closes. Calls without a list id act on
+  //   the ACTIVE list, the one the index shows; there is always one.
   var shortlist = (function () {
-    var KEY_PREFIX = 'htf-shortlist-';
-    var GLASSES_PREFIX = 'htf-shortlist-glasses-';
-    var PORTIONS_PREFIX = 'htf-shortlist-portions-';
-    var VERSION = '-v1';
-    var entries = null;   // the in-memory copy; null until first read
-    var counts = null;    // url -> glasses, for the entries that are not 1
-    var servings = null;  // url -> portions, for the entries that have been set
-
-    function storageKey() {
-      return HTF.site ? KEY_PREFIX + HTF.site + VERSION : '';
-    }
-
-    function glassesKey() {
-      return HTF.site ? GLASSES_PREFIX + HTF.site + VERSION : '';
-    }
-
-    /* Stored state is untrusted input: hand-edited, left by an older build,
-       or not an array. Anything that is not a list of strings reads as an
-       empty shortlist, never a half-read one. */
-    function read() {
-      if (entries) return entries;
-      entries = [];
-      var key = storageKey();
-      if (!key) return entries;
-      try {
-        var raw = JSON.parse(localStorage.getItem(key));
-        if (Array.isArray(raw)) {
-          raw.forEach(function (v) {
-            if (typeof v === 'string' && v && entries.indexOf(v) === -1) entries.push(v);
-          });
-        }
-      } catch (e) { /* an empty shortlist, and the page works */ }
-      return entries;
-    }
-
-    function write() {
-      var key = storageKey();
-      if (!key) return;
-      try {
-        localStorage.setItem(key, JSON.stringify(entries));
-      } catch (e) { /* this visit still has it; tomorrow will not */ }
-    }
-
-    /* The glasses map: untrusted input like the list above. Only whole numbers
-       above one are kept, because a missing entry already means one glass. */
-    function readGlasses() {
-      if (counts) return counts;
-      counts = {};
-      var key = glassesKey();
-      if (!key) return counts;
-      try {
-        var raw = JSON.parse(localStorage.getItem(key));
-        if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-          Object.keys(raw).forEach(function (url) {
-            var n = raw[url];
-            if (typeof n === 'number' && isFinite(n) && n > 1) counts[url] = Math.min(MAX_COUNT, Math.floor(n));
-          });
-        }
-      } catch (e) { /* everything is one glass, and the page works */ }
-      return counts;
-    }
-
-    function writeGlasses() {
-      var key = glassesKey();
-      if (!key) return;
-      try {
-        localStorage.setItem(key, JSON.stringify(counts));
-      } catch (e) { /* this visit still has it; tomorrow will not */ }
-    }
-
-    /* --- How many portions (#801) ------------------------------------------
-       A key of its own, not the glasses map: a missing glasses entry is one
-       glass, a missing portions entry is "however many this recipe makes",
-       which only the build knows. So `1` is a real, storable answer here.
-       `-v2` because `-v1` values include batch counts that cannot be told
-       from portion counts; a version bump discards them, never reinterprets. */
-    function portionsKey() {
-      return HTF.site ? PORTIONS_PREFIX + HTF.site + '-v2' : '';
-    }
-
-    function readPortions() {
-      if (servings) return servings;
-      servings = {};
-      var key = portionsKey();
-      if (!key) return servings;
-      try {
-        var raw = JSON.parse(localStorage.getItem(key));
-        if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-          Object.keys(raw).forEach(function (url) {
-            var n = raw[url];
-            if (typeof n === 'number' && isFinite(n) && n > 0) {
-              servings[url] = Math.min(MAX_COUNT, Math.floor(n));
-            }
-          });
-        }
-      } catch (e) { /* every recipe as written, and the page works */ }
-      return servings;
-    }
-
-    function writePortions() {
-      var key = portionsKey();
-      if (!key) return;
-      try {
-        localStorage.setItem(key, JSON.stringify(servings));
-      } catch (e) { /* this visit still has it; tomorrow will not */ }
-    }
-
-    /* --- How many batches (#1297) ------------------------------------------
-       A key of its own, not the portions map: a `makes:` recipe counts
-       BATCHES and a `serves:` recipe counts people, and a stored `6` cannot
-       say which it is. A half is storable and nothing else below one; whether
-       THIS recipe may have a half (page.half_recipe) is the caller's question.
-       A missing entry is one batch. */
-    var BATCHES_PREFIX = 'htf-shortlist-batches-';
-
+    var RECORD_PREFIX = 'htf-shortlists-';
+    var DEFAULT_NAME = 'Shortlist';
+    var NAME_MAX = 40;
     // The most of anything a list holds: glasses, portions or batches. Equal
     // to the `max` the shopping list's boxes declare. A box's `max` is not
     // enforced on typing, and an uncapped count prints "6.2e+28 kg".
     var MAX_COUNT = 99;
-    var batchCounts = null;
+    var state = null;   // { active: id, lists: [list] }; null until first read
 
-    function batchesKey() {
-      return HTF.site ? BATCHES_PREFIX + HTF.site + '-v1' : '';
+    function recordKey() {
+      return HTF.site ? RECORD_PREFIX + HTF.site + '-v1' : '';
     }
 
-    function wholeOrHalf(n) {
+    /* The one-list keys this record replaced. Read only when the record is
+       absent, so a reader's list from before #1521 becomes "Shortlist". */
+    function legacyKey(kind) {
+      var versions = { '': '-v1', 'glasses-': '-v1', 'portions-': '-v2',
+        'batches-': '-v1', 'ticked-': '-v1' };
+      return 'htf-shortlist-' + kind + HTF.site + versions[kind];
+    }
+
+    function getJSON(key) {
+      try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return undefined; }
+    }
+
+    // --- Stored state is untrusted input -----------------------------------
+    // Hand-edited, left by an older build, or the wrong shape. Each part is
+    // read on its own, so one bad part costs only itself.
+
+    function stringList(raw) {
+      var out = [];
+      if (!Array.isArray(raw)) return out;
+      raw.forEach(function (v) {
+        if (typeof v === 'string' && v && out.indexOf(v) === -1) out.push(v);
+      });
+      return out;
+    }
+
+    function countMap(raw, keep) {
+      var out = {};
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+      Object.keys(raw).forEach(function (url) {
+        var n = typeof raw[url] === 'number' && isFinite(raw[url]) ? keep(raw[url]) : null;
+        if (n !== null) out[url] = n;
+      });
+      return out;
+    }
+
+    /* A missing glasses entry is one glass, so only counts above one are kept. */
+    function glassesValue(n) {
+      var value = Math.min(MAX_COUNT, Math.floor(Number(n)));
+      return isFinite(value) && value > 1 ? value : null;
+    }
+
+    /* A missing portions entry is "however many this recipe makes", which only
+       the build knows, so `1` is a real answer (#801). */
+    function portionsValue(n) {
+      var value = Math.min(MAX_COUNT, Math.floor(Number(n)));
+      return isFinite(value) && value >= 1 ? value : null;
+    }
+
+    /* A `makes:` recipe counts batches (#1297): the nearest whole number, or a
+       half below three quarters. Whether THIS recipe may have a half is the
+       caller's question. */
+    function batchesValue(n) {
       var value = Number(n);
-      if (!isFinite(value) || value <= 0) return null;
+      if (n === null || n === '' || !isFinite(value) || value <= 0) return null;
       if (value < 0.75) return 0.5;
       return Math.min(MAX_COUNT, Math.max(1, Math.round(value)));
     }
 
-    function readBatches() {
-      if (batchCounts) return batchCounts;
-      batchCounts = {};
-      var key = batchesKey();
-      if (!key) return batchCounts;
-      try {
-        var raw = JSON.parse(localStorage.getItem(key));
-        if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-          Object.keys(raw).forEach(function (url) {
-            var n = typeof raw[url] === 'number' ? wholeOrHalf(raw[url]) : null;
-            if (n !== null) batchCounts[url] = n;
-          });
-        }
-      } catch (e) { /* every recipe at one batch, and the page works */ }
-      return batchCounts;
+    /* A list's name: one line, no control characters, at most NAME_MAX long.
+       '' when nothing is left. Names are unique, ignoring case. */
+    function cleanName(raw) {
+      return String(raw == null ? '' : raw)
+        .replace(/[\u0000-\u001f\u007f\s]+/g, ' ')
+        .trim().slice(0, NAME_MAX).trim();
     }
 
-    function writeBatches() {
-      var key = batchesKey();
+    function blankList(id, name) {
+      return { id: id, name: name, entries: [], glasses: {}, portions: {},
+        batches: {}, ticked: [] };
+    }
+
+    function fillList(list, raw) {
+      list.entries = stringList(raw.entries);
+      list.glasses = countMap(raw.glasses, glassesValue);
+      list.portions = countMap(raw.portions, portionsValue);
+      list.batches = countMap(raw.batches, batchesValue);
+      list.ticked = stringList(raw.ticked);
+      return list;
+    }
+
+    function fromLegacy() {
+      return fillList(blankList('l1', DEFAULT_NAME), {
+        entries: getJSON(legacyKey('')),
+        glasses: getJSON(legacyKey('glasses-')),
+        portions: getJSON(legacyKey('portions-')),
+        batches: getJSON(legacyKey('batches-')),
+        ticked: getJSON(legacyKey('ticked-'))
+      });
+    }
+
+    function nextId(lists) {
+      var most = 0;
+      lists.forEach(function (l) {
+        var n = Number(l.id.slice(1));
+        if (n > most) most = n;
+      });
+      return 'l' + (most + 1);
+    }
+
+    function named(lists, name, exceptId) {
+      var folded = name.toLowerCase();
+      for (var i = 0; i < lists.length; i += 1) {
+        if (lists[i].id !== exceptId && lists[i].name.toLowerCase() === folded) return lists[i];
+      }
+      return null;
+    }
+
+    function fromRecord(raw) {
+      var lists = [];
+      var rawLists = raw && typeof raw === 'object' && Array.isArray(raw.lists) ? raw.lists : [];
+      rawLists.forEach(function (item) {
+        if (!item || typeof item !== 'object') return;
+        var name = cleanName(typeof item.name === 'string' ? item.name : '');
+        if (!name || named(lists, name)) return;
+        var taken = lists.some(function (l) { return l.id === item.id; });
+        var id = typeof item.id === 'string' && /^l[0-9]+$/.test(item.id) && !taken
+          ? item.id : nextId(lists);
+        lists.push(fillList(blankList(id, name), item));
+      });
+      if (!lists.length) lists.push(blankList('l1', DEFAULT_NAME));
+      var active = lists.some(function (l) { return l.id === raw.active; })
+        ? raw.active : lists[0].id;
+      return { active: active, lists: lists };
+    }
+
+    function read() {
+      if (state) return state;
+      var key = recordKey();
+      var text = null;
+      if (key) {
+        try { text = localStorage.getItem(key); } catch (e) { text = null; }
+      }
+      if (text === null || text === undefined) {
+        state = key ? { active: 'l1', lists: [fromLegacy()] }
+          : { active: 'l1', lists: [blankList('l1', DEFAULT_NAME)] };
+      } else {
+        var raw;
+        try { raw = JSON.parse(text); } catch (e) { raw = null; }
+        state = fromRecord(raw || {});
+      }
+      return state;
+    }
+
+    function write() {
+      var key = recordKey();
       if (!key) return;
       try {
-        localStorage.setItem(key, JSON.stringify(batchCounts));
+        localStorage.setItem(key, JSON.stringify(state));
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
-    /* --- What is already in the basket (#1457) ----------------------------
-       One list of shopping-list row keys, as each list's build() returns them:
-       folded names, so a row keeps its tick when "lemon" becomes "lemons" or
-       its amount changes. Kept until "untick all", not pruned to the rows on
-       show: the list is redrawn with no rows at all while it is hidden. */
-    var TICKED_PREFIX = 'htf-shortlist-ticked-';
-    var tickedRows = null;
-
-    function tickedKey() {
-      return HTF.site ? TICKED_PREFIX + HTF.site + '-v1' : '';
+    function find(id) {
+      var lists = read().lists;
+      for (var i = 0; i < lists.length; i += 1) if (lists[i].id === id) return lists[i];
+      return null;
     }
 
-    function readTicked() {
-      if (tickedRows) return tickedRows;
-      tickedRows = [];
-      var key = tickedKey();
-      if (!key) return tickedRows;
-      try {
-        var raw = JSON.parse(localStorage.getItem(key));
-        if (Array.isArray(raw)) {
-          raw.forEach(function (v) {
-            if (typeof v === 'string' && v && tickedRows.indexOf(v) === -1) tickedRows.push(v);
-          });
-        }
-      } catch (e) { /* nothing ticked, and the page works */ }
-      return tickedRows;
+    function active() {
+      return find(read().active) || read().lists[0];
     }
 
-    function writeTicked() {
-      var key = tickedKey();
-      if (!key) return;
-      try {
-        localStorage.setItem(key, JSON.stringify(tickedRows));
-      } catch (e) { /* this visit still has it; tomorrow will not */ }
+    function toggleIn(id, url) {
+      var list = find(id);
+      if (!list || !url) return false;
+      var at = list.entries.indexOf(url);
+      if (at === -1) list.entries.push(url); else list.entries.splice(at, 1);
+      write();
+      return at === -1;
+    }
+
+    /* Add every one of these to one list and persist once. A merge: what is
+       already on it keeps its place. -> how many were not already on it. */
+    function addInto(list, urls) {
+      var added = 0;
+      (Array.isArray(urls) ? urls : []).forEach(function (url) {
+        if (typeof url !== 'string' || !url) return;
+        if (list.entries.indexOf(url) === -1) { list.entries.push(url); added += 1; }
+      });
+      if (added) write();
+      return added;
+    }
+
+    /* The list a kept or restored list goes into: the one of that name, or a
+       new one. A nameless link goes into the active list (#1093). */
+    function listFor(name) {
+      var clean = cleanName(name);
+      if (!clean) return active();
+      var found = named(read().lists, clean);
+      if (found) return found;
+      var list = blankList(nextId(read().lists), clean);
+      read().lists.push(list);
+      return list;
     }
 
     /* A key's slug: the last non-empty path segment, lowercased.
@@ -407,64 +421,147 @@ window.HTF = window.HTF || {};
       return '';
     }
 
-    function keysBySlug(liveKeys) {
+    function resolveSlugs(slugs, liveKeys) {
       var bySlug = {};
       (Array.isArray(liveKeys) ? liveKeys : []).forEach(function (key) {
         if (typeof key !== 'string') return;
         var slug = slugOf(key);
         // First one wins.
-        if (slug && !Object.prototype.hasOwnProperty.call(bySlug, slug)) {
-          bySlug[slug] = key;
+        if (slug && !Object.prototype.hasOwnProperty.call(bySlug, slug)) bySlug[slug] = key;
+      });
+      var out = { keys: [], unmatched: [] };
+      (Array.isArray(slugs) ? slugs : []).forEach(function (raw) {
+        if (typeof raw !== 'string') return;
+        var slug = raw.trim().toLowerCase();
+        if (!slug) return;
+        if (Object.prototype.hasOwnProperty.call(bySlug, slug)) {
+          if (out.keys.indexOf(bySlug[slug]) === -1) out.keys.push(bySlug[slug]);
+        } else if (out.unmatched.indexOf(slug) === -1) {
+          out.unmatched.push(slug);
         }
       });
-      return bySlug;
+      return out;
     }
 
     return {
-      /** @returns {string[]} the entries, oldest first. A copy — callers sort. */
-      list: function () { return read().slice(); },
+      DEFAULT_NAME: DEFAULT_NAME,
+      NAME_MAX: NAME_MAX,
+      cleanName: cleanName,
 
-      /** @param {string} url @returns {boolean} */
-      has: function (url) { return read().indexOf(url) !== -1; },
+      // --- The lists themselves (#1521) -----------------------------------
 
-      /** @returns {number} */
-      count: function () { return read().length; },
-
-      /**
-       * Flip one entry and persist.
-       * @returns {boolean} true if it is now shortlisted
-       */
-      toggle: function (url) {
-        if (!url) return false;
-        var all = read();
-        var at = all.indexOf(url);
-        if (at === -1) all.push(url); else all.splice(at, 1);
-        write();
-        return at === -1;
+      /** @returns {{id:string, name:string, count:number}[]} in the order made */
+      lists: function () {
+        return read().lists.map(function (l) {
+          return { id: l.id, name: l.name, count: l.entries.length };
+        });
       },
 
-      /** Empty it — the marks, all three count maps and the ticks together.
-          No page control calls it (#1100); the store's tests do. */
-      clear: function () {
-        tickedRows = [];
-        writeTicked();
-        entries = [];
+      /** @returns {string} the id of the list the index shows */
+      activeId: function () { return active().id; },
+
+      /** @returns {string} its name */
+      activeName: function () { return active().name; },
+
+      /** @returns {boolean} false for an id that names no list */
+      setActive: function (id) {
+        if (!find(id)) return false;
+        read().active = id;
         write();
-        counts = {};
-        writeGlasses();
-        servings = {};
-        writePortions();
-        batchCounts = {};
-        writeBatches();
+        return true;
+      },
+
+      /**
+       * Whether a name is free to use. Clean it first.
+       * @param {string} [exceptId] - the list being renamed, which may keep its own
+       */
+      nameFree: function (name, exceptId) {
+        var clean = cleanName(name);
+        return !!clean && !named(read().lists, clean, exceptId);
+      },
+
+      /** @returns {string|null} the new list's id; null for an empty or taken name */
+      create: function (name) {
+        var clean = cleanName(name);
+        if (!clean || named(read().lists, clean)) return null;
+        var list = blankList(nextId(read().lists), clean);
+        read().lists.push(list);
+        write();
+        return list.id;
+      },
+
+      /** @returns {boolean} false for no such list, or an empty or taken name */
+      rename: function (id, name) {
+        var list = find(id);
+        var clean = cleanName(name);
+        if (!list || !clean || named(read().lists, clean, id)) return false;
+        list.name = clean;
+        write();
+        return true;
+      },
+
+      /** Delete a list. The last one goes too, and an empty "Shortlist" takes
+          its place. The active list moves to the first. @returns {boolean} */
+      remove: function (id) {
+        var s = read();
+        var at = -1;
+        s.lists.forEach(function (l, i) { if (l.id === id) at = i; });
+        if (at === -1) return false;
+        s.lists.splice(at, 1);
+        if (!s.lists.length) s.lists.push(blankList(nextId([{ id: id }]), DEFAULT_NAME));
+        if (!find(s.active)) s.active = s.lists[0].id;
+        write();
+        return true;
+      },
+
+      /** @returns {boolean} */
+      hasIn: function (id, url) {
+        var list = find(id);
+        return !!list && list.entries.indexOf(url) !== -1;
+      },
+
+      /** Flip one entry in one list. @returns {boolean} true if it is now on it */
+      toggleIn: toggleIn,
+
+      /** @returns {boolean} whether any list holds it: what a + mark shows */
+      inAny: function (url) {
+        return read().lists.some(function (l) { return l.entries.indexOf(url) !== -1; });
+      },
+
+      /** Every list with something on it, for the export block.
+          @returns {{name:string, keys:string[]}[]} */
+      exportLists: function () {
+        return read().lists.filter(function (l) { return l.entries.length; })
+          .map(function (l) { return { name: l.name, keys: l.entries.slice() }; });
+      },
+
+      // --- The active list --------------------------------------------------
+
+      /** @returns {string[]} the entries, oldest first. A copy — callers sort. */
+      list: function () { return active().entries.slice(); },
+
+      /** @param {string} url @returns {boolean} */
+      has: function (url) { return active().entries.indexOf(url) !== -1; },
+
+      /** @returns {number} */
+      count: function () { return active().entries.length; },
+
+      /** Flip one entry and persist. @returns {boolean} true if it is now on it */
+      toggle: function (url) { return toggleIn(active().id, url); },
+
+      /** Empty the active list: the marks, the counts and the ticks together.
+          No page control calls it; the store's tests do. */
+      clear: function () {
+        var list = active();
+        fillList(list, {});
+        write();
       },
 
       /* --- How many glasses of each (#546) ----------------------------------
-         A second key, not a richer entry: an array of `{url, glasses}` would
-         change the shape of every list already stored. A missing entry is one
-         glass, so setting a count back to 1 removes it, and a number left
-         behind by a dropped drink is read by nothing. */
+         A missing entry is one glass, so setting a count back to 1 removes
+         it, and a number left behind by a dropped drink is read by nothing. */
       glasses: function (url) {
-        var n = readGlasses()[url];
+        var n = active().glasses[url];
         return typeof n === 'number' && n > 0 ? n : 1;
       },
 
@@ -474,12 +571,11 @@ window.HTF = window.HTF || {};
        */
       setGlasses: function (url, n) {
         if (!url) return 1;
-        var all = readGlasses();
-        var value = Math.min(MAX_COUNT, Math.floor(Number(n)));
-        if (!isFinite(value) || value <= 1) delete all[url];
-        else all[url] = value;
-        writeGlasses();
-        return value > 1 ? value : 1;
+        var value = glassesValue(n);
+        if (value === null) delete active().glasses[url];
+        else active().glasses[url] = value;
+        write();
+        return value === null ? 1 : value;
       },
 
       /**
@@ -488,7 +584,7 @@ window.HTF = window.HTF || {};
        *          substitutes the recipe's own portion count
        */
       portions: function (url) {
-        var n = readPortions()[url];
+        var n = active().portions[url];
         return typeof n === 'number' && n > 0 ? n : null;
       },
 
@@ -498,15 +594,10 @@ window.HTF = window.HTF || {};
        */
       setPortions: function (url, n) {
         if (!url) return null;
-        var all = readPortions();
-        var value = Math.min(MAX_COUNT, Math.floor(Number(n)));
-        if (!isFinite(value) || value < 1) {
-          delete all[url];
-          writePortions();
-          return null;
-        }
-        all[url] = value;
-        writePortions();
+        var value = n === null || n === undefined ? null : portionsValue(n);
+        if (value === null) delete active().portions[url];
+        else active().portions[url] = value;
+        write();
         return value;
       },
 
@@ -516,7 +607,7 @@ window.HTF = window.HTF || {};
        *          said, which is one batch
        */
       batches: function (url) {
-        var n = readBatches()[url];
+        var n = active().batches[url];
         return typeof n === 'number' && n > 0 ? n : null;
       },
 
@@ -527,20 +618,20 @@ window.HTF = window.HTF || {};
        */
       setBatches: function (url, n) {
         if (!url) return null;
-        var all = readBatches();
-        var value = wholeOrHalf(n);
-        if (value === null) {
-          delete all[url];
-          writeBatches();
-          return null;
-        }
-        all[url] = value;
-        writeBatches();
+        var value = batchesValue(n);
+        if (value === null) delete active().batches[url];
+        else active().batches[url] = value;
+        write();
         return value;
       },
 
+      /* --- What is already in the basket (#1457) ----------------------------
+         Shopping-list row keys, as each list's build() returns them: folded
+         names, so a row keeps its tick when "lemon" becomes "lemons". Kept
+         until "untick all", not pruned to the rows on show. */
+
       /** @param {string} rowKey - a shopping-list row's `key` @returns {boolean} */
-      ticked: function (rowKey) { return readTicked().indexOf(rowKey) !== -1; },
+      ticked: function (rowKey) { return active().ticked.indexOf(rowKey) !== -1; },
 
       /**
        * @param {string} rowKey - a shopping-list row's `key`
@@ -549,11 +640,11 @@ window.HTF = window.HTF || {};
        */
       setTicked: function (rowKey, on) {
         if (typeof rowKey !== 'string' || !rowKey) return false;
-        var all = readTicked();
+        var all = active().ticked;
         var at = all.indexOf(rowKey);
         if (on && at === -1) all.push(rowKey);
         if (!on && at !== -1) all.splice(at, 1);
-        writeTicked();
+        write();
         return !!on;
       },
 
@@ -563,26 +654,27 @@ window.HTF = window.HTF || {};
        * @returns {number} how many were ticked
        */
       untick: function (rowKeys) {
-        var all = readTicked();
+        var all = active().ticked;
         var dropped = 0;
         (Array.isArray(rowKeys) ? rowKeys : []).forEach(function (rowKey) {
           var at = all.indexOf(rowKey);
           if (at !== -1) { all.splice(at, 1); dropped += 1; }
         });
-        if (dropped) writeTicked();
+        if (dropped) write();
         return dropped;
       },
 
       /** Every tick, shown or not: the list starts afresh for the next shop. */
       untickAll: function () {
-        tickedRows = [];
-        writeTicked();
+        active().ticked = [];
+        write();
       },
 
       /* --- A shortlist someone sent (#1093) ---------------------------------
-         `?shortlist=aviation,negroni` names drinks by slug: the folders
-         around a key move and the last segment does not. slugOf() is the one
-         spelling of "a key's slug", so a link this site writes resolves here. */
+         `?shortlist=aviation,negroni&list=Friday` names drinks by slug: the
+         folders around a key move and the last segment does not. slugOf() is
+         the one spelling of "a key's slug", so a link this site writes
+         resolves here. */
       slugOf: slugOf,
 
       /**
@@ -593,43 +685,51 @@ window.HTF = window.HTF || {};
        * @returns {{keys:string[], unmatched:string[]}} `keys` in link order,
        *          once each; `unmatched` the slugs nothing on the page answers to
        */
-      resolveSlugs: function (slugs, liveKeys) {
-        var bySlug = keysBySlug(liveKeys);
-        var out = { keys: [], unmatched: [] };
-        (Array.isArray(slugs) ? slugs : []).forEach(function (raw) {
-          if (typeof raw !== 'string') return;
-          var slug = raw.trim().toLowerCase();
-          if (!slug) return;
-          if (Object.prototype.hasOwnProperty.call(bySlug, slug)) {
-            if (out.keys.indexOf(bySlug[slug]) === -1) out.keys.push(bySlug[slug]);
-          } else if (out.unmatched.indexOf(slug) === -1) {
-            out.unmatched.push(slug);
-          }
-        });
-        return out;
+      resolveSlugs: resolveSlugs,
+
+      /** Merge these into the active list and persist once.
+          @returns {number} how many were not already on it */
+      addAll: function (urls) { return addInto(active(), urls); },
+
+      /**
+       * The shared view's "keep these": into the list of that name, made if
+       * there is none, or the active list for a nameless link. That list
+       * becomes the active one.
+       * @returns {{id:string, added:number}}
+       */
+      keep: function (name, urls) {
+        var list = listFor(name);
+        var added = addInto(list, urls);
+        read().active = list.id;
+        write();
+        return { id: list.id, added: added };
       },
 
       /**
-       * Mark every one of these and persist once: the shared view's "keep
-       * these" (#1093). A merge: what is already marked keeps its place.
-       * @returns {number} how many were not already marked
+       * A pasted export block, put back: each list into the one of its name,
+       * made if there is none. The active list stays as it is.
+       * @param {{name:string, slugs:string[]}[]} blocks - parseShortlistBlock's
+       * @param {string[]} liveKeys - every `data-shortlist-key` on the page
+       * @returns {{lists:number, added:number, unmatched:string[]}}
        */
-      addAll: function (urls) {
-        var all = read();
-        var added = 0;
-        (Array.isArray(urls) ? urls : []).forEach(function (url) {
-          if (typeof url !== 'string' || !url) return;
-          if (all.indexOf(url) === -1) { all.push(url); added += 1; }
+      restore: function (blocks, liveKeys) {
+        var out = { lists: 0, added: 0, unmatched: [] };
+        (Array.isArray(blocks) ? blocks : []).forEach(function (block) {
+          var resolved = resolveSlugs(block.slugs, liveKeys);
+          resolved.unmatched.forEach(function (slug) {
+            if (out.unmatched.indexOf(slug) === -1) out.unmatched.push(slug);
+          });
+          if (!resolved.keys.length) return;
+          out.added += addInto(listFor(block.name || DEFAULT_NAME), resolved.keys);
+          out.lists += 1;
         });
-        if (added) write();
-        return added;
+        write();
+        return out;
       },
 
-      /* For tests only: drops the cached reads so a test can stage a second
+      /* For tests only: drops the cached read so a test can stage a second
          scenario in the same page. */
-      _forget: function () {
-        entries = null; counts = null; servings = null; batchCounts = null; tickedRows = null;
-      }
+      _forget: function () { state = null; }
     };
   })();
 
