@@ -1,8 +1,7 @@
 {% comment %} The shortlist picker (#1521): what any `.btn-shortlist` opens.
    A <template>, so it renders nothing until shortlist.js clones it once and
-   fills the list rows. The × is the ingredient hint's (_sass/food/_ingredient-hints.scss). "see all" opens the index's shortlist view, as "see
-   shortlist" does (_includes/page-actions.html). {% endcomment %}
-{%- assign picker_site = site.data.sites[page.site_key] -%}
+   fills the list rows. The × is the ingredient hint's
+   (_sass/food/_ingredient-hints.scss). {% endcomment %}
 <template id="shortlist-picker-template">
   <div class="shortlist-picker" role="dialog">
     <button type="button" class="shortlist-picker-close" aria-label="close">&times;</button>
@@ -16,7 +15,5 @@
       </span>
     </form>
     <p class="shortlist-picker-error" role="alert" hidden></p>
-    <hr class="shortlist-picker-rule">
-    <a class="shortlist-picker-see-all" href="{{ picker_site.home | relative_url }}?shortlist=1#results">see all</a>
   </div>
 </template>

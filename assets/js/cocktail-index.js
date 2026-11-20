@@ -1376,6 +1376,8 @@
      `parseQuery`: `shortlisted` is a view, not a field a URL may set. */
   var arrivedShortlist = HTF.filterState.parseShortlist(location.search);
   if (arrivedShortlist.own || arrivedShortlist.slugs.length) {
+    // `?shortlist=all` (#1521): SEE ALL is the list on show.
+    if (arrivedShortlist.all) HTF.shortlist.setActive(HTF.shortlist.ALL);
     state = FilterState.enterShortlistView();
     resetControls();
     if (arrivedShortlist.slugs.length) {

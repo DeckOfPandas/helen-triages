@@ -32,17 +32,27 @@
     }));
   }
 
-  /* The options, each "name (N)", and the active one chosen. */
+  function option(value, text, chosen) {
+    var node = document.createElement('option');
+    node.value = value;
+    node.textContent = text;
+    node.selected = chosen;
+    select.appendChild(node);
+  }
+
+  /* The options, each "name (N)", then a rule and SEE ALL (N), every recipe
+     on any list once, and the active one chosen. A browser that draws no
+     <hr> in a <select> leaves the rule out. Rename and delete have no list
+     to act on in SEE ALL, so they hide. */
   function paint() {
     var active = store.activeId();
     select.textContent = '';
     store.lists().forEach(function (list) {
-      var option = document.createElement('option');
-      option.value = list.id;
-      option.textContent = list.name + ' (' + list.count + ')';
-      option.selected = list.id === active;
-      select.appendChild(option);
+      option(list.id, list.name + ' (' + list.count + ')', list.id === active);
     });
+    select.appendChild(document.createElement('hr'));
+    option(store.ALL, 'SEE ALL (' + store.total() + ')', active === store.ALL);
+    actions.hidden = !!mode || active === store.ALL;
   }
 
   function openForm(which) {
@@ -60,7 +70,7 @@
   function closeForm() {
     mode = null;
     form.hidden = true;
-    actions.hidden = false;
+    actions.hidden = store.activeId() === store.ALL;
     newRow.hidden = false;
   }
 
@@ -111,5 +121,8 @@
 
   input.maxLength = store.NAME_MAX;
   paint();
+  /* Again once the index has read its address: `?shortlist=all` sets SEE ALL
+     in a DOMContentLoaded handler registered before this one. */
+  document.addEventListener('DOMContentLoaded', paint);
   document.addEventListener('htf:shortlist-change', paint);
 })();

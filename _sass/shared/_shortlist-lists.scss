@@ -99,9 +99,8 @@
 // The list the recipe is on reads in the site's colour.
 .shortlist-picker-list input:checked + .shortlist-list-name { color: var(--shortlist-on); }
 
-// "+ new list" and "see all": rows in the actions' caps, quiet until hovered.
-.shortlist-picker-new,
-.shortlist-picker-see-all {
+// "+ new list": a row in the actions' caps, quiet until hovered.
+.shortlist-picker-new {
   display: flex;
   align-items: center;
   gap: $space-md;
@@ -138,12 +137,6 @@
 .shortlist-picker-form-buttons {
   display: flex;
   gap: $space-sm;
-}
-
-.shortlist-picker-rule {
-  margin: $space-sm $space-lg;
-  border: 0;
-  border-top: 1px solid $color-border;
 }
 
 .shortlist-picker-name,
@@ -191,12 +184,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: $space-sm;
-}
-
-.shortlist-lists-label {
-  font-family: $font-label;
-  font-size: 0.85rem;
-  color: $color-clear-text;
 }
 
 .shortlist-lists-select { max-width: 100%; }

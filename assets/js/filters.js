@@ -1733,6 +1733,8 @@ function renderResultsPool() {
      link (`sharedKeys`); resolveSlugs writes nothing. */
   var arrivedShortlist = FilterState.parseShortlist(location.search);
   if (arrivedShortlist.own || arrivedShortlist.slugs.length) {
+    // `?shortlist=all` (#1521): SEE ALL is the list on show.
+    if (arrivedShortlist.all) HTF.shortlist.setActive(HTF.shortlist.ALL);
     state = FilterState.enterShortlistView();
     resetFilterControls();
     restored = null;

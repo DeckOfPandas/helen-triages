@@ -1,13 +1,12 @@
 {% comment %} The list chooser (#1521), the same on both indexes: which list the
-   shortlist view shows, rename and delete beside it, and "+ new list" on the
-   row under it. New and rename open the one name form, which takes the place
+   shortlist view shows, SEE ALL last under a rule, rename and delete beside
+   it, and "+ new list" on the row under it. No visible label (Helen). New and rename open the one name form, which takes the place
    of the controls it came from. Ships `hidden`; the index script shows it
    while your own shortlist view is on, and shortlist-lists.js wires it. The
    icons are _includes/icons/. {% endcomment %}
 <div class="shortlist-lists" data-shortlist-lists hidden>
   <div class="shortlist-lists-row">
-    <label class="shortlist-lists-label" for="shortlist-lists-select">choose shortlist</label>
-    <select class="shortlist-lists-select" id="shortlist-lists-select" data-shortlist-lists-select></select>
+    <select class="shortlist-lists-select" id="shortlist-lists-select" aria-label="choose shortlist" data-shortlist-lists-select></select>
     <span class="shortlist-lists-actions" data-shortlist-lists-actions>
       <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="rename">{% include icons/pencil.svg %}<span>rename</span></button>
       <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="delete">{% include icons/bin.svg %}<span>delete</span></button>

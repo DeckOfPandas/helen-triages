@@ -142,18 +142,18 @@ test('parseName does not leak into parseQuery', () => {
 // parsed, never substring-matched.
 
 test('parseShortlist: ?shortlist=1 is the own list, with no slugs', () => {
-  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1'), { own: true, slugs: [], name: '' });
-  assert.deepStrictEqual(FS.parseShortlist('?mood=sharp&shortlist=1'), { own: true, slugs: [], name: '' });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1'), { own: true, all: false, slugs: [], name: '' });
+  assert.deepStrictEqual(FS.parseShortlist('?mood=sharp&shortlist=1'), { own: true, all: false, slugs: [], name: '' });
 });
 
 test('parseShortlist: a list of slugs is a sent list, in link order, once each', () => {
   assert.deepStrictEqual(FS.parseShortlist('?shortlist=negroni,aviation,negroni'),
-    { own: false, slugs: ['negroni', 'aviation'], name: '' });
+    { own: false, all: false, slugs: ['negroni', 'aviation'], name: '' });
 });
 
 test('parseShortlist: a slug beginning with 1 is a slug, not the own-list flag', () => {
   assert.deepStrictEqual(FS.parseShortlist('?shortlist=10-minute-dal'),
-    { own: false, slugs: ['10-minute-dal'], name: '' });
+    { own: false, all: false, slugs: ['10-minute-dal'], name: '' });
 });
 
 test('parseShortlist: anything that is not [a-z0-9-] is dropped, not matched', () => {
@@ -161,11 +161,11 @@ test('parseShortlist: anything that is not [a-z0-9-] is dropped, not matched', (
   // Jekyll-written URL segment, which carries no other character.
   assert.deepStrictEqual(
     FS.parseShortlist('?shortlist=Dal,%3Cscript%3E,../x,,-lead,moules%20mariniere'),
-    { own: false, slugs: ['dal'], name: '' });
+    { own: false, all: false, slugs: ['dal'], name: '' });
 });
 
 test('parseShortlist: nothing, an empty value, or no parameter is neither', () => {
-  const none = { own: false, slugs: [], name: '' };
+  const none = { own: false, all: false, slugs: [], name: '' };
   assert.deepStrictEqual(FS.parseShortlist(''), none);
   assert.deepStrictEqual(FS.parseShortlist(undefined), none);
   assert.deepStrictEqual(FS.parseShortlist('?shortlist='), none);
@@ -174,14 +174,14 @@ test('parseShortlist: nothing, an empty value, or no parameter is neither', () =
 });
 
 test('parseShortlist: the last shortlist parameter wins', () => {
-  assert.deepStrictEqual(FS.parseShortlist('?shortlist=dal&shortlist=1'), { own: true, slugs: [], name: '' });
-  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1&shortlist=dal'), { own: false, slugs: ['dal'], name: '' });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=dal&shortlist=1'), { own: true, all: false, slugs: [], name: '' });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1&shortlist=dal'), { own: false, all: false, slugs: ['dal'], name: '' });
 });
 
 test('shortlistQuery writes what parseShortlist reads back', () => {
   const q = FS.shortlistQuery(['negroni', 'Aviation', 'negroni']);
   assert.strictEqual(q, 'shortlist=negroni,aviation');
-  assert.deepStrictEqual(FS.parseShortlist('?' + q), { own: false, slugs: ['negroni', 'aviation'], name: '' });
+  assert.deepStrictEqual(FS.parseShortlist('?' + q), { own: false, all: false, slugs: ['negroni', 'aviation'], name: '' });
 });
 
 test('shortlistQuery leaves out what the parser would drop, and is empty for nothing', () => {
@@ -196,9 +196,18 @@ test('#1521: a sent list carries its name in `list`, and the name round-trips', 
   const q = FS.shortlistQuery(['dal', 'trifle'], 'Sunday lunch & co');
   assert.strictEqual(q, 'shortlist=dal,trifle&list=Sunday%20lunch%20%26%20co');
   assert.deepStrictEqual(FS.parseShortlist('?' + q),
-    { own: false, slugs: ['dal', 'trifle'], name: 'Sunday lunch & co' });
+    { own: false, all: false, slugs: ['dal', 'trifle'], name: 'Sunday lunch & co' });
   // Either order, and `+` is a space as everywhere else in this grammar.
   assert.strictEqual(FS.parseShortlist('?list=Week+nights&shortlist=dal').name, 'Week nights');
+});
+
+test('#1521: ?shortlist=all is your own SEE ALL, and `all` is never a slug', () => {
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=all'),
+    { own: true, all: true, slugs: [], name: '' });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=ALL'),
+    { own: true, all: true, slugs: [], name: '' });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=dal,all').slugs, ['dal']);
+  assert.strictEqual(FS.shortlistQuery(['all']), '');
 });
 
 test('#1521: a name means nothing without slugs, and an empty name is none', () => {

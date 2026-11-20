@@ -175,6 +175,28 @@
 
   var last = base;
 
+  /* The shortlists' SEE ALL keeps this recipe's number, and this box shows
+     it (#1521): a change here is a change there, and the other way. A
+     `makes:` recipe's box counts the thing made and SEE ALL counts batches,
+     so the two differ by `base`. The recipe as written stores nothing. */
+  var shortlist = HTF.shortlist && HTF.shortlist.ALL ? HTF.shortlist : null;
+  var key = control ? control.getAttribute('data-shortlist-key') : '';
+  var byBatch = !!(input && input.hasAttribute('data-made'));
+
+  function stored() {
+    if (!shortlist || !key || !mode) return null;
+    var n = byBatch ? shortlist.batchesIn(shortlist.ALL, key)
+      : shortlist.portionsIn(shortlist.ALL, key);
+    return n ? mode.clamp(byBatch ? n * base : n) : null;
+  }
+
+  function remember(n) {
+    if (!shortlist || !key) return;
+    var value = n === base ? null : n;
+    if (byBatch) shortlist.setBatchesIn(shortlist.ALL, key, value === null ? null : value / base);
+    else shortlist.setPortionsIn(shortlist.ALL, key, value);
+  }
+
   function put(field, value) {
     if (field !== document.activeElement) field.value = value;
   }
@@ -230,6 +252,7 @@
 
     last = n;
     if (!mode) return;
+    remember(n);
     put(input, mode.box(n));
     /* The word after the box agrees with the number in it -- "1 waffle",
        "2 × 8-inch cakes", "2 litres". Portions returns null: that word is the
@@ -280,6 +303,8 @@
   if (!mode) return;
   input.value = mode.box(base);
   control.hidden = false;
+  var start = stored();
+  if (start !== null && start !== base) apply(start);
 
   input.addEventListener('input', redraw);
   input.addEventListener('change', settle);

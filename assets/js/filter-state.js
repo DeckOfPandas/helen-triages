@@ -97,19 +97,18 @@
     return ship;
   }
 
-  // The shortlist query is not a kind either, and has two meanings (#1093):
-  //   ?shortlist=1                  this browser's own shortlist
-  //   ?shortlist=negroni,aviation   a shortlist someone sent, by slug
-  // A slug is [a-z0-9-] and nothing else; anything outside that is dropped,
-  // because a link is untrusted input. `1` alone is the own-list flag, never a
-  // slug. The last `shortlist` parameter wins. `&list=<name>` names a sent
-  // list (#1521); the store cleans the name before it keeps one.
-  // -> { own: boolean, slugs: string[], name: string }; never own and slugs.
+  // The shortlist query is not a kind either (#1093, #1521):
+  //   ?shortlist=1 your list on show; ?shortlist=all your SEE ALL;
+  //   ?shortlist=negroni,aviation&list=Friday  a list someone sent, by slug.
+  // A slug is [a-z0-9-] and never `1` or `all`; anything else is dropped,
+  // because a link is untrusted input. The last `shortlist` parameter wins;
+  // the store cleans a `list` name before it keeps one.
+  // -> { own, all, slugs, name }; `all` only with `own`, never own and slugs.
   var SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
 
   function parseShortlist(search) {
     var body = String(search == null ? '' : search).replace(/^[?#]/, '');
-    var out = { own: false, slugs: [], name: '' };
+    var out = { own: false, all: false, slugs: [], name: '' };
     var name = '';
     body.split('&').forEach(function (chunk) {
       var eq = chunk.indexOf('=');
@@ -118,11 +117,13 @@
       if (key === 'list') { name = decodeValue(chunk.slice(eq + 1)).trim(); return; }
       if (key !== 'shortlist') return;
       var raw = chunk.slice(eq + 1);
-      out = { own: false, slugs: [], name: '' };
-      if (decodeValue(raw).trim() === '1') { out.own = true; return; }
+      out = { own: false, all: false, slugs: [], name: '' };
+      var whole = decodeValue(raw).trim().toLowerCase();
+      if (whole === '1') { out.own = true; return; }
+      if (whole === 'all') { out.own = true; out.all = true; return; }
       raw.split(',').forEach(function (rawValue) {
         var slug = decodeValue(rawValue).trim().toLowerCase();
-        if (!SLUG_RE.test(slug) || slug === '1') return;
+        if (!SLUG_RE.test(slug) || slug === '1' || slug === 'all') return;
         if (out.slugs.indexOf(slug) === -1) out.slugs.push(slug);
       });
     });
@@ -137,7 +138,7 @@
     var kept = [];
     (Array.isArray(slugs) ? slugs : []).forEach(function (s) {
       var slug = String(s).trim().toLowerCase();
-      if (SLUG_RE.test(slug) && slug !== '1' && kept.indexOf(slug) === -1) kept.push(slug);
+      if (SLUG_RE.test(slug) && slug !== '1' && slug !== 'all' && kept.indexOf(slug) === -1) kept.push(slug);
     });
     if (!kept.length) return '';
     var label = String(name == null ? '' : name).trim();

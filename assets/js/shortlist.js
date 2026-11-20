@@ -53,7 +53,7 @@
      `[data-shortlist-count]` is how many there are to see on this page, not
      how many the store holds (#847): a key can outlive its page, and the
      index can only show this page's rows. `[data-shortlist-total]` is the
-     store's own count, for the "see shortlist (N)" link
+     store's own count, for the "see shortlists (N)" link
      (_includes/page-actions.html), shown only while it is above 0 (#1210). */
   function paintCounts() {
     var seen = [];

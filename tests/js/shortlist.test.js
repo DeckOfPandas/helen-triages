@@ -865,3 +865,84 @@ test('#1521: a failed write still keeps a new list for this visit', () => {
   HTF.shortlist.toggleIn(id, '/dal/');
   assert.strictEqual(HTF.shortlist.hasIn(id, '/dal/'), true);
 });
+
+// --- SEE ALL (#1521) ------------------------------------------------------------
+// Every recipe on any list, once, with numbers and ticks of its own, which the
+// recipe page's scaler shares.
+
+test('#1521: SEE ALL shows every recipe on any list once, in list order', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  s.toggle('/dal/');
+  s.toggle('/soup/');
+  const other = s.create('Weeknights');
+  s.toggleIn(other, '/stew/');
+  s.toggleIn(other, '/dal/');
+  assert.strictEqual(s.setActive(s.ALL), true);
+  assert.strictEqual(s.activeId(), 'all');
+  assert.deepStrictEqual(plain(s.list()), ['/dal/', '/soup/', '/stew/']);
+  assert.strictEqual(s.count(), 3);
+  assert.strictEqual(s.has('/stew/'), true);
+  assert.deepStrictEqual(lists(HTF), [['Shortlist', 2], ['Weeknights', 2]], 'not a list of its own');
+});
+
+test('#1521: SEE ALL\'s numbers and ticks are its own, and survive a reload', () => {
+  const storage = workingStorage();
+  const s = pageWith(storage).HTF.shortlist;
+  s.toggle('/dal/');
+  s.setPortions('/dal/', 2);
+  s.setTicked('onion', true);
+  s.setActive(s.ALL);
+  assert.strictEqual(s.portions('/dal/'), null, 'not the list\'s 2');
+  assert.strictEqual(s.ticked('onion'), false);
+  s.setPortions('/dal/', 8);
+  s.setBatches('/cake/', 2);
+  s.setTicked('lime', true);
+  const again = pageWith(storage).HTF.shortlist;
+  assert.strictEqual(again.activeId(), 'all');
+  assert.strictEqual(again.portions('/dal/'), 8);
+  assert.strictEqual(again.batches('/cake/'), 2);
+  assert.strictEqual(again.ticked('lime'), true);
+  again.untickAll();
+  assert.strictEqual(again.ticked('lime'), false, 'untick all reaches SEE ALL\'s own ticks');
+  again.setActive(again.lists()[0].id);
+  assert.strictEqual(again.portions('/dal/'), 2);
+});
+
+test('#1521: the ...In calls read and write SEE ALL from anywhere, as the recipe page does', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  assert.strictEqual(s.setPortionsIn(s.ALL, '/dal/', 6), 6);
+  assert.strictEqual(s.setBatchesIn(s.ALL, '/cake/', 0.5), 0.5);
+  assert.strictEqual(s.portions('/dal/'), null, 'the list on show is untouched');
+  s.setActive(s.ALL);
+  assert.strictEqual(s.portions('/dal/'), 6);
+  assert.strictEqual(s.batchesIn(s.ALL, '/cake/'), 0.5);
+  assert.strictEqual(s.setPortionsIn(s.ALL, '/dal/', null), null);
+  assert.strictEqual(s.portionsIn(s.ALL, '/dal/'), null);
+  assert.strictEqual(s.portionsIn('l99', '/dal/'), null, 'no such list');
+});
+
+test('#1521: in SEE ALL, additions go to the first list, and rename and delete find no list', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  s.create('Weeknights');
+  s.setActive(s.ALL);
+  s.addAll(['/dal/']);
+  s.keep('', ['/soup/']);
+  assert.deepStrictEqual(lists(HTF), [['Shortlist', 2], ['Weeknights', 0]]);
+  assert.strictEqual(s.rename(s.ALL, 'Nope'), false);
+  assert.strictEqual(s.remove(s.ALL), false);
+  s.setActive(s.ALL);
+  s.remove(s.lists()[1].id);
+  assert.strictEqual(s.activeId(), 'all', 'deleting a list leaves SEE ALL on show');
+});
+
+test('#1521: a stored SEE ALL that is the wrong shape reads as empty numbers', () => {
+  const raw = JSON.stringify({ active: 'all', lists: [{ id: 'l1', name: 'A', entries: ['/a/'] }],
+    all: { portions: 'six', ticked: [3, 'lime'] } });
+  const { HTF } = pageWith(workingStorage({ [RECORD_KEY]: raw }));
+  assert.strictEqual(HTF.shortlist.activeId(), 'all');
+  assert.strictEqual(HTF.shortlist.portions('/a/'), null);
+  assert.strictEqual(HTF.shortlist.ticked('lime'), true);
+});

@@ -209,7 +209,8 @@ window.HTF = window.HTF || {};
     // to the `max` the shopping list's boxes declare. A box's `max` is not
     // enforced on typing, and an uncapped count prints "6.2e+28 kg".
     var MAX_COUNT = 99;
-    var state = null;   // { active: id, lists: [list] }; null until first read
+    var ALL = 'all';    // SEE ALL's id: never a list's, which are `l<n>`
+    var state = null;   // { active, lists: [list], all }; null until first read
 
     function recordKey() {
       return HTF.site ? RECORD_PREFIX + HTF.site + '-v1' : '';
@@ -335,9 +336,10 @@ window.HTF = window.HTF || {};
         lists.push(fillList(blankList(id, name), item));
       });
       if (!lists.length) lists.push(blankList('l1', DEFAULT_NAME));
-      var active = lists.some(function (l) { return l.id === raw.active; })
+      var active = raw.active === ALL || lists.some(function (l) { return l.id === raw.active; })
         ? raw.active : lists[0].id;
-      return { active: active, lists: lists };
+      var all = raw.all && typeof raw.all === 'object' ? raw.all : {};
+      return { active: active, lists: lists, all: fillList(blankList(ALL, ''), all) };
     }
 
     function read() {
@@ -348,8 +350,8 @@ window.HTF = window.HTF || {};
         try { text = localStorage.getItem(key); } catch (e) { text = null; }
       }
       if (text === null || text === undefined) {
-        state = key ? { active: 'l1', lists: [fromLegacy()] }
-          : { active: 'l1', lists: [blankList('l1', DEFAULT_NAME)] };
+        state = { active: 'l1', lists: [key ? fromLegacy() : blankList('l1', DEFAULT_NAME)],
+          all: blankList(ALL, '') };
       } else {
         var raw;
         try { raw = JSON.parse(text); } catch (e) { raw = null; }
@@ -372,8 +374,50 @@ window.HTF = window.HTF || {};
       return null;
     }
 
+    /* Every recipe on any list, once, in list order then the order added. */
+    function union() {
+      var seen = [];
+      read().lists.forEach(function (l) {
+        l.entries.forEach(function (url) { if (seen.indexOf(url) === -1) seen.push(url); });
+      });
+      return seen;
+    }
+
+    /* A list's counts and ticks, or SEE ALL's own, which no list shares. */
+    function bucket(id) {
+      return id === ALL ? read().all : find(id);
+    }
+
+    /* The list on show. SEE ALL is the union, with its own counts and ticks:
+       the maps are SEE ALL's own objects, mutated in place; `entries` is a
+       copy, never written to. */
     function active() {
-      return find(read().active) || read().lists[0];
+      var s = read();
+      if (s.active === ALL) {
+        return { id: ALL, name: '', entries: union(), glasses: s.all.glasses,
+          portions: s.all.portions, batches: s.all.batches, ticked: s.all.ticked };
+      }
+      return find(s.active) || s.lists[0];
+    }
+
+    function countIn(holder, kind, url) {
+      var n = holder ? holder[kind][url] : null;
+      return typeof n === 'number' && n > 0 ? n : null;
+    }
+
+    /* `value` is already cleaned; null forgets the entry. */
+    function setCountIn(holder, kind, url, value) {
+      if (!url || !holder) return null;
+      if (value === null) delete holder[kind][url];
+      else holder[kind][url] = value;
+      write();
+      return value;
+    }
+
+    /* Where an addition to "the list on show" goes: SEE ALL has no entries of
+       its own, so its first list. */
+    function writable() {
+      return read().active === ALL ? read().lists[0] : active();
     }
 
     function toggleIn(id, url) {
@@ -401,7 +445,7 @@ window.HTF = window.HTF || {};
        new one. A nameless link goes into the active list (#1093). */
     function listFor(name) {
       var clean = cleanName(name);
-      if (!clean) return active();
+      if (!clean) return writable();
       var found = named(read().lists, clean);
       if (found) return found;
       var list = blankList(nextId(read().lists), clean);
@@ -463,9 +507,12 @@ window.HTF = window.HTF || {};
       /** @returns {string} its name */
       activeName: function () { return active().name; },
 
-      /** @returns {boolean} false for an id that names no list */
+      /** SEE ALL's id, for setActive and the `...In` count calls. */
+      ALL: ALL,
+
+      /** @returns {boolean} false for an id that names no list, nor SEE ALL */
       setActive: function (id) {
-        if (!find(id)) return false;
+        if (id !== ALL && !find(id)) return false;
         read().active = id;
         write();
         return true;
@@ -509,7 +556,7 @@ window.HTF = window.HTF || {};
         if (at === -1) return false;
         s.lists.splice(at, 1);
         if (!s.lists.length) s.lists.push(blankList(nextId([{ id: id }]), DEFAULT_NAME));
-        if (!find(s.active)) s.active = s.lists[0].id;
+        if (s.active !== ALL && !find(s.active)) s.active = s.lists[0].id;
         write();
         return true;
       },
@@ -529,13 +576,7 @@ window.HTF = window.HTF || {};
       },
 
       /** @returns {number} recipes on any list, each counted once */
-      total: function () {
-        var seen = [];
-        read().lists.forEach(function (l) {
-          l.entries.forEach(function (url) { if (seen.indexOf(url) === -1) seen.push(url); });
-        });
-        return seen.length;
-      },
+      total: function () { return union().length; },
 
       /** Every list with something on it, for the export block.
           @returns {{name:string, keys:string[]}[]} */
@@ -556,13 +597,12 @@ window.HTF = window.HTF || {};
       count: function () { return active().entries.length; },
 
       /** Flip one entry and persist. @returns {boolean} true if it is now on it */
-      toggle: function (url) { return toggleIn(active().id, url); },
+      toggle: function (url) { return toggleIn(writable().id, url); },
 
       /** Empty the active list: the marks, the counts and the ticks together.
           No page control calls it; the store's tests do. */
       clear: function () {
-        var list = active();
-        fillList(list, {});
+        fillList(read().active === ALL ? read().all : active(), {});
         write();
       },
 
@@ -592,22 +632,15 @@ window.HTF = window.HTF || {};
        * @returns {number|null} `null` means nobody has said, and the caller
        *          substitutes the recipe's own portion count
        */
-      portions: function (url) {
-        var n = active().portions[url];
-        return typeof n === 'number' && n > 0 ? n : null;
-      },
+      portions: function (url) { return countIn(active(), 'portions', url); },
 
       /**
        * @param {number|null} n - portions; anything below 1 forgets the entry
        * @returns {number|null} what it ended up as
        */
       setPortions: function (url, n) {
-        if (!url) return null;
-        var value = n === null || n === undefined ? null : portionsValue(n);
-        if (value === null) delete active().portions[url];
-        else active().portions[url] = value;
-        write();
-        return value;
+        return setCountIn(active(), 'portions', url,
+          n === null || n === undefined ? null : portionsValue(n));
       },
 
       /**
@@ -615,10 +648,7 @@ window.HTF = window.HTF || {};
        * @returns {number|null} a whole number or 0.5; `null` means nobody has
        *          said, which is one batch
        */
-      batches: function (url) {
-        var n = active().batches[url];
-        return typeof n === 'number' && n > 0 ? n : null;
-      },
+      batches: function (url) { return countIn(active(), 'batches', url); },
 
       /**
        * @param {number|null} n - batches: the nearest whole number, or a half
@@ -626,12 +656,19 @@ window.HTF = window.HTF || {};
        * @returns {number|null} what it ended up as
        */
       setBatches: function (url, n) {
-        if (!url) return null;
-        var value = batchesValue(n);
-        if (value === null) delete active().batches[url];
-        else active().batches[url] = value;
-        write();
-        return value;
+        return setCountIn(active(), 'batches', url, batchesValue(n));
+      },
+
+      /* The same four for a named list, or SEE ALL (`ALL`): the recipe page's
+         scaler reads and writes SEE ALL's numbers (#1521). */
+      portionsIn: function (id, url) { return countIn(bucket(id), 'portions', url); },
+      setPortionsIn: function (id, url, n) {
+        return setCountIn(bucket(id), 'portions', url,
+          n === null || n === undefined ? null : portionsValue(n));
+      },
+      batchesIn: function (id, url) { return countIn(bucket(id), 'batches', url); },
+      setBatchesIn: function (id, url, n) {
+        return setCountIn(bucket(id), 'batches', url, batchesValue(n));
       },
 
       /* --- What is already in the basket (#1457) ----------------------------
@@ -675,7 +712,7 @@ window.HTF = window.HTF || {};
 
       /** Every tick, shown or not: the list starts afresh for the next shop. */
       untickAll: function () {
-        active().ticked = [];
+        active().ticked.length = 0;
         write();
       },
 
@@ -698,7 +735,7 @@ window.HTF = window.HTF || {};
 
       /** Merge these into the active list and persist once.
           @returns {number} how many were not already on it */
-      addAll: function (urls) { return addInto(active(), urls); },
+      addAll: function (urls) { return addInto(writable(), urls); },
 
       /**
        * The shared view's "keep these": into the list of that name, made if
