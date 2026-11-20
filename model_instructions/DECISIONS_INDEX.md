@@ -59,7 +59,8 @@ argument and the rules each field is read by.
 - 2026-10-18 · §4 · an ingest ignores a "you will need" equipment list.
 - 2026-11-03 · §4 · page furniture: drop what sells; everything else written on the page goes in the body.
 - 2026-10-18 · §4 · a sidebar box ingested as a recipe has no body.
-- 2026-10-30 · §4 · a magazine page's citation: the book shape plus "via" for an extract, a credit only from the page itself, the cover month.
+- 2026-10-30 · §4 · a magazine page's citation: the book shape plus "via" for an extract, and a credit only from the page itself.
+- 2026-11-19 · §4 · a margin credit is no author; a feature built around a cook is; a book the page names is cited with its author.
 - 2026-10-30 · §4 · header and method times that disagree: cook_time takes the header's and a QQ note names the mismatch.
 - 2026-10-30 · §4 · the method may add a phase no ingredient group matches, and a step straddling two phases stays whole in the earlier one.
 - 2026-10-30 · §4 · a clear typo in the source's ingredient list is fixed in item: and kept in the QQ original.
@@ -83,7 +84,13 @@ argument and the rules each field is read by.
 - 2026-11-03 · §4 · a recipe written up in a chat, not transcribed from a page, has QQ Claude method lines and no QQ original.
 - 2026-11-03 · §4 · an unqualified milk, egg or butter takes the house default, and the line says what the source printed.
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
-- 2026-11-11 · §4 · a rewrite has no "heat the oven" step; the temperature goes where the oven is first used.
+- 2026-11-19 · §4 · a rewrite never says "preheat the oven"; the temperature goes where the oven is first used.
+- 2026-11-19 · §4 · a source step that straddles two phases may have its QQ Claude lines split across the method groups.
+- 2026-11-19 · §4 · cook_time leaves out cooling: "X mins, plus overnight cooling".
+- 2026-11-19 · §4 · caster sugar a source leaves unqualified is golden, except in a meringue or a pale icing or cream, where it is white.
+- 2026-11-19 · §4 · vanilla bean paste is a house vanilla, and 1 tsp of it is 1 vanilla pod, either way.
+- 2026-11-19 · §4 · a 2-lb loaf tin is written "2-lb (900 g) loaf tin, about 25 x 12.5 x 8 cm".
+- 2026-11-19 · §4 · a teaspoon is 5 ml and a tablespoon 15 ml, on both sites.
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
 - 2026-10-28 · §4 · makes: is written as a count of a named thing.
 - 2026-11-03 · §4 · a dessert, cake or bake makes the thing, sized from its tin, with the source's slices in brackets.
@@ -100,7 +107,7 @@ argument and the rules each field is read by.
 - 2026-08-20 · §4 · #406 · "Adapted from" prefixes published work and only published work.
 - 2026-08-20 · §4 · #406 · a source with no date is a website; a publication is a print issue and always carries one.
 - 2026-08-20 · §4 · #406 · a source nobody has established is source: "QQ" with source_type: unknown, and on a published recipe it is meant to break the build.
-- 2026-08-21 · §4 · #406 · a book source names its author, as <title>, <author> or <Author>'s <title>; there is no authorless form and no exception list.
+- 2026-11-19 · §4 · #406 · (replacing 2026-08-21, #406) — a book source names its author, as <title>, <author> or <Author>'s <title>, unless it is a collection.
 - 2026-09-11 · §4 · #406 · source: "unknown" is the closed answer, and only Helen closes it.
 - 2026-08-20 · §4 · #406 · a citation names its source and never its publisher.
 - undated · §4 · #69 #68 · Undated, #69, #68 — ingredient groups are ordered by title relevance: the group named for the dish leads; within a group, ingredients follow call order.
@@ -149,6 +156,9 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
+- 2026-11-19 · §5 · (replacing 2026-10-30's cover month) — a magazine's issue is the one Helen's folder names.
+- 2026-11-19 · §5 · nigella.com's single oven figure is conventional; the fan figure is 20 lower.
+- 2026-11-19 · §5 · a nigella.com recipe cites the book its page is "Featured in".
 - 2026-10-30 · §5 · where a source prints metric and imperial, keep the metric, bakes included; ounces only where it gives nothing else.
 - 2026-10-30 · §5 · a single oven figure from an unruled source is kept as printed and asked about once for the book; a labelled fan figure wins over a gas mark that disagrees.
 - 2026-10-19 · §5 · an unlabelled oven pair 20 degrees apart is conventional and fan.
@@ -173,6 +183,7 @@ argument and the rules each field is read by.
 - 2026-10-30 · §7 · cocoa powder alone earns chocolate where the dish tastes of chocolate.
 - 2026-10-21 · §7 · legumes and mushrooms are star ingredients, and greens means leaves and brassicas.
 - 2026-10-29 · §7 · beans eaten whole in the pod are greens, and the legumes filter finds them too; potatoes are root veg.
+- 2026-11-19 · §7 · goose is poultry — Helen: "Goose is poultry, I was wrong earlier.
 - 2026-10-21 · §7 · knife and fork and herbivore-ish are moods.
 - 2026-08-09 · §7 · #72 · per-recipe tag calls stand and are not "fixed" for consistency.
 - 2026-08-12 · §7 · #187 · eggs is a star ingredient only where the dish is about the egg.
@@ -197,6 +208,7 @@ argument and the rules each field is read by.
 - 2026-10-29 · §7 · dietary restrictions are not marked — Helen: "I don't mark dietary restrictions." No tag, note, field or question for vegan, gluten-free and the like, at ingest or after; a claim …
 - 2026-10-11 · §7 · a quiche, a tarte tatin, a soufflé and a salad that is the meal are a main; a plain cauliflower cheese and a sprout salad are extras.
 - 2026-11-05 · §7 · #1462 · A9 — the course labels are filters, and MOOD's drinks and desserts stay as they are.
+- 2026-11-19 · §7 · a non-alcoholic drink is a food recipe tagged drinks; an alcoholic one is a cocktail.
 - 2026-08-01 · §8 · the ingredient picker stays, and so does title search.
 - 2026-08-16 · §8 · #281 · a bad candidate in the exclude (LEAVE OUT) picker is fixed for what ships, not for the drafts.
 - 2026-09-15 · §8 · #1092 · food's HAS TO HAVE picks several ingredients, ANDed.

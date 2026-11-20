@@ -551,7 +551,7 @@ def test_sugar_specifies_type(recipe):
 _QUALIFIED_MUSTARD = {
     "english mustard", "english mustard powder", "dijon mustard",
     "french mustard", "wholegrain mustard", "whole mustard seeds",
-    "mustard oil",
+    "white mustard seeds", "black mustard seeds", "mustard oil",
 }
 _QUALIFIED_SOY_SAUCE = {"dark soy sauce", "light soy sauce"}
 _QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste", "dried ginger",
@@ -629,7 +629,8 @@ def test_mixed_spice_and_five_spice_say_powder(recipe):
 _QUALIFIED_NUTMEG = {"whole nutmeg", "ground nutmeg"}
 _QUALIFIED_CINNAMON = {"cinnamon stick", "cinnamon sticks", "ground cinnamon"}
 _QUALIFIED_CLOVES = {"whole cloves", "ground cloves"}
-_QUALIFIED_VANILLA = {"vanilla extract", "vanilla essence", "vanilla pod"}
+_QUALIFIED_VANILLA = {"vanilla extract", "vanilla essence", "vanilla pod",
+                      "vanilla bean paste"}
 
 
 def test_nutmeg_cinnamon_cloves_vanilla_specify_type(recipe):

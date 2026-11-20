@@ -200,6 +200,7 @@ not_on_cards:
   - raw sugar
   - golden caster sugar
   - molasses sugar
+  - dark brown soft sugar
   - palm sugar
   - sugar cube
   - honey
@@ -824,6 +825,7 @@ sugars:
   # long way from `molasses sugar`.
   - "golden caster sugar"
   - "molasses sugar"
+  - "dark brown soft sugar"
   - "palm sugar"
   - "sugar cube"
   # Measured by the spoon, as a dry sugar (`1 tsp`), never in millilitres.
@@ -891,6 +893,9 @@ fruit_and_herbs:
   # and excluding one must not drop drinks built on the other.
   - "cucumber"
   - "kaffir lime leaves"
+  # Mulled whole, halved and studded with cloves.
+  - "clementine"
+  - "bay leaves"
 
 other:
   - "soda water"
@@ -921,6 +926,12 @@ other:
   # Sprinkled onto a flame, so an ingredient with the amount `(sprinkle)` and
   # not a garnish. Filed as `salt` is: the larder shelf and `not_on_cards`.
   - "ground cinnamon"
+  # Whole spices, infused in a mulled drink and counted, never measured.
+  - "cloves"
+  - "cinnamon stick"
+  - "green cardamom pods"
+  # A herbal teabag's tea; `black tea` is not a substitute.
+  - "apple and ginger tea"
   - "cider vinegar"
   # A measured ingredient, not a garnish: `other` holds what is neither juice,
   # syrup nor alcohol.
@@ -930,6 +941,8 @@ other:
   - "cream"
   - "milk"
   - "whole egg"
+  # Weighed and melted into the spirit (the After Eight Martini).
+  - "dark chocolate"
 
 # === GENERIC -> FAMILY. Bases only. ===
 # A generic absent from here has no family, which is correct for every
@@ -1213,11 +1226,18 @@ shelf_of:
   raspberries: fresh produce
   rosemary: fresh produce
   ground cinnamon: larder
+  cloves: larder
+  cinnamon stick: larder
+  green cardamom pods: larder
+  apple and ginger tea: larder
+  clementine: fresh produce
+  bay leaves: fresh produce
   salt: larder
   vanilla extract: larder
   xanthan gum: larder
   water: larder
   whole egg: larder
+  dark chocolate: larder
   # sugar syrup
   agave syrup: sugar syrup
   "cane sugar syrup 1:1": sugar syrup
@@ -1238,6 +1258,7 @@ shelf_of:
   "pear, apricot and rosemary syrup": sugar syrup
   pineapple syrup: sugar syrup
   molasses sugar: sugar syrup
+  dark brown soft sugar: sugar syrup
   orgeat: sugar syrup
   palm sugar: sugar syrup
   passion fruit syrup: sugar syrup

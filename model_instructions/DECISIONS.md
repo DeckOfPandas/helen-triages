@@ -346,10 +346,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   *"Delete the bodies"*: the body repeated the `QQ original` lines unmarked,
   and would have published the book's text.
 - **2026-10-30 — a magazine page's citation: the book shape plus "via" for an
-  extract, a credit only from the page itself, the cover month.** Helen chose
-  *"Book shape, then "via""*, *"Yes, but not (c)"* (an uncredited page in a
-  book feature is the magazine's, and a first-name tip credit is no author)
-  and *"The cover month"*. `SOURCE_ATTRIBUTION_SPEC.md` holds the shapes.
+  extract, and a credit only from the page itself.** Helen chose *"Book
+  shape, then "via""* and *"Yes, but not (c)"* (an uncredited page in a book
+  feature is the magazine's, and a first-name tip credit is no author). The
+  issue it names is §5's folder ruling. `SOURCE_ATTRIBUTION_SPEC.md` holds
+  the shapes.
+- **2026-11-19 — a margin credit is no author; a feature built around a cook
+  is; a book the page names is cited with its author.** Asked about "Recipe
+  SARA BUENFELD" in a margin, Helen: *"Margin credits: no."* Asked about a
+  feature on Richard Burr, and NOPI and *Plenty More* printed without their
+  author: *"Those all sound like real credits, so please add them."*
 - **2026-10-30 — header and method times that disagree: `cook_time` takes the
   header's and a `QQ` note names the mismatch.** Helen chose *"Header, and
   flag it"*.
@@ -478,12 +484,45 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-08 — a `QQ Claude` line gives the fan figure alone.** One of the
   rulings from two claude.ai chats that Helen confirmed as standing, each a
   yes. Its `QQ original` keeps everything the source printed.
-- **2026-11-11 — a rewrite has no "heat the oven" step; the temperature goes
-  where the oven is first used.** Helen: *"I HATE having a "heat the oven"
-  step. I mean, like, duhhh. … mention the temperature the first time it's
-  used."* So "Roast at 180°C fan for 10 mins", and a later step in the same
-  oven names no figure unless it changes. The grill is the same: "grill on
-  its highest setting for 5 mins". The `QQ original` keeps the source's step.
+- **2026-11-19 — a rewrite never says "preheat the oven"; the temperature goes
+  where the oven is first used.** Helen, 2026-11-11: *"I HATE having a "heat
+  the oven" step. I mean, like, duhhh."*; 2026-11-19: *"I dislike "Preheat
+  the oven", so please never write it. Just include the correct oven
+  temperature in the prose at the cook step. Trust the cook."* So "Roast at
+  180°C fan for 10 mins", and a later step in the same oven names no figure
+  unless it changes; the grill likewise. The `QQ original` keeps the source's
+  step, and a source step that only heats the oven has no `QQ Claude` line.
+- **2026-11-19 — a source step that straddles two phases may have its `QQ
+  Claude` lines split across the method groups.** Helen, of a step that cools
+  a cake and then ices it: *"consider if these should be split into separate
+  steps, which could then be split over the sections."* The `QQ original`
+  stays whole in the earlier group; the lines for the later phase open the
+  next group.
+- **2026-11-19 — `cook_time` leaves out cooling: "X mins, plus overnight
+  cooling".** Helen, of a meringue left overnight in a switched-off oven:
+  *"Don't add the cooling time to the cook time -- say "X mins, plus
+  overnight cooling"."* Where the oven goes off as the dish goes in, *"No
+  cooking, then overnight cooling"*: `"None, plus overnight cooling"`.
+- **2026-11-19 — caster sugar a source leaves unqualified is golden, except
+  in a meringue or a pale icing or cream, where it is white.** Helen:
+  *"Golden for everything unspecified, other than meringue or light icing
+  etc."* The line says what the source printed (`note: "the source gave
+  \"caster sugar\""`), as milk, eggs and butter do (below).
+- **2026-11-19 — `vanilla bean paste` is a house vanilla, and 1 tsp of it is
+  1 vanilla pod, either way.** Helen: *"Add vanilla bean paste (plus a
+  conversion to and from pods -- 1 tsp = 1 pod"*. `_QUALIFIED_VANILLA` in
+  `tests/test_style.py`; no hint on the page yet.
+- **2026-11-19 — a 2-lb loaf tin is written "2-lb (900 g) loaf tin, about
+  25 x 12.5 x 8 cm".** Helen: *"if this version here is more full then use
+  this one everywhere."* In `QQ Claude` lines and published methods; a `QQ
+  original` keeps the source's words.
+- **2026-11-19 — a teaspoon is 5 ml and a tablespoon 15 ml, on both sites.**
+  Helen: *"for cocktails the standard I believe is 5 ml. Let's use that
+  everywhere, but log my info in case we change our minds."* Her info: a UK
+  teaspoon is 6 ml, a US one 5 ml, and *"1 tbsp = 2 tsp for both"*; asked,
+  the house's 15 ml tablespoon is 3 teaspoons. `_data/food/costs.yml` and
+  `measures:` in `_data/cocktails/ingredients.yml` hold the figures; a
+  cocktail still writes millilitres, never `tsp`.
 - **2026-10-29 — an unheaded first ingredient group is named for the dish or
   its main component, unasked.** Helen: *"hopefully this would be obvious,
   like "for the beef", or "for the pie"?"* The name is read after "For the".
@@ -499,6 +538,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   out."* So `makes: "one 20-cm cake (about 10 slices)"`, `"one 900-g loaf
   (8–10 slices)"`, `"one 23-cm cake"` where no slices are given, `"16
   biscuits"`. The scaler counts the whole thing and ignores the bracket.
+  A pudding or trifle is sized from its basin or bowl, with the source's
+  servings in the bracket: `"one 1.1-litre pudding (serves 4–6)"`, `"one
+  20-cm trifle (serves 8–10)"`. Helen, 2026-11-19: *"Yes, and please
+  document."*
 - **2026-10-08 — Helen's own recipes are `source: "Henry"`, `source_type:
   person`, and her own version of a regional dish is `"Henry,
   Alsace-style"`.** Confirmed as standing the same day, as the old journal
@@ -579,13 +622,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   build, which is fine."* Not `Unknown` and not blank: the first reads as a
   finished answer and the second as nothing to see. Each of the pair requires
   the other. Do not guess a citation to get past it.
-- **2026-08-21, #406 — a `book` source names its author, as `<title>,
-  <author>` or `<Author>'s <title>`; there is no authorless form and no
-  exception list.** Helen: *"I can't imagine knowing the name of a book but
-  not its author."* `Adapted from Wagamama Feed Your Soul` had passed on two
-  published pages. The one book that seemed to have no author was not a book:
-  *"it's from Good Food, from a special one-off section"*, so it is a dateless
-  `website`. If a book seems authorless, check it is a book, then ask her.
+- **2026-11-19 (replacing 2026-08-21, #406) — a `book` source names its
+  author, as `<title>, <author>` or `<Author>'s <title>`, unless it is a
+  collection.** Helen, 2026-08-21: *"I can't imagine knowing the name of a
+  book but not its author."* `Adapted from Wagamama Feed Your Soul` had passed
+  on two published pages, and the one book that seemed authorless was a
+  magazine's one-off section, so a dateless `website`. Then, of *The Great
+  British Bake Off: Celebrations*, 2026-11-19: *"No author -- it's a
+  collection."* A collection is cited by its title. Any other authorless book:
+  check it is a book, then ask her.
 - **2026-09-11, #406 — `source: "unknown"` is the closed answer, and only
   Helen closes it.** Helen, with the apple coleslaw ready to publish and its
   source still `QQ`: *"Please write 'unknown' for the source on coleslaw."*
@@ -942,6 +987,19 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
   conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
   says "170°C fan"; the `QQ original` keeps the printed figure.
+- **2026-11-19 (replacing 2026-10-30's cover month) — a magazine's issue is
+  the one Helen's folder names.** Helen:
+  *"issue details should always follow the folder I send you the recipe in,
+  no need to guess"*. A folder `Good Food 2015-11` is `Good Food, November
+  2015`, whatever a page's footer shows or hides.
+- **2026-11-19 — nigella.com's single oven figure is conventional; the fan
+  figure is 20 lower.** Her answers for Ham in Coca Cola (240 → 220°C fan,
+  180 → 160°C fan) and Christmas Chutney (140 → 120°C fan) were each 20 below,
+  and asked whether that is the rule for the site, Helen: *"Yes."*
+- **2026-11-19 — a nigella.com recipe cites the book its page is "Featured
+  in".** Offered a note or the citation, Helen: *"Citation."* So `"Adapted
+  from Nigella Christmas, Nigella Lawson"`, `source_type: book`. Both rulings
+  are in `sources.yml`.
 - **2026-10-30 — where a source prints metric and imperial, keep the metric,
   bakes included; ounces only where it gives nothing else.** Helen chose
   *"Metric when both printed"*, making general what she ruled for Good Food on
@@ -1099,6 +1157,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   and legumes categories"*, choosing an automatic word list and the one
   `greens` badge. `star_also` in `_data/food/taxonomy.yml` holds the list;
   shelled beans stay `legumes`. And: *"Potatoes are root veg."*
+- **2026-11-19 — goose is `poultry`.** Helen: *"Goose is poultry, I was wrong
+  earlier. Please fix here and everywhere."* (Replaces the same day's
+  "goose is game".)
 - **2026-10-21 — `knife and fork` and `herbivore-ish` are moods.** The audit
   found 39 draft mains with no mood: plainly cooked centrepieces, and
   vegetables as the main event. On the first Helen ruled out "proper dinner"
@@ -1248,6 +1309,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   concern to me."* Later: *"'Desserts' and 'drinks' seem to contain the right
   things."* So `main`, `side` and `starter` stay in PRACTICALITIES beside
   `freezable`, and a food MOOD called `drinks` beside a drinks site is fine.
+- **2026-11-19 — a non-alcoholic drink is a food recipe tagged `drinks`; an
+  alcoholic one is a cocktail.** Helen, of a mince pie tea: *"Mince Pie Tea
+  should live on the food site. I don't know what the rule is here.
+  Non-alcoholic vs alcoholic isn't quite right, but probably near enough."*
+  A rough line, to be revisited when a drink sits badly on it.
 
 ## §8 Ingredient search
 

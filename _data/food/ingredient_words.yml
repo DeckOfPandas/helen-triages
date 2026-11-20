@@ -261,16 +261,23 @@ aliases:
   coriander seeds: coriander seed
   courgettes: courgette
   cucumbers: cucumber
+  brown shrimps: brown shrimp
+  chicken livers: chicken liver
   duck breasts: duck breast
+  ducks: duck
+  fennel bulbs: fennel bulb
   eating apples: eating apple
   egg whites: egg white
   egg yolks: egg yolk
   eggs: egg
   green chillies: green chilli
   green peppers: green pepper
+  hispi cabbages: hispi cabbage
   leeks: leek
   lemons: lemon
   limes: lime
+  lemon soles: lemon sole
+  lobsters: lobster
   little gem lettuces: Little Gem lettuce
   mashed potatoes: mashed potato
   meringues: meringue
@@ -290,7 +297,13 @@ aliases:
   sweet potatoes: sweet potato
   thyme sprigs: thyme sprig
   tomatoes: tomato
+  whole cloves: whole clove
   plums: plum
+  vanilla pods: vanilla pod
+  parsnips: parsnip
+  preserved lemons: preserved lemon
+  pomegranates: pomegranate
+  Granny Smith apples: Granny Smith apple
   # "baby" is not a modifier (baby corn is not corn), so these are judged one
   # phrase at a time.
   baby carrots: carrot

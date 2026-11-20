@@ -147,6 +147,8 @@ canonical:
     - "grated nutmeg"
     - "grated chocolate"
     - "grated cinnamon"
+    # Maker's choice, one string, in the source's words (the Stronsay Beast).
+    - "a whisper of cinnamon or a twist of lime"
     # A garnish here, not a pour: dashed over the top with no count.
     - "Angostura bitters"
     # A mass noun, so it is in `no_article` below.
@@ -173,6 +175,8 @@ canonical:
     - "icing sugar"
     # The straw runs through it (Navy Grog's method says so).
     - "ice cone"
+    # The mint chocolate, on the rim or the side (the After Eight Martini).
+    - "After Eight"
 
 # LEFT: the string exactly as a drink says it today. RIGHT: what it might
 # become, or `QQ` where a judgement is needed. A row is resolved by deleting
@@ -191,6 +195,7 @@ no_article:
   - grated nutmeg
   - grated chocolate
   - grated cinnamon
+  - a whisper of cinnamon or a twist of lime   # brings its own "a"
   - whipped cream                       # a mass noun
   - desiccated coconut                  # a mass noun
   - cocoa powder                        # a mass noun

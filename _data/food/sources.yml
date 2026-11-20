@@ -29,6 +29,20 @@
     - rule: "Add the recipe's author to the citation (\", <Firstname Lastname>\") where the magazine makes a fuss about them: a byline, a photo, a named feature."
       helen: "Add Good Food recipe authors where the magazine has made a fuss about them."
       date: 2026-11-03
+    - rule: "A credit printed down the margin (\"Recipe SARA BUENFELD\") is not a fuss: the citation stays the magazine's."
+      helen: "Margin credits: no."
+      date: 2026-11-19
+
+- name: "Nigella Lawson"
+  match: "Nigella Lawson"
+  oven: conventional
+  rulings:
+    - rule: "nigella.com labels its fan figure (180°C/160°C Fan) where it gives one; where it prints a single figure with its gas mark (240°C/gas mark 9), that is conventional, so the fan figure is 20 lower: the rewrite says 220°C fan."
+      helen: "Yes"
+      date: 2026-11-19
+    - rule: "A nigella.com page names the book it is \"Featured in\": cite that book, \"Adapted from <Book>, Nigella Lawson\", source_type book."
+      helen: "Citation."
+      date: 2026-11-19
 
 - name: "Delia Smith"
   match: "Delia"

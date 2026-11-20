@@ -265,7 +265,9 @@ else has already done (MANUAL §9.1).
   eggs, garlic, ginger, chocolate, mustard, vinegar. Source silent → `QQ`, never a
   default -- **except milk, eggs and butter, which have house defaults**:
   `semi-skimmed milk`, a large egg (`amount: "2 large"`), `salted butter`, or
-  `unsalted butter` in a bake whose recipe names salt. Each such line gets
+  `unsalted butter` in a bake whose recipe names salt; unqualified caster
+  sugar is `golden caster sugar`, or `white caster sugar` in a meringue or a
+  pale icing or cream. Each such line gets
   `note: "the source gave \"butter\""` in the source's own word: an
   ingredient note is a lowercase fragment, no full stop. Helen: *"If
   milk and eggs aren't qualified in the source then: milk -> semi-skimmed
@@ -290,6 +292,8 @@ else has already done (MANUAL §9.1).
   on her list. Helen: *"I would like "Estimated 10 mins" to be written, then
   our tidying scripts block promotion for recipes with estimated times."*
   `test_no_estimated_time_reaches_promotion` fails on one in `4-promote/`.
+  Cooling is never in `cook_time`: `"20 mins, plus overnight cooling"`, or
+  `"None, plus overnight cooling"` where the oven is off before it cooks.
 - **What is never transcribed**: a nutrition box and its badges (*"Drop them
   and add clear instructions for ingestion to ignore these"*); a "you will
   need" equipment list (*"the rule is "trust the cook""*); anything on the page
@@ -361,8 +365,9 @@ else has already done (MANUAL §9.1).
     and **give the groups the same names**. A recipe whose ingredients split
     into `ragù` and `white sauce` does not have a one-phase method. The
     method may add a phase no ingredient group matches (`Assemble`, `To
-    decorate`), and a source step that straddles two phases stays whole in
-    the earlier one.
+    decorate`). A source step that straddles two phases keeps its `QQ
+    original` in the earlier group, and its `QQ Claude` lines for the later
+    phase open the next (DECISIONS §4).
   - The converse still holds and is not a licence: one phase means one unnamed
     ingredient group and a flat `method:`. Do not split a sequence the source
     ran as one.
@@ -395,6 +400,8 @@ else has already done (MANUAL §9.1).
   ("four circles about 2 cm wider", "2 bay leaves"). A time straight after its
   verb takes "for" ("roast for about 15 mins"); one set off by a comma after
   the end point takes none ("fry to soften, about 10 mins").
+- **A magazine's issue is the one Helen's folder names** (`Good Food
+  2015-11` is November 2015): never read it off a footer (DECISIONS §5).
 - **The citation**, per `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`. For
   food that is `source` + `source_type`; a dated magazine is a `publication`, an
   undated one is a `website`, and that distinction catches everyone out. For
@@ -464,11 +471,12 @@ else has already done (MANUAL §9.1).
     she cut it. She kept "still be slightly sticky inside" a few lines
     earlier, because that one changes what the cook does next (keep it in the
     oven, don't panic) and the ending flourish didn't.
-  - **No "heat the oven" step.** The temperature goes where the oven is first
-    used ("Roast at 180°C fan for 10 mins"), and a later step in the same oven
-    names no figure unless it changes; the grill likewise ("grill on its
-    highest setting"). Helen: *"I HATE having a "heat the oven" step. I mean,
-    like, duhhh."* DECISIONS §4.
+  - **Never write "preheat the oven".** The temperature goes where the oven
+    is first used ("Roast at 180°C fan for 10 mins"), and a later step in the
+    same oven names no figure unless it changes; the grill likewise ("grill
+    on its highest setting"). A source step that only heats the oven keeps
+    its `QQ original` and gets no `QQ Claude` line. Helen: *"I dislike
+    "Preheat the oven", so please never write it."* DECISIONS §4.
 
   None of this is a licence to write a `QQ Claude` line closer to her *voice*
   in the Tier 3 sense -- it's still her call when a step needs her own

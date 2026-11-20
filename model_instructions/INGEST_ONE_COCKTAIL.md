@@ -495,7 +495,8 @@ does not give one you cannot pick: that is a `QQ`.
 `honey water 3:1`
 
 **Sugars:** `white sugar` · `raw sugar` · `golden caster sugar` ·
-`molasses sugar` · `palm sugar` · `sugar cube` · `powdered sugar`
+`molasses sugar` · `dark brown soft sugar` · `palm sugar` · `sugar cube` ·
+`powdered sugar`
 
 **Juices:** `lime juice` · `lemon juice` · `orange juice` ·
 `blood orange juice` · `pineapple juice` · `grapefruit juice` ·
@@ -505,13 +506,16 @@ does not give one you cannot pick: that is a `QQ`.
 **Fruit and herbs:** `lime` · `pineapple` · `passion fruit` · `raspberries` ·
 `blackberries` · `pear` · `dried apricots` · `lemon zest` · `grapefruit zest` ·
 `lime zest with flesh` · `mint` · `basil` · `rosemary` · `fruit purée` ·
-`maraschino cherry` · `orange slice` · `cucumber` · `kaffir lime leaves`
+`maraschino cherry` · `orange slice` · `cucumber` · `kaffir lime leaves` ·
+`clementine` · `bay leaves`
 
 **Other:** `soda water` · `ginger beer` · `coconut water` · `birch water` ·
 `natural yoghurt` · `water` · `black tea` · `espresso` · `cola` ·
 `coconut cream` · `Coco mix` · `egg white` · `orange flower water` ·
-`vanilla extract` · `xanthan gum` · `salt` · `ground cinnamon` ·
-`cider vinegar` · `olive oil` · `cream` · `milk` · `whole egg`
+`vanilla extract` · `xanthan gum` · `salt` · `ground cinnamon` · `cloves` ·
+`cinnamon stick` · `green cardamom pods` · `apple and ginger tea` ·
+`cider vinegar` · `olive oil` · `cream` · `milk` · `whole egg` ·
+`dark chocolate`
 <!-- vocab:generics end -->
 
 ---
@@ -589,11 +593,12 @@ edible violet · edible orchid · mint leaf · thyme sprig · basil leaf (floate
 thin cucumber slice (floated) · length of cucumber peel
 
 **Spice and other:** grated nutmeg · grated chocolate · grated cinnamon ·
-Angostura bitters · whipped cream · cinnamon stick · ginger wheel ·
-stem ginger slice · skewered crystallised ginger · desiccated coconut ·
-star anise (floated) · skewered green olive · skewered black olives ·
+a whisper of cinnamon or a twist of lime · Angostura bitters · whipped cream ·
+cinnamon stick · ginger wheel · stem ginger slice ·
+skewered crystallised ginger · desiccated coconut · star anise (floated) ·
+skewered green olive · skewered black olives ·
 small stuffed dead Norwegian Blue · three coffee beans · cocoa powder ·
-icing sugar · ice cone
+icing sugar · ice cone · After Eight
 <!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:
