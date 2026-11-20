@@ -520,8 +520,12 @@ def _accent_map():
     return words, no_accent
 
 
+LINK_TARGET = re.compile(r"\]\([^)]*\)")
+
+
 def fix_accents(text, path, skip_qq=True, _cache={}):
-    """Prose only. Never `source:` or a slug; QQ lines as `fix_en_dashes`."""
+    """Prose only. Never `source:`, a slug or a markdown link's target, whose
+    accented spelling is a different address; QQ lines as `fix_en_dashes`."""
     if "map" not in _cache:
         _cache["map"] = _accent_map()
     words, no_accent = _cache["map"]
@@ -531,15 +535,18 @@ def fix_accents(text, path, skip_qq=True, _cache={}):
         if (skip_qq and is_qq(line)) or re.match(r"^source(_url)?:", line):
             out.append(line)
             continue
+        targets = LINK_TARGET.findall(line)
+        prose = LINK_TARGET.split(line)
         for plain, accented in words.items():
             if plain in no_accent:
                 continue
             pattern = re.compile(rf"\b{re.escape(plain)}\b", re.I)
-            if pattern.search(line):
+            if any(pattern.search(part) for part in prose):
                 def keep_case(m):
                     return accented.capitalize() if m.group()[:1].isupper() else accented
-                line = pattern.sub(keep_case, line)
+                prose = [pattern.sub(keep_case, part) for part in prose]
                 changed.append(f"{plain} -> {accented}")
+        line = prose[0] + "".join(t + p for t, p in zip(targets, prose[1:]))
         out.append(line)
     return "\n".join(out), changed
 
