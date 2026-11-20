@@ -1582,8 +1582,10 @@ no price. DECISIONS §8.2.
   total it cannot reach makes the row unpriced, or "from £X" where part of
   it was priced; never zero.
 - **What shows**: each row's price (`.shopping-list-price`), the total under
-  the rows (`.shopping-list-total`, "roughly £M (£X–£Y)", or "from £X — n
-  lines have no price"), and after each recipe's sentence one portion of a
+  the rows (`.shopping-list-total`, "roughly £M (£X–£Y)" or "from £X", and
+  under it, quieter, "n lines have no price (a, b)":
+  `HTF.shoppingList.drawTotal`, which the cocktail list's total uses too),
+  and after each recipe's sentence one portion of a
   `serves:` recipe or one batch of a `makes:` one (`.shopping-list-cost`),
   priced from the recipe as written and fixed whatever the box says.
 - **The recipe page** says the same figure in the drink page's footer
@@ -1821,11 +1823,22 @@ and unique ignoring case. `HTF.shortlist`'s single-list calls (`has`,
 `toggleIn`, `inAny`, `create`, `rename`, `remove` and `setActive` are the
 rest. Still one browser on one device (DECISIONS §8.3).
 
+**SEE ALL** (`HTF.shortlist.ALL`, the id `all`) can be the active list: every
+recipe on any list, once, in list order. It is not a list, and has no
+entries of its own; it has its own portions, batches, glasses and ticks (the
+record's `all`). In it, an addition goes to the first list, and rename and
+delete find nothing. Its numbers are the recipe page scaler's too
+(`portionsIn`/`batchesIn` and their setters with `ALL`, from
+`assets/js/recipe-scale.js`, keyed by the control's `data-shortlist-key`):
+the scaler opens at SEE ALL's number and writes each change back, a
+`makes:` recipe's thing-made count stored as batches, and the recipe as
+written stores nothing. `?shortlist=all` opens it.
+
 **Every `.btn-shortlist` opens the picker** (`assets/js/shortlist.js`, cloned
 from the `<template>` in `_includes/shortlist-picker.html`, which the layout
-emits on any page with a site key): a tick box per list, "+ new list", which
-makes a list with this recipe already on it, and under a rule "see all", the
-index's shortlist view. It opens on every press, on both sites, index or page.
+emits on any page with a site key): a tick box per list and "+ new list",
+which makes a list with this recipe already on it. It opens on every press, on
+both sites, index or page.
 The control is `is-on` while any list holds the recipe. The picker closes on
 its × (the ingredient hint's), on Escape (both put focus back on the
 control), on a press or focus outside it, and when the index hides the row it
@@ -1839,8 +1852,8 @@ Courier Prime, Helen's choice. The chooser's and the name forms' buttons are
 an icon from `_includes/icons/` (pencil, bin, plus, save, close).
 
 **`shortlisted (N)` counts every recipe on any list, once** (`paintCounts`
-in `shortlist.js`, `HTF.shortlist.total()` for a page's `see shortlist (N)`),
-and the chooser's options carry each list's own count.
+in `shortlist.js`, `HTF.shortlist.total()` for a page's `see shortlists
+(N)`), and the chooser's options carry each list's own count.
 
 **The view is not a facet**, and shows the active list. Pressing it
 on clears every other filter and shows that list. Setting any filter, or
@@ -1853,18 +1866,22 @@ cases from both field tables. Why it does not compose: DECISIONS §8.3.
 
 **The list chooser** (`_includes/shortlist-lists.html`,
 `assets/js/shortlist-lists.js`) shows under the pill while your own view is
-on: each index unhides it beside painting the pill. "choose shortlist", a
-select of "name (N)", sets the active list, with rename and delete beside it
-and "+ new list" on the row under. New and rename open one name form in place
-of the buttons; delete asks `window.confirm` first. Every change dispatches `htf:shortlist-change`, which
-both indexes already repaint from.
+on: each index unhides it beside painting the pill. A select with no
+visible label (its `aria-label` is "choose shortlist") of "name (N)", then an
+`<hr>` and "SEE ALL (N)", sets the active list; rename and delete sit beside
+it, hidden in SEE ALL, and "+ new list" on the row under. New and rename open
+one name form in place of the buttons; delete asks `window.confirm` first.
+Every change dispatches `htf:shortlist-change`, which both indexes already
+repaint from. It paints again on DOMContentLoaded, after the index has read
+`?shortlist=all`.
 
 **`?shortlist=1` enters the view on both indexes**, by calling the same
-`enterShortlistView()` the button calls, so the two doors land in one state.
-It runs after the other query blocks and replaces them, and drops the
-remembered scroll with the remembered list. The `see shortlist (N)` link
-beside a page's shortlist pill (`_includes/page-actions.html`) points there,
-ends `#results`, and is shown only while some list has something on it.
+`enterShortlistView()` the button calls, so the two doors land in one state;
+`?shortlist=all` does the same with SEE ALL made active first. It runs after
+the other query blocks and replaces them, and drops the remembered scroll
+with the remembered list. The `see shortlists (N)` link beside a page's
+shortlist pill (`_includes/page-actions.html`) opens SEE ALL, ends
+`#results`, and is shown only while some list has something on it.
 
 **`?shortlist=slug,slug&list=Name` is a shortlist someone sent. The index
 shows it and saves none of it.**
@@ -5119,8 +5136,8 @@ they are deliberately not drawn alike.
   bordered in `$color-border` on `$color-surface`; hover and on take the
   border to `currentColor`, so the site's own state colours drive it.
 - **`.btn-see-shortlist`** is a plain quiet-caps link in the same face as
-  print and pdf: "see shortlist (N)", word first, no arrow. It links to the
-  index with `?shortlist=1#results` (§8.9), which shows the active list. N is
+  print and pdf: "see shortlists (N)", word first, no arrow. It links to the
+  index with `?shortlist=all#results` (§8.9), which shows SEE ALL. N is
   every recipe on any list, once (`data-shortlist-total`, from
   `HTF.shortlist.total()`), not the page's. The pill opens the picker.
   **It stays hidden while N is 0**; `paintCounts()` in `shortlist.js`

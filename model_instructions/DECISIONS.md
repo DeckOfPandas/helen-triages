@@ -1416,7 +1416,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   recipe page says how many are missing and names them: "From £1.43 a batch
   in ingredients, not counting 1 unpriced item (cockerel carcass)." — Helen:
   *"number 1, but with "not counting X unpriced items""*; the names on
-  2026-11-08, #1486.
+  2026-11-08, #1486. On both shopping lists the total is a line of its own
+  and under it, quieter, "1 line has no price (item name, item name)" —
+  Helen's own spec, 2026-11-20, #1523.
 - **2026-11-03, #1458 — a researched food price's range is the median's
   bracket: the middle 50% of 6+ shop prices, the range of 3–5, the mean's two
   ends of 2.** Helen: *"2 points mean, 3-5 points median with range in
@@ -1796,10 +1798,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   and "keep these" saves into the list of that name; a pasted block restores
   every list (replacing #1100's "no restore"). Then, on the built page: the
   shortlisted count is every recipe on any list, once; list names are in
-  Courier Prime, everywhere; the chooser is labelled *"choose shortlist"*
-  with "+ new list" on a row of its own; every button carries an icon; the
-  pills take the shortlisted pill's states; the picker has the ingredient
-  hint's × and, under a rule, *"SEE ALL"*.
+  Courier Prime, everywhere; the chooser has no label (*"less is more"*) and
+  "+ new list" on a row of its own; every button carries an icon; the pills
+  take the shortlisted pill's states; the + picker has the ingredient hint's
+  × and no SEE ALL. **SEE ALL** is the chooser's last option, under a rule:
+  every recipe on any list, once, with portions of its own, which are the
+  recipe page scaler's number, both ways (Helen: *"if see all portions are
+  edited then that number is carried over to the recipe page scaler, and
+  vice versa"*). A recipe page's link reads *"SEE SHORTLISTS (N)"* and opens
+  it.
 - **2026-10-10, #1342 — the note over a shared shortlist and its "keep these"
   button keep the wording an agent wrote.** Helen, shown both: *"Both good,
   thanks!"* "a shared shortlist (N)" and "keep these" are approved strings,
