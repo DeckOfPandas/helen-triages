@@ -145,6 +145,7 @@ one stage on both sites.
 |---|---|---|---|
 | `0-not-made/` | — | ✓ | temporary: drinks she has never made, wishlisted ones included. Not a stage, and no test requires it |
 | `0-christmas/` | ✓ | — | temporary: food she is planning for the family Christmases of 2026. Not a stage, and no test requires it |
+| `2026-11-19/` | ✓ | — | temporary: the non-Christmas recipes ingested on 19 November 2026, kept together for now. Not a stage, and no test requires it |
 | pool (the root) | ✓ | ✓ | ingested; nobody has touched it since |
 | `1-rewrite/` | ✓ | ✓ | she has picked it and will rewrite it next |
 | `2-make/` | ✓ | ✓ | readable enough to make from |
