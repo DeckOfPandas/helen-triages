@@ -346,10 +346,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   *"Delete the bodies"*: the body repeated the `QQ original` lines unmarked,
   and would have published the book's text.
 - **2026-10-30 — a magazine page's citation: the book shape plus "via" for an
-  extract, a credit only from the page itself, the cover month.** Helen chose
-  *"Book shape, then "via""*, *"Yes, but not (c)"* (an uncredited page in a
-  book feature is the magazine's, and a first-name tip credit is no author)
-  and *"The cover month"*. `SOURCE_ATTRIBUTION_SPEC.md` holds the shapes.
+  extract, and a credit only from the page itself.** Helen chose *"Book
+  shape, then "via""* and *"Yes, but not (c)"* (an uncredited page in a book
+  feature is the magazine's, and a first-name tip credit is no author). The
+  issue it names is §5's folder ruling. `SOURCE_ATTRIBUTION_SPEC.md` holds
+  the shapes.
+- **2026-11-19 — a margin credit is no author; a feature built around a cook
+  is; a book the page names is cited with its author.** Asked about "Recipe
+  SARA BUENFELD" in a margin, Helen: *"Margin credits: no."* Asked about a
+  feature on Richard Burr, and NOPI and *Plenty More* printed without their
+  author: *"Those all sound like real credits, so please add them."*
 - **2026-10-30 — header and method times that disagree: `cook_time` takes the
   header's and a `QQ` note names the mismatch.** Helen chose *"Header, and
   flag it"*.
@@ -981,7 +987,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the fan figure is 20 lower.** Asked whether "190°C/Gas 5" there is
   conventional, Helen: *"Conventional: fan is 20 less".* A `QQ Claude` line
   says "170°C fan"; the `QQ original` keeps the printed figure.
-- **2026-11-19 — a magazine's issue is the one Helen's folder names.** Helen:
+- **2026-11-19 (replacing 2026-10-30's cover month) — a magazine's issue is
+  the one Helen's folder names.** Helen:
   *"issue details should always follow the folder I send you the recipe in,
   no need to guess"*. A folder `Good Food 2015-11` is `Good Food, November
   2015`, whatever a page's footer shows or hides.

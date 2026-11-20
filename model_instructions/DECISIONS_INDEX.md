@@ -59,7 +59,8 @@ argument and the rules each field is read by.
 - 2026-10-18 · §4 · an ingest ignores a "you will need" equipment list.
 - 2026-11-03 · §4 · page furniture: drop what sells; everything else written on the page goes in the body.
 - 2026-10-18 · §4 · a sidebar box ingested as a recipe has no body.
-- 2026-10-30 · §4 · a magazine page's citation: the book shape plus "via" for an extract, a credit only from the page itself, the cover month.
+- 2026-10-30 · §4 · a magazine page's citation: the book shape plus "via" for an extract, and a credit only from the page itself.
+- 2026-11-19 · §4 · a margin credit is no author; a feature built around a cook is; a book the page names is cited with its author.
 - 2026-10-30 · §4 · header and method times that disagree: cook_time takes the header's and a QQ note names the mismatch.
 - 2026-10-30 · §4 · the method may add a phase no ingredient group matches, and a step straddling two phases stays whole in the earlier one.
 - 2026-10-30 · §4 · a clear typo in the source's ingredient list is fixed in item: and kept in the QQ original.
@@ -155,7 +156,7 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
 - 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-10-18 · §5 · Riverford Companions prints a conventional oven figure; the fan figure is 20 lower.
-- 2026-11-19 · §5 · a magazine's issue is the one Helen's folder names.
+- 2026-11-19 · §5 · (replacing 2026-10-30's cover month) — a magazine's issue is the one Helen's folder names.
 - 2026-11-19 · §5 · nigella.com's single oven figure is conventional; the fan figure is 20 lower.
 - 2026-11-19 · §5 · a nigella.com recipe cites the book its page is "Featured in".
 - 2026-10-30 · §5 · where a source prints metric and imperial, keep the metric, bakes included; ounces only where it gives nothing else.

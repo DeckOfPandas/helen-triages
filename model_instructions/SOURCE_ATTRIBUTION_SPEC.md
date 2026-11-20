@@ -79,8 +79,14 @@ Helen's rulings:
   extracted from a book: the box two pages on does not reach it.
 - **A first-name-only credit is not an author.** "Juliet's tip" leaves the
   page the magazine's.
-- **The date is the issue's cover month**, even where the page footers name a
-  season or a feast ("Christmas 2026" in the November issue).
+- **A cook the magazine makes a fuss about is an author**: a byline, a photo,
+  a feature built around them. **A margin credit is not** ("Recipe SARA
+  BUENFELD" down the side).
+- **A book the page names is cited with its author**, even where the page
+  leaves the author off (NOPI and *Plenty More* are Ottolenghi's).
+- **The issue is the one Helen's folder names** (`Good Food 2015-11` is
+  `Good Food, November 2015`; `Olive Christmas 2026` is `olive magazine,
+  Christmas 2026`), whatever a page's footer shows.
 
 ---
 
