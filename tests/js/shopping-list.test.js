@@ -875,6 +875,21 @@ test('the total counts what it could not price, rather than hiding it', () => {
   assert.strictEqual(sum.unpriced, 1);
 });
 
+test('#1523: the total names what it could not price, on a line of its own', () => {
+  const rows = SL.build([
+    ing('420 ml', 'London dry gin'),
+    ing('8 leaves', 'mint'),
+    ing('2 dashes', 'saffron tincture')
+  ], { rates: RATES });
+  const sum = SL.total(rows);
+  assert.deepStrictEqual(Array.from(sum.unpricedNames), ['mint', 'saffron tincture']);
+  assert.strictEqual(SL.unpricedLine(sum), '2 lines have no price (mint, saffron tincture)');
+  assert.strictEqual(SL.unpricedLine({ unpriced: 1, unpricedNames: ['kombu'] }),
+    '1 line has no price (kombu)');
+  assert.strictEqual(SL.unpricedLine({ unpriced: 0, unpricedNames: [] }), '');
+  assert.strictEqual(SL.unpricedLine(null), '');
+});
+
 test('a list with nothing priceable has no total at all', () => {
   const rows = SL.build([ing('8 leaves', 'mint')], { rates: RATES });
   assert.strictEqual(SL.total(rows), null);
