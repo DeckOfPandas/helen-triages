@@ -1794,7 +1794,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   chooser; portions, batches and glasses are per list; the old list becomes
   "Shortlist"; deleting a list asks first; each link carries its list's name
   and "keep these" saves into the list of that name; a pasted block restores
-  every list (replacing #1100's "no restore").
+  every list (replacing #1100's "no restore"). Then, on the built page: the
+  shortlisted count is every recipe on any list, once; list names are in
+  Courier Prime, everywhere; the chooser is labelled *"choose shortlist"*
+  with "+ new list" on a row of its own; every button carries an icon; the
+  pills take the shortlisted pill's states; the picker has the ingredient
+  hint's × and, under a rule, *"SEE ALL"*.
 - **2026-10-10, #1342 — the note over a shared shortlist and its "keep these"
   button keep the wording an agent wrote.** Helen, shown both: *"Both good,
   thanks!"* "a shared shortlist (N)" and "keep these" are approved strings,

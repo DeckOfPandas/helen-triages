@@ -1821,14 +1821,28 @@ and unique ignoring case. `HTF.shortlist`'s single-list calls (`has`,
 `toggleIn`, `inAny`, `create`, `rename`, `remove` and `setActive` are the
 rest. Still one browser on one device (DECISIONS §8.3).
 
-**Every `.btn-shortlist` opens the picker** (`assets/js/shortlist.js`): a tick
-box per list and "+ new list…", which makes a list with this recipe already on
-it. It opens on every press, on both sites, index or page. The control is
-`is-on` while any list holds the recipe. The picker closes on Escape (focus
-back to the control), on a press or focus outside it, and when the index
-hides the row it opened under.
+**Every `.btn-shortlist` opens the picker** (`assets/js/shortlist.js`, cloned
+from the `<template>` in `_includes/shortlist-picker.html`, which the layout
+emits on any page with a site key): a tick box per list, "+ new list", which
+makes a list with this recipe already on it, and under a rule "see all", the
+index's shortlist view. It opens on every press, on both sites, index or page.
+The control is `is-on` while any list holds the recipe. The picker closes on
+its × (the ingredient hint's), on Escape (both put focus back on the
+control), on a press or focus outside it, and when the index hides the row it
+opened under.
 
-**`shortlisted (N)` is a view, not a facet**, of the active list. Pressing it
+**Looks** (`_sass/shared/_shortlist-lists.scss`): the picker's top rule, ticks
+and ticked names are `--shortlist-on`, the site's own "on" colour, which each
+site's `_shortlist.scss` sets. Every list name is `--shortlist-name-font`,
+Courier Prime, Helen's choice. The chooser's and the name forms' buttons are
+`.btn-shortlist-lists`, each site's `.btn-shortlist-only` pill extended, with
+an icon from `_includes/icons/` (pencil, bin, plus, save, close).
+
+**`shortlisted (N)` counts every recipe on any list, once** (`paintCounts`
+in `shortlist.js`, `HTF.shortlist.total()` for a page's `see shortlist (N)`),
+and the chooser's options carry each list's own count.
+
+**The view is not a facet**, and shows the active list. Pressing it
 on clears every other filter and shows that list. Setting any filter, or
 choosing a search result, while it is on turns it off and applies that filter
 to the whole collection; typing into a box without choosing keeps it. `clear
@@ -1839,9 +1853,10 @@ cases from both field tables. Why it does not compose: DECISIONS §8.3.
 
 **The list chooser** (`_includes/shortlist-lists.html`,
 `assets/js/shortlist-lists.js`) shows under the pill while your own view is
-on: each index unhides it beside painting the pill. A select of "name (N)"
-sets the active list; new and rename open an inline name box; delete asks
-`window.confirm` first. Every change dispatches `htf:shortlist-change`, which
+on: each index unhides it beside painting the pill. "choose shortlist", a
+select of "name (N)", sets the active list, with rename and delete beside it
+and "+ new list" on the row under. New and rename open one name form in place
+of the buttons; delete asks `window.confirm` first. Every change dispatches `htf:shortlist-change`, which
 both indexes already repaint from.
 
 **`?shortlist=1` enters the view on both indexes**, by calling the same
@@ -1849,7 +1864,7 @@ both indexes already repaint from.
 It runs after the other query blocks and replaces them, and drops the
 remembered scroll with the remembered list. The `see shortlist (N)` link
 beside a page's shortlist pill (`_includes/page-actions.html`) points there,
-ends `#results`, and is shown only while the active list has something on it.
+ends `#results`, and is shown only while some list has something on it.
 
 **`?shortlist=slug,slug&list=Name` is a shortlist someone sent. The index
 shows it and saves none of it.**
@@ -5105,9 +5120,9 @@ they are deliberately not drawn alike.
   border to `currentColor`, so the site's own state colours drive it.
 - **`.btn-see-shortlist`** is a plain quiet-caps link in the same face as
   print and pdf: "see shortlist (N)", word first, no arrow. It links to the
-  index with `?shortlist=1#results` (§8.9), which shows the active list, and N
-  is that list's count (`data-shortlist-total`, from
-  `HTF.shortlist.count()`), not the page's. The pill opens the picker.
+  index with `?shortlist=1#results` (§8.9), which shows the active list. N is
+  every recipe on any list, once (`data-shortlist-total`, from
+  `HTF.shortlist.total()`), not the page's. The pill opens the picker.
   **It stays hidden while N is 0**; `paintCounts()` in `shortlist.js`
   decides on every change.
 - Both ship `hidden` and `shortlist.js` reveals them: a control that
