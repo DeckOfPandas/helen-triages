@@ -566,8 +566,8 @@
     renderShoppingTotal(rows);
   }
 
-  /* What the shop comes to (#817), summed from the rows just rendered, and it
-     says how many lines it could not price. */
+  /* What the shop comes to (#817), summed from the rows just rendered, and
+     under it the lines it could not price, by name (#1523). */
   function renderShoppingTotal(rows) {
     if (!shoppingTotal) return;
     var sum = HTF.shoppingList.total(rows);
@@ -576,12 +576,7 @@
       shoppingTotal.textContent = '';
       return;
     }
-    var text = 'roughly ' + sum.text;
-    if (sum.unpriced) {
-      text += ' — ' + sum.unpriced +
-        (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
-    }
-    shoppingTotal.textContent = text;
+    HTF.shoppingList.drawTotal(shoppingTotal, 'roughly ' + sum.text, sum);
     shoppingTotal.hidden = false;
   }
 

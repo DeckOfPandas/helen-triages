@@ -64,6 +64,14 @@
 
 .shortlist-export-lists[hidden] { display: none; }
 
+// Under a shopping list's total, the lines it leaves out (#1523): a footnote
+// to the figure, so quieter than it. Both indexes draw it (shopping-list.js).
+.shopping-list-total .shopping-list-unpriced {
+  font-weight: 400;
+  font-size: 0.85em;
+  color: $color-clear-text;
+}
+
 // The note over a list opened from a share link (#1093), in the hint's
 // voice. Under the count row on both indexes, taking that row's gap above it
 // and giving the same gap to the list below.

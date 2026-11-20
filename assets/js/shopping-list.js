@@ -283,14 +283,14 @@
     var min = 0;
     var max = 0;
     var priced = 0;
-    var unpriced = 0;
+    var names = [];
     asList(rows).forEach(function (row) {
       if (row && row.price) {
         min += row.price.min;
         max += row.price.max;
         priced += 1;
       } else if (row) {
-        unpriced += 1;
+        names.push(row.label);
       }
     });
     if (!priced) return null;
@@ -299,9 +299,34 @@
       max: max,
       exact: Math.abs(max - min) < 0.005,
       priced: priced,
-      unpriced: unpriced,
+      unpriced: names.length,
+      unpricedNames: names,
       text: moneyText(min, max)
     };
+  }
+
+  /* The line under a shopping list's total that says what it leaves out,
+     naming the lines (#1523): "2 lines have no price (kombu, saffron)". ''
+     where everything is priced. Both indexes draw it. */
+  function unpricedLine(sum) {
+    var n = sum && sum.unpriced;
+    if (!n) return '';
+    var names = (sum.unpricedNames || []).filter(Boolean);
+    return n + (n === 1 ? ' line has no price' : ' lines have no price') +
+      (names.length ? ' (' + names.join(', ') + ')' : '');
+  }
+
+  /* A total and that line, as two lines of `el`. Text only, so a name is
+     never markup. */
+  function drawTotal(el, text, sum) {
+    el.textContent = text;
+    var line = unpricedLine(sum);
+    if (!line) return;
+    el.appendChild(document.createElement('br'));
+    var span = document.createElement('span');
+    span.className = 'shopping-list-unpriced';
+    span.textContent = line;
+    el.appendChild(span);
   }
 
   /* Only an amount written exactly `(top)` is a top; any other unquantified
@@ -696,6 +721,8 @@
   var api = {
     build: build,
     total: total,
+    unpricedLine: unpricedLine,
+    drawTotal: drawTotal,
     moneyText: moneyText,
     moneyHtml: moneyHtml,
     parseAmount: parseAmount,

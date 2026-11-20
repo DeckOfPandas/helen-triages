@@ -1506,8 +1506,9 @@ function renderResultsPool() {
     renderShoppingTotal(shownRows);
   }
 
-  /* What the shop comes to (#1458), as on the cocktail list (#817), and how
-     many lines it could not price. Hidden where nothing is costed. */
+  /* What the shop comes to (#1458), as on the cocktail list (#817), and
+     under it the lines it could not price, by name (#1523). Hidden where
+     nothing is costed. */
   function renderShoppingTotal(rows) {
     if (!shoppingTotal) return;
     var sum = COST_UNITS ? HTF.foodShoppingList.costTotal(rows) : null;
@@ -1516,12 +1517,7 @@ function renderResultsPool() {
       shoppingTotal.textContent = '';
       return;
     }
-    var text = (sum.partial ? '' : 'roughly ') + sum.text;
-    if (sum.unpriced) {
-      text += ' — ' + sum.unpriced +
-        (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
-    }
-    shoppingTotal.textContent = text;
+    HTF.shoppingList.drawTotal(shoppingTotal, (sum.partial ? '' : 'roughly ') + sum.text, sum);
     shoppingTotal.hidden = false;
   }
 
