@@ -941,6 +941,8 @@ other:
   - "cream"
   - "milk"
   - "whole egg"
+  # Weighed and melted into the spirit (the After Eight Martini).
+  - "dark chocolate"
 
 # === GENERIC -> FAMILY. Bases only. ===
 # A generic absent from here has no family, which is correct for every
@@ -1235,6 +1237,7 @@ shelf_of:
   xanthan gum: larder
   water: larder
   whole egg: larder
+  dark chocolate: larder
   # sugar syrup
   agave syrup: sugar syrup
   "cane sugar syrup 1:1": sugar syrup

@@ -748,6 +748,7 @@ weight_prices:
   white sugar:         { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   golden caster sugar: { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   palm sugar:          { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
+  dark chocolate:      { gbp_per_kg_min: 8.00, gbp_per_kg_max: 25.00, basis: "placeholder, not shop-checked: GBP 0.80-2.50 / 100 g bar (supermarket 70% to fine)", confidence: low }
 
 # --- how much a `(top)` pours ---
 # A declared range, because topping is not measuring (DECISIONS §9.3.5). It

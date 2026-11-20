@@ -514,7 +514,8 @@ does not give one you cannot pick: that is a `QQ`.
 `coconut cream` · `Coco mix` · `egg white` · `orange flower water` ·
 `vanilla extract` · `xanthan gum` · `salt` · `ground cinnamon` · `cloves` ·
 `cinnamon stick` · `green cardamom pods` · `apple and ginger tea` ·
-`cider vinegar` · `olive oil` · `cream` · `milk` · `whole egg`
+`cider vinegar` · `olive oil` · `cream` · `milk` · `whole egg` ·
+`dark chocolate`
 <!-- vocab:generics end -->
 
 ---
@@ -597,7 +598,7 @@ cinnamon stick · ginger wheel · stem ginger slice ·
 skewered crystallised ginger · desiccated coconut · star anise (floated) ·
 skewered green olive · skewered black olives ·
 small stuffed dead Norwegian Blue · three coffee beans · cocoa powder ·
-icing sugar · ice cone
+icing sugar · ice cone · After Eight
 <!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:

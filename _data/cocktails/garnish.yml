@@ -175,6 +175,8 @@ canonical:
     - "icing sugar"
     # The straw runs through it (Navy Grog's method says so).
     - "ice cone"
+    # The mint chocolate, on the rim or the side (the After Eight Martini).
+    - "After Eight"
 
 # LEFT: the string exactly as a drink says it today. RIGHT: what it might
 # become, or `QQ` where a judgement is needed. A row is resolved by deleting
