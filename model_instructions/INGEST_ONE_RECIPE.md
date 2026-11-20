@@ -765,7 +765,8 @@ batch comes from one of them, the index may say so once.
 - Both units are printed (100g/4oz). Write the metric figure only, bakes included, and do not list the dropped imperial. Helen: *"Metric only, bakes too"*
 - An aside under the standing "gf tip" rubric is transcribed without the label: it is Good Food's tip, not gluten-free. Helen: *"Good Food tip, the magazine source I use a lot?"*
 - Cite it as "Adapted from Good Food, <Month Year>", never "BBC Good Food". An issue whose footer says "Christmas" is the November issue. Helen: *""Christmas 2026" means "November 2026" -- this is always the case for Good Food, Nov not Dec."*
-- Add the recipe's author to the citation (", <Firstname Lastname>") where the magazine makes a fuss about them: a byline, a photo, a named feature. A credit down the margin is not a fuss. Helen: *"Add Good Food recipe authors where the magazine has made a fuss about them."* and *"Margin credits: no."*
+- Add the recipe's author to the citation (", <Firstname Lastname>") where the magazine makes a fuss about them: a byline, a photo, a named feature. Helen: *"Add Good Food recipe authors where the magazine has made a fuss about them."*
+- A credit printed down the margin ("Recipe SARA BUENFELD") is not a fuss: the citation stays the magazine's. Helen: *"Margin credits: no."*
 
 **Nigella Lawson** — a `source:` containing "Nigella Lawson":
 - nigella.com labels its fan figure (180°C/160°C Fan) where it gives one; where it prints a single figure with its gas mark (240°C/gas mark 9), that is conventional, so the fan figure is 20 lower: the rewrite says 220°C fan. Helen: *"Yes"*
