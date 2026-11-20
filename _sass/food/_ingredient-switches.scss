@@ -10,14 +10,14 @@
 // with the chosen word bold and the knob slid to it. Each script builds its
 // own `button.ingredient-switch[role=switch]`; `aria-checked` is the state.
 
-// The row they share. Pulled up into the heading's bottom margin, so it belongs
-// to INGREDIENTS rather than to the first group. A switch that does not fit
-// beside the other takes a line of its own; none ever breaks inside itself.
+// The block they share. Pulled up into the heading's bottom margin, so it
+// belongs to INGREDIENTS rather than to the first group. Each switch has a
+// line of its own at every width, and none ever breaks inside itself.
 .ingredient-switches {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: $space-md $space-xl;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-md;
   margin: (-$space-xl) 0 $space-lg;
 }
 

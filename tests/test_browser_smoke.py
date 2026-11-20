@@ -516,6 +516,11 @@ def test_metric_switch_converts_the_imperial_amounts_and_back(chromium, visit, p
     _settle(v.page)
     switch = v.page.locator(".ingredient-units")
     assert switch.get_attribute("aria-checked") == "false"
+    # Helen: "tickbox switch on one line, imperial switch on the next line".
+    ticks = v.page.locator(".ingredient-ticks").bounding_box()
+    units = switch.bounding_box()
+    assert units["y"] >= ticks["y"] + ticks["height"], (
+        f"{url} at {width}px: the metric switch is not on the line below the tick switch")
     written = v.page.evaluate(AMOUNTS)
     assert any(IMPERIAL_AMOUNT.search(a) for a in written), f"{url}: {written}"
 
