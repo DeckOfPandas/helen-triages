@@ -3,7 +3,7 @@ title: "Sticky Squidgy Ginger Loaf Cake with Treacle Topping"
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 tagline: "The cake is already sticky and dense, but then adding the treacle topping to it is ridiculous."
 source: "Henry"
 source_type: person
@@ -69,7 +69,7 @@ method_groups:
       - "Stir the ground spice blend and grated fresh ginger into the warm melted mixture and leave to infuse for 5 mins."
       - "Whisk the milk with the eggs into the slightly cooled saucepan mixture."
       - "Mix the flour, bicarbonate of soda and salt together, then gently pour in the wet mixture, and whisk gently until the batter is smooth."
-      - "Pour into a lined and greased 2-lb loaf tin, and bake at 140°C fan for 65–75 mins. Definitely check it at 65 mins. Done means still slightly sticky inside."
+      - "Pour into a lined and greased 2-lb (900 g) loaf tin, about 25 x 12.5 x 8 cm, and bake at 140°C fan for 65–75 mins. Definitely check it at 65 mins. Done means still slightly sticky inside."
       - "Cool completely in the tin."
   - name: "Make the treacle topping"
     steps:
