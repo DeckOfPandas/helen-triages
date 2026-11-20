@@ -1,6 +1,6 @@
 {
   "kit_repo": "helen-contains-claude-webdev",
-  "kit_commit": "290313e128b2497b2df8c74e1f3afcf0eeaabc18",
+  "kit_commit": "40c8b63511050ca6ae3d83483e0b12a3cc088c0b",
   "files": {
     ".claude/hooks/README.md": "0ba773835a2737e2b19e527596d17909426c7c401855a19b5672110434766979",
     ".claude/hooks/guard-awk.py": "3dd599df8eea1f323791bd5733302d896bd6b0813a014b24bb6783087149ad72",
@@ -28,7 +28,7 @@
     ".devcontainer/claude_code_latest.py": "5978fc97545064eaf8080637ba17c5bebbc5ab6e3d6dda551ce62cac9bc07ea2",
     ".devcontainer/container.bashrc": "db32bef6f7ef79d99e52cf964147dbfdbc38bd8957605c9984896788ad93cd32",
     ".devcontainer/devcontainer.template.json": "a2274581b5eba9bf5e09371da712617139dda8a9c908b80231d344a528598af0",
-    ".devcontainer/init-firewall.sh": "7750e5c2e4417376edb54a0a7c91e67ccdee1969c88f944b5d0c1e1c22ea6c71",
+    ".devcontainer/init-firewall.sh": "b8428c2b5bda970f8ca4be3bdd57a8adfcf5e08ee5ec3f8e07e47140e4def268",
     ".devcontainer/kit.local.example.env": "d35f7eddd87578917c41553ed3d1b3be9f75649cc22ef107364eeef6a9f24857",
     ".devcontainer/managed-settings.json": "3cea804bfc938b171b075c79545d114f3c7fb0cc7d40a1dc25c1b5e66036126a",
     ".devcontainer/read_local_token.py": "1e474e259c7e5f9fc4642f569e95b5d9caaf1f6e490314ff02c45a6d6617f9f4",
@@ -67,7 +67,7 @@
     "tests/kit/test_github_burst.py": "529b321c6d723fedd2fb520c0d861229551e7c4ceda536493c6f0c2119213d62",
     "tests/kit/test_hooks.py": "acac9bc65d55cc40d8d77df355620c096ea7eea88d1fe9971add29d503a229d2",
     "tests/kit/test_kit_build.py": "5676beb9f488c1019df9c8aa5950ea3b13802b1cf2d97f733f9bc9515ea90ba9",
-    "tests/kit/test_kit_config.py": "b0f4e6f0374bc98f6c1a3dbc83821828adbf64596d3fce50e5dc19d53a2218f7",
+    "tests/kit/test_kit_config.py": "32b8ea2eeaddf88c59ec0dc9c4775684a62f51771bb8f2cb6e7019f3174e6863",
     "tests/kit/test_kit_lock.py": "057698dfb21997547eca43f8ecaf1365ed6655944984ccf5b1f001da48c8a5e2",
     "tests/kit/test_kit_manifest.py": "10c1900c447748fd26c4e2abd80d012216faf383a344f52f36ac7d38c0ba9ba9",
     "tests/kit/test_kit_ports.py": "89c3f1f8bb2b4f212c7cba8a8bc6024321bee6e0563a820342cc24c148d0c23e",

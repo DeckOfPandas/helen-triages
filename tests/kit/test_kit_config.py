@@ -230,6 +230,31 @@ def test_run_sh_no_firewall_turns_it_off_for_one_run(project):
     assert "NET_ADMIN" not in run and "NET_RAW" not in run and "init-firewall.sh" not in run
 
 
+def firewall_script(kit_root: Path) -> str:
+    return (kit_root / ".devcontainer" / "init-firewall.sh").read_text()
+
+
+def test_firewall_script_parses(kit_root):
+    done = subprocess.run(["bash", "-n", str(kit_root / ".devcontainer" / "init-firewall.sh")],
+                          capture_output=True, text=True)
+    assert done.returncode == 0, done.stderr
+
+
+def test_firewall_rerun_never_recreates_the_live_set(kit_root):
+    # A rule holds the live set, so destroying it fails and creating it again
+    # dies; the list is built under another name and swapped in.
+    script = firewall_script(kit_root)
+    assert not re.search(r"ipset (destroy|create|add) allowed-domains\b", script)
+    assert re.search(r'ipset swap "\$NEW_SET" allowed-domains', script)
+
+
+def test_firewall_allows_github_by_its_published_ranges(kit_root):
+    # github.com rotates its address within minutes, so one lookup goes stale.
+    script = firewall_script(kit_root)
+    assert "https://api.github.com/meta" in script
+    assert ".git" in script and "https://github.com" in script
+
+
 def test_run_sh_toggles_and_flags(project):
     text = (project / ".devcontainer" / "kit.env").read_text()
     text = text.replace("WITH_RUBY=0", "WITH_RUBY=1").replace('PORTS=""', 'PORTS="5998:4000"')
