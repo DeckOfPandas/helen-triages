@@ -1777,13 +1777,24 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   *"Hide it in shared view"* of 2026-09-15.) It covers both sites: asked on
   2026-11-03 (#1462 C4), Helen: *"Yes shopping list shared link ruling covers
   cocktails."*
-- **Undated, #546 — the shortlist lives in one browser on one device, one
-  list per site, with no account; that is a ceiling, not a first step.**
-  Helen: *"one browser, one device, no sharing, no account etc is truly all I
-  want -- I actively don't want more."* And it *"can be food rows or cocktail
-  cards ... doesn't need to be a mixed list on one page"*. `localStorage`, one
-  store per site. The share link of #1093 is the one thing added since, and it
-  saves nothing. Do not propose sync or sign-in.
+- **Undated, #546 — the shortlists live in one browser on one device, per
+  site, with no account; that is a ceiling, not a first step.** Helen: *"one
+  browser, one device, no sharing, no account etc is truly all I want -- I
+  actively don't want more."* And it *"can be food rows or cocktail cards ...
+  doesn't need to be a mixed list on one page"*. `localStorage`, one record
+  per site. Do not propose sync or sign-in. (Its "one list per site" was
+  replaced by #1521, below.)
+- **2026-11-20, #1521 — many named lists, a recipe on any number of them,
+  all exported as one block, and restorable from it.** Helen: *"I would like
+  the ability to create multiple shortlists ... give the shortlists custom
+  names ... export all shortlists together, so one block to copy and paste
+  containing all shortlist URLs. Saving locally only is fine."* Her choices,
+  asked one by one: the + opens a picker of lists every time, two taps, over
+  one tap while there is one list; the index shows one list at a time from a
+  chooser; portions, batches and glasses are per list; the old list becomes
+  "Shortlist"; deleting a list asks first; each link carries its list's name
+  and "keep these" saves into the list of that name; a pasted block restores
+  every list (replacing #1100's "no restore").
 - **2026-10-10, #1342 — the note over a shared shortlist and its "keep these"
   button keep the wording an agent wrote.** Helen, shown both: *"Both good,
   thanks!"* "a shared shortlist (N)" and "keep these" are approved strings,
@@ -5663,13 +5674,16 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   was typography, an agent's call; a word is voice, so it shipped as a marked
   placeholder until she confirmed "drinks" and food's "portions" final on
   2026-09-20 (#1088). Markup, not CSS `content:`.
-- **2026-09-15, PR #1100 — the shortlist panel is a share link and nothing
-  else.** Helen: *"Remove the rest of the apparatus: no JSON export or import,
-  no clear."* The summary reads *"Share or save the shortlist"* and the hint,
-  on both sites, *"Loading this shows recipes without saving them."* The fear
-  the export was built for (*"I just KNOW that something will go wrong and I'll
-  lose my shortlist"*) is served by the link, which keeps no portions or
-  glasses.
+- **2026-09-15, PR #1100; 2026-11-20, #1521 — the shortlist panel is links
+  and nothing else: no JSON, no clear.** Helen, of #1100: *"Remove the rest of
+  the apparatus: no JSON export or import, no clear."* Since #1521 the links
+  are a block, one per list, and a pasted block restores them (§8.3). The
+  hint, on both sites, is hers: *"Loading this shows recipes without saving
+  them."* The summary *"Share or save the shortlist"* became "the shortlists"
+  and the restore line was written by a session, both awaiting her look. The
+  fear the export was built for (*"I just KNOW that something will go wrong
+  and I'll lose my shortlist"*) is served by the links, which keep no portions
+  or glasses.
 - **2026-09-20, #1088 — "If you liked this, how about…" is final.** Helen:
   *"The if you like this text isn't a placeholder. Final version."* The words
   were hers from #927's title. A placeholder marker means she has not ruled,
