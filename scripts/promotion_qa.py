@@ -25,7 +25,7 @@ FOLDERS = ["1-rewrite", "2-make", "3-keep", "4-promote"]
 MODULES = ["test_style", "test_front_matter", "test_taxonomy"]
 
 AT_3_KEEP = {"test_note_dicts_have_label_and_text", "test_internal_recipe_links_resolve",
-             "test_meta_block_is_exactly_the_three_flags_in_order"}
+             "test_meta_block_is_exactly_the_four_flags_in_order"}
 
 
 def targets(args):

@@ -137,7 +137,7 @@ NOT_FOR_DRAFTS = {
     "test_required_field_present":
         "the draft twin checks key presence only, deliberately, without the "
         "'and it must be written' half",
-    "test_meta_block_is_exactly_the_three_flags_in_order":
+    "test_meta_block_is_exactly_the_four_flags_in_order":
         "5 drafts, down from 341 -- the #429 migration landed 2026-08-29 and "
         "this is no longer a TODO. Three legitimately carry claude_rewritten, "
         "which #418 allows on a draft and this rule forbids outright; two have "
@@ -331,7 +331,8 @@ def test_meta_fields_are_nested_not_top_level(draft):
 
 
 def test_meta_block_complete(draft):
-    """A draft's `meta:` is a mapping carrying `rewritten` and `proofread`.
+    """A draft's `meta:` carries `made_before`, `rewritten` and `proofread`,
+    and `made_before` is a real boolean: the local "untried" filter reads it.
 
     Narrower than the recipe version, which also requires `awaiting_fix`: that
     flag fails closed and is Helen's to set, so a draft may not have one yet.
@@ -341,8 +342,12 @@ def test_meta_block_complete(draft):
     assert isinstance(meta, dict), (
         f"{where_draft(draft)} has no `meta:` block, or it is not a mapping."
     )
-    missing = [f for f in ("rewritten", "proofread") if f not in meta]
+    missing = [f for f in ("made_before", "rewritten", "proofread") if f not in meta]
     assert not missing, f"{where_draft(draft)} `meta:` is missing {missing}."
+    assert isinstance(meta["made_before"], bool), (
+        f"{where_draft(draft)} has `meta.made_before: {meta['made_before']!r}`; "
+        f"write an unquoted true or false."
+    )
 
 
 def test_meta_sits_directly_under_the_title(draft):

@@ -98,6 +98,7 @@ assume recipes with lots of missing text are to be deliberately excluded."*
 ---
 title: "Lemony Cavolo Nero and Butter Bean Soup"
 meta:
+  made_before: false
   rewritten: false
   awaiting_fix: false
   proofread: false
@@ -162,12 +163,15 @@ name you give is a courtesy rather than a contract.
 | a "you will need" list | **Ignore it.** Cake rings, thermometers, palette knives and foil are never an ingredient group or a note. Helen: *"the rule is "trust the cook"."* |
 | page furniture | **Drop anything that sells something**: a show appearance, a ticket line or phone number, a book plug, a TV listing, a "next month" teaser, a web pointer, a "what to drink" box with bottles and prices. **Keep writing about the dish**: an essay, a bio of the cook, a boxed aside, which go in the body below the front matter. Helen: *"Drop ads, keep essays."* |
 | a sidebar box with no list | A box such as "Kale crisps" or "Mastering perfect mash" becomes a file in the usual shape (quantities lifted from its text, per §2) and **has no body**: its words are already in the `QQ original` lines, and a body repeating them would publish the book's text unmarked. |
-| `meta` | Exactly these three keys, in this order, all `false`, **directly under `title:`**. See below. |
+| `meta` | Exactly these four keys, in this order, all `false`, **directly under `title:`**. See below. |
 
-**`meta:` is three flags, in that order, and on a new file all three are
+**`meta:` is four flags, in that order, and on a new file all four are
 `false`. It is the second key, straight after `title:`**, because Helen
-checks the flags first whenever she opens a file. `rewritten` and `proofread` are Helen's own claims about her own
-work — you never set either `true`. `awaiting_fix: false` is what lets a page
+checks the flags first whenever she opens a file. `made_before`, `rewritten`
+and `proofread` are Helen's own claims about her own work — you never set any
+of them `true`; `made_before: false` is what puts a recipe in the local
+`untried` view, and a food recipe publishes only once it is `true`.
+`awaiting_fix: false` is what lets a page
 publish once it is finished, and `false` is the only value that works: a missing
 key, or `"false"` in quotes, holds the page back silently. Write
 `awaiting_fix`, with an underscore, never a hyphen.
@@ -934,6 +938,7 @@ line above the envelope is its issue title:
 ---
 title: "Crispy Sage Butter Gnocchi"
 meta:
+  made_before: false
   rewritten: false
   awaiting_fix: false
   proofread: false

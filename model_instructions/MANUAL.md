@@ -571,7 +571,8 @@ code, so do not quote the banned call in a comment.
 
 ```yaml
 title: "Lemony Cavolo Nero and Butter Bean Soup"
-meta:                            # exactly these three, in this order -- §4.0.
+meta:                            # exactly these four, in this order -- §4.0.
+  made_before: false             # Helen's; true or the recipe does not publish
   rewritten: false               # A draft's second key; a published recipe
   awaiting_fix: false            # keeps the order it was promoted in
   proofread: false
@@ -617,7 +618,7 @@ checked.
 | `serves` xor `makes`; `method` xor `method_groups` | `test_serves_xor_makes`, `test_method_xor_method_groups` |
 | Top-level scalar strings are double-quoted | `SCALAR_STRING_FIELDS`; `/tidy-drafts` fixes it mechanically |
 | Members of `main_ingredients` and `tags` are quoted | `test_main_ingredients_entries_are_quoted`, `test_tags_entries_are_quoted` (`tests/test_taxonomy.py`, and again over drafts) |
-| `meta:` is `rewritten`, `awaiting_fix`, `proofread`, in that order, real booleans, nothing else | `test_meta_block_is_exactly_the_three_flags_in_order` |
+| `meta:` is `made_before`, `rewritten`, `awaiting_fix`, `proofread`, in that order, real booleans, nothing else | `test_meta_block_is_exactly_the_four_flags_in_order`; a draft's `made_before` by `test_meta_block_complete` |
 | A draft's `meta:` sits directly under `title:`; `tidy_drafts.py --site food --only order --apply` moves it | `test_meta_sits_directly_under_the_title` (`tests/test_drafts.py`) |
 | A draft's `main_ingredients` name its herbs (bay included), citrus, cream and wine, and a bake's flour, butter, eggs and sugar, bar garnishes, washes, options and alternatives (DECISIONS §6) | `test_main_ingredients_name_what_the_dish_tastes_of` (`tests/test_drafts.py`) |
 | A `main_ingredients` entry is singular or plural as its ingredient list is, and every plural has an alias making it one chip with its singular (§6) | `test_main_ingredients_use_the_lists_own_number`, `test_no_ingredient_is_two_chips_by_number` (`tests/test_taxonomy.py`) |
@@ -625,12 +626,18 @@ checked.
 | Retired keys stay retired | `RETIRED`, which says what replaced each |
 | `serves:` opens with a number, or `makes:` with a count `food_yield.rb` reads (a draft's `QQ` excepted) | `tests/test_food_shopping.py` |
 
-`meta.claude_rewritten` (optional) may sit alongside the three on a draft
+`meta.claude_rewritten` (optional) may sit after `rewritten` on a draft
 only: it records that Claude took a tidy-up pass, not that the recipe is
-rewritten. `RETIRED` and the tombstone beside
-`test_claude_rewritten_is_a_real_boolean` record the retired `cooked_before`
-promotion gate and how to restore it. Do not resurrect a retired key for a
-gap it used to paper over.
+rewritten. Do not resurrect a retired key for a gap it used to paper over.
+
+**`made_before` says Helen has cooked it.** It is hers to set, like
+`rewritten` and `proofread`; an ingest writes `false`. On food it is a leg of
+the publish gate (`_plugins/publish_gate.rb`): a published recipe she sets
+`false` leaves the live site. Locally, the food index's `untried` pill, beside
+`hide drafts`, narrows the list to rows whose `made_before` is not `true`
+(`data-untried`, written only under `site.show_drafts`) and composes with every
+filter, so `festive` plus `untried` is the Christmas test pool. No row badge
+(#562). DECISIONS §4.
 
 **`source_type` is required alongside `source`.**
 `model_instructions/SOURCE_ATTRIBUTION_SPEC.md` is the contract and

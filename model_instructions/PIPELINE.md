@@ -63,7 +63,7 @@ flowchart TD
     MP --> PF["HELEN PROOFREADS THE RENDERED PAGE<br/>jekyll-local /…/drafts/‹folder›/‹slug›/<br/>rewritten: true (hers) · proofread: true"]:::helen
     PF --> PROMO["PROMOTION (Helen, or Claude when she asks)<br/>re-check the gate · copy · byte-compare ·<br/>delete from private · baseline commit · PR"]:::claude
     PROMO --> MERGE["Helen merges → deploy"]:::helen
-    MERGE --> LIVE["_food_recipes/ · _cocktail_recipes/<br/>awaiting_fix: false AND proofread: true<br/>cocktails also rewritten: true"]:::live
+    MERGE --> LIVE["_food_recipes/ · _cocktail_recipes/<br/>awaiting_fix: false AND proofread: true<br/>cocktails also rewritten: true<br/>food also made_before: true"]:::live
 
     LIVE -->|"an agent edit"| TOUCH{"how big?"}:::claude
     TOUCH -->|"a word or a number"| ASK["ask Helen; she may grant<br/>no flip (move the baseline)"]:::helen
@@ -253,8 +253,8 @@ Six steps, the same on both sites. This is the short version;
    thing wrong is `awaiting_fix: true` in a commit that says what; it is fixed
    between them, she re-reads, and the flag goes back.
 6. **Promotion.** Helen promotes a recipe herself, or asks Claude to. Claude never decides a file is ready and never moves one to the public repo unasked. The steps: re-check the gate at copy time, failing
-   closed (`awaiting_fix: false` and `proofread: true`, and on a cocktail
-   `rewritten: true`); copy into the public collection; byte-compare; delete
+   closed (`awaiting_fix: false` and `proofread: true`, on a cocktail
+   `rewritten: true`, and on food `made_before: true`, Helen's flag); copy into the public collection; byte-compare; delete
    from the private repo; move the baseline constant in a commit of its own
    and prove the guard still bites; check each page by name in the production
    build; run `python3 scripts/verify.py`; open the PR on `main`, naming any
