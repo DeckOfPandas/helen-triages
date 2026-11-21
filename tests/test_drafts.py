@@ -649,6 +649,10 @@ def test_citrus_is_measured_not_squeezed(draft):
     _st.test_citrus_is_measured_not_squeezed(draft)
 
 
+def test_citrus_juice_is_freshly_squeezed(draft):
+    _st.test_citrus_juice_is_freshly_squeezed(draft)
+
+
 def test_spellings(draft):
     _st.test_spellings(draft)
 
