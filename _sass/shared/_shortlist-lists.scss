@@ -140,8 +140,7 @@
 }
 
 .shortlist-picker-name,
-.shortlist-lists-name,
-.shortlist-lists-select {
+.shortlist-lists-name {
   min-width: 0;
   font-family: var(--shortlist-name-font);
   font-size: 1rem;   // 16px: below it, iOS zooms the page on focus
@@ -186,9 +185,106 @@
   gap: $space-sm;
 }
 
-.shortlist-lists-select { max-width: 100%; }
+// The button naming the list on show, in the name box's dress, with a caret.
+// Its menu is the picker's box, opened under it, its left edge on the
+// button's.
+.shortlist-lists-choose {
+  position: relative;
+  max-width: 100%;
+}
+
+.shortlist-lists-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-md;
+  max-width: 100%;
+  min-height: 2.5rem;
+  box-sizing: border-box;
+  padding: $space-xs $space-md;
+  color: $color-text;
+  background: $color-surface;
+  border: 1.5px solid $color-border;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover,
+  &:focus-visible,
+  &[aria-expanded="true"] {
+    outline: none;
+    border-color: var(--shortlist-on);
+  }
+}
+
+.shortlist-lists-toggle::after {
+  content: "";
+  flex: none;
+  width: 0.45em;
+  height: 0.45em;
+  margin-top: -0.25em;
+  border-right: 2px solid var(--shortlist-on);
+  border-bottom: 2px solid var(--shortlist-on);
+  transform: rotate(45deg);
+}
+
+.shortlist-lists-menu {
+  top: calc(100% + #{$space-xs});
+  left: 0;
+}
+
+// A row as the picker's: the tick box's room holds a tick on the list shown.
+.shortlist-lists-option {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  width: 100%;
+  min-height: 2.5rem;
+  box-sizing: border-box;
+  padding: 0 $space-lg;
+  color: $color-text;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+
+  &::before {
+    content: "";
+    flex: none;
+    width: 1.1rem;
+    color: var(--shortlist-on);
+    font-weight: 700;
+    text-align: center;
+  }
+
+  &:hover,
+  &:focus-visible {
+    outline: none;
+    background: color-mix(in srgb, var(--shortlist-on) 10%, transparent);
+  }
+
+  &[aria-current="true"] { color: var(--shortlist-on); }
+  &[aria-current="true"]::before { content: "\2713"; }
+}
+
+.shortlist-picker-list:first-child .shortlist-lists-option { padding-right: 2.75rem; }
+
+// SEE ALL, under a rule, in the actions' caps.
+.shortlist-lists-all {
+  margin-top: $space-sm;
+  padding-top: $space-sm;
+  border-top: 1px solid $color-border;
+}
+
+.shortlist-lists-all-name {
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 
 // `hidden` must win over the displays above.
+.shortlist-lists-menu[hidden],
 .shortlist-lists[hidden],
 .shortlist-lists-row[hidden],
 .shortlist-lists-actions[hidden],

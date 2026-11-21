@@ -1582,22 +1582,30 @@ function renderResultsPool() {
      The button ships `hidden` and is revealed here, by the script that makes
      the filter real. It is a view, not a facet (#918): pressing it on clears
      every other filter, boxes and pools included; a filter set while it is on
-     takes it off again (reconcileShortlistView, in update()). */
+     takes it off again (reconcileShortlistView, in update()). Turning it on
+     opens SEE ALL, the view its count counts (#1521). */
   if (shortlistOnlyBtn) {
     shortlistOnlyBtn.hidden = false;
     shortlistOnlyBtn.addEventListener('click', function () {
       if (sharedKeys) {
         // Over a shared list the button is not on (syncShortlistOnly), so a
-        // press means what it means when off: show MY shortlist.
+        // press means what it means when off: show MY shortlists.
         sharedKeys = null;
         sharedUnmatched = [];
       } else if (state.shortlisted) {
         state.shortlisted = false;
+        update();
+        return;
       } else {
         state = FilterState.enterShortlistView();
         resetFilterControls();
       }
       update();
+      // The change event repaints the chooser and the counts.
+      HTF.shortlist.setActive(HTF.shortlist.ALL);
+      document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
+        detail: { key: null, on: false, list: HTF.shortlist.ALL }
+      }));
     });
   }
 

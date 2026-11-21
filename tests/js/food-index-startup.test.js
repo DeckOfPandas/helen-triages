@@ -291,6 +291,20 @@ function showTheList(doc) {
   doc.getElementById('shortlist-only').dispatch('click');
 }
 
+// The pill opens SEE ALL (#1521), whose counts and ticks are its own: a test
+// that sets them before pressing it sets them there.
+function seeAll(win) {
+  win.HTF.shortlist.setActive(win.HTF.shortlist.ALL);
+}
+
+test('#1521: the pill opens SEE ALL, whichever list was on show', () => {
+  const { win, doc } = boot();
+  const store = win.HTF.shortlist;
+  store.setActive(store.create('Sunday lunch'));
+  showTheList(doc);
+  assert.strictEqual(store.activeId(), store.ALL);
+});
+
 // --- the canary ---------------------------------------------------------------
 
 test('the index gets to the end of filters.js', () => {
@@ -543,6 +557,7 @@ test('one cake is a cake, not a batch: the row names the thing made', () => {
 
 test('two of them take the plural, and a dozen stays a dozen', () => {
   const { win, doc, panel } = boot({ recipes: SINGLE_THINGS });
+  seeAll(win);
   ['cake', 'sauce', 'pies'].forEach((slug) => {
     win.HTF.shortlist.toggle('/food/recipes/' + slug + '/');
     win.HTF.shortlist.setBatches('/food/recipes/' + slug + '/', 2);
@@ -701,6 +716,7 @@ test('#1457: every row has a tick box, and a tick made earlier is drawn ticked',
   // The list is rebuilt whole on every number change: the store is what
   // carries a tick across, so the render must read it back.
   const { win, doc, panel } = boot();
+  seeAll(win);
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.setTicked('onion', true);
   showTheList(doc);
@@ -718,6 +734,7 @@ test('#1457: a new count for one recipe unticks its rows, and only its rows', ()
   // Recipe a stands behind flour, onions and olive oil; the cookies behind
   // peanut butter and an egg.
   const { win, doc, panel } = boot();
+  seeAll(win);
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.toggle('/food/recipes/cookies/');
   ['plain flour', 'olive oil', 'egg'].forEach((k) => win.HTF.shortlist.setTicked(k, true));
@@ -739,6 +756,7 @@ test('#1457: a new count for one recipe unticks its rows, and only its rows', ()
 test('a count above one is still batches of that many', () => {
   // 18 of something is a batch, unlike one named thing.
   const { win, doc, panel } = boot();
+  seeAll(win);
   win.HTF.shortlist.toggle('/food/recipes/cookies/');
   win.HTF.shortlist.setBatches('/food/recipes/cookies/', 2);
   showTheList(doc);
@@ -854,6 +872,7 @@ test('a by-eye measure is totalled to a whole one, from the panel\'s own list', 
       }
     }
   });
+  seeAll(win);
   win.HTF.shortlist.setPortions('/food/recipes/a/', 7);
   win.HTF.shortlist.toggle('/food/recipes/a/');
   showTheList(doc);

@@ -987,16 +987,22 @@
     shortlistOnlyBtn.addEventListener('click', function () {
       if (sharedKeys) {
         // Over a shared list the button is not on, so a press means what it
-        // means when off: show MY shortlist (#1093).
+        // means when off: show MY shortlists, as SEE ALL (#1521).
         sharedKeys = null;
         sharedUnmatched = [];
       } else if (state.shortlisted) {
         state.shortlisted = false;
+        apply();
+        return;
       } else {
         state = FilterState.enterShortlistView();
         resetControls();
       }
-      apply();
+      // The change event repaints the chooser, and apply() with it.
+      HTF.shortlist.setActive(HTF.shortlist.ALL);
+      document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
+        detail: { key: null, on: false, list: HTF.shortlist.ALL }
+      }));
     });
   }
 
