@@ -51,7 +51,7 @@ ingredient_groups:
     - amount: "½"
       item: "orange, zested"
     - amount: "2 tsp"
-      item: orange juice
+      item: "freshly squeezed orange juice"
     - item: "a few tbsp chopped roasted pistachios, to top"
 method_groups:
   - name: "cake"
