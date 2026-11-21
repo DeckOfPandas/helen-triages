@@ -97,28 +97,32 @@ tags:
     # anchovy, bacon or chorizo in a supporting role is fine. Wider than
     # `virtuous`, which is about lightness.
     - herbivore-ish
-    # Small, hot and eaten between meals: toasties, fritters, things on toast.
-    - hot snack
     - ice cream
     # A sit-down dinner eaten with a knife and fork and cooked properly: a
     # roast, a braise, a whole fish, a vegetable centrepiece. About how it is
     # eaten, not what is on the plate, so it needs no animal. The counterpart
     # of `one-handed food`.
     - knife and fork
-    # Finger food to pass round with drinks.
+    # Savoury, bite-sized, passed round with drinks at a party. A dish served
+    # at the table in portions (fishcakes, a tart, a pâté for four) is a
+    # starter, not nibbles; a sweet bite is a sweet treat (`tag_hints: clashes`).
     - nibbles
     # Food you can eat curled on the sofa: nothing that rolls, spills or has to
     # be chased. Tagged by hand on the eating mechanics. Never a soup; a
     # meatball alone is, on spaghetti or in a broth it is not.
     - one-handed food
     - salad
+    # A small savoury thing for one or two between meals, hot or cold:
+    # toasties, fritters, crumpets, things on toast, kale crisps. A sweet one
+    # is a sweet treat; one passed round at a party is nibbles.
+    - savoury snack
     # The result makes people gasp at the table, however little work it took.
     - showstopper
     - soup
     # Small sweet things eaten by hand outside a meal, made or named as
     # individual pieces: a biscuit, a bun, a brownie, a bar, a scone. Not a
     # whole cake in slices, nor a traybake cut into squares.
-    - sweet snack
+    - sweet treat
     - virtuous
 
   practicalities:
@@ -133,9 +137,9 @@ tags:
     # You can make this and stash it for later. A separate axis from
     # `make-ahead` and never a co-tag of it.
     - freezable
-    # This could be dinner. Never with dessert, sweet snack, ice cream, drinks
+    # This could be dinner. Never with dessert, sweet treat, ice cream, drinks
     # or nibbles; asked about with bakes, extras, side, starter, breakfast or
-    # hot snack. Savoury pancakes are breakfast or a snack, never a main; a
+    # savoury snack. Savoury pancakes are breakfast or a snack, never a main; a
     # frittata, baked eggs, a vegetable fritter or a griddle cake may be one.
     - main
     # A substantial part of the dish, or all of it, is prepared well before
@@ -173,6 +177,11 @@ co_tags:
 #   ingredients_all  every one of these as a whole word in the ingredient items
 #   text_any         any of these phrases in the tagline, method or notes
 tag_hints:
+  # Tags that never sit together (#1526): a recipe carrying both is reported.
+  clashes:
+    nibbles: [sweet treat, dessert, main, salad, soup, knife and fork]
+    savoury snack: [sweet treat, dessert]
+    sweet treat: [main, side]
   tags:
     salad:     { title: [salad] }
     soup:      { title: [soup] }

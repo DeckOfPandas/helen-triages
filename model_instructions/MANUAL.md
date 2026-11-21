@@ -1139,13 +1139,18 @@ regardless.
   result (it makes people gasp at the table). Either, both or neither. Slow
   is not fiddly.
 - `bakes` is a baked good out of the oven, not anything that merely goes in
-  it. `sweet snack` is individual pieces eaten by hand outside a meal, not
+  it. `sweet treat` is individual pieces eaten by hand outside a meal, not
   slices of something else.
+- The snack tags are three: `nibbles` (savoury, bite-sized, passed round with
+  drinks at a party), `savoury snack` (small, for one or two between meals,
+  hot or cold) and `sweet treat`. Pairs that never sit together are
+  `tag_hints: clashes` in `_data/food/taxonomy.yml`, which
+  `scripts/check_food_tags.py` reports, at ingest and on request.
 
 **`main` — this could be dinner — is the one tag with a rule behind its
-proposal.** Never with `dessert`, `sweet snack`, `ice cream`, `drinks` or
+proposal.** Never with `dessert`, `sweet treat`, `ice cream`, `drinks` or
 `nibbles`. A recipe with none of those and none of `bakes`, `extras`, `side`,
-`starter`, `breakfast`, `hot snack` is a main. With one of that second six
+`starter`, `breakfast`, `savoury snack` is a main. With one of that second six
 it is a question to Helen — except that savoury pancakes are breakfast or a
 snack, never dinner. A frittata, baked eggs, a vegetable fritter or a griddle
 cake may be a main, and is asked.

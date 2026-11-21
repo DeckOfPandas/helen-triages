@@ -386,7 +386,7 @@ _MAIN_WORDS = {
             r"|cognac|rum|cider|beer|stout|mirin|sake",
 }
 _BAKE_STAPLES = {"flour", "butter", "eggs", "sugar"}
-_BAKE_TAGS = {"bakes", "dessert", "sweet snack"}
+_BAKE_TAGS = {"bakes", "dessert", "sweet treat"}
 # Where the word names something else.
 _NOT_THE_WORD = re.compile(
     r"\b(?:butter beans?|peanut butter|nut butter|almond butter|cocoa butter"

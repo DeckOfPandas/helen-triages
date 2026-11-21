@@ -12,7 +12,7 @@ makes: "about 3 dozen"
 prep_time: "Approximately forever, but who cares"
 cook_time: "15 mins"
 main_ingredients: ["almonds", "candied peel", "glacé cherries", "dark chocolate", "double cream", "angelica", "golden caster sugar", "salted butter", "plain flour"]
-tags: ["bakes", "sweet snack", "fiddly and fun"]
+tags: ["bakes", "sweet treat", "fiddly and fun"]
 ingredient_groups:
   - items:
     - amount: "2 tbsp"

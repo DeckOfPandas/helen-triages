@@ -28,9 +28,9 @@ test('+ decodes to a space -- Jekyll url_encode spells a space that way', () => 
 });
 
 test('every space-bearing taxonomy value survives the + round trip', () => {
-  const encoded = 'tag=carbs+party,hot+snack,ice+cream,one-handed+food&star=root+veg';
+  const encoded = 'tag=carbs+party,savoury+snack,ice+cream,one-handed+food&star=root+veg';
   const parsed = FS.parseQuery(encoded);
-  assert.deepStrictEqual(parsed.tag, ['carbs party', 'hot snack', 'ice cream', 'one-handed food']);
+  assert.deepStrictEqual(parsed.tag, ['carbs party', 'savoury snack', 'ice cream', 'one-handed food']);
   assert.deepStrictEqual(parsed.star, ['root veg']);
 });
 

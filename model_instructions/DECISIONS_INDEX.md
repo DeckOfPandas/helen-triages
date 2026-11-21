@@ -193,7 +193,7 @@ argument and the rules each field is read by.
 - 2026-10-08 · §7 · food gets no tag deriver; it gets a report.
 - 2026-10-10 · §7 · food tags are proposed by a session reading the draft against each tag's written meaning, for Helen's yes or no.
 - 2026-10-10 · §7 · bakes means "would this appear on Great British Bake Off?"
-- 2026-10-10 · §7 · sweets is renamed sweet snack — Helen: "what if we rename 'sweets' to 'sweet snacks', or something else with the word 'sweet' in it?
+- 2026-11-21 · §7 · #1526 · (replacing 2026-10-10's sweet snack) — three snack tags: nibbles, savoury snack, sweet treat, with clashes reported.
 - 2026-10-10 · §7 · fiddly and fun is a mood for the PROCESS, and showstopper is narrowed to the RESULT.
 - 2026-10-11 · §7 · main is a real practicality tag, seeded by subtraction, and the same rule is the proposal at ingest.
 - 2026-10-21 · §7 · a frittata, baked eggs, a vegetable fritter or a griddle cake may be a main; savoury pancakes are breakfast or a snack, never a main.
@@ -202,7 +202,7 @@ argument and the rules each field is read by.
 - 2026-10-21 · §7 · fruit is a cake's star only where the fruit is the point.
 - 2026-10-11 · §7 · no soup is one-handed food — Helen: "soup is never called one-handed food".
 - 2026-10-11 · §7 · melting chocolate is prep, so a fridge cake is no-cook.
-- 2026-10-11 · §7 · a sweet snack is named for the piece — A brownie or a bar is one; a cake cut up to serve is not.
+- 2026-10-11 · §7 · a sweet treat is named for the piece — A brownie or a bar is one; a cake cut up to serve is not.
 - 2026-08-16 · §7 · #216 · make-ahead means a substantial part of the dish, or all of it, is prepared well ahead of serving; it is a separate axis from freezable.
 - 2026-10-10 · §7 · feta does not count for cheese-tastic, even a whole baked block; burrata does.
 - 2026-10-10 · §7 · fiddly and fun needs a fiddle a cook would really do, and threading skewers is not one.
