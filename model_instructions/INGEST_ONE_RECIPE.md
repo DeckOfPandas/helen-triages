@@ -238,7 +238,8 @@ milk will do.
 **Butter:** `clarified butter` · `salted butter` · `unsalted butter`
 
 **Flour:** `dark rye flour` · `gluten-free flour` · `plain flour` ·
-`rice flour` · `self-raising flour` · `wholemeal flour`
+`rice flour` · `self-raising flour` · `semolina flour` · `spelt flour` ·
+`strong white bread flour` · `wholemeal flour`
 
 **Sugar:** `coconut palm sugar` · `dark brown muscovado sugar` ·
 `dark brown soft sugar` · `demerara sugar` · `golden caster sugar` ·
@@ -260,21 +261,23 @@ milk will do.
 **Cloves:** `ground cloves` · `whole cloves`
 
 **Vanilla:** `vanilla bean paste` · `vanilla essence` · `vanilla extract` ·
-`vanilla pod`
+`vanilla pod` · `vanilla pods`
 
 **Cardamom:** `black cardamom pod` · `black cardamom pods` ·
 `black cardamom powder` · `black cardamom seed` · `black cardamom seeds` ·
 `green cardamom pod` · `green cardamom pods` · `green cardamom powder` ·
 `green cardamom seed` · `green cardamom seeds`
 
-**Mustard:** `black mustard seeds` · `dijon mustard` · `english mustard` ·
-`english mustard powder` · `french mustard` · `mustard oil` ·
-`white mustard seeds` · `whole mustard seeds` · `wholegrain mustard`
+**Mustard:** `american mustard` · `black mustard seeds` · `dijon mustard` ·
+`english mustard` · `english mustard powder` · `french mustard` ·
+`mustard oil` · `white mustard seeds` · `whole mustard seeds` ·
+`wholegrain mustard`
 
 **Soy sauce:** `dark soy sauce` · `light soy sauce`
 
-**Vinegar:** `apple cider vinegar` · `balsamic vinegar` · `malt vinegar` ·
-`red wine vinegar` · `rice vinegar` · `sherry vinegar` · `white wine vinegar`
+**Vinegar:** `apple cider vinegar` · `balsamic vinegar` · `coconut vinegar` ·
+`malt vinegar` · `red wine vinegar` · `rice vinegar` · `sherry vinegar` ·
+`white wine vinegar`
 
 **Chocolate:** `dark chocolate` · `milk chocolate` · `unsweetened chocolate` ·
 `very dark chocolate` · `white chocolate`

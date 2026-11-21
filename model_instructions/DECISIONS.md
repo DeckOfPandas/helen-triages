@@ -1079,6 +1079,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   closed lists for the families where synonyms creep plus the audit for the
   long tail; yoghurt joined the closed lists. Her grant covered nine
   published lines.
+- **2026-11-21 — unsalted butter with no salt: a bake gets a pinch of salt, a
+  savoury dish a note.** Thirteen drafts had unsalted butter and neither salt
+  nor a note (`test_unsalted_butter_has_salt_or_a_note`). Helen: *"Bakes salt,
+  savoury note"*: a bake lists `a pinch` of `salt` beside the butter and the
+  method uses it; a savoury dish is already seasoned to taste, so a note says
+  so.
 
 ## §6 `main_ingredients`
 

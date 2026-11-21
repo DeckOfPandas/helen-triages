@@ -171,6 +171,7 @@ argument and the rules each field is read by.
 - undated · §5 · #139 · Undated, #139 — dark-family chocolate carries its cacao percentage on the ingredient list and never in main_ingredients.
 - 2026-11-21 · §5 · a measured citrus juice is "freshly squeezed lemon juice", every citrus but yuzu, unless the line says bottled.
 - 2026-11-21 · §5 · one name for one product: flaked sea salt, extra-virgin olive oil, natural yoghurt, whole milk, and the rest.
+- 2026-11-21 · §5 · unsalted butter with no salt: a bake gets a pinch of salt, a savoury dish a note.
 - 2026-08-29 · §6 · main_ingredients has no cap; the old eight had been read as a budget.
 - 2026-09-06 · §6 · #762 · where two spellings of one ingredient exist the majority wins, and it is fixed in the data: cornflour, beansprouts.
 - 2026-09-22 · §6 · derive_main_ingredients.py reorders a list and never changes its members, and never writes to _food_recipes/.

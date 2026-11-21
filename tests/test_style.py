@@ -500,7 +500,8 @@ _QUALIFIED_BUTTER = {"salted butter", "unsalted butter", "clarified butter"}
 # A line that is butter for the tin and nothing else. "plus extra" means the
 # line is an ingredient of the dish too, so it does not match.
 _ONLY_FOR_GREASING = re.compile(r"^(?!.*\bplus\b).*,\s*(?:extra,\s*)?(?:for greasing|to grease)\b", re.I)
-_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour", "wholemeal flour", "dark rye flour"}
+_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour", "wholemeal flour", "dark rye flour",
+                    "strong white bread flour", "spelt flour", "semolina flour"}
 _QUALIFIED_SUGAR = {
     "golden caster sugar", "golden granulated sugar", "white caster sugar",
     "light brown soft sugar", "dark brown soft sugar",
@@ -515,7 +516,9 @@ _COMPOUND_EXCLUDE = {
         r"\b(butter beans?|peanut butter|almond butter|cashew butter"
         r"|pistachio butter|all-butter)\b", re.I,
     ),
-    "sugar": re.compile(r"\bsugar snap\b", re.I),
+    "sugar": re.compile(r"\bsugar snaps?\b|\bsugar-free\b|\bsugar flowers?\b", re.I),
+    "ginger": re.compile(
+        r"\bginger (?:ale|beer|jam|preserve|marmalade|wine)\b|\bpickled ginger\b", re.I),
     "flour": None,
     "cloves": re.compile(r"\bgarlic\b", re.I),
     "milk": re.compile(r"\b(milk chocolate|malted milk powder)\b", re.I),
@@ -592,6 +595,7 @@ _QUALIFIED_MUSTARD = {
     "english mustard", "english mustard powder", "dijon mustard",
     "french mustard", "wholegrain mustard", "whole mustard seeds",
     "white mustard seeds", "black mustard seeds", "mustard oil",
+    "american mustard",
 }
 _QUALIFIED_SOY_SAUCE = {"dark soy sauce", "light soy sauce"}
 _QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste", "dried ginger",
@@ -670,7 +674,7 @@ _QUALIFIED_NUTMEG = {"whole nutmeg", "ground nutmeg"}
 _QUALIFIED_CINNAMON = {"cinnamon stick", "cinnamon sticks", "ground cinnamon"}
 _QUALIFIED_CLOVES = {"whole cloves", "ground cloves"}
 _QUALIFIED_VANILLA = {"vanilla extract", "vanilla essence", "vanilla pod",
-                      "vanilla bean paste"}
+                      "vanilla pods", "vanilla bean paste"}
 
 
 def test_nutmeg_cinnamon_cloves_vanilla_specify_type(recipe):
@@ -713,6 +717,7 @@ def test_cardamom_specifies_type(recipe):
 _QUALIFIED_VINEGAR = {
     "apple cider vinegar", "balsamic vinegar", "red wine vinegar",
     "rice vinegar", "sherry vinegar", "white wine vinegar", "malt vinegar",
+    "coconut vinegar",
 }
 
 
@@ -731,7 +736,8 @@ def test_vinegar_specifies_type(recipe):
 # minced` is complete. The ingredient list is checked as amount plus item;
 # main_ingredients has no amount, so the form must be in the string itself.
 _QUALIFIED_GARLIC_FORM = re.compile(
-    r"\bcloves?\b|\bhead\b|\bpaste\b|\bpur[ée]e\b|\bpowder\b|\bgranulated\b|\bwild garlic\b", re.I,
+    r"\bcloves?\b|\bheads?\b|\bpaste\b|\bpur[ée]e\b|\bpowder\b|\bgranul(?:ated|es)\b"
+    r"|\bsalt\b|\bwild garlic\b", re.I,
 )
 
 
@@ -837,7 +843,7 @@ _ALL_CHOCOLATE_TYPES = set(_CHOCOLATE_PERCENT) | _CHOCOLATE_NO_PERCENT
 _CHOCOLATE_FORM_EXEMPT = re.compile(r"\b(chips|shavings)\b", re.I)
 
 # A prepared product, not a bar of chocolate to type: exempt entirely.
-_CHOCOLATE_COMPOUND_EXCLUDE = re.compile(r"\bchocolate (syrup|beans)\b", re.I)
+_CHOCOLATE_COMPOUND_EXCLUDE = re.compile(r"\bchocolate (syrup|beans|flavouring)\b", re.I)
 
 
 def test_chocolate_specifies_type(recipe):
