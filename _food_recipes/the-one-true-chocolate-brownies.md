@@ -44,6 +44,7 @@ method_short:
     * Bake 160°C fan 20–25 mins until just cracked and doesn't wobble
     * Cool in the tin >30 mins
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

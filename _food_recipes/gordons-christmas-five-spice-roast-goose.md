@@ -44,6 +44,7 @@ notes:
   - label: "Keep the fat"
     text: "Roast potatoes. Adjective and imperative."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

@@ -72,6 +72,7 @@ notes:
     text: "As for all egg-white recipes, eggs more than a week old work best. The bowl must be perfectly clean and dry before starting. Wipe it out with lemon juice if in doubt."
 
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

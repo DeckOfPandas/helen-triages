@@ -44,6 +44,7 @@ notes:
   - label: "Cracking"
     text: "If the top of the cake cracks, bake at a lower temperature."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

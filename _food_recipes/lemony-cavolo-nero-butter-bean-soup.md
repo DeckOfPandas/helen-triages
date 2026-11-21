@@ -45,6 +45,7 @@ notes:
   - label: "Thicker texture"
     text: "Mash some of the beans with a fork before adding them, for a thicker soup."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

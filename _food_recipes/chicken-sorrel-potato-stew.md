@@ -53,6 +53,7 @@ notes:
   - label: "Freezing"
     text: "Freeze the base before adding the mustard and sorrel, then stir both in fresh once reheated. The sorrel won't survive freezing and reheating."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

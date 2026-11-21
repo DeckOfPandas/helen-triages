@@ -27,6 +27,7 @@ notes:
   - label: "Resting"
     text: "The resting step is crucial for tenderness otherwise the juices will run away on slicing."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

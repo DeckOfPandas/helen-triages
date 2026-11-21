@@ -47,6 +47,7 @@ notes:
   - label: "patience"
     text: "Arguably better on day two than straight out of the tin."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

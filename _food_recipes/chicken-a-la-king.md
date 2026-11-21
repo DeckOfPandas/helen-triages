@@ -56,6 +56,7 @@ notes:
   - label: "Mushroom fun"
     text: "Button mushrooms are always fun to eat in one-handed food, especially if you don't halve them, because then you get to chase them around your plate."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

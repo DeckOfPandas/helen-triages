@@ -32,6 +32,7 @@ notes:
   - label: "Freezing"
     text: "Freezable before the butter goes in."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

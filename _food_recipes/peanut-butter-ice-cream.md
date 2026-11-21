@@ -30,6 +30,7 @@ notes:
   - label: "Fudge swirl variant"
     text: "Melt, then see chocolate chip variant."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

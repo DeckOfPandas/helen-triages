@@ -31,6 +31,7 @@ notes:
   - label: "Swapping flours is easy"
     text: "Just maintain the classic ratio."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

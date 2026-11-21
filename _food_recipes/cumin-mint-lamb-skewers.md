@@ -46,6 +46,7 @@ method:
 method_short:
   - "Marinate overnight then grill 15 mins."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

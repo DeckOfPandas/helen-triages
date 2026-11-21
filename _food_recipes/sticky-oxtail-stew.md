@@ -60,6 +60,7 @@ notes:
   - label: "As a pasta sauce"
     text: "Also excellent stirred through pappardelle and served with grated Parmesan."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

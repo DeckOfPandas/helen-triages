@@ -30,6 +30,7 @@ method:
 method_short:
   - Oh come on.
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

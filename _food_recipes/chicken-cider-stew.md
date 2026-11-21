@@ -60,6 +60,7 @@ notes:
   - label: "Philosophy of peeling"
     text: "I never bother peeling vegetables any more because they taste better skin-on. The last time I noticed I was peeling an apple I had an epiphany that life is, for me, simply too short for prep that is only cosmetic. And no, I did not continue peeling the apple."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

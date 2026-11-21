@@ -43,6 +43,7 @@ notes:
   - label: "Mincemeat"
     text: "Robertson's mincemeat from a jar is absolutely fine. This is true because Grandma Kath told me."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

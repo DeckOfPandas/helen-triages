@@ -25,6 +25,7 @@ method_short:
   - ""
 notes: []
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

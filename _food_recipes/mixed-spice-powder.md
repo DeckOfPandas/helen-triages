@@ -32,6 +32,7 @@ notes:
   - label: "Storing"
     text: "Keeps up to three months in a sealed jar."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

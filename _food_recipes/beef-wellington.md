@@ -86,6 +86,7 @@ notes:
   - label: "Portion size"
     text: "In theory this serves four, but fillet is rich...and also expensive. Two Wellingtons may feed six comfortably if there are generous sides. Helen, Simon, Patrick and Lauren once happily shared just one, but then there were two different kinds of potato Dauphinoise on the table at the time, so."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true
