@@ -589,7 +589,7 @@ SPELLINGS = {
     r"\bbain marie\b": "bain-marie",
     r"\brice wine vinegar\b": "rice vinegar",
     r"\bbaking soda\b": "bicarbonate of soda",
-    # One name for one product (DECISIONS §5, 2026-11-21): Helen's rulings.
+    # One name for one product: Helen's rulings (DECISIONS §5).
     r"\bsea salt flakes\b": "flaked sea salt",
     r"\bflaky (?:sea )?salt\b": "flaked sea salt",
     r"\bmaldon (?:sea )?salt(?: flakes)?\b": "flaked sea salt",

@@ -802,7 +802,7 @@ def test_milk_specifies_type(recipe):
     )
 
 
-# Yoghurt names its kind on the ingredient line (DECISIONS §5, 2026-11-21);
+# Yoghurt names its kind on the ingredient line (DECISIONS §5);
 # main_ingredients keeps the plain "yoghurt" chip, which the picker merges to.
 # Full-fat and low-fat forms qualify a listed kind ("full-fat natural yoghurt").
 _QUALIFIED_YOGHURT = {
