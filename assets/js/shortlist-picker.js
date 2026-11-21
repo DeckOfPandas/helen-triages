@@ -88,10 +88,12 @@
     });
   }
 
+  // Every list change ends here; `htf:lists-change` tells the rest of the page.
   function repaint() {
     controls().forEach(paint);
     paintLinks();
     if (picker && !picker.hidden) fillPicker();
+    document.dispatchEvent(new CustomEvent('htf:lists-change'));
   }
 
   // --- the picker ------------------------------------------------------------------
@@ -155,8 +157,9 @@
       if (box) box.focus();
     });
 
-    picker.addEventListener('keydown', function (ev) {
-      if (ev.key !== 'Escape') return;
+    // On the document: Safari leaves focus on the page when a label is tapped.
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Escape' || picker.hidden) return;
       ev.preventDefault();
       if (!form.hidden) { showForm(false); newBtn.focus(); return; }
       closePicker(true);
@@ -173,10 +176,12 @@
     problem.textContent = '';
   }
 
+  // Redrawn whole, so a box that had focus gets it back.
   function fillPicker() {
     var key = openFor.getAttribute('data-shortlist-key');
     var on = lists.listsWith(key);
     var ul = picker.querySelector('.shortlist-picker-lists');
+    var focused = ul.contains(document.activeElement) ? document.activeElement.getAttribute('data-list') : '';
     ul.textContent = '';
     lists.all().forEach(function (list) {
       var li = document.createElement('li');
@@ -193,6 +198,7 @@
       label.appendChild(name);
       li.appendChild(label);
       ul.appendChild(li);
+      if (list.id === focused) box.focus();
     });
   }
 
@@ -290,6 +296,14 @@
     });
   }
 
+  // For another control that opens and closes a button's picker (recipe-lists.js).
+  HTF.shortlistPicker = {
+    toggle: function (btn, anchor) {
+      if (opener === anchor) closePicker(false);
+      else openPicker(btn, anchor);
+    }
+  };
+
   function wire() {
     wireInto();
     controls().forEach(function (btn) {
@@ -314,7 +328,8 @@
         press(btn);
         return;
       }
-      if (picker && !picker.hidden && !picker.contains(target)) closePicker(false);
+      if (picker && !picker.hidden && !picker.contains(target) &&
+          !(opener && opener.contains(target))) closePicker(false);
     });
 
     document.addEventListener('focusin', function (ev) {

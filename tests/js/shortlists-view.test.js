@@ -124,6 +124,26 @@ test('a refused name says why, naming the list it clashes with as that list spel
   assert.strictEqual(view.nameProblemText('clash', 'LEMONS', LISTS), 'You already have a list called “Lemons”.');
 });
 
+// --- the recipe page's scaler and a list's portions ------------------------------
+
+test('a serves: recipe\'s scaler and its list hold the same number of portions', () => {
+  assert.strictEqual(view.scalerFromPortions(6, { made: false, base: 4 }), 6);
+  assert.strictEqual(view.portionsFromScaler(6, { made: false, base: 4 }), 6);
+});
+
+test('a makes: recipe\'s list counts batches; its scaler counts the things made', () => {
+  const cookies = { made: true, base: 18 };
+  assert.strictEqual(view.scalerFromPortions(2, cookies), 36, 'two batches of 18 is 36 cookies');
+  assert.strictEqual(view.portionsFromScaler(36, cookies), 2);
+  assert.strictEqual(view.portionsFromScaler(9, cookies), 0.5, 'half a batch is half the things');
+});
+
+test('a note under the scaler says which lists the recipe is on', () => {
+  assert.strictEqual(view.inListsText(0), '');
+  assert.strictEqual(view.inListsText(1), 'in 1 list');
+  assert.strictEqual(view.inListsText(3), 'in 3 lists');
+});
+
 // --- links --------------------------------------------------------------------
 
 test('the browse link carries the list it fills, and a recipe link the list it is opened from', () => {

@@ -174,6 +174,8 @@
   }
 
   var last = base;
+  // Told the number after every redraw: recipe-lists.js saves it to a list.
+  var listeners = [];
 
   function put(field, value) {
     if (field !== document.activeElement) field.value = value;
@@ -231,6 +233,7 @@
     last = n;
     if (!mode) return;
     put(input, mode.box(n));
+    listeners.forEach(function (fn) { fn(n); });
     /* The word after the box agrees with the number in it -- "1 waffle",
        "2 × 8-inch cakes", "2 litres". Portions returns null: that word is the
        markup's and never changes. */
@@ -274,7 +277,15 @@
     setMetric: function (on) {
       metric = !!on;
       apply(last);
-    }
+    },
+    /* For a list's portions (#1521): what the box counts (`made`: the things
+       a `makes:` recipe makes, `base` of them to one batch), and a way to set
+       it and hear it change. `scales` is false where there is no box. */
+    scales: !!mode,
+    made: !!(whole && input.hasAttribute('data-made')),
+    base: base,
+    set: function (n) { if (mode) apply(n); },
+    onChange: function (fn) { listeners.push(fn); }
   };
 
   if (!mode) return;

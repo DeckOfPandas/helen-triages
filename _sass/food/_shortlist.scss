@@ -157,6 +157,44 @@
   &:focus-visible { color: $color-recipe-link-hover; }
 }
 
+// --- A recipe page opened from a list (#1521) --------------------------------------
+// "← Christmas starters" beside the back arrow, a link in the link colour;
+// under the scaler, which list it saves to, or "in 2 lists" to open the
+// picker, quiet as the scaler's own note.
+.shortlists-back {
+  margin-left: $space-lg;
+  min-width: 0;
+  font-family: $font-headings;
+  font-weight: 700;
+  color: $color-recipe-link;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
+.recipe-lists-note {
+  margin: $space-xs 0 0;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
+.recipe-lists-open {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: $color-recipe-link;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible,
+  &[aria-expanded="true"] { color: $color-recipe-link-hover; }
+}
+
 // --- The drafts switch (#1358), a local build only ---------------------------------
 // The pill the shortlisted-only button wore, on a line of its own under the
 // count. Capitals: a view switch is an action (#1005).

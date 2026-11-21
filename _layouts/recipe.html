@@ -3,6 +3,9 @@ layout: default
 ---
 
 {% include back-to-index.html %}
+{% comment %} Opened from a list (`?list=`), the way back to that list's tab (#1521):
+   recipe-lists.js names it and moves it onto the furniture line. {% endcomment %}
+<a class="shortlists-back" href="{{ '/food/shortlists/' | relative_url }}" data-shortlists-back hidden>your shortlists</a>
 
 <article class="recipe">
   <div class="recipe-title">
@@ -182,6 +185,7 @@ layout: default
       <button type="button" class="recipe-scale-step recipe-scale-plus" aria-label="make more">+</button>
     </div>
     <p class="recipe-scale-note" hidden></p>
+    <p class="recipe-lists-note" data-recipe-lists hidden></p>
   {% elsif page.portions and page.ingredient_groups.size > 0 %}
     <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}" data-count-nouns="{{ site.data.food.scaling.count_nouns | join: '|' | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="one fewer portion">&minus;</button>
@@ -192,6 +196,7 @@ layout: default
       <button type="button" class="recipe-scale-step recipe-scale-plus" aria-label="one more portion">+</button>
     </div>
     <p class="recipe-scale-note" hidden></p>
+    <p class="recipe-lists-note" data-recipe-lists hidden></p>
   {% endif %}
 
   {% comment %} short_method_enabled (_config.yml) turns off both the toggle and the print
@@ -491,3 +496,6 @@ layout: default
 <script src="{{ '/assets/js/recipe-hints.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/ingredient-ticks.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/ingredient-units.js' | relative_url }}"></script>
+{% comment %} After the scaler and everything that redraws it: a list's own number is
+   set last (#1521). {% endcomment %}
+<script src="{{ '/assets/js/recipe-lists.js' | relative_url }}"></script>

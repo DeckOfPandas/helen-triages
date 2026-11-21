@@ -115,6 +115,17 @@ def test_the_food_index_only_browses():
         "the index must link to the shortlists page, as a link that counts lists")
 
 
+def test_a_lists_number_is_set_after_everything_that_redraws_the_scaler():
+    layout = (ROOT / "_layouts/recipe.html").read_text(encoding="utf-8")
+    order = ["recipe-scale.js", "ingredient-units.js", "recipe-lists.js"]
+    found = [layout.find("/assets/js/" + name) for name in order]
+    assert -1 not in found, f"_layouts/recipe.html no longer loads all of {order}"
+    assert found == sorted(found), (
+        "recipe-lists.js must load after recipe-scale.js, whose hook it uses, and "
+        "after ingredient-units.js, which redraws the amounts: loaded earlier, a "
+        "list's number is set and then drawn over with the recipe's own (#1521)")
+
+
 FOOD_BUTTONS = ["food/index.html", "_includes/food/recipe-row.html", "_includes/page-actions.html"]
 
 

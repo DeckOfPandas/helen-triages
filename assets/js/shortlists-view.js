@@ -84,6 +84,21 @@
     return 'your ' + lists + (lists === 1 ? ' shortlist' : ' shortlists');
   }
 
+  /* A list keeps portions, batches for a `makes:` recipe; the recipe page's
+     scaler counts portions, or the things made (`scale`: { made, base }). */
+  function scalerFromPortions(portions, scale) {
+    return scale.made ? portions * scale.base : portions;
+  }
+
+  function portionsFromScaler(n, scale) {
+    return scale.made ? n / scale.base : n;
+  }
+
+  function inListsText(count) {
+    if (!count) return '';
+    return 'in ' + count + (count === 1 ? ' list' : ' lists');
+  }
+
   function withQuery(url, key, value) {
     return url + (url.indexOf('?') === -1 ? '?' : '&') + key + '=' + encodeURIComponent(value);
   }
@@ -98,6 +113,9 @@
     buttonWords: buttonWords,
     linkText: linkText,
     nameProblemText: nameProblemText,
+    scalerFromPortions: scalerFromPortions,
+    portionsFromScaler: portionsFromScaler,
+    inListsText: inListsText,
     intoUrl: function (indexUrl, id) { return withQuery(indexUrl, 'into', id); },
     listUrl: function (recipeUrl, id) { return withQuery(recipeUrl, 'list', id); }
   };
