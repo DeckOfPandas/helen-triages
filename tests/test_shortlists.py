@@ -54,6 +54,8 @@ def test_foods_old_keys_are_removed_by_name_and_no_cocktail_key_is():
 
 PAGE = ROOT / "food/shortlists.html"
 PAGE_JS = ROOT / "assets/js/shortlists-page.js"
+PICKER = ROOT / "_includes/shortlist-picker.html"
+INDEX = ROOT / "food/index.html"
 
 
 def test_the_shortlists_page_exists_and_says_what_it_needs_without_javascript():
@@ -82,7 +84,8 @@ def test_the_tabs_are_real_tabs():
 
 def test_every_input_on_the_page_has_a_label():
     sources = {"food/shortlists.html": PAGE.read_text(encoding="utf-8"),
-               "assets/js/shortlists-page.js": PAGE_JS.read_text(encoding="utf-8")}
+               "assets/js/shortlists-page.js": PAGE_JS.read_text(encoding="utf-8"),
+               "_includes/shortlist-picker.html": PICKER.read_text(encoding="utf-8")}
     unlabelled = []
     for name, text in sources.items():
         labelled = set(re.findall(r"""<label[^>]*\bfor=["']([\w-]+)""", text))
@@ -97,3 +100,34 @@ def test_every_input_on_the_page_has_a_label():
         f"its row's label; food-shopping-rows.js gives a number box aria-label): {unlabelled}")
     assert sum(len(re.findall(r"<input\b", t)) for t in sources.values()) >= 3, (
         "found fewer inputs than the page has: the scan above is reading the wrong files")
+
+
+def test_the_food_index_only_browses():
+    text = INDEX.read_text(encoding="utf-8")
+    left = [marker for marker in ('id="shortlist-only"', 'id="shopping-list"', "data-shared-shortlist",
+                                  "data-shortlist-export-panel", "recipe-data.html", "shortlist-export.js")
+            if marker in text]
+    assert not left, (
+        "the food index is for browsing; its lists, their shopping and sharing "
+        f"live on food/shortlists.html (#1521). Back on the index: {left}")
+    assert re.search(r'<a class="shortlists-link" href="\{\{ \'/food/shortlists/\' \| relative_url \}\}" '
+                     r'data-shortlists-link>', text), (
+        "the index must link to the shortlists page, as a link that counts lists")
+
+
+FOOD_BUTTONS = ["food/index.html", "_includes/food/recipe-row.html", "_includes/page-actions.html"]
+
+
+@pytest.mark.parametrize("source", FOOD_BUTTONS)
+def test_every_food_shortlist_button_says_what_it_is_and_where_it_starts(source):
+    text = (ROOT / source).read_text(encoding="utf-8")
+    if source.endswith("page-actions.html"):
+        text = text.split('{% if page.site_key == "food" %}')[1].split("{% else %}")[0]
+    buttons = re.findall(r'<button[^>]*class="btn-shortlist"[^>]*>', text, re.S)
+    assert buttons, f"{source} has no shortlist button: the scan is reading the wrong place"
+    for button in buttons:
+        for attribute in ("data-shortlist-key=", "data-shortlist-title=", "data-portions=", "hidden"):
+            assert attribute in button, (
+                f"{source}'s shortlist button has no {attribute}: the picker needs the "
+                "recipe's key, its name and the portions it starts at, and the button "
+                "ships hidden until the script that works it has run")

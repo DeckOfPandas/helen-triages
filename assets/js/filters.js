@@ -29,10 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
   var matrix = document.querySelector('.controls');
   var recipeList = document.querySelector('.recipe-list');
 
-  /* The shortlisted-only button (#546) sits on the results heading, not in
-     the matrix. It ships `hidden` and is revealed below. */
-  var shortlistOnlyBtn = document.getElementById('shortlist-only');
-
   /* Hide the drafts (#1358). The button exists only on a local build, so
      this is null on the deployed index. A row is a draft if it wears the
      `.badge-draft` pill. Not a field of `state`; cocktail-index.js has the
@@ -40,15 +36,6 @@ document.addEventListener('DOMContentLoaded', function () {
   var draftsBtn = document.getElementById('drafts-toggle');
   var hideDrafts = false;
 
-  /* A shortlist someone sent, `?shortlist=slug,slug` (#1093): opening the
-     link shows the list and saves none of it. It is the shortlist view with a
-     different answer to "is this row on it": `state.shortlisted` is true, so
-     any filter takes the view off (#918) and update() drops this list when it
-     does. Not in `state`, so the back-memory never carries a stranger's list
-     into this browser's next visit. null when no shared list is showing. */
-  var sharedKeys = null;
-  var sharedUnmatched = [];
-  var sharedNote = document.querySelector('[data-shared-shortlist]');
   // The one clear-all is the results pill's × (_includes/results-pill.html,
   // #1448): this script sets its visibility and wires its click, and
   // results-bar.js shows it whenever that visibility says there is something
@@ -600,32 +587,6 @@ function renderResultsPool() {
     });
   }
 
-  /* The shortlisted-only button (#546) is outside `.controls`, so it is
-     painted from state here, class and aria-pressed together. */
-  function syncShortlistOnly() {
-    if (!shortlistOnlyBtn) return;
-    // `is-on`, the shortlist controls' state class on both sites, not the
-    // matrix's `.active`. A shared list is not YOUR shortlist, so the button
-    // is not on while one shows (#1093).
-    var own = !!state.shortlisted && !sharedKeys;
-    shortlistOnlyBtn.classList.toggle('is-on', own);
-    shortlistOnlyBtn.setAttribute('aria-pressed', own ? 'true' : 'false');
-  }
-
-  /* The note over a shared list, and its "keep these" (#1342). */
-  function syncSharedNote() {
-    if (!sharedNote) return;
-    sharedNote.hidden = !sharedKeys;
-    if (!sharedKeys) return;
-    var text = sharedNote.querySelector('[data-shared-shortlist-text]');
-    if (text) {
-      text.textContent = 'a shared shortlist (' + sharedKeys.length + ')' +
-        (sharedUnmatched.length ? '; not found: ' + sharedUnmatched.join(', ') : '');
-    }
-    var keep = sharedNote.querySelector('[data-shared-shortlist-keep]');
-    if (keep) keep.hidden = sharedKeys.length === 0;
-  }
-
   // The toggles change state and call update(); a badge click is the same
   // action. Button classes are syncFilterButtons()' job.
   function toggleTag(value) {
@@ -645,11 +606,6 @@ function renderResultsPool() {
 
   function update(preservePage) {
     if (!preservePage) { currentPage = 1; showAll = false; }
-    /* The shortlist view gives way to any other filter (#918): every handler
-       that sets a field ends in update(), so this line is the whole rule. */
-    FilterState.reconcileShortlistView(state);
-    if (!state.shortlisted) { sharedKeys = null; sharedUnmatched = []; }
-    syncSharedNote();
     var visibleCount = 0;
     var totalPages = 1;
     var suppressList = state.isSearching && !hasNarrowingFilter();
@@ -663,19 +619,13 @@ function renderResultsPool() {
 
     items.forEach(function(li) {
       /* The row as FilterState.rowMatchesFilters needs it (#506).
-         `shortlisted` and `titleFolded` are built only when asked for: each is
-         a lookup per row per update. `shortlisted` is the one fact not on a
-         data- attribute: it is in this browser's localStorage (#546). */
+         `titleFolded` is built only when asked for: a lookup per row per
+         update. */
       var row = {
         tags: (li.dataset.tags || '').split(',').filter(Boolean),
         star: li.dataset.star || '',
         starAlso: (li.dataset.starAlso || '').split(',').filter(Boolean),
         ingredients: (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); }),
-        shortlisted: state.shortlisted
-          ? (sharedKeys
-            ? sharedKeys.indexOf(li.dataset.url || '') !== -1
-            : HTF.shortlist.has(li.dataset.url || ''))
-          : false,
         titleFolded: state.nameQuery
           ? HTF.ingredientSearch.fold(
             ((li.querySelector('.recipe-title-link') || {}).textContent || '').toLowerCase())
@@ -810,10 +760,6 @@ function renderResultsPool() {
     // Order matters between these two: syncAriaPressed() reads the .active
     // class syncFilterButtons() has just painted.
     syncFilterButtons();
-    syncShortlistOnly();
-    /* Unconditional (#801): the list must disappear when the filter goes off
-       and lose a recipe un-shortlisted while it is on. */
-    renderShoppingList();
     updateInlineLabels();
     updateIngredientClear();
     renderExcludeActive();
@@ -824,10 +770,10 @@ function renderResultsPool() {
   /* The address bar says what is chosen (#1462 C3), so a reload or a copied
      link shows the same list; arrival reads it back in applyQueryString.
      Off until startup has read the query it arrived with, which every
-     update() before then would otherwise overwrite. A shared shortlist keeps
-     the link it came by until the reader leaves it. */
+     update() before then would otherwise overwrite. `?into=` (the list being
+     filled, shortlist-picker.js) is carried through untouched. */
   var addressBarLive = false;
-  var arrivedSharedSlugs = [];
+  var arrivedInto = (/[?&]into=([a-z0-9]+)/.exec(location.search) || [])[1] || '';
   function setList(set) {
     var list = [];
     set.forEach(function (v) { list.push(v); });
@@ -835,17 +781,13 @@ function renderResultsPool() {
   }
   function syncAddressBar() {
     if (!addressBarLive) return;
-    if (state.shortlisted) {
-      FilterState.replaceQuery(sharedKeys
-        ? FilterState.shortlistQuery(arrivedSharedSlugs) : 'shortlist=1');
-      return;
-    }
     FilterState.replaceQuery(FilterState.buildQuery([
       ['star', state.star ? [state.star] : []],
       ['tag', setList(state.tags)],
       ['ing', setList(state.includedIngredients)],
       ['out', setList(state.excludedIngredients)],
-      ['q', [nameSearchBox ? nameSearchBox.value : '']]
+      ['q', [nameSearchBox ? nameSearchBox.value : '']],
+      ['into', arrivedInto ? [arrivedInto] : []]
     ]));
   }
 
@@ -979,8 +921,7 @@ function renderResultsPool() {
     });
   }
 
-  /* The boxes and pools that are DOM, not state. Shared by clear-all and the
-     shortlist button (#918), so the two cannot disagree about which exist. */
+  /* The boxes and pools that are DOM, not state, which clear-all empties. */
   function resetFilterControls() {
     if (searchBox) searchBox.value = '';
     if (nameSearchBox) nameSearchBox.value = '';
@@ -1009,328 +950,8 @@ function renderResultsPool() {
     });
   }
 
-  /* --- The shopping list (#801) ----------------------------------------------
-     The arithmetic is assets/js/food-shopping-list.js; this gathers entries
-     and paints. Shown only while the shortlist view is on. It reads the
-     store, not the visible rows: you shop from what you shortlisted. */
-  var shoppingEl = document.getElementById('shopping-list');
-  var shoppingRecipes = shoppingEl && shoppingEl.querySelector('.shopping-list-recipes');
-  var shoppingAisles = shoppingEl && shoppingEl.querySelector('.shopping-list-aisles');
-  var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
-  var shoppingNote = shoppingEl && shoppingEl.querySelector('.shopping-list-note');
-  var shoppingTotal = shoppingEl && shoppingEl.querySelector('.shopping-list-total');
-  // #1457. Ticking a row off, and starting the next shop afresh.
-  var refreshUntick = shoppingAisles
-    ? HTF.shoppingTicks.wire(shoppingAisles, shoppingEl.querySelector('.shopping-list-untick'))
-    : function () {};
-  // The rows last drawn, for HTF.shoppingTicks.recount when a count changes.
-  var shownRows = [];
-
-  /* Each recipe's ingredients and yield, emitted by food/index.html from
-     _plugins/food_shopping.rb. Absent or unreadable, the shopping list
-     renders nothing and every filter still works. */
-  var RECIPES = (function () {
-    var node = document.getElementById('recipe-ingredients');
-    if (!node) return {};
-    try {
-      return JSON.parse(node.textContent) || {};
-    } catch (e) {
-      console.warn('filters.js: could not parse #recipe-ingredients — ' + e.message);
-      return {};
-    }
-  })();
-
-  var AISLES = (function () {
-    var node = document.getElementById('recipe-aisles');
-    if (!node) return [];
-    try {
-      var parsed = JSON.parse(node.textContent);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      console.warn('filters.js: could not parse #recipe-aisles — ' + e.message);
-      return [];
-    }
-  })();
-
-  /* #1458. Present on a local build only (site.show_costs); null here means
-     nothing is costed and no price is drawn. */
-  var COST_UNITS = (function () {
-    var node = document.getElementById('food-cost-units');
-    if (!node) return null;
-    try {
-      var parsed = JSON.parse(node.textContent);
-      return parsed && typeof parsed === 'object' ? parsed : null;
-    } catch (e) {
-      console.warn('filters.js: could not parse #food-cost-units — ' + e.message);
-      return null;
-    }
-  })();
-
-  /* Measures bought whole (#1297): `half_step_measures` and
-     `half_step_counts` from _data/food/scaling.yml. Absent, nothing rounds. */
-  var WHOLE_MEASURES = String(
-    (shoppingEl && shoppingEl.getAttribute('data-whole-measures')) || '')
-    .split(',').filter(Boolean);
-
-  // A sprig, a bunch: bought whole, used in quarters. `quarter_step_measures`.
-  var QUARTER_MEASURES = String(
-    (shoppingEl && shoppingEl.getAttribute('data-quarter-measures')) || '')
-    .split(',').filter(Boolean);
-
-  /* Nouns bought by count, so two recipes' lemons read "2 lemons" (#1297):
-     `count_nouns`. Absent, a row keeps the recipe's spelling. */
-  var COUNT_NOUNS = String(
-    (shoppingEl && shoppingEl.getAttribute('data-count-nouns')) || '')
-    .split(',').filter(Boolean);
-
-  /* Things that hold what a recipe makes (a jar, a tin), so a row reads
-     "2 jars of Peanut Sauce": `container_words`. */
-  var CONTAINER_NOUNS = String(
-    (shoppingEl && shoppingEl.getAttribute('data-container-nouns')) || '')
-    .split(',').filter(Boolean);
-
-  /* Title and href per row, read once. `dataset.titleText` is the unmarked
-     title, so a name search's <mark> never reaches the list. The blob's keys
-     are site-relative; the row's link already carries the base URL. */
-  var hrefByUrl = {};
-  var titleByUrl = (function () {
-    var map = {};
-    items.forEach(function (li) {
-      var link = li.querySelector('.recipe-title-link');
-      if (li.dataset.url && link) {
-        map[li.dataset.url] = link.dataset.titleText || link.textContent;
-        hrefByUrl[li.dataset.url] = link.getAttribute('href') || li.dataset.url;
-      }
-    });
-    return map;
-  })();
-
-  // The words and markup of every row: assets/js/food-shopping-rows.js.
-  var rows = HTF.foodShoppingRows.create({
-    recipes: RECIPES, titles: titleByUrl, hrefs: hrefByUrl,
-    containerNouns: CONTAINER_NOUNS, buildOptions: buildOptions(), escape: HTF.escapeHtml
-  });
-  var hasPortions = rows.hasPortions;
-  var isBatch = rows.isBatch;
-  var halfOffered = rows.halfOffered;
-  var batchCount = rows.batchCount;
-  var rowInner = rows.rowInner;
-
-  /* In the order they were shortlisted (the store keeps insertion order).
-     Recipes no longer on the page are dropped. */
-  function shortlistedRecipes() {
-    // A list someone sent is totalled as it stands (see renderShoppingList).
-    return (sharedKeys || HTF.shortlist.list()).filter(function (url) {
-      return Object.prototype.hasOwnProperty.call(RECIPES, url);
-    });
-  }
-
-  /* --- A `serves:` recipe counts people (#815) -------------------------------
-     The number in the box: what was last typed, or the recipe's own count.
-     null where the recipe carries none, and then there is no box. */
-  function portionsFor(url) {
-    if (!hasPortions(url)) return null;
-    return HTF.shortlist.portions(url) || RECIPES[url].p;
-  }
-
-  /* Portions wanted over portions made; batches for a `makes:` recipe. A
-     recipe with no count scales by 1 and gets no box. */
-  function scaleFor(url) {
-    if (isBatch(url)) return batchesFor(url);
-    if (!hasPortions(url)) return 1;
-    return portionsFor(url) / RECIPES[url].p;
-  }
-
-  /* --- A `makes:` recipe counts batches (#1297) ------------------------------
-     The count has its own store (HTF.shortlist.batches): a stored 6 cannot
-     say whether it meant people or batches. A stored half is honoured only
-     while the build still offers one. */
-  function batchesFor(url) {
-    var n = HTF.shortlist.batches(url) || 1;
-    return (n < 1 && !halfOffered(url)) ? 1 : n;
-  }
-
-  function rowSentence(url, n) {
-    return '<span>' + rowInner(url, n) + '</span>';
-  }
-
-  function renderShoppingList() {
-    if (!shoppingEl) return;
-    /* Shown over a shared list too. Opening the link still saves nothing:
-       the list is totalled from the link. A number typed into a box is saved,
-       as that recipe's count. */
-    shoppingEl.hidden = !state.shortlisted;
-    if (shoppingEl.hidden) return;
-
-    var urls = shortlistedRecipes();
-    if (shoppingEmpty) shoppingEmpty.hidden = urls.length > 0;
-
-    /* Rebuilt whole, but never from the input handler: replacing the node
-       under a typing cursor loses the caret (it calls renderTotals() alone).
-       Batch rows go last, under a hairline drawn on the first one when
-       portions rows sit above it, so the boxes counting people and the ones
-       counting batches read as two kinds. Each group keeps shortlist order. */
-    var portionRows = urls.filter(function (url) { return !isBatch(url); });
-    var batchRows = urls.filter(isBatch);
-    var firstBatch = portionRows.length ? batchRows[0] : null;
-
-    if (shoppingRecipes) {
-      shoppingRecipes.innerHTML = portionRows.concat(batchRows).map(function (url) {
-        /* No portion count, no box (hasPortions): such a recipe contributes
-           its ingredients at x1 and says why it cannot be scaled. */
-        if (isBatch(url)) {
-          var batches = batchesFor(url);
-          return (url === firstBatch
-            ? '<li class="shopping-list-recipe--first-batch">' : '<li>') +
-            rows.boxHtml(url, batches) + rows.withCost(url, rowSentence(url, batches)) +
-            '</li>';
-        }
-
-        if (!hasPortions(url)) {
-          return '<li class="shopping-list-recipe--unscalable">' +
-            '<span>' + HTF.escapeHtml(titleByUrl[url] || url) +
-            '<span class="shopping-list-yield-missing">' +
-            'no serving size — open <code>serves:</code> with a number</span>' +
-            '</span></li>';
-        }
-
-        return '<li>' + rows.boxHtml(url, portionsFor(url)) +
-          rows.withCost(url, rowSentence(url, portionsFor(url))) + '</li>';
-      }).join('');
-    }
-
-    renderTotals(urls);
-  }
-
-  function buildOptions() {
-    return {
-      aisles: AISLES, wholeMeasures: WHOLE_MEASURES,
-      quarterMeasures: QUARTER_MEASURES, countNouns: COUNT_NOUNS,
-      costUnits: COST_UNITS
-    };
-  }
-
-  function renderTotals(urls) {
-    if (!shoppingAisles) return;
-
-    var shortlisted = urls || shortlistedRecipes();
-    var entries = [];
-    shortlisted.forEach(function (url) {
-      entries = entries.concat(rows.entries(url, scaleFor(url)));
-    });
-
-    /* A panel with boxes and no totals says so. The usual cause is
-       _plugins/food_shopping.rb not having run: Jekyll loads plugins once at
-       boot and does not reload them on watch. */
-    if (shortlisted.length && !entries.length) {
-      console.warn(
-        'filters.js: every shortlisted recipe reached the page with no '
-        + 'ingredients, so the shopping list has nothing to total. This is '
-        + 'almost always _plugins/food_shopping.rb not having run: Jekyll '
-        + 'loads plugins once at startup and does not reload them on watch, '
-        + 'so restart `jekyll-local` rather than waiting for a rebuild.'
-      );
-      shoppingAisles.innerHTML =
-        '<p class="shopping-list-empty">No ingredient data was built for '
-        + 'these recipes, so there is nothing to add up. If this is the local '
-        + 'server, restart it — its plugins are loaded once at startup.</p>';
-      shownRows = [];
-      refreshUntick();
-      renderShoppingTotal([]);
-      return;
-    }
-
-    var aisles = HTF.foodShoppingList.build(entries, buildOptions());
-    shownRows = [];
-    aisles.forEach(function (aisle) { shownRows = shownRows.concat(aisle.items); });
-
-    /* What the numbers did not reach, as on the recipe page (#1088). */
-    if (shoppingNote) {
-      shoppingNote.textContent = rows.unscaledNote(aisles);
-      shoppingNote.hidden = !shoppingNote.textContent;
-    }
-
-    /* Rebuilt whole: a few dozen rows are not worth a diffing render. */
-    shoppingAisles.innerHTML = rows.aislesHtml(aisles, HTF.shoppingTicks);
-    refreshUntick();
-    renderShoppingTotal(shownRows);
-  }
-
-  /* What the shop comes to (#1458), as on the cocktail list (#817), and how
-     many lines it could not price. Hidden where nothing is costed. */
-  function renderShoppingTotal(shown) {
-    if (!shoppingTotal) return;
-    shoppingTotal.textContent = rows.totalText(shown);
-    shoppingTotal.hidden = !shoppingTotal.textContent;
-  }
-
-  if (shoppingRecipes) {
-    // Delegated, because the inputs are replaced on every shortlist change.
-    shoppingRecipes.addEventListener('input', function (ev) {
-      var input = ev.target;
-      if (!input.classList || !input.classList.contains('shopping-list-portions')) return;
-      var url = input.dataset.url;
-      var before = isBatch(url) ? batchesFor(url) : portionsFor(url);
-      var shown;
-      if (isBatch(url)) {
-        var typed = Number(input.value);
-        shown = HTF.shortlist.setBatches(url,
-          batchCount(url, input.value, batchesFor(url))) || 1;
-        // Only the spinner's 1½ is rewritten under the cursor. Typing carries
-        // an `inputType` and waits for `change`: rewriting "2.2" to "2" mid-
-        // figure made the next key give "25" (#1386).
-        if (!ev.inputType && typed > 1 && typed % 1 !== 0) input.value = String(shown);
-      } else {
-        shown = HTF.shortlist.setPortions(url, input.value) || portionsFor(url);
-      }
-      /* The row's words move with the number and are rewritten in place. */
-      var word = input.parentNode && input.parentNode.querySelector &&
-        input.parentNode.querySelector('.shopping-list-count-word');
-      if (word && word.parentNode) word.parentNode.innerHTML = rowInner(url, shown);
-      // A new count is a new shop for that recipe's rows (#1457).
-      if ((isBatch(url) ? batchesFor(url) : portionsFor(url)) !== before) {
-        HTF.shoppingTicks.recount(shownRows, [url]);
-      }
-      // Totals only. Re-rendering the recipe list would replace the very input
-      // being typed into and take the caret with it.
-      renderTotals();
-    });
-
-    /* On `change`, a box shows what it was taken as: "0.2" where no half is
-       offered is one batch, and "1.5" portions is 1. */
-    shoppingRecipes.addEventListener('change', function (ev) {
-      var input = ev.target;
-      if (!input.classList || !input.classList.contains('shopping-list-portions')) return;
-      var url = input.dataset.url;
-      input.value = String(isBatch(url) ? batchesFor(url) : portionsFor(url));
-    });
-  }
-
-  /* --- The shortlist (#546) ---------------------------------------------------
-     The button ships `hidden` and is revealed here, by the script that makes
-     the filter real. It is a view, not a facet (#918): pressing it on clears
-     every other filter, boxes and pools included; a filter set while it is on
-     takes it off again (reconcileShortlistView, in update()). */
-  if (shortlistOnlyBtn) {
-    shortlistOnlyBtn.hidden = false;
-    shortlistOnlyBtn.addEventListener('click', function () {
-      if (sharedKeys) {
-        // Over a shared list the button is not on (syncShortlistOnly), so a
-        // press means what it means when off: show MY shortlist.
-        sharedKeys = null;
-        sharedUnmatched = [];
-      } else if (state.shortlisted) {
-        state.shortlisted = false;
-      } else {
-        state = FilterState.enterShortlistView();
-        resetFilterControls();
-      }
-      update();
-    });
-  }
-
   /* #1358. The label names what a press will do, and `is-on` says the list is
-     currently narrowed, as it does on the button above. */
+     currently narrowed. */
   if (draftsBtn) {
     draftsBtn.hidden = false;
     draftsBtn.addEventListener('click', function () {
@@ -1339,30 +960,6 @@ function renderResultsPool() {
       draftsBtn.classList.toggle('is-on', hideDrafts);
       draftsBtn.setAttribute('aria-pressed', hideDrafts ? 'true' : 'false');
       update();
-    });
-  }
-
-  /* A row's own toggle changed (dispatched by shortlist.js). Unconditional,
-     and `update(true)` keeps the page number: marking a row on page 3 must
-     not throw you back to page 1. */
-  document.addEventListener('htf:shortlist-change', function () {
-    update(true);
-  });
-
-  /* Keep these (#1093): merges the shared list into this browser's shortlist
-     (addAll never un-marks anything), then shows that shortlist. The change
-     event repaints every row's toggle. */
-  var sharedKeep = sharedNote && sharedNote.querySelector('[data-shared-shortlist-keep]');
-  if (sharedKeep) {
-    sharedKeep.addEventListener('click', function () {
-      if (!sharedKeys) return;
-      var keys = sharedKeys;
-      sharedKeys = null;
-      sharedUnmatched = [];
-      HTF.shortlist.addAll(keys);
-      document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
-        detail: { key: null, on: true, kept: keys.length }
-      }));
     });
   }
 
@@ -1467,25 +1064,6 @@ function renderResultsPool() {
   // you left instead (#387).
   var restored = restoreIndexMemory();
   if (!restored) shuffleRecipeList();
-
-  /* `?shortlist=1` (#1011) enters the shortlist view exactly as the button
-     does, after the query-string filters and the memory, and replaces both;
-     the remembered scroll goes with the remembered list. `?shortlist=a,b`
-     (#1093) enters the same view and answers "is this row on it" from the
-     link (`sharedKeys`); resolveSlugs writes nothing. */
-  var arrivedShortlist = FilterState.parseShortlist(location.search);
-  if (arrivedShortlist.own || arrivedShortlist.slugs.length) {
-    state = FilterState.enterShortlistView();
-    resetFilterControls();
-    restored = null;
-    if (arrivedShortlist.slugs.length) {
-      arrivedSharedSlugs = arrivedShortlist.slugs;
-      var resolvedShared = HTF.shortlist.resolveSlugs(arrivedShortlist.slugs,
-        items.map(function (li) { return li.dataset.url || ''; }));
-      sharedKeys = resolvedShared.keys;
-      sharedUnmatched = resolvedShared.unmatched;
-    }
-  }
 
   /* `?q=` (#1024), from the search box: exactly what typing into the name
      box does. After the memory and the shuffle, because a name just typed is

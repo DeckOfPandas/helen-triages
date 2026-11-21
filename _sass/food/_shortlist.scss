@@ -3,24 +3,20 @@
 @use "shared/tokens" as *;
 
 // =============================================================================
-// THE SHORTLIST (#546)
+// THE SHORTLIST BUTTON (#546, #1521)
 // =============================================================================
-// Two controls of different kinds. .btn-shortlist marks one recipe: on an
-// index row's right-hand end, and on a recipe page as a pill (#1210; the pill
-// is shared/_furniture.scss's, the colours are below). .btn-shortlist-only
-// shows only what is marked: one per index, under the count it changes.
+// .btn-shortlist puts one recipe on lists: on an index row's right-hand end,
+// and on a recipe page as a pill (#1210; the pill is shared/_furniture.scss's,
+// the colours are below). It reads "+ shortlist", "✓ 2 lists", or, filling
+// one list, that list's name (shortlist-picker.js writes the word).
 //
 // Grey off, magenta on. $color-recipe-link for the on state, not the raw
 // $color-dazzling-dragonfruit: the darkened one is the text-carrying member of
 // the pair (_palette.scss). Hover goes to the raw, lighter hue.
-//
-// The word never changes and the mark does: `+` off, `✓` on, drawn in ::before
-// (shortlist.js sets the class and aria-pressed). So the control cannot change
-// width, and a row does not move when one is pressed.
 
 // --- The mark ----------------------------------------------------------------
-// A fixed box: `+` and `✓` are not the same width in the face, and would shift
-// the word on every press.
+// `+` off, `✓` on, drawn in ::before in a fixed box: the two are not the same
+// width in the face.
 %shortlist-mark {
   &::before {
     content: '+';
@@ -87,21 +83,89 @@
   margin-left: $space-lg;
 }
 
-// --- Shortlisted-only --------------------------------------------------------
-// A pill on its own line under the count (`.results-count-row`,
-// food/index.html), the same shape and placement as cocktails' in food's
-// colours. Not in META FILTERS: that block is gated on show_source_wording and
-// so is local-only, and this filter is for a visitor. A border, not the tape
-// shape (`.tag-shape`) food's filter chips wear: the tape is the filter
-// matrix's own mark, and this is not a filter on a recipe's properties.
-.btn-shortlist-only {
+// A list's name is the word while filling it: cut to a width a row can spare,
+// the whole name in the button's label.
+.btn-shortlist-word {
+  display: inline-block;
+  max-width: 11em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+// --- The chevron, filling one list ---------------------------------------------
+// Beside each button, opening the full picker the button no longer opens.
+.btn-shortlist-more {
+  flex-shrink: 0;
+  align-self: flex-start;
+  width: 1.75rem;
+  height: $recipe-title-size * $recipe-title-line-height;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: $color-clear-text;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 0.4em;
+    height: 0.4em;
+    margin-top: -0.3em;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    vertical-align: middle;
+  }
+
+  &:hover,
+  &:focus-visible,
+  &[aria-expanded="true"] { color: $color-recipe-link-hover; }
+}
+
+// --- "Adding to Lemons · done" ---------------------------------------------------
+// At the top of the page and stuck there while it scrolls: the results pill
+// owns the foot of the screen.
+.shortlist-into-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: $space-xs $space-sm;
+  margin: 0 0 $space-lg;
+  padding: $space-sm $space-md;
+  background: $color-surface;
+  border-bottom: 3px solid $color-dazzling-dragonfruit;
+  font-family: $font-headings;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.shortlist-into-name { color: $color-recipe-link; }
+
+.shortlist-into-done {
+  margin-left: auto;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $color-recipe-link;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
+// --- The drafts switch (#1358), a local build only ---------------------------------
+// The pill the shortlisted-only button wore, on a line of its own under the
+// count. Capitals: a view switch is an action (#1005).
+.btn-drafts-toggle {
   font-family: $font-headings;
   font-size: 0.8rem;
   font-weight: 400;
-  // A view switch is an action, so capitals (#1005).
   text-transform: uppercase;
   letter-spacing: 0.06em;
-
   background: $color-surface;
   border: 1.5px solid $color-border;
   border-radius: 0;
@@ -110,13 +174,9 @@
   white-space: nowrap;
   -webkit-text-stroke: 0;
   text-shadow: none;
-
   color: $color-clear-text;
   transition: color 0.12s ease-in-out, border-color 0.12s ease-in-out;
 
-  // The border moves with the text. On cocktails' dark ground the border
-  // alone carries the state; on this paper a 1.5px line changing colour is
-  // too quiet to do it alone.
   &:hover,
   &:focus-visible {
     color: $color-recipe-link-hover;
@@ -128,20 +188,10 @@
     color: $color-recipe-link;
     border-color: $color-recipe-link;
     font-weight: 700;
-
-    &:hover,
-    &:focus-visible {
-      color: $color-recipe-link-hover;
-      border-color: $color-recipe-link-hover;
-    }
   }
 }
-
-// The local-only drafts switch (#1358): the pill above, on a line of its own
-// under it, pulled up so the two read as a pair. Only a local build shows the
-// element (food/index.html).
-.btn-drafts-toggle { @extend .btn-shortlist-only; }
 
 .drafts-toggle-row {
   margin: (-$space-sm) 0 $space-lg;
 }
+

@@ -442,7 +442,6 @@ def test_the_recipe_scaler_is_handed_the_half_step_measures():
 
 
 @pytest.mark.parametrize("page, wiring", [
-    (("food", "index.html"), "filters.js"),
     (("food", "shortlists.html"), "shortlists-page.js"),
 ])
 def test_the_food_shopping_scripts_load_in_dependency_order(page, wiring):
@@ -594,7 +593,7 @@ def test_the_shopping_list_reads_the_aisles_from_the_data_file():
     The keyword table stays off the page: the matching happens at build time
     in _plugins/food_shopping.rb.
     """
-    for page in (("food", "index.html"), ("food", "shortlists.html")):
+    for page in (("food", "shortlists.html"),):
         assert "{% include food/recipe-data.html %}" in read(*page), (
             f"{'/'.join(page)} no longer includes _includes/food/recipe-data.html, "
             "so its shopping list has no recipes, aisles or order.")
@@ -3405,7 +3404,7 @@ def test_the_leopard_version_is_the_hash_of_the_committed_files():
 def _food_shopping_measures():
     """_includes/food/shopping-measures.html, the shopping list's attributes,
     after checking every page with a food shopping list puts them on it."""
-    for page in (("food", "index.html"), ("food", "shortlists.html")):
+    for page in (("food", "shortlists.html"),):
         assert re.search(r'id="shopping-list"[^>]*\{%\s*include food/shopping-measures\.html\s*%\}',
                          read(*page)), (
             f"{'/'.join(page)}'s #shopping-list no longer carries "
@@ -3431,13 +3430,10 @@ def test_the_index_shopping_list_is_handed_the_by_eye_measures():
         "_includes/food/shopping-measures.html no longer joins "
         "half_step_measures and half_step_counts as data-whole-measures."
     )
-    filters = read("assets", "js", "filters.js")
-    assert "getAttribute('data-whole-measures')" in filters, (
-        "filters.js no longer reads data-whole-measures off the panel."
-    )
-    assert "wholeMeasures: WHOLE_MEASURES" in filters, (
-        "filters.js reads the by-eye measures and does not hand them to "
-        "HTF.foodShoppingList.build(), so no total is rounded."
+    wiring = read("assets", "js", "shortlists-page.js")
+    assert "wholeMeasures: words('data-whole-measures')" in wiring, (
+        "shortlists-page.js no longer hands data-whole-measures to build(), "
+        "so no total is rounded."
     )
 
 
@@ -3496,7 +3492,6 @@ def test_the_index_shopping_list_is_handed_the_count_nouns():
         "The list is for words where adding an `s` is always right."
     )
 
-    index = read("food", "index.html")
     assert re.search(
         r'data-count-nouns="\{\{\s*'
         r'site\.data\.food\.scaling\.count_nouns\s*\|\s*join:\s*\',\'',
@@ -3504,14 +3499,13 @@ def test_the_index_shopping_list_is_handed_the_count_nouns():
         "_includes/food/shopping-measures.html no longer joins "
         "site.data.food.scaling.count_nouns as data-count-nouns."
     )
-    filters = read("assets", "js", "filters.js")
-    assert "getAttribute('data-count-nouns')" in filters
-    assert "countNouns: COUNT_NOUNS" in filters, (
-        "filters.js reads the count nouns and does not hand them to build()."
+    wiring = read("assets", "js", "shortlists-page.js")
+    assert "countNouns: words('data-count-nouns')" in wiring, (
+        "shortlists-page.js no longer hands the count nouns to build()."
     )
-    assert 'class="shopping-list-note"' in index, (
-        "food/index.html has lost the `(Not scaled: ...)` line's element; "
-        "filters.js fills it and says nothing when it is missing."
+    assert 'class="shopping-list-note"' in read("food", "shortlists.html"), (
+        "food/shortlists.html has lost the `(Not scaled: ...)` line's element; "
+        "shortlists-page.js fills it and says nothing when it is missing."
     )
 
 
@@ -3570,6 +3564,4 @@ def test_the_quarter_step_measures_reach_both_scalers():
         r'quarter_step_measures\s*\|\s*join:\s*\',\'', _food_shopping_measures()), (
         "_includes/food/shopping-measures.html no longer joins quarter_step_measures."
     )
-    filters = read("assets", "js", "filters.js")
-    assert "getAttribute('data-quarter-measures')" in filters
-    assert "quarterMeasures: QUARTER_MEASURES" in filters
+    assert "quarterMeasures: words('data-quarter-measures')" in read("assets", "js", "shortlists-page.js")

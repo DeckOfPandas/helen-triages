@@ -276,6 +276,8 @@
     KEY: KEY,
     EVERYTHING: EVERYTHING,
     NAME_MAX: NAME_MAX,
+    // Forget what was read, so the next call reads the key again.
+    refresh: function () { state = null; },
     all: function () { return copy(load()).lists; },
     get: function (id) { return find(copy(load()), id); },
     view: function () { return load().view; },

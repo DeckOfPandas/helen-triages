@@ -75,6 +75,9 @@
 // The shortlists page (#1521). After shopping-list, whose recipe rows it
 // adds a "remove" to.
 @use "food/shortlists-page";
+// The picker every shortlist button opens (#1521). After shortlists-page,
+// whose name form and small buttons it shares.
+@use "food/shortlist-picker";
 // After recipe-notes-body: the about page sits on .recipe-body-content and
 // overrides parts of it.
 @use "food/about";

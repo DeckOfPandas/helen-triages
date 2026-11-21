@@ -63,7 +63,7 @@ article.recipe .method-short {
 // rule: the taxonomy badges are links (#40), and so are two action controls
 // (#1058), the see-shortlist link and pdf above the head's rule, and a
 // temperature chart's label, which keeps its ink (#1501).
-article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf, .tc-row-link) {
+article.recipe a:not(.badge, .btn-see-shortlist, .shortlists-link, .btn-pdf, .tc-row-link) {
   color: $color-recipe-link;
   font-weight: 600;
 

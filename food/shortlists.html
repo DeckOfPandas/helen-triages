@@ -85,11 +85,9 @@ permalink: /food/shortlists/
 {% include food/recipe-data.html %}
 
 {% comment %} In this order: each shopping script reads the one before it as it parses
-   (tests/test_site_config.py::test_the_food_shopping_scripts_load_in_dependency_order),
-   and the page reads the store and the view. {% endcomment %}
+   (tests/test_site_config.py::test_the_food_shopping_scripts_load_in_dependency_order).
+   The store and the view are in the layout's head. {% endcomment %}
 <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-shopping-rows.js' | relative_url }}"></script>
-<script src="{{ '/assets/js/shortlists-store.js' | relative_url }}"></script>
-<script src="{{ '/assets/js/shortlists-view.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/shortlists-page.js' | relative_url }}"></script>

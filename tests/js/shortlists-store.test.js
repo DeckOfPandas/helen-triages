@@ -226,6 +226,17 @@ test('a stored record in the wrong shape reads as no lists, and a bad list costs
   ]);
 });
 
+test('refresh() reads the key again, so a page back from the cache shows what another page saved', () => {
+  const { lists, store } = boot();
+  lists.all();
+  const other = boot({ [lists.KEY]: store.read(lists.KEY) });
+  other.lists.create('Made elsewhere');
+  store.setItem(lists.KEY, other.store.read(other.lists.KEY));
+  assert.strictEqual(lists.all().length, 0, 'without a refresh the page keeps what it read');
+  lists.refresh();
+  assert.deepStrictEqual(plain(lists.all().map((l) => l.name)), ['Made elsewhere']);
+});
+
 test('a write that throws still leaves the lists working for this visit', () => {
   const store = storage();
   store.setItem = () => { throw new Error('QuotaExceededError'); };

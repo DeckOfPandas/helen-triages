@@ -98,6 +98,32 @@ test('a recipe the page has no data for adds nothing and breaks nothing', () => 
   assert.deepStrictEqual(totals(view.rows(lists, 'l1')), { 'plain flour': '200 g' });
 });
 
+// --- the index's words ----------------------------------------------------------
+
+test('the recipe button says how many lists, or offers to shortlist', () => {
+  assert.deepStrictEqual(plainButton(view.buttonWords(0)), { word: 'shortlist', on: false });
+  assert.deepStrictEqual(plainButton(view.buttonWords(1)), { word: '1 list', on: true });
+  assert.deepStrictEqual(plainButton(view.buttonWords(3)), { word: '3 lists', on: true });
+});
+
+test('in adding-to mode the button names the list and says whether the recipe is on it', () => {
+  assert.deepStrictEqual(plainButton(view.buttonWords(2, { name: 'Lemons', on: false })), { word: 'Lemons', on: false });
+  assert.deepStrictEqual(plainButton(view.buttonWords(2, { name: 'Lemons', on: true })), { word: 'Lemons', on: true });
+});
+
+test('the link to the page counts lists, so the number matches the noun', () => {
+  assert.strictEqual(view.linkText(0), 'shortlists');
+  assert.strictEqual(view.linkText(1), 'your 1 shortlist');
+  assert.strictEqual(view.linkText(6), 'your 6 shortlists');
+});
+
+function plainButton(b) { return { word: b.word, on: b.on }; }
+
+test('a refused name says why, naming the list it clashes with as that list spells it', () => {
+  assert.strictEqual(view.nameProblemText('empty', '', LISTS), 'Give the list a name.');
+  assert.strictEqual(view.nameProblemText('clash', 'LEMONS', LISTS), 'You already have a list called “Lemons”.');
+});
+
 // --- links --------------------------------------------------------------------
 
 test('the browse link carries the list it fills, and a recipe link the list it is opened from', () => {

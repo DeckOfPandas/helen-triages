@@ -1,0 +1,179 @@
+@use "sass:color";
+@use "food/palette" as *;
+@use "shared/tokens" as *;
+
+// =============================================================================
+// THE PICKER (#1521): what a .btn-shortlist opens
+// =============================================================================
+// Cloned and placed by shortlist-picker.js: absolute in the document, under
+// the control, right edges level. A tick box per list, "+ new list", and the
+// way to the shortlists page. Its name form and small buttons are the
+// shortlists page's (_shortlists-page.scss).
+
+.shortlist-picker {
+  position: absolute;
+  z-index: 50;
+  min-width: 15rem;
+  max-width: calc(100vw - #{2 * $space-sm});
+  box-sizing: border-box;
+  padding: $space-sm 0;
+  background: $color-surface;
+  color: $color-text;
+  border: 1.5px solid $color-border;
+  border-top: 4px solid $color-recipe-link;
+  box-shadow: 0 6px 18px rgba($color-text, 0.2);
+  text-align: left;
+  font-family: $font-body;
+  font-size: 1rem;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+
+  &[hidden] { display: none; }
+}
+
+.shortlist-picker-close {
+  position: absolute;
+  top: $space-xs;
+  right: $space-xs;
+  padding: $space-xs $space-sm;
+  border: 0;
+  background: none;
+  color: $color-clear-text;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
+// The recipe the lists are for, clear of the ×.
+.shortlist-picker-title {
+  margin: 0 0 $space-xs;
+  padding: 0 2.75rem 0 $space-lg;
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: $color-clear-text;
+  overflow-wrap: anywhere;
+}
+
+.shortlist-picker-lists {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// A row tall enough for a thumb.
+.shortlist-picker-list label {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  min-height: 2.5rem;
+  padding: 0 $space-lg;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+
+  &:hover { background: color.mix($color-dazzling-dragonfruit, $color-surface, 10%); }
+}
+
+// A drawn box: a browser's own differs by engine and theme.
+.shortlist-picker-list input {
+  flex: none;
+  box-sizing: border-box;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  border: 1.5px solid $color-clear-text;
+  border-radius: 3px;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+
+  &:checked {
+    background: $color-recipe-link url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 85% no-repeat;
+    border-color: $color-recipe-link;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-recipe-link;
+    outline-offset: 2px;
+  }
+}
+
+.shortlist-list-name {
+  font-family: $font-headings;
+  font-size: 1rem;
+  text-transform: lowercase;
+}
+
+.shortlist-picker-list input:checked + .shortlist-list-name { color: $color-recipe-link; }
+
+// "+ new list": a row in the actions' caps.
+.shortlist-picker-new {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 2.5rem;
+  padding: 0 $space-lg;
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $color-recipe-link;
+  background: none;
+  border: 0;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+
+  &[hidden] { display: none; }
+}
+
+.shortlist-picker-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  padding: $space-xs $space-lg;
+
+  &[hidden] { display: none; }
+}
+
+.shortlist-picker-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: $space-sm $space-md;
+}
+
+// 16px: below it, iOS zooms the page on focus.
+.shortlist-picker-name {
+  flex: 1 1 10rem;
+  min-width: 0;
+  padding: $space-xs $space-sm;
+  font-family: $font-body;
+  font-size: 1rem;
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-clear-text;
+  border-radius: $radius-sm;
+
+  &:focus-visible {
+    outline: 2px solid $color-recipe-link;
+    outline-offset: 1px;
+  }
+}
+
+.shortlist-picker-see {
+  display: block;
+  margin-top: $space-xs;
+  padding: $space-sm $space-lg 0;
+  border-top: 1px solid $color-border;
+  font-size: 0.85rem;
+}

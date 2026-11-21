@@ -90,9 +90,7 @@
   }
 
   function problemText(problem, name) {
-    if (problem === 'empty') return 'Give the list a name.';
-    var clash = lists.all().filter(function (l) { return l.name.toLowerCase() === name.toLowerCase(); })[0];
-    return 'You already have a list called “' + (clash ? clash.name : name) + '”.';
+    return V.nameProblemText(problem, name, lists.all());
   }
 
   // --- tabs ------------------------------------------------------------------
@@ -500,6 +498,13 @@
   }
   window.addEventListener('scroll', soon, { passive: true });
   window.addEventListener('resize', soon);
+
+  // Back from a recipe, which may have changed the lists.
+  window.addEventListener('pageshow', function (ev) {
+    if (!ev.persisted) return;
+    lists.refresh();
+    render();
+  });
 
   render();
   root.hidden = false;

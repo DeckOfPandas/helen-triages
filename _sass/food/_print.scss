@@ -38,6 +38,14 @@
     display: none;
   }
 
+  // The shortlists' controls (#1521): the picker, the chevron beside a button
+  // while filling a list, and the bar that says which.
+  .shortlist-picker,
+  .btn-shortlist-more,
+  .shortlist-into-bar {
+    display: none;
+  }
+
   // Badges are a browsing affordance, and the page being printed is already
   // chosen.
   .recipe-badges {

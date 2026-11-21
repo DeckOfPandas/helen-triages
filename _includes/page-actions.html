@@ -1,20 +1,25 @@
 {% comment %} ── The shortlist pair: the same two controls, in the same place, on both
-   sites (#1005, #1011, #1210) ──
+   sites (#1005, #1210) ──
    A recipe page puts this on the INGREDIENTS heading's line; a drink page on
-   the read it / make it toggle's line, in `.cocktail-controls`. One include,
-   so the two cannot drift. Print and pdf are on the furniture line
-   (page-print.html). DECISIONS §13 (#1210).
-   The button is a pill, drawn in shared/_furniture.scss. The link beside it
-   is deliberately not made to look like it: one changes this page, the other
-   goes to a different one.
-   Both ship `hidden` and shortlist.js reveals them; the link stays hidden
-   while the count is zero. The shortlist key is `page.url`, not
-   `relative_url`: the same key the index row or card for this page emits. The
-   link's count is the store's (`data-shortlist-total`), not
-   `[data-shortlist-count]`, which counts marked controls on this page. The
-   link ends in `#results` (#1057) so the index scrolls to the list. {% endcomment %}
+   the read it / make it toggle's line. One include, so the two cannot drift.
+   The button is a pill (shared/_furniture.scss); the link beside it is not
+   made to look like it: one changes this page, the other goes to another.
+   The key is `page.url`, the same key the index row or card emits. Food's
+   button opens shortlist-picker.js's picker and its link goes to the
+   shortlists page (#1521); cocktails' are shortlist.js's, the link hidden
+   at zero and ending in `#results` (#1057). {% endcomment %}
 {% assign actions_site = site.data.sites[page.site_key] %}
 <div class="page-actions">
+{% if page.site_key == "food" %}
+  <button type="button"
+          class="btn-shortlist"
+          data-shortlist-key="{{ page.url }}"
+          data-shortlist-title="{{ page.title | escape }}"
+          data-portions="{% include food/default-portions.html recipe=page %}"
+          aria-label="shortlist {{ page.title | escape }}"
+          hidden>shortlist</button>
+  <a class="shortlists-link" href="{{ '/food/shortlists/' | relative_url }}" data-shortlists-link>shortlists</a>
+{% else %}
   <button type="button"
           class="btn-shortlist"
           data-shortlist-key="{{ page.url }}"
@@ -23,4 +28,5 @@
   <a class="btn-see-shortlist"
      href="{{ actions_site.home | relative_url }}?shortlist=1#results"
      hidden>see shortlist (<span data-shortlist-total>0</span>)</a>
+{% endif %}
 </div>

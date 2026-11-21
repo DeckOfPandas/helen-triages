@@ -29,9 +29,9 @@
   justify-content: flex-start;
 }
 
-// The row under the count (#729, #730): the shortlisted-only pill's line; see
-// _sass/food/_shortlist.scss. The heading above keeps its own $space-sm bottom
-// margin and this holds the list off underneath.
+// The row under the count (#729, #730): the link to the shortlists page
+// (#1521). The heading above keeps its own $space-sm bottom margin and this
+// holds the list off underneath.
 .results-count-row {
   display: flex;
   align-items: baseline;

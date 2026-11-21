@@ -192,12 +192,8 @@
     // HAS TO HAVE (#1092). A row survives only if it has every chosen entry.
     includedIngredients: { empty: function () { return new Set(); }, narrows: true },
 
-    // Show only what is shortlisted (#546). The answer is not on the row: it
-    // is a fact about this browser, so rowMatchesFilters is handed
-    // `row.shortlisted`. It is a view, not a facet (#918): never true while
-    // any other narrowing field is set -- see enterShortlistViewFor and
-    // reconcileShortlistViewFor.
-    shortlisted: { empty: function () { return false; }, narrows: true },
+    // No `shortlisted`: the food index only browses, and the shortlists have
+    // their own page, food/shortlists.html (#1521).
 
     // The title search, folded and lowercased by filters.js before it lands
     // here.
@@ -231,7 +227,9 @@
     exclude: { empty: function () { return new Set(); }, narrows: true },
     nameQuery: { empty: function () { return ''; }, narrows: true },
 
-    // Same meaning as in FIELD_SPEC.
+    // Show only what is shortlisted (#546). The answer is not on the card: it
+    // is a fact about this browser. A view, not a facet (#918): never true
+    // while any other narrowing field is set -- see enterShortlistViewFor.
     shortlisted: { empty: function () { return false; }, narrows: true },
 
     // Half-typed searches, as isSearching in FIELD_SPEC.
@@ -362,10 +360,6 @@
 
     if (s.nameQuery && String(r.titleFolded || '').indexOf(s.nameQuery) === -1) return false;
 
-    // `row.shortlisted` is the caller's answer from HTF.shortlist, not a data-
-    // attribute: the build cannot know what is in this browser's localStorage.
-    if (s.shortlisted && !r.shortlisted) return false;
-
     if (!includesRow(r.ingredients || [], s.includedIngredients, familyMatch)) return false;
 
     return true;
@@ -489,8 +483,6 @@
     hasAnythingToClear: food.hasAnythingToClear,
     isEmpty: food.isEmpty,
     hasNarrowingFilter: food.hasNarrowingFilter,
-    enterShortlistView: food.enterShortlistView,
-    reconcileShortlistView: food.reconcileShortlistView,
 
     // The two tables and the factory that binds either. Exported so a test can
     // generate its per-field cases from the spec, not from a hand-written list.

@@ -1,7 +1,7 @@
-// The shortlist is a view, not a facet (#918, DECISIONS §8.3): `shortlisted`
-// never ANDs with another filter. The rule is two functions in
-// filter-state.js, generated here across both field tables so neither index
-// can quietly keep composing:
+// On the cocktail index the shortlist is a view, not a facet (#918, DECISIONS
+// §8.3): `shortlisted` never ANDs with another filter. The rule is two
+// functions in filter-state.js, generated here across the table that has it.
+// The food index has no shortlist view: its lists have a page (#1521).
 //
 //   enterShortlistView()          everything cleared, `shortlisted` true
 //   reconcileShortlistView(state) the view gives way to any other set field,
@@ -12,7 +12,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const FS = require('../../assets/js/filter-state.js');
 
-const TABLES = { food: FS.FOOD_FIELDS, cocktails: FS.COCKTAIL_FIELDS };
+const TABLES = { cocktails: FS.COCKTAIL_FIELDS };
 
 // A non-empty value of the right shape for a field, from its own factory.
 function filled(spec, field) {
@@ -27,7 +27,7 @@ Object.keys(TABLES).forEach((name) => {
   const spec = TABLES[name];
   const B = FS.create(spec);
 
-  test(`${name}: both tables declare shortlisted, or this rule has nothing to hold`, () => {
+  test(`${name}: the table declares shortlisted, or this rule has nothing to hold`, () => {
     assert.ok('shortlisted' in spec, `${name} has no shortlisted field`);
   });
 
@@ -94,12 +94,12 @@ Object.keys(TABLES).forEach((name) => {
   });
 });
 
-test('the food-shaped exports carry the two functions, so filters.js can call them unqualified', () => {
-  assert.strictEqual(typeof FS.enterShortlistView, 'function');
-  assert.strictEqual(typeof FS.reconcileShortlistView, 'function');
-  assert.strictEqual(FS.enterShortlistView().shortlisted, true);
+test('the food index has no shortlisted field and no shortlist view: it only browses (#1521)', () => {
+  assert.ok(!('shortlisted' in FS.FOOD_FIELDS), 'a food shortlisted filter is back on the index');
+  assert.strictEqual(FS.enterShortlistView, undefined, 'the food-shaped view functions are back');
+  assert.strictEqual(FS.reconcileShortlistView, undefined);
 });
 
 test('a missing state is answered, not thrown at', () => {
-  assert.strictEqual(FS.reconcileShortlistView(undefined), false);
+  assert.strictEqual(FS.create(FS.COCKTAIL_FIELDS).reconcileShortlistView(undefined), false);
 });

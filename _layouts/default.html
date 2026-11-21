@@ -103,6 +103,14 @@
      touches nothing in the body. After assets.js, which it calls.
   {% endcomment %}
   <script src="{{ '/assets/js/ground-print.js' | relative_url }}"></script>
+  {% comment %} Food's named shortlists (#1521): the store and what to show for
+     it, in the head because food/shortlists.html's own script calls them as
+     it parses. Neither touches the page until asked. Cocktails keeps its one
+     list (HTF.shortlist in assets.js) until its own move. {% endcomment %}
+  {% if page.site_key == "food" %}
+  <script src="{{ '/assets/js/shortlists-store.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/shortlists-view.js' | relative_url }}"></script>
+  {% endif %}
 </head>
 <body>
 
@@ -304,12 +312,16 @@
      place among the passes above does not matter. {% endcomment %}
   <script src="{{ '/assets/js/card-tagline.js' | relative_url }}"></script>
 
-  {% comment %} shortlist.js wires every `.btn-shortlist` on the page (#546),
-     from the shell because the buttons are spread across layouts and index
-     pages. Below {{ content }} is safe for this script: nothing calls into it
-     at parse time, the store it needs (HTF.shortlist) is in assets.js in the
-     head, and its own wiring waits for DOMContentLoaded. {% endcomment %}
+  {% comment %} Every `.btn-shortlist` on the page is wired from the shell, because the
+     buttons are spread across layouts and index pages: on food by
+     shortlist-picker.js and its template (#1521), elsewhere by shortlist.js
+     (#546). Nothing calls into either at parse time. {% endcomment %}
+  {% if page.site_key == "food" %}
+  {% include shortlist-picker.html %}
+  <script src="{{ '/assets/js/shortlist-picker.js' | relative_url }}"></script>
+  {% else %}
   <script src="{{ '/assets/js/shortlist.js' | relative_url }}"></script>
+  {% endif %}
 
   {% comment %} The wordmark deliberately differs from page headings (#477);
      the reasoning is beside the values in _sass/shared/_layout.scss.

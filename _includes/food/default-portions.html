@@ -1,0 +1,2 @@
+{% comment %} The portions a recipe starts at on a list (#1521): one batch of a `makes:`
+   recipe, a `serves:` recipe's own count, else 1. `include.recipe`. {% endcomment %}{% if include.recipe.whole_recipes %}1{% elsif include.recipe.portions %}{{ include.recipe.portions }}{% else %}1{% endif %}

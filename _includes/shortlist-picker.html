@@ -1,0 +1,32 @@
+{% comment %} What every `.btn-shortlist` opens, and the "adding to" bar (#1521). MANUAL
+   §8.9. <template>s render nothing; shortlist-picker.js clones each once.
+   The addresses are built here, so the script derives no base URL. Food's
+   for now: cocktails takes this include when it moves to named lists. {% endcomment %}
+<template id="shortlist-picker-template">
+  <div class="shortlist-picker" role="dialog">
+    <button type="button" class="shortlist-picker-close" aria-label="close">&times;</button>
+    <p class="shortlist-picker-title"></p>
+    <ul class="shortlist-picker-lists"></ul>
+    <button type="button" class="shortlist-picker-new" aria-expanded="false">+ new list</button>
+    <form class="shortlist-picker-form" hidden>
+      <label class="shortlists-name-label" for="shortlist-picker-name">Name your new list</label>
+      <span class="shortlist-picker-row">
+        <input type="text" id="shortlist-picker-name" class="shortlist-picker-name" maxlength="40"
+               placeholder="name your list" autocomplete="off" spellcheck="false"
+               aria-describedby="shortlist-picker-problem">
+        <button type="submit" class="shortlists-text-button">save</button>
+        <button type="button" class="shortlists-text-button shortlist-picker-cancel">cancel</button>
+      </span>
+      <span class="shortlists-name-problem" id="shortlist-picker-problem" aria-live="polite"></span>
+    </form>
+    <a class="shortlists-link shortlist-picker-see" href="{{ '/food/shortlists/' | relative_url }}">see your shortlists</a>
+  </div>
+</template>
+<template id="shortlist-into-template">
+  <div class="shortlist-into-bar" role="region" aria-label="Adding to a list">
+    <span class="shortlist-into-text">Adding to <strong class="shortlist-into-name"></strong></span>
+    <span aria-hidden="true">·</span>
+    <a class="shortlist-into-done" href="{{ '/food/shortlists/' | relative_url }}">done</a>
+  </div>
+</template>
+<p class="visually-hidden" aria-live="polite" data-shortlist-live></p>

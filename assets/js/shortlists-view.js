@@ -63,6 +63,27 @@
     return out;
   }
 
+  /* A recipe button's word: how many lists it is on, or, filling one list
+     (`into`: { name, on }), that list's name. The mark is the stylesheet's. */
+  function buttonWords(count, into) {
+    if (into) return { word: into.name, on: !!into.on };
+    if (!count) return { word: 'shortlist', on: false };
+    return { word: count + (count === 1 ? ' list' : ' lists'), on: true };
+  }
+
+  // The line under a refused name: `problem` is the store's 'empty' or 'clash'.
+  function nameProblemText(problem, name, lists) {
+    if (problem === 'empty') return 'Give the list a name.';
+    var folded = String(name).toLowerCase();
+    var clash = lists.filter(function (l) { return l.name.toLowerCase() === folded; })[0];
+    return 'You already have a list called “' + (clash ? clash.name : name) + '”.';
+  }
+
+  function linkText(lists) {
+    if (!lists) return 'shortlists';
+    return 'your ' + lists + (lists === 1 ? ' shortlist' : ' shortlists');
+  }
+
   function withQuery(url, key, value) {
     return url + (url.indexOf('?') === -1 ? '?' : '&') + key + '=' + encodeURIComponent(value);
   }
@@ -74,6 +95,9 @@
     tabLabel: tabLabel,
     countText: countText,
     shoppingEntries: shoppingEntries,
+    buttonWords: buttonWords,
+    linkText: linkText,
+    nameProblemText: nameProblemText,
     intoUrl: function (indexUrl, id) { return withQuery(indexUrl, 'into', id); },
     listUrl: function (recipeUrl, id) { return withQuery(recipeUrl, 'list', id); }
   };

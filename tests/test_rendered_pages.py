@@ -475,6 +475,11 @@ CONTROL_STATE_FIELDS = {
     "exclude-search-box": "isExcludeSearching",
 }
 
+# Text boxes on the index that filter nothing, so have no field to clear.
+NOT_FILTERS = {
+    "shortlist-picker-name": "names a new list in the shortlist picker (#1521)",
+}
+
 
 def test_every_text_input_on_the_index_has_state_behind_it(site):
     html = (site / "food" / "index.html").read_text(encoding="utf-8")
@@ -485,7 +490,7 @@ def test_every_text_input_on_the_index_has_state_behind_it(site):
         "below is now vacuous, which is exactly the trap it exists inside."
     )
 
-    unknown = sorted(ids - set(CONTROL_STATE_FIELDS))
+    unknown = sorted(ids - set(CONTROL_STATE_FIELDS) - set(NOT_FILTERS))
     assert not unknown, (
         f"the index page has text input(s) {unknown} that this test has never "
         f"been told about. Every box a user can type into needs a field in "
@@ -499,7 +504,7 @@ def test_every_text_input_on_the_index_has_state_behind_it(site):
     declared = set(re.findall(r"^\s{4}(\w+):\s*\{\s*empty:", spec, re.M))
     wiring = (ROOT / "assets" / "js" / "filters.js").read_text(encoding="utf-8")
 
-    for box_id in sorted(ids):
+    for box_id in sorted(ids - set(NOT_FILTERS)):
         field = CONTROL_STATE_FIELDS[box_id]
         assert field in declared, (
             f"#{box_id} is mapped to the state field '{field}', which "
@@ -2226,15 +2231,15 @@ def test_the_decoration_resolver_sees_a_cancelling_rule():
 # so the built page is the only place it can be checked; a Python copy of the
 # rule could pass while the site is wrong.
 
-def _shopping_blob(site, page="index.html"):
-    """The #recipe-ingredients JSON off the built food index."""
+def _shopping_blob(site, page="shortlists/index.html"):
+    """The #recipe-ingredients JSON off the built shortlists page (#1521)."""
     html = (site / "food" / page).read_text(encoding="utf-8")
     match = re.search(
         r'<script type="application/json" id="recipe-ingredients">(.*?)</script>',
         html, re.S)
     assert match, (
-        "the built food index has no #recipe-ingredients block, so the shopping "
-        "list has no data and silently shows nothing."
+        "the built shortlists page has no #recipe-ingredients block, so its "
+        "shopping lists have no data and silently show nothing."
     )
     return json.loads(match.group(1))
 
@@ -2350,9 +2355,10 @@ def test_every_recipe_reaches_the_page_with_a_portion_count(site):
 def test_the_production_shopping_blob_holds_exactly_what_has_a_row(prod_site):
     """One row, one entry, in the build that ships.
 
-    An extra entry is the direction that matters: it can be a draft's or a
-    held-back recipe's ingredient list published on the live index, which only
-    the production build shows (#235's shape). A row with no entry is a
+    The blob is the shortlists page's, the rows the index's (#1521). An extra
+    entry is the direction that matters: it can be a draft's or a held-back
+    recipe's ingredient list published on the live site, which only the
+    production build shows (#235's shape). A row with no entry is a
     shortlisted recipe the shopping list silently ignores.
     """
     blob = _shopping_blob(prod_site)

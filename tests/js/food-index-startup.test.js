@@ -1,4 +1,4 @@
-// The food index runs to the end, and its shopping list fills in (#801).
+// The food index runs to the end, and its filters and address bar work.
 //
 //   node --test tests/js/*.test.js
 //
@@ -25,101 +25,26 @@ const JS_DIR = path.join(ROOT, 'assets', 'js');
 
 // assets.js comes from _layouts/default.html; the rest are food/index.html's
 // own tags, in its order. The test at the foot of this file pins this list to
-// the template; test_the_food_shopping_scripts_load_in_dependency_order in
-// tests/test_site_config.py pins the template's order.
+// the template.
 const SCRIPTS = [
   'assets.js',
   'ingredient-search.js',
   'list-view.js',
   'filter-state.js',
-  'shopping-list.js',
-  'food-shopping-list.js',
-  'food-shopping-rows.js',
   'filters.js',
   // Wires itself on DOMContentLoaded, after filters.js's handler, and returns
   // at once here: this sandbox has no IntersectionObserver, which is the path
   // a browser without the API takes.
-  'results-bar.js',
-  // #849. Nobody's dependency; listed because the test at the foot of this
-  // file asserts this array is the template's script list.
-  'shortlist-export.js'
-];
-
-/* Hand-built, and small enough to read in one screen. `y` is what the build
-   hands over, the yield up to Helen's own words: `b`'s recipe says "6,
-   depending on appetite" and the list is given "6". */
-const RECIPES = {
-  '/food/recipes/a/': {
-    p: 4, y: '4', k: 'serves',
-    i: [{ a: '200 g', n: 'plain flour', s: 'cupboard' },
-      { a: '2', n: 'onions', s: 'produce' },
-      { a: '', n: 'olive oil', s: 'cupboard' }]
-  },
-  '/food/recipes/b/': {
-    p: 6, y: '6', k: 'serves',
-    i: [{ a: '300 g', n: 'plain flour', s: 'cupboard' },
-      { a: '1', n: 'onion', s: 'produce' }]
-  },
-  /* The two `makes:` recipes, which count batches (#1297). `w` is
-     page.whole_recipes, `h` page.half_recipe, `m` page.made: the figures the
-     recipe page's own scaler reads (#1286). The gelato makes a measure and may
-     be halved; the cookies make a count and may not. Neither has `p`: a
-     `makes:` recipe counts people nowhere. */
-  '/food/recipes/gelato/': {
-    p: null, y: 'About 750 ml', k: 'makes', w: true, h: true,
-    m: { kind: 'measure', base: 750, unit: 'ml', box: '750' },
-    i: [{ a: '125 ml', n: 'whipping cream', s: 'dairy' },
-      { a: '500 ml', n: 'whole milk', s: 'dairy' }]
-  },
-  '/food/recipes/cookies/': {
-    p: null, y: '18 cookies', k: 'makes', w: true, h: false,
-    m: { kind: 'count', base: 18, stem: 'cookies', rest: '', box: '18' },
-    i: [{ a: '100 g', n: 'peanut butter', s: 'cupboard' },
-      { a: '1', n: 'egg', s: 'dairy' }]
-  }
-};
-
-const AISLES = [
-  { key: 'produce', label: 'produce' },
-  { key: 'cupboard', label: 'store cupboard' },
-  { key: 'other', label: 'other' }
+  'results-bar.js'
 ];
 
 const TITLES = {
   '/food/recipes/a/': 'Aubergine thing',
   '/food/recipes/b/': 'Beetroot cake',
   '/food/recipes/gelato/': 'Blackberry gelato',
-  '/food/recipes/cookies/': 'Peanut Butter Cookies',
-  // Only in the list when a test passes SINGLE_THINGS as `options.recipes`.
-  '/food/recipes/cake/': 'Beetroot Chocolate Cake',
-  '/food/recipes/sauce/': 'Peanut Sauce',
-  '/food/recipes/pies/': 'Mince Pies'
+  '/food/recipes/cookies/': 'Peanut Butter Cookies'
 };
-
-/* `makes:` recipes whose yield is one named thing, as _plugins/food_yield.rb
-   reads "one 8-inch cake", "1 jar" and "1 dozen mince pies". None is offered a
-   half: a yield has to halve to at least one of itself. Passed as
-   `options.recipes`, so the standing fixture is unchanged. */
-const SINGLE_THINGS = {
-  '/food/recipes/cake/': {
-    p: null, y: 'one 8-inch cake', k: 'makes', w: true, h: false,
-    m: { kind: 'count', base: 1, stem: '8-inch cake', rest: '', box: '1',
-      singular: true, times: true, invariable: false },
-    i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
-  },
-  '/food/recipes/sauce/': {
-    p: null, y: '1 jar', k: 'makes', w: true, h: false,
-    m: { kind: 'count', base: 1, stem: 'jar', rest: '', box: '1',
-      singular: true, times: false, invariable: false },
-    i: [{ a: '200 g', n: 'peanuts', s: 'cupboard' }]
-  },
-  '/food/recipes/pies/': {
-    p: null, y: '1 dozen mince pies', k: 'makes', w: true, h: false,
-    m: { kind: 'count', base: 1, stem: 'dozen mince pies', rest: '', box: '1',
-      singular: true, times: false, invariable: true },
-    i: [{ a: '300 g', n: 'mincemeat', s: 'cupboard' }]
-  }
-};
+const URLS = Object.keys(TITLES);
 
 /* `data-ingredients` -- main_ingredients, comma-joined as food/index.html
    joins them. What the HAS TO HAVE picker's vocabulary is built from, and so
@@ -134,13 +59,9 @@ const MAIN_INGREDIENTS = {
 /**
  * A food index with everything the scripts read, and nothing else.
  *
- * @param {Object} [options]
- * @param {Object} [options.recipes] - replaces the #recipe-ingredients blob,
- *        for the tests about what happens when the build hands over something
- *        unexpected.
+ * @param {Object} [options] - `search`, `hash`, `backForward`, `beforeStart`
  */
 function boot(options) {
-  const recipes = (options && options.recipes) || RECIPES;
   const doc = createDocument();
   const el = (tag, cls, attrs) => {
     const node = doc.createElement(tag);
@@ -157,12 +78,10 @@ function boot(options) {
   doc.body.appendChild(el('meta', '', { name: 'base-url', content: '' }));
   doc.body.appendChild(el('meta', '', { name: 'site-key', content: 'food' }));
 
-  /* The three JSON blocks the page emits. Without one, its script warns and
-     falls back to nothing, which would test a different program from the one
-     that ships. */
+  /* The JSON block the page emits. Without it the script warns and falls
+     back to nothing, which would test a different program from the one that
+     ships. */
   json('ingredient-vocabulary', { search: { family_button_min_chars: 3 } });
-  json('recipe-aisles', AISLES);
-  json('recipe-ingredients', recipes);
 
   // The name box, so `?q=` (#1024) has somewhere to land; the input handler
   // is not exercised here, only the query's arrival.
@@ -191,7 +110,7 @@ function boot(options) {
   doc.body.appendChild(starSection);
 
   const list = el('ul', 'recipe-list');
-  Object.keys(recipes).forEach((url) => {
+  URLS.forEach((url) => {
     const li = el('li', '', {
       'data-url': url, 'data-tags': '', 'data-star': '',
       'data-ingredients': MAIN_INGREDIENTS[url] || '', 'data-all-ingredients': '|'
@@ -203,30 +122,6 @@ function boot(options) {
     list.appendChild(li);
   });
   doc.body.appendChild(list);
-
-  const countRow = el('div', 'results-count-row');
-  countRow.appendChild(el('button', 'btn-shortlist-only', { id: 'shortlist-only' }));
-  // #1093's note over a shared list, with the attributes filters.js reaches for.
-  const shared = el('p', 'shared-shortlist', { 'data-shared-shortlist': '' });
-  shared.appendChild(el('span', '', { 'data-shared-shortlist-text': '' }));
-  shared.appendChild(el('button', 'btn-shared-keep', { 'data-shared-shortlist-keep': '' }));
-  countRow.appendChild(shared);
-  doc.body.appendChild(countRow);
-
-  // The stub has `dispatch(type)`; the page calls the DOM's dispatchEvent with
-  // a CustomEvent, which "keep these" (#1093) does to repaint everything.
-  doc.dispatchEvent = (ev) => doc.dispatch(ev.type, ev);
-
-  const panel = el('section', 'shopping-list', {
-    id: 'shopping-list', 'data-whole-measures': 'handful,pinch',
-    'data-count-nouns': 'onion,lemon', 'data-container-nouns': 'jar,tin,batch'
-  });
-  panel.appendChild(el('div', 'shopping-list-head'));
-  panel.appendChild(el('ul', 'shopping-list-recipes'));
-  panel.appendChild(el('p', 'shopping-list-note'));
-  panel.appendChild(el('div', 'shopping-list-aisles'));
-  panel.appendChild(el('p', 'shopping-list-empty'));
-  doc.body.appendChild(panel);
 
   const win = {
     document: doc,
@@ -277,15 +172,7 @@ function boot(options) {
   // filters.js is one big DOMContentLoaded handler; nothing above has run yet.
   doc.dispatch('DOMContentLoaded');
 
-  return { doc, win, panel, list, results, starSection };
-}
-
-const aislesHtml = (panel) => panel.querySelector('.shopping-list-aisles').innerHTML;
-const recipesHtml = (panel) => panel.querySelector('.shopping-list-recipes').innerHTML;
-
-/** Turn the shortlisted-only filter on, the way pressing the pill does. */
-function showTheList(doc) {
-  doc.getElementById('shortlist-only').dispatch('click');
+  return { doc, win, list, results, starSection };
 }
 
 // --- the canary ---------------------------------------------------------------
@@ -297,13 +184,28 @@ test('the index gets to the end of filters.js', () => {
     + 'page is a blank index with nothing in the console anybody will see.');
 });
 
-test('it still gets to the end with a shortlist to render', () => {
-  // The interesting half: the panel's own code path, run at startup rather
-  // than from a click.
-  const { win, doc, list } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-  assert.strictEqual(list.style.visibility, 'visible');
+// --- the index only browses (#1521) ----------------------------------------------
+// The shortlists have a page of their own: the index has no shortlist view,
+// no shared list and no shopping list, and a link that asks for one lands on
+// the whole index.
+
+test('?shortlist=1 and a sent list are ignored: every row shows', () => {
+  for (const search of ['?shortlist=1', '?shortlist=a,gelato']) {
+    const { list } = boot({ search });
+    assert.strictEqual(visibleRows(list).length, URLS.length, `${search} narrowed the index`);
+  }
+});
+
+test('?into= rides through the address bar as the filters change', () => {
+  const written = [];
+  const { doc } = boot({
+    search: '?into=l3',
+    beforeStart: (win) => { win.history.replaceState = (s, t, url) => written.push(url); }
+  });
+  typeIngredient(doc, 'aubergines');
+  assert.ok(written.length, 'choosing a filter wrote nothing to the address bar');
+  assert.match(written[written.length - 1], /into=l3/,
+    'the list being filled dropped out of the address: a reload would leave the mode');
 });
 
 test('the count paints its number and its word into separate spans', () => {
@@ -316,706 +218,9 @@ test('the count paints its number and its word into separate spans', () => {
   assert.strictEqual(doc.getElementById('recipe-count').textContent, '4 recipes');
 });
 
-test('a page with no shopping list at all still runs', () => {
-  // Every other food page shares filters.js's ancestors, and a template that
-  // has not been given the panel must not take the index down with it.
-  const { doc, list } = boot();
-  const panel = doc.getElementById('shopping-list');
-  panel.parentNode.removeChild(panel);
-  assert.strictEqual(list.style.visibility, 'visible');
-});
-
-// --- the panel ----------------------------------------------------------------
-
-test('the panel is hidden until the shortlisted filter is on', () => {
-  const { doc, panel } = boot();
-  assert.strictEqual(panel.hidden, true);
-  showTheList(doc);
-  assert.strictEqual(panel.hidden, false);
-});
-
-test('an empty shortlist says so rather than showing an empty list', () => {
-  const { doc, panel } = boot();
-  showTheList(doc);
-  assert.strictEqual(panel.querySelector('.shopping-list-empty').hidden, false);
-  assert.strictEqual(aislesHtml(panel), '');
-});
-
-test('each recipe starts at however many it makes', () => {
-  // Not at 1, and not at some global default: an untouched list shops for
-  // every recipe exactly as written, which is the answer you want before you
-  // have said anything.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');   // serves 4
-  win.HTF.shortlist.toggle('/food/recipes/b/');   // guessed at 6
-  showTheList(doc);
-
-  const html = recipesHtml(panel);
-  assert.match(html, /value="4" data-url="\/food\/recipes\/a\/"/);
-  assert.match(html, /value="6" data-url="\/food\/recipes\/b\/"/);
-});
-
-test('the yield is on the control, never printed beside the name', () => {
-  // A number at each end of a short line reads as one expression, so the
-  // yield is on the input and never beside the name.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  showTheList(doc);
-
-  const html = recipesHtml(panel);
-  assert.ok(!html.includes('shopping-list-yield'),
-    'the yield is beside the recipe name again -- see the note in '
-    + '_sass/food/_shopping-list.scss before putting it back.');
-  // Still SAID, so it is there on hover and for a screen reader.
-  assert.ok(html.includes('which serves 4'), 'the stated serving size, quoted');
-  assert.ok(html.includes('which serves 6'), 'the figure is quoted');
-  assert.ok(html.includes('title='), 'the yield is reachable on hover');
-});
-
-test('the visible row says what the number counts, then the name', () => {
-  // #1297. The number is the input; the yield is still not on the row.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-  const visible = recipesHtml(panel).replace(/<[^>]*>/g, '').trim();
-  assert.strictEqual(visible, 'portions of Aubergine thing');
-});
-
-test('the totals are grouped by aisle, in the declared order', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  showTheList(doc);
-
-  const html = aislesHtml(panel);
-  assert.ok(html.indexOf('produce') < html.indexOf('store cupboard'));
-  // 200 g + 300 g, from two recipes, on one line.
-  assert.match(html, /<span class="shopping-list-amount">500 g<\/span>/);
-  // `onion` and `onions` are the same shopping, and three of them are onions
-  // -- the plural reaching build() through `data-count-nouns` (#1297).
-  assert.match(html,
-    /<span class="shopping-list-amount">3<\/span><span class="shopping-list-name">onions<\/span>/);
-});
-
-/* The per-recipe inputs are written with innerHTML, which this stub stores as
-   a string, so they cannot be found and clicked. The listener is delegated and
-   reads `ev.target`, so a stand-in carrying the three things it looks at runs
-   the same code. */
-const typedInto = (url, value) => ({
-  classList: { contains: (cls) => cls === 'shopping-list-portions' },
-  dataset: { url: url },
-  value: String(value)
-});
-
-test('one recipe can be rescaled on its own', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  showTheList(doc);
-
-  panel.querySelector('.shopping-list-recipes')
-    .dispatch('input', { target: typedInto('/food/recipes/a/', 8) });
-
-  // a doubles to 400 g, b is untouched at 300 g.
-  assert.match(aislesHtml(panel), /<span class="shopping-list-amount">700 g<\/span>/);
-  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/a/'), 8);
-  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/b/'), null,
-    'a recipe nobody typed into must stay at however many it makes');
-});
-
-test('rescaling one recipe does not replace the input being typed into', () => {
-  // The per-recipe list is rebuilt whole on every shortlist change, but not
-  // from the input handler: replacing the node under a typing cursor loses
-  // the caret and the keystroke.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-
-  const before = recipesHtml(panel);
-  panel.querySelector('.shopping-list-recipes')
-    .dispatch('input', { target: typedInto('/food/recipes/a/', 8) });
-
-  assert.strictEqual(recipesHtml(panel), before,
-    'the per-recipe controls were re-rendered from the input handler, which on '
-    + 'a real page takes the caret out of the box being typed into.');
-  // ...while the totals DID move.
-  assert.match(aislesHtml(panel), /<span class="shopping-list-amount">400 g<\/span>/);
-});
-
-test('an input event from something else is ignored', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-
-  assert.doesNotThrow(() => {
-    panel.querySelector('.shopping-list-recipes').dispatch('input', {
-      target: { classList: { contains: () => false }, dataset: {}, value: '9' }
-    });
-  });
-  assert.match(aislesHtml(panel), /<span class="shopping-list-amount">200 g<\/span>/);
-});
-
-test('un-shortlisting a recipe takes it out of the totals', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  showTheList(doc);
-  assert.match(aislesHtml(panel), /500 g/);
-
-  // What shortlist.js dispatches when a row's own toggle is pressed.
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  doc.dispatch('htf:shortlist-change');
-  assert.match(aislesHtml(panel), /200 g/);
-});
-
-test('an ingredient with no amount is still a line', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-  assert.match(aislesHtml(panel),
-    /<span class="shopping-list-name">olive oil<\/span>/);
-});
-
-// --- a `makes:` recipe counts BATCHES -- #1297 --------------------------------
-// Half a batch only where the build allows it, and no portion figure: a
-// portion of 18 cookies has no meaning. `serves:` recipes still count people.
-
-const batchInput = (url, value) => ({
-  classList: { contains: (cls) => cls === 'shopping-list-portions' },
-  dataset: { url: url },
-  value: String(value)
-});
-
-test('a `makes:` recipe starts at one batch, and its row says batches', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');
-  showTheList(doc);
-
-  const html = recipesHtml(panel);
-  assert.match(html, /value="1" data-url="\/food\/recipes\/cookies\/" data-batches/);
-  assert.strictEqual(html.replace(/<[^>]*>/g, '').trim(),
-    'batch of 18 Peanut Butter Cookies');
-  assert.ok(html.includes('aria-label="batches of Peanut Butter Cookies'));
-  assert.match(aislesHtml(panel), /100 g/);
-});
-
-test('the figure after "of" is shown only for a count above one', () => {
-  // "2 batches of 750 ml Blackberry gelato" reads worse than the name alone.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');
-  showTheList(doc);
-  assert.strictEqual(recipesHtml(panel).replace(/<[^>]*>/g, '').trim(),
-    'batch of Blackberry gelato');
-});
-
-// --- a yield that is ONE named thing is counted as that thing ------------------
-// "one 8-inch cake" and "1 jar" are not batches: the row names the thing made.
-
-const rowText = (panel) => recipesHtml(panel).split('</li>')
-  .map((row) => row.replace(/<[^>]*>/g, '').trim()).filter(Boolean);
-
-test('one cake is a cake, not a batch: the row names the thing made', () => {
-  const { win, doc, panel } = boot({ recipes: SINGLE_THINGS });
-  win.HTF.shortlist.toggle('/food/recipes/cake/');
-  win.HTF.shortlist.toggle('/food/recipes/sauce/');
-  win.HTF.shortlist.toggle('/food/recipes/pies/');
-  showTheList(doc);
-
-  assert.deepStrictEqual(rowText(panel), [
-    // The title names the thing ("Cake"), so the noun is not said twice.
-    '× 8-inch Beetroot Chocolate Cake',
-    // A jar holds the sauce, so it comes first with "of". `jar` is in the
-    // fixture's data-container-nouns.
-    'jar of Peanut Sauce',
-    // A dozen is counted in dozens; "mince pies" is already in the title.
-    'dozen Mince Pies'
-  ]);
-  const html = recipesHtml(panel);
-  assert.ok(!/batch/.test(html.replace(/data-batches/g, '')
-    .replace(/shopping-list-recipe--first-batch/g, '')), html);
-  // The label cannot move with the number, so it does not try to.
-  assert.ok(html.includes('aria-label="how many: Beetroot Chocolate Cake, which makes one 8-inch cake"'), html);
-});
-
-test('two of them take the plural, and a dozen stays a dozen', () => {
-  const { win, doc, panel } = boot({ recipes: SINGLE_THINGS });
-  ['cake', 'sauce', 'pies'].forEach((slug) => {
-    win.HTF.shortlist.toggle('/food/recipes/' + slug + '/');
-    win.HTF.shortlist.setBatches('/food/recipes/' + slug + '/', 2);
-  });
-  showTheList(doc);
-
-  assert.deepStrictEqual(rowText(panel), [
-    // The title is not made plural, which is why the × is there at one too.
-    '× 8-inch Beetroot Chocolate Cake',
-    'jars of Peanut Sauce',
-    'dozen Mince Pies'
-  ]);
-  assert.match(aislesHtml(panel), /500 g/, 'and two cakes is twice the flour');
-});
-
-test('one thing that IS the dish, and is not in its name, follows the name', () => {
-  // A traybake is not a container, so there is no "of"; the noun takes the
-  // plural above one.
-  const recipes = {
-    '/food/recipes/cake/': {
-      p: null, y: 'one traybake', k: 'makes', w: true, h: false,
-      m: { kind: 'count', base: 1, stem: 'traybake', rest: '', box: '1',
-        singular: true, times: false, invariable: false },
-      i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
-    }
-  };
-  const { win, doc, panel } = boot({ recipes });
-  win.HTF.shortlist.toggle('/food/recipes/cake/');
-  showTheList(doc);
-  assert.deepStrictEqual(rowText(panel), ['Beetroot Chocolate Cake traybake']);
-  win.HTF.shortlist.setBatches('/food/recipes/cake/', 3);
-  doc.dispatch('htf:shortlist-change');
-  assert.deepStrictEqual(rowText(panel), ['Beetroot Chocolate Cake traybakes']);
-});
-
-test('the title\'s own noun goes singular before the thing made', () => {
-  // A plural noun in the title goes singular when the thing made follows it.
-  // The cookies' row, where nothing follows the title, keeps its plural.
-  const recipes = {
-    '/food/recipes/cookies/': Object.assign({}, RECIPES['/food/recipes/cookies/'], {
-      y: '16 squares',
-      m: { kind: 'count', base: 16, stem: 'squares', rest: '', box: '16' }
-    })
-  };
-  const { win, doc, panel } = boot({ recipes });
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');
-  showTheList(doc);
-  assert.deepStrictEqual(rowText(panel), ['batch of 16 Peanut Butter Cookie squares']);
-});
-
-test('a batch says what it is a batch OF when the title does not', () => {
-  // `makes: "24 squares"`: the row says what the batch is of. The cookies'
-  // title already says cookies; a dozen stays a dozen.
-  const recipes = {
-    '/food/recipes/cake/': {
-      p: null, y: '24 squares', k: 'makes', w: true, h: false,
-      m: { kind: 'count', base: 24, stem: 'squares', rest: '', box: '24' },
-      i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
-    },
-    '/food/recipes/cookies/': RECIPES['/food/recipes/cookies/'],
-    '/food/recipes/pies/': {
-      p: null, y: 'about 3 dozen', k: 'makes', w: true, h: false,
-      m: { kind: 'count', base: 3, stem: 'dozen', rest: '', box: '3', invariable: true },
-      i: [{ a: '300 g', n: 'mincemeat', s: 'cupboard' }]
-    }
-  };
-  const { win, doc, panel } = boot({ recipes });
-  Object.keys(recipes).forEach((url) => win.HTF.shortlist.toggle(url));
-  showTheList(doc);
-  assert.deepStrictEqual(rowText(panel), [
-    'batch of 24 Beetroot Chocolate Cake squares',
-    'batch of 18 Peanut Butter Cookies',
-    'batch of 3 dozen Mince Pies'
-  ]);
-});
-
-test('every recipe named in the panel is a link to it, in the row title\'s class', () => {
-  // Each name is a link; the figure and the words stay outside it.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');
-  showTheList(doc);
-  const html = recipesHtml(panel);
-  assert.ok(html.includes(
-    '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>'), html);
-  assert.ok(html.includes(
-    '18 <a class="shopping-list-recipe-link" href="/food/recipes/cookies/">Peanut Butter Cookies</a>'),
-    'the figure and the words stay outside the link: ' + html);
-});
-
-test('an item nobody scaled names the recipe it came from, as a link', () => {
-  // An unscaled item names its recipe in brackets, so the reader knows which
-  // page to look at. Recipe `a` lists olive oil with no amount; its flour and
-  // onions are scaled and say nothing. The bracket is outside the tick's
-  // label (#1457), so following the link never ticks the row.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  showTheList(doc);
-  const html = aislesHtml(panel);
-  assert.ok(html.includes(
-    '<span class="shopping-list-name">olive oil</span></label>' +
-    '<span class="shopping-list-unscaled">(' +
-    '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>)</span>'),
-    html);
-  assert.strictEqual(html.split('shopping-list-unscaled').length - 1, 1,
-    'only the unscaled row carries a bracket');
-});
-
-test('#1457: every row has a tick box, and a tick made earlier is drawn ticked', () => {
-  // The list is rebuilt whole on every number change: the store is what
-  // carries a tick across, so the render must read it back.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.setTicked('onion', true);
-  showTheList(doc);
-  const html = aislesHtml(panel);
-  assert.ok(html.includes(
-    '<li class="shopping-list-row is-ticked"><label class="shopping-list-line">' +
-    '<input type="checkbox" class="shopping-list-tick" data-key="onion" checked>' +
-    '<span class="shopping-list-amount">2</span>'), html);
-  assert.ok(html.includes(
-    '<li class="shopping-list-row"><label class="shopping-list-line">' +
-    '<input type="checkbox" class="shopping-list-tick" data-key="plain flour">'), html);
-});
-
-test('#1457: a new count for one recipe unticks its rows, and only its rows', () => {
-  // Recipe a stands behind flour, onions and olive oil; the cookies behind
-  // peanut butter and an egg.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');
-  ['plain flour', 'olive oil', 'egg'].forEach((k) => win.HTF.shortlist.setTicked(k, true));
-  showTheList(doc);
-  const rows = panel.querySelector('.shopping-list-recipes');
-
-  // The number it already had is not a new count.
-  rows.dispatch('input', { target: typedInto('/food/recipes/a/', 4) });
-  assert.strictEqual(win.HTF.shortlist.ticked('plain flour'), true, 'no change, no untick');
-
-  rows.dispatch('input', { target: typedInto('/food/recipes/a/', 8) });
-  assert.strictEqual(win.HTF.shortlist.ticked('plain flour'), false);
-  assert.strictEqual(win.HTF.shortlist.ticked('olive oil'), false, 'unscaled rows go too');
-  assert.strictEqual(win.HTF.shortlist.ticked('egg'), true, 'another recipe keeps its ticks');
-  assert.ok(!aislesHtml(panel).includes('data-key="plain flour" checked'), 'and the redraw shows it');
-});
-
-
-test('a count above one is still batches of that many', () => {
-  // 18 of something is a batch, unlike one named thing.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');
-  win.HTF.shortlist.setBatches('/food/recipes/cookies/', 2);
-  showTheList(doc);
-  assert.deepStrictEqual(rowText(panel), ['batches of 18 Peanut Butter Cookies']);
-});
-
-test('NO PORTION FIGURE IS PRINTED FOR A `makes:` RECIPE, anywhere on its row', () => {
-  // The estimate is still in the blob (`p: 9`) and must not reach the row,
-  // its title or its label.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');
-  showTheList(doc);
-  // The input's CLASS is still `shopping-list-portions`; nothing a person or
-  // a screen reader is given may say the word.
-  const html = recipesHtml(panel).replace(/ class="[^"]*"/g, '');
-  assert.ok(!/portion/.test(html), html);
-  assert.ok(!html.includes('~'), html);
-  assert.ok(html.includes('which makes 18 cookies'), 'the yield, in its own words');
-});
-
-test('typing a number of batches multiplies the recipe', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');
-  showTheList(doc);
-
-  panel.querySelector('.shopping-list-recipes')
-    .dispatch('input', { target: batchInput('/food/recipes/cookies/', 3) });
-
-  assert.match(aislesHtml(panel), /300 g/);
-  assert.match(aislesHtml(panel), /<span class="shopping-list-amount">3<\/span>/,
-    'three eggs, never a fraction of one');
-  assert.strictEqual(win.HTF.shortlist.batches('/food/recipes/cookies/'), 3);
-  assert.strictEqual(win.HTF.shortlist.portions('/food/recipes/cookies/'), null,
-    'a batch count must never be written into the portions store');
-});
-
-test('half a batch is offered only where the build allows it', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');     // h: true
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');    // h: false
-  showTheList(doc);
-
-  const html = recipesHtml(panel);
-  assert.match(html, /min="0\.5" max="99" step="0\.5"[^>]*recipes\/gelato\//);
-  assert.match(html, /min="1" max="99" step="1"[^>]*recipes\/cookies\//);
-
-  const rows = panel.querySelector('.shopping-list-recipes');
-  rows.dispatch('input', { target: batchInput('/food/recipes/gelato/', 0.5) });
-  rows.dispatch('input', { target: batchInput('/food/recipes/cookies/', 0.5) });
-
-  assert.strictEqual(win.HTF.shortlist.batches('/food/recipes/gelato/'), 0.5);
-  assert.strictEqual(win.HTF.shortlist.batches('/food/recipes/cookies/'), 1,
-    'half a batch of the cookies is half an egg');
-  assert.match(aislesHtml(panel), /250 ml/, 'half the milk');
-  assert.match(aislesHtml(panel), /100 g/, 'all of the peanut butter');
-});
-
-test('there is no batch and a half: the spinner goes on to the next whole one', () => {
-  // The box steps in halves so that it can reach ½, and so lands on 1½ on the
-  // way up from 1 and down from 2. Halves exist only between 0 and 1.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');
-  showTheList(doc);
-  const rows = panel.querySelector('.shopping-list-recipes');
-
-  const up = batchInput('/food/recipes/gelato/', 1.5);
-  rows.dispatch('input', { target: up });
-  assert.strictEqual(win.HTF.shortlist.batches('/food/recipes/gelato/'), 2);
-  assert.strictEqual(up.value, '2', 'the box is corrected under the spinner');
-
-  rows.dispatch('input', { target: batchInput('/food/recipes/gelato/', 1.5) });
-  assert.strictEqual(win.HTF.shortlist.batches('/food/recipes/gelato/'), 1);
-});
-
-test('the food list has no "set all" box: one number cannot mean portions and batches', () => {
-  // Helen removed it: with batch rows beside portions rows it could only ever
-  // set some of the list. Each recipe is set by its own box.
-  const template = fs.readFileSync(path.join(ROOT, 'food', 'index.html'), 'utf8');
-  assert.ok(!template.includes('shopping-list-setall'), 'food/index.html has a "set all" box again');
-});
-
-test('a portions number left in the store is not read as batches', () => {
-  // The store may still hold a portions entry for a `makes:` recipe. A stored
-  // 6 was six people; read as batches it shops for six times the gelato.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.setPortions('/food/recipes/gelato/', 6);
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');
-  showTheList(doc);
-  assert.match(recipesHtml(panel), /value="1" data-url="\/food\/recipes\/gelato\//);
-  assert.match(aislesHtml(panel), /125 ml/);
-});
-
-test('no figure is marked as a guess: every one is the recipe\'s own', () => {
-  // serves_estimate is retired, so nothing on the list prints a `~`.
-  const { win, doc, panel } = boot();
-  ['/food/recipes/a/', '/food/recipes/b/', '/food/recipes/gelato/'].forEach(
-    (u) => win.HTF.shortlist.toggle(u));
-  showTheList(doc);
-  assert.ok(!recipesHtml(panel).includes('~'), 'a figure is marked as estimated');
-  assert.ok(recipesHtml(panel).includes('which makes About 750 ml'),
-    'a makes: recipe quotes its own yield');
-});
-
-test('a by-eye measure is totalled to a whole one, from the panel\'s own list', () => {
-  // #1297: the list reaches build() through `data-whole-measures`. Seven
-  // portions of a recipe for four is 1.75 handfuls, and prints 2.
-  const { win, doc, panel } = boot({
-    recipes: {
-      '/food/recipes/a/': {
-        p: 4, y: '4', k: 'serves',
-        i: [{ a: '1 handful', n: 'parsley', s: 'produce' }]
-      }
-    }
-  });
-  win.HTF.shortlist.setPortions('/food/recipes/a/', 7);
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-  assert.match(aislesHtml(panel), /<span class="shopping-list-amount">2 handfuls<\/span>/);
-});
-
-test('the juice and the zest of one lemon is one lemon, on the real wiring', () => {
-  // #1297: the marks ride from the blob (`pt`, `f`, `c`, `x`) into build().
-  const { win, doc, panel } = boot({
-    recipes: {
-      '/food/recipes/a/': {
-        p: 4, y: '4', k: 'serves',
-        i: [{ a: '', n: 'juice of 1 lemon', s: 'produce', pt: ['juice'], f: 'lemon', c: '1' },
-          { a: '', n: 'zest of 1 lemon', s: 'produce', pt: ['zest'], f: 'lemon', c: '1' },
-          { a: '85 ml', n: 'olive oil', s: 'cupboard' },
-          { a: '', n: 'olive oil', s: 'cupboard', x: true }]
-      }
-    }
-  });
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-  const html = aislesHtml(panel);
-  assert.match(html,
-    /<span class="shopping-list-amount">1<\/span><span class="shopping-list-name">lemon<\/span>/);
-  assert.match(html, /<span class="shopping-list-amount">85 ml<\/span>/);
-  assert.ok(!html.includes('×'), 'the pointer line added a count to the oil');
-});
-
-test('A STORED NUMBER CANNOT RESURRECT A BOX THE RECIPE CANNOT SUPPORT', () => {
-  /* portionsFor() must ask the recipe before the store. A number typed
-     earlier outlives the recipe's own data in localStorage; trusted, it draws
-     a box that accepts 200 and scales nothing. So this test seeds the store. */
-  const { win, doc, panel } = boot({
-    recipes: {
-      '/food/recipes/a/': {
-        p: null, y: 'Depends on appetite', k: 'serves',
-        i: [{ a: '125 ml', n: 'whipping cream', s: 'cupboard' }]
-      }
-    }
-  });
-  // A number typed before the recipe lost, or never had, its count.
-  win.HTF.shortlist.setPortions('/food/recipes/a/', 200);
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-
-  assert.ok(!recipesHtml(panel).includes('<input'),
-    'a stored number drew a box for a recipe with no portion count');
-  assert.match(recipesHtml(panel), /no serving size/);
-  assert.match(aislesHtml(panel), /125 ml/,
-    'and the amounts stay exactly as the recipe wrote them, not x200');
-});
-
-test('a recipe with NO portion count gets no box, and says why', () => {
-  /* A draft whose yield is still Helen's `QQ`. It contributes at x1 and says
-     what is missing, rather than offering a control that does nothing. */
-  const { win, doc, panel } = boot({
-    recipes: {
-      '/food/recipes/a/': {
-        p: null, y: 'QQ', k: 'serves',
-        i: [{ a: '200 g', n: 'plain flour', s: 'cupboard' }]
-      }
-    }
-  });
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-
-  const html = recipesHtml(panel);
-  assert.ok(!html.includes('<input'), 'no control that cannot work');
-  assert.match(html, /no serving size/);
-  assert.match(html, /open <code>serves:<\/code> with a number/, 'the note says what to write');
-  // Its ingredients still count, at the recipe as written.
-  assert.match(aislesHtml(panel), /200 g/);
-});
-
-test('a shortlisted recipe that is no longer on the page is dropped quietly', () => {
-  // A renamed or unpublished recipe, left in localStorage.
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/gone/');
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-  assert.ok(!recipesHtml(panel).includes('/food/recipes/gone/'));
-  assert.match(aislesHtml(panel), /200 g/);
-});
-
-// --- arriving at the shortlist by URL, #1011 -----------------------------------
-// `?shortlist=1` is what "see shortlist" on a recipe page links to. The index
-// turns the view on through the same `enterShortlistView()` the
-// `shortlisted (N)` button calls, so the two doors lead to one state (#918,
-// MANUAL 8.9).
-
-function shortlistViewIsOn(doc) {
-  const btn = doc.getElementById('shortlist-only');
-  assert.ok(btn, 'the fixture has no shortlisted-only button.');
-  return btn.getAttribute('aria-pressed') === 'true' &&
-         btn.classList.contains('is-on');
-}
-
 function visibleRows(list) {
   return list.children.filter((li) => !li.hidden && li.style.display !== 'none');
 }
-
-test('#1011: ?shortlist=1 turns the shortlist view on at startup', () => {
-  const { doc, list } = boot({ search: '?shortlist=1' });
-  assert.ok(shortlistViewIsOn(doc),
-    'if the index does not read the query, the URL lands on an ordinary ' +
-    'index -- which looks like a working page and is not one.');
-  assert.strictEqual(visibleRows(list).length, 0,
-    'the view is on and nothing is shortlisted, so nothing survives -- which ' +
-    'is also what proves the state reached update().');
-});
-
-test('#1011: without the query the view stays off', () => {
-  const { doc, list } = boot();
-  assert.ok(!shortlistViewIsOn(doc));
-  assert.strictEqual(visibleRows(list).length, Object.keys(RECIPES).length);
-});
-
-test('#1011: a shortlisted recipe is what the link shows', () => {
-  const { win, doc, list } = boot({ search: '?shortlist=1' });
-  // The store is read at update time, so marking one after boot and
-  // dispatching the change event is what a row's own toggle does.
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  doc.dispatch('htf:shortlist-change');
-  assert.ok(shortlistViewIsOn(doc), 'a toggle must not knock the view off');
-  assert.deepStrictEqual(
-    visibleRows(list).map((li) => li.getAttribute('data-url')),
-    ['/food/recipes/a/']);
-});
-
-// --- a shortlist someone sent, #1093 ------------------------------------------------
-// `?shortlist=a,gelato` opens the view `?shortlist=1` does, answering "is this
-// row on it" from the link. It shows the list and saves none of it; "keep
-// these" makes it yours.
-
-const sharedNote = (doc) => doc.querySelector('[data-shared-shortlist]');
-const visibleUrls = (list) => visibleRows(list).map((li) => li.getAttribute('data-url'));
-
-test('#1093: a sent list shows exactly those recipes', () => {
-  const { doc, list } = boot({ search: '?shortlist=gelato,a' });
-  assert.deepStrictEqual(visibleUrls(list).sort(), ['/food/recipes/a/', '/food/recipes/gelato/']);
-});
-
-test('#1093: opening a sent list saves NOTHING to this browser', () => {
-  const { win } = boot({ search: '?shortlist=gelato,a' });
-  assert.strictEqual(win.HTF.shortlist.count(), 0,
-    'the link wrote to the store. Helen: "Show it, don\'t save it".');
-});
-
-test('#1093: the sent list is shown over this browser\'s own, not merged with it', () => {
-  const { win, doc, list } = boot({ search: '?shortlist=gelato' });
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  doc.dispatch('htf:shortlist-change');
-  assert.deepStrictEqual(visibleUrls(list), ['/food/recipes/gelato/'],
-    'a recipe marked in THIS browser leaked into the list someone sent.');
-});
-
-test('#1093: the button that counts YOUR shortlist is not lit over a sent one', () => {
-  const { doc } = boot({ search: '?shortlist=gelato' });
-  assert.ok(!shortlistViewIsOn(doc));
-});
-
-test('#1093: the note says how many, and names what it could not find', () => {
-  const { doc } = boot({ search: '?shortlist=gelato,renamed-thing' });
-  const note = sharedNote(doc);
-  assert.strictEqual(note.hidden, false);
-  const text = note.querySelector('[data-shared-shortlist-text]').textContent;
-  assert.match(text, /\(1\)/);
-  assert.match(text, /renamed-thing/);
-});
-
-test('a sent list opens WITH its shopping list, totalled from the link', () => {
-  const { win, panel } = boot({ search: '?shortlist=gelato,a' });
-  assert.strictEqual(panel.hidden, false);
-  assert.deepStrictEqual(rowText(panel),
-    ['portions of Aubergine thing', 'batch of Blackberry gelato']);
-  assert.match(aislesHtml(panel), /500 ml/, 'the gelato\'s milk, as written');
-  assert.strictEqual(win.HTF.shortlist.count(), 0,
-    'and showing it still saved nothing: "Show it, don\'t save it".');
-});
-
-test('#1093: keep these merges the list in and shows YOUR shortlist', () => {
-  const { win, doc, list, panel } = boot({ search: '?shortlist=gelato' });
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  doc.querySelector('[data-shared-shortlist-keep]').dispatch('click');
-
-  // Through JSON: the array was made in the page's realm, not this one.
-  assert.deepStrictEqual(JSON.parse(JSON.stringify(win.HTF.shortlist.list())),
-    ['/food/recipes/b/', '/food/recipes/gelato/']);
-  assert.ok(shortlistViewIsOn(doc), 'after keeping, the view is your own shortlist');
-  assert.deepStrictEqual(visibleUrls(list).sort(), ['/food/recipes/b/', '/food/recipes/gelato/']);
-  assert.strictEqual(sharedNote(doc).hidden, true);
-  assert.strictEqual(panel.hidden, false, 'your own list shops again');
-});
-
-test('#1093: pressing shortlisted (N) over a sent list shows YOUR list instead', () => {
-  const { win, doc, list } = boot({ search: '?shortlist=gelato' });
-  win.HTF.shortlist.toggle('/food/recipes/b/');
-  doc.getElementById('shortlist-only').dispatch('click');
-  assert.ok(shortlistViewIsOn(doc));
-  assert.deepStrictEqual(visibleUrls(list), ['/food/recipes/b/']);
-  assert.strictEqual(sharedNote(doc).hidden, true);
-});
-
-test('#1093: a slug nothing answers to still enters the view, showing nothing', () => {
-  const { doc, list } = boot({ search: '?shortlist=nothing-by-this-name' });
-  assert.deepStrictEqual(visibleUrls(list), []);
-  assert.strictEqual(sharedNote(doc).hidden, false, 'and the note says why');
-  assert.strictEqual(doc.querySelector('[data-shared-shortlist-keep]').hidden, true,
-    'there is nothing to keep');
-});
 
 // --- arriving with a name, #1024 -----------------------------------------------
 
@@ -1055,20 +260,20 @@ test('#1050: an ingredient nothing names leaves the picker in a plain search', (
   // stays in the box with nothing chosen, and every row still shows.
   const { doc, list } = boot({ search: '?ing=quince' });
   assert.strictEqual(doc.getElementById('ingredient-search-box').value, 'quince');
-  assert.strictEqual(visibleRows(list).length, Object.keys(RECIPES).length,
+  assert.strictEqual(visibleRows(list).length, URLS.length,
     'nothing was chosen, so nothing should be narrowing the list.');
 });
 
 // --- arriving at a fragment, #1057 and #1059 ------------------------------------
 // The startup block scrolls to any element id `location.hash` names, not only
-// "results": #1057 (the see-shortlist link) and #1059 (a badge's own
-// filter-section fragment) both rely on that.
+// "results": #1057 (a search result) and #1059 (a badge's own filter-section
+// fragment) both rely on that.
 
 test('#1050/#1057: arriving at #results scrolls the count line into view', () => {
   const { results } = boot({ hash: '#results' });
   assert.strictEqual(results._scrollCalls.length, 1,
     'the startup block must scroll to location.hash again after the reveal, ' +
-    'the same landing a search result and "see shortlist" both rely on.');
+    'the landing a search result relies on.');
   // Not assert.deepStrictEqual: the options object was built inside the vm
   // context filters.js runs in, so it has that realm's own Object.prototype
   // and fails a STRICT structural compare despite being the same shape.
@@ -1099,7 +304,7 @@ test('#387: a genuine back navigation restores scroll instead, and skips the fra
     backForward: true,
     beforeStart(w) {
       w.HTF.indexMemory.save('htf-index-memory-v1', {
-        order: Object.keys(RECIPES),
+        order: URLS,
         filters: w.HTF.filterState.serialise(w.HTF.filterState.emptyState()),
         ingredientLabels: {},
         page: 1,
@@ -1234,76 +439,6 @@ test('this harness loads what food/index.html actually loads', () => {
     'tests/js/food-index-startup.test.js loads a different set of scripts from '
     + 'food/index.html. Update SCRIPTS to match the template.');
 });
-
-// --- #1297: batch rows last, and the not-scaled note ---------------------------
-
-const noteOf = (panel) => panel.querySelector('.shopping-list-note');
-
-test('#1297: the batch rows come last, under a rule, whatever order they were shortlisted in', () => {
-  // Grouped at the bottom, so boxes counting people and boxes counting
-  // batches read as two kinds.
-  const { win, doc, panel } = boot();
-  ['/food/recipes/cookies/', '/food/recipes/a/', '/food/recipes/gelato/',
-    '/food/recipes/b/'].forEach((url) => win.HTF.shortlist.toggle(url));
-  showTheList(doc);
-
-  const html = recipesHtml(panel);
-  const at = (slug) => html.indexOf('data-url="/food/recipes/' + slug + '/"');
-  assert.ok(at('a') < at('b') && at('b') < at('cookies') && at('cookies') < at('gelato'),
-    'portions rows first, then batch rows, each in shortlist order');
-  assert.strictEqual(html.split('shopping-list-recipe--first-batch').length - 1, 1,
-    'exactly one row carries the rule');
-  assert.ok(html.indexOf('shopping-list-recipe--first-batch') < at('cookies') &&
-    html.indexOf('shopping-list-recipe--first-batch') > at('b'),
-    'and it is the first batch row');
-});
-
-test('#1297: with no portions rows above them, the batch rows have no rule', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');
-  win.HTF.shortlist.toggle('/food/recipes/gelato/');
-  showTheList(doc);
-  assert.ok(!recipesHtml(panel).includes('shopping-list-recipe--first-batch'));
-});
-
-test('#1297: what was not scaled is named under the rows, in her format', () => {
-  // Bracketed, comma-joined, no full stop.
-  const { win, doc, panel } = boot({
-    recipes: {
-      '/food/recipes/a/': {
-        p: 4, y: '4', k: 'serves',
-        i: [{ a: '200 g', n: 'plain flour', s: 'cupboard' },
-          { a: '', n: 'olive oil', s: 'cupboard' },
-          { a: 'some', n: 'salt', s: 'cupboard' },
-          { a: '', n: 'coriander sprigs', s: 'produce' }]
-      }
-    }
-  });
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  showTheList(doc);
-  assert.strictEqual(noteOf(panel).textContent,
-    '(Not scaled: coriander sprigs, olive oil, salt)');
-  assert.strictEqual(noteOf(panel).hidden, false);
-  // Still on the list below: it has to be bought.
-  assert.match(aislesHtml(panel), /<span class="shopping-list-name">olive oil<\/span>/);
-});
-
-test('#1297: with everything scaled there is no note', () => {
-  const { win, doc, panel } = boot();
-  win.HTF.shortlist.toggle('/food/recipes/cookies/');
-  showTheList(doc);
-  assert.strictEqual(noteOf(panel).textContent, '');
-  assert.strictEqual(noteOf(panel).hidden, true);
-});
-
-test('#1297: a page without the note element still totals', () => {
-  const { win, doc, panel } = boot();
-  const note = noteOf(panel);
-  note.parentNode.removeChild(note);
-  win.HTF.shortlist.toggle('/food/recipes/a/');
-  assert.doesNotThrow(() => showTheList(doc));
-});
-
 
 // --- the address bar follows the filters, #1462 C3 ----------------------------
 // What is chosen is written into the query, so a reload or a copied link shows

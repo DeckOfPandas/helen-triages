@@ -30,12 +30,13 @@
                 </div>
               </div>
             </div>
-            {% comment %} The index row's button, exactly: same class, same key, same `hidden`.
-               shortlist.js finds every `.btn-shortlist` on the document. {% endcomment %}
+            {% comment %} The index row's button, exactly: same class, key and attributes.
+               shortlist-picker.js finds every `.btn-shortlist` on the document. {% endcomment %}
             <button type="button"
                     class="btn-shortlist"
                     data-shortlist-key="{{ _rel.url }}"
-                    aria-label="shortlist {{ _rel.title }}"
-                    aria-pressed="false"
+                    data-shortlist-title="{{ _rel.title | escape }}"
+                    data-portions="{% include food/default-portions.html recipe=_rel %}"
+                    aria-label="shortlist {{ _rel.title | escape }}"
                     hidden>shortlist</button>
           </li>
