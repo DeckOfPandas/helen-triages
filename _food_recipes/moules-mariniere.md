@@ -33,6 +33,7 @@ notes:
   - label: "£wine"
     text: "The wine doesn't need to be good enough to drink, just dry dry dry."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

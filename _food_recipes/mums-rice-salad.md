@@ -40,6 +40,7 @@ notes:
   - label: "Robbie must not be trusted"
     text: "Robbie thinks this salad is nice with added pineapple."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

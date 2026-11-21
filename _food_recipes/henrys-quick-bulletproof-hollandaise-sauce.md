@@ -36,6 +36,7 @@ notes:
     text: If you know how to reheat this reliably then please let me know...because my heart hopes this isn't impossible in spite of my small novel below. 
 
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

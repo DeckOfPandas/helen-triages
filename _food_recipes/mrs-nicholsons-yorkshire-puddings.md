@@ -31,6 +31,7 @@ notes:
   - label: "Olive oil"
     text: "Do not use olive oil. Kristian once used olive oil, and after we re-entered the evacuated house we found him lying on the kitchen floor with a wet towel over his face."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

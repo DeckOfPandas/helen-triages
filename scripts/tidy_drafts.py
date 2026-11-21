@@ -558,8 +558,8 @@ def fix_meta_block(text, path):
     """The #429 migration: drop the retired keys, put the flags in order.
 
     The order is `test_front_matter.META_ORDER`, asserted by
-    test_meta_block_is_exactly_the_three_flags_in_order. An optional
-    `claude_rewritten` sits after the first flag.
+    test_meta_block_is_exactly_the_four_flags_in_order. An optional
+    `claude_rewritten` sits after `rewritten`.
 
     A missing flag is reported, never invented. `awaiting_fix` fails closed,
     so writing `false` in asserts the recipe is fit to publish, which is
@@ -605,8 +605,9 @@ def fix_meta_block(text, path):
             f"the docstring. The rest of the block was still tidied."
         )
 
-    order = [META_ORDER[0]] + [k for k in META_OPTIONAL if k in block] \
-            + META_ORDER[1:]
+    after = META_ORDER.index("rewritten") + 1
+    order = META_ORDER[:after] + [k for k in META_OPTIONAL if k in block] \
+            + META_ORDER[after:]
     rebuilt = [block[k] for k in order if k in block]
     if rebuilt != [block[k] for k in block]:
         changed.append("reordered to " + " -> ".join(META_ORDER))

@@ -4,6 +4,7 @@
 #     meta.awaiting_fix: false    both sites
 #     meta.proofread:    true     both sites
 #     meta.rewritten:    true     a cocktail only
+#     meta.made_before:  true     a food recipe only: tested before it ships
 #
 # Anything else is held back: a flag missing, set the other way, spelled with a
 # hyphen, or written as a string. The comparisons are strict (`== false`,
@@ -55,6 +56,11 @@ Jekyll::Hooks.register :site, :post_read do |site|
       # publishes (#722).
       if name == "cocktail_recipes"
         reasons << "rewritten" unless meta["rewritten"] == true
+      end
+      # Food recipes only: Helen publishes nothing she has not cooked
+      # (DECISIONS §4). The magic bag's schema has no such flag.
+      if name == "food_recipes"
+        reasons << "made_before" unless meta["made_before"] == true
       end
 
       # The log names each page and the flag that stopped it, because a bare count

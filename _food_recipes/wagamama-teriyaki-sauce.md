@@ -29,6 +29,7 @@ notes:
  - label: "Storage"
    text: "Keeps airtight in the fridge for several weeks."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

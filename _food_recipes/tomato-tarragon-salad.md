@@ -41,6 +41,7 @@ notes:
   - label: "Pairs with"
     text: "Perfect with [roast beef fillet](../roast-beef-fillet/)."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

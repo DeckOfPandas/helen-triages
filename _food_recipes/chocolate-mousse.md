@@ -51,6 +51,7 @@ method_short:
     * Loosen with ¼ whites 10 folds max, pour back into whites 12 folds max
     * Portion, fridge >6h
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

@@ -36,6 +36,7 @@ notes:
   - label: "Timing"
     text: "Plan for 24 hours: salt overnight, five-spice for a couple of hours the next day, then the roast on the day."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

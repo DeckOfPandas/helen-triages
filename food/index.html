@@ -206,11 +206,14 @@ permalink: /food/
 </div>
 {% comment %} Hide / show drafts, on a local build only (#1358): gated on
    `site.show_drafts`, which only _config_local.yml declares. Ships `hidden`;
-   filters.js reveals and wires it. The identical block is on
-   cocktails/index.html. {% endcomment %}
+   filters.js reveals and wires it. The drafts button's identical block is on
+   cocktails/index.html. `untried` narrows to rows saying `meta.made_before`
+   is not true, which only a local build marks (`data-untried`); food only,
+   and never a row badge (#562). DECISIONS §4. {% endcomment %}
 {% if site.show_drafts %}
 <p class="drafts-toggle-row">
   <button type="button" class="btn-drafts-toggle" id="drafts-toggle" aria-pressed="false" hidden>hide drafts</button>
+  <button type="button" class="btn-drafts-toggle" id="untried-toggle" aria-pressed="false" hidden>untried</button>
 </p>
 {% endif %}
 
@@ -337,7 +340,11 @@ permalink: /food/
           {% endfor %}
         {% endif %}
       {% endfor %}
-      <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}"{% if _star_also != "" %} data-star-also="{{ _star_also }}"{% endif %} data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}">
+      {% comment %} Local builds only; the magic bag has no `made_before`. {% endcomment %}
+      {% assign _untried = false %}
+      {% if site.show_drafts and recipe.meta.made_before != true %}{% assign _untried = true %}{% endif %}
+      {% if is_magic_bag %}{% assign _untried = false %}{% endif %}
+      <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}"{% if _star_also != "" %} data-star-also="{{ _star_also }}"{% endif %} data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}"{% if _untried %} data-untried{% endif %}>
 
         <div class="recipe-row-content">
         <a class="recipe-title-link" href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>

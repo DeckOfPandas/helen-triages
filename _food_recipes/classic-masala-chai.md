@@ -42,6 +42,7 @@ notes:
   - label: "Pay attention"
     text: "Don't over-boil the spices, because they turn bitter fast."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

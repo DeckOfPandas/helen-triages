@@ -44,6 +44,7 @@ notes:
   - label: "Wine amount"
     text: "Everything is fine."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

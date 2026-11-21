@@ -47,6 +47,7 @@ notes:
   - label: "Saving time"
     text: "The [teriyaki sauce](../teriyaki-sauce/) recipe is this same sauce on its own —  it keeps in the fridge for about a week."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true
