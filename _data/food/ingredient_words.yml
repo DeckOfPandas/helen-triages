@@ -231,6 +231,30 @@ aliases:
   vanilla bean paste: vanilla paste
   vanilla bean paste or extract: [vanilla paste, vanilla extract]
   vanilla extract or paste: [vanilla extract, vanilla paste]
+  # A qualifier that names no different product folds into the plain chip
+  # (DECISIONS §8). Safe on the include side: each target's words start the
+  # raw entry's own words, so the chip still matches every recipe it names.
+  # A kind stays its own chip: whole cloves, whole nutmeg, whole milk, flaked
+  # almonds, a whole bird, cooked turkey or chicken. Bottled juices too.
+  lemon juice: lemon
+  lemon zest: lemon
+  unwaxed lemons: lemon
+  unwaxed lemon: lemon
+  lime juice: lime
+  orange juice: orange
+  orange zest: orange
+  whole fennel seeds: fennel seeds
+  raw honey: honey
+  natural yoghurt: yoghurt
+  fine polenta: polenta
+  fine green beans: green beans
+  frozen peas: peas
+  frozen spinach: spinach
+  whole blanched almonds: blanched almonds
+  fine salt: salt
+  flaky salt: salt
+  fine sea salt: sea salt
+  flaky sea salt: sea salt
   # Plurals offered beside their own singular: a recipe writes the number its
   # ingredient list does (DECISIONS §6), and this makes the two one chip.
   # `singulars` cannot: it normalises a word for matching and does not merge
@@ -402,7 +426,7 @@ aliases:
   kosher salt or 4 tsp fine sea salt: [kosher salt, fine sea salt]
   lamb or chicken stock: [lamb, chicken stock]
   maple syrup or honey: [maple syrup, honey]
-  natural yoghurt or milk: [natural yoghurt, milk]
+  natural yoghurt or milk: [yoghurt, milk]
   oil or butter: [oil, butter]
   parmesan or pecorino: [parmesan, pecorino]
   pecorino or parmesan: [pecorino, parmesan]

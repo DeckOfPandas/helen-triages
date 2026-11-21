@@ -1384,6 +1384,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   a precedent for stripping other brand names. The two five-spice spellings
   are one picker entry and get no "(all)" button.
   `_data/food/ingredient_words.yml`.
+- **2026-11-21 — a qualifier that names no different product is one chip
+  with the plain ingredient; a kind keeps its own.** Shown 25 groups of
+  `main_ingredients` chips split by a qualifier, Helen merged lemon juice,
+  zest and unwaxed lemons into `lemon` (lime and orange the same): *"1"*;
+  and raw honey, natural yoghurt, fine polenta, fine green beans, frozen peas
+  and spinach, whole blanched almonds and the fine and flaky salts:
+  *"Merge them"*. Kinds stay apart, per §6: whole cloves and whole nutmeg
+  (*"Name each as its list does"*), whole milk, flaked almonds, a whole bird,
+  cooked turkey or chicken, and bottled juices. Each is an alias in
+  `_data/food/ingredient_words.yml`.
 
 ### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
 
