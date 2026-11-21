@@ -1179,8 +1179,11 @@ function renderResultsPool() {
     var fold = HTF.shoppingList.foldUnit;
     var wanted = fold(word);
     if (!wanted) return false;
+    // A hyphened word counts whole and by its parts: "Sacher-Torte" names a torte.
     return String(title).toLowerCase().split(/[\s,()\/&]+/).some(function (w) {
-      return w !== '' && fold(w) === wanted;
+      return w !== '' && (fold(w) === wanted || w.split('-').some(function (part) {
+        return part !== '' && fold(part) === wanted;
+      }));
     });
   }
 
@@ -1204,6 +1207,16 @@ function renderResultsPool() {
     return match[1] + single + tail;
   }
 
+  /* The thing made said after the title's own noun, so before any " with
+     ...": "Potato Cake pieces with Smoked Salmon", never "... Salmon pieces".
+     Returned as the row's title and post. */
+  function thingAfterHead(title, thing) {
+    var named = singularHead(title);
+    var cut = named.search(/\s+with\s+/i);
+    if (cut === -1) return { title: named, post: ' ' + thing };
+    return { title: named.slice(0, cut) + ' ' + thing + named.slice(cut), post: '' };
+  }
+
   /* The words of a row around the recipe's name: `word` is what the number
      counts, `pre`/`post` sit either side, `title` is the name as written.
        [2] batches of 18 [Peanut Butter Cookies]    title names the thing
@@ -1221,6 +1234,11 @@ function renderResultsPool() {
     out.word = batchWord(n);
     var made = RECIPES[url].m;
     if (!(made && made.kind === 'count' && made.stem)) return out;
+    // "enough marinade for 4 portions of fish" says what it is for after the name.
+    if (/^enough\s/i.test(String(made.prefix || ''))) {
+      out.post = ', ' + made.prefix + ' ' + made.box + ' ' + made.stem + String(made.rest || '');
+      return out;
+    }
 
     var unitLabel = HTF.shoppingList.unitLabel;
     var words = String(made.stem).split(/\s+/);
@@ -1248,8 +1266,9 @@ function renderResultsPool() {
       }
       out.word = (times + group).trim();
       out.pre = before ? before + ' ' : '';
-      out.title = singularHead(title);
-      out.post = ' ' + (n > 1 ? unitLabel(noun, 2) : noun);
+      var thing = thingAfterHead(title, n > 1 ? unitLabel(noun, 2) : noun);
+      out.title = thing.title;
+      out.post = thing.post;
       return out;
     }
 
@@ -1257,8 +1276,9 @@ function renderResultsPool() {
     if (!made.box || /^batch/i.test(String(made.stem))) return out;
     out.pre = made.box + ' ' + (group ? group + ' ' : '');
     if (!named) {
-      out.title = singularHead(title);
-      out.post = ' ' + words.join(' ') + String(made.rest || '');
+      var said = thingAfterHead(title, words.join(' ') + String(made.rest || ''));
+      out.title = said.title;
+      out.post = said.post;
     }
     return out;
   }
@@ -1501,8 +1521,9 @@ function renderResultsPool() {
     renderShoppingTotal(shownRows);
   }
 
-  /* What the shop comes to (#1458), as on the cocktail list (#817), and how
-     many lines it could not price. Hidden where nothing is costed. */
+  /* What the shop comes to (#1458), as on the cocktail list (#817), and
+     under it the lines it could not price, by name (#1523). Hidden where
+     nothing is costed. */
   function renderShoppingTotal(rows) {
     if (!shoppingTotal) return;
     var sum = COST_UNITS ? HTF.foodShoppingList.costTotal(rows) : null;
@@ -1511,12 +1532,7 @@ function renderResultsPool() {
       shoppingTotal.textContent = '';
       return;
     }
-    var text = (sum.partial ? '' : 'roughly ') + sum.text;
-    if (sum.unpriced) {
-      text += ' — ' + sum.unpriced +
-        (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
-    }
-    shoppingTotal.textContent = text;
+    HTF.shoppingList.drawTotal(shoppingTotal, (sum.partial ? '' : 'roughly ') + sum.text, sum);
     shoppingTotal.hidden = false;
   }
 

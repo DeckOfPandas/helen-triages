@@ -1416,7 +1416,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   recipe page says how many are missing and names them: "From £1.43 a batch
   in ingredients, not counting 1 unpriced item (cockerel carcass)." — Helen:
   *"number 1, but with "not counting X unpriced items""*; the names on
-  2026-11-08, #1486.
+  2026-11-08, #1486. The shopping list's total names them too (#1523), on a
+  quieter second line under the figure.
 - **2026-11-03, #1458 — a researched food price's range is the median's
   bracket: the middle 50% of 6+ shop prices, the range of 3–5, the mean's two
   ends of 2.** Helen: *"2 points mean, 3-5 points median with range in
@@ -1530,7 +1531,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   dozen" doubled can be "two dozen". Our scaler is integer.'*; *"950 ml for
   one order of a recipe becomes 1900 ml for 2"*; *"64+ tiny macarons, 128+
   tiny macarons"*; *'if "some" is originally guessed to be 4 portions, 2x
-  should be 8 portions'*. The words are `yields:` in `_data/food/scaling.yml`.
+  should be 8 portions'*. 2026-11-21: *'update that marinade to makes "enough
+  marinade for 4 portions of fish", which then scales to "...for 8 portions"
+  and so on'*, so an "enough <thing> for N" lead-in is read. The words are
+  `yields:` in `_data/food/scaling.yml`.
   Not ruled: whether the "Makes" line at the top of the page moves with the
   box.
 - **2026-10-04, #1286 — a `makes:` recipe is offered half a recipe only where
@@ -1678,7 +1682,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   where the title names the thing; *'"[2] jars of peanut sauce", "[3] rainbow
   confetti traybakes"'* where it does not. A container comes first with "of";
   anything else follows the title. Which words are containers is
-  `yields.container_words`, a session's list of nine. No colon. The recipe
+  `yields.container_words`, a session's list. 2026-11-21, Helen: *'"1 × 24-cm
+  trifle Blackberry Syllabub with Marsala Pear Compote bowl", which should be
+  "1 x 24-cm trifle bowl of Blackberry Syllabub with..."'*, so a vessel (bowl,
+  basin, mould, ramekin) is a container, and a thing that follows a title
+  goes before its " with …". No colon. The recipe
   page ("2 × 8-inch cakes") was already right.
 - **2026-10-11 — a batch row says the thing made once: after the title where
   the title does not name it, with the title's own noun made singular.**
