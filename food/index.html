@@ -340,7 +340,11 @@ permalink: /food/
           {% endfor %}
         {% endif %}
       {% endfor %}
-      <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}"{% if _star_also != "" %} data-star-also="{{ _star_also }}"{% endif %} data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}"{% if site.show_drafts and is_magic_bag == false and recipe.meta.made_before != true %} data-untried{% endif %}>
+      {% comment %} Local builds only; the magic bag has no `made_before`. {% endcomment %}
+      {% assign _untried = false %}
+      {% if site.show_drafts and recipe.meta.made_before != true %}{% assign _untried = true %}{% endif %}
+      {% if is_magic_bag %}{% assign _untried = false %}{% endif %}
+      <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}"{% if _star_also != "" %} data-star-also="{{ _star_also }}"{% endif %} data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}"{% if _untried %} data-untried{% endif %}>
 
         <div class="recipe-row-content">
         <a class="recipe-title-link" href="{{ recipe.url | relative_url }}">{{ recipe.title }}</a>
