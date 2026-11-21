@@ -1407,13 +1407,16 @@ figures the recipe's own page uses, so the two step alike.
   batches.
 - **The thing made is said once.** Where the title already names it (the
   yield's last word found in the title, singular against singular) the noun is
-  dropped. Where it does not, the noun follows the title, and the title's own
-  last word before any " with …" goes singular if it is a plain plural
-  (`singularHead`): "batch of 16 … Brownie squares".
+  dropped; a hyphened title word counts by its parts too, so "Sacher-Torte"
+  names a torte. Where it does not, the noun follows the title's own noun,
+  which goes singular if it is a plain plural (`singularHead`), and comes
+  before any " with …" (`thingAfterHead`): "batch of 16 … Brownie squares",
+  "batch of 30 Potato Cake pieces with Smoked Salmon …".
 - **A yield of one named thing is not a batch.** Named by the title, the row
   is `×` and the title, which is not made plural. Not named, a container
-  (`yields.container_words`) goes first with "of" and anything else follows
-  the title, plural above one.
+  (`yields.container_words`, a bowl or a tin, never a cake) goes first with
+  "of", "× 24-cm trifle bowl of Blackberry Syllabub …", and anything else
+  follows the title, plural above one.
 - **It needs the noun**, so a `makes:` that opens with a number names the
   thing (`"16 bars"`, never `"16"`). A bare count has nothing to print and its
   row is "batch of" the title.
@@ -1851,12 +1854,15 @@ Courier Prime, Helen's choice. The chooser's and the name forms' buttons are
 `.btn-shortlist-lists`, each site's `.btn-shortlist-only` pill extended, with
 an icon from `_includes/icons/` (pencil, bin, plus, save, close).
 
-**`shortlisted (N)` counts every recipe on any list, once** (`paintCounts`
-in `shortlist.js`, `HTF.shortlist.total()` for a page's `see shortlists
-(N)`), and the chooser's options carry each list's own count.
+**The index's pill reads `see shortlists (N)`, the words of a page's link,
+and counts every recipe on any list, once** (`paintCounts` in
+`shortlist.js`, `HTF.shortlist.total()` for the page's link). The chooser's
+rows carry each list's own count. The two keep their own shapes: the pill
+changes the page it is on, the link leaves it (DECISIONS §13).
 
-**The view is not a facet**, and shows the active list. Pressing it
-on clears every other filter and shows that list. Setting any filter, or
+**The view is not a facet**, and shows the active list. Pressing the pill
+on clears every other filter and opens SEE ALL, the view its count counts,
+whichever list was on show. Setting any filter, or
 choosing a search result, while it is on turns it off and applies that filter
 to the whole collection; typing into a box without choosing keeps it. `clear
 all` turns it off. The rule is two functions in `assets/js/filter-state.js`,
@@ -1866,10 +1872,15 @@ cases from both field tables. Why it does not compose: DECISIONS §8.3.
 
 **The list chooser** (`_includes/shortlist-lists.html`,
 `assets/js/shortlist-lists.js`) shows under the pill while your own view is
-on: each index unhides it beside painting the pill. A select with no
-visible label (its `aria-label` is "choose shortlist") of "name (N)", then an
-`<hr>` and "SEE ALL (N)", sets the active list; rename and delete sit beside
-it, hidden in SEE ALL, and "+ new list" on the row under. New and rename open
+on: each index unhides it beside painting the pill. A button with no
+visible label (its `aria-label` is "choose shortlist"), naming the active
+list with a caret, opens a menu in the picker's own box (`.shortlist-picker`:
+the top rule, edges, shadow and ×): a row per list, "name (N)", then SEE ALL
+(N) under a rule, a tick in the picker's tick-box column on the one shown. Not
+a `<select>`, whose open list the browser draws and no stylesheet reaches.
+Up and down walk the rows; Escape, the ×, a choice, or a press or focus
+outside closes it. Rename and delete sit beside the button, hidden in SEE ALL,
+and "+ new list" on the row under. New and rename open
 one name form in place of the buttons; delete asks `window.confirm` first.
 Every change dispatches `htf:shortlist-change`, which both indexes already
 repaint from. It paints again on DOMContentLoaded, after the index has read
@@ -1893,8 +1904,8 @@ shows it and saves none of it.**
   one on it" in place of the store. The page drops the list the moment the
   view goes.
 - The note `[data-shared-shortlist]` says the name, how many, and any slug
-  nothing answers to. `shortlisted (N)` is not lit; pressing it shows your own
-  list.
+  nothing answers to. The pill is not lit; pressing it shows your own lists,
+  as SEE ALL.
 - The shopping list is open and totals the link's recipes as written. A number
   typed into a box is saved, as that recipe's count on the active list.
 - **"keep these"** (`HTF.shortlist.keep`) merges the list into the list of

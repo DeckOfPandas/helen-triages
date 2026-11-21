@@ -1679,7 +1679,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   where the title names the thing; *'"[2] jars of peanut sauce", "[3] rainbow
   confetti traybakes"'* where it does not. A container comes first with "of";
   anything else follows the title. Which words are containers is
-  `yields.container_words`, a session's list of nine. No colon. The recipe
+  `yields.container_words`, a session's list. 2026-11-21, Helen: *'"1 × 24-cm
+  trifle Blackberry Syllabub with Marsala Pear Compote bowl", which should be
+  "1 x 24-cm trifle bowl of Blackberry Syllabub with..."'*, so a vessel (bowl,
+  basin, mould, ramekin) is a container, and a thing that follows a title
+  goes before its " with …". No colon. The recipe
   page ("2 × 8-inch cakes") was already right.
 - **2026-10-11 — a batch row says the thing made once: after the title where
   the title does not name it, with the title's own noun made singular.**
@@ -1806,7 +1810,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   recipe page scaler's number, both ways (Helen: *"if see all portions are
   edited then that number is carried over to the recipe page scaler, and
   vice versa"*). A recipe page's link reads *"SEE SHORTLISTS (N)"* and opens
-  it.
+  it. 2026-11-21: the index's pill says the same words and pressing it opens
+  SEE ALL (*"rather than to a view where I only see 4 recipes"* under a count
+  of 9); asked pill or link, *"they should be the same"*, a session's reading
+  kept #1210's shapes, a pill that changes the page and a link that leaves
+  it, with one wording. The chooser is *"like the modal"*: the picker's box,
+  not a `<select>`. One rule above the shopping list, not two.
 - **2026-10-10, #1342 — the note over a shared shortlist and its "keep these"
   button keep the wording an agent wrote.** Helen, shown both: *"Both good,
   thanks!"* "a shared shortlist (N)" and "keep these" are approved strings,
