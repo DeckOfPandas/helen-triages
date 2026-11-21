@@ -231,6 +231,35 @@ aliases:
   vanilla bean paste: vanilla paste
   vanilla bean paste or extract: [vanilla paste, vanilla extract]
   vanilla extract or paste: [vanilla extract, vanilla paste]
+  # A qualifier that names no different product folds into the plain chip
+  # (DECISIONS §8). Safe on the include side: each target's words start the
+  # raw entry's own words, so the chip still matches every recipe it names.
+  # A kind stays its own chip: whole cloves, whole nutmeg, whole milk, flaked
+  # almonds, a whole bird, cooked turkey or chicken. Bottled juices too.
+  lemon juice: lemon
+  freshly squeezed lemon juice: lemon
+  freshly squeezed lime juice: lime
+  freshly squeezed orange juice: orange
+  freshly squeezed blood orange juice: blood orange
+  freshly squeezed grapefruit juice: grapefruit
+  freshly squeezed clementine juice: clementine
+  lemon zest: lemon
+  unwaxed lemons: lemon
+  unwaxed lemon: lemon
+  lime juice: lime
+  orange juice: orange
+  orange zest: orange
+  whole fennel seeds: fennel seeds
+  raw honey: honey
+  natural yoghurt: yoghurt
+  fine polenta: polenta
+  fine green beans: green beans
+  frozen peas: peas
+  frozen spinach: spinach
+  whole blanched almonds: blanched almonds
+  fine salt: salt
+  fine sea salt: sea salt
+  flaked sea salt: sea salt
   # Plurals offered beside their own singular: a recipe writes the number its
   # ingredient list does (DECISIONS §6), and this makes the two one chip.
   # `singulars` cannot: it normalises a word for matching and does not merge
@@ -347,11 +376,11 @@ aliases:
   # Fat level and culture are not what anyone excludes. The target is `natural
   # yoghurt`, not bare `yoghurt`: sweetened and flavoured yoghurts are a
   # different answer.
-  full-fat natural yoghurt: natural yoghurt
-  low-fat natural yoghurt: natural yoghurt
-  natural bio yoghurt: natural yoghurt
-  thick natural yoghurt: natural yoghurt
-  unsweetened natural yoghurt: natural yoghurt
+  full-fat natural yoghurt: yoghurt
+  low-fat natural yoghurt: yoghurt
+  natural bio yoghurt: yoghurt
+  thick natural yoghurt: yoghurt
+  unsweetened natural yoghurt: yoghurt
   gel- or paste-based colouring if wanted: food colouring
   # Compounds and prep states from the derived vocabulary (#273).
   barley or brown rice miso: miso
@@ -399,10 +428,10 @@ aliases:
   ghee or vegetable oil: [ghee, vegetable oil]
   hummus or yoghurt: [hummus, yoghurt]
   kale or cavolo nero: [kale, cavolo nero]
-  kosher salt or 4 tsp fine sea salt: [kosher salt, fine sea salt]
+  kosher salt or 4 tsp fine sea salt: [kosher salt, sea salt]
   lamb or chicken stock: [lamb, chicken stock]
   maple syrup or honey: [maple syrup, honey]
-  natural yoghurt or milk: [natural yoghurt, milk]
+  natural yoghurt or milk: [yoghurt, milk]
   oil or butter: [oil, butter]
   parmesan or pecorino: [parmesan, pecorino]
   pecorino or parmesan: [pecorino, parmesan]
@@ -463,7 +492,7 @@ aliases:
 
   # Prep and cut that do not change what the thing is. The brown sugars are
   # deliberately not here: they are distinct products a baker chooses between.
-  extra virgin olive oil: olive oil
+  extra-virgin olive oil: olive oil
   freshly ground black peppercorns: black peppercorns
   freshly ground szechuan peppercorns: szechuan peppercorns
   skin-on boneless pork belly: pork belly

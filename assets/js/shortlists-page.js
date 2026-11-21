@@ -248,8 +248,10 @@
     noteEl.textContent = shop.unscaledNote(aisles);
     noteEl.hidden = !noteEl.textContent;
     aislesEl.innerHTML = shop.aislesHtml(aisles, ticks(view));
-    totalEl.textContent = shop.totalText(shown);
-    totalEl.hidden = !totalEl.textContent;
+    var sum = shop.total(shown);
+    totalEl.textContent = '';
+    if (sum) HTF.shoppingList.drawTotal(totalEl, sum.text, sum.sum);
+    totalEl.hidden = !sum;
     refreshUntick();
   }
 

@@ -37,7 +37,7 @@ ingredient_groups:
     - amount: "1 tbsp"
       item: "rice vinegar"
     - amount: "1 tbsp"
-      item: "fresh lime juice"
+      item: "freshly squeezed lime juice"
     - amount: "1 tsp"
       item: honey
     - amount: "½ tsp"

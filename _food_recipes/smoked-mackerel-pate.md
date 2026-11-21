@@ -16,7 +16,7 @@ ingredient_groups:
     - amount: "100 g"
       item: cream cheese
     - amount: "45 ml"
-      item: lemon juice
+      item: "freshly squeezed lemon juice"
     - item: plenty of salt and pepper
 method:
   - Just whizz it all until blended.

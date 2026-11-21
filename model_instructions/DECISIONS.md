@@ -1062,6 +1062,29 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   is the index's pill. Milk and white chocolate never take a percentage. Chips
   and shavings need a type word and no percentage. `_CHOCOLATE_PERCENT` and
   the three chocolate tests in `tests/test_style.py`.
+- **2026-11-21 — a measured citrus juice is "freshly squeezed lemon juice",
+  every citrus but yuzu, unless the line says bottled.** Helen: *"Please make
+  the house style "freshly squeezed lemon juice", for all citrus... If a
+  recipe requires bottled for reasons like acidity predictability then it'll
+  say so."* Food only: a cocktail's `lemon juice` is a closed generic already
+  shelved as freshly squeezed. Her grant covered the four published lines.
+  `citrus_juice_house` in `tests/test_style.py`; the tidy pass applies it.
+- **2026-11-21 — one name for one product: flaked sea salt, extra-virgin
+  olive oil, natural yoghurt, whole milk, and the rest.** An audit of every
+  ingredient name (`scripts/audit_ingredient_names.py`) found 56 groups
+  written more than one way. Helen ruled the synonyms, naming two herself:
+  *"1. flaked sea salt. 9. extra-virgin olive oil."* Each is a house spelling
+  in `tests/conftest.py` (`SPELLINGS`), so recipes and drafts alike hold to it.
+  Asked whether to declare every food ingredient as cocktails do, she chose
+  closed lists for the families where synonyms creep plus the audit for the
+  long tail; yoghurt joined the closed lists. Her grant covered nine
+  published lines.
+- **2026-11-21 — unsalted butter with no salt: a bake gets a pinch of salt, a
+  savoury dish a note.** Thirteen drafts had unsalted butter and neither salt
+  nor a note (`test_unsalted_butter_has_salt_or_a_note`). Helen: *"Bakes salt,
+  savoury note"*: a bake lists `a pinch` of `salt` beside the butter and the
+  method uses it; a savoury dish is already seasoned to taste, so a note says
+  so.
 
 ## §6 `main_ingredients`
 
@@ -1384,6 +1407,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   a precedent for stripping other brand names. The two five-spice spellings
   are one picker entry and get no "(all)" button.
   `_data/food/ingredient_words.yml`.
+- **2026-11-21 — a qualifier that names no different product is one chip
+  with the plain ingredient; a kind keeps its own.** Shown 25 groups of
+  `main_ingredients` chips split by a qualifier, Helen merged lemon juice,
+  zest and unwaxed lemons into `lemon` (lime and orange the same): *"1"*;
+  and raw honey, natural yoghurt, fine polenta, fine green beans, frozen peas
+  and spinach, whole blanched almonds and the fine and flaky salts:
+  *"Merge them"*. Kinds stay apart, per §6: whole cloves and whole nutmeg
+  (*"Name each as its list does"*), whole milk, flaked almonds, a whole bird,
+  cooked turkey or chicken, and bottled juices. Each is an alias in
+  `_data/food/ingredient_words.yml`.
 
 ### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
 
@@ -1416,7 +1449,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   recipe page says how many are missing and names them: "From £1.43 a batch
   in ingredients, not counting 1 unpriced item (cockerel carcass)." — Helen:
   *"number 1, but with "not counting X unpriced items""*; the names on
-  2026-11-08, #1486.
+  2026-11-08, #1486. The shopping list's total names them too (#1523), on a
+  quieter second line under the figure.
 - **2026-11-03, #1458 — a researched food price's range is the median's
   bracket: the middle 50% of 6+ shop prices, the range of 3–5, the mean's two
   ends of 2.** Helen: *"2 points mean, 3-5 points median with range in
@@ -1530,7 +1564,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   dozen" doubled can be "two dozen". Our scaler is integer.'*; *"950 ml for
   one order of a recipe becomes 1900 ml for 2"*; *"64+ tiny macarons, 128+
   tiny macarons"*; *'if "some" is originally guessed to be 4 portions, 2x
-  should be 8 portions'*. The words are `yields:` in `_data/food/scaling.yml`.
+  should be 8 portions'*. 2026-11-21: *'update that marinade to makes "enough
+  marinade for 4 portions of fish", which then scales to "...for 8 portions"
+  and so on'*, so an "enough <thing> for N" lead-in is read. The words are
+  `yields:` in `_data/food/scaling.yml`.
   Not ruled: whether the "Makes" line at the top of the page moves with the
   box.
 - **2026-10-04, #1286 — a `makes:` recipe is offered half a recipe only where
@@ -1678,7 +1715,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   where the title names the thing; *'"[2] jars of peanut sauce", "[3] rainbow
   confetti traybakes"'* where it does not. A container comes first with "of";
   anything else follows the title. Which words are containers is
-  `yields.container_words`, a session's list of nine. No colon. The recipe
+  `yields.container_words`, a session's list. 2026-11-21, Helen: *'"1 × 24-cm
+  trifle Blackberry Syllabub with Marsala Pear Compote bowl", which should be
+  "1 x 24-cm trifle bowl of Blackberry Syllabub with..."'*, so a vessel (bowl,
+  basin, mould, ramekin) is a container, and a thing that follows a title
+  goes before its " with …". No colon. The recipe
   page ("2 × 8-inch cakes") was already right.
 - **2026-10-11 — a batch row says the thing made once: after the title where
   the title does not name it, with the title's own noun made singular.**
@@ -4419,6 +4460,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 
 ## §11 Working practices
 
+- **2026-11-21 — every check that can run at ingest does, so its questions
+  come with the batch.** Helen: *"I would like as few rounds as possible
+  between ingestion and cooking, then between deciding to keep and
+  publication."* Offered five changes, she chose three: the whole tidy pass
+  at every ingest, `promotion_qa.py` at ingest (FIX fixed, HELEN'S in the one
+  list), and `check_food_tags.py`'s hints in that list. Declined for now: a
+  "known recipe" mode straight to `4-promote/`. The ingest finishing pass in
+  `.claude/commands/ingest.md` is the procedure; PIPELINE.md §3 says so too.
 - **2026-08-12 — a heading lettering change applies to every heading on the
   whole site.** Helen: *"Did your heading lettering change touch all headings
   on the whole site? That is what I want."* A design ruling the old journal

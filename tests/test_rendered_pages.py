@@ -3537,7 +3537,8 @@ def test_a_fruit_written_as_its_juice_or_zest_is_marked_for_the_list(site):
 
       item: "finely grated zest of 1 lemon"      the count is in the item
       amount: "1", item: "lemon, juiced"         the part is after the comma
-      amount: "1 tbsp", item: "lemon juice"      NOT a lemon: never marked
+      amount: "1 tbsp", item: "freshly squeezed lemon juice"
+                                                 NOT a lemon: never marked
     """
     blob = _shopping_blob(site)
 
@@ -3557,9 +3558,9 @@ def test_a_fruit_written_as_its_juice_or_zest_is_marked_for_the_list(site):
     both = line("/food/recipes/cranberry-sauce/", "orange")
     assert sorted(both.get("pt", [])) == ["juice", "zest"], both
 
-    bottled = line("/food/recipes/smoked-mackerel-pate/", "lemon juice")
-    assert not ({"pt", "f", "x"} & set(bottled)), (
-        f"45 ml of lemon juice was read as some number of lemons: {bottled}"
+    measured = line("/food/recipes/smoked-mackerel-pate/", "freshly squeezed lemon juice")
+    assert not ({"pt", "f", "x"} & set(measured)), (
+        f"45 ml of lemon juice was read as some number of lemons: {measured}"
     )
 
 

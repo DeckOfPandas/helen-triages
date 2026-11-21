@@ -93,8 +93,11 @@
     function wordInTitle(word, text) {
       var wanted = foldUnit(word);
       if (!wanted) return false;
+      // A hyphened word counts whole and by its parts: "Sacher-Torte" names a torte.
       return String(text).toLowerCase().split(/[\s,()\/&]+/).some(function (w) {
-        return w !== '' && foldUnit(w) === wanted;
+        return w !== '' && (foldUnit(w) === wanted || w.split('-').some(function (part) {
+          return part !== '' && foldUnit(part) === wanted;
+        }));
       });
     }
 
@@ -113,6 +116,15 @@
       return match[1] + single + tail;
     }
 
+    /* The thing made said after the title's own noun, so before any " with
+       ...": "Potato Cake pieces with Smoked Salmon", never "... Salmon pieces". */
+    function thingAfterHead(text, thing) {
+      var named = singularHead(text);
+      var cut = named.search(/\s+with\s+/i);
+      if (cut === -1) return { title: named, post: ' ' + thing };
+      return { title: named.slice(0, cut) + ' ' + thing + named.slice(cut), post: '' };
+    }
+
     /* The words around the recipe's name: `word` is what the number counts.
          [2] batches of 18 [Peanut Butter Cookies]    title names the thing
          [1] batch of 24 [Guinness ... Cake] squares  it does not: said after
@@ -128,6 +140,11 @@
       out.word = n > 1 ? 'batches of' : 'batch of';
       var made = RECIPES[url].m;
       if (!(made && made.kind === 'count' && made.stem)) return out;
+      // "enough marinade for 4 portions of fish" says what it is for after the name.
+      if (/^enough\s/i.test(String(made.prefix || ''))) {
+        out.post = ', ' + made.prefix + ' ' + made.box + ' ' + made.stem + String(made.rest || '');
+        return out;
+      }
 
       var words = String(made.stem).split(/\s+/);
       var group = made.invariable ? words.shift() : '';
@@ -151,8 +168,9 @@
         }
         out.word = (times + group).trim();
         out.pre = before ? before + ' ' : '';
-        out.title = singularHead(text);
-        out.post = ' ' + (n > 1 ? unitLabel(noun, 2) : noun);
+        var thing = thingAfterHead(text, n > 1 ? unitLabel(noun, 2) : noun);
+        out.title = thing.title;
+        out.post = thing.post;
         return out;
       }
 
@@ -160,8 +178,9 @@
       if (!made.box || /^batch/i.test(String(made.stem))) return out;
       out.pre = made.box + ' ' + (group ? group + ' ' : '');
       if (!named) {
-        out.title = singularHead(text);
-        out.post = ' ' + words.join(' ') + String(made.rest || '');
+        var said = thingAfterHead(text, words.join(' ') + String(made.rest || ''));
+        out.title = said.title;
+        out.post = said.post;
       }
       return out;
     }
@@ -301,15 +320,13 @@
       return names.length ? '(Not scaled: ' + names.join(', ') + ')' : '';
     }
 
-    // What the shop comes to (#1458), or '' where nothing is costed.
-    function totalText(rows) {
+    /* What the shop comes to (#1458): `text`, and the `sum` that
+       shoppingList.drawTotal names the unpriced lines from (#1523). null
+       where nothing is costed. */
+    function total(rows) {
       var sum = options.costUnits ? foodShoppingList.costTotal(rows) : null;
-      if (!sum) return '';
-      var text = (sum.partial ? '' : 'roughly ') + sum.text;
-      if (sum.unpriced) {
-        text += ' — ' + sum.unpriced + (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
-      }
-      return text;
+      if (!sum) return null;
+      return { text: (sum.partial ? '' : 'roughly ') + sum.text, sum: sum };
     }
 
     return {
@@ -321,7 +338,7 @@
       rowWords: rowWords, rowInner: rowInner, recipeLink: recipeLink,
       boxHtml: boxHtml, unscalableHtml: unscalableHtml, withCost: withCost,
       entries: entries, build: build, aislesHtml: aislesHtml,
-      unscaledNote: unscaledNote, totalText: totalText
+      unscaledNote: unscaledNote, total: total
     };
   }
 

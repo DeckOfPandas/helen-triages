@@ -448,6 +448,46 @@ def test_citrus_is_measured_not_squeezed(recipe):
     )
 
 
+# A measured citrus juice is "freshly squeezed" (DECISIONS §5), unless the
+# line says it is not fresh. `citrus_juice_house` is the one reading;
+# scripts/tidy_drafts.py imports it to apply it. Yuzu is not here: in the UK
+# it is bought bottled.
+_CITRUS_FRUITS = ("blood orange", "seville orange", "pink grapefruit", "orange",
+                  "lemon", "lime", "grapefruit", "clementine", "satsuma",
+                  "mandarin", "tangerine")
+_CITRUS_JUICE = re.compile(
+    r"^(?:fresh(?:ly)?[- ]squeezed |fresh |squeezed )?(?P<fruit>"
+    + "|".join(_CITRUS_FRUITS) + r") juice\b", re.I)
+_NOT_FRESH = re.compile(
+    r"\b(?:bottled|carton|shop-bought|store-bought|from concentrate|long-life"
+    r"|ready-made|cordial)\b", re.I)
+
+
+def citrus_juice_house(item):
+    """The item as house style writes it, or None if it is already right or
+    is not a measured citrus juice: "lemon juice" and "fresh lemon juice"
+    become "freshly squeezed lemon juice"; a bottled or carton line is left."""
+    text = str(item or "")
+    m = _CITRUS_JUICE.match(text)
+    if not m or _NOT_FRESH.search(text):
+        return None
+    fruit = m.group("fruit").lower().replace("seville", "Seville")
+    new = f"freshly squeezed {fruit} juice" + text[m.end():]
+    return None if new == text else new
+
+
+def test_citrus_juice_is_freshly_squeezed(recipe):
+    bad = [i.get("item") for g in recipe.fm.get("ingredient_groups") or []
+           for i in (g or {}).get("items") or []
+           if isinstance(i, dict) and "QQ" not in str(i.get("item"))
+           and citrus_juice_house(i.get("item"))]
+    assert not bad, (
+        f"{where(recipe)} lists citrus juice not written as freshly squeezed: "
+        f"{bad}. Write \"freshly squeezed lemon juice\" (lime, orange and the "
+        f"rest the same), or say \"bottled\"; scripts/tidy_drafts.py fixes a draft."
+    )
+
+
 # --- butter, sugar, flour: closed list of qualifiers ------------------------
 # #74. Each is a closed list of allowed names, not merely "isn't bare":
 # "caster sugar" and "muscovado sugar" are qualified and still wrong.
@@ -460,7 +500,8 @@ _QUALIFIED_BUTTER = {"salted butter", "unsalted butter", "clarified butter"}
 # A line that is butter for the tin and nothing else. "plus extra" means the
 # line is an ingredient of the dish too, so it does not match.
 _ONLY_FOR_GREASING = re.compile(r"^(?!.*\bplus\b).*,\s*(?:extra,\s*)?(?:for greasing|to grease)\b", re.I)
-_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour", "wholemeal flour", "dark rye flour"}
+_QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour", "wholemeal flour", "dark rye flour",
+                    "strong white bread flour", "spelt flour", "semolina flour"}
 _QUALIFIED_SUGAR = {
     "golden caster sugar", "golden granulated sugar", "white caster sugar",
     "light brown soft sugar", "dark brown soft sugar",
@@ -475,7 +516,9 @@ _COMPOUND_EXCLUDE = {
         r"\b(butter beans?|peanut butter|almond butter|cashew butter"
         r"|pistachio butter|all-butter)\b", re.I,
     ),
-    "sugar": re.compile(r"\bsugar snap\b", re.I),
+    "sugar": re.compile(r"\bsugar snaps?\b|\bsugar-free\b|\bsugar flowers?\b", re.I),
+    "ginger": re.compile(
+        r"\bginger (?:ale|beer|jam|preserve|marmalade|wine)\b|\bpickled ginger\b", re.I),
     "flour": None,
     "cloves": re.compile(r"\bgarlic\b", re.I),
     "milk": re.compile(r"\b(milk chocolate|malted milk powder)\b", re.I),
@@ -552,6 +595,7 @@ _QUALIFIED_MUSTARD = {
     "english mustard", "english mustard powder", "dijon mustard",
     "french mustard", "wholegrain mustard", "whole mustard seeds",
     "white mustard seeds", "black mustard seeds", "mustard oil",
+    "american mustard",
 }
 _QUALIFIED_SOY_SAUCE = {"dark soy sauce", "light soy sauce"}
 _QUALIFIED_GINGER = {"fresh ginger", "ground ginger", "ginger paste", "dried ginger",
@@ -630,7 +674,7 @@ _QUALIFIED_NUTMEG = {"whole nutmeg", "ground nutmeg"}
 _QUALIFIED_CINNAMON = {"cinnamon stick", "cinnamon sticks", "ground cinnamon"}
 _QUALIFIED_CLOVES = {"whole cloves", "ground cloves"}
 _QUALIFIED_VANILLA = {"vanilla extract", "vanilla essence", "vanilla pod",
-                      "vanilla bean paste"}
+                      "vanilla pods", "vanilla bean paste"}
 
 
 def test_nutmeg_cinnamon_cloves_vanilla_specify_type(recipe):
@@ -673,6 +717,7 @@ def test_cardamom_specifies_type(recipe):
 _QUALIFIED_VINEGAR = {
     "apple cider vinegar", "balsamic vinegar", "red wine vinegar",
     "rice vinegar", "sherry vinegar", "white wine vinegar", "malt vinegar",
+    "coconut vinegar",
 }
 
 
@@ -691,7 +736,8 @@ def test_vinegar_specifies_type(recipe):
 # minced` is complete. The ingredient list is checked as amount plus item;
 # main_ingredients has no amount, so the form must be in the string itself.
 _QUALIFIED_GARLIC_FORM = re.compile(
-    r"\bcloves?\b|\bhead\b|\bpaste\b|\bpur[ée]e\b|\bpowder\b|\bgranulated\b|\bwild garlic\b", re.I,
+    r"\bcloves?\b|\bheads?\b|\bpaste\b|\bpur[ée]e\b|\bpowder\b|\bgranul(?:ated|es)\b"
+    r"|\bsalt\b|\bwild garlic\b", re.I,
 )
 
 
@@ -762,6 +808,26 @@ def test_milk_specifies_type(recipe):
     )
 
 
+# Yoghurt names its kind on the ingredient line (DECISIONS §5);
+# main_ingredients keeps the plain "yoghurt" chip, which the picker merges to.
+# Full-fat and low-fat forms qualify a listed kind ("full-fat natural yoghurt").
+_QUALIFIED_YOGHURT = {
+    "natural yoghurt", "greek yoghurt", "greek-style yoghurt",
+    "coconut yoghurt", "coconut milk yoghurt", "soya yoghurt",
+}
+
+
+def test_yoghurt_specifies_type(recipe):
+    """Bare "yoghurt" leaves the cook choosing between natural and Greek, which
+    differ in thickness and tang. Checked on the ingredient lines only."""
+    bad = [b for b in _unqualified(recipe, "yoghurt", _QUALIFIED_YOGHURT)
+           if b.startswith("ingredient")]
+    assert not bad, (
+        f"{where(recipe)} has unqualified yoghurt: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_YOGHURT))}."
+    )
+
+
 # --- chocolate: type, plus a cacao percentage on the recipe page only -------
 # #139. Dark-family chocolate carries a cacao percentage on the recipe's
 # ingredient list, so a cook knows what to buy; main_ingredients stays a plain
@@ -777,7 +843,7 @@ _ALL_CHOCOLATE_TYPES = set(_CHOCOLATE_PERCENT) | _CHOCOLATE_NO_PERCENT
 _CHOCOLATE_FORM_EXEMPT = re.compile(r"\b(chips|shavings)\b", re.I)
 
 # A prepared product, not a bar of chocolate to type: exempt entirely.
-_CHOCOLATE_COMPOUND_EXCLUDE = re.compile(r"\bchocolate (syrup|beans)\b", re.I)
+_CHOCOLATE_COMPOUND_EXCLUDE = re.compile(r"\bchocolate (syrup|beans|flavouring)\b", re.I)
 
 
 def test_chocolate_specifies_type(recipe):

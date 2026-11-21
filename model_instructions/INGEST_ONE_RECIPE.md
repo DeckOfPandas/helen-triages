@@ -238,7 +238,8 @@ milk will do.
 **Butter:** `clarified butter` · `salted butter` · `unsalted butter`
 
 **Flour:** `dark rye flour` · `gluten-free flour` · `plain flour` ·
-`rice flour` · `self-raising flour` · `wholemeal flour`
+`rice flour` · `self-raising flour` · `semolina flour` · `spelt flour` ·
+`strong white bread flour` · `wholemeal flour`
 
 **Sugar:** `coconut palm sugar` · `dark brown muscovado sugar` ·
 `dark brown soft sugar` · `demerara sugar` · `golden caster sugar` ·
@@ -260,26 +261,31 @@ milk will do.
 **Cloves:** `ground cloves` · `whole cloves`
 
 **Vanilla:** `vanilla bean paste` · `vanilla essence` · `vanilla extract` ·
-`vanilla pod`
+`vanilla pod` · `vanilla pods`
 
 **Cardamom:** `black cardamom pod` · `black cardamom pods` ·
 `black cardamom powder` · `black cardamom seed` · `black cardamom seeds` ·
 `green cardamom pod` · `green cardamom pods` · `green cardamom powder` ·
 `green cardamom seed` · `green cardamom seeds`
 
-**Mustard:** `black mustard seeds` · `dijon mustard` · `english mustard` ·
-`english mustard powder` · `french mustard` · `mustard oil` ·
-`white mustard seeds` · `whole mustard seeds` · `wholegrain mustard`
+**Mustard:** `american mustard` · `black mustard seeds` · `dijon mustard` ·
+`english mustard` · `english mustard powder` · `french mustard` ·
+`mustard oil` · `white mustard seeds` · `whole mustard seeds` ·
+`wholegrain mustard`
 
 **Soy sauce:** `dark soy sauce` · `light soy sauce`
 
-**Vinegar:** `apple cider vinegar` · `balsamic vinegar` · `malt vinegar` ·
-`red wine vinegar` · `rice vinegar` · `sherry vinegar` · `white wine vinegar`
+**Vinegar:** `apple cider vinegar` · `balsamic vinegar` · `coconut vinegar` ·
+`malt vinegar` · `red wine vinegar` · `rice vinegar` · `sherry vinegar` ·
+`white wine vinegar`
 
 **Chocolate:** `dark chocolate` · `milk chocolate` · `unsweetened chocolate` ·
 `very dark chocolate` · `white chocolate`
 
 **Loomi:** `black loomi` · `white loomi` · `yellow loomi`
+
+**Yoghurt:** `coconut milk yoghurt` · `coconut yoghurt` · `greek yoghurt` ·
+`greek-style yoghurt` · `natural yoghurt` · `soya yoghurt`
 <!-- vocab:qualifiers end -->
 
 **Milk, eggs and butter have house defaults, and the line says when one was
@@ -304,6 +310,14 @@ sugar`, except in a meringue or a pale icing or cream, where it is `white
 caster sugar`, and the line says what the source printed (`note: "the source
 gave \"caster sugar\""`). Helen: *"Golden for everything unspecified, other
 than meringue or light icing etc."*
+
+**A measured citrus juice is freshly squeezed**: "lemon juice" and "fresh
+lime juice" are written `freshly squeezed lemon juice`, `freshly squeezed lime
+juice`, and the same for every citrus but yuzu, with no note. A line that says
+bottled, or carton, keeps its word. "1 lemon, juiced" is already fresh. Helen:
+*"almost always, freshly squeezed lemon juice is best, as well as correct. If a
+recipe requires bottled for reasons like acidity predictability then it'll say
+so."* The tidy pass converts a draft.
 
 **A weight the source gives beside a count goes in the amount's bracket**,
 never the item, because the scaler reads only the amount: amount `"2 (about

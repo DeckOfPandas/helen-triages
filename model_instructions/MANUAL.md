@@ -112,7 +112,9 @@ merging anything that touches a slug-keyed entry.
 `python3 scripts/check_food_tags.py` is a report and is deliberately not in
 `verify.py`. It lists food recipes whose tags or star disagree with their
 title, from `tag_hints` in `_data/food/taxonomy.yml`. It writes nothing and
-fails nothing; `--drafts` is the list to have open while proofreading.
+fails nothing; `--drafts` is the list to have open while proofreading, and
+the ingest finishing pass (`.claude/commands/ingest.md`) folds its hints for a
+new batch into the questions for Helen.
 
 **One `pytest` at a time.** Two runs share one `.jekyll-cache` and one `tmp/`.
 (The gate fixtures named `zzz-gate-…` are written into a copy of the tree by
@@ -1407,13 +1409,18 @@ figures the recipe's own page uses, so the two step alike.
   batches.
 - **The thing made is said once.** Where the title already names it (the
   yield's last word found in the title, singular against singular) the noun is
-  dropped. Where it does not, the noun follows the title, and the title's own
-  last word before any " with …" goes singular if it is a plain plural
-  (`singularHead`): "batch of 16 … Brownie squares".
+  dropped; a hyphened title word counts by its parts too, so "Sacher-Torte"
+  names a torte. Where it does not, the noun follows the title's own noun,
+  which goes singular if it is a plain plural (`singularHead`), and comes
+  before any " with …" (`thingAfterHead`): "batch of 16 … Brownie squares",
+  "batch of 30 Potato Cake pieces with Smoked Salmon …".
 - **A yield of one named thing is not a batch.** Named by the title, the row
   is `×` and the title, which is not made plural. Not named, a container
-  (`yields.container_words`) goes first with "of" and anything else follows
-  the title, plural above one.
+  (`yields.container_words`, a bowl or a tin, never a cake) goes first with
+  "of", "× 24-cm trifle bowl of Blackberry Syllabub …", and anything else
+  follows the title, plural above one.
+- **An "enough <thing> for" yield follows the name** as written: "batch of
+  Sticky Soy …, enough marinade for 4 portions of fish".
 - **It needs the noun**, so a `makes:` that opens with a number names the
   thing (`"16 bars"`, never `"16"`). A bare count has nothing to print and its
   row is "batch of" the title.
@@ -1583,7 +1590,9 @@ no price. DECISIONS §8.2.
   it was priced; never zero.
 - **What shows**: each row's price (`.shopping-list-price`), the total under
   the rows (`.shopping-list-total`, "roughly £M (£X–£Y)", or "from £X — n
-  lines have no price"), and after each recipe's sentence one portion of a
+  lines have no price", with a quieter second line naming them, "n lines
+  have no price (a, b)": `HTF.shoppingList.drawTotal`, on both indexes), and
+  after each recipe's sentence one portion of a
   `serves:` recipe or one batch of a `makes:` one (`.shopping-list-cost`),
   priced from the recipe as written and fixed whatever the box says.
 - **The recipe page** says the same figure in the drink page's footer
@@ -1674,7 +1683,9 @@ word with no plural.
 derived figure: a typed number goes to the nearest whole recipe.
 
 `food_yield.rb` reads only the start of the `makes:` line, after an optional
-word from `yields.approx_words`:
+word from `yields.approx_words`, or after an "enough <thing> for" lead-in
+(`ENOUGH`), which stays before the box as `prefix`. A bare "Enough for one
+pie" names no thing and is not read.
 
 | `makes:` | ×1 | ×2 |
 |---|---|---|
@@ -1683,6 +1694,7 @@ word from `yields.approx_words`:
 | `64+ tiny macarons` | `64+` tiny macarons | `128+` |
 | `one 8-inch cake` — a number word | `1` × 8-inch cake | `2` × 8-inch cakes |
 | `1 dozen mince pies` | `1` dozen mince pies | `2` dozen mince pies |
+| `enough marinade for 4 portions of fish` | enough marinade for `4` portions of fish | … for `8` portions of fish |
 | `950 ml`, `approx. 75 g` — a measure | `950` ml | `1900` ml |
 | `1 batch — <Helen's words>` | `1` batch | `2` batches; ×½ reads `½` batch |
 | `1 batch, about 100 g` — a measure after the thing (`also`) | `1` batch, about 100 g | `2` batches, about 200 g |

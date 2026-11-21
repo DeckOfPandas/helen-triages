@@ -99,6 +99,10 @@ yields:
     - tray
     - dish
     - loaf
+    - bowl
+    - basin
+    - mould
+    - ramekin
 
 # The words _plugins/food_half_recipe.rb judges by. A `makes:` recipe is offered
 # x½ only where every line halves to a figure a person could act on; one line

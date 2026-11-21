@@ -37,7 +37,7 @@ ingredient_groups:
     - amount: "150 g"
       item: natural yoghurt
     - amount: "2 tbsp"
-      item: extra virgin olive oil
+      item: extra-virgin olive oil
 method:
   - "Mix the dressing in a bowl and salt like you intend to cure."
   - "Halve and finely slice the sprouts using the slicing attachment on a food processor (or the adamantium index finger you must have if you want to do this by hand)."

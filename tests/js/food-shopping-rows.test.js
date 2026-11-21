@@ -168,6 +168,43 @@ test('a batch says what it is a batch OF, the title\'s own noun going singular b
   assert.strictEqual(said('/food/recipes/dozens/', 1), 'batch of 3 dozen Mince Pies');
 });
 
+function sayOne(recipe, title, n) {
+  return text(rowsModule.create({
+    recipes: { '/r/': recipe }, titles: { '/r/': title }, escape: esc,
+    containerNouns: ['jar', 'tin', 'batch', 'bowl']
+  }).rowInner('/r/', n || 1));
+}
+
+test('a sized bowl holds the dish: "× 24-cm trifle bowl of", not after the name', () => {
+  assert.strictEqual(sayOne({
+    p: null, y: 'one 24-cm trifle bowl', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 1, stem: '24-cm trifle bowl', rest: '', box: '1', times: true }
+  }, 'Blackberry Syllabub'), '× 24-cm trifle bowl of Blackberry Syllabub',
+  'Helen\'s example: never "24-cm trifle Blackberry Syllabub bowl"');
+});
+
+test('a hyphened title names its parts: Sacher-Torte is a torte', () => {
+  assert.strictEqual(sayOne({
+    p: null, y: 'one 19-cm torte', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 1, stem: '19-cm torte', rest: '', box: '1', times: true }
+  }, 'Sacher-Torte'), '× 19-cm Sacher-Torte');
+});
+
+test('the thing made goes after the title\'s noun, before its "with"', () => {
+  assert.strictEqual(sayOne({
+    p: null, y: '30 pieces', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 30, stem: 'pieces', rest: '', box: '30' }
+  }, 'Potato Cakes with Smoked Salmon'), 'batch of 30 Potato Cake pieces with Smoked Salmon');
+});
+
+test('"enough marinade for 4 portions of fish" follows the name, as written', () => {
+  assert.strictEqual(sayOne({
+    p: null, y: 'enough marinade for 4 portions of fish', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 4, prefix: 'enough marinade for', stem: 'portions', rest: ' of fish', box: '4' }
+  }, 'Sticky Soy and Miso Dipping Sauce'),
+  'batch of Sticky Soy and Miso Dipping Sauce, enough marinade for 4 portions of fish');
+});
+
 test('NO PORTION FIGURE IS PRINTED FOR A `makes:` RECIPE, in its words, title or label', () => {
   const r = rows();
   const html = (r.boxHtml('/food/recipes/gelato/', 2) + r.rowInner('/food/recipes/gelato/', 2))
@@ -290,7 +327,19 @@ test('a per-person amount is that many people\'s worth', () => {
   assert.match(html, /1\.5 kg/);
 });
 
+test('a costed total hands back its figure and the sum that names what it left out', () => {
+  const r = rows({ buildOptions: { aisles: AISLES, costUnits: {} } });
+  const got = r.total([
+    { label: 'flour', cost: { min: 1, max: 1 } },
+    { label: 'kombu', cost: { unpriced: true } }
+  ]);
+  assert.strictEqual(got.text, 'from £1.00',
+    'a total missing a line is "from" what is known, never "roughly"');
+  assert.deepStrictEqual(Array.from(got.sum.unpricedNames), ['kombu'],
+    'shoppingList.drawTotal names the unpriced lines from this (#1523)');
+});
+
 test('with no cost units nothing is costed or totalled', () => {
-  assert.strictEqual(rows().totalText([{ label: 'x', cost: { min: 1, max: 1 } }]), '');
+  assert.strictEqual(rows().total([{ label: 'x', cost: { min: 1, max: 1 } }]), null);
   assert.strictEqual(rows().withCost('/food/recipes/a/', '<span>s</span>'), '<span>s</span>');
 });

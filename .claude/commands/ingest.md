@@ -198,16 +198,13 @@ without its flag, so run it dry first if you want to see what it will do.
    other flag; `--derive` REPLACES a list that exists, which is the one thing
    not to do to a file that arrived with one. Read its docstring before
    trusting the result; a list of hers is better than the derivation.
-5. **Tidy.** A cocktail always gets `python3 scripts/tidy_drafts.py --site
-   cocktails --only order --apply`, which puts its keys in page order by moving
-   whole blocks and editing no line;
-   `test_a_draft_drinks_keys_are_in_page_order` fails until it has. A food
-   file always gets `--site food --only order --apply`, which moves its
-   `meta:` block to directly under `title:`;
-   `test_meta_sits_directly_under_the_title` fails until it has. Then
-   `/tidy-drafts`, either collection, if the quoting or typography needs it. On
-   food it formats a `QQ` line's dashes, unit spaces and accents and changes no
-   other word; on a drink it never touches one.
+5. **Tidy, the whole pass, every time**: `python3 scripts/tidy_drafts.py
+   --site food --apply` (or `--site cocktails`). Helen: fewer rounds between
+   ingestion and cooking. It puts a drink's keys in page order and a food
+   file's `meta:` under `title:`, and does the quoting, dashes, accents, units,
+   size words and citrus wording. On food it formats a `QQ` line's dashes,
+   unit spaces and accents and changes no other word; on a drink it never
+   touches one.
 6. **`pytest`**, once. Everything mechanical shows up here -- quoting, dashes,
    accents, an undeclared tag, a missing glass.
 7. **Work whatever is left against the three tiers.** What steps 2 to 6 left
@@ -216,6 +213,18 @@ without its flag, so run it dry first if you want to see what it will do.
 8. **`python3 scripts/ingest_preflight.py`**, which reports the undeclared
    bottles, near-miss garnishes and silences in the source as one list. With no
    arguments it reads what this branch changed; it never writes.
+9. **Food: `python3 scripts/promotion_qa.py <each new file>`**, the published
+   rules run now rather than at `keep`, so `keep` raises nothing new and
+   publication is one proofread. Fix every **FIX** in a commit of its own; every
+   **HELEN'S** finding (which butter, sugar, milk, egg size; an estimated time;
+   a yield) goes in the one list; leave **AT 3-KEEP**. Then `python3
+   scripts/check_food_tags.py --drafts`, and put its hints for this batch's
+   slugs in the same list as tag questions. Neither writes.
+10. **Food: `python3 scripts/audit_ingredient_names.py`**, which writes
+   `tmp/item-synonyms.md`: ingredient names written more than one way for one
+   thing. A group that includes one of this batch's names goes in the list for
+   Helen with a proposed house name; her ruling becomes a `SPELLINGS` entry in
+   `tests/conftest.py` (DECISIONS §5). It never writes a recipe.
 
 **What not to do to it.** Do not rewrite its prose, and do not "improve" a
 `QQ Claude` line -- a rewrite pass has already happened and redoing it burns
@@ -247,7 +256,7 @@ that would need coining, a glass the source did not name, a tagline, a
 **Bring them ONCE, grouped by decision** -- `ingest_preflight.py` exists to
 build exactly that list.
 
-**Work in the finishing pass's order, steps 2 to 8**, running each script dry
+**Work in the finishing pass's order, steps 2 to 10**, running each script dry
 first and writing only where it reports a difference. Then one list to Helen,
 then commit.
 
@@ -538,7 +547,7 @@ else has already done (MANUAL §9.1).
   about how it reaches the table, and a THING on the drink. The test: *can you
   write it as a bare noun and lose nothing?* "with a straw" → `Straw.` loses
   nothing. "Top with crushed ice to serve" loses WHEN, so it is a method step.
-- **Run the finishing pass, steps 2 to 8, after writing the files**:
+- **Run the finishing pass, steps 2 to 10, after writing the files**:
   `resolve_pours.py`, then the moods, then the key order.
 
 ## TIER 2 -- fill in, and say plainly they are proposals
@@ -624,8 +633,9 @@ her flip it.**
    text out of frame is left out on purpose**: not transcribed, not asked
    about, not noted (DECISIONS §4).
 
-6. **Run the finishing pass, steps 2 to 8.** It ends with the pre-flight, which
-   is the whole point of doing this in a batch.
+6. **Run the finishing pass, steps 2 to 10.** It ends with the pre-flight, the
+   promotion rules and the name audit, which is the whole point of doing this
+   in a batch: every question arrives in one list.
 
 7. **Bring Helen the report ONCE.** Not a gap at a time -- that is the failure
    the pre-flight exists to fix. Group her decisions and ask them together.
