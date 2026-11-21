@@ -280,6 +280,9 @@ milk will do.
 `very dark chocolate` · `white chocolate`
 
 **Loomi:** `black loomi` · `white loomi` · `yellow loomi`
+
+**Yoghurt:** `coconut milk yoghurt` · `coconut yoghurt` · `greek yoghurt` ·
+`greek-style yoghurt` · `natural yoghurt` · `soya yoghurt`
 <!-- vocab:qualifiers end -->
 
 **Milk, eggs and butter have house defaults, and the line says when one was

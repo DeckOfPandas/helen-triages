@@ -802,6 +802,26 @@ def test_milk_specifies_type(recipe):
     )
 
 
+# Yoghurt names its kind on the ingredient line (DECISIONS §5, 2026-11-21);
+# main_ingredients keeps the plain "yoghurt" chip, which the picker merges to.
+# Full-fat and low-fat forms qualify a listed kind ("full-fat natural yoghurt").
+_QUALIFIED_YOGHURT = {
+    "natural yoghurt", "greek yoghurt", "greek-style yoghurt",
+    "coconut yoghurt", "coconut milk yoghurt", "soya yoghurt",
+}
+
+
+def test_yoghurt_specifies_type(recipe):
+    """Bare "yoghurt" leaves the cook choosing between natural and Greek, which
+    differ in thickness and tang. Checked on the ingredient lines only."""
+    bad = [b for b in _unqualified(recipe, "yoghurt", _QUALIFIED_YOGHURT)
+           if b.startswith("ingredient")]
+    assert not bad, (
+        f"{where(recipe)} has unqualified yoghurt: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_YOGHURT))}."
+    )
+
+
 # --- chocolate: type, plus a cacao percentage on the recipe page only -------
 # #139. Dark-family chocolate carries a cacao percentage on the recipe's
 # ingredient list, so a cook knows what to buy; main_ingredients stays a plain

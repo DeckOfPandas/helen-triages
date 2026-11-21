@@ -1069,6 +1069,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   say so."* Food only: a cocktail's `lemon juice` is a closed generic already
   shelved as freshly squeezed. Her grant covered the four published lines.
   `citrus_juice_house` in `tests/test_style.py`; the tidy pass applies it.
+- **2026-11-21 — one name for one product: flaked sea salt, extra-virgin
+  olive oil, natural yoghurt, whole milk, and the rest.** An audit of every
+  ingredient name (`scripts/audit_ingredient_names.py`) found 56 groups
+  written more than one way. Helen ruled the synonyms, naming two herself:
+  *"1. flaked sea salt. 9. extra-virgin olive oil."* Each is a house spelling
+  in `tests/conftest.py` (`SPELLINGS`), so recipes and drafts alike hold to it.
+  Asked whether to declare every food ingredient as cocktails do, she chose
+  closed lists for the families where synonyms creep plus the audit for the
+  long tail; yoghurt joined the closed lists. Her grant covered nine
+  published lines.
 
 ## §6 `main_ingredients`
 

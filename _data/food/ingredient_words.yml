@@ -258,9 +258,8 @@ aliases:
   frozen spinach: spinach
   whole blanched almonds: blanched almonds
   fine salt: salt
-  flaky salt: salt
   fine sea salt: sea salt
-  flaky sea salt: sea salt
+  flaked sea salt: sea salt
   # Plurals offered beside their own singular: a recipe writes the number its
   # ingredient list does (DECISIONS §6), and this makes the two one chip.
   # `singulars` cannot: it normalises a word for matching and does not merge
@@ -493,7 +492,7 @@ aliases:
 
   # Prep and cut that do not change what the thing is. The brown sugars are
   # deliberately not here: they are distinct products a baker chooses between.
-  extra virgin olive oil: olive oil
+  extra-virgin olive oil: olive oil
   freshly ground black peppercorns: black peppercorns
   freshly ground szechuan peppercorns: szechuan peppercorns
   skin-on boneless pork belly: pork belly

@@ -182,7 +182,7 @@ QUALIFIER_LISTS = {
     "vanilla": "_QUALIFIED_VANILLA", "cardamom": "_QUALIFIED_CARDAMOM",
     "mustard": "_QUALIFIED_MUSTARD", "soy_sauce": "_QUALIFIED_SOY_SAUCE",
     "vinegar": "_QUALIFIED_VINEGAR", "chocolate": "_ALL_CHOCOLATE_TYPES",
-    "loomi": "_QUALIFIED_LOOMI",
+    "loomi": "_QUALIFIED_LOOMI", "yoghurt": "_QUALIFIED_YOGHURT",
 }
 
 
