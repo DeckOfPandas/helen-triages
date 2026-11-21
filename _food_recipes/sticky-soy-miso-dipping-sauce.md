@@ -4,7 +4,7 @@ meta:
   made_before: true
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 tagline: "A sake, mirin and white miso sauce, thickened to a sticky glaze."
 source: "Henry"
 source_type: person
