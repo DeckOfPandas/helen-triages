@@ -435,7 +435,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 #   2. move it in a commit of its own, quoting her grant in the message;
 #   3. move it before the next agent edit, or it covers that too.
 # Grants made on parallel branches need the merge commit with both behind it.
-BASELINE_COMMIT = "bffc53ec"   # nine recipes' house ingredient names, Helen's grant; 1b99caf6 and every earlier grant behind it
+BASELINE_COMMIT = "92367a43"   # nine recipes' snack tags (#1526), Helen's grant; bffc53ec and every earlier grant behind it
 AGENT_TRAILER = "co-authored-by: claude"
 
 
@@ -819,6 +819,23 @@ ADJUDICATED_REWRITES = {
             "them into 1-rewrite/ and rewrote them; the agent moved them to "
             "2-make/ as she asked. The commit that showed #1482's gap; covered "
             "by her standing grant under 026f3224."
+        ),
+        "c2513a43": (
+            "Four 0-christmas/ Christmas Eve mains (pig's cheeks, lobster "
+            "salad, pink radicchio salad, venison terrine), 2026-11-21. "
+            "Helen's own rewrites and flags, made in the agent's worktree and "
+            "committed for her; covered by her standing grant under 026f3224."
+        ),
+        "dd7b6216": (
+            "0-christmas/.../spiced-duck-orange-glazed-endive.md, 2026-11-21. "
+            "Helen's second round, her rewrite and flag, committed for her; "
+            "covered by her standing grant under 026f3224."
+        ),
+        "6469f025": (
+            "Five 0-christmas/ drafts (cranberry sausages, French toast, "
+            "farls, parfait, pickled pears), 2026-11-21. Helen's rewrites and "
+            "flags, rescued from the wrong branch and committed for her; "
+            "covered by her standing grant under 026f3224."
         ),
     },
     "_food_recipes": {

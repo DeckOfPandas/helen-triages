@@ -820,9 +820,9 @@ def test_recipe_badges_are_links_carrying_their_own_filter_value():
     # value containing a space.
     assert "url_encode" in html, (
         "_includes/recipe_badges.html builds a badge href without url_encode. "
-        "Six taxonomy values contain a space (oily fish, root veg, carbs "
-        "party, hot snack, ice cream, one-handed food) and would produce a "
-        "URL with a raw space in it."
+        "Taxonomy values containing a space (oily fish, root veg, carbs "
+        "party, savoury snack, sweet treat, one-handed food...) would produce "
+        "a URL with a raw space in it."
     )
     for param in ("?star=", "?tag="):
         assert param in html, (

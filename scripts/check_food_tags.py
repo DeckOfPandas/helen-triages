@@ -112,6 +112,13 @@ def check(fm, hints):
     return missing, star_notes
 
 
+def clashes(fm, hints):
+    """(tag, other) for each pair of tags taxonomy.yml says never sit together."""
+    tags = {str(t) for t in fm.get("tags") or []}
+    return [(tag, other) for tag, others in (hints.get("clashes") or {}).items()
+            if tag in tags for other in others if other in tags]
+
+
 def load(folder):
     for path in sorted(folder.rglob("*.md")):
         match = FRONT_MATTER.match(path.read_text(encoding="utf-8"))
@@ -142,15 +149,19 @@ def main(argv=None):
         if not folder.is_dir():
             print(f"\n{name}: {folder.name}/ is absent (a separate private repo; clone it first).")
             continue
-        tag_rows, blank_rows, differ_rows, scanned = [], [], [], 0
+        tag_rows, blank_rows, differ_rows, clash_rows, scanned = [], [], [], [], 0
         for path, fm in load(folder):
             scanned += 1
+            clash_rows += [(a, b, path.stem) for a, b in clashes(fm, hints)]
             missing, star_notes = check(fm, hints)
             for tag, why in missing:
                 tag_rows.append((tag, path.stem, why))
             for suggested, star, why in star_notes:
                 (blank_rows if not star else differ_rows).append((suggested, path.stem, star, why))
         print(f"\n{'=' * 70}\n{name}: {scanned} recipes")
+        print(f"\n  Two tags that never sit together ({len(clash_rows)})")
+        for a, b, slug in sorted(clash_rows):
+            print(f"    {a} + {b}  {slug}")
         print(f"\n  A tag the recipe may be missing ({len(tag_rows)})")
         for tag, slug, why in sorted(tag_rows):
             print(f"    {tag:10s} {slug}  ({why})")

@@ -552,9 +552,9 @@ term.
 **Mood** — *what you feel like eating, a craving:*
 <!-- vocab:tags:mood start -->
 `bakes`, `carbs party`, `cheese-tastic`, `dessert`, `drinks`, `fakeaway`,
-`fiddly and fun`, `herbivore-ish`, `hot snack`, `ice cream`, `knife and fork`,
-`nibbles`, `one-handed food`, `salad`, `showstopper`, `soup`, `sweet snack`,
-`virtuous`
+`fiddly and fun`, `herbivore-ish`, `ice cream`, `knife and fork`, `nibbles`,
+`one-handed food`, `salad`, `savoury snack`, `showstopper`, `soup`,
+`sweet treat`, `virtuous`
 <!-- vocab:tags:mood end -->
 
 **Practicalities** — *what the occasion demands of you, regardless:*
@@ -566,9 +566,9 @@ term.
 Meanings you would not guess:
 
 - **`main`** — this could be dinner. **Work it out by subtraction, last, once
-  the other tags are chosen.** With any of `dessert`, `sweet snack`,
+  the other tags are chosen.** With any of `dessert`, `sweet treat`,
   `ice cream`, `drinks` or `nibbles`: never. With none of those and none of
-  `bakes`, `extras`, `side`, `starter`, `breakfast` or `hot snack`: add
+  `bakes`, `extras`, `side`, `starter`, `breakfast` or `savoury snack`: add
   `main`. With one of that second six, it depends on the dish (a quiche is a
   bake and dinner; a starter for two may be a main; a sauce is not), so decide
   and say which way you went in the hand-back list. **Savoury pancakes are
@@ -621,7 +621,7 @@ And the plainer ones, as Helen means them:
   pizza dough are in. A soufflé, a Wellington, a microwave mug cake and
   anything set in the fridge are not.
 - **`dessert`** — a pudding course you serve at the table.
-- **`sweet snack`** — small sweet things eaten by hand outside a meal:
+- **`sweet treat`** — small sweet things eaten by hand outside a meal:
   brownies, biscuits, fudge, truffles, a fairy cake, a scone, a muffin. Her
   test: *"would I serve it on a cake plate at 4 o clock after a long
   improving walk?"* **It has to be made as individual pieces: a whole cake
@@ -638,9 +638,14 @@ And the plainer ones, as Helen means them:
 - **`cheese-tastic`** — cheese is the pleasure of the dish, not a garnish.
   Feta does not count; burrata does.
 - **`fakeaway`** — a home version of something you would order in.
-- **`hot snack`** — small, hot and eaten between meals: toasties, fritters,
-  things on toast.
-- **`nibbles`** — finger food to pass round with drinks.
+- **`savoury snack`** — a small savoury thing for one or two between meals,
+  hot or cold: toasties, fritters, crumpets, things on toast, kale crisps.
+  Never sweet: a sweet one is a `sweet treat`.
+- **`nibbles`** — savoury, bite-sized, passed round with drinks at a party.
+  **A dish served at the table in portions is a `starter`, not nibbles**:
+  fishcakes, a tart, a pâté for four, a salad. Never with `sweet treat`,
+  `dessert`, `main`, `salad`, `soup` or `knife and fork`;
+  `scripts/check_food_tags.py` reports a clash.
 - **`breakfast`** — eaten in the morning.
 - **`extras`** — not a dish by itself: sides, sauces, stocks, pickles, doughs.
 - **`festive`** — Christmas, or another named feast, where the dish is the
