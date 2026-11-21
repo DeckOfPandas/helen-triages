@@ -292,21 +292,20 @@ test('asked for, each row says which recipes it is for, closed until its own che
   const flour = closed.slice(closed.indexOf('data-from-toggle="plain flour'));
   assert.match(flour, /^data-from-toggle="[^"]*" aria-expanded="false" aria-controls="(shopping-from-\d+)" aria-label="which recipes use plain flour"><\/button>/);
   const id = /aria-controls="(shopping-from-\d+)"/.exec(flour)[1];
-  assert.ok(closed.includes('<p class="shopping-list-from" id="' + id + '" hidden>for ' +
-    '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>, ' +
-    '<a class="shopping-list-recipe-link" href="/food/recipes/cake/">'), closed);
+  assert.ok(closed.includes('<ul class="shopping-list-from" id="' + id + '" hidden>' +
+    '<li><a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a></li>' +
+    '<li><a class="shopping-list-recipe-link" href="/food/recipes/cake/">'), closed);
   assert.ok(closed.indexOf('</label><button') !== -1, 'the chevron is outside the label, so it never ticks the row');
   const open = r.aislesHtml(both, ticks([]), { open: (key) => key.indexOf('plain flour') === 0 });
-  assert.ok(open.includes('id="' + id + '">for '), 'a row asked open starts open');
+  assert.ok(open.includes('id="' + id + '"><li>'), 'a row asked open starts open');
   assert.strictEqual(new Set(closed.match(/id="shopping-from-\d+"/g)).size, closed.match(/id="shopping-from-\d+"/g).length,
     'every breakdown has its own id');
 });
 
-test('with a breakdown, a line\'s not-scaled bracket goes under it, before the breakdown', () => {
+test('with a breakdown, a line has no not-scaled bracket: the breakdown names the recipe already', () => {
   const html = rows().aislesHtml(aisles([['/food/recipes/a/', 4]]), ticks([]), { open: () => false });
-  assert.ok(html.includes('</div><p class="shopping-list-unscaled">(' +
-    '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>)</p>' +
-    '<p class="shopping-list-from"'), html);
+  assert.ok(!html.includes('shopping-list-unscaled'), html);
+  assert.ok(html.includes('<span class="shopping-list-name">olive oil</span></label><button'), html);
 });
 
 test('not asked for, a row has no breakdown and its markup is as before', () => {

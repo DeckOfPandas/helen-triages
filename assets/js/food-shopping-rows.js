@@ -289,8 +289,8 @@
     }
 
     function fromHtml(row, id, open) {
-      return '<p class="shopping-list-from" id="' + id + '"' + (open ? '' : ' hidden') + '>for ' +
-        row.recipes.map(function (url) { return recipeLink(url); }).join(', ') + '</p>';
+      return '<ul class="shopping-list-from" id="' + id + '"' + (open ? '' : ' hidden') + '>' +
+        row.recipes.map(function (url) { return '<li>' + recipeLink(url) + '</li>'; }).join('') + '</ul>';
     }
 
     /* The aisles as markup. `ticks` gives each row its box and class (#1457):
@@ -308,13 +308,12 @@
             var open = !!(broken && from.open(row.key));
             if (!broken) {
               return '<li class="shopping-list-row' + ticks.rowClass(row.key) + '">' +
-                rowLineHtml(row, ticks, '') + unscaledHtml(row, 'span') + priceHtml(row) + '</li>';
+                rowLineHtml(row, ticks, '') + unscaledHtml(row) + priceHtml(row) + '</li>';
             }
-            // The bracket goes under the line here, beside the breakdown it
-            // belongs with, so the line has room for its chevron on a phone.
+            // No not-scaled bracket: the breakdown names every recipe already.
             return '<li class="shopping-list-row shopping-list-row--from' + ticks.rowClass(row.key) + '">' +
               '<div class="shopping-list-row-main">' + rowLineHtml(row, ticks, fromToggleHtml(row, id, open)) +
-              priceHtml(row) + '</div>' + unscaledHtml(row, 'p') + fromHtml(row, id, open) + '</li>';
+              priceHtml(row) + '</div>' + fromHtml(row, id, open) + '</li>';
           }).join('') +
           '</ul></section>';
       }).join('');
@@ -329,10 +328,10 @@
     }
 
     // Outside the label, so following a link never ticks the row.
-    function unscaledHtml(row, tag) {
+    function unscaledHtml(row) {
       if (!row.unscaledRecipes || !row.unscaledRecipes.length) return '';
-      return '<' + tag + ' class="shopping-list-unscaled">(' +
-        row.unscaledRecipes.map(function (url) { return recipeLink(url); }).join(', ') + ')</' + tag + '>';
+      return '<span class="shopping-list-unscaled">(' +
+        row.unscaledRecipes.map(function (url) { return recipeLink(url); }).join(', ') + ')</span>';
     }
 
     function priceHtml(row) {

@@ -222,10 +222,10 @@
   }
 }
 
-// Under the line, the not-scaled bracket and the breakdown start where the
-// name does: past the tick box and the amount column (`.shopping-list-amount`).
-.shopping-list-row--from > .shopping-list-unscaled,
+// Under the line, the breakdown starts where the name does: past the tick box
+// and the amount column (`.shopping-list-amount`).
 .shopping-list-from {
+  list-style: none;
   margin: $space-xxs 0 0;
   padding-left: calc(1.05rem + 8.5rem + #{2 * $space-sm});
 
@@ -273,9 +273,12 @@
   }
 }
 
-.shopping-list-from {
+// One recipe a line. Not a shopping row: none of `.shopping-list-items li`.
+.shopping-list-items .shopping-list-from li {
+  display: block;
+  padding: $space-xxs 0 0;
+  border: 0;
   font-size: 0.85rem;
-  color: $color-clear-text;
 }
 
 // Magenta, the shortlist's own "on" colour (_shortlist.scss): a tick is the
