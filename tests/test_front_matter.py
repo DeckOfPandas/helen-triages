@@ -820,6 +820,23 @@ ADJUDICATED_REWRITES = {
             "2-make/ as she asked. The commit that showed #1482's gap; covered "
             "by her standing grant under 026f3224."
         ),
+        "c2513a43": (
+            "Four 0-christmas/ Christmas Eve mains (pig's cheeks, lobster "
+            "salad, pink radicchio salad, venison terrine), 2026-11-21. "
+            "Helen's own rewrites and flags, made in the agent's worktree and "
+            "committed for her; covered by her standing grant under 026f3224."
+        ),
+        "dd7b6216": (
+            "0-christmas/.../spiced-duck-orange-glazed-endive.md, 2026-11-21. "
+            "Helen's second round, her rewrite and flag, committed for her; "
+            "covered by her standing grant under 026f3224."
+        ),
+        "6469f025": (
+            "Five 0-christmas/ drafts (cranberry sausages, French toast, "
+            "farls, parfait, pickled pears), 2026-11-21. Helen's rewrites and "
+            "flags, rescued from the wrong branch and committed for her; "
+            "covered by her standing grant under 026f3224."
+        ),
     },
     "_food_recipes": {
         "2d97c96a": (
