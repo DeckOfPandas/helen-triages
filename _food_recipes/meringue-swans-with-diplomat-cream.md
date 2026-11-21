@@ -17,7 +17,7 @@ ingredient_groups:
     - amount: "150 g"
       item: "white caster sugar"
     - amount: "½ tsp"
-      item: "lemon juice"
+      item: "freshly squeezed lemon juice"
     - amount: "1 tsp"
       item: cornflour
   - name: "diplomat cream"
