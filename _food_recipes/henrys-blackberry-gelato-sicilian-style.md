@@ -34,7 +34,7 @@ ingredient_groups:
     - amount: "30 g"
       item: "golden granulated sugar"
     - amount: "1 tbsp"
-      item: "fresh lemon juice"
+      item: "freshly squeezed lemon juice"
 method_groups:
   - name: "purée"
     steps:

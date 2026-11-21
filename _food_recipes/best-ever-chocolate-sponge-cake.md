@@ -25,7 +25,7 @@ ingredient_groups:
     - amount: "200 ml"
       item: semi-skimmed milk
     - amount: "1 tbsp"
-      item: lemon juice
+      item: "freshly squeezed lemon juice"
     - amount: "100 g"
       item: salted butter
     - amount: "175 g"

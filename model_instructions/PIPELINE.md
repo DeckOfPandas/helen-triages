@@ -196,9 +196,13 @@ enforces it: food's `recipe` fixture includes every draft in `3-keep/` and
 in `tests/conftest.py`: a `QQ`, an estimated time, the tagline, group and
 spice order) are enforced in `4-promote/` only.
 
-Whenever a draft lands in `1-rewrite/`, `2-make/`, `3-keep/` or `4-promote/`,
-by her word or her hand, run `python3 scripts/promotion_qa.py <folder or
-path>`. It applies the same rules, in place, and sorts the findings: **FIX**
+**The same rules run at ingest** (`.claude/commands/ingest.md`, finishing
+pass), so their questions arrive with the batch's and `keep` raises nothing
+new. Helen: as few rounds as possible between ingestion and cooking, and
+between deciding to keep and publication. Whenever a draft lands in
+`1-rewrite/`, `2-make/`, `3-keep/` or `4-promote/`, by her word or her hand,
+run `python3 scripts/promotion_qa.py <folder or path>` again, for anything a
+rewrite has changed. It applies the same rules, in place, and sorts the findings: **FIX**
 (mechanical: fix it, in a commit of its own), **HELEN'S** (bring them in one
 list) and **AT 3-KEEP** (the empty note pair, `claude_rewritten`, a link to
 another draft: fine until `3-keep/`, a FIX there). A `2-make/` draft is also

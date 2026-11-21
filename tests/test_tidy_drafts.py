@@ -340,6 +340,46 @@ def test_a_food_qq_line_is_formatted_and_keeps_its_marker(food, before, after):
     )
 
 
+CITRUS_BEFORE = '''---
+title: "Citrus Test"
+meta:
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+ingredient_groups:
+  - name: ""
+    items:
+    - amount: "2 tbsp"
+      item: "lemon juice"
+    - amount: "1 tbsp"
+      item: "fresh lime juice, plus wedges to serve"
+    - amount: "100 ml"
+      item: "blood orange juice"
+    - amount: "50 ml"
+      item: "bottled lemon juice"
+    - amount: "1"
+      item: "orange, zest and juice"
+    - amount: "2 tbsp"
+      item: "yuzu juice"
+    - amount: "1 tbsp"
+      item: "QQ lemon juice"
+---
+'''
+
+
+def test_citrus_juice_becomes_freshly_squeezed_and_nothing_else_moves(food):
+    """DECISIONS §5: a measured citrus juice is "freshly squeezed", unless the
+    line says bottled. A whole fruit, yuzu and a QQ line are left alone."""
+    path = food / "citrus.md"
+    path.write_text(CITRUS_BEFORE, encoding="utf-8")
+    run_food(food, "--apply", "--only", "citrus")
+    want = CITRUS_BEFORE.replace(
+        '"lemon juice"', '"freshly squeezed lemon juice"').replace(
+        '"fresh lime juice, plus', '"freshly squeezed lime juice, plus').replace(
+        '"blood orange juice"', '"freshly squeezed blood orange juice"')
+    assert path.read_text(encoding="utf-8") == want
+
+
 def test_a_food_qq_claude_line_is_still_held_to_house_style(food):
     """The one QQ shape the pass may edit, and it must still edit it.
 

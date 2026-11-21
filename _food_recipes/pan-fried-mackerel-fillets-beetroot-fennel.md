@@ -29,7 +29,7 @@ ingredient_groups:
     - amount: "1"
       item: "apple, cored, quartered and sliced"
     - amount: "1 tbsp"
-      item: "fresh lemon juice, plus lemon wedges to serve"
+      item: "freshly squeezed lemon juice, plus lemon wedges to serve"
     - amount: "100 g"
       item: full-fat natural yoghurt
     - amount: "1 bunch (about 25 g)"

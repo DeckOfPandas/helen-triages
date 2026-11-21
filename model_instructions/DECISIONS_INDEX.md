@@ -169,6 +169,8 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — cardamom is always green or black, and always pods, powder or seeds.
 - 2026-08-12 · §5 · #167 · milk names its type from the source, and "milk (any kind)" is a real answer for a recipe that does not care.
 - undated · §5 · #139 · Undated, #139 — dark-family chocolate carries its cacao percentage on the ingredient list and never in main_ingredients.
+- 2026-11-21 · §5 · a measured citrus juice is "freshly squeezed lemon juice", every citrus but yuzu, unless the line says bottled.
+- 2026-11-21 · §5 · one name for one product: flaked sea salt, extra-virgin olive oil, natural yoghurt, whole milk, and the rest.
 - 2026-08-29 · §6 · main_ingredients has no cap; the old eight had been read as a budget.
 - 2026-09-06 · §6 · #762 · where two spellings of one ingredient exist the majority wins, and it is fixed in the data: cornflour, beansprouts.
 - 2026-09-22 · §6 · derive_main_ingredients.py reorders a list and never changes its members, and never writes to _food_recipes/.
@@ -218,6 +220,7 @@ argument and the rules each field is read by.
 - undated · §8 · #273 · Undated, #273 — in the exclude picker a descriptor that does not change what the thing is collapses into the plain ingredient.
 - 2026-08-16 · §8 · #281 · an "X or Y" ingredient splits into two picker entries only where both halves are already known ingredients; two joined by a method both count; a citrus fruit covers its juice and …
 - undated · §8 · Undated — gressingham is stripped as a modifier, "five-spice powder" is "five-spice", and to glaze is a trailing phrase.
+- 2026-11-21 · §8 · a qualifier that names no different product is one chip with the plain ingredient; a kind keeps its own.
 - 2026-09-07 · §8.2 · #801 · the food index has cocktails' shopping list and scaler.
 - 2026-11-03 · §8.2 · #1458 · the food shortlist is costed, on a local build only, as the cocktail one is.
 - 2026-11-03 · §8.2 · #1458 · a recipe's line quotes one portion of a serves: recipe or one batch of a makes: one, and does not move with the box.
@@ -674,6 +677,7 @@ argument and the rules each field is read by.
 - 2026-10-04 · §10 · #1194 · a published drink's note must be a filled label-and-text pair.
 - undated · §10 · Undated — test_ingredient_notes_are_lowercase_fragments flags and never rewrites.
 - 2026-11-05 · §10 · #1462 · E6 — no downloadable _site artifact on PRs.
+- 2026-11-21 · §11 · every check that can run at ingest does, so its questions come with the batch.
 - 2026-08-12 · §11 · a heading lettering change applies to every heading on the whole site.
 - 2026-08-12 · §11 · #131 #128 · the CSS --modifier class naming is real BEM and stays; the full migration plan is not to be resurrected.
 - 2026-08-16 · §11 · Helen is asked each decision as it is hit, not in a batch at the end.

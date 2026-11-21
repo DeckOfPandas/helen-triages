@@ -448,6 +448,46 @@ def test_citrus_is_measured_not_squeezed(recipe):
     )
 
 
+# A measured citrus juice is "freshly squeezed" (DECISIONS §5), unless the
+# line says it is not fresh. `citrus_juice_house` is the one reading;
+# scripts/tidy_drafts.py imports it to apply it. Yuzu is not here: in the UK
+# it is bought bottled.
+_CITRUS_FRUITS = ("blood orange", "seville orange", "pink grapefruit", "orange",
+                  "lemon", "lime", "grapefruit", "clementine", "satsuma",
+                  "mandarin", "tangerine")
+_CITRUS_JUICE = re.compile(
+    r"^(?:fresh(?:ly)?[- ]squeezed |fresh |squeezed )?(?P<fruit>"
+    + "|".join(_CITRUS_FRUITS) + r") juice\b", re.I)
+_NOT_FRESH = re.compile(
+    r"\b(?:bottled|carton|shop-bought|store-bought|from concentrate|long-life"
+    r"|ready-made|cordial)\b", re.I)
+
+
+def citrus_juice_house(item):
+    """The item as house style writes it, or None if it is already right or
+    is not a measured citrus juice: "lemon juice" and "fresh lemon juice"
+    become "freshly squeezed lemon juice"; a bottled or carton line is left."""
+    text = str(item or "")
+    m = _CITRUS_JUICE.match(text)
+    if not m or _NOT_FRESH.search(text):
+        return None
+    fruit = m.group("fruit").lower().replace("seville", "Seville")
+    new = f"freshly squeezed {fruit} juice" + text[m.end():]
+    return None if new == text else new
+
+
+def test_citrus_juice_is_freshly_squeezed(recipe):
+    bad = [i.get("item") for g in recipe.fm.get("ingredient_groups") or []
+           for i in (g or {}).get("items") or []
+           if isinstance(i, dict) and "QQ" not in str(i.get("item"))
+           and citrus_juice_house(i.get("item"))]
+    assert not bad, (
+        f"{where(recipe)} lists citrus juice not written as freshly squeezed: "
+        f"{bad}. Write \"freshly squeezed lemon juice\" (lime, orange and the "
+        f"rest the same), or say \"bottled\"; scripts/tidy_drafts.py fixes a draft."
+    )
+
+
 # --- butter, sugar, flour: closed list of qualifiers ------------------------
 # #74. Each is a closed list of allowed names, not merely "isn't bare":
 # "caster sugar" and "muscovado sugar" are qualified and still wrong.
@@ -759,6 +799,26 @@ def test_milk_specifies_type(recipe):
         f"{where(recipe)} has unqualified milk: {bad!r}. Confirm from the "
         f"original source rather than assuming whole milk -- "
         f"allowed: {', '.join(sorted(_QUALIFIED_MILK))}."
+    )
+
+
+# Yoghurt names its kind on the ingredient line (DECISIONS §5);
+# main_ingredients keeps the plain "yoghurt" chip, which the picker merges to.
+# Full-fat and low-fat forms qualify a listed kind ("full-fat natural yoghurt").
+_QUALIFIED_YOGHURT = {
+    "natural yoghurt", "greek yoghurt", "greek-style yoghurt",
+    "coconut yoghurt", "coconut milk yoghurt", "soya yoghurt",
+}
+
+
+def test_yoghurt_specifies_type(recipe):
+    """Bare "yoghurt" leaves the cook choosing between natural and Greek, which
+    differ in thickness and tang. Checked on the ingredient lines only."""
+    bad = [b for b in _unqualified(recipe, "yoghurt", _QUALIFIED_YOGHURT)
+           if b.startswith("ingredient")]
+    assert not bad, (
+        f"{where(recipe)} has unqualified yoghurt: {bad!r}. "
+        f"Allowed: {', '.join(sorted(_QUALIFIED_YOGHURT))}."
     )
 
 

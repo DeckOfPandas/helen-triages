@@ -27,7 +27,7 @@ ingredient_groups:
     - amount: "60 ml"
       item: oil
     - amount: "120 g"
-      item: low- or zero-fat plain yoghurt
+      item: low- or zero-fat natural yoghurt
     - amount: "3 large"
       item: eggs
     - amount: "200 g"
@@ -51,7 +51,7 @@ ingredient_groups:
     - amount: "½"
       item: "orange, zested"
     - amount: "2 tsp"
-      item: orange juice
+      item: "freshly squeezed orange juice"
     - item: "a few tbsp chopped roasted pistachios, to top"
 method_groups:
   - name: "cake"
