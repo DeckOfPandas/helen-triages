@@ -26,7 +26,7 @@ ingredient_groups:
     - amount: "2 tbsp"
       item: balsamic vinegar
     - amount: "2 tbsp"
-      item: extra virgin olive oil
+      item: extra-virgin olive oil
     - amount: "2"
       item: "shallots, peeled and finely chopped"
     - amount: "1 large handful each"

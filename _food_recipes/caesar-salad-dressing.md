@@ -14,7 +14,7 @@ ingredient_groups:
     - amount: "225 g"
       item: mayonnaise
     - amount: "1 tbsp"
-      item: lemon juice
+      item: "freshly squeezed lemon juice"
     - amount: "1 tsp"
       item: Worcestershire sauce
     - amount: "1 tsp"

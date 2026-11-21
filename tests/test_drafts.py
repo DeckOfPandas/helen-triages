@@ -110,6 +110,7 @@ NOT_FOR_DRAFTS = {
     "test_soy_sauce_as_tamari_alternative_specifies_dark_or_light":
         "content judgement; 4 drafts",
     "test_sugar_specifies_type": "content judgement; 117 drafts",
+    "test_yoghurt_specifies_type": "content judgement, checked at promotion",
     "test_unsalted_butter_has_salt_or_a_note": "content judgement; 19 drafts",
     "test_vinegar_specifies_type": "content judgement; 19 drafts",
     "test_oven_temperature_says_fan":
@@ -647,6 +648,10 @@ def test_no_ampersand_in_title(draft, taxonomy):
 
 def test_citrus_is_measured_not_squeezed(draft):
     _st.test_citrus_is_measured_not_squeezed(draft)
+
+
+def test_citrus_juice_is_freshly_squeezed(draft):
+    _st.test_citrus_juice_is_freshly_squeezed(draft)
 
 
 def test_spellings(draft):

@@ -589,6 +589,22 @@ SPELLINGS = {
     r"\bbain marie\b": "bain-marie",
     r"\brice wine vinegar\b": "rice vinegar",
     r"\bbaking soda\b": "bicarbonate of soda",
+    # One name for one product: Helen's rulings (DECISIONS §5).
+    r"\bsea salt flakes\b": "flaked sea salt",
+    r"\bflaky (?:sea )?salt\b": "flaked sea salt",
+    r"\bmaldon (?:sea )?salt(?: flakes)?\b": "flaked sea salt",
+    r"\b(?:red|dried) chill?i flakes\b": "chilli flakes",
+    r"\bred pepper flakes\b": "chilli flakes",
+    r"\ball-purpose flour\b": "plain flour",
+    r"\bplain yoghurt\b": "natural yoghurt",
+    r"\bfull-fat milk\b": "whole milk",
+    r"\bhalf-fat crème fraîche\b": "low-fat crème fraîche",
+    r"\b(?:soft light|light soft) brown sugar\b": "light brown soft sugar",
+    r"\b(?:soft dark|dark soft) brown sugar\b": "dark brown soft sugar",
+    r"\bextra virgin\b": "extra-virgin",
+    r"\bflatleaf\b": "flat-leaf",
+    r"\bbouillon cubes?\b": "stock cube",
+    r"\bwholewheat\b": "wholemeal",
 }
 
 DEGREELESS_TEMPERATURE = re.compile(r"\b(\d{2,3})\s*(?:oC|C\b)(?!\w)")
