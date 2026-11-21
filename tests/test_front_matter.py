@@ -435,7 +435,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 #   2. move it in a commit of its own, quoting her grant in the message;
 #   3. move it before the next agent edit, or it covers that too.
 # Grants made on parallel branches need the merge commit with both behind it.
-BASELINE_COMMIT = "f36d8eda"   # four recipes' freshly squeezed citrus juice, Helen's grant; 78369ca7 and every earlier grant behind it
+BASELINE_COMMIT = "1b99caf6"   # eight recipes' freshly squeezed citrus juice, Helen's grant; f36d8eda and every earlier grant behind it
 AGENT_TRAILER = "co-authored-by: claude"
 
 
