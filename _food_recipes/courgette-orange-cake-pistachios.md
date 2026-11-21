@@ -27,7 +27,7 @@ ingredient_groups:
     - amount: "60 ml"
       item: oil
     - amount: "120 g"
-      item: low- or zero-fat plain yoghurt
+      item: low- or zero-fat natural yoghurt
     - amount: "3 large"
       item: eggs
     - amount: "200 g"

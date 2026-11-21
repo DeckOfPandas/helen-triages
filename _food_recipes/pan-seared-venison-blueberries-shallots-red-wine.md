@@ -17,7 +17,7 @@ ingredient_groups:
     - amount: "5"
       item: dried juniper berries
     - item: sea salt and freshly ground black pepper
-    - item: extra virgin olive oil
+    - item: extra-virgin olive oil
     - amount: "1 x 800 g"
       item: "venison loin, trimmed"
     - amount: "4"

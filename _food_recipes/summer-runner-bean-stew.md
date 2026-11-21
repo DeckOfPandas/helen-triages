@@ -37,7 +37,7 @@ ingredient_groups:
       item: "can cannellini or butter beans, drained"
     - item: "handful of fresh basil"
     - amount: "2 tbsp"
-      item: extra virgin olive oil
+      item: extra-virgin olive oil
 method:
   - "Fry the onion with a pinch of salt slowly, about 15 mins, until caramelised."
   - "Prep the runner beans: trim, de-string, and cut on the diagonal."

@@ -32,11 +32,11 @@ ingredient_groups:
     - amount: "1–2"
       item: "lemons, juiced, to taste"
       note: "and I add zest too if I can find the microplane"
-    - item: "extra virgin olive oil, to garnish"
+    - item: "extra-virgin olive oil, to garnish"
 method:
   - "Fry the onion and carrot with a pinch of salt for 6–8 mins until soft. Stir in the garlic and herbs, cook for a minute or two, then add the tomato purée and caremelise. Add the stock and simmer."
   - "Add the cavolo nero, then the butter beans including their liquid, and simmer for 6–8 mins until the greens are tender."
-  - "Add plenty of lemon juice to taste — it should be bright and flavourful. Remove the herb sprigs. Serve in bowls with extra virgin olive oil on top."
+  - "Add plenty of lemon juice to taste — it should be bright and flavourful. Remove the herb sprigs. Serve in bowls with extra-virgin olive oil on top."
 method_short:
   - ""
 notes:

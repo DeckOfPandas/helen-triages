@@ -54,7 +54,7 @@ ingredient_groups:
       item: "Parmesan, grated"
     - amount: "2 tbsp"
       item: "dried tarragon"
-    - item: "sea salt flakes, to sprinkle"
+    - item: "flaked sea salt, to sprinkle"
 method_groups:
   - name: "filling"
     steps:

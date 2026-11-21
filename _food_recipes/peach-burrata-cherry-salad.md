@@ -30,7 +30,7 @@ ingredient_groups:
       item: "pumpkin seeds, toasted"
     - amount: "2 tbsp"
       item: "balsamic vinegar"
-    - item: "flaky salt, to finish"
+    - item: "flaked sea salt, to finish"
   - name: "peaches"
     items:
     - amount: "4"
@@ -58,7 +58,7 @@ method:
   - "Salt the chopped tomatoes and drain, at least 15 mins, retaining the liquid, then toss the flesh in olive oil."
   - "Deglaze the peach roasting tin with a splash of balsamic and the tomato water, and reduce slightly."
   - "Arrange the tomatoes and peaches on a platter. Scatter over the torn burrata, cherries, basil, oregano, and toasted pumpkin seeds."
-  - "Finish with the pan sauce, and flaky salt."
+  - "Finish with the pan sauce, and flaked sea salt."
 method_short:
   - ""
 ---
