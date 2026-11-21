@@ -4446,6 +4446,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 
 ## §11 Working practices
 
+- **2026-11-21 — every check that can run at ingest does, so its questions
+  come with the batch.** Helen: *"I would like as few rounds as possible
+  between ingestion and cooking, then between deciding to keep and
+  publication."* Offered five changes, she chose three: the whole tidy pass
+  at every ingest, `promotion_qa.py` at ingest (FIX fixed, HELEN'S in the one
+  list), and `check_food_tags.py`'s hints in that list. Declined for now: a
+  "known recipe" mode straight to `4-promote/`. The ingest finishing pass in
+  `.claude/commands/ingest.md` is the procedure; PIPELINE.md §3 says so too.
 - **2026-08-12 — a heading lettering change applies to every heading on the
   whole site.** Helen: *"Did your heading lettering change touch all headings
   on the whole site? That is what I want."* A design ruling the old journal

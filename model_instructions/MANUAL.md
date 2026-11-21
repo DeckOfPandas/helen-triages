@@ -112,7 +112,9 @@ merging anything that touches a slug-keyed entry.
 `python3 scripts/check_food_tags.py` is a report and is deliberately not in
 `verify.py`. It lists food recipes whose tags or star disagree with their
 title, from `tag_hints` in `_data/food/taxonomy.yml`. It writes nothing and
-fails nothing; `--drafts` is the list to have open while proofreading.
+fails nothing; `--drafts` is the list to have open while proofreading, and
+the ingest finishing pass (`.claude/commands/ingest.md`) folds its hints for a
+new batch into the questions for Helen.
 
 **One `pytest` at a time.** Two runs share one `.jekyll-cache` and one `tmp/`.
 (The gate fixtures named `zzz-gate-…` are written into a copy of the tree by
