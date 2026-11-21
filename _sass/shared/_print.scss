@@ -42,10 +42,11 @@
     display: none;
   }
 
-  // The shortlist's controls cannot be pressed on paper (#546). All three
+  // The shortlist's controls cannot be pressed on paper (#546). The first two
   // classes exist on both sites, which is why the rule is here and not in a
-  // site's print partial. The drafts toggle is named, not reached by its
-  // @extend of .btn-shortlist-only, which cannot cross into shared/.
+  // site's print partial; the drafts toggle is cocktails' (food's is a switch).
+  // It is named, not reached by its @extend of .btn-shortlist-only, which
+  // cannot cross into shared/.
   .btn-shortlist,
   .btn-shortlist-only,
   .btn-drafts-toggle {

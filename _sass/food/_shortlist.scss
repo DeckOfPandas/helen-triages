@@ -137,11 +137,18 @@
   }
 }
 
-// The local-only drafts switch (#1358): the pill above, on a line of its own
-// under it, pulled up so the two read as a pair. Only a local build shows the
-// element (food/index.html).
-.btn-drafts-toggle { @extend .btn-shortlist-only; }
-
-.drafts-toggle-row {
+// The local-only switches (#1358), drafts and untried: the recipe page's
+// switch (_ingredient-switches.scss), one per line, under the shortlisted
+// pill. Only a local build shows them (food/index.html); paper cannot press them.
+.index-switches {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-xs;
   margin: (-$space-sm) 0 $space-lg;
+
+  @media print { display: none; }
+
+  // `.ingredient-switch` sets a display, which beats the browser's [hidden].
+  .ingredient-switch[hidden] { display: none; }
 }
