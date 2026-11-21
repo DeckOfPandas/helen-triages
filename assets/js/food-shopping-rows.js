@@ -280,33 +280,64 @@
       return foodShoppingList.build(list, options);
     }
 
+    // A row's breakdown: a chevron beside it, and the recipes it is for under
+    // it. Its own button, since a tap on the line ticks it (#1521).
+    function fromToggleHtml(row, id, open) {
+      return '<button type="button" class="shopping-list-from-toggle" data-from-toggle="' + esc(row.key) +
+        '" aria-expanded="' + open + '" aria-controls="' + id + '" aria-label="' +
+        esc('which recipes use ' + row.label) + '"></button>';
+    }
+
+    function fromHtml(row, id, open) {
+      return '<p class="shopping-list-from" id="' + id + '"' + (open ? '' : ' hidden') + '>for ' +
+        row.recipes.map(function (url) { return recipeLink(url); }).join(', ') + '</p>';
+    }
+
     /* The aisles as markup. `ticks` gives each row its box and class (#1457):
-       `box(key)` and `rowClass(key)`. */
-    function aislesHtml(aisles, ticks) {
+       `box(key)` and `rowClass(key)`. `from`, if given, adds each row's
+       breakdown: `open(key)` says whether it starts open. */
+    function aislesHtml(aisles, ticks, from) {
+      var n = 0;
       return aisles.map(function (aisle) {
         return '<section class="shopping-list-aisle">' +
           '<h3 class="shopping-list-aisle-name">' + esc(aisle.label) + '</h3>' +
           '<ul class="shopping-list-items">' +
           aisle.items.map(function (row) {
-            return '<li class="shopping-list-row' + ticks.rowClass(row.key) + '">' +
-              '<label class="shopping-list-line">' + ticks.box(row.key) +
-              '<span class="shopping-list-amount">' + esc(row.text) + '</span>' +
-              '<span class="shopping-list-name">' + esc(row.label) + '</span>' +
-              (row.aside ? '<span class="shopping-list-aside">(' + esc(row.aside) + ')</span>' : '') +
-              '</label>' +
-              // Outside the label, so following a link never ticks the row.
-              (row.unscaledRecipes && row.unscaledRecipes.length
-                ? '<span class="shopping-list-unscaled">(' +
-                  row.unscaledRecipes.map(function (url) { return recipeLink(url); }).join(', ') + ')</span>'
-                : '') +
-              (row.cost && row.cost.text
-                ? '<span class="shopping-list-price">' +
-                  shoppingList.moneyHtml(row.cost.text, esc) + '</span>'
-                : '') +
-              '</li>';
+            var broken = from && row.recipes && row.recipes.length;
+            var id = 'shopping-from-' + (n += 1);
+            var open = !!(broken && from.open(row.key));
+            if (!broken) {
+              return '<li class="shopping-list-row' + ticks.rowClass(row.key) + '">' +
+                rowLineHtml(row, ticks, '') + unscaledHtml(row, 'span') + priceHtml(row) + '</li>';
+            }
+            // The bracket goes under the line here, beside the breakdown it
+            // belongs with, so the line has room for its chevron on a phone.
+            return '<li class="shopping-list-row shopping-list-row--from' + ticks.rowClass(row.key) + '">' +
+              '<div class="shopping-list-row-main">' + rowLineHtml(row, ticks, fromToggleHtml(row, id, open)) +
+              priceHtml(row) + '</div>' + unscaledHtml(row, 'p') + fromHtml(row, id, open) + '</li>';
           }).join('') +
           '</ul></section>';
       }).join('');
+    }
+
+    function rowLineHtml(row, ticks, toggle) {
+      return '<label class="shopping-list-line">' + ticks.box(row.key) +
+        '<span class="shopping-list-amount">' + esc(row.text) + '</span>' +
+        '<span class="shopping-list-name">' + esc(row.label) + '</span>' +
+        (row.aside ? '<span class="shopping-list-aside">(' + esc(row.aside) + ')</span>' : '') +
+        '</label>' + toggle;
+    }
+
+    // Outside the label, so following a link never ticks the row.
+    function unscaledHtml(row, tag) {
+      if (!row.unscaledRecipes || !row.unscaledRecipes.length) return '';
+      return '<' + tag + ' class="shopping-list-unscaled">(' +
+        row.unscaledRecipes.map(function (url) { return recipeLink(url); }).join(', ') + ')</' + tag + '>';
+    }
+
+    function priceHtml(row) {
+      if (!row.cost || !row.cost.text) return '';
+      return '<span class="shopping-list-price">' + shoppingList.moneyHtml(row.cost.text, esc) + '</span>';
     }
 
     // "(Not scaled: salt, olive oil)", or '' where everything scaled.

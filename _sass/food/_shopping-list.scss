@@ -206,6 +206,78 @@
   cursor: pointer;
 }
 
+// A line with a breakdown (#1521): the line as above, and under it the
+// recipes it is for, opened by a chevron of its own beside the name.
+.shopping-list-items li.shopping-list-row--from { display: block; }
+
+.shopping-list-row-main {
+  display: flex;
+  align-items: baseline;
+  gap: $space-sm;
+
+  // The chevron's room, on a phone, comes out of the amount column, whose
+  // amounts already wrap inside it.
+  @media (max-width: 600px) {
+    .shopping-list-amount { flex-basis: 6.5rem; }
+  }
+}
+
+// Under the line, the not-scaled bracket and the breakdown start where the
+// name does: past the tick box and the amount column (`.shopping-list-amount`).
+.shopping-list-row--from > .shopping-list-unscaled,
+.shopping-list-from {
+  margin: $space-xxs 0 0;
+  padding-left: calc(1.05rem + 8.5rem + #{2 * $space-sm});
+
+  // On a phone that column would leave them a strip: past the tick box only.
+  @media (max-width: 600px) { padding-left: calc(1.05rem + #{$space-sm}); }
+}
+
+.shopping-list-from-toggle {
+  flex-shrink: 0;
+  align-self: flex-start;
+  width: 1.75rem;
+  height: 1.5rem;
+  margin-left: -$space-xs;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $color-clear-text;
+  cursor: pointer;
+
+  // A chevron, drawn: pointing right when shut, down when open.
+  &::before {
+    content: '';
+    display: block;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin: auto;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform 0.12s ease-in-out;
+  }
+
+  &[aria-expanded="true"]::before { transform: rotate(45deg); }
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+
+  &:focus-visible {
+    outline: 2px solid $color-recipe-link;
+    outline-offset: -2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::before { transition: none; }
+  }
+}
+
+.shopping-list-from {
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
 // Magenta, the shortlist's own "on" colour (_shortlist.scss): a tick is the
 // same act of marking a thing. The edge is the quiet text colour, because
 // $color-border is too faint to read as a control.

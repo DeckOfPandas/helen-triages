@@ -39,14 +39,15 @@
   }
 
   // The shortlists' controls (#1521): the picker, the chevron beside a button
-  // while filling a list, the bar that says which, and the note under the
-  // scaler, and a row's grip and arrows. The back link is on the furniture
-  // line, which prints nothing.
+  // while filling a list, the bar that says which, the note under the scaler,
+  // a row's grip and arrows, and a shopping line's chevron (an open breakdown
+  // still prints). The back link is on the furniture line, which prints nothing.
   .shortlist-picker,
   .btn-shortlist-more,
   .shortlist-into-bar,
   .recipe-lists-note,
   .reorder-handle,
+  .shopping-list-from-toggle,
   .shortlists-arrange-open {
     display: none;
   }

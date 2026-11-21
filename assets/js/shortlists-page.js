@@ -268,7 +268,9 @@
     aisles.forEach(function (aisle) { shown = shown.concat(aisle.items); });
     noteEl.textContent = shop.unscaledNote(aisles);
     noteEl.hidden = !noteEl.textContent;
-    aislesEl.innerHTML = shop.aislesHtml(aisles, ticks(view));
+    aislesEl.innerHTML = shop.aislesHtml(aisles, ticks(view), {
+      open: function (key) { return !!opened[key]; }
+    });
     var sum = shop.total(shown);
     totalEl.textContent = '';
     if (sum) HTF.shoppingList.drawTotal(totalEl, sum.text, sum.sum);
@@ -285,6 +287,19 @@
     lists.untick(id, keys);
     lists.untick(EVERYTHING, keys);
   }
+
+  // A line's breakdown stays open through redraws, for this visit only.
+  var opened = {};
+
+  aislesEl.addEventListener('click', function (ev) {
+    var toggle = ev.target.closest('[data-from-toggle]');
+    if (!toggle) return;
+    var open = toggle.getAttribute('aria-expanded') !== 'true';
+    opened[toggle.getAttribute('data-from-toggle')] = open;
+    toggle.setAttribute('aria-expanded', String(open));
+    document.getElementById(toggle.getAttribute('aria-controls')).hidden = !open;
+    placePill();
+  });
 
   aislesEl.addEventListener('change', function (ev) {
     var box = ev.target;
