@@ -1,4 +1,4 @@
-/* The stock and spice hints on a recipe's ingredient lines (MANUAL §8.2), in
+/* The ingredient hints on a recipe's ingredient lines (MANUAL §8.2), in
    the cocktails' ship-key pattern (ship-key.js): a small ringed i after the
    line opens a modal box saying how much, closed by its ×, Escape or a click
    on the backdrop. The words are HTF.foodHints'; this file finds the lines,
@@ -75,7 +75,10 @@
     var amount = amountOf(row);
     var item = itemOf(row);
     return HTF.foodHints.stockHint(amount, item, data) ||
-      HTF.foodHints.spiceHint(amount, item, data);
+      HTF.foodHints.spiceHint(amount, item, data) ||
+      HTF.foodHints.wholeSpiceHint(amount, item, data) ||
+      HTF.foodHints.vanillaHint(amount, item, data) ||
+      HTF.foodHints.pasteHint(amount, item, data);
   }
 
   function fill(row, hint) {
