@@ -50,3 +50,50 @@ def test_foods_old_keys_are_removed_by_name_and_no_cocktail_key_is():
     cocktail = [k for k in named if "cocktail" in k]
     assert not cocktail, f"cocktails' shortlist is still live and must not be removed: {cocktail}"
     assert "removeItem" in text, "the old keys are listed but never removed"
+
+
+PAGE = ROOT / "food/shortlists.html"
+PAGE_JS = ROOT / "assets/js/shortlists-page.js"
+
+
+def test_the_shortlists_page_exists_and_says_what_it_needs_without_javascript():
+    text = PAGE.read_text(encoding="utf-8")
+    assert "permalink: /food/shortlists/" in text, "food/shortlists.html must be served at /food/shortlists/"
+    noscript = re.search(r"<noscript>(.*?)</noscript>", text, re.S)
+    assert noscript and "JavaScript" in noscript.group(1) and "browser" in noscript.group(1), (
+        "with scripts off the page must say plainly that shortlists live in this "
+        "browser and need JavaScript")
+    assert re.search(r"<div[^>]*data-shortlists[^>]*\bhidden\b", text), (
+        "the page's own markup must ship hidden, so a reader with scripts off "
+        "sees the no-JavaScript line and nothing half-built")
+
+
+def test_the_tabs_are_real_tabs():
+    text = PAGE.read_text(encoding="utf-8")
+    js = PAGE_JS.read_text(encoding="utf-8")
+    assert re.search(r'role="tablist"[^>]*aria-label=', text), "the tab row needs role=tablist and a name"
+    assert 'role="tabpanel"' in text, "the tabs need a tabpanel to control"
+    for attribute in ('role="tab"', "aria-selected=", 'aria-controls="shortlists-panel"', "tabindex="):
+        assert attribute in js, f"shortlists-page.js must draw each tab with {attribute}"
+    for key in ("ArrowRight", "ArrowLeft", "Home", "End"):
+        assert key in js, f"the tabs must move with {key}"
+    assert "aria-labelledby" in js, "the panel must be named by its selected tab"
+
+
+def test_every_input_on_the_page_has_a_label():
+    sources = {"food/shortlists.html": PAGE.read_text(encoding="utf-8"),
+               "assets/js/shortlists-page.js": PAGE_JS.read_text(encoding="utf-8")}
+    unlabelled = []
+    for name, text in sources.items():
+        labelled = set(re.findall(r"""<label[^>]*\bfor=["']([\w-]+)""", text))
+        for tag in re.findall(r"<input\b[^>]*>", text):
+            if 'type="checkbox"' in tag or "aria-label" in tag:
+                continue
+            ident = re.search(r"""\bid=["']([\w-]+)""", tag)
+            if not ident or ident.group(1) not in labelled:
+                unlabelled.append(f"{name}: {tag[:80]}")
+    assert not unlabelled, (
+        "every text input needs a <label for> naming it (a tick box sits inside "
+        f"its row's label; food-shopping-rows.js gives a number box aria-label): {unlabelled}")
+    assert sum(len(re.findall(r"<input\b", t)) for t in sources.values()) >= 3, (
+        "found fewer inputs than the page has: the scan above is reading the wrong files")

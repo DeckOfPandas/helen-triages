@@ -1105,6 +1105,17 @@ function renderResultsPool() {
     return map;
   })();
 
+  // The words and markup of every row: assets/js/food-shopping-rows.js.
+  var rows = HTF.foodShoppingRows.create({
+    recipes: RECIPES, titles: titleByUrl, hrefs: hrefByUrl,
+    containerNouns: CONTAINER_NOUNS, buildOptions: buildOptions(), escape: HTF.escapeHtml
+  });
+  var hasPortions = rows.hasPortions;
+  var isBatch = rows.isBatch;
+  var halfOffered = rows.halfOffered;
+  var batchCount = rows.batchCount;
+  var rowInner = rows.rowInner;
+
   /* In the order they were shortlisted (the store keeps insertion order).
      Recipes no longer on the page are dropped. */
   function shortlistedRecipes() {
@@ -1115,16 +1126,7 @@ function renderResultsPool() {
   }
 
   /* --- A `serves:` recipe counts people (#815) -------------------------------
-     `p` is its portion count, the number opening `serves:`.
-
-     Can this recipe be scaled? Asked of the recipe, never of the store: a
-     stored number is a preference, not a capability. */
-  function hasPortions(url) {
-    var recipe = RECIPES[url];
-    return !!(recipe && recipe.p > 0);
-  }
-
-  /* The number in the box: what was last typed, or the recipe's own count.
+     The number in the box: what was last typed, or the recipe's own count.
      null where the recipe carries none, and then there is no box. */
   function portionsFor(url) {
     if (!hasPortions(url)) return null;
@@ -1140,166 +1142,16 @@ function renderResultsPool() {
   }
 
   /* --- A `makes:` recipe counts batches (#1297) ------------------------------
-     The row says "batches" in words, so the box cannot be mistaken for a
-     portions box. `w`, `h` and `m` are the recipe page's own figures (#1286):
-     whole recipes, half offered, what one makes. Both step ½, 1, 2, 3 and
-     never 1½. The count has its own store (HTF.shortlist.batches): a stored
-     6 cannot say whether it meant people or batches. */
-  function isBatch(url) {
-    var recipe = RECIPES[url];
-    return !!(recipe && recipe.w);
-  }
-
-  function halfOffered(url) {
-    return isBatch(url) && !!RECIPES[url].h;
-  }
-
-  /* One batch until she says otherwise. A stored half is honoured only while
-     the build still offers one: a preference is not a capability. */
+     The count has its own store (HTF.shortlist.batches): a stored 6 cannot
+     say whether it meant people or batches. A stored half is honoured only
+     while the build still offers one. */
   function batchesFor(url) {
     var n = HTF.shortlist.batches(url) || 1;
     return (n < 1 && !halfOffered(url)) ? 1 : n;
   }
 
-  /* A typed or stepped figure, made into one the box can hold. The spinner
-     moves in halves so that it can reach ½, which means it also lands on 1½:
-     that goes on to the next whole batch in the direction it was travelling. */
-  function batchCount(url, raw, previous) {
-    var n = Number(raw);
-    if (!isFinite(n) || n <= 0) return null;
-    if (n < 1) return halfOffered(url) ? 0.5 : 1;
-    if (n % 1 !== 0) return n > previous ? Math.ceil(n) : Math.floor(n);
-    return n;
-  }
-
-  /* Is a word of the yield already in the title? "cookies" of Peanut Butter
-     Cookies, yes. Compared in the singular both sides (`foldUnit`), so "pies"
-     finds "Pie". */
-  function wordInTitle(word, title) {
-    var fold = HTF.shoppingList.foldUnit;
-    var wanted = fold(word);
-    if (!wanted) return false;
-    return String(title).toLowerCase().split(/[\s,()\/&]+/).some(function (w) {
-      return w !== '' && fold(w) === wanted;
-    });
-  }
-
-  function batchWord(n) {
-    return n > 1 ? 'batches of' : 'batch of';
-  }
-
-  /* "Sweet Potato Chocolate Brownies" before "squares" is "Brownie". The
-     thing-name word is the last one before any " with ...". Only a plain
-     plural is touched: `-ss` and `-us` words (Swiss, hummus) are not. */
-  function singularHead(title) {
-    var text = String(title);
-    var cut = text.search(/\s+with\s+/i);
-    var head = cut === -1 ? text : text.slice(0, cut);
-    var tail = cut === -1 ? '' : text.slice(cut);
-    var match = /^(.*?)([A-Za-zÀ-ɏ]+)$/.exec(head);
-    if (!match || !/[^su]s$/i.test(match[2])) return text;
-    var single = HTF.shoppingList.foldUnit(match[2]);
-    if (!single || single === match[2].toLowerCase()) return text;
-    if (/^[A-Z]/.test(match[2])) single = single.charAt(0).toUpperCase() + single.slice(1);
-    return match[1] + single + tail;
-  }
-
-  /* The words of a row around the recipe's name: `word` is what the number
-     counts, `pre`/`post` sit either side, `title` is the name as written.
-       [2] batches of 18 [Peanut Butter Cookies]    title names the thing
-       [1] batch of 24 [Guinness ... Cake] squares  it does not: said after
-       [2] × [Lemon Meringue Pie]                   one whole thing: never "batch"
-       [2] jars of [Peanut Sauce]                   a container holds it: "of"
-       [3] [Rainbow Confetti] traybakes             one thing that is it
-     A × also precedes a yield that opens with a digit ("2 × 8-inch"). */
-  function rowWords(url, title, n) {
-    var out = { word: '', pre: '', title: title, post: '' };
-    if (!isBatch(url)) {
-      out.word = n === 1 ? 'portion of' : 'portions of';
-      return out;
-    }
-    out.word = batchWord(n);
-    var made = RECIPES[url].m;
-    if (!(made && made.kind === 'count' && made.stem)) return out;
-
-    var unitLabel = HTF.shoppingList.unitLabel;
-    var words = String(made.stem).split(/\s+/);
-    // "dozen" is counted as itself and never changes with the number.
-    var group = made.invariable ? words.shift() : '';
-    var noun = words.length ? words[words.length - 1] : '';
-    var named = !noun || wordInTitle(noun, title);
-    // What stood before the noun, less anything the title already says
-    // ("mince" of "dozen mince pies").
-    var before = words.slice(0, -1).filter(function (w) {
-      return !wordInTitle(w, title);
-    }).join(' ');
-    var lead = (group ? group + ' ' : '') + (before ? before + ' ' : '');
-
-    if (Number(made.base) === 1) {
-      var times = made.times ? '× ' : '';
-      if (!named && CONTAINER_NOUNS.indexOf(HTF.shoppingList.foldUnit(noun)) !== -1) {
-        out.word = times + lead + (n > 1 ? unitLabel(noun, 2) : noun) + ' of';
-        return out;
-      }
-      if (named) {
-        out.word = group || '×';
-        out.pre = before ? before + ' ' : '';
-        return out;
-      }
-      out.word = (times + group).trim();
-      out.pre = before ? before + ' ' : '';
-      out.title = singularHead(title);
-      out.post = ' ' + (n > 1 ? unitLabel(noun, 2) : noun);
-      return out;
-    }
-
-    // `makes: "3 batches (...)"` counts batches already: "batch of 3" is noise.
-    if (!made.box || /^batch/i.test(String(made.stem))) return out;
-    out.pre = made.box + ' ' + (group ? group + ' ' : '');
-    if (!named) {
-      out.title = singularHead(title);
-      out.post = ' ' + words.join(' ') + String(made.rest || '');
-    }
-    return out;
-  }
-
-  /* The recipe's name as a link to the row's own href. `text` is the name as
-     a row has reworded it ("... Brownie" before "squares"). */
-  function recipeLink(url, text) {
-    return '<a class="shopping-list-recipe-link" href="' +
-      HTF.escapeHtml(hrefByUrl[url] || url) + '">' +
-      HTF.escapeHtml(text || titleByUrl[url] || url) + '</a>';
-  }
-
-  /* Everything after the box. Its own function because the input handler
-     rewrites it in place: the box cannot be re-rendered under a typing
-     cursor, and several words of the row move with the number. */
-  function rowInner(url, n) {
-    var words = rowWords(url, titleByUrl[url] || url, n);
-    return '<span class="shopping-list-count-word">' +
-      HTF.escapeHtml(words.word) + '</span>' + (words.word ? ' ' : '') +
-      HTF.escapeHtml(words.pre) + recipeLink(url, words.title) +
-      HTF.escapeHtml(words.post);
-  }
-
   function rowSentence(url, n) {
     return '<span>' + rowInner(url, n) + '</span>';
-  }
-
-  /* What a screen reader is told the box counts. It cannot move with the
-     number, so a row that is not batches says "how many". */
-  function boxLabel(url) {
-    var made = RECIPES[url] && RECIPES[url].m;
-    var single = made && made.kind === 'count' && Number(made.base) === 1 && made.stem;
-    return single ? 'how many: ' : 'batches of ';
-  }
-
-  /* The yield in the recipe's own words and key: `k` is `serves` or `makes`,
-     so a `makes:` value is never printed behind the word "serves". */
-  function yieldText(url) {
-    var recipe = RECIPES[url];
-    if (!recipe || !recipe.y) return '';
-    return (recipe.k || 'serves') + ' ' + recipe.y;
   }
 
   function renderShoppingList() {
@@ -1324,66 +1176,30 @@ function renderResultsPool() {
 
     if (shoppingRecipes) {
       shoppingRecipes.innerHTML = portionRows.concat(batchRows).map(function (url) {
-        var title = titleByUrl[url] || url;
-        var yielded = yieldText(url);
         /* No portion count, no box (hasPortions): such a recipe contributes
-           its ingredients at x1 and says why it cannot be scaled.
-           A `makes:` recipe reads "2 batches of 18 Peanut Butter Cookies"
-           (#1297): the figure after "of" is one batch's and never moves. */
+           its ingredients at x1 and says why it cannot be scaled. */
         if (isBatch(url)) {
           var batches = batchesFor(url);
-          var floor = halfOffered(url) ? '0.5' : '1';
-          var makes = RECIPES[url].y ? ', which makes ' + RECIPES[url].y : '';
           return (url === firstBatch
             ? '<li class="shopping-list-recipe--first-batch">' : '<li>') +
-            '<input type="number" class="shopping-list-portions" min="' + floor +
-            '" max="99" step="' + floor + '" inputmode="decimal" value="' + batches + '" ' +
-            'data-url="' + HTF.escapeHtml(url) + '" data-batches ' +
-            'title="' + HTF.escapeHtml(title + makes) + '" ' +
-            'aria-label="' + HTF.escapeHtml(boxLabel(url) + title + makes) + '">' +
-            withCost(url, rowSentence(url, batches)) +
+            rows.boxHtml(url, batches) + rows.withCost(url, rowSentence(url, batches)) +
             '</li>';
         }
 
         if (!hasPortions(url)) {
           return '<li class="shopping-list-recipe--unscalable">' +
-            '<span>' + HTF.escapeHtml(title) +
+            '<span>' + HTF.escapeHtml(titleByUrl[url] || url) +
             '<span class="shopping-list-yield-missing">' +
             'no serving size — open <code>serves:</code> with a number</span>' +
             '</span></li>';
         }
 
-        /* The yield is not printed beside the name: "7 Moules Marinière
-           serves 4" reads as 7 × 4. It goes in the control's title and
-           aria-label instead. */
-        var relative = yielded ? ', which ' + yielded : '';
-        return '<li>' +
-          '<input type="number" class="shopping-list-portions" min="1" max="99" step="1" ' +
-          'inputmode="numeric" value="' + portionsFor(url) + '" ' +
-          'data-url="' + HTF.escapeHtml(url) + '" ' +
-          'title="' + HTF.escapeHtml(title + relative) + '" ' +
-          'aria-label="portions of ' + HTF.escapeHtml(title + relative) + '">' +
-          withCost(url, rowSentence(url, portionsFor(url))) +
-          '</li>';
+        return '<li>' + rows.boxHtml(url, portionsFor(url)) +
+          rows.withCost(url, rowSentence(url, portionsFor(url))) + '</li>';
       }).join('');
     }
 
     renderTotals(urls);
-  }
-
-  /* One recipe's lines as build() takes them. `recipe` and the four marks are
-     #1297's: see `reunite` in food-shopping-list.js for what each one does to
-     the total. `rate` is #1458's, present on a local build only. */
-  function entriesFor(url, scale) {
-    return ((RECIPES[url] || {}).i || []).map(function (ing) {
-      return {
-        amount: ing.a, name: ing.n, aisle: ing.s, scale: scale,
-        // How many people a per-person amount is for (#1481), at this scale.
-        people: !isBatch(url) && hasPortions(url) ? RECIPES[url].p * scale : null,
-        recipe: url, parts: ing.pt, fruit: ing.f, count: ing.c, pointer: ing.x,
-        rate: ing.r
-      };
-    });
   }
 
   function buildOptions() {
@@ -1394,36 +1210,13 @@ function renderResultsPool() {
     };
   }
 
-  /* " @ £1.80 a portion", " @ £4.20 a batch", or "" (#1458). Like a drink's
-     price per glass, it does not move with the box: one portion of a `serves:`
-     recipe, one batch of a `makes:` one, priced from the recipe as written.
-     "from £X" where some line could not be priced. */
-  function recipeCostSuffix(url) {
-    if (!COST_UNITS) return '';
-    var per = isBatch(url) ? 1 : (hasPortions(url) ? RECIPES[url].p : 0);
-    var each = HTF.foodShoppingList.recipeCost(entriesFor(url, 1), per, buildOptions());
-    if (!each) return '';
-    return ' @ ' + each.text + (isBatch(url) ? ' a batch' : ' a portion');
-  }
-
-  /* The sentence and its price in one inline box, so the price wraps with the
-     words as the drinks list's does rather than squeezing them into a column
-     of their own. Outside rowSentence's span, which the input handler
-     rewrites: the figure does not move with the box. */
-  function withCost(url, sentence) {
-    var text = recipeCostSuffix(url);
-    if (!text) return sentence;
-    return '<span>' + sentence +
-      '<span class="shopping-list-cost">' + HTF.escapeHtml(text) + '</span></span>';
-  }
-
   function renderTotals(urls) {
     if (!shoppingAisles) return;
 
     var shortlisted = urls || shortlistedRecipes();
     var entries = [];
     shortlisted.forEach(function (url) {
-      entries = entries.concat(entriesFor(url, scaleFor(url)));
+      entries = entries.concat(rows.entries(url, scaleFor(url)));
     });
 
     /* A panel with boxes and no totals says so. The usual cause is
@@ -1451,73 +1244,24 @@ function renderResultsPool() {
     shownRows = [];
     aisles.forEach(function (aisle) { shownRows = shownRows.concat(aisle.items); });
 
-    /* What the numbers did not reach, as on the recipe page (#1088): a row
-       is named when any line behind it had no amount to scale ("salt, to
-       taste"). Bracketed, comma-joined, no full stop, in the list's order. */
+    /* What the numbers did not reach, as on the recipe page (#1088). */
     if (shoppingNote) {
-      var unscaled = [];
-      aisles.forEach(function (aisle) {
-        aisle.items.forEach(function (row) {
-          if (row.unquantified.length) unscaled.push(row.label);
-        });
-      });
-      shoppingNote.textContent = unscaled.length
-        ? '(Not scaled: ' + unscaled.join(', ') + ')' : '';
-      shoppingNote.hidden = unscaled.length === 0;
+      shoppingNote.textContent = rows.unscaledNote(aisles);
+      shoppingNote.hidden = !shoppingNote.textContent;
     }
 
     /* Rebuilt whole: a few dozen rows are not worth a diffing render. */
-    shoppingAisles.innerHTML = aisles.map(function (aisle) {
-      return '<section class="shopping-list-aisle">' +
-        '<h3 class="shopping-list-aisle-name">' + HTF.escapeHtml(aisle.label) + '</h3>' +
-        '<ul class="shopping-list-items">' +
-        aisle.items.map(function (row) {
-          return '<li class="shopping-list-row' + HTF.shoppingTicks.rowClass(row.key) + '">' +
-            '<label class="shopping-list-line">' +
-            HTF.shoppingTicks.box(row.key) +
-            '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
-            '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + '</span>' +
-            /* "(1¼ in the recipes)" (#1297): the amount is what to buy. */
-            (row.aside ? '<span class="shopping-list-aside">(' +
-              HTF.escapeHtml(row.aside) + ')</span>' : '') +
-            '</label>' +
-            /* Whose line was not scaled: each a link to its recipe. Outside
-               the label, so following a link never ticks the row (#1457). */
-            (row.unscaledRecipes && row.unscaledRecipes.length
-              ? '<span class="shopping-list-unscaled">(' +
-                row.unscaledRecipes.map(recipeLink).join(', ') + ')</span>'
-              : '') +
-            /* What the line costs (#1458), local only; outside the label like
-               the cocktail list's. A free or unpriced row draws nothing. */
-            (row.cost && row.cost.text
-              ? '<span class="shopping-list-price">' +
-                HTF.shoppingList.moneyHtml(row.cost.text, HTF.escapeHtml) + '</span>'
-              : '') +
-            '</li>';
-        }).join('') +
-        '</ul></section>';
-    }).join('');
+    shoppingAisles.innerHTML = rows.aislesHtml(aisles, HTF.shoppingTicks);
     refreshUntick();
     renderShoppingTotal(shownRows);
   }
 
   /* What the shop comes to (#1458), as on the cocktail list (#817), and how
      many lines it could not price. Hidden where nothing is costed. */
-  function renderShoppingTotal(rows) {
+  function renderShoppingTotal(shown) {
     if (!shoppingTotal) return;
-    var sum = COST_UNITS ? HTF.foodShoppingList.costTotal(rows) : null;
-    if (!sum) {
-      shoppingTotal.hidden = true;
-      shoppingTotal.textContent = '';
-      return;
-    }
-    var text = (sum.partial ? '' : 'roughly ') + sum.text;
-    if (sum.unpriced) {
-      text += ' — ' + sum.unpriced +
-        (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
-    }
-    shoppingTotal.textContent = text;
-    shoppingTotal.hidden = false;
+    shoppingTotal.textContent = rows.totalText(shown);
+    shoppingTotal.hidden = !shoppingTotal.textContent;
   }
 
   if (shoppingRecipes) {

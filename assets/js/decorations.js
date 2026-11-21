@@ -217,8 +217,9 @@
       // Every element that can hold a .tag-shape slot must be in this list. A
       // host missing from it makes `host` null and the slot is silently
       // skipped: no shape fetched, no fill shown.
-      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit, .btn-chaos, .btn-mood, .btn-pool');
-      var text = (host ? host.textContent : '').trim().toLowerCase();
+      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit, .btn-chaos, .btn-mood, .btn-pool, .shortlists-tab');
+      // `data-tag-key` stands in for text that changes, such as a tab's count.
+      var text = (host ? host.getAttribute('data-tag-key') || host.textContent : '').trim().toLowerCase();
       if (!text) return;
 
       // This runs again whenever a script adds a slot, so a slot is restyled

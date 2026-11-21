@@ -1,0 +1,95 @@
+---
+layout: default
+title: "Shortlists"
+permalink: /food/shortlists/
+---
+
+{% comment %} Your shortlists (#1521). MANUAL §8.9. They live in this browser's
+   localStorage (DECISIONS §8.3), so the build can only send what every
+   recipe is made of: the page itself is drawn by
+   assets/js/shortlists-page.js, and ships `hidden` behind a no-JavaScript
+   line. Everything else on the site works without scripts. {% endcomment %}
+{% include food/published-recipes.html %}
+
+<article class="shortlists-page">
+  <div class="recipe-title">
+    <h1 class="recipe-main-title"><span class="recipe-title-text">Shortlists</span></h1>
+  </div>
+
+  <noscript>
+    <p class="shortlists-nojs">Your shortlists live in this browser, and showing them needs JavaScript. Everything else on the site works without it.</p>
+  </noscript>
+
+  <div class="shortlists" data-shortlists data-index-url="{{ '/food/' | relative_url }}" hidden>
+    {% comment %} Tabs: everything, then each list (role="tab", drawn by the script). "+ new
+       list" is a button beside them and not a tab: it opens a form, it shows
+       no panel. {% endcomment %}
+    <div class="shortlists-tabbar">
+      <div class="shortlists-tabs" role="tablist" aria-label="Your shortlists" data-shortlists-tabs></div>
+      <button type="button" class="shortlists-tab shortlists-tab--new" data-shortlists-new
+              aria-expanded="false" aria-controls="shortlists-new-form"><span class="tag-shape" aria-hidden="true"></span>+ new list</button>
+    </div>
+
+    <form class="shortlists-name-form" id="shortlists-new-form" data-shortlists-new-form hidden>
+      <label class="shortlists-name-label" for="shortlists-new-name">Name your new list</label>
+      <span class="shortlists-name-row">
+        <input type="text" id="shortlists-new-name" class="shortlists-name-input" maxlength="40"
+               placeholder="name your list" autocomplete="off" spellcheck="false"
+               aria-describedby="shortlists-new-problem">
+        <button type="submit" class="shortlists-text-button">save</button>
+        <button type="button" class="shortlists-text-button" data-shortlists-cancel>cancel</button>
+      </span>
+      <span class="shortlists-name-problem" id="shortlists-new-problem" aria-live="polite"></span>
+    </form>
+
+    <div class="shortlists-panel" role="tabpanel" id="shortlists-panel" tabindex="0" data-shortlists-panel>
+      <div class="shortlists-body" id="shortlists-recipes" data-shortlists-body></div>
+
+      <section class="shopping-list" id="shopping-list" aria-labelledby="shopping-list-title" {% include food/shopping-measures.html %} hidden>
+        <div class="shopping-list-head">
+          <h2 class="shopping-list-title" id="shopping-list-title">Shopping list</h2>
+        </div>
+        <p class="shopping-list-note" hidden></p>
+        <div class="shopping-list-aisles"></div>
+        <p class="shopping-list-total" hidden></p>
+        <p class="shopping-list-untick-row"><button type="button" class="shopping-list-untick" hidden>Untick all</button></p>
+      </section>
+    </div>
+
+    {% comment %} Asked before a list goes. A native <dialog>, opened with showModal():
+       the browser traps focus inside it, Escape closes it, and focus returns
+       to the button that opened it. {% endcomment %}
+    <dialog class="shortlists-dialog" data-shortlists-delete aria-labelledby="shortlists-delete-title">
+      <form method="dialog">
+        <h2 class="shortlists-dialog-title" id="shortlists-delete-title">Delete <span data-shortlists-delete-name></span>?</h2>
+        <p class="shortlists-dialog-text">The recipes stay on the site, and on any other list they are on.</p>
+        <p class="shortlists-dialog-actions">
+          <button type="submit" value="keep" class="shortlists-text-button" autofocus>keep it</button>
+          <button type="submit" value="delete" class="shortlists-text-button shortlists-text-button--danger">delete</button>
+        </p>
+      </form>
+    </dialog>
+
+    {% comment %} The jump pill: the results pill's look (_includes/results-pill.html), and
+       two faces of its own: "↓ shopping list" while that is below the screen,
+       "↑ recipes" once it is reached. Ships `hidden`. {% endcomment %}
+    <div class="results-pill shortlists-pill" data-shortlists-pill hidden>
+      <button type="button" class="results-pill-part" data-shortlists-pill-down><span>shopping list</span>{% include icons/arrow-right.svg class="results-pill-arrow" %}</button>
+      <button type="button" class="results-pill-part" data-shortlists-pill-up hidden><span>recipes</span>{% include icons/arrow-right.svg class="results-pill-arrow results-pill-arrow--up" %}</button>
+    </div>
+
+    <p class="shortlists-live visually-hidden" aria-live="polite" data-shortlists-live></p>
+  </div>
+</article>
+
+{% include food/recipe-data.html %}
+
+{% comment %} In this order: each shopping script reads the one before it as it parses
+   (tests/test_site_config.py::test_the_food_shopping_scripts_load_in_dependency_order),
+   and the page reads the store and the view. {% endcomment %}
+<script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/food-shopping-rows.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/shortlists-store.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/shortlists-view.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/shortlists-page.js' | relative_url }}"></script>

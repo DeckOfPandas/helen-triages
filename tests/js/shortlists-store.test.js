@@ -166,6 +166,19 @@ test('shopping ticks are kept per list and for everything, apart', () => {
   assert.deepStrictEqual(plain(core.ticked(s, made.id)), []);
 });
 
+test('unticking named rows leaves the rest, and no names unticks them all', () => {
+  const { core } = boot();
+  const made = core.create(core.empty(), 'L');
+  let s = made.state;
+  ['onion', 'flour', 'egg'].forEach((key) => { s = core.setTicked(s, made.id, key, true); });
+  s = core.setTicked(s, core.EVERYTHING, 'onion', true);
+  s = core.untick(s, made.id, ['onion', 'egg']);
+  assert.deepStrictEqual(plain(core.ticked(s, made.id)), ['flour'], 'only the named rows go');
+  assert.deepStrictEqual(plain(core.ticked(s, core.EVERYTHING)), ['onion'], 'and only in that scope');
+  s = core.untick(s, made.id);
+  assert.deepStrictEqual(plain(core.ticked(s, made.id)), [], 'no names is every row');
+});
+
 // --- storage --------------------------------------------------------------------
 
 test('food reads and writes one key, versioned, and nothing else', () => {

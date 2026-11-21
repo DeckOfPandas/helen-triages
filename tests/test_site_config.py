@@ -441,32 +441,34 @@ def test_the_recipe_scaler_is_handed_the_half_step_measures():
         )
 
 
-def test_the_food_shopping_scripts_load_in_dependency_order():
-    """food-shopping-list.js reads HTF.shoppingList, and filters.js reads both.
+@pytest.mark.parametrize("page, wiring", [
+    (("food", "index.html"), "filters.js"),
+    (("food", "shortlists.html"), "shortlists-page.js"),
+])
+def test_the_food_shopping_scripts_load_in_dependency_order(page, wiring):
+    """Each script reads the one before it as it parses.
 
     The shopping list (#801) is a chain: the amount parser (shopping-list.js),
-    the food arithmetic (food-shopping-list.js) and the wiring (filters.js).
-    food-shopping-list.js reads HTF.shoppingList at module scope, so loading
-    it first throws as it parses and kills filters.js's whole startup: a blank
-    index, not just a missing panel.
+    the food arithmetic (food-shopping-list.js), the rows' words and markup
+    (food-shopping-rows.js) and the page's wiring. A script loaded before the
+    one it reads throws as it parses and kills the page's whole startup.
     """
-    html = read("food", "index.html")
-    order = ["shopping-list.js", "food-shopping-list.js", "filters.js"]
+    html = read(*page)
+    order = ["shopping-list.js", "food-shopping-list.js", "food-shopping-rows.js", wiring]
     found = {}
     for name in order:
         # `shopping-list\.js` would also match `food-shopping-list.js`; the
         # slash pins the pattern to the start of a filename.
         match = re.search(r"<script src=[^>]*/" + re.escape(name), html)
-        assert match, f"food/index.html no longer loads assets/js/{name}."
+        assert match, f"{'/'.join(page)} no longer loads assets/js/{name}."
         found[name] = match.start()
 
-    assert (found["shopping-list.js"] < found["food-shopping-list.js"]
-            < found["filters.js"]), (
-        "the shopping list's three scripts are out of order in food/index.html. "
-        "shopping-list.js defines HTF.shoppingList, which food-shopping-list.js "
-        "reads as it parses; that defines HTF.foodShoppingList, which filters.js "
-        "calls. Any other order throws once in the console and leaves the whole "
-        "index unfiltered."
+    positions = [found[name] for name in order]
+    assert positions == sorted(positions), (
+        f"the shopping list's scripts are out of order in {'/'.join(page)}: "
+        f"they must load as {order}. Each reads the one before it as it "
+        "parses; any other order throws once in the console and leaves the "
+        "page unwired."
     )
 
 
@@ -592,10 +594,14 @@ def test_the_shopping_list_reads_the_aisles_from_the_data_file():
     The keyword table stays off the page: the matching happens at build time
     in _plugins/food_shopping.rb.
     """
-    html = read("food", "index.html")
+    for page in (("food", "index.html"), ("food", "shortlists.html")):
+        assert "{% include food/recipe-data.html %}" in read(*page), (
+            f"{'/'.join(page)} no longer includes _includes/food/recipe-data.html, "
+            "so its shopping list has no recipes, aisles or order.")
+    html = read("_includes", "food", "recipe-data.html")
     assert 'id="recipe-aisles"' in html, (
-        "food/index.html no longer emits the #recipe-aisles block, so the "
-        "shopping list has no headings and no order to put them in."
+        "_includes/food/recipe-data.html no longer emits the #recipe-aisles "
+        "block, so the shopping list has no headings and no order to put them in."
     )
     assert "site.data.food.aisles.order" in html, (
         "the #recipe-aisles block no longer reads _data/food/aisles.yml's own "
@@ -604,7 +610,7 @@ def test_the_shopping_list_reads_the_aisles_from_the_data_file():
     )
     # Comments stripped first: the template's prose names what it does not emit.
     assert "aisles.keywords" not in _strip_comments(html, ".html"), (
-        "food/index.html looks like it is emitting the aisle KEYWORD table. "
+        "_includes/food/recipe-data.html looks like it is emitting the aisle KEYWORD table. "
         "That belongs at build time in _plugins/food_shopping.rb -- one "
         "implementation of the matching rule, and 400 keywords off the page."
     )
@@ -3396,6 +3402,18 @@ def test_the_leopard_version_is_the_hash_of_the_committed_files():
     )
 
 
+def _food_shopping_measures():
+    """_includes/food/shopping-measures.html, the shopping list's attributes,
+    after checking every page with a food shopping list puts them on it."""
+    for page in (("food", "index.html"), ("food", "shortlists.html")):
+        assert re.search(r'id="shopping-list"[^>]*\{%\s*include food/shopping-measures\.html\s*%\}',
+                         read(*page)), (
+            f"{'/'.join(page)}'s #shopping-list no longer carries "
+            "_includes/food/shopping-measures.html, so its totals are not rounded "
+            "and its counts not made plural.")
+    return read("_includes", "food", "shopping-measures.html")
+
+
 def test_the_index_shopping_list_is_handed_the_by_eye_measures():
     """The by-eye measures reach the index's shopping list (#1297).
 
@@ -3404,14 +3422,14 @@ def test_the_index_shopping_list_is_handed_the_by_eye_measures():
     hands it to `build()` as `wholeMeasures`. Break a link and nothing
     errors: the list prints "1.17 handfuls".
     """
-    index = read("food", "index.html")
+    measures = _food_shopping_measures()
     assert re.search(
-        r'id="shopping-list"[^>]*data-whole-measures="\{\{\s*'
+        r'data-whole-measures="\{\{\s*'
         r'site\.data\.food\.scaling\.half_step_measures\s*\|\s*concat:\s*'
         r'site\.data\.food\.scaling\.half_step_counts\s*\|\s*join:\s*\',\'',
-        index), (
-        "food/index.html no longer joins half_step_measures and "
-        "half_step_counts onto #shopping-list as data-whole-measures."
+        measures), (
+        "_includes/food/shopping-measures.html no longer joins "
+        "half_step_measures and half_step_counts as data-whole-measures."
     )
     filters = read("assets", "js", "filters.js")
     assert "getAttribute('data-whole-measures')" in filters, (
@@ -3480,10 +3498,11 @@ def test_the_index_shopping_list_is_handed_the_count_nouns():
 
     index = read("food", "index.html")
     assert re.search(
-        r'id="shopping-list"[^>]*data-count-nouns="\{\{\s*'
-        r'site\.data\.food\.scaling\.count_nouns\s*\|\s*join:\s*\',\'', index), (
-        "food/index.html no longer joins site.data.food.scaling.count_nouns "
-        "onto #shopping-list as data-count-nouns."
+        r'data-count-nouns="\{\{\s*'
+        r'site\.data\.food\.scaling\.count_nouns\s*\|\s*join:\s*\',\'',
+        _food_shopping_measures()), (
+        "_includes/food/shopping-measures.html no longer joins "
+        "site.data.food.scaling.count_nouns as data-count-nouns."
     )
     filters = read("assets", "js", "filters.js")
     assert "getAttribute('data-count-nouns')" in filters
@@ -3546,11 +3565,10 @@ def test_the_quarter_step_measures_reach_both_scalers():
         "_plugins/food_shopping.rb now hands half_step_counts to the "
         "half-recipe judge, which would let an odd count of pats or lots halve."
     )
-    index = read("food", "index.html")
     assert re.search(
         r'data-quarter-measures="\{\{\s*site\.data\.food\.scaling\.'
-        r'quarter_step_measures\s*\|\s*join:\s*\',\'', index), (
-        "food/index.html no longer joins quarter_step_measures onto the panel."
+        r'quarter_step_measures\s*\|\s*join:\s*\',\'', _food_shopping_measures()), (
+        "_includes/food/shopping-measures.html no longer joins quarter_step_measures."
     )
     filters = read("assets", "js", "filters.js")
     assert "getAttribute('data-quarter-measures')" in filters

@@ -173,6 +173,17 @@
     return (tickedArray(state, scope) || []).slice();
   }
 
+  // The named rows, or with no names every row, in one scope.
+  function untick(state, scope, rowKeys) {
+    var next = copy(state);
+    var ticks = tickedArray(next, scope);
+    if (!ticks) return next;
+    var keep = rowKeys ? ticks.filter(function (key) { return rowKeys.indexOf(key) === -1; }) : [];
+    ticks.length = 0;
+    keep.forEach(function (key) { ticks.push(key); });
+    return next;
+  }
+
   // --- a stored record is untrusted input -------------------------------------
   // Each list is read on its own, so one bad list costs only itself.
 
@@ -216,7 +227,7 @@
     create: create, rename: rename, remove: remove,
     setMember: setMember, setPortions: setPortions, portions: portions, listsWith: listsWith,
     moveList: moveList, moveItem: moveItem, setView: setView,
-    setTicked: setTicked, ticked: ticked
+    setTicked: setTicked, ticked: ticked, untick: untick
   };
 
   // --- storage: the one place the key is named ----------------------------------
@@ -280,6 +291,7 @@
     moveItem: function (id, recipe, to) { save(moveItem(load(), id, recipe, to)); },
     setView: function (view) { save(setView(load(), view)); },
     setTicked: function (scope, rowKey, on) { save(setTicked(load(), scope, rowKey, on)); },
-    ticked: function (scope) { return ticked(load(), scope); }
+    ticked: function (scope) { return ticked(load(), scope); },
+    untick: function (scope, rowKeys) { save(untick(load(), scope, rowKeys)); }
   };
 })();

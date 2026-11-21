@@ -1,0 +1,298 @@
+@use "sass:color";
+@use "food/palette" as *;
+@use "shared/tokens" as *;
+
+// =============================================================================
+// THE SHORTLISTS PAGE (#1521), food/shortlists.html
+// =============================================================================
+// One hierarchy: the tabs choose, the heading names, the rows are the work,
+// the shopping list is the result. One style per kind of control: tabs are
+// tape, links are magenta with an arrow, small actions are quiet Courier caps
+// (the shopping list's "untick all"), and the numbers are the shopping list's
+// own boxes.
+
+.shortlists-page {
+  font-family: $font-body;
+  color: $color-text;
+}
+
+.shortlists-nojs {
+  max-width: 65ch;
+  padding: $space-md $space-lg;
+  border: 1px solid $color-border;
+  background: $color-surface;
+}
+
+// --- the tabs ------------------------------------------------------------------
+// Washi tape, as the filter chips wear it (shared/_tag-shape.scss): pale at
+// rest, bright magenta when chosen. The chosen one is also struck heavier,
+// so the colour is not the only cue. Ink on the bright tape, not white: white
+// on raw magenta is under 4.5:1.
+
+.shortlists-tabbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: $space-xs $space-sm;
+  margin: 0 0 $space-lg;
+}
+
+.shortlists-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xs $space-sm;
+  min-width: 0;
+}
+
+.shortlists-tab {
+  position: relative;
+  isolation: isolate;
+  max-width: 100%;
+  padding: $space-xs $space-md;
+  border: 0;
+  background: none;
+  font-family: $font-headings;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: left;
+  text-transform: lowercase;
+  overflow-wrap: anywhere;
+  color: $color-text;
+  cursor: pointer;
+
+  .tag-shape { color: color.mix($color-dazzling-dragonfruit, $color-white, 16%); }
+
+  &:hover .tag-shape { color: color.mix($color-dazzling-dragonfruit, $color-white, 34%); }
+
+  &:focus-visible {
+    outline: 2px solid $color-text;
+    outline-offset: 2px;
+  }
+
+  &.is-selected {
+    -webkit-text-stroke: $faux-bold-stroke currentColor;
+    .tag-shape { color: $color-dazzling-dragonfruit; }
+  }
+}
+
+.shortlists-tab-count {
+  font-weight: 400;
+  -webkit-text-stroke: 0;
+}
+
+// "+ new list" opens a form, so it is not a tab: the same tape, quieter still,
+// and the link colour.
+.shortlists-tab--new {
+  color: $color-recipe-link;
+  .tag-shape { color: rgba($color-text, 0.07); }
+  &:hover .tag-shape { color: rgba($color-text, 0.16); }
+}
+
+// --- naming a list ---------------------------------------------------------------
+
+.shortlists-name-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  margin: 0 0 $space-lg;
+
+  &[hidden] { display: none; }
+}
+
+.shortlists-name-label {
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $color-clear-text;
+}
+
+.shortlists-name-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: $space-sm $space-lg;
+}
+
+.shortlists-name-input {
+  flex: 1 1 12rem;
+  min-width: 0;
+  max-width: 24rem;
+  padding: $space-xs $space-sm;
+  font-family: $font-body;
+  font-size: 1rem;
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-clear-text;
+  border-radius: $radius-sm;
+
+  &:focus-visible {
+    outline: 2px solid $color-recipe-link;
+    outline-offset: 1px;
+  }
+}
+
+.shortlists-name-problem {
+  font-size: 0.85rem;
+  color: $color-ingredient-active;
+}
+
+// --- the small actions -------------------------------------------------------------
+
+.shortlists-text-button {
+  padding: $space-xxs 0;
+  border: 0;
+  background: none;
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $color-clear-text;
+  cursor: pointer;
+  transition: color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
+.shortlists-text-button--danger { color: $color-recipe-link; }
+
+// --- a link --------------------------------------------------------------------------
+
+.shortlists-link {
+  font-family: $font-headings;
+  font-weight: 700;
+  color: $color-recipe-link;
+  text-decoration: none;
+
+  &::after { content: '\00a0\2192'; }   // nbsp →
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
+// --- the panel -------------------------------------------------------------------------
+
+.shortlists-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: $space-xs $space-lg;
+  margin: 0 0 $space-xxs;
+}
+
+.shortlists-heading {
+  margin: 0;
+  font-family: $font-headings;
+  font-size: 1.45rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  color: $color-text;
+
+  &:focus { outline: none; }
+}
+
+.shortlists-actions {
+  display: flex;
+  gap: $space-lg;
+}
+
+.shortlists-count {
+  margin: 0 0 $space-lg;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
+.shortlists-empty {
+  margin: 0 0 $space-xs;
+  color: $color-clear-text;
+}
+
+.shortlists-browse { margin: 0 0 $space-lg; }
+
+// A row is the shopping list's recipe row (_shopping-list.scss), with "remove"
+// pushed to its right-hand end.
+.shortlists-recipes li > span { min-width: 0; }
+
+// "remove" takes room the index's rows keep, so a long price may wrap here.
+.shortlists-recipes .shopping-list-cost { white-space: normal; }
+
+.shortlists-remove {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: $space-md;
+}
+
+.shortlists-gone { color: $color-clear-text; }
+
+// --- everything: one section per list --------------------------------------------------
+
+.shortlists-section { margin-top: $space-xl; }
+
+.shortlists-section-name {
+  margin: 0 0 $space-sm;
+  padding-bottom: $space-xxs;
+  border-bottom: 1px solid $color-border;
+  font-family: $font-headings;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+// The list's name opens its tab: a link in all but element.
+.shortlists-section-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: $color-text;
+  cursor: pointer;
+
+  &::after {
+    content: '\00a0\2192';
+    color: $color-recipe-link;
+  }
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
+.shortlists-section-count {
+  margin-left: $space-md;
+  font-family: $font-body;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: $color-clear-text;
+}
+
+// --- the delete dialog -------------------------------------------------------------------
+
+.shortlists-dialog {
+  max-width: min(28rem, calc(100vw - #{2 * $space-lg}));
+  padding: $space-lg $space-xl;
+  border: 2px solid $color-text;
+  background: $color-surface;
+  color: $color-text;
+
+  &::backdrop { background: rgba($color-text, 0.45); }
+}
+
+.shortlists-dialog-title {
+  margin: 0 0 $space-sm;
+  font-family: $font-headings;
+  font-size: 1.15rem;
+  overflow-wrap: anywhere;
+}
+
+.shortlists-dialog-text { margin: 0; }
+
+.shortlists-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-xl;
+  margin: $space-lg 0 0;
+}

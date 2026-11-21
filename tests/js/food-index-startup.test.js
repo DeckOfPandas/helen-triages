@@ -34,6 +34,7 @@ const SCRIPTS = [
   'filter-state.js',
   'shopping-list.js',
   'food-shopping-list.js',
+  'food-shopping-rows.js',
   'filters.js',
   // Wires itself on DOMContentLoaded, after filters.js's handler, and returns
   // at once here: this sandbox has no IntersectionObserver, which is the path

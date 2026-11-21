@@ -72,6 +72,9 @@
 // After shopping-list: it @extends %food-number-input and overrides its
 // width, and the override has to come later in the source to win.
 @use "food/recipe-scale";
+// The shortlists page (#1521). After shopping-list, whose recipe rows it
+// adds a "remove" to.
+@use "food/shortlists-page";
 // After recipe-notes-body: the about page sits on .recipe-body-content and
 // overrides parts of it.
 @use "food/about";

@@ -1,0 +1,3 @@
+{% comment %} The attributes a food shopping list's element carries, from
+   _data/food/scaling.yml: by-eye measures bought whole, quarter-step ones,
+   nouns bought by count and containers (#1297). One line, inside the tag. {% endcomment %}data-whole-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: ',' | escape }}" data-quarter-measures="{{ site.data.food.scaling.quarter_step_measures | join: ',' | escape }}" data-count-nouns="{{ site.data.food.scaling.count_nouns | join: ',' | escape }}" data-container-nouns="{{ site.data.food.scaling.yields.container_words | join: ',' | escape }}"

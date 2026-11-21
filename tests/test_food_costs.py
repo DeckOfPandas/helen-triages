@@ -226,10 +226,16 @@ def test_prices_reach_the_page_only_behind_show_costs():
     §8.2): `site.show_costs` is declared in _config_local.yml alone."""
     prod = yaml.safe_load((ROOT / "_config.yml").read_text(encoding="utf-8"))
     assert not prod.get("show_costs"), "_config.yml must not set show_costs"
-    page = (ROOT / "food" / "index.html").read_text(encoding="utf-8")
-    assert '{% if site.show_costs and ing.rate %},"r":' in page, (
-        "food/index.html emits a rate without the show_costs gate")
-    _assert_gated(page, 'id="food-cost-units"', "food/index.html")
+    # The recipe data both food pages carry, from one include.
+    data = (ROOT / "_includes" / "food" / "recipe-data.html").read_text(encoding="utf-8")
+    assert '{% if site.show_costs and ing.rate %},"r":' in data, (
+        "_includes/food/recipe-data.html emits a rate without the show_costs gate")
+    _assert_gated(data, 'id="food-cost-units"', "_includes/food/recipe-data.html")
+    for name in ("index.html", "shortlists.html"):
+        page = (ROOT / "food" / name).read_text(encoding="utf-8")
+        assert "ing.rate" not in page and 'id="food-cost-units"' not in page, (
+            f"food/{name} emits costs itself: they belong behind the gate in "
+            "_includes/food/recipe-data.html")
 
     # The recipe page's cost line: the footer, its data and its script.
     layout = (ROOT / "_layouts" / "recipe.html").read_text(encoding="utf-8")

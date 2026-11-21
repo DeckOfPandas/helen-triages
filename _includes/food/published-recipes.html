@@ -1,0 +1,20 @@
+{% comment %} Sets `all_recipes` and `_rendered_recipes` for the page that includes it:
+   a Liquid `assign` is global, so both are in scope after the include. Used
+   by food/index.html and food/shortlists.html, which must agree on what
+   exists.
+
+   Drafts join only if they publish (#235): `site.food_drafts` is filled
+   whenever the collection is declared, so `output` is read from
+   site.collections, which _config_local.yml turns on. The magic bag always
+   joins: it is `output: true`. {% endcomment %}
+{% assign all_recipes = site.food_recipes | concat: site.food_magic_bag %}
+{% assign _drafts_collection = site.collections | where: "label", "food_drafts" | first %}
+{% if _drafts_collection.output %}
+  {% assign all_recipes = all_recipes | concat: site.food_drafts %}
+{% endif %}
+{% assign all_recipes = all_recipes | sort: "title" %}
+{% comment %} The `meta.rewritten` gate does not apply to the magic bag, which has no
+   source to reword; tests/test_magic_bag.py rejects `meta.rewritten` on one.
+   Without the exemption an entry renders locally and vanishes from the
+   deployed pages with a green build. {% endcomment %}
+{% assign _rendered_recipes = all_recipes | where_exp: "r", "r.meta.rewritten or site.show_source_wording or r.collection == 'food_magic_bag'" %}
