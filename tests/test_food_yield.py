@@ -80,6 +80,9 @@ CASES = {
         dict(kind=COUNT, base=1, stem="double-layer 8-inch cake", times=False),
     "one 7-inch round cake": dict(kind=COUNT, base=1, stem="7-inch round cake", times=True),
     "one pie": dict(kind=COUNT, base=1, stem="pie", singular=True, times=False),
+    # Helen: "enough marinade for 4 portions of fish", which scales to "for 8".
+    "enough marinade for 4 portions of fish":
+        dict(kind=COUNT, base=4, prefix="enough marinade for", stem="portions", rest=" of fish"),
     'one 9"-square tin': dict(kind=COUNT, base=1, stem='9"-square tin', times=True),
     "Two 8-inch cakes": dict(kind=COUNT, base=2, stem="8-inch cakes", singular=False),
 

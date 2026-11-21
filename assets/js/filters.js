@@ -1239,6 +1239,11 @@ function renderResultsPool() {
     out.word = batchWord(n);
     var made = RECIPES[url].m;
     if (!(made && made.kind === 'count' && made.stem)) return out;
+    // "enough marinade for 4 portions of fish" says what it is for after the name.
+    if (/^enough\s/i.test(String(made.prefix || ''))) {
+      out.post = ', ' + made.prefix + ' ' + made.box + ' ' + made.stem + String(made.rest || '');
+      return out;
+    }
 
     var unitLabel = HTF.shoppingList.unitLabel;
     var words = String(made.stem).split(/\s+/);

@@ -96,7 +96,8 @@ const TITLES = {
   '/food/recipes/pies/': 'Mince Pies',
   '/food/recipes/trifle/': 'Blackberry Syllabub',
   '/food/recipes/torte/': 'Sacher-Torte',
-  '/food/recipes/potato/': 'Potato Cakes with Smoked Salmon'
+  '/food/recipes/potato/': 'Potato Cakes with Smoked Salmon',
+  '/food/recipes/marinade/': 'Sticky Soy and Miso Dipping Sauce'
 };
 
 /* `makes:` recipes whose yield is one named thing, as _plugins/food_yield.rb
@@ -636,6 +637,22 @@ test('the thing made goes after the title\'s noun, before its "with"', () => {
   win.HTF.shortlist.toggle('/food/recipes/potato/');
   showTheList(doc);
   assert.deepStrictEqual(rowText(panel), ['batch of 30 Potato Cake pieces with Smoked Salmon']);
+});
+
+test('"enough marinade for 4 portions of fish" follows the name, as written', () => {
+  const recipes = {
+    '/food/recipes/marinade/': {
+      p: null, y: 'enough marinade for 4 portions of fish', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 4, prefix: 'enough marinade for', stem: 'portions',
+        rest: ' of fish', box: '4' },
+      i: [{ a: '2 tbsp', n: 'miso', s: 'cupboard' }]
+    }
+  };
+  const { win, doc, panel } = boot({ recipes });
+  win.HTF.shortlist.toggle('/food/recipes/marinade/');
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel),
+    ['batch of Sticky Soy and Miso Dipping Sauce, enough marinade for 4 portions of fish']);
 });
 
 test('the title\'s own noun goes singular before the thing made', () => {
