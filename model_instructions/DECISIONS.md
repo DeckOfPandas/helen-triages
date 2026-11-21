@@ -1532,7 +1532,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   dozen" doubled can be "two dozen". Our scaler is integer.'*; *"950 ml for
   one order of a recipe becomes 1900 ml for 2"*; *"64+ tiny macarons, 128+
   tiny macarons"*; *'if "some" is originally guessed to be 4 portions, 2x
-  should be 8 portions'*. The words are `yields:` in `_data/food/scaling.yml`.
+  should be 8 portions'*. 2026-11-21: *'update that marinade to makes "enough
+  marinade for 4 portions of fish", which then scales to "...for 8 portions"
+  and so on'*, so an "enough <thing> for N" lead-in is read. The words are
+  `yields:` in `_data/food/scaling.yml`.
   Not ruled: whether the "Makes" line at the top of the page moves with the
   box.
 - **2026-10-04, #1286 — a `makes:` recipe is offered half a recipe only where
@@ -1815,7 +1818,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   of 9); asked pill or link, *"they should be the same"*, a session's reading
   kept #1210's shapes, a pill that changes the page and a link that leaves
   it, with one wording. The chooser is *"like the modal"*: the picker's box,
-  not a `<select>`. One rule above the shopping list, not two.
+  not a `<select>`; then, shown both side by side, *"make the one under X
+  survivors look like the one that pops out from the recipe rows"*: its
+  width, its tick boxes, its colours. One rule above the shopping list, not
+  two.
 - **2026-10-10, #1342 — the note over a shared shortlist and its "keep these"
   button keep the wording an agent wrote.** Helen, shown both: *"Both good,
   thanks!"* "a shared shortlist (N)" and "keep these" are approved strings,

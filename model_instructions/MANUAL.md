@@ -1679,7 +1679,11 @@ word with no plural.
 derived figure: a typed number goes to the nearest whole recipe.
 
 `food_yield.rb` reads only the start of the `makes:` line, after an optional
-word from `yields.approx_words`:
+word from `yields.approx_words`, or after an "enough <thing> for" lead-in
+(`ENOUGH`), which stays before the box as `prefix`. A bare "Enough for one
+pie" names no thing and is not read. On the index's shopping list an
+"enough" yield follows the name: "batch of Sticky Soy …, enough marinade for
+4 portions of fish".
 
 | `makes:` | ×1 | ×2 |
 |---|---|---|
@@ -1688,6 +1692,7 @@ word from `yields.approx_words`:
 | `64+ tiny macarons` | `64+` tiny macarons | `128+` |
 | `one 8-inch cake` — a number word | `1` × 8-inch cake | `2` × 8-inch cakes |
 | `1 dozen mince pies` | `1` dozen mince pies | `2` dozen mince pies |
+| `enough marinade for 4 portions of fish` | enough marinade for `4` portions of fish | … for `8` portions of fish |
 | `950 ml`, `approx. 75 g` — a measure | `950` ml | `1900` ml |
 | `1 batch — <Helen's words>` | `1` batch | `2` batches; ×½ reads `½` batch |
 | `1 batch, about 100 g` — a measure after the thing (`also`) | `1` batch, about 100 g | `2` batches, about 200 g |
@@ -1875,9 +1880,13 @@ cases from both field tables. Why it does not compose: DECISIONS §8.3.
 on: each index unhides it beside painting the pill. A button with no
 visible label (its `aria-label` is "choose shortlist"), naming the active
 list with a caret, opens a menu in the picker's own box (`.shortlist-picker`:
-the top rule, edges, shadow and ×): a row per list, "name (N)", then SEE ALL
-(N) under a rule, a tick in the picker's tick-box column on the one shown. Not
-a `<select>`, whose open list the browser draws and no stylesheet reaches.
+the top rule, edges, shadow and ×), as wide as its longest name: a row per
+list, "name (N)", then SEE ALL (N) under a rule, each with the picker's tick
+box, filled on the one shown. Both draw that box themselves
+(`%shortlist-box`), since a browser's own checkbox differs by engine and
+theme. Not a `<select>`, whose open list the browser draws and no stylesheet
+reaches. Opened by a press, focus sits on the menu; by the keyboard, on the
+list shown.
 Up and down walk the rows; Escape, the ×, a choice, or a press or focus
 outside closes it. Rename and delete sit beside the button, hidden in SEE ALL,
 and "+ new list" on the row under. New and rename open
