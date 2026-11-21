@@ -159,6 +159,28 @@ test('a list\'s recipes come in the list\'s order on its tab and on everything',
   assert.deepStrictEqual(view.rows(moved, 'everything').map((r) => r.recipe), [B, A]);
 });
 
+// --- sharing ------------------------------------------------------------------
+
+test('a link\'s missing recipes are counted in words, and none says nothing', () => {
+  assert.strictEqual(view.missingText(0), '');
+  assert.strictEqual(view.missingText(1), '1 recipe in the link is not on this site, so it is left out.');
+  assert.strictEqual(view.missingText(3), '3 recipes in the link are not on this site, so they are left out.');
+});
+
+test('a name in use offers keep both (under its free name), merge, or leave out', () => {
+  const words = view.clashChoices('Lemons', 'Lemons (2)');
+  assert.strictEqual(words.question, 'You already have a list called “Lemons”.');
+  assert.strictEqual(words.both, 'keep both, this one as “Lemons (2)”');
+  assert.match(words.merge, /your portions stay/);
+  assert.strictEqual(words.skip, 'leave it out');
+});
+
+test('what was brought in is announced, and kept when it came from a link', () => {
+  assert.strictEqual(view.broughtText(0), 'Nothing brought in.');
+  assert.strictEqual(view.broughtText(1, true), 'Kept one list.');
+  assert.strictEqual(view.broughtText(3, false), 'Brought in 3 lists.');
+});
+
 // --- links --------------------------------------------------------------------
 
 test('the browse link carries the list it fills, and a recipe link the list it is opened from', () => {

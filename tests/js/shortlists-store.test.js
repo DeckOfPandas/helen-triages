@@ -237,6 +237,53 @@ test('refresh() reads the key again, so a page back from the cache shows what an
   assert.deepStrictEqual(plain(lists.all().map((l) => l.name)), ['Made elsewhere']);
 });
 
+// --- bringing lists in ------------------------------------------------------------
+
+test('a free name is the name, or the next "(n)" after it, cut to fit and never clashing', () => {
+  const { lists } = boot();
+  assert.strictEqual(lists.freeName('Lemons'), 'Lemons');
+  lists.create('Lemons');
+  assert.strictEqual(lists.freeName('lemons'), 'lemons (2)', 'a clash is a clash in any case');
+  lists.create('Lemons (2)');
+  assert.strictEqual(lists.freeName('Lemons'), 'Lemons (3)');
+  const long = 'x'.repeat(lists.NAME_MAX);
+  lists.create(long);
+  const free = lists.freeName(long);
+  assert.strictEqual(free.length, lists.NAME_MAX);
+  assert.ok(free.endsWith(' (2)'), free);
+  assert.strictEqual(lists.freeName('  '), 'Shared list', 'a link with no name');
+});
+
+test('bringing lists in adds new ones at the end, in order, under free names, in one write', () => {
+  const { lists, store } = boot();
+  lists.create('Lemons');
+  let writes = 0;
+  const set = store.setItem;
+  store.setItem = (k, v) => { writes += 1; set(k, v); };
+  const ids = lists.bringIn([
+    { action: 'new', name: 'Lemons', items: [{ recipe: A, portions: 4 }, { recipe: B, portions: 1.5 }] },
+    { action: 'new', name: 'Pies', items: [{ recipe: C, portions: 200 }] }
+  ]);
+  assert.strictEqual(writes, 1);
+  assert.deepStrictEqual(plain(lists.all().map((l) => l.name)), ['Lemons', 'Lemons (2)', 'Pies']);
+  assert.deepStrictEqual(plain(ids), [lists.all()[1].id, lists.all()[2].id]);
+  assert.deepStrictEqual(plain(lists.all()[1].items), [{ recipe: A, portions: 4 }, { recipe: B, portions: 1.5 }]);
+  assert.ok(lists.all()[2].items[0].portions <= 99, 'portions from a link are clamped like any other');
+});
+
+test('a merge adds only what the list lacks, its own portions winning; a skip does nothing', () => {
+  const { lists } = boot();
+  const lemons = lists.create('Lemons').id;
+  lists.setMember(lemons, A, true, 8);
+  const ids = lists.bringIn([
+    { action: 'merge', into: lemons, items: [{ recipe: A, portions: 2 }, { recipe: B, portions: 3 }] },
+    { action: 'skip', name: 'Pies', items: [{ recipe: C, portions: 1 }] }
+  ]);
+  assert.deepStrictEqual(plain(ids), [lemons]);
+  assert.deepStrictEqual(plain(lists.all()), [{ id: lemons, name: 'Lemons', ticked: [],
+    items: [{ recipe: A, portions: 8 }, { recipe: B, portions: 3 }] }]);
+});
+
 test('a write that throws still leaves the lists working for this visit', () => {
   const store = storage();
   store.setItem = () => { throw new Error('QuotaExceededError'); };

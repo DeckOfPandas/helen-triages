@@ -66,6 +66,25 @@ permalink: /food/shortlists/
       </section>
     </div>
 
+    {% comment %} Sharing and backing up: every list as one link a line, and a box that
+       takes such a block (or one link) back, through a preview that asks
+       about each name already in use. {% endcomment %}
+    <section class="shortlists-share" aria-labelledby="shortlists-share-title" data-shortlists-share>
+      <h2 class="shortlists-heading shortlists-share-title" id="shortlists-share-title">Share or back up</h2>
+      <div class="shortlists-share-out" data-shortlists-share-out>
+        <p class="shortlists-share-text">Every list, one link a line. Send it to share; keep it somewhere safe to back up. The box below takes it back.</p>
+        <label class="shortlists-name-label" for="shortlists-export">Your lists</label>
+        <textarea id="shortlists-export" class="shortlists-block" rows="3" readonly spellcheck="false" data-shortlists-export></textarea>
+        <p class="shortlists-share-actions"><button type="button" class="shortlists-text-button" data-shortlists-copy hidden>copy</button></p>
+      </div>
+      <label class="shortlists-name-label" for="shortlists-import">Bring lists in</label>
+      <textarea id="shortlists-import" class="shortlists-block" rows="3" spellcheck="false"
+                placeholder="paste a shortlist link, or a block of them" aria-describedby="shortlists-import-problem" data-shortlists-import></textarea>
+      <p class="shortlists-name-problem" id="shortlists-import-problem" aria-live="polite" data-shortlists-import-problem></p>
+      <p class="shortlists-share-actions"><button type="button" class="shortlists-text-button" data-shortlists-preview>preview</button></p>
+      <div class="shortlists-preview" tabindex="-1" data-shortlists-preview-panel hidden></div>
+    </section>
+
     {% comment %} Asked before a list goes. A native <dialog>, opened with showModal():
        the browser traps focus inside it, Escape closes it, and focus returns
        to the button that opened it. {% endcomment %}
@@ -101,4 +120,5 @@ permalink: /food/shortlists/
 <script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-shopping-rows.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/drag-reorder.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/shortlists-share.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/shortlists-page.js' | relative_url }}"></script>

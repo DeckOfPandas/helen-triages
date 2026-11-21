@@ -1,8 +1,9 @@
 // shortlists-page.js: the DOM of food/shortlists.html (#1521). MANUAL §8.9.
 // The lists are HTF.lists (shortlists-store.js), what to show for them is
-// HTF.listsView (shortlists-view.js), and every shopping word and total is
-// HTF.foodShoppingRows: this file draws and listens, and decides nothing a
-// test could not reach through those three.
+// HTF.listsView (shortlists-view.js), every shopping word and total is
+// HTF.foodShoppingRows, and links are HTF.listsShare (shortlists-share.js):
+// this file draws and listens, and decides nothing a test could not reach
+// through those four.
 //
 // The tabs are a WAI-ARIA tablist with automatic activation: arrows, Home and
 // End move the selection, and only the selected tab is in the tab order. A tab
@@ -16,7 +17,7 @@
 
   var HTF = window.HTF;
   var root = document.querySelector('[data-shortlists]');
-  if (!HTF || !HTF.lists || !HTF.listsView || !HTF.foodShoppingRows || !root) return;
+  if (!HTF || !HTF.lists || !HTF.listsView || !HTF.foodShoppingRows || !HTF.listsShare || !root) return;
 
   var lists = HTF.lists;
   var V = HTF.listsView;
@@ -95,10 +96,68 @@
     return V.nameProblemText(problem, name, lists.all());
   }
 
+  // --- a shared link -----------------------------------------------------------
+  // `?shortlist=` opens the list it carries as a "shared" tab beside the
+  // others, held in this page only: nothing is stored until "keep these".
+
+  var share = HTF.listsShare;
+  var SHARED = 'shared';
+  var bySlug = {};
+  Object.keys(RECIPES).forEach(function (url) { bySlug[share.slugOf(url)] = url; });
+
+  // A read link's slugs as this site's recipes, at the link's portions or
+  // each recipe's own; `missing` counts the slugs the site lacks.
+  function resolve(read) {
+    var items = [];
+    var missing = 0;
+    read.items.forEach(function (item) {
+      var url = bySlug[item.slug];
+      if (!url) { missing += 1; return; }
+      items.push({ recipe: url, portions: item.portions || shop.defaultCount(url) });
+    });
+    return { name: read.name, items: items, missing: missing };
+  }
+
+  var fromLink = share.read(location.search);
+  var shared = fromLink ? resolve(fromLink) : null;
+  var viewing = shared ? SHARED : null;
+  var sharedTicks = [];
+
+  function currentView() {
+    return viewing || lists.view();
+  }
+
+  function sharedName() {
+    return shared.name || lists.UNNAMED;
+  }
+
+  function forgetShared() {
+    shared = null;
+    viewing = null;
+    sharedTicks = [];
+    if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + location.hash);
+  }
+
+  function rowsFor(view) {
+    if (view !== SHARED) return V.rows(lists.all(), view);
+    return shared.items.map(function (item) {
+      return { list: SHARED, recipe: item.recipe, portions: item.portions };
+    });
+  }
+
   // --- tabs ------------------------------------------------------------------
 
+  function tabsFor(view) {
+    var tabs = V.tabs(lists.all(), view);
+    if (!shared) return tabs;
+    if (viewing) tabs.forEach(function (tab) { tab.selected = false; });
+    tabs.splice(1, 0, { id: SHARED, name: 'shared: ' + sharedName(), count: shared.items.length,
+      selected: viewing === SHARED });
+    return tabs;
+  }
+
   function renderTabs(view) {
-    tabsEl.innerHTML = V.tabs(lists.all(), view).map(function (tab) {
+    tabsEl.innerHTML = tabsFor(view).map(function (tab) {
       return '<button type="button" role="tab" class="shortlists-tab' +
         (tab.selected ? ' is-selected' : '') + '" id="shortlists-tab-' + esc(tab.id) +
         '" data-tab="' + esc(tab.id) + '" data-tag-key="' + esc(tab.name) +
@@ -115,7 +174,8 @@
   }
 
   function select(id, focus) {
-    lists.setView(id);
+    viewing = id === SHARED && shared ? SHARED : null;
+    if (!viewing) lists.setView(id);
     closeNewForm();
     renaming = null;
     render();
@@ -237,15 +297,57 @@
       }).join('');
   }
 
+  // A shared list's rows say their count in words: there is nothing to edit
+  // until it is kept.
+  function sharedRowHtml(item) {
+    var url = item.recipe;
+    var n = shop.count(url, item.portions);
+    if (!shop.boxHtml(url, n)) {
+      return '<li class="shortlists-recipe shopping-list-recipe--unscalable">' + shop.unscalableHtml(url, hrefs[url]) + '</li>';
+    }
+    return '<li class="shortlists-recipe">' + shop.withCost(url, '<span class="shortlists-words">' +
+      '<span class="shortlists-shared-count">' + n + '</span> ' + shop.rowInner(url, n, hrefs[url]) + '</span>') + '</li>';
+  }
+
+  function sharedBody() {
+    return '<div class="shortlists-head"><h2 class="shortlists-heading" id="shortlists-heading" tabindex="-1">' +
+      esc(sharedName()) + '</h2></div>' +
+      '<p class="shortlists-shared-note">Sent to you as a link. Nothing here is kept until you keep it.</p>' +
+      '<p class="shortlists-actions shortlists-shared-actions">' +
+      '<button type="button" class="shortlists-text-button" data-keep-shared>keep these</button>' +
+      '<button type="button" class="shortlists-text-button" data-drop-shared>not now</button></p>' +
+      (shared.missing ? '<p class="shortlists-count">' + esc(V.missingText(shared.missing)) + '</p>' : '') +
+      '<p class="shortlists-count">' + V.countText(shared.items.length) + '</p>' +
+      (shared.items.length ? '<ul class="shopping-list-recipes shortlists-recipes">' +
+        shared.items.map(sharedRowHtml).join('') + '</ul>' : '');
+  }
+
   function renderBody(view) {
+    if (view === SHARED) { body.innerHTML = sharedBody(); return; }
     var list = lists.get(view);
     body.innerHTML = list ? listBody(list) : everythingBody(lists.all());
   }
 
   // --- the shopping list -----------------------------------------------------
+  // A shared list's ticks are this page's alone, like the list.
+
+  function tickedFor(view) {
+    return view === SHARED ? sharedTicks.slice() : lists.ticked(view);
+  }
+
+  function setTickedFor(view, key, on) {
+    if (view !== SHARED) { lists.setTicked(view, key, on); return; }
+    sharedTicks = sharedTicks.filter(function (k) { return k !== key; });
+    if (on) sharedTicks.push(key);
+  }
+
+  function untickFor(view) {
+    if (view === SHARED) sharedTicks = [];
+    else lists.untick(view);
+  }
 
   function ticks(view) {
-    var on = lists.ticked(view);
+    var on = tickedFor(view);
     return {
       box: function (key) {
         return '<input type="checkbox" class="shopping-list-tick" data-key="' + esc(key) + '"' +
@@ -260,7 +362,7 @@
   }
 
   function renderShopping(view) {
-    var entries = V.shoppingEntries(V.rows(lists.all(), view), shop);
+    var entries = V.shoppingEntries(rowsFor(view), shop);
     shoppingEl.hidden = entries.length === 0;
     if (shoppingEl.hidden) return;
     var aisles = shop.build(entries);
@@ -304,14 +406,14 @@
   aislesEl.addEventListener('change', function (ev) {
     var box = ev.target;
     if (!box.classList.contains('shopping-list-tick')) return;
-    lists.setTicked(lists.view(), box.getAttribute('data-key'), box.checked);
+    setTickedFor(currentView(), box.getAttribute('data-key'), box.checked);
     box.closest('li').classList.toggle('is-ticked', box.checked);
     refreshUntick();
   });
 
   untickBtn.addEventListener('click', function () {
-    lists.untick(lists.view());
-    renderShopping(lists.view());
+    untickFor(currentView());
+    renderShopping(currentView());
     var first = aislesEl.querySelector('.shopping-list-tick');
     if (first) first.focus();
   });
@@ -319,10 +421,11 @@
   // --- everything at once ----------------------------------------------------
 
   function render() {
-    var view = lists.view();
+    var view = currentView();
     renderTabs(view);
     renderBody(view);
     renderShopping(view);
+    renderShare();
     arrangeBtn.hidden = lists.all().length < 2;
     placePill();
     if (HTF.tagShapes) HTF.tagShapes();
@@ -530,6 +633,132 @@
     }, dragOptions));
   }
 
+  // --- sharing and bringing in --------------------------------------------------------
+  // Both ways in, the import box and "keep these", go through one preview,
+  // which asks about each name already in use: keep both (the default),
+  // merge, or leave it out.
+
+  var shareOut = root.querySelector('[data-shortlists-share-out]');
+  var exportEl = root.querySelector('[data-shortlists-export]');
+  var copyBtn = root.querySelector('[data-shortlists-copy]');
+  var importEl = root.querySelector('[data-shortlists-import]');
+  var importProblem = root.querySelector('[data-shortlists-import-problem]');
+  var previewEl = root.querySelector('[data-shortlists-preview-panel]');
+  var pageBase = location.origin + location.pathname;
+  var incoming = null;
+  var keeping = false;
+
+  function renderShare() {
+    var all = lists.all();
+    shareOut.hidden = !all.length;
+    exportEl.value = share.block(pageBase, all);
+    copyBtn.hidden = !all.length || !(navigator.clipboard && navigator.clipboard.writeText);
+  }
+
+  exportEl.addEventListener('focus', function () { exportEl.select(); });
+
+  copyBtn.addEventListener('click', function () {
+    navigator.clipboard.writeText(exportEl.value).then(function () {
+      copyBtn.textContent = 'copied';
+      announce('Copied.');
+      setTimeout(function () { copyBtn.textContent = 'copy'; }, 1200);
+    }, function () { /* the box is still there to select by hand */ });
+  });
+
+  function clashOf(name) {
+    var folded = lists.core.cleanName(name || lists.UNNAMED).toLowerCase();
+    return lists.all().filter(function (list) { return list.name.toLowerCase() === folded; })[0] || null;
+  }
+
+  function choiceHtml(i, value, text, checked) {
+    return '<label class="shortlists-preview-choice"><input type="radio" name="shortlists-preview-' + i +
+      '" value="' + value + '"' + (checked ? ' checked' : '') + '> ' + esc(text) + '</label>';
+  }
+
+  function previewHtml() {
+    return '<h3 class="shortlists-preview-title">' + (keeping ? 'Keeping ' : 'Bringing in ') +
+      (incoming.length === 1 ? 'one list' : incoming.length + ' lists') + '</h3>' +
+      incoming.map(function (list, i) {
+        var name = list.name || lists.UNNAMED;
+        var clash = clashOf(name);
+        var html = '<fieldset class="shortlists-preview-list"><legend>' + esc(name) + ' · ' +
+          V.countText(list.items.length) + '</legend>' +
+          (list.missing ? '<p class="shortlists-preview-note">' + esc(V.missingText(list.missing)) + '</p>' : '');
+        if (!clash) return html + '<p class="shortlists-preview-note">A new list, after yours.</p></fieldset>';
+        var words = V.clashChoices(clash.name, lists.freeName(name));
+        return html + '<p class="shortlists-preview-note">' + esc(words.question) + '</p>' +
+          choiceHtml(i, 'new', words.both, true) + choiceHtml(i, 'merge', words.merge) +
+          choiceHtml(i, 'skip', words.skip) + '</fieldset>';
+      }).join('') +
+      '<p class="shortlists-share-actions">' +
+      '<button type="button" class="shortlists-text-button" data-preview-go>keep these</button>' +
+      '<button type="button" class="shortlists-text-button" data-preview-cancel>cancel</button></p>';
+  }
+
+  function openPreview(list, fromShared) {
+    incoming = list;
+    keeping = fromShared;
+    importProblem.textContent = '';
+    previewEl.innerHTML = previewHtml();
+    previewEl.hidden = false;
+    goTo(previewEl);
+  }
+
+  function closePreview() {
+    incoming = null;
+    previewEl.hidden = true;
+    previewEl.innerHTML = '';
+  }
+
+  root.querySelector('[data-shortlists-preview]').addEventListener('click', function () {
+    var read = share.readBlock(importEl.value).map(resolve);
+    if (!read.length) {
+      closePreview();
+      importProblem.textContent = 'There is no shortlist link in that. Paste what “Share or back up” gives you.';
+      importEl.focus();
+      return;
+    }
+    openPreview(read, false);
+  });
+
+  previewEl.addEventListener('click', function (ev) {
+    if (ev.target.closest('[data-preview-cancel]')) {
+      var back = keeping ? body.querySelector('[data-keep-shared]') : importEl;
+      closePreview();
+      if (back) back.focus();
+      return;
+    }
+    if (!ev.target.closest('[data-preview-go]')) return;
+    var plans = incoming.map(function (list, i) {
+      var chosen = previewEl.querySelector('input[name="shortlists-preview-' + i + '"]:checked');
+      var clash = clashOf(list.name);
+      return { action: chosen ? chosen.value : 'new', name: list.name, into: clash && clash.id, items: list.items };
+    });
+    var ids = lists.bringIn(plans);
+    var kept = keeping;
+    closePreview();
+    if (kept) forgetShared();
+    else importEl.value = '';
+    if (ids.length) select(ids[0], true);
+    else render();
+    announce(V.broughtText(ids.length, kept));
+  });
+
+  body.addEventListener('click', function (ev) {
+    if (!shared) return;
+    if (ev.target.closest('[data-keep-shared]')) {
+      openPreview([shared], true);
+      return;
+    }
+    if (ev.target.closest('[data-drop-shared]')) {
+      closePreview();
+      forgetShared();
+      render();
+      selectedTab().focus();
+      announce('Not kept.');
+    }
+  });
+
   // --- a new list -----------------------------------------------------------------
 
   function closeNewForm() {
@@ -541,7 +770,7 @@
   newBtn.addEventListener('click', function () {
     if (!newForm.hidden) { closeNewForm(); return; }
     renaming = null;
-    renderBody(lists.view());
+    renderBody(currentView());
     newForm.hidden = false;
     newBtn.setAttribute('aria-expanded', 'true');
     newInput.value = '';

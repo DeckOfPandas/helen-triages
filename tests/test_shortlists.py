@@ -104,14 +104,17 @@ def test_every_input_on_the_page_has_a_label():
     for name, text in sources.items():
         labelled = set(re.findall(r"""<label[^>]*\bfor=["']([\w-]+)""", text))
         for tag in re.findall(r"<input\b[^>]*>", text):
-            if 'type="checkbox"' in tag or "aria-label" in tag:
+            if 'type="checkbox"' in tag or 'type="radio"' in tag or "aria-label" in tag:
                 continue
             ident = re.search(r"""\bid=["']([\w-]+)""", tag)
             if not ident or ident.group(1) not in labelled:
                 unlabelled.append(f"{name}: {tag[:80]}")
     assert not unlabelled, (
-        "every text input needs a <label for> naming it (a tick box sits inside "
-        f"its row's label; food-shopping-rows.js gives a number box aria-label): {unlabelled}")
+        "every text input needs a <label for> naming it (a tick box or a preview's "
+        "choice sits inside its own label; food-shopping-rows.js gives a number box "
+        f"aria-label): {unlabelled}")
+    assert re.search(r'<label class="shortlists-preview-choice"><input type="radio"', sources[
+        "assets/js/shortlists-page.js"]), "a preview's choice must sit inside its label, which names it"
     assert sum(len(re.findall(r"<input\b", t)) for t in sources.values()) >= 3, (
         "found fewer inputs than the page has: the scan above is reading the wrong files")
 

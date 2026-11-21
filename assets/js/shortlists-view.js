@@ -99,6 +99,30 @@
     return 'in ' + count + (count === 1 ? ' list' : ' lists');
   }
 
+  // Recipes a shared link names that this site does not have.
+  function missingText(n) {
+    if (!n) return '';
+    return n === 1 ? '1 recipe in the link is not on this site, so it is left out.'
+      : n + ' recipes in the link are not on this site, so they are left out.';
+  }
+
+  // The preview's choice for a list whose name is taken: `free` is the name
+  // keeping both would give it.
+  function clashChoices(name, free) {
+    return {
+      question: 'You already have a list called “' + name + '”.',
+      both: 'keep both, this one as “' + free + '”',
+      merge: 'add its recipes to yours (your portions stay)',
+      skip: 'leave it out'
+    };
+  }
+
+  function broughtText(count, kept) {
+    if (!count) return 'Nothing brought in.';
+    var what = count === 1 ? 'one list' : count + ' lists';
+    return (kept ? 'Kept ' : 'Brought in ') + what + '.';
+  }
+
   // What the live region says after a move; `to` counts from 0.
   function movedText(name, to, total) {
     return name + ' moved to ' + (to + 1) + ' of ' + total + '.';
@@ -127,6 +151,9 @@
     portionsFromScaler: portionsFromScaler,
     inListsText: inListsText,
     movedText: movedText,
+    missingText: missingText,
+    clashChoices: clashChoices,
+    broughtText: broughtText,
     moveLabel: moveLabel,
     intoUrl: function (indexUrl, id) { return withQuery(indexUrl, 'into', id); },
     listUrl: function (recipeUrl, id) { return withQuery(recipeUrl, 'list', id); }

@@ -392,6 +392,117 @@
 
 .shortlists-arrange-done-row { margin: 0 0 $space-lg; }
 
+// --- sharing and bringing in -------------------------------------------------------------
+// Under everything else, set apart by a rule: it is about the lists, not the
+// tab on show. The boxes are the name input's, grown to hold a block.
+
+.shortlists-share {
+  max-width: 48rem;
+  margin-top: $space-xl * 2;
+  padding-top: $space-lg;
+  border-top: 1px solid $color-border;
+}
+
+.shortlists-share-title { margin-bottom: $space-sm; }
+
+.shortlists-share-text {
+  max-width: 65ch;
+  margin: 0 0 $space-md;
+  font-size: 0.9rem;
+  color: $color-clear-text;
+}
+
+.shortlists-share-out[hidden] { display: none; }
+
+.shortlists-block {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: $space-xs 0 0;
+  padding: $space-xs $space-sm;
+  font-family: $font-label;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-clear-text;
+  border-radius: $radius-sm;
+  resize: vertical;
+
+  &:focus-visible {
+    outline: 2px solid $color-recipe-link;
+    outline-offset: 1px;
+  }
+}
+
+.shortlists-share-actions {
+  display: flex;
+  gap: $space-lg;
+  margin: $space-xs 0 $space-lg;
+}
+
+.shortlists-preview {
+  margin: 0 0 $space-lg;
+  padding: $space-md $space-lg;
+  border: 2px solid $color-text;
+  background: $color-surface;
+
+  &:focus { outline: none; }
+  &[hidden] { display: none; }
+}
+
+.shortlists-preview-title {
+  margin: 0 0 $space-sm;
+  font-family: $font-headings;
+  font-size: 1.05rem;
+}
+
+.shortlists-preview-list {
+  margin: 0 0 $space-md;
+  padding: 0;
+  border: 0;
+
+  legend {
+    padding: 0;
+    font-family: $font-headings;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+}
+
+.shortlists-preview-note {
+  margin: $space-xxs 0;
+  font-size: 0.9rem;
+  color: $color-clear-text;
+}
+
+.shortlists-preview-choice {
+  display: flex;
+  align-items: baseline;
+  gap: $space-xs;
+  padding: $space-xxs 0;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  input { accent-color: $color-recipe-link; }
+}
+
+// --- a shared list ------------------------------------------------------------------------
+
+.shortlists-shared-note {
+  margin: $space-xs 0;
+  font-size: 0.9rem;
+  color: $color-clear-text;
+}
+
+.shortlists-shared-actions { margin: 0 0 $space-md; }
+
+.shortlists-shared-count {
+  font-family: $font-label;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 // --- the delete dialog -------------------------------------------------------------------
 
 .shortlists-dialog {

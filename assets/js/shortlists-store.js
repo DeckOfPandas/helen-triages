@@ -184,6 +184,49 @@
     return next;
   }
 
+  // --- bringing lists in ---------------------------------------------------------
+
+  // `name`, or "name (2)", "name (3)"... clashing with no list; the name is
+  // cut to make room for the number, never the number dropped. A link with
+  // no name brings in "Shared list".
+  var UNNAMED = 'Shared list';
+  function freeName(state, rawName) {
+    var name = cleanName(rawName) || UNNAMED;
+    if (!nameProblem(state, name)) return name;
+    for (var n = 2; ; n += 1) {
+      var tail = ' (' + n + ')';
+      var tried = cleanName(name.slice(0, NAME_MAX - tail.length)) + tail;
+      if (!nameProblem(state, tried)) return tried;
+    }
+  }
+
+  /* Imported or kept lists, in one write. Each plan is { action, name, into,
+     items: [{ recipe, portions }] }: 'new' adds a list at the end under a
+     free name; 'merge' adds to list `into` the recipes it lacks, its own
+     portions winning; 'skip' does nothing. */
+  function bringIn(state, plans) {
+    var next = copy(state);
+    var ids = [];
+    plans.forEach(function (plan) {
+      var list = null;
+      if (plan.action === 'new') {
+        list = { id: 'l' + next.next, name: freeName(next, plan.name), items: [], ticked: [] };
+        next.next += 1;
+        next.lists.push(list);
+      } else if (plan.action === 'merge') {
+        list = find(next, plan.into);
+      }
+      if (!list) return;
+      ids.push(list.id);
+      (plan.items || []).forEach(function (item) {
+        if (item && item.recipe && indexOfRecipe(list, item.recipe) === -1) {
+          list.items.push({ recipe: item.recipe, portions: clampPortions(item.portions) });
+        }
+      });
+    });
+    return { state: next, ids: ids };
+  }
+
   // --- a stored record is untrusted input -------------------------------------
   // Each list is read on its own, so one bad list costs only itself.
 
@@ -227,7 +270,8 @@
     create: create, rename: rename, remove: remove,
     setMember: setMember, setPortions: setPortions, portions: portions, listsWith: listsWith,
     moveList: moveList, moveItem: moveItem, setView: setView,
-    setTicked: setTicked, ticked: ticked, untick: untick
+    setTicked: setTicked, ticked: ticked, untick: untick,
+    freeName: freeName, bringIn: bringIn
   };
 
   // --- storage: the one place the key is named ----------------------------------
@@ -276,6 +320,7 @@
     KEY: KEY,
     EVERYTHING: EVERYTHING,
     NAME_MAX: NAME_MAX,
+    UNNAMED: UNNAMED,
     // Forget what was read, so the next call reads the key again.
     refresh: function () { state = null; },
     all: function () { return copy(load()).lists; },
@@ -294,6 +339,13 @@
     setView: function (view) { save(setView(load(), view)); },
     setTicked: function (scope, rowKey, on) { save(setTicked(load(), scope, rowKey, on)); },
     ticked: function (scope) { return ticked(load(), scope); },
-    untick: function (scope, rowKeys) { save(untick(load(), scope, rowKeys)); }
+    untick: function (scope, rowKeys) { save(untick(load(), scope, rowKeys)); },
+    freeName: function (name) { return freeName(load(), name); },
+    // The ids written to, in the plans' order.
+    bringIn: function (plans) {
+      var outcome = bringIn(load(), plans);
+      save(outcome.state);
+      return outcome.ids;
+    }
   };
 })();

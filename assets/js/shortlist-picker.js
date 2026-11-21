@@ -23,6 +23,14 @@
   var V = HTF.listsView;
   var FIRST_LIST = 'Shortlist';
 
+  // A shared link made before the shortlists page, `food/?shortlist=…`,
+  // opens there, where shared lists are shown.
+  var shortlistsLink = document.querySelector('a[data-shortlists-link]');
+  if (shortlistsLink && /[?&]shortlist=/.test(location.search)) {
+    location.replace(shortlistsLink.href.split(/[?#]/)[0] + location.search + location.hash);
+    return;
+  }
+
   function all(selector, root) {
     return Array.prototype.slice.call((root || document).querySelectorAll(selector));
   }
