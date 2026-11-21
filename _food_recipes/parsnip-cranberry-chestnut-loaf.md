@@ -74,6 +74,7 @@ notes:
   - label: "Make ahead"
     text: "The loaf can be made to the end of the layering step up to 24 hours ahead, then covered and chilled before baking."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

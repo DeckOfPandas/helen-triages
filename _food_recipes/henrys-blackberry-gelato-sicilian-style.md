@@ -1,6 +1,7 @@
 ---
 title: "Henry's Sicilian-Style Blackberry Gelato"
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

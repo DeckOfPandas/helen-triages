@@ -53,6 +53,7 @@ notes:
   - label: "Make ahead"
     text: "To make ahead, assemble the thing completely up to the point of baking, and keep it covered in the fridge for a day. Bake it straight from cold and give it an extra 10 mins in the oven."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

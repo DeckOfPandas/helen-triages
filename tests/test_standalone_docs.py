@@ -199,7 +199,7 @@ def test_the_food_docs_example_obeys_the_schema_it_describes():
     fm = _example(_doc(FOOD_DOC), "Crispy Sage Butter Gnocchi")
     problems = []
 
-    if list(fm.get("meta") or {}) != ["rewritten", "awaiting_fix", "proofread"]:
+    if list(fm.get("meta") or {}) != ["made_before", "rewritten", "awaiting_fix", "proofread"]:
         problems.append(f"meta keys/order: {list(fm.get('meta') or {})}")
     if list(fm)[1:2] != ["meta"]:
         problems.append("meta is not the key directly under title "

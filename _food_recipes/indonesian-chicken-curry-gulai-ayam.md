@@ -90,6 +90,7 @@ notes:
   - label: "Flexible cooking time"
     text: "Can be simmered a little longer, but the chicken becomes tough and stringy if left too long."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

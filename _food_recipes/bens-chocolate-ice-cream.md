@@ -37,6 +37,7 @@ notes:
   - label: "Chocolate Almond Variation"
     text: "Add 150 g roasted whole almonds (salted or unsalted) once the ice cream stiffens, about 2 mins before it's done."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

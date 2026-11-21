@@ -37,6 +37,7 @@ notes:
   - label: "Make-ahead"
     text: "The fat will solidify on top if you fridge this, and it's much easier to lift off cold than to spoon off hot. Reheat gently."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

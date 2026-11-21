@@ -28,6 +28,7 @@ notes:
   - label: "Butter"
     text: "Reportedly some people add a knob of butter before serving. Don't add any if you're freezing this."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

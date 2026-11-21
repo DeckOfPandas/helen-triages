@@ -48,6 +48,7 @@ notes:
     text: "Parmesan rinds freeze well, and can be added straight from frozen."
 
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

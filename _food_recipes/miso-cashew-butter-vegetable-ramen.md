@@ -51,6 +51,7 @@ notes:
   - label: "cashew butter"
     text: "Make sure it's plain and unsweetened."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

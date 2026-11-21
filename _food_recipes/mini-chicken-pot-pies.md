@@ -1,6 +1,7 @@
 ---
 title: "Mini Chicken Pot Pies"
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

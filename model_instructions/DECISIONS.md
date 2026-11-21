@@ -277,14 +277,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   it properly"*. Seven staged files had gone unscanned, the ones closest to
   publication. The folders are now `1-rewrite/`, `2-make/`, `3-keep/` and
   `4-promote/` (`PIPELINE.md`).
-- **2026-08-21, #429 — `meta:` is exactly three flags in order, and promotion
-  is never a step where "has it been cooked?" is open.** `cooked_before` and
-  `date_last_edited` are retired; both were read by nothing. Helen's ruling: a
-  recipe is cooked-and-liked (promoted), cooked-and-disliked (deleted) or not
-  cooked, *"why would I put it on my battle tested site?"* And *"I never want
-  to publish anything I haven't tested."* No test enforces it on food: it is
-  hers to decide at promotion. The made-and-liked state short of a rewrite is
-  now the drafts folder `3-keep/`, not a flag.
+- **2026-11-21 (replacing #429's 2026-08-21 ruling) — food `meta:` is four
+  flags, `made_before` first, and an untried recipe does not publish.** Helen,
+  before a month of Christmas test cooking: *"I now want to differentiate
+  between recipes I've cooked before and haven't cooked before, local site
+  only"*, so she can browse for candidates *"without having to remember they
+  exist"*. She chose an explicit flag over the folders, and kept #429's *"I
+  never want to publish anything I haven't tested"* as a gate leg: `made_before:
+  true` or the page is held back (cocktails differ, #722). The local index has
+  an `untried` pill that composes with every filter; never a row badge (#562).
+  Seeded once from the pipeline (published, `3-keep/`, `4-promote/` true, the
+  rest false); after that it is hers, set as she rewrites and proofreads, and
+  no command flips it. `date_last_edited` stays retired.
 - **2026-10-30 — a food DRAFT's `meta:` block sits directly under `title:`.**
   Helen: *"I'd like metadata (e.g. rewritten: false) to sit near the top of
   recipe files, to help me when I'm rewriting so I don't keep opening the same

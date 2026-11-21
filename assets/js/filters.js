@@ -40,6 +40,12 @@ document.addEventListener('DOMContentLoaded', function () {
   var draftsBtn = document.getElementById('drafts-toggle');
   var hideDrafts = false;
 
+  /* Only the untried (DECISIONS §4): local builds only, like the drafts
+     button, and composing with every filter. A row is untried if it carries
+     `data-untried`. */
+  var untriedBtn = document.getElementById('untried-toggle');
+  var onlyUntried = false;
+
   /* A shortlist someone sent, `?shortlist=slug,slug` (#1093): opening the
      link shows the list and saves none of it. It is the shortlist view with a
      different answer to "is this row on it": `state.shortlisted` is true, so
@@ -689,6 +695,7 @@ function renderResultsPool() {
 
       /* The local-only drafts switch, #1358. */
       if (visible && hideDrafts && li.querySelector('.badge-draft')) visible = false;
+      if (visible && onlyUntried && !li.hasAttribute('data-untried')) visible = false;
 
       if (visible) matchingLis.push(li);
       else if (!suppressList) li.style.display = 'none';
@@ -1610,6 +1617,18 @@ function renderResultsPool() {
       draftsBtn.textContent = hideDrafts ? 'show drafts' : 'hide drafts';
       draftsBtn.classList.toggle('is-on', hideDrafts);
       draftsBtn.setAttribute('aria-pressed', hideDrafts ? 'true' : 'false');
+      update();
+    });
+  }
+
+  /* A filter's label, not an action's: `is-on` and aria-pressed carry the
+     state, as on a filter chip. */
+  if (untriedBtn) {
+    untriedBtn.hidden = false;
+    untriedBtn.addEventListener('click', function () {
+      onlyUntried = !onlyUntried;
+      untriedBtn.classList.toggle('is-on', onlyUntried);
+      untriedBtn.setAttribute('aria-pressed', onlyUntried ? 'true' : 'false');
       update();
     });
   }

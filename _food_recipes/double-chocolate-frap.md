@@ -35,6 +35,7 @@ notes:
   - label: "Grated chocolate"
     text: I used to add grated chocolate to this but it goes weird when frozen so now I don't.
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

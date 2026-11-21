@@ -51,6 +51,7 @@ notes:
   - label: "Freezing"
     text: "The cake freezes well, but the frosting does not."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

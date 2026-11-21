@@ -46,6 +46,7 @@ notes:
   - label: "Keeping"
     text: "Keeps for ages wrapped in foil or in a tin."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

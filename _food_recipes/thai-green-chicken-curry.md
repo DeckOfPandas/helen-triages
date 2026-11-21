@@ -55,6 +55,7 @@ notes:
   - label: "Cooking time"
     text: "Cooking time is very flexible."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

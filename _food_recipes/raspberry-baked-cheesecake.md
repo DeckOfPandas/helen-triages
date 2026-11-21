@@ -43,6 +43,7 @@ notes:
   - label: "Fruit"
     text: "I'm going to make this with blackberries tomorrow..."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

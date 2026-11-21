@@ -1,6 +1,7 @@
 ---
 title: "Pan-Fried Mackerel Fillets with Beetroot and Fennel"
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

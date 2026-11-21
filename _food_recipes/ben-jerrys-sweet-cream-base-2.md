@@ -29,6 +29,7 @@ notes:
   - label: "US half-and-half"
     text: "Strictly speaking, the perfect substitution for US \"half-and-half\" would be 100 ml whole milk with 60 ml single cream."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

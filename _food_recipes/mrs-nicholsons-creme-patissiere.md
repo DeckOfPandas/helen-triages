@@ -39,6 +39,7 @@ notes:
   - label: "Before using"
     text: "It may need a quick whisk before using as it could look a little lumpy, but generally nobody notices."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

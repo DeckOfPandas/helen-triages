@@ -59,6 +59,7 @@ notes:
   - label: "Blood oranges are sneaky"
     text: "Blood oranges vary in sweetness and flavour, so taste the sauce often and correct with salt or vinegar or whatever it needs."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true
