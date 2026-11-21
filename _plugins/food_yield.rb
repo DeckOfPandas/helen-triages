@@ -9,6 +9,7 @@
 #   "4–6 waffles, depending..."  count, base 4: a range starts from its lower end
 #   "64+ tiny macarons"          count 64, and the `+` is kept
 #   "one 8-inch cake"            count 1, a number word; the 8 is never the count
+#   "enough marinade for 4 portions of fish"   count 4 of portions
 #   "1 dozen mince pies"         count 1 of "dozen mince pies"
 #   "950 ml", "approx. 75 g"     a measure: scales by whole recipes
 #   "Some", "about 8", "9 or 16", "1.5 litres"   nil: the portions box stays
@@ -22,6 +23,9 @@ module HelenTriages
     # "1 large jar, or several small ones" is a large jar.
     THING_END = /\s*(?:,|\(|;|\s—\s|\s-\s|\sor\s)/
 
+    # "enough <thing> for": a bare "Enough for one pie" names no thing, and stays unread.
+    ENOUGH = /\A(enough\s+\S.*?\s+for)\s+(?=\S)/i
+
     module_function
 
     # @param text  [String] the recipe's `makes:` value
@@ -34,8 +38,14 @@ module HelenTriages
       return nil if rest.empty?
 
       prefix = ""
+      # "enough marinade for 4 portions of fish": the words up to "for" stay
+      # put before the box, and the count after them scales.
+      if (m = ENOUGH.match(rest))
+        prefix = m[1]
+        rest = m.post_match
+      end
       approx = Array(vocab["approx_words"]).map(&:to_s).sort_by { |w| -w.length }
-      unless approx.empty?
+      unless approx.empty? || !prefix.empty?
         pattern = /\A(#{approx.map { |w| Regexp.escape(w) }.join("|")})(?=\s)\s+/i
         if (m = pattern.match(rest))
           prefix = m[1]
