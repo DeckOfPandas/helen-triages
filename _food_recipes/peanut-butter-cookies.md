@@ -8,7 +8,7 @@ prep_time: "20 mins"
 cook_time: "10 mins"
 main_ingredients: ["peanut butter", "unsalted butter", "plain flour", "dark brown soft sugar", "egg"]
 star_ingredient:
-tags: ["bakes", "sweet snack"]
+tags: ["bakes", "sweet treat"]
 ingredient_groups:
   - items:
     - amount: "180 g"

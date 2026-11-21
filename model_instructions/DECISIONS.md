@@ -1224,14 +1224,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   a baked cheesecake, pizza dough, fondants, puddings, crumbles, burger buns.
   Not: a soufflé, a beef Wellington, meringue swans (*"No one gets in cosy
   baking mode and makes ad hoc swans with creme diplomat"*).
-- **2026-10-10 — `sweets` is renamed `sweet snack`.** Helen: *"what if we
-  rename 'sweets' to 'sweet snacks', or something else with the word 'sweet'
-  in it? Biscuits should be in there, but every single time I have to remind
-  myself why it's not just toffee and chocolate truffles."* Singular, as `hot
-  snack`'s twin. Under the new name *"Fairy cakes are in again now"*; her
-  test: *"would I serve it on a cake plate at 4 o clock after a long improving
-  walk?"* A saved link filtering on `sweets` matches nothing, judged a fair
-  price.
+- **2026-11-21, #1526 (replacing 2026-10-10's `sweet snack`) — three snack
+  tags: `nibbles`, `savoury snack`, `sweet treat`, with clashes reported.**
+  Helen: *"Rename "sweet snack" -> "sweet treat"."* and, asked to review "hot
+  snack" against "nibbles", chose the split: `nibbles` is savoury,
+  bite-sized and passed round with drinks at a party; `hot snack` became
+  `savoury snack`, small, for one or two between meals, hot or cold; a sweet
+  one is a `sweet treat` (so mince pies and mug cakes). Truffles, fishcakes
+  and potato cakes are not nibbles (*"Not nibbles"*). Pairs that never sit
+  together are `tag_hints: clashes` in `_data/food/taxonomy.yml`, reported by
+  `scripts/check_food_tags.py` at ingest. Her test for a sweet treat stands:
+  *"would I serve it on a cake plate at 4 o clock after a long improving
+  walk?"* A saved link on an old name matches nothing.
 - **2026-10-10 — `fiddly and fun` is a mood for the PROCESS, and `showstopper`
   is narrowed to the RESULT.** Helen: *"I wonder if we need a 'I want to faff'
   tag ... I honestly prefer savoury things, so remembering about e.g. tomato
@@ -1245,9 +1249,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   want to cook dinner, scrolling through a list for inspiration without
   having to visually filter out kale crisps and various cakes."* Then:
   *"Declare it, please seed by subtraction, then as we go forward from this
-  baseline now, we derive."* Never with `dessert`, `sweet snack`, `ice cream`,
+  baseline now, we derive."* Never with `dessert`, `sweet treat`, `ice cream`,
   `drinks`, `nibbles`; asked about with `bakes`, `extras`, `starter`,
-  `breakfast`, `hot snack`. A derived "dinner" button was the alternative: it
+  `breakfast`, `savoury snack`. A derived "dinner" button was the alternative: it
   is wrong at the edges, which are the dishes she scrolls for. Reading "we
   derive" as a proposal, not a deriver, is a session's.
 - **2026-10-21 — a frittata, baked eggs, a vegetable fritter or a griddle
@@ -1256,7 +1260,7 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   in another hat, right? Let's allow those to be mains."* Then, the same day,
   shown that the rule took `main` off the kale frittata and kept
   `herbivore-ish` off green baked eggs, she ruled that both are mains.
-  Each is a `main` question like `starter` or `hot snack`.
+  Each is a `main` question like `starter` or `savoury snack`.
 - **2026-10-21 — `side` is a practicality, split out of `extras`.** Helen,
   retagging Jansson's temptation and a gratin: *"-extras +side -- let's
   discuss this, there are lots of these"*, then yes to splitting it out.
@@ -1273,7 +1277,7 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-11 — melting chocolate is prep, so a fridge cake is `no-cook`.**
   Helen first agreed the opposite, then: *"pulsing chocolate in the microwave
   isn't messy like cooking!"*
-- **2026-10-11 — a `sweet snack` is named for the piece.** A brownie or a bar
+- **2026-10-11 — a `sweet treat` is named for the piece.** A brownie or a bar
   is one; a cake cut up to serve is not. Helen: *"I think sweet snacks are
   individual things, not slices of something else."* So not a traybake cut
   into squares either.
