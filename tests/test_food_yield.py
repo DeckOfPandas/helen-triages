@@ -344,6 +344,7 @@ GETS_A_HALF_STEP = {
     "jerrys-chocolate-ice-cream", "macarons", "mixed-spice-powder",
     "mrs-nicholsons-creme-patissiere",
     "mrs-nicholsons-yorkshire-puddings", "pear-shrub",
+    "sticky-soy-miso-dipping-sauce",
     "sweet-potato-chocolate-brownies", "teriyaki-marinade-or-glaze", "teriyaki-sauce",
     "wagamama-teriyaki-sauce",
     "wagamama-yakitori-sauce",
