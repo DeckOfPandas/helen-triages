@@ -82,6 +82,20 @@ def test_the_tabs_are_real_tabs():
     assert "aria-labelledby" in js, "the panel must be named by its selected tab"
 
 
+def test_a_tab_is_only_tapped_and_a_grip_never_scrolls_the_page():
+    js = PAGE_JS.read_text(encoding="utf-8")
+    tabs = re.search(r"function renderTabs\(view\) \{(.*?)\n  \}", js, re.S)
+    assert tabs, "shortlists-page.js has no renderTabs(view): the scan is reading the wrong place"
+    assert "reorder" not in tabs.group(1) and "draggable" not in tabs.group(1), (
+        "a tab is only ever tapped: lists are moved in arrange mode, where a stray "
+        "drag cannot reorder them by accident (#1521)")
+    scss = (ROOT / "_sass/food/_shortlists-page.scss").read_text(encoding="utf-8")
+    grip = re.search(r"\n\.reorder-grip \{(.*?)\n\}", scss, re.S)
+    assert grip and "touch-action: none" in grip.group(1), (
+        "the grip needs touch-action: none, or a finger on it scrolls the page in "
+        "iPad Safari instead of dragging the row")
+
+
 def test_every_input_on_the_page_has_a_label():
     sources = {"food/shortlists.html": PAGE.read_text(encoding="utf-8"),
                "assets/js/shortlists-page.js": PAGE_JS.read_text(encoding="utf-8"),

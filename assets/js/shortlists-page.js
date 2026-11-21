@@ -5,7 +5,9 @@
 // test could not reach through those three.
 //
 // The tabs are a WAI-ARIA tablist with automatic activation: arrows, Home and
-// End move the selection, and only the selected tab is in the tab order.
+// End move the selection, and only the selected tab is in the tab order. A tab
+// is only ever tapped: lists move in "arrange", and a list's recipes on its own
+// tab, by drag-reorder.js's grip or by each row's ↑/↓.
 // Anything that re-renders closes the rename and new-list forms first, so a
 // form is never left open on a list it does not belong to.
 
@@ -142,28 +144,45 @@
     return V.listUrl(hrefs[url] || url, id);
   }
 
-  function rowHtml(row, listName) {
+  // A grip to drag by (drag-reorder.js) and ↑/↓ for everyone else.
+  function stepHtml(name, way, off) {
+    return '<button type="button" class="reorder-step" data-move="' + way + '" aria-label="' +
+      esc(V.moveLabel(name, way)) + '"' + (off ? ' disabled' : '') + '>' +
+      (way === 'up' ? '↑' : '↓') + '</button>';
+  }
+
+  function handleHtml(name, at, total) {
+    return '<span class="reorder-handle"><span class="reorder-grip" data-reorder-grip aria-hidden="true"></span>' +
+      '<span class="reorder-steps">' + stepHtml(name, 'up', at === 0) +
+      stepHtml(name, 'down', at === total - 1) + '</span></span>';
+  }
+
+  // `at` and `total` are given only where the row can be moved: a list's own tab.
+  function rowHtml(row, listName, at, total) {
     var url = row.recipe;
+    var title = titles[url] || url.replace(/\/$/, '').split('/').pop();
     var remove = '<button type="button" class="shortlists-text-button shortlists-remove" data-remove ' +
-      'aria-label="remove ' + esc((titles[url] || url) + ' from ' + listName) + '">remove</button>';
-    var attrs = 'class="shortlists-recipe" data-list="' + esc(row.list) + '" data-url="' + esc(url) + '"';
+      'aria-label="remove ' + esc(title + ' from ' + listName) + '">remove</button>';
+    var movable = total > 1;
+    var attrs = 'class="shortlists-recipe" data-list="' + esc(row.list) + '" data-url="' + esc(url) + '"' +
+      (movable ? ' data-reorder-item' : '');
+    var handle = movable ? handleHtml(title, at, total) : '';
     if (!shop.has(url)) {
-      var slug = url.replace(/\/$/, '').split('/').pop();
-      return '<li ' + attrs + '><span class="shortlists-gone">' + esc(slug) +
+      return '<li ' + attrs + '>' + handle + '<span class="shortlists-gone">' + esc(title) +
         ' <span class="shopping-list-yield-missing">is no longer on the site</span></span>' + remove + '</li>';
     }
     var n = shop.count(url, row.portions);
     var box = shop.boxHtml(url, n, 'data-list="' + esc(row.list) + '"');
     if (!box) {
-      return '<li ' + attrs.replace('class="', 'class="shopping-list-recipe--unscalable ') + '>' +
+      return '<li ' + attrs.replace('class="', 'class="shopping-list-recipe--unscalable ') + '>' + handle +
         shop.unscalableHtml(url, recipeHref(url, row.list)) + remove + '</li>';
     }
-    return '<li ' + attrs + '>' + box +
+    return '<li ' + attrs + '>' + handle + box +
       shop.withCost(url, '<span class="shortlists-words">' + shop.rowInner(url, n, recipeHref(url, row.list)) + '</span>') +
       remove + '</li>';
   }
 
-  function recipesHtml(list) {
+  function recipesHtml(list, movable) {
     var rows = V.rows([list], list.id);
     if (!rows.length) {
       return '<p class="shortlists-empty">Nothing on ' + esc(list.name) + ' yet.</p>' +
@@ -171,7 +190,9 @@
         esc(V.intoUrl(indexUrl, list.id)) + '">Browse recipes to fill it</a></p>';
     }
     return '<ul class="shopping-list-recipes shortlists-recipes">' +
-      rows.map(function (row) { return rowHtml(row, list.name); }).join('') + '</ul>';
+      rows.map(function (row, i) {
+        return movable ? rowHtml(row, list.name, i, rows.length) : rowHtml(row, list.name);
+      }).join('') + '</ul>';
   }
 
   function renameFormHtml(list) {
@@ -196,7 +217,7 @@
       '</span></div>' +
       (renaming === list.id ? renameFormHtml(list) : '') +
       '<p class="shortlists-count">' + V.countText(list.items.length) + '</p>' +
-      recipesHtml(list);
+      recipesHtml(list, true);
   }
 
   function everythingBody(all) {
@@ -287,6 +308,7 @@
     renderTabs(view);
     renderBody(view);
     renderShopping(view);
+    arrangeBtn.hidden = lists.all().length < 2;
     placePill();
     if (HTF.tagShapes) HTF.tagShapes();
   }
@@ -337,6 +359,15 @@
   body.addEventListener('click', function (ev) {
     var go = ev.target.closest('[data-go]');
     if (go) { select(go.getAttribute('data-go'), true); return; }
+
+    var step = ev.target.closest('[data-move]');
+    if (step) {
+      var moving = step.closest('[data-list]');
+      var way = step.getAttribute('data-move');
+      var at = rowsOf(body).indexOf(moving);
+      moveRecipe(moving, at + (way === 'up' ? -1 : 1), way);
+      return;
+    }
 
     var removeBtn = ev.target.closest('[data-remove]');
     if (removeBtn) {
@@ -394,6 +425,95 @@
       body.querySelector('[data-rename]').focus();
     }
   });
+
+  // --- moving rows ------------------------------------------------------------------
+  // After a move the rows are redrawn, so focus goes back to the moved row's
+  // arrow, or its other arrow once it reaches an end.
+
+  function rowsOf(container) {
+    return Array.prototype.slice.call(container.querySelectorAll('[data-reorder-item]'));
+  }
+
+  function focusStep(container, attribute, value, way) {
+    var row = rowsOf(container).filter(function (el) { return el.getAttribute(attribute) === value; })[0];
+    if (!row || !way) return;
+    var btn = row.querySelector('[data-move="' + way + '"]');
+    if (btn.disabled) btn = row.querySelector('[data-move="' + (way === 'up' ? 'down' : 'up') + '"]');
+    btn.focus();
+  }
+
+  function moveRecipe(row, to, way) {
+    var id = row.getAttribute('data-list');
+    var url = row.getAttribute('data-url');
+    var total = rowsOf(body).length;
+    lists.moveItem(id, url, to);
+    render();
+    focusStep(body, 'data-url', url, way);
+    announce(V.movedText(titles[url] || url, Math.max(0, Math.min(total - 1, to)), total));
+  }
+
+  var arrangeBtn = root.querySelector('[data-shortlists-arrange]');
+  var arrangePanel = root.querySelector('[data-shortlists-arrange-panel]');
+  var arrangeList = root.querySelector('[data-shortlists-arrange-lists]');
+  var tabbar = root.querySelector('.shortlists-tabbar');
+  var arranging = false;
+
+  function renderArrange() {
+    var all = lists.all();
+    arrangeList.innerHTML = all.map(function (list, i) {
+      return '<li class="shortlists-arrange-list" data-reorder-item data-id="' + esc(list.id) + '">' +
+        handleHtml(list.name, i, all.length) +
+        '<span class="shortlists-arrange-name">' + esc(list.name) + '</span>' +
+        '<span class="shortlists-section-count">' + V.countText(list.items.length) + '</span></li>';
+    }).join('');
+  }
+
+  function arrange(on) {
+    arranging = on;
+    closeNewForm();
+    renaming = null;
+    tabbar.hidden = on;
+    panel.hidden = on;
+    arrangePanel.hidden = !on;
+    if (on) {
+      renderArrange();
+      pill.hidden = true;
+      document.getElementById('shortlists-arrange-title').focus();
+    } else {
+      render();
+      arrangeBtn.focus();
+    }
+  }
+
+  function moveList(row, to, way) {
+    var id = row.getAttribute('data-id');
+    var total = lists.all().length;
+    lists.moveList(id, to);
+    renderArrange();
+    focusStep(arrangeList, 'data-id', id, way);
+    announce(V.movedText(nameOf(id), Math.max(0, Math.min(total - 1, to)), total));
+  }
+
+  arrangeBtn.addEventListener('click', function () { arrange(true); });
+  root.querySelector('[data-shortlists-arrange-done]').addEventListener('click', function () { arrange(false); });
+
+  arrangeList.addEventListener('click', function (ev) {
+    var step = ev.target.closest('[data-move]');
+    if (!step) return;
+    var row = step.closest('[data-id]');
+    var way = step.getAttribute('data-move');
+    moveList(row, rowsOf(arrangeList).indexOf(row) + (way === 'up' ? -1 : 1), way);
+  });
+
+  if (HTF.dragReorder) {
+    var dragOptions = { item: '[data-reorder-item]', grip: '[data-reorder-grip]' };
+    HTF.dragReorder.attach(body, Object.assign({
+      onDrop: function (row, from, to) { moveRecipe(row, to); }
+    }, dragOptions));
+    HTF.dragReorder.attach(arrangeList, Object.assign({
+      onDrop: function (row, from, to) { moveList(row, to); }
+    }, dragOptions));
+  }
 
   // --- a new list -----------------------------------------------------------------
 
@@ -479,7 +599,7 @@
   }
 
   function placePill() {
-    if (shoppingEl.hidden) { pill.hidden = true; return; }
+    if (shoppingEl.hidden || arranging) { pill.hidden = true; return; }
     var list = shoppingEl.getBoundingClientRect();
     var recipes = body.getBoundingClientRect();
     var below = list.top > window.innerHeight;
@@ -506,6 +626,7 @@
     if (!ev.persisted) return;
     lists.refresh();
     render();
+    if (arranging) renderArrange();
   });
 
   render();

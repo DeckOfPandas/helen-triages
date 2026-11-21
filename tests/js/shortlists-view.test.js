@@ -144,6 +144,21 @@ test('a note under the scaler says which lists the recipe is on', () => {
   assert.strictEqual(view.inListsText(3), 'in 3 lists');
 });
 
+// --- moving -------------------------------------------------------------------
+
+test('a row\'s arrows are named for what they move, and a move is announced by place', () => {
+  assert.strictEqual(view.moveLabel('Christmas starters', 'up'), 'move Christmas starters up');
+  assert.strictEqual(view.moveLabel('Trifle', 'down'), 'move Trifle down');
+  assert.strictEqual(view.movedText('Christmas starters', 0, 4), 'Christmas starters moved to 1 of 4.');
+  assert.strictEqual(view.movedText('Trifle', 3, 4), 'Trifle moved to 4 of 4.');
+});
+
+test('a list\'s recipes come in the list\'s order on its tab and on everything', () => {
+  const moved = [{ id: 'l1', name: 'Christmas starters', items: [{ recipe: B, portions: 6 }, { recipe: A, portions: 4 }] }];
+  assert.deepStrictEqual(view.rows(moved, 'l1').map((r) => r.recipe), [B, A]);
+  assert.deepStrictEqual(view.rows(moved, 'everything').map((r) => r.recipe), [B, A]);
+});
+
 // --- links --------------------------------------------------------------------
 
 test('the browse link carries the list it fills, and a recipe link the list it is opened from', () => {

@@ -199,7 +199,8 @@
   gap: $space-lg;
 }
 
-.shortlists-count {
+.shortlists-count,
+.shortlists-arrange-hint {
   margin: 0 0 $space-lg;
   font-size: 0.85rem;
   color: $color-clear-text;
@@ -268,6 +269,128 @@
   font-weight: 400;
   color: $color-clear-text;
 }
+
+// --- moving rows -------------------------------------------------------------------------
+// The grip is drawn dots, so no font decides its look, inside a padded box a
+// finger can find. `touch-action: none`, or a finger on it scrolls the page in
+// iPad Safari. The dragged row lifts on the page's own surface; the others
+// slide aside, without the slide when motion is reduced.
+
+// The grip beside ↑ over ↓: narrow, so a phone row keeps its width for words.
+.reorder-handle {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  flex-shrink: 0;
+  margin-right: $space-xs;
+}
+
+.reorder-steps {
+  display: flex;
+  flex-direction: column;
+}
+
+.reorder-grip {
+  box-sizing: content-box;
+  width: 12px;
+  height: 18px;
+  padding: 7px 6px;
+  background: radial-gradient(circle, $color-clear-text 1.5px, transparent 2px) 0 0 / 6px 6px;
+  background-origin: content-box;
+  background-clip: content-box;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.reorder-step {
+  min-width: 1.75rem;
+  min-height: 1.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: $font-body;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: $color-clear-text;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+
+  &:focus-visible {
+    outline: 2px solid $color-recipe-link;
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+}
+
+.is-reordering {
+  user-select: none;
+  -webkit-user-select: none;
+
+  > [data-reorder-item] { transition: transform 0.15s ease-out; }
+
+  > .is-dragging {
+    position: relative;
+    z-index: 1;
+    transition: none;
+    background: $color-surface;
+    box-shadow: 0 4px 14px rgba($color-text, 0.18);
+
+    .reorder-grip { cursor: grabbing; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    > [data-reorder-item] { transition: none; }
+  }
+}
+
+// --- arranging the lists -----------------------------------------------------------------
+
+.shortlists-tabbar[hidden],
+.shortlists-panel[hidden],
+.shortlists-arrange[hidden] { display: none; }
+
+.shortlists-arrange-lists {
+  list-style: none;
+  max-width: 32rem;
+  margin: 0 0 $space-lg;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.shortlists-arrange-list {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  padding: $space-xs 0;
+  border-bottom: 1px solid $color-border;
+}
+
+.shortlists-arrange-name {
+  min-width: 0;
+  font-family: $font-headings;
+  font-weight: 700;
+  text-transform: lowercase;
+  overflow-wrap: anywhere;
+}
+
+.shortlists-arrange-list .shortlists-section-count {
+  margin-left: auto;
+  padding-left: $space-md;
+  white-space: nowrap;
+}
+
+.shortlists-arrange-open { align-self: center; }
+
+.shortlists-arrange-done-row { margin: 0 0 $space-lg; }
 
 // --- the delete dialog -------------------------------------------------------------------
 

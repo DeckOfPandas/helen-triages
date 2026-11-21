@@ -40,11 +40,14 @@
 
   // The shortlists' controls (#1521): the picker, the chevron beside a button
   // while filling a list, the bar that says which, and the note under the
-  // scaler. The back link is on the furniture line, which prints nothing.
+  // scaler, and a row's grip and arrows. The back link is on the furniture
+  // line, which prints nothing.
   .shortlist-picker,
   .btn-shortlist-more,
   .shortlist-into-bar,
-  .recipe-lists-note {
+  .recipe-lists-note,
+  .reorder-handle,
+  .shortlists-arrange-open {
     display: none;
   }
 

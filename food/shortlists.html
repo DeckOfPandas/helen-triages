@@ -28,7 +28,17 @@ permalink: /food/shortlists/
       <div class="shortlists-tabs" role="tablist" aria-label="Your shortlists" data-shortlists-tabs></div>
       <button type="button" class="shortlists-tab shortlists-tab--new" data-shortlists-new
               aria-expanded="false" aria-controls="shortlists-new-form"><span class="tag-shape" aria-hidden="true"></span>+ new list</button>
+      <button type="button" class="shortlists-text-button shortlists-arrange-open" data-shortlists-arrange hidden>arrange</button>
     </div>
+
+    {% comment %} Arranging the lists: the tabs as a stack to drag, or to move with each
+       row's arrows. The tabs themselves are only ever tapped. {% endcomment %}
+    <section class="shortlists-arrange" aria-labelledby="shortlists-arrange-title" data-shortlists-arrange-panel hidden>
+      <h2 class="shortlists-heading" id="shortlists-arrange-title" tabindex="-1">Arrange your lists</h2>
+      <p class="shortlists-arrange-hint">Drag a list by its handle, or use its arrows. The tabs follow this order.</p>
+      <ol class="shortlists-arrange-lists" data-shortlists-arrange-lists></ol>
+      <p class="shortlists-arrange-done-row"><button type="button" class="shortlists-text-button" data-shortlists-arrange-done>done</button></p>
+    </section>
 
     <form class="shortlists-name-form" id="shortlists-new-form" data-shortlists-new-form hidden>
       <label class="shortlists-name-label" for="shortlists-new-name">Name your new list</label>
@@ -90,4 +100,5 @@ permalink: /food/shortlists/
 <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-shopping-rows.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/drag-reorder.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/shortlists-page.js' | relative_url }}"></script>
