@@ -8,7 +8,7 @@ prep_time: "15 mins plus cooling"
 cook_time: "1 hr 30 min, mostly baking the potatoes"
 main_ingredients: ["sweet potatoes", "almond butter", "cocoa powder", "dark chocolate", "maple syrup", "plain flour"]
 star_ingredient: "root veg"
-tags: ["bakes", "sweet snack"]
+tags: ["bakes", "sweet treat"]
 ingredient_groups:
   - items:
     - amount: "2 (about 400 g)"
