@@ -18,10 +18,11 @@
 // while walking a shop, hence the small caps and the rule under each.
 // =============================================================================
 
+// No rule of its own, unlike cocktails': it opens straight under the last
+// row's, and a second rule a gap below it read as two (#1521).
 .shopping-list {
-  margin: $space-xxl 0 0;
+  margin: 0;
   padding-top: $space-lg;
-  border-top: 1px solid $color-border;
 }
 
 .shopping-list-head {

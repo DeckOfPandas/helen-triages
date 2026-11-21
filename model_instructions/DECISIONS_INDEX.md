@@ -271,7 +271,8 @@ argument and the rules each field is read by.
 - 2026-09-10 · §8.3 · #918 · shortlisted is a view, not a filter: it never combines with another filter.
 - 2026-09-15 · §8.3 · #1093 · a shortlist link is shown, not saved, and "keep these" makes it yours.
 - 2026-10-11 · §8.3 · opening a sent shortlist link shows the index with the shopping list open.
-- 2026-09-10 · §8.3 · #546 · Undated, #546 — the shortlist lives in one browser on one device, one list per site, with no account; that is a ceiling, not a first step.
+- 2026-09-10 · §8.3 · #546 · Undated, #546 — the shortlists live in one browser on one device, per site, with no account; that is a ceiling, not a first step.
+- 2026-11-20 · §8.3 · #1521 · many named lists, a recipe on any number of them, all exported as one block, and restorable from it.
 - 2026-10-10 · §8.3 · #1342 · the note over a shared shortlist and its "keep these" button keep the wording an agent wrote.
 - 2026-08-16 · §9.1 · cocktail field names and vocabularies are public; only the drinks are private.
 - 2026-10-11 · §9.1 · the public repo's main moves only by a PR Helen merges; a small set of changes may be pushed straight to a private drafts repo's main.
@@ -859,7 +860,7 @@ argument and the rules each field is read by.
 - 2026-11-05 · §13 · #1462 · E3 — a candidates script goes once she has chosen; scripts/leopard_candidates.py alone is kept.
 - 2026-09-15 · §13 · #1097 · "recipes" means recipes on both sites; "food recipes" and "cocktail recipes" name one site's; counts are sometimes "portions" / "drinks".
 - 2026-09-15 · §13 · #1086 · the cocktail scaler reads − [1] drinks +, the word after the box.
-- 2026-09-15 · §13 · #1100 · PR #1100 — the shortlist panel is a share link and nothing else.
+- 2026-09-15 · §13 · #1100 #1521 · PR #1100; 2026-11-20, #1521 — the shortlist panel is links and nothing else: no JSON, no clear.
 - 2026-09-20 · §13 · #1088 · "If you liked this, how about…" is final.
 - 2026-10-28 · §13 · #1288 · the search dropdown's page group is headed I KNOW WHAT I WANT, on both sites.
 - 2026-09-20 · §13 · #1088 · a filtered index with no matches says "Blank canvas." on both sites; "Nothing to see here yet." is cocktails' empty-collection line.

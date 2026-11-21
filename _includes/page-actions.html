@@ -10,9 +10,9 @@
    Both ship `hidden` and shortlist.js reveals them; the link stays hidden
    while the count is zero. The shortlist key is `page.url`, not
    `relative_url`: the same key the index row or card for this page emits. The
-   link's count is the store's (`data-shortlist-total`), not
-   `[data-shortlist-count]`, which counts marked controls on this page. The
-   link ends in `#results` (#1057) so the index scrolls to the list. {% endcomment %}
+   link's count is every recipe on any list, once (`data-shortlist-total`),
+   and it opens the index's SEE ALL (#1521). It ends in `#results` (#1057)
+   so the index scrolls to the list. {% endcomment %}
 {% assign actions_site = site.data.sites[page.site_key] %}
 <div class="page-actions">
   <button type="button"
@@ -21,6 +21,6 @@
           aria-pressed="false"
           hidden>shortlist</button>
   <a class="btn-see-shortlist"
-     href="{{ actions_site.home | relative_url }}?shortlist=1#results"
-     hidden>see shortlist (<span data-shortlist-total>0</span>)</a>
+     href="{{ actions_site.home | relative_url }}?shortlist=all#results"
+     hidden>see shortlists (<span data-shortlist-total>0</span>)</a>
 </div>

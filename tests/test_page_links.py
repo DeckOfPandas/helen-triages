@@ -231,11 +231,11 @@ TRUSTED_DYNAMIC = (
     # The back arrow on a recipe or drink page (#387,
     # _includes/back-to-index.html).
     re.compile(r"^\{\{\s*back_site\.home\s*\|\s*relative_url\s*\}\}$"),
-    # The see-shortlist link (#1011, _includes/page-actions.html). The query
-    # does not change the page fetched, and `#results` is an id both indexes
-    # carry (test_the_search_box_searches_for_anything_on_every_site_page,
+    # The see-shortlists link (#1011, #1521, _includes/page-actions.html). The
+    # query does not change the page fetched, and `#results` is an id both
+    # indexes carry (test_the_search_box_searches_for_anything_on_every_site_page,
     # tests/test_site_config.py).
-    re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1#results$"),
+    re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=all#results$"),
     # The footer's reference links.
     re.compile(r"^\{\{\s*link\.url\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*(?:recipe|cocktail)\.url\s*\|\s*relative_url\s*\}\}$"),

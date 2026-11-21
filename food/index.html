@@ -196,7 +196,7 @@ permalink: /food/
           class="btn-shortlist-only"
           id="shortlist-only"
           aria-pressed="false"
-          hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
+          hidden>see shortlists (<span data-shortlist-count>0</span>)</button>
   {% comment %} The shortlisted view (#546, #918) is a view of the shortlist, not a filter
      that composes: pressing it clears every other filter, and setting any other
      filter leaves it. No separate page: a shortlisted recipe that has no row
@@ -204,6 +204,7 @@ permalink: /food/
   {% comment %} Ships `hidden`, like every shortlist control; shortlist.js reveals it and
      fills `[data-shortlist-count]`. {% endcomment %}
 </div>
+{% include shortlist-lists.html %}
 {% comment %} Hide / show drafts, on a local build only (#1358): gated on
    `site.show_drafts`, which only _config_local.yml declares. Ships `hidden`;
    filters.js reveals and wires it. The identical block is on
@@ -458,21 +459,7 @@ permalink: /food/
   <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
 </section>
 
-{% comment %} Share or save the shortlist: one link and nothing else (#1100). The link
-   (#1093) opens this index showing the list without saving it. The cocktails
-   index carries the identical block. It ships `hidden`, and
-   shortlist-export.js reveals it only while something is shortlisted. The
-   words are Helen's, and the same on both sites. {% endcomment %}
-<details class="shortlist-export" id="shortlist-export"
-         data-shortlist-export-panel hidden>
-  <summary>Share or save the shortlist</summary>
-  <p class="shortlist-export-hint">Loading this shows recipes without saving them.</p>
-  <input type="text" class="shortlist-share-link" data-shortlist-share
-         readonly spellcheck="false" aria-label="A link to this shortlist">
-  <button type="button" class="btn-shortlist-copy" data-shortlist-share-copy hidden>
-    copy link
-  </button>
-</details>
+{% include shortlist-export.html %}
 
 {% comment %} What each recipe is made of, and how many it feeds (#801), for every recipe:
    the shortlist is in localStorage, which the build cannot see. The row gate
@@ -539,6 +526,8 @@ permalink: /food/
    that builds the `× clear all` it mirrors. Guarded by
    tests/test_site_config.py::test_the_results_bar_loads_after_the_index_script_on_both_indexes. {% endcomment %}
 <script src="{{ '/assets/js/results-bar.js' | relative_url }}"></script>
-{% comment %} Order does not matter for this one: it reads HTF.shortlist at run time and
-   subscribes to an event. Last so it is obvious it is nobody's dependency. {% endcomment %}
+{% comment %} Order does not matter for these two: they read HTF.shortlist at run time
+   and subscribe to an event. Last so it is obvious they are nobody's
+   dependency. {% endcomment %}
+<script src="{{ '/assets/js/shortlist-lists.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/shortlist-export.js' | relative_url }}"></script>

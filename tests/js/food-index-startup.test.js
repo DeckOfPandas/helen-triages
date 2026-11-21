@@ -39,8 +39,9 @@ const SCRIPTS = [
   // at once here: this sandbox has no IntersectionObserver, which is the path
   // a browser without the API takes.
   'results-bar.js',
-  // #849. Nobody's dependency; listed because the test at the foot of this
-  // file asserts this array is the template's script list.
+  // #849, #1521. Nobody's dependencies; listed because the test at the foot
+  // of this file asserts this array is the template's script list.
+  'shortlist-lists.js',
   'shortlist-export.js'
 ];
 
@@ -92,7 +93,11 @@ const TITLES = {
   // Only in the list when a test passes SINGLE_THINGS as `options.recipes`.
   '/food/recipes/cake/': 'Beetroot Chocolate Cake',
   '/food/recipes/sauce/': 'Peanut Sauce',
-  '/food/recipes/pies/': 'Mince Pies'
+  '/food/recipes/pies/': 'Mince Pies',
+  '/food/recipes/trifle/': 'Blackberry Syllabub',
+  '/food/recipes/torte/': 'Sacher-Torte',
+  '/food/recipes/potato/': 'Potato Cakes with Smoked Salmon',
+  '/food/recipes/marinade/': 'Sticky Soy and Miso Dipping Sauce'
 };
 
 /* `makes:` recipes whose yield is one named thing, as _plugins/food_yield.rb
@@ -218,7 +223,7 @@ function boot(options) {
 
   const panel = el('section', 'shopping-list', {
     id: 'shopping-list', 'data-whole-measures': 'handful,pinch',
-    'data-count-nouns': 'onion,lemon', 'data-container-nouns': 'jar,tin,batch'
+    'data-count-nouns': 'onion,lemon', 'data-container-nouns': 'jar,tin,batch,bowl'
   });
   panel.appendChild(el('div', 'shopping-list-head'));
   panel.appendChild(el('ul', 'shopping-list-recipes'));
@@ -286,6 +291,20 @@ const recipesHtml = (panel) => panel.querySelector('.shopping-list-recipes').inn
 function showTheList(doc) {
   doc.getElementById('shortlist-only').dispatch('click');
 }
+
+// The pill opens SEE ALL (#1521), whose counts and ticks are its own: a test
+// that sets them before pressing it sets them there.
+function seeAll(win) {
+  win.HTF.shortlist.setActive(win.HTF.shortlist.ALL);
+}
+
+test('#1521: the pill opens SEE ALL, whichever list was on show', () => {
+  const { win, doc } = boot();
+  const store = win.HTF.shortlist;
+  store.setActive(store.create('Sunday lunch'));
+  showTheList(doc);
+  assert.strictEqual(store.activeId(), store.ALL);
+});
 
 // --- the canary ---------------------------------------------------------------
 
@@ -539,6 +558,7 @@ test('one cake is a cake, not a batch: the row names the thing made', () => {
 
 test('two of them take the plural, and a dozen stays a dozen', () => {
   const { win, doc, panel } = boot({ recipes: SINGLE_THINGS });
+  seeAll(win);
   ['cake', 'sauce', 'pies'].forEach((slug) => {
     win.HTF.shortlist.toggle('/food/recipes/' + slug + '/');
     win.HTF.shortlist.setBatches('/food/recipes/' + slug + '/', 2);
@@ -572,6 +592,67 @@ test('one thing that IS the dish, and is not in its name, follows the name', () 
   win.HTF.shortlist.setBatches('/food/recipes/cake/', 3);
   doc.dispatch('htf:shortlist-change');
   assert.deepStrictEqual(rowText(panel), ['Beetroot Chocolate Cake traybakes']);
+});
+
+test('a sized bowl holds the dish: "× 24-cm trifle bowl of", not after the name', () => {
+  // Helen's example: never "24-cm trifle Blackberry Syllabub bowl".
+  const recipes = {
+    '/food/recipes/trifle/': {
+      p: null, y: 'one 24-cm trifle bowl', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 1, stem: '24-cm trifle bowl', rest: '', box: '1',
+        singular: true, times: true, invariable: false },
+      i: [{ a: '300 g', n: 'blackberries', s: 'fruit' }]
+    }
+  };
+  const { win, doc, panel } = boot({ recipes });
+  win.HTF.shortlist.toggle('/food/recipes/trifle/');
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), ['× 24-cm trifle bowl of Blackberry Syllabub']);
+});
+
+test('a hyphened title names its parts: Sacher-Torte is a torte', () => {
+  const recipes = {
+    '/food/recipes/torte/': {
+      p: null, y: 'one 19-cm torte', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 1, stem: '19-cm torte', rest: '', box: '1',
+        singular: true, times: true, invariable: false },
+      i: [{ a: '150 g', n: 'dark chocolate', s: 'cupboard' }]
+    }
+  };
+  const { win, doc, panel } = boot({ recipes });
+  win.HTF.shortlist.toggle('/food/recipes/torte/');
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), ['× 19-cm Sacher-Torte']);
+});
+
+test('the thing made goes after the title\'s noun, before its "with"', () => {
+  const recipes = {
+    '/food/recipes/potato/': {
+      p: null, y: '30 pieces', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 30, stem: 'pieces', rest: '', box: '30' },
+      i: [{ a: '500 g', n: 'potatoes', s: 'produce' }]
+    }
+  };
+  const { win, doc, panel } = boot({ recipes });
+  win.HTF.shortlist.toggle('/food/recipes/potato/');
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), ['batch of 30 Potato Cake pieces with Smoked Salmon']);
+});
+
+test('"enough marinade for 4 portions of fish" follows the name, as written', () => {
+  const recipes = {
+    '/food/recipes/marinade/': {
+      p: null, y: 'enough marinade for 4 portions of fish', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 4, prefix: 'enough marinade for', stem: 'portions',
+        rest: ' of fish', box: '4' },
+      i: [{ a: '2 tbsp', n: 'miso', s: 'cupboard' }]
+    }
+  };
+  const { win, doc, panel } = boot({ recipes });
+  win.HTF.shortlist.toggle('/food/recipes/marinade/');
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel),
+    ['batch of Sticky Soy and Miso Dipping Sauce, enough marinade for 4 portions of fish']);
 });
 
 test('the title\'s own noun goes singular before the thing made', () => {
@@ -652,6 +733,7 @@ test('#1457: every row has a tick box, and a tick made earlier is drawn ticked',
   // The list is rebuilt whole on every number change: the store is what
   // carries a tick across, so the render must read it back.
   const { win, doc, panel } = boot();
+  seeAll(win);
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.setTicked('onion', true);
   showTheList(doc);
@@ -669,6 +751,7 @@ test('#1457: a new count for one recipe unticks its rows, and only its rows', ()
   // Recipe a stands behind flour, onions and olive oil; the cookies behind
   // peanut butter and an egg.
   const { win, doc, panel } = boot();
+  seeAll(win);
   win.HTF.shortlist.toggle('/food/recipes/a/');
   win.HTF.shortlist.toggle('/food/recipes/cookies/');
   ['plain flour', 'olive oil', 'egg'].forEach((k) => win.HTF.shortlist.setTicked(k, true));
@@ -690,6 +773,7 @@ test('#1457: a new count for one recipe unticks its rows, and only its rows', ()
 test('a count above one is still batches of that many', () => {
   // 18 of something is a batch, unlike one named thing.
   const { win, doc, panel } = boot();
+  seeAll(win);
   win.HTF.shortlist.toggle('/food/recipes/cookies/');
   win.HTF.shortlist.setBatches('/food/recipes/cookies/', 2);
   showTheList(doc);
@@ -805,6 +889,7 @@ test('a by-eye measure is totalled to a whole one, from the panel\'s own list', 
       }
     }
   });
+  seeAll(win);
   win.HTF.shortlist.setPortions('/food/recipes/a/', 7);
   win.HTF.shortlist.toggle('/food/recipes/a/');
   showTheList(doc);

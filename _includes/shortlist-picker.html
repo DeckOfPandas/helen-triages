@@ -1,0 +1,19 @@
+{% comment %} The shortlist picker (#1521): what any `.btn-shortlist` opens.
+   A <template>, so it renders nothing until shortlist.js clones it once and
+   fills the list rows. The × is the ingredient hint's
+   (_sass/food/_ingredient-hints.scss). {% endcomment %}
+<template id="shortlist-picker-template">
+  <div class="shortlist-picker" role="dialog">
+    <button type="button" class="shortlist-picker-close" aria-label="close">&times;</button>
+    <ul class="shortlist-picker-lists"></ul>
+    <button type="button" class="shortlist-picker-new">{% include icons/plus.svg %}<span>new list</span></button>
+    <form class="shortlist-picker-form" hidden>
+      <input type="text" class="shortlist-picker-name" aria-label="Name for the new list" autocomplete="off">
+      <span class="shortlist-picker-form-buttons">
+        <button type="submit" class="btn-shortlist-lists">{% include icons/save.svg %}<span>save</span></button>
+        <button type="button" class="btn-shortlist-lists shortlist-picker-cancel">{% include icons/close.svg %}<span>cancel</span></button>
+      </span>
+    </form>
+    <p class="shortlist-picker-error" role="alert" hidden></p>
+  </div>
+</template>

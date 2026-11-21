@@ -34,10 +34,11 @@
   color: $color-clear-text;
 }
 
-// The share link (#1093), which is all the panel holds (#1100). Readonly but
-// selectable, because select-all is how it is copied on a phone with no
-// clipboard API; shortlist-export.js selects it whole on focus.
-.shortlist-share-link {
+// The block of links, a line per list (#1521), and the box a block is pasted
+// back into. The first is readonly but selectable, because select-all is how
+// it is copied on a phone with no clipboard API; shortlist-export.js selects
+// it whole on focus. No wrapping, so a line is a list.
+.shortlist-share-block {
   display: block;
   width: 100%;
   margin-top: $space-sm;
@@ -48,8 +49,27 @@
   color: $color-text;
   background: $color-surface;
   border: 1px solid $color-border;
+  white-space: pre;
+  overflow-x: auto;
+  resize: vertical;
   -webkit-user-select: text;
   user-select: text;
+}
+
+.shortlist-restore-result {
+  margin: $space-sm 0 0;
+  font-size: 0.9rem;
+  color: $color-clear-text;
+}
+
+.shortlist-export-lists[hidden] { display: none; }
+
+// Under a shopping list's total, the lines it leaves out (#1523): a footnote
+// to the figure, so quieter than it. Both indexes draw it (shopping-list.js).
+.shopping-list-total .shopping-list-unpriced {
+  font-weight: 400;
+  font-size: 0.85em;
+  color: $color-clear-text;
 }
 
 // The note over a list opened from a share link (#1093), in the hint's

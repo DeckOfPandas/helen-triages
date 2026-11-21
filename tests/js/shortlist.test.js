@@ -17,7 +17,17 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { makePage, load } = require('./stub-dom.js');
 
+// The one-list key from before #1521: seeding it is what a returning reader's
+// browser holds, so every test that seeds it also tests the migration.
 const FOOD_KEY = 'htf-shortlist-food-v1';
+// The record every list is written to (#1521).
+const RECORD_KEY = 'htf-shortlists-food-v1';
+
+/** The active list as persisted: what the page reads back tomorrow. */
+function saved(storage, site) {
+  const record = JSON.parse(storage.read(site ? 'htf-shortlists-' + site + '-v1' : RECORD_KEY));
+  return record.lists.find((l) => l.id === record.active);
+}
 
 /* Array comparisons go through JSON: `assert.deepStrictEqual` checks
    prototypes, and an array built inside the vm context is an instance of that
@@ -105,7 +115,7 @@ test('clear() empties it', () => {
   HTF.shortlist.toggle('/a/');
   HTF.shortlist.clear();
   assert.strictEqual(HTF.shortlist.count(), 0);
-  assert.strictEqual(storage.read(FOOD_KEY), '[]');
+  assert.deepStrictEqual(saved(storage).entries, []);
 });
 
 // --- persistence --------------------------------------------------------------
@@ -113,7 +123,7 @@ test('clear() empties it', () => {
 test('a toggle is written to localStorage under this site\'s own key', () => {
   const { HTF, storage } = pageWith();
   HTF.shortlist.toggle('/food/recipes/dal/');
-  assert.deepStrictEqual(JSON.parse(storage.read(FOOD_KEY)), ['/food/recipes/dal/']);
+  assert.deepStrictEqual(saved(storage).entries, ['/food/recipes/dal/']);
 });
 
 test('what a previous visit wrote is read back', () => {
@@ -134,8 +144,8 @@ test('the two sites keep two lists, from one localStorage', () => {
 
   assert.deepStrictEqual(plain(food.HTF.shortlist.list()), ['/food/recipes/dal/']);
   assert.deepStrictEqual(plain(cocktails.HTF.shortlist.list()), ['/cocktails/drinks/negroni/']);
-  assert.ok(shared.read('htf-shortlist-food-v1'));
-  assert.ok(shared.read('htf-shortlist-cocktails-v1'));
+  assert.deepStrictEqual(saved(shared, 'food').entries, ['/food/recipes/dal/']);
+  assert.deepStrictEqual(saved(shared, 'cocktails').entries, ['/cocktails/drinks/negroni/']);
 });
 
 test('a page with no site-key has no store at all, and does not throw', () => {
@@ -188,7 +198,7 @@ test('a count is stored and read back', () => {
   const { HTF, storage } = pageWith();
   assert.strictEqual(HTF.shortlist.setGlasses('/a/', 6), 6);
   assert.strictEqual(HTF.shortlist.glasses('/a/'), 6);
-  assert.deepStrictEqual(JSON.parse(storage.read('htf-shortlist-glasses-food-v1')), { '/a/': 6 });
+  assert.deepStrictEqual(saved(storage).glasses, { '/a/': 6 });
 });
 
 test('setting a count back to one REMOVES it, rather than storing the default', () => {
@@ -197,7 +207,7 @@ test('setting a count back to one REMOVES it, rather than storing the default', 
   const { HTF, storage } = pageWith();
   HTF.shortlist.setGlasses('/a/', 6);
   assert.strictEqual(HTF.shortlist.setGlasses('/a/', 1), 1);
-  assert.deepStrictEqual(JSON.parse(storage.read('htf-shortlist-glasses-food-v1')), {});
+  assert.deepStrictEqual(saved(storage).glasses, {});
 });
 
 test('a nonsense count is one glass, not a stored nonsense', () => {
@@ -288,8 +298,7 @@ test('one portion is a real answer and survives a reload', () => {
   assert.strictEqual(HTF.shortlist.setPortions('/a/', 1), 1);
   HTF.shortlist._forget();
   assert.strictEqual(HTF.shortlist.portions('/a/'), 1);
-  assert.strictEqual(
-    JSON.parse(storage.getItem('htf-shortlist-portions-food-v2'))['/a/'], 1);
+  assert.strictEqual(saved(storage).portions['/a/'], 1);
 });
 
 test('anything below one forgets the entry rather than storing it', () => {
@@ -370,8 +379,7 @@ test('#1297: a batch count is stored under its own key and survives a reload', (
   assert.strictEqual(HTF.shortlist.setBatches('/a/', 3), 3);
   HTF.shortlist._forget();
   assert.strictEqual(HTF.shortlist.batches('/a/'), 3);
-  assert.strictEqual(
-    JSON.parse(storage.getItem('htf-shortlist-batches-food-v1'))['/a/'], 3);
+  assert.strictEqual(saved(storage).batches['/a/'], 3);
 });
 
 test('#1297: half a batch is storable, and nothing else below one is', () => {
@@ -424,7 +432,7 @@ test('#1457: nothing is ticked until something is', () => {
 test('#1457: a tick is stored under its own key and survives a reload', () => {
   const storage = workingStorage();
   pageWith(storage).HTF.shortlist.setTicked('onion', true);
-  assert.deepStrictEqual(JSON.parse(storage.read(TICKED_KEY)), ['onion']);
+  assert.deepStrictEqual(saved(storage).ticked, ['onion']);
   assert.strictEqual(pageWith(storage).HTF.shortlist.ticked('onion'), true);
 });
 
@@ -442,7 +450,7 @@ test('#1457: ticking twice stores the row once, so one untick clears it', () => 
   HTF.shortlist.setTicked('onion', true);
   HTF.shortlist.setTicked('onion', true);
   HTF.shortlist.setTicked('onion', false);
-  assert.deepStrictEqual(JSON.parse(storage.read(TICKED_KEY)), []);
+  assert.deepStrictEqual(saved(storage).ticked, []);
 });
 
 test('#1457: untickAll() clears every tick, and leaves the shortlist alone', () => {
@@ -454,7 +462,7 @@ test('#1457: untickAll() clears every tick, and leaves the shortlist alone', () 
   HTF.shortlist._forget();
   assert.strictEqual(HTF.shortlist.ticked('onion'), false);
   assert.strictEqual(HTF.shortlist.ticked('lime'), false);
-  assert.deepStrictEqual(JSON.parse(storage.read(TICKED_KEY)), []);
+  assert.deepStrictEqual(saved(storage).ticked, []);
   assert.strictEqual(HTF.shortlist.has('/a/'), true);
 });
 
@@ -480,7 +488,7 @@ test('#1457: a ticks record of the wrong shape reads as nothing ticked', () => {
 test('#1457: an empty row key is refused rather than stored', () => {
   const { HTF, storage } = pageWith();
   assert.strictEqual(HTF.shortlist.setTicked('', true), false);
-  assert.strictEqual(storage.read(TICKED_KEY), undefined);
+  assert.strictEqual(storage.read(RECORD_KEY), undefined);
 });
 
 test('#1457: the two sites keep separate ticks', () => {
@@ -608,7 +616,7 @@ test('#1457: untick() drops only the rows it names, and says how many were ticke
   const { HTF, storage } = pageWith();
   ['onion', 'lime', 'salt'].forEach((k) => HTF.shortlist.setTicked(k, true));
   assert.strictEqual(HTF.shortlist.untick(['onion', 'salt', 'never ticked']), 2);
-  assert.deepStrictEqual(JSON.parse(storage.read(TICKED_KEY)), ['lime']);
+  assert.deepStrictEqual(saved(storage).ticked, ['lime']);
   assert.strictEqual(HTF.shortlist.untick('onion'), 0, 'not a list: nothing happens');
 });
 
@@ -661,4 +669,280 @@ test('a huge count saved before the ceiling comes back as 99', () => {
   assert.strictEqual(HTF.shortlist.portions('/a/'), 99);
   assert.strictEqual(HTF.shortlist.batches('/a/'), 99);
   assert.strictEqual(HTF.shortlist.glasses('/a/'), 99);
+});
+
+// --- many named lists (#1521) -------------------------------------------------
+// The calls above act on the ACTIVE list, the one the index shows. These name
+// a list, or are about the lists themselves.
+
+const lists = (HTF) => plain(HTF.shortlist.lists().map((l) => [l.name, l.count]));
+
+test('#1521: a fresh browser has one empty list, called Shortlist, and it is active', () => {
+  const { HTF } = pageWith();
+  assert.deepStrictEqual(lists(HTF), [['Shortlist', 0]]);
+  assert.strictEqual(HTF.shortlist.activeName(), 'Shortlist');
+});
+
+test('#1521: the one list from before becomes "Shortlist", counts and ticks and all', () => {
+  const { HTF } = pageWith(workingStorage({
+    [FOOD_KEY]: JSON.stringify(['/a/', '/b/']),
+    'htf-shortlist-portions-food-v2': JSON.stringify({ '/a/': 6 }),
+    'htf-shortlist-batches-food-v1': JSON.stringify({ '/b/': 0.5 }),
+    'htf-shortlist-glasses-food-v1': JSON.stringify({ '/a/': 3 }),
+    'htf-shortlist-ticked-food-v1': JSON.stringify(['onion'])
+  }));
+  assert.deepStrictEqual(lists(HTF), [['Shortlist', 2]]);
+  assert.strictEqual(HTF.shortlist.portions('/a/'), 6);
+  assert.strictEqual(HTF.shortlist.batches('/b/'), 0.5);
+  assert.strictEqual(HTF.shortlist.glasses('/a/'), 3);
+  assert.strictEqual(HTF.shortlist.ticked('onion'), true);
+});
+
+test('#1521: once the record exists, the old keys are never read again', () => {
+  // Otherwise deleting "Shortlist" would bring the old list back on reload.
+  const storage = workingStorage({ [FOOD_KEY]: JSON.stringify(['/a/']) });
+  const first = pageWith(storage).HTF.shortlist;
+  first.remove(first.activeId());
+  const again = pageWith(storage).HTF.shortlist;
+  assert.strictEqual(again.count(), 0);
+});
+
+test('#1521: one recipe in two lists; each list says only for itself', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  const first = s.activeId();
+  const second = s.create('Weeknights');
+  assert.strictEqual(s.toggleIn(first, '/dal/'), true);
+  assert.strictEqual(s.toggleIn(second, '/dal/'), true);
+  assert.strictEqual(s.hasIn(first, '/dal/'), true);
+  assert.strictEqual(s.hasIn(second, '/dal/'), true);
+  s.toggleIn(first, '/dal/');
+  assert.strictEqual(s.hasIn(first, '/dal/'), false);
+  assert.strictEqual(s.inAny('/dal/'), true, 'still on Weeknights');
+  s.toggleIn(second, '/dal/');
+  assert.strictEqual(s.inAny('/dal/'), false);
+});
+
+test('#1521: total() counts each recipe once, however many lists it is on', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  assert.strictEqual(s.total(), 0);
+  s.toggle('/dal/');
+  s.toggle('/soup/');
+  const other = s.create('Weeknights');
+  s.toggleIn(other, '/dal/');
+  s.toggleIn(other, '/stew/');
+  assert.strictEqual(s.total(), 3);
+});
+
+test('#1521: portions, batches, glasses and ticks are each list\'s own', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  const first = s.activeId();
+  s.setPortions('/dal/', 6);
+  s.setBatches('/cake/', 2);
+  s.setGlasses('/negroni/', 4);
+  s.setTicked('onion', true);
+  s.setActive(s.create('Weeknights'));
+  assert.strictEqual(s.portions('/dal/'), null);
+  assert.strictEqual(s.batches('/cake/'), null);
+  assert.strictEqual(s.glasses('/negroni/'), 1);
+  assert.strictEqual(s.ticked('onion'), false);
+  s.setPortions('/dal/', 2);
+  s.setActive(first);
+  assert.strictEqual(s.portions('/dal/'), 6, 'Lasagne at 6 here and 2 there');
+});
+
+test('#1521: the active list survives a reload', () => {
+  const storage = workingStorage();
+  const s = pageWith(storage).HTF.shortlist;
+  s.setActive(s.create('Weeknights'));
+  s.toggle('/dal/');
+  const again = pageWith(storage).HTF.shortlist;
+  assert.strictEqual(again.activeName(), 'Weeknights');
+  assert.deepStrictEqual(plain(again.list()), ['/dal/']);
+});
+
+test('#1521: names are cleaned, and unique ignoring case', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  assert.strictEqual(s.create('   '), null);
+  assert.strictEqual(s.create('shortlist'), null, 'Shortlist exists');
+  const id = s.create('  Sunday \n\t lunch  ');
+  assert.strictEqual(s.lists().find((l) => l.id === id).name, 'Sunday lunch');
+  assert.strictEqual(s.create('x'.repeat(100)) !== null, true);
+  assert.ok(s.lists().every((l) => l.name.length <= s.NAME_MAX));
+  assert.strictEqual(s.nameFree('SUNDAY LUNCH'), false);
+  assert.strictEqual(s.nameFree('Sunday lunch', id), true, 'a list may keep its own name');
+});
+
+test('#1521: rename keeps the recipes, and refuses a taken or empty name', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  s.toggle('/dal/');
+  const other = s.create('Weeknights');
+  assert.strictEqual(s.rename(s.activeId(), 'weeknights'), false);
+  assert.strictEqual(s.rename(s.activeId(), ' '), false);
+  assert.strictEqual(s.rename('l99', 'Nope'), false);
+  assert.strictEqual(s.rename(s.activeId(), 'Sunday'), true);
+  assert.strictEqual(s.activeName(), 'Sunday');
+  assert.deepStrictEqual(plain(s.list()), ['/dal/']);
+  assert.strictEqual(s.rename(other, 'WEEKNIGHTS'), true, 'its own name in new case');
+});
+
+test('#1521: deleting the active list moves to the first; deleting the last leaves an empty Shortlist', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  s.toggle('/dal/');
+  const second = s.create('Weeknights');
+  s.setActive(second);
+  assert.strictEqual(s.remove(second), true);
+  assert.strictEqual(s.activeName(), 'Shortlist');
+  assert.strictEqual(s.remove('l99'), false);
+  s.rename(s.activeId(), 'Mine');
+  assert.strictEqual(s.remove(s.activeId()), true);
+  assert.deepStrictEqual(lists(HTF), [['Shortlist', 0]]);
+  assert.strictEqual(s.inAny('/dal/'), false);
+});
+
+test('#1521: a new list never reuses a live id', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  const a = s.create('A');
+  const b = s.create('B');
+  s.remove(a);
+  const c = s.create('C');
+  assert.notStrictEqual(c, b);
+  assert.strictEqual(new Set(s.lists().map((l) => l.id)).size, s.lists().length);
+});
+
+test('#1521: exportLists() is every list with something on it, in order', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  s.toggle('/dal/');
+  s.create('Empty');
+  s.toggleIn(s.create('Weeknights'), '/soup/');
+  assert.deepStrictEqual(plain(s.exportLists()),
+    [{ name: 'Shortlist', keys: ['/dal/'] }, { name: 'Weeknights', keys: ['/soup/'] }]);
+});
+
+test('#1521: a record of the wrong shape reads as one empty Shortlist, never half-read', () => {
+  ['not json', '7', JSON.stringify([]), JSON.stringify({ lists: 'x' }), JSON.stringify({ lists: [] })]
+    .forEach((raw) => {
+      const { HTF } = pageWith(workingStorage({ [RECORD_KEY]: raw, [FOOD_KEY]: JSON.stringify(['/a/']) }));
+      assert.deepStrictEqual(lists(HTF), [['Shortlist', 0]], raw);
+    });
+});
+
+test('#1521: inside a record, each bad list is dropped and each bad part costs only itself', () => {
+  const raw = JSON.stringify({
+    active: 'l7',
+    lists: [
+      null,
+      { id: 'l1', name: '', entries: ['/x/'] },
+      { id: 'l2', name: 'Good', entries: ['/a/', 3, '/a/'], portions: { '/a/': 'six', '/b/': 4 } },
+      { id: 'l2', name: 'Same id', entries: 'nope', ticked: ['lime', null] },
+      { id: 'l3', name: 'good', entries: ['/dup-name/'] }
+    ]
+  });
+  const { HTF } = pageWith(workingStorage({ [RECORD_KEY]: raw }));
+  const s = HTF.shortlist;
+  assert.deepStrictEqual(lists(HTF), [['Good', 1], ['Same id', 0]]);
+  assert.strictEqual(s.activeName(), 'Good', 'an active id naming no list falls back to the first');
+  assert.strictEqual(s.portions('/a/'), null);
+  assert.strictEqual(s.portions('/b/'), 4);
+  const ids = s.lists().map((l) => l.id);
+  assert.strictEqual(new Set(ids).size, 2, 'the clashing id was given a fresh one');
+});
+
+test('#1521: a failed write still keeps a new list for this visit', () => {
+  const { HTF } = pageWith({
+    getItem: () => null,
+    setItem: () => { throw new Error('QuotaExceededError'); }
+  });
+  const id = HTF.shortlist.create('Weeknights');
+  assert.ok(id);
+  HTF.shortlist.toggleIn(id, '/dal/');
+  assert.strictEqual(HTF.shortlist.hasIn(id, '/dal/'), true);
+});
+
+// --- SEE ALL (#1521) ------------------------------------------------------------
+// Every recipe on any list, once, with numbers and ticks of its own, which the
+// recipe page's scaler shares.
+
+test('#1521: SEE ALL shows every recipe on any list once, in list order', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  s.toggle('/dal/');
+  s.toggle('/soup/');
+  const other = s.create('Weeknights');
+  s.toggleIn(other, '/stew/');
+  s.toggleIn(other, '/dal/');
+  assert.strictEqual(s.setActive(s.ALL), true);
+  assert.strictEqual(s.activeId(), 'all');
+  assert.deepStrictEqual(plain(s.list()), ['/dal/', '/soup/', '/stew/']);
+  assert.strictEqual(s.count(), 3);
+  assert.strictEqual(s.has('/stew/'), true);
+  assert.deepStrictEqual(lists(HTF), [['Shortlist', 2], ['Weeknights', 2]], 'not a list of its own');
+});
+
+test('#1521: SEE ALL\'s numbers and ticks are its own, and survive a reload', () => {
+  const storage = workingStorage();
+  const s = pageWith(storage).HTF.shortlist;
+  s.toggle('/dal/');
+  s.setPortions('/dal/', 2);
+  s.setTicked('onion', true);
+  s.setActive(s.ALL);
+  assert.strictEqual(s.portions('/dal/'), null, 'not the list\'s 2');
+  assert.strictEqual(s.ticked('onion'), false);
+  s.setPortions('/dal/', 8);
+  s.setBatches('/cake/', 2);
+  s.setTicked('lime', true);
+  const again = pageWith(storage).HTF.shortlist;
+  assert.strictEqual(again.activeId(), 'all');
+  assert.strictEqual(again.portions('/dal/'), 8);
+  assert.strictEqual(again.batches('/cake/'), 2);
+  assert.strictEqual(again.ticked('lime'), true);
+  again.untickAll();
+  assert.strictEqual(again.ticked('lime'), false, 'untick all reaches SEE ALL\'s own ticks');
+  again.setActive(again.lists()[0].id);
+  assert.strictEqual(again.portions('/dal/'), 2);
+});
+
+test('#1521: the ...In calls read and write SEE ALL from anywhere, as the recipe page does', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  assert.strictEqual(s.setPortionsIn(s.ALL, '/dal/', 6), 6);
+  assert.strictEqual(s.setBatchesIn(s.ALL, '/cake/', 0.5), 0.5);
+  assert.strictEqual(s.portions('/dal/'), null, 'the list on show is untouched');
+  s.setActive(s.ALL);
+  assert.strictEqual(s.portions('/dal/'), 6);
+  assert.strictEqual(s.batchesIn(s.ALL, '/cake/'), 0.5);
+  assert.strictEqual(s.setPortionsIn(s.ALL, '/dal/', null), null);
+  assert.strictEqual(s.portionsIn(s.ALL, '/dal/'), null);
+  assert.strictEqual(s.portionsIn('l99', '/dal/'), null, 'no such list');
+});
+
+test('#1521: in SEE ALL, additions go to the first list, and rename and delete find no list', () => {
+  const { HTF } = pageWith();
+  const s = HTF.shortlist;
+  s.create('Weeknights');
+  s.setActive(s.ALL);
+  s.addAll(['/dal/']);
+  s.keep('', ['/soup/']);
+  assert.deepStrictEqual(lists(HTF), [['Shortlist', 2], ['Weeknights', 0]]);
+  assert.strictEqual(s.rename(s.ALL, 'Nope'), false);
+  assert.strictEqual(s.remove(s.ALL), false);
+  s.setActive(s.ALL);
+  s.remove(s.lists()[1].id);
+  assert.strictEqual(s.activeId(), 'all', 'deleting a list leaves SEE ALL on show');
+});
+
+test('#1521: a stored SEE ALL that is the wrong shape reads as empty numbers', () => {
+  const raw = JSON.stringify({ active: 'all', lists: [{ id: 'l1', name: 'A', entries: ['/a/'] }],
+    all: { portions: 'six', ticked: [3, 'lime'] } });
+  const { HTF } = pageWith(workingStorage({ [RECORD_KEY]: raw }));
+  assert.strictEqual(HTF.shortlist.activeId(), 'all');
+  assert.strictEqual(HTF.shortlist.portions('/a/'), null);
+  assert.strictEqual(HTF.shortlist.ticked('lime'), true);
 });

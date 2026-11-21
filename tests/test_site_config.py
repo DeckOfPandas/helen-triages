@@ -906,13 +906,13 @@ def test_filter_sections_carry_the_id_their_badges_and_chips_link_to():
 
 
 def test_the_see_shortlist_link_lands_on_the_results_list():
-    """#1057: "see shortlist" lands on the count line both indexes carry
-    id="results" on, not the top of the index.
+    """#1057: "see shortlists" lands on the count line both indexes carry
+    id="results" on, not the top of the index, in SEE ALL (#1521).
     """
     page_actions = read("_includes", "page-actions.html")
-    assert re.search(r'href="[^"]*\?shortlist=1#results"', page_actions), (
-        '_includes/page-actions.html\'s "see shortlist" link no longer ends '
-        'in "?shortlist=1#results" -- #1057. It must land on the count line '
+    assert re.search(r'href="[^"]*\?shortlist=all#results"', page_actions), (
+        '_includes/page-actions.html\'s "see shortlists" link no longer ends '
+        'in "?shortlist=all#results" -- #1057, #1521. It must land on the count line '
         'both indexes carry id="results" on, the same landing a search '
         'result gets.'
     )

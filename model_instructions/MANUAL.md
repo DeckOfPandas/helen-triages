@@ -1384,8 +1384,8 @@ skipped here and indexed there.
 #### The panel and its rows
 
 The panel is the last thing on the food index and is shown only in the
-shortlist view (§8.9). It totals the shortlist, in the order recipes were
-shortlisted, not the rows on screen.
+shortlist view (§8.9). It totals the list on show, in the order recipes were
+added to it, not the rows on screen.
 
 **Each row says what its number counts.** A `serves:` recipe's box counts
 portions; a `makes:` recipe's (`w`) counts batches, from the same three
@@ -1407,13 +1407,16 @@ figures the recipe's own page uses, so the two step alike.
   batches.
 - **The thing made is said once.** Where the title already names it (the
   yield's last word found in the title, singular against singular) the noun is
-  dropped. Where it does not, the noun follows the title, and the title's own
-  last word before any " with …" goes singular if it is a plain plural
-  (`singularHead`): "batch of 16 … Brownie squares".
+  dropped; a hyphened title word counts by its parts too, so "Sacher-Torte"
+  names a torte. Where it does not, the noun follows the title's own noun,
+  which goes singular if it is a plain plural (`singularHead`), and comes
+  before any " with …" (`thingAfterHead`): "batch of 16 … Brownie squares",
+  "batch of 30 Potato Cake pieces with Smoked Salmon …".
 - **A yield of one named thing is not a batch.** Named by the title, the row
   is `×` and the title, which is not made plural. Not named, a container
-  (`yields.container_words`) goes first with "of" and anything else follows
-  the title, plural above one.
+  (`yields.container_words`, a bowl or a tin, never a cake) goes first with
+  "of", "× 24-cm trifle bowl of Blackberry Syllabub …", and anything else
+  follows the title, plural above one.
 - **It needs the noun**, so a `makes:` that opens with a number names the
   thing (`"16 bars"`, never `"16"`). A bare count has nothing to print and its
   row is "batch of" the title.
@@ -1582,8 +1585,10 @@ no price. DECISIONS §8.2.
   total it cannot reach makes the row unpriced, or "from £X" where part of
   it was priced; never zero.
 - **What shows**: each row's price (`.shopping-list-price`), the total under
-  the rows (`.shopping-list-total`, "roughly £M (£X–£Y)", or "from £X — n
-  lines have no price"), and after each recipe's sentence one portion of a
+  the rows (`.shopping-list-total`, "roughly £M (£X–£Y)" or "from £X", and
+  under it, quieter, "n lines have no price (a, b)":
+  `HTF.shoppingList.drawTotal`, which the cocktail list's total uses too),
+  and after each recipe's sentence one portion of a
   `serves:` recipe or one batch of a `makes:` one (`.shopping-list-cost`),
   priced from the recipe as written and fixed whatever the box says.
 - **The recipe page** says the same figure in the drink page's footer
@@ -1674,7 +1679,11 @@ word with no plural.
 derived figure: a typed number goes to the nearest whole recipe.
 
 `food_yield.rb` reads only the start of the `makes:` line, after an optional
-word from `yields.approx_words`:
+word from `yields.approx_words`, or after an "enough <thing> for" lead-in
+(`ENOUGH`), which stays before the box as `prefix`. A bare "Enough for one
+pie" names no thing and is not read. On the index's shopping list an
+"enough" yield follows the name: "batch of Sticky Soy …, enough marinade for
+4 portions of fish".
 
 | `makes:` | ×1 | ×2 |
 |---|---|---|
@@ -1683,6 +1692,7 @@ word from `yields.approx_words`:
 | `64+ tiny macarons` | `64+` tiny macarons | `128+` |
 | `one 8-inch cake` — a number word | `1` × 8-inch cake | `2` × 8-inch cakes |
 | `1 dozen mince pies` | `1` dozen mince pies | `2` dozen mince pies |
+| `enough marinade for 4 portions of fish` | enough marinade for `4` portions of fish | … for `8` portions of fish |
 | `950 ml`, `approx. 75 g` — a measure | `950` ml | `1900` ml |
 | `1 batch — <Helen's words>` | `1` batch | `2` batches; ×½ reads `½` batch |
 | `1 batch, about 100 g` — a measure after the thing (`also`) | `1` batch, about 100 g | `2` batches, about 200 g |
@@ -1787,13 +1797,14 @@ for `filters.js` and `cocktail-index.js` alike; `@mixin shopping-tick` in
 
 #### Storage
 
-`HTF.shortlist` (`assets/js/assets.js`) keeps the counts in localStorage keys
-of their own, per site: glasses, portions and batches. They are separate
-because a missing entry means something different in each: one glass; however
-many this recipe makes, so `1` is a real stored answer; one batch. A stored 6
-cannot say whether it meant people or batches. A half batch is storable;
-whether this recipe may have one is `filters.js`'s question. The ticks are a
-fourth key, a list of row keys.
+`HTF.shortlist` (`assets/js/assets.js`) keeps the counts inside each list
+(§8.9), so the same recipe can be 6 portions on one list and 2 on another:
+glasses, portions and batches, as three maps. They are separate because a
+missing entry means something different in each: one glass; however many this
+recipe makes, so `1` is a real stored answer; one batch. A stored 6 cannot say
+whether it meant people or batches. A half batch is storable; whether this
+recipe may have one is `filters.js`'s question. The ticks are a fourth part of
+the list, a list of row keys. The shopping list always reads the active list.
 
 #### Tests
 
@@ -1806,49 +1817,129 @@ parser), `food-index-startup.test.js` (the wiring and the batch rows, §10.2),
 reaching both pages), `tests/test_food_shopping.py` (the data),
 `tests/test_food_yield.py`, `tests/test_rendered_pages.py`.
 
-### 8.9 The shortlist view on both indexes
+### 8.9 The shortlists on both indexes
 
-**`shortlisted (N)` is a view, not a facet.** Pressing it on clears every
-other filter and shows the whole shortlist. Setting any filter, or choosing a
-search result, while it is on turns it off and applies that filter to the
-whole collection; typing into a box without choosing keeps it. `clear all`
-turns it off. The rule is two functions in `assets/js/filter-state.js`,
+**There are named lists, as many as the reader makes** (#1521). One
+localStorage record per site, `htf-shortlists-<site>-v1`, holds every list:
+its id, name, entries, counts (§8.2) and ticks, and which list is active.
+There is always at least one: a fresh browser has an empty "Shortlist", and
+deleting the last list leaves one. A browser with the one list from before
+#1521 gets it as "Shortlist", counts and ticks included; the old keys are read
+only while the record is absent. Names are one line, at most 40 characters,
+and unique ignoring case. `HTF.shortlist`'s single-list calls (`has`,
+`toggle`, `portions`, `ticked`...) act on the **active** list; `hasIn`,
+`toggleIn`, `inAny`, `create`, `rename`, `remove` and `setActive` are the
+rest. Still one browser on one device (DECISIONS §8.3).
+
+**SEE ALL** (`HTF.shortlist.ALL`, the id `all`) can be the active list: every
+recipe on any list, once, in list order. It is not a list, and has no
+entries of its own; it has its own portions, batches, glasses and ticks (the
+record's `all`). In it, an addition goes to the first list, and rename and
+delete find nothing. Its numbers are the recipe page scaler's too
+(`portionsIn`/`batchesIn` and their setters with `ALL`, from
+`assets/js/recipe-scale.js`, keyed by the control's `data-shortlist-key`):
+the scaler opens at SEE ALL's number and writes each change back, a
+`makes:` recipe's thing-made count stored as batches, and the recipe as
+written stores nothing. `?shortlist=all` opens it.
+
+**Every `.btn-shortlist` opens the picker** (`assets/js/shortlist.js`, cloned
+from the `<template>` in `_includes/shortlist-picker.html`, which the layout
+emits on any page with a site key): a tick box per list and "+ new list",
+which makes a list with this recipe already on it. It opens on every press, on
+both sites, index or page.
+The control is `is-on` while any list holds the recipe. The picker closes on
+its × (the ingredient hint's), on Escape (both put focus back on the
+control), on a press or focus outside it, and when the index hides the row it
+opened under.
+
+**Looks** (`_sass/shared/_shortlist-lists.scss`): the picker's top rule, ticks
+and ticked names are `--shortlist-on`, the site's own "on" colour, which each
+site's `_shortlist.scss` sets. Every list name is `--shortlist-name-font`,
+Courier Prime, Helen's choice. The chooser's and the name forms' buttons are
+`.btn-shortlist-lists`, each site's `.btn-shortlist-only` pill extended, with
+an icon from `_includes/icons/` (pencil, bin, plus, save, close).
+
+**The index's pill reads `see shortlists (N)`, the words of a page's link,
+and counts every recipe on any list, once** (`paintCounts` in
+`shortlist.js`, `HTF.shortlist.total()` for the page's link). The chooser's
+rows carry each list's own count. The two keep their own shapes: the pill
+changes the page it is on, the link leaves it (DECISIONS §13).
+
+**The view is not a facet**, and shows the active list. Pressing the pill
+on clears every other filter and opens SEE ALL, the view its count counts,
+whichever list was on show. Setting any filter, or
+choosing a search result, while it is on turns it off and applies that filter
+to the whole collection; typing into a box without choosing keeps it. `clear
+all` turns it off. The rule is two functions in `assets/js/filter-state.js`,
 `enterShortlistView` and `reconcileShortlistView`, the second run at the top
 of every `update()`/`apply()`; `tests/js/shortlist-view.test.js` generates the
 cases from both field tables. Why it does not compose: DECISIONS §8.3.
 
-**`?shortlist=1` enters it on both indexes**, by calling the same
-`enterShortlistView()` the button calls, so the two doors land in one state.
-It runs after the other query blocks and replaces them, and drops the
-remembered scroll with the remembered list. The `see shortlist (N)` link
-beside a page's shortlist pill (`_includes/page-actions.html`) points there,
-ends `#results`, and is shown only while N is above zero.
+**The list chooser** (`_includes/shortlist-lists.html`,
+`assets/js/shortlist-lists.js`) shows under the pill while your own view is
+on: each index unhides it beside painting the pill. A button with no
+visible label (its `aria-label` is "choose shortlist"), naming the active
+list with a caret, opens a menu in the picker's own box (`.shortlist-picker`:
+the top rule, edges, shadow and ×), as wide as its longest name: a row per
+list, "name (N)", then SEE ALL (N) under a rule, each with the picker's tick
+box, filled on the one shown. Both draw that box themselves
+(`%shortlist-box`), since a browser's own checkbox differs by engine and
+theme. Not a `<select>`, whose open list the browser draws and no stylesheet
+reaches. Opened by a press, focus sits on the menu; by the keyboard, on the
+list shown.
+Up and down walk the rows; Escape, the ×, a choice, or a press or focus
+outside closes it. Rename and delete sit beside the button, hidden in SEE ALL,
+and "+ new list" on the row under. New and rename open
+one name form in place of the buttons; delete asks `window.confirm` first.
+Every change dispatches `htf:shortlist-change`, which both indexes already
+repaint from. It paints again on DOMContentLoaded, after the index has read
+`?shortlist=all`.
 
-**`?shortlist=slug,slug` is a shortlist someone sent. The index shows it and
-saves none of it.**
+**`?shortlist=1` enters the view on both indexes**, by calling the same
+`enterShortlistView()` the button calls, so the two doors land in one state;
+`?shortlist=all` does the same with SEE ALL made active first. It runs after
+the other query blocks and replaces them, and drops the remembered scroll
+with the remembered list. The `see shortlists (N)` link beside a page's
+shortlist pill (`_includes/page-actions.html`) opens SEE ALL, ends
+`#results`, and is shown only while some list has something on it.
+
+**`?shortlist=slug,slug&list=Name` is a shortlist someone sent. The index
+shows it and saves none of it.**
 
 - `HTF.filterState.parseShortlist` reads both meanings: slugs are `[a-z0-9-]`
-  only, and `1` is never a slug. `HTF.shortlist.resolveSlugs` matches slugs to
-  live keys and writes nothing.
+  only, and `1` is never a slug. `list` is the name, read only beside slugs.
+  `HTF.shortlist.resolveSlugs` matches slugs to live keys and writes nothing.
 - The view is the ordinary shortlist view with `sharedKeys` answering "is this
   one on it" in place of the store. The page drops the list the moment the
   view goes.
-- The note `[data-shared-shortlist]` says how many and names any slug nothing
-  answers to. `shortlisted (N)` is not lit; pressing it shows your own list.
+- The note `[data-shared-shortlist]` says the name, how many, and any slug
+  nothing answers to. The pill is not lit; pressing it shows your own lists,
+  as SEE ALL.
 - The shopping list is open and totals the link's recipes as written. A number
-  typed into a box is saved, as that recipe's count.
-- **"keep these"** merges the list in (`HTF.shortlist.addAll`) and shows
-  yours.
+  typed into a box is saved, as that recipe's count on the active list.
+- **"keep these"** (`HTF.shortlist.keep`) merges the list into the list of
+  that name, made if there is none, and shows it. A link with no name merges
+  into the active list.
 
-**The link is the whole panel** at the foot of each index, "Share or save the
-shortlist" (`[data-shortlist-export-panel]`, shown only while something is
-shortlisted). `shortlist-export.js` builds `[data-shortlist-share]` from
-`shortlistQuery` and `slugOf`. There is no JSON export, no restore and no
-clear button, and a link carries no portions or glasses.
+**The panel at the foot of each index**, "Share or save the shortlists"
+(`_includes/shortlist-export.html`, `assets/js/shortlist-export.js`), is
+always there once the script runs:
 
-Tests: `tests/js/shortlist-share.test.js` (the store),
-`filter-state.test.js` (the grammar), and both index startup harnesses (the
-wiring).
+- **The block**: a line per list with something on it, `Name: link`, built by
+  `HTF.filterState.shortlistBlock`, with "copy all". Shown only while some list
+  has something on it. A link carries no portions or glasses.
+- **Restore**: a box that takes a pasted block (`parseShortlistBlock` finds
+  every `shortlist=` link on any line, whatever surrounds it) and
+  `HTF.shortlist.restore` merges each list into the one of its name. It says
+  how many lists and recipes, and names slugs nothing answers to. The active
+  list stays as it was.
+
+There is no clear button.
+
+Tests: `tests/js/shortlist.test.js` (the store and the lists),
+`shortlist-share.test.js` (keep and restore), `filter-state.test.js` (the
+grammar and the block), and both index startup harnesses (the wiring). The
+picker and the chooser have no stub-DOM test; check them in a browser.
 
 ## 9. Cocktails
 
@@ -5065,9 +5156,10 @@ they are deliberately not drawn alike.
   bordered in `$color-border` on `$color-surface`; hover and on take the
   border to `currentColor`, so the site's own state colours drive it.
 - **`.btn-see-shortlist`** is a plain quiet-caps link in the same face as
-  print and pdf: "see shortlist (N)", word first, no arrow. It links to the
-  index with `?shortlist=1#results` (§8.9). N is the store's count
-  (`data-shortlist-total`, from `HTF.shortlist.count()`), not the page's.
+  print and pdf: "see shortlists (N)", word first, no arrow. It links to the
+  index with `?shortlist=all#results` (§8.9), which shows SEE ALL. N is
+  every recipe on any list, once (`data-shortlist-total`, from
+  `HTF.shortlist.total()`), not the page's. The pill opens the picker.
   **It stays hidden while N is 0**; `paintCounts()` in `shortlist.js`
   decides on every change.
 - Both ship `hidden` and `shortlist.js` reveals them: a control that

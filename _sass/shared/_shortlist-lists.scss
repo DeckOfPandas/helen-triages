@@ -1,0 +1,322 @@
+@use "shared/theme" as *;
+@use "shared/tokens" as *;
+
+// THE PICKER AND THE LIST CHOOSER (#1521), on both sites.
+//
+// In shared/ for the reason shared/_shortlist-export.scss is: one block of
+// markup, one script, two palettes. Colours are palette-contract names, plus
+// `--shortlist-on`, the site's own "on the shortlist" colour, which each
+// site's _shortlist.scss sets. The pills' shape and states are each site's
+// `.btn-shortlist-only`, extended there. A list name is in
+// `--shortlist-name-font` wherever it appears.
+
+// Helen's choice of face for a list name (#1521): the pills' Courier, lowercase.
+:root { --shortlist-name-font: #{$font-headings}; }
+
+// An icon in a pill or a row, beside its word, the word's own colour.
+.btn-icon {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.btn-shortlist-lists {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+// --- The picker --------------------------------------------------------------
+// Opened by any `.btn-shortlist`, cloned and placed by shortlist.js: absolute
+// in the document, under the control, its right edge on the control's.
+.shortlist-picker {
+  position: absolute;
+  z-index: 50;
+  min-width: 15rem;
+  max-width: calc(100vw - 16px);
+  box-sizing: border-box;
+  padding: $space-sm 0;
+  background: $color-surface;
+  color: $color-text;
+  border: 1.5px solid $color-border;
+  border-top: 4px solid var(--shortlist-on);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+// The ingredient hint's × (food/_ingredient-hints.scss), in the top corner.
+.shortlist-picker-close {
+  position: absolute;
+  top: $space-xs;
+  right: $space-xs;
+  padding: $space-xs $space-sm;
+  border: 0;
+  background: none;
+  color: $color-clear-text;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: var(--shortlist-on); }
+}
+
+.shortlist-picker-lists {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Room on the right of the first row for the ×.
+.shortlist-picker-list:first-child label { padding-right: 2.75rem; }
+
+// A row tall enough for a thumb, with room either side.
+.shortlist-picker-list label {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  min-height: 2.5rem;
+  padding: 0 $space-lg;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+
+  &:hover { background: color-mix(in srgb, var(--shortlist-on) 10%, transparent); }
+}
+
+// One drawn tick box for the picker's inputs and the chooser's rows: a
+// browser's own box differs by engine and theme, so the two would not match.
+%shortlist-box {
+  flex: none;
+  box-sizing: border-box;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  border: 1.5px solid $color-clear-text;
+  border-radius: 3px;
+  background: transparent;
+}
+
+%shortlist-box-on {
+  background: var(--shortlist-on) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 85% no-repeat;
+  border-color: var(--shortlist-on);
+}
+
+.shortlist-picker-list input {
+  @extend %shortlist-box;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+
+  &:checked { @extend %shortlist-box-on; }
+
+  &:focus-visible {
+    outline: 2px solid var(--shortlist-on);
+    outline-offset: 2px;
+  }
+}
+
+.shortlist-list-name {
+  font-family: var(--shortlist-name-font);
+  font-size: 1rem;
+}
+
+// The list the recipe is on reads in the site's colour.
+.shortlist-picker-list input:checked + .shortlist-list-name { color: var(--shortlist-on); }
+
+// "+ new list": a row in the actions' caps, quiet until hovered.
+.shortlist-picker-new {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 2.5rem;
+  padding: 0 $space-lg;
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $color-clear-text;
+  background: none;
+  border: 0;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+
+  &:hover,
+  &:focus-visible { color: var(--shortlist-on); }
+}
+
+.shortlist-picker-new .btn-icon { color: var(--shortlist-on); }
+
+.shortlist-picker-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm;
+  padding: $space-xs $space-lg;
+}
+
+.shortlist-picker-form-buttons {
+  display: flex;
+  gap: $space-sm;
+}
+
+.shortlist-picker-name,
+.shortlist-lists-name {
+  min-width: 0;
+  font-family: var(--shortlist-name-font);
+  font-size: 1rem;   // 16px: below it, iOS zooms the page on focus
+  color: $color-text;
+  background: $color-surface;
+  border: 1.5px solid $color-border;
+  padding: $space-xs $space-sm;
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--shortlist-on);
+  }
+}
+
+.shortlist-picker-name { flex: 1 1 10rem; }
+
+.shortlist-picker-error,
+.shortlist-lists-error {
+  margin: $space-xs 0 0;
+  padding: 0 $space-lg;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
+// --- The chooser -------------------------------------------------------------
+// Under the shortlisted pill while your own list shows: the choice with its
+// rename and delete, then "+ new list". Each line wraps on a phone.
+.shortlist-lists {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-sm;
+  margin: 0 0 $space-lg;
+}
+
+.shortlist-lists-row,
+.shortlist-lists-actions,
+.shortlist-lists-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-sm;
+}
+
+// The button naming the list on show, in the name box's dress, with a caret.
+// Its menu is the picker's box, opened under it, its left edge on the
+// button's.
+.shortlist-lists-choose {
+  position: relative;
+  max-width: 100%;
+}
+
+.shortlist-lists-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-md;
+  max-width: 100%;
+  min-height: 2.5rem;
+  box-sizing: border-box;
+  padding: $space-xs $space-md;
+  color: $color-text;
+  background: $color-surface;
+  border: 1.5px solid $color-border;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover,
+  &:focus-visible,
+  &[aria-expanded="true"] {
+    outline: none;
+    border-color: var(--shortlist-on);
+  }
+}
+
+.shortlist-lists-toggle::after {
+  content: "";
+  flex: none;
+  width: 0.45em;
+  height: 0.45em;
+  margin-top: -0.25em;
+  border-right: 2px solid var(--shortlist-on);
+  border-bottom: 2px solid var(--shortlist-on);
+  transform: rotate(45deg);
+}
+
+// As wide as its longest name, as the picker is: inside the button's span it
+// would otherwise shrink to the button and wrap every name.
+.shortlist-lists-menu {
+  top: calc(100% + #{$space-xs});
+  left: 0;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+
+  &:focus { outline: none; }
+}
+
+// A row as the picker's: a tick box, filled on the list shown, and the name.
+.shortlist-lists-option {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  width: 100%;
+  min-height: 2.5rem;
+  box-sizing: border-box;
+  padding: 0 $space-lg;
+  color: $color-text;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+
+  &::before {
+    @extend %shortlist-box;
+    content: "";
+  }
+
+  &:hover,
+  &:focus-visible {
+    outline: none;
+    background: color-mix(in srgb, var(--shortlist-on) 10%, transparent);
+  }
+
+  &[aria-current="true"] { color: var(--shortlist-on); }
+
+  &[aria-current="true"]::before { @extend %shortlist-box-on; }
+}
+
+.shortlist-picker-list:first-child .shortlist-lists-option { padding-right: 2.75rem; }
+
+// SEE ALL, under a rule, in the actions' caps.
+.shortlist-lists-all {
+  margin-top: $space-sm;
+  padding-top: $space-sm;
+  border-top: 1px solid $color-border;
+}
+
+.shortlist-lists-all-name {
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+// `hidden` must win over the displays above.
+.shortlist-lists-menu[hidden],
+.shortlist-lists[hidden],
+.shortlist-lists-row[hidden],
+.shortlist-lists-actions[hidden],
+.shortlist-lists-form[hidden],
+.shortlist-picker-new[hidden],
+.shortlist-picker-form[hidden] { display: none; }
+
+.shortlist-lists-error { flex-basis: 100%; margin: 0; padding: 0; }

@@ -54,6 +54,8 @@
 @use "cocktails/shortlist";
 // The export panel (#849), shared because it is identical on both indexes.
 @use "shared/shortlist-export";
+// The picker and the list chooser (#1521), shared for the same reason.
+@use "shared/shortlist-lists";
 // After cocktails/cards: the parts it clones from a card (.drink-card-name
 // and its siblings) are styled by rules cards defines.
 @use "cocktails/universe";

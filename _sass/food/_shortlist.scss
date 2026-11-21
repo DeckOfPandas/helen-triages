@@ -142,6 +142,19 @@
 // element (food/index.html).
 .btn-drafts-toggle { @extend .btn-shortlist-only; }
 
+// The list chooser's and the picker's pills (#1521, shared/_shortlist-lists.scss):
+// this pill's shape and hover, and its on state while pressed.
+.btn-shortlist-lists {
+  @extend .btn-shortlist-only;
+
+  &:active {
+    color: $color-recipe-link;
+    border-color: $color-recipe-link;
+  }
+}
+
+:root { --shortlist-on: #{$color-recipe-link}; }
+
 .drafts-toggle-row {
   margin: (-$space-sm) 0 $space-lg;
 }

@@ -48,7 +48,9 @@ document.addEventListener('DOMContentLoaded', function () {
      into this browser's next visit. null when no shared list is showing. */
   var sharedKeys = null;
   var sharedUnmatched = [];
+  var sharedName = '';   // the link's `list=` (#1521); '' for a nameless link
   var sharedNote = document.querySelector('[data-shared-shortlist]');
+  var listChooser = document.querySelector('[data-shortlist-lists]');
   // The one clear-all is the results pill's × (_includes/results-pill.html,
   // #1448): this script sets its visibility and wires its click, and
   // results-bar.js shows it whenever that visibility says there is something
@@ -610,6 +612,8 @@ function renderResultsPool() {
     var own = !!state.shortlisted && !sharedKeys;
     shortlistOnlyBtn.classList.toggle('is-on', own);
     shortlistOnlyBtn.setAttribute('aria-pressed', own ? 'true' : 'false');
+    // The list chooser (#1521) belongs to your own shortlist view.
+    if (listChooser) listChooser.hidden = !own;
   }
 
   /* The note over a shared list, and its "keep these" (#1342). */
@@ -619,7 +623,8 @@ function renderResultsPool() {
     if (!sharedKeys) return;
     var text = sharedNote.querySelector('[data-shared-shortlist-text]');
     if (text) {
-      text.textContent = 'a shared shortlist (' + sharedKeys.length + ')' +
+      text.textContent = 'a shared shortlist' + (sharedName ? ', ' + sharedName : '') +
+        ' (' + sharedKeys.length + ')' +
         (sharedUnmatched.length ? '; not found: ' + sharedUnmatched.join(', ') : '');
     }
     var keep = sharedNote.querySelector('[data-shared-shortlist-keep]');
@@ -837,7 +842,7 @@ function renderResultsPool() {
     if (!addressBarLive) return;
     if (state.shortlisted) {
       FilterState.replaceQuery(sharedKeys
-        ? FilterState.shortlistQuery(arrivedSharedSlugs) : 'shortlist=1');
+        ? FilterState.shortlistQuery(arrivedSharedSlugs, sharedName) : 'shortlist=1');
       return;
     }
     FilterState.replaceQuery(FilterState.buildQuery([
@@ -1179,8 +1184,11 @@ function renderResultsPool() {
     var fold = HTF.shoppingList.foldUnit;
     var wanted = fold(word);
     if (!wanted) return false;
+    // A hyphened word counts whole and by its parts: "Sacher-Torte" names a torte.
     return String(title).toLowerCase().split(/[\s,()\/&]+/).some(function (w) {
-      return w !== '' && fold(w) === wanted;
+      return w !== '' && (fold(w) === wanted || w.split('-').some(function (part) {
+        return part !== '' && fold(part) === wanted;
+      }));
     });
   }
 
@@ -1204,6 +1212,16 @@ function renderResultsPool() {
     return match[1] + single + tail;
   }
 
+  /* The thing made said after the title's own noun, so before any " with
+     ...": "Potato Cake pieces with Smoked Salmon", never "... Salmon pieces".
+     Returned as the row's title and post. */
+  function thingAfterHead(title, thing) {
+    var named = singularHead(title);
+    var cut = named.search(/\s+with\s+/i);
+    if (cut === -1) return { title: named, post: ' ' + thing };
+    return { title: named.slice(0, cut) + ' ' + thing + named.slice(cut), post: '' };
+  }
+
   /* The words of a row around the recipe's name: `word` is what the number
      counts, `pre`/`post` sit either side, `title` is the name as written.
        [2] batches of 18 [Peanut Butter Cookies]    title names the thing
@@ -1221,6 +1239,11 @@ function renderResultsPool() {
     out.word = batchWord(n);
     var made = RECIPES[url].m;
     if (!(made && made.kind === 'count' && made.stem)) return out;
+    // "enough marinade for 4 portions of fish" says what it is for after the name.
+    if (/^enough\s/i.test(String(made.prefix || ''))) {
+      out.post = ', ' + made.prefix + ' ' + made.box + ' ' + made.stem + String(made.rest || '');
+      return out;
+    }
 
     var unitLabel = HTF.shoppingList.unitLabel;
     var words = String(made.stem).split(/\s+/);
@@ -1248,8 +1271,9 @@ function renderResultsPool() {
       }
       out.word = (times + group).trim();
       out.pre = before ? before + ' ' : '';
-      out.title = singularHead(title);
-      out.post = ' ' + (n > 1 ? unitLabel(noun, 2) : noun);
+      var thing = thingAfterHead(title, n > 1 ? unitLabel(noun, 2) : noun);
+      out.title = thing.title;
+      out.post = thing.post;
       return out;
     }
 
@@ -1257,8 +1281,9 @@ function renderResultsPool() {
     if (!made.box || /^batch/i.test(String(made.stem))) return out;
     out.pre = made.box + ' ' + (group ? group + ' ' : '');
     if (!named) {
-      out.title = singularHead(title);
-      out.post = ' ' + words.join(' ') + String(made.rest || '');
+      var said = thingAfterHead(title, words.join(' ') + String(made.rest || ''));
+      out.title = said.title;
+      out.post = said.post;
     }
     return out;
   }
@@ -1501,8 +1526,9 @@ function renderResultsPool() {
     renderShoppingTotal(shownRows);
   }
 
-  /* What the shop comes to (#1458), as on the cocktail list (#817), and how
-     many lines it could not price. Hidden where nothing is costed. */
+  /* What the shop comes to (#1458), as on the cocktail list (#817), and
+     under it the lines it could not price, by name (#1523). Hidden where
+     nothing is costed. */
   function renderShoppingTotal(rows) {
     if (!shoppingTotal) return;
     var sum = COST_UNITS ? HTF.foodShoppingList.costTotal(rows) : null;
@@ -1511,12 +1537,7 @@ function renderResultsPool() {
       shoppingTotal.textContent = '';
       return;
     }
-    var text = (sum.partial ? '' : 'roughly ') + sum.text;
-    if (sum.unpriced) {
-      text += ' — ' + sum.unpriced +
-        (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
-    }
-    shoppingTotal.textContent = text;
+    HTF.shoppingList.drawTotal(shoppingTotal, (sum.partial ? '' : 'roughly ') + sum.text, sum);
     shoppingTotal.hidden = false;
   }
 
@@ -1566,22 +1587,30 @@ function renderResultsPool() {
      The button ships `hidden` and is revealed here, by the script that makes
      the filter real. It is a view, not a facet (#918): pressing it on clears
      every other filter, boxes and pools included; a filter set while it is on
-     takes it off again (reconcileShortlistView, in update()). */
+     takes it off again (reconcileShortlistView, in update()). Turning it on
+     opens SEE ALL, the view its count counts (#1521). */
   if (shortlistOnlyBtn) {
     shortlistOnlyBtn.hidden = false;
     shortlistOnlyBtn.addEventListener('click', function () {
       if (sharedKeys) {
         // Over a shared list the button is not on (syncShortlistOnly), so a
-        // press means what it means when off: show MY shortlist.
+        // press means what it means when off: show MY shortlists.
         sharedKeys = null;
         sharedUnmatched = [];
       } else if (state.shortlisted) {
         state.shortlisted = false;
+        update();
+        return;
       } else {
         state = FilterState.enterShortlistView();
         resetFilterControls();
       }
       update();
+      // The change event repaints the chooser and the counts.
+      HTF.shortlist.setActive(HTF.shortlist.ALL);
+      document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
+        detail: { key: null, on: false, list: HTF.shortlist.ALL }
+      }));
     });
   }
 
@@ -1605,9 +1634,10 @@ function renderResultsPool() {
     update(true);
   });
 
-  /* Keep these (#1093): merges the shared list into this browser's shortlist
-     (addAll never un-marks anything), then shows that shortlist. The change
-     event repaints every row's toggle. */
+  /* Keep these (#1093, #1521): merges the shared list into the list of its
+     name, made if there is none (the active list for a nameless link), never
+     un-marking anything, then shows that list. The change event repaints
+     every row's toggle. */
   var sharedKeep = sharedNote && sharedNote.querySelector('[data-shared-shortlist-keep]');
   if (sharedKeep) {
     sharedKeep.addEventListener('click', function () {
@@ -1615,7 +1645,7 @@ function renderResultsPool() {
       var keys = sharedKeys;
       sharedKeys = null;
       sharedUnmatched = [];
-      HTF.shortlist.addAll(keys);
+      HTF.shortlist.keep(sharedName, keys);
       document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
         detail: { key: null, on: true, kept: keys.length }
       }));
@@ -1731,11 +1761,14 @@ function renderResultsPool() {
      link (`sharedKeys`); resolveSlugs writes nothing. */
   var arrivedShortlist = FilterState.parseShortlist(location.search);
   if (arrivedShortlist.own || arrivedShortlist.slugs.length) {
+    // `?shortlist=all` (#1521): SEE ALL is the list on show.
+    if (arrivedShortlist.all) HTF.shortlist.setActive(HTF.shortlist.ALL);
     state = FilterState.enterShortlistView();
     resetFilterControls();
     restored = null;
     if (arrivedShortlist.slugs.length) {
       arrivedSharedSlugs = arrivedShortlist.slugs;
+      sharedName = HTF.shortlist.cleanName(arrivedShortlist.name);
       var resolvedShared = HTF.shortlist.resolveSlugs(arrivedShortlist.slugs,
         items.map(function (li) { return li.dataset.url || ''; }));
       sharedKeys = resolvedShared.keys;

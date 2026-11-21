@@ -37,6 +37,8 @@ const PAGE_SCRIPTS = [
   // #849. Nobody's dependency; here because cocktail-index-startup.test.js
   // asserts this list is the template's. It loads after universe.js on the
   // page, and universe.js is filtered out of that comparison.
+  // #1521. Returns at once: the stub page has no `[data-shortlist-lists]`.
+  'shortlist-lists.js',
   'shortlist-export.js',
   // #1440. Nobody's dependency either. The stub page has no `#ship-key`, so
   // here it returns at its first line.

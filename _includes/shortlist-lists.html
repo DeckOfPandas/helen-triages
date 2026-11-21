@@ -1,0 +1,31 @@
+{% comment %} The list chooser (#1521), the same on both indexes: a button naming the
+   list on show, opening a menu in the + picker's dress (one row per list,
+   SEE ALL last under a rule), rename and delete beside it, and "+ new list"
+   on the row under it. No visible label (Helen). New and rename open the one
+   name form, in place of the controls it came from. Ships `hidden`; the index
+   script shows it while your own shortlist view is on, and shortlist-lists.js
+   fills and wires it. The icons are _includes/icons/. {% endcomment %}
+<div class="shortlist-lists" data-shortlist-lists hidden>
+  <div class="shortlist-lists-row">
+    <span class="shortlist-lists-choose">
+      <button type="button" class="shortlist-lists-toggle" aria-label="choose shortlist" aria-haspopup="true" aria-expanded="false" data-shortlist-lists-toggle><span class="shortlist-list-name" data-shortlist-lists-current></span></button>
+      <div class="shortlist-picker shortlist-lists-menu" tabindex="-1" data-shortlist-lists-menu hidden>
+        <button type="button" class="shortlist-picker-close" aria-label="Close" data-shortlist-lists-close>&times;</button>
+        <ul class="shortlist-picker-lists" data-shortlist-lists-options></ul>
+      </div>
+    </span>
+    <span class="shortlist-lists-actions" data-shortlist-lists-actions>
+      <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="rename">{% include icons/pencil.svg %}<span>rename</span></button>
+      <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="delete">{% include icons/bin.svg %}<span>delete</span></button>
+    </span>
+  </div>
+  <div class="shortlist-lists-row" data-shortlist-lists-new-row>
+    <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="new">{% include icons/plus.svg %}<span>new list</span></button>
+  </div>
+  <form class="shortlist-lists-form" data-shortlist-lists-form hidden>
+    <input type="text" class="shortlist-lists-name" data-shortlist-lists-name autocomplete="off">
+    <button type="submit" class="btn-shortlist-lists">{% include icons/save.svg %}<span>save</span></button>
+    <button type="button" class="btn-shortlist-lists" data-shortlist-lists-action="cancel">{% include icons/close.svg %}<span>cancel</span></button>
+    <span class="shortlist-lists-error" data-shortlist-lists-error role="alert" hidden></span>
+  </form>
+</div>

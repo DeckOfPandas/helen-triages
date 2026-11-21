@@ -234,7 +234,9 @@
      dropped by apply() the moment the view goes. null when none is showing. */
   var sharedKeys = null;
   var sharedUnmatched = [];
+  var sharedName = '';   // the link's `list=` (#1521); '' for a nameless link
   var sharedNote = document.querySelector('[data-shared-shortlist]');
+  var listChooser = document.querySelector('[data-shortlist-lists]');
 
   // Declared here rather than beside the code that builds them, so apply() can
   // never read them before they exist. Populated further down.
@@ -564,8 +566,8 @@
     renderShoppingTotal(rows);
   }
 
-  /* What the shop comes to (#817), summed from the rows just rendered, and it
-     says how many lines it could not price. */
+  /* What the shop comes to (#817), summed from the rows just rendered, and
+     under it the lines it could not price, by name (#1523). */
   function renderShoppingTotal(rows) {
     if (!shoppingTotal) return;
     var sum = HTF.shoppingList.total(rows);
@@ -574,12 +576,7 @@
       shoppingTotal.textContent = '';
       return;
     }
-    var text = 'roughly ' + sum.text;
-    if (sum.unpriced) {
-      text += ' — ' + sum.unpriced +
-        (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
-    }
-    shoppingTotal.textContent = text;
+    HTF.shoppingList.drawTotal(shoppingTotal, 'roughly ' + sum.text, sum);
     shoppingTotal.hidden = false;
   }
 
@@ -681,7 +678,8 @@
     if (!sharedKeys) return;
     var text = sharedNote.querySelector('[data-shared-shortlist-text]');
     if (text) {
-      text.textContent = 'a shared shortlist (' + sharedKeys.length + ')' +
+      text.textContent = 'a shared shortlist' + (sharedName ? ', ' + sharedName : '') +
+        ' (' + sharedKeys.length + ')' +
         (sharedUnmatched.length ? '; not found: ' + sharedUnmatched.join(', ') : '');
     }
     var keep = sharedNote.querySelector('[data-shared-shortlist-keep]');
@@ -794,6 +792,8 @@
       var ownView = !!state.shortlisted && !sharedKeys;
       shortlistOnlyBtn.classList.toggle('is-on', ownView);
       shortlistOnlyBtn.setAttribute('aria-pressed', ownView ? 'true' : 'false');
+      // The list chooser (#1521) belongs to your own shortlist view.
+      if (listChooser) listChooser.hidden = !ownView;
     }
     syncSharedNote();
 
@@ -825,7 +825,7 @@
     if (!addressBarLive) return;
     var FS = HTF.filterState;
     if (state.shortlisted) {
-      FS.replaceQuery(sharedKeys ? FS.shortlistQuery(arrivedSharedSlugs) : 'shortlist=1');
+      FS.replaceQuery(sharedKeys ? FS.shortlistQuery(arrivedSharedSlugs, sharedName) : 'shortlist=1');
       return;
     }
     FS.replaceQuery(FS.buildQuery([
@@ -987,16 +987,22 @@
     shortlistOnlyBtn.addEventListener('click', function () {
       if (sharedKeys) {
         // Over a shared list the button is not on, so a press means what it
-        // means when off: show MY shortlist (#1093).
+        // means when off: show MY shortlists, as SEE ALL (#1521).
         sharedKeys = null;
         sharedUnmatched = [];
       } else if (state.shortlisted) {
         state.shortlisted = false;
+        apply();
+        return;
       } else {
         state = FilterState.enterShortlistView();
         resetControls();
       }
-      apply();
+      // The change event repaints the chooser, and apply() with it.
+      HTF.shortlist.setActive(HTF.shortlist.ALL);
+      document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
+        detail: { key: null, on: false, list: HTF.shortlist.ALL }
+      }));
     });
   }
 
@@ -1015,8 +1021,9 @@
   /* Dispatched by shortlist.js when a card's own toggle changes. */
   document.addEventListener('htf:shortlist-change', apply);
 
-  /* Keep these (#1093): merges the shared list into this browser's shortlist
-     and shows it; the change event repaints the toggles. */
+  /* Keep these (#1093, #1521): merges the shared list into the list of its
+     name, made if there is none, and shows that list; the change event
+     repaints the toggles. */
   var sharedKeep = sharedNote && sharedNote.querySelector('[data-shared-shortlist-keep]');
   if (sharedKeep) {
     sharedKeep.addEventListener('click', function () {
@@ -1024,7 +1031,7 @@
       var keys = sharedKeys;
       sharedKeys = null;
       sharedUnmatched = [];
-      HTF.shortlist.addAll(keys);
+      HTF.shortlist.keep(sharedName, keys);
       document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
         detail: { key: null, on: true, kept: keys.length }
       }));
@@ -1375,10 +1382,13 @@
      `parseQuery`: `shortlisted` is a view, not a field a URL may set. */
   var arrivedShortlist = HTF.filterState.parseShortlist(location.search);
   if (arrivedShortlist.own || arrivedShortlist.slugs.length) {
+    // `?shortlist=all` (#1521): SEE ALL is the list on show.
+    if (arrivedShortlist.all) HTF.shortlist.setActive(HTF.shortlist.ALL);
     state = FilterState.enterShortlistView();
     resetControls();
     if (arrivedShortlist.slugs.length) {
       arrivedSharedSlugs = arrivedShortlist.slugs;
+      sharedName = HTF.shortlist.cleanName(arrivedShortlist.name);
       var resolvedShared = HTF.shortlist.resolveSlugs(arrivedShortlist.slugs,
         model.map(function (d) { return d.url || ''; }));
       sharedKeys = resolvedShared.keys;
