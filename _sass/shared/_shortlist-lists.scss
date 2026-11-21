@@ -83,12 +83,36 @@
   &:hover { background: color-mix(in srgb, var(--shortlist-on) 10%, transparent); }
 }
 
-.shortlist-picker-list input {
+// One drawn tick box for the picker's inputs and the chooser's rows: a
+// browser's own box differs by engine and theme, so the two would not match.
+%shortlist-box {
   flex: none;
+  box-sizing: border-box;
   width: 1.1rem;
   height: 1.1rem;
   margin: 0;
-  accent-color: var(--shortlist-on);
+  border: 1.5px solid $color-clear-text;
+  border-radius: 3px;
+  background: transparent;
+}
+
+%shortlist-box-on {
+  background: var(--shortlist-on) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 85% no-repeat;
+  border-color: var(--shortlist-on);
+}
+
+.shortlist-picker-list input {
+  @extend %shortlist-box;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+
+  &:checked { @extend %shortlist-box-on; }
+
+  &:focus-visible {
+    outline: 2px solid var(--shortlist-on);
+    outline-offset: 2px;
+  }
 }
 
 .shortlist-list-name {
@@ -226,12 +250,18 @@
   transform: rotate(45deg);
 }
 
+// As wide as its longest name, as the picker is: inside the button's span it
+// would otherwise shrink to the button and wrap every name.
 .shortlist-lists-menu {
   top: calc(100% + #{$space-xs});
   left: 0;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+
+  &:focus { outline: none; }
 }
 
-// A row as the picker's: the tick box's room holds a tick on the list shown.
+// A row as the picker's: a tick box, filled on the list shown, and the name.
 .shortlist-lists-option {
   display: flex;
   align-items: center;
@@ -248,12 +278,8 @@
   overflow-wrap: anywhere;
 
   &::before {
+    @extend %shortlist-box;
     content: "";
-    flex: none;
-    width: 1.1rem;
-    color: var(--shortlist-on);
-    font-weight: 700;
-    text-align: center;
   }
 
   &:hover,
@@ -263,7 +289,8 @@
   }
 
   &[aria-current="true"] { color: var(--shortlist-on); }
-  &[aria-current="true"]::before { content: "\2713"; }
+
+  &[aria-current="true"]::before { @extend %shortlist-box-on; }
 }
 
 .shortlist-picker-list:first-child .shortlist-lists-option { padding-right: 2.75rem; }

@@ -75,11 +75,13 @@
     return Array.prototype.slice.call(options.querySelectorAll('.shortlist-lists-option'));
   }
 
-  function openMenu() {
+  /* From the keyboard, focus lands on the list shown; from a press, on the
+     menu itself, so no row wears the focus colour until the arrows move. */
+  function openMenu(byKey) {
     menu.hidden = false;
     toggle.setAttribute('aria-expanded', 'true');
     var chosen = options.querySelector('[aria-current="true"]') || rows()[0];
-    if (chosen) chosen.focus();
+    if (byKey && chosen) chosen.focus(); else menu.focus();
   }
 
   function closeMenu(refocus) {
@@ -89,8 +91,9 @@
     if (refocus) toggle.focus();
   }
 
-  toggle.addEventListener('click', function () {
-    if (menu.hidden) openMenu(); else closeMenu(true);
+  // `detail` is 0 for a click made by Enter or Space.
+  toggle.addEventListener('click', function (ev) {
+    if (menu.hidden) openMenu(ev.detail === 0); else closeMenu(true);
   });
 
   menu.addEventListener('click', function (ev) {
@@ -108,6 +111,7 @@
     ev.preventDefault();
     var list = rows();
     var at = list.indexOf(document.activeElement);
+    if (at === -1) at = ev.key === 'ArrowDown' ? -1 : list.length;
     var next = ev.key === 'ArrowDown' ? at + 1 : at - 1;
     list[(next + list.length) % list.length].focus();
   });
