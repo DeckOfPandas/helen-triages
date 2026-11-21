@@ -237,6 +237,12 @@ aliases:
   # A kind stays its own chip: whole cloves, whole nutmeg, whole milk, flaked
   # almonds, a whole bird, cooked turkey or chicken. Bottled juices too.
   lemon juice: lemon
+  freshly squeezed lemon juice: lemon
+  freshly squeezed lime juice: lime
+  freshly squeezed orange juice: orange
+  freshly squeezed blood orange juice: blood orange
+  freshly squeezed grapefruit juice: grapefruit
+  freshly squeezed clementine juice: clementine
   lemon zest: lemon
   unwaxed lemons: lemon
   unwaxed lemon: lemon

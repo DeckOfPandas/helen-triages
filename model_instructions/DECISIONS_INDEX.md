@@ -169,6 +169,7 @@ argument and the rules each field is read by.
 - undated · §5 · Undated — cardamom is always green or black, and always pods, powder or seeds.
 - 2026-08-12 · §5 · #167 · milk names its type from the source, and "milk (any kind)" is a real answer for a recipe that does not care.
 - undated · §5 · #139 · Undated, #139 — dark-family chocolate carries its cacao percentage on the ingredient list and never in main_ingredients.
+- 2026-11-21 · §5 · a measured citrus juice is "freshly squeezed lemon juice", every citrus but yuzu, unless the line says bottled.
 - 2026-08-29 · §6 · main_ingredients has no cap; the old eight had been read as a budget.
 - 2026-09-06 · §6 · #762 · where two spellings of one ingredient exist the majority wins, and it is fixed in the data: cornflour, beansprouts.
 - 2026-09-22 · §6 · derive_main_ingredients.py reorders a list and never changes its members, and never writes to _food_recipes/.

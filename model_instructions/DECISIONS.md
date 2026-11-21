@@ -1062,6 +1062,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   is the index's pill. Milk and white chocolate never take a percentage. Chips
   and shavings need a type word and no percentage. `_CHOCOLATE_PERCENT` and
   the three chocolate tests in `tests/test_style.py`.
+- **2026-11-21 — a measured citrus juice is "freshly squeezed lemon juice",
+  every citrus but yuzu, unless the line says bottled.** Helen: *"Please make
+  the house style "freshly squeezed lemon juice", for all citrus... If a
+  recipe requires bottled for reasons like acidity predictability then it'll
+  say so."* Food only: a cocktail's `lemon juice` is a closed generic already
+  shelved as freshly squeezed. Her grant covered the four published lines.
+  `citrus_juice_house` in `tests/test_style.py`; the tidy pass applies it.
 
 ## §6 `main_ingredients`
 

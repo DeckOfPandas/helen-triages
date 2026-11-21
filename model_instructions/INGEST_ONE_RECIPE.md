@@ -305,6 +305,14 @@ caster sugar`, and the line says what the source printed (`note: "the source
 gave \"caster sugar\""`). Helen: *"Golden for everything unspecified, other
 than meringue or light icing etc."*
 
+**A measured citrus juice is freshly squeezed**: "lemon juice" and "fresh
+lime juice" are written `freshly squeezed lemon juice`, `freshly squeezed lime
+juice`, and the same for every citrus but yuzu, with no note. A line that says
+bottled, or carton, keeps its word. "1 lemon, juiced" is already fresh. Helen:
+*"almost always, freshly squeezed lemon juice is best, as well as correct. If a
+recipe requires bottled for reasons like acidity predictability then it'll say
+so."* The tidy pass converts a draft.
+
 **A weight the source gives beside a count goes in the amount's bracket**,
 never the item, because the scaler reads only the amount: amount `"2 (about
 300 g)"`, item `"mackerel fillets"`. "approx" is "about". A bracket that
