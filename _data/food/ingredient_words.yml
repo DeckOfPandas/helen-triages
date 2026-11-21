@@ -377,11 +377,11 @@ aliases:
   # Fat level and culture are not what anyone excludes. The target is `natural
   # yoghurt`, not bare `yoghurt`: sweetened and flavoured yoghurts are a
   # different answer.
-  full-fat natural yoghurt: natural yoghurt
-  low-fat natural yoghurt: natural yoghurt
-  natural bio yoghurt: natural yoghurt
-  thick natural yoghurt: natural yoghurt
-  unsweetened natural yoghurt: natural yoghurt
+  full-fat natural yoghurt: yoghurt
+  low-fat natural yoghurt: yoghurt
+  natural bio yoghurt: yoghurt
+  thick natural yoghurt: yoghurt
+  unsweetened natural yoghurt: yoghurt
   gel- or paste-based colouring if wanted: food colouring
   # Compounds and prep states from the derived vocabulary (#273).
   barley or brown rice miso: miso
@@ -429,7 +429,7 @@ aliases:
   ghee or vegetable oil: [ghee, vegetable oil]
   hummus or yoghurt: [hummus, yoghurt]
   kale or cavolo nero: [kale, cavolo nero]
-  kosher salt or 4 tsp fine sea salt: [kosher salt, fine sea salt]
+  kosher salt or 4 tsp fine sea salt: [kosher salt, sea salt]
   lamb or chicken stock: [lamb, chicken stock]
   maple syrup or honey: [maple syrup, honey]
   natural yoghurt or milk: [yoghurt, milk]
