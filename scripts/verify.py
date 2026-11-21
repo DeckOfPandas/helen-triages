@@ -18,9 +18,12 @@ pytest's line is its pass/skip count, never its last line, which is a timing
 (`--durations` in pytest.ini). conftest's "Not evidence about ..." blocks are
 printed beneath it, because a green count without them overstates the run.
 
-The JS test files are globbed here, not listed, so a new test file cannot be
-left out silently. Never run two of these at once: concurrent runs share one
-`.jekyll-cache` and one `tmp/`. Exits non-zero if anything fails.
+Every check's whole output goes to tmp/verify/<check>.log and the summary to
+tmp/verify/summary.log, overwritten each run, so a failure can be read after
+the fact however the run was started. The JS test files are globbed here, not
+listed, so a new test file cannot be left out silently. Never run two of these
+at once: concurrent runs share one `.jekyll-cache` and one `tmp/`. Exits
+non-zero if anything fails.
 """
 from __future__ import annotations
 
@@ -31,6 +34,25 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOG_DIR = os.path.join(ROOT, "tmp", "verify")
+
+
+def log_name(name: str) -> str:
+    return os.path.join(LOG_DIR, re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") + ".log")
+
+
+class Summary:
+    """Prints a line and keeps it in tmp/verify/summary.log as well."""
+
+    def __init__(self) -> None:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        self.path = os.path.join(LOG_DIR, "summary.log")
+        open(self.path, "w").close()
+
+    def __call__(self, line: str = "") -> None:
+        print(line, flush=True)
+        with open(self.path, "a") as f:
+            f.write(line + "\n")
 
 # pytest's closing count: "3021 passed, 14 skipped, 2 warnings in 81.2s".
 PYTEST_COUNT = re.compile(r"\b\d+ (passed|failed|error|errors|skipped)\b")
@@ -94,12 +116,14 @@ def checks() -> list[tuple[str, list[str], str | None, int | None]]:
 
 
 def main() -> int:
+    print = Summary()
     js = js_suite()
     if len(js) <= 2:
         print("No JS test files found -- the glob is wrong, or you are not in "
               "the repo root. Refusing to report a pass on zero tests.")
         return 1
 
+    print("Full output of each check: tmp/verify/<check>.log")
     failed, skipped = [], []
     for name, cmd, expect, skip_code in checks():
         try:
@@ -112,6 +136,8 @@ def main() -> int:
             continue
 
         out = (r.stdout + r.stderr).strip()
+        with open(log_name(name), "w") as f:
+            f.write(out + "\n")
         lines = [ln for ln in out.split("\n") if ln.strip()]
 
         if skip_code is not None and r.returncode == skip_code:
