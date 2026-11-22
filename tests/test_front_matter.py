@@ -848,6 +848,11 @@ ADJUDICATED_REWRITES = {
             "her rewrites and flags, committed for her unchanged; covered by "
             "her standing grant under 026f3224."
         ),
+        "2bae36b3": (
+            "Alain Ducasse's gougères, 2026-11-22: Helen's rewrite and flags "
+            "(made and rewritten), committed for her unchanged; covered by her "
+            "standing grant under 026f3224."
+        ),
     },
     "_food_recipes": {
         "2d97c96a": (
