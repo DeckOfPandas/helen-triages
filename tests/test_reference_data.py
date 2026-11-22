@@ -853,7 +853,7 @@ NO_TEMPERATURE_BECAUSE = {
                 "method",
     # The same kind. If a probe step is ever added, wire ham.cured in and take
     # this out.
-    "sticky-marmalade-ham": "a whole gammon cooked covered for about 5 hrs then "
+    "sticky-bone-in-marmalade-ham": "a whole gammon cooked covered for about 5 hrs then "
                             "glazed; done by time, and no step probes anything — "
                             "ham.cured is right about the cut and irrelevant to "
                             "the method",
