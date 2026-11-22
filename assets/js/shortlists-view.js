@@ -36,7 +36,7 @@
   // A list's colour, 0 to HUES - 1, from the number in its id. The store
   // never reuses a number, so the hues go round in the order lists were
   // made, and moving or deleting a list leaves every other list's hue alone.
-  var HUES = 8;
+  var HUES = 7;
   function hueOf(id) {
     var n = /^l(\d+)$/.exec(String(id));
     return n ? (Number(n[1]) - 1 + HUES) % HUES : -1;

@@ -56,8 +56,8 @@ test('a tab reads "name · count"; everything\'s counts recipes and lists', () =
   assert.strictEqual(view.tabCount({ id: 'everything', count: 1, lists: 1 }), '1 recipe · 1 list');
 });
 
-test('a list\'s colour goes round eight hues in the order lists were made', () => {
-  assert.deepStrictEqual(['l1', 'l2', 'l8', 'l9', 'l17'].map(view.hueOf), [0, 1, 7, 0, 0]);
+test('a list\'s colour goes round seven hues in the order lists were made', () => {
+  assert.deepStrictEqual(['l1', 'l2', 'l7', 'l8', 'l15'].map(view.hueOf), [0, 1, 6, 0, 0]);
   assert.strictEqual(view.hueOf('everything'), -1, 'everything has no hue of its own');
   assert.strictEqual(view.hueOf('shared'), -1);
 });

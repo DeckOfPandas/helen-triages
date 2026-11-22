@@ -18,45 +18,37 @@
   // --- Highlighters ----------------------------------------------------------
   // Shapes 1 and 13 are excluded from the pool. Shapes 2–12 plus their flips,
   // shuffled once per page load.
-  var HIGHLIGHTERS = [];
-  for (var h = 2; h <= 12; h++) {
-    HIGHLIGHTERS.push('highlighter-' + h);
-    HIGHLIGHTERS.push('highlighter-' + h + '-flip');
-  }
-
-  // Texture is randomised once per page so the whole page agrees with itself.
-  var TEXTURES = [
-    { baseFrequency: '0.015 0.05', alphaRow: '0.4 0.4 0.4 0 0.25' },
-    { baseFrequency: '0.02 0.06',  alphaRow: '0.3 0.3 0.3 0 0.45' }
-  ];
-  var tex  = TEXTURES[Math.floor(Math.random() * TEXTURES.length)];
-  var seed = Math.floor(Math.random() * 1000);
-
-  function applyTexture(svg) {
-    return svg
-      .replace(/baseFrequency="[^"]*"/, 'baseFrequency="' + tex.baseFrequency + '"')
-      .replace(/seed="\d+"/, 'seed="' + seed + '"')
-      .replace(/0\.4 0\.4 0\.4 0 0\.25|0\.3 0\.3 0\.3 0 0\.45/, tex.alphaRow);
-  }
-
-  function highlightInto(slot, name) {
-    var url = HTF.siteAsset('/highlighters/' + name + '.svg');
-    if (url) HTF.fetchSvg(url, function (svg) { slot.innerHTML = applyTexture(svg); });
-  }
-
   function highlighters() {
     var slots = document.querySelectorAll('.highlighter-slot');
     if (!slots.length) return;
-    var nextName = HTF.makeShuffledPicker(HIGHLIGHTERS.slice());
-    slots.forEach(function (slot) { highlightInto(slot, nextName()); });
-  }
 
-  // For a script that draws a slot after this file's one pass: the
-  // shortlists page's headings (#1521). `n` picks a shape from the pool, so
-  // a heading keeps its shape through a redraw.
-  HTF.highlightInto = function (slot, n) {
-    highlightInto(slot, HIGHLIGHTERS[Math.abs(n) % HIGHLIGHTERS.length]);
-  };
+    var pool = [];
+    for (var n = 2; n <= 12; n++) {
+      pool.push('highlighter-' + n);
+      pool.push('highlighter-' + n + '-flip');
+    }
+    var nextName = HTF.makeShuffledPicker(pool);
+
+    // Texture is randomised once per page so the whole page agrees with itself.
+    var variants = [
+      { baseFrequency: '0.015 0.05', alphaRow: '0.4 0.4 0.4 0 0.25' },
+      { baseFrequency: '0.02 0.06',  alphaRow: '0.3 0.3 0.3 0 0.45' }
+    ];
+    var tex  = variants[Math.floor(Math.random() * variants.length)];
+    var seed = Math.floor(Math.random() * 1000);
+
+    function applyTexture(svg) {
+      return svg
+        .replace(/baseFrequency="[^"]*"/, 'baseFrequency="' + tex.baseFrequency + '"')
+        .replace(/seed="\d+"/, 'seed="' + seed + '"')
+        .replace(/0\.4 0\.4 0\.4 0 0\.25|0\.3 0\.3 0\.3 0 0\.45/, tex.alphaRow);
+    }
+
+    slots.forEach(function (slot) {
+      var url = HTF.siteAsset('/highlighters/' + nextName() + '.svg');
+      if (url) HTF.fetchSvg(url, function (svg) { slot.innerHTML = applyTexture(svg); });
+    });
+  }
 
   // --- Masking tape behind the wordmark --------------------------------------
   // Header chrome: one set of files for the whole repo (assets/img/chrome/tape/,

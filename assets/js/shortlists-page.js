@@ -79,6 +79,10 @@
   var pillUp = pill.querySelector('[data-shortlists-pill-up]');
   var live = root.querySelector('[data-shortlists-live]');
 
+  // CANDIDATES ONLY, not for merge: ?tabs=strip shows the fallback for
+  // unselected tabs, grey tape with a strip of the list's colour.
+  if (/[?&]tabs=strip/.test(window.location.search)) root.setAttribute('data-tabs', 'strip');
+
   var renaming = null;
   var deleting = null;
 
@@ -181,7 +185,8 @@
       '<span class="tag-shape" aria-hidden="true"></span>' +
       '<span class="shortlists-tab-name">' + esc(tab.name) + '</span>' +
       '<span class="shortlists-tab-count"> · ' + esc(V.tabCount(tab)) + '</span>' +
-      (every && tab.hues.length ? bandHtml(tab.hues) : '') + '</button>';
+      (every && tab.hues.length ? bandHtml(tab.hues) : '') +
+      (tab.hue >= 0 ? '<span class="shortlists-tab-strip" aria-hidden="true"></span>' : '') + '</button>';
   }
 
   function renderTabs(view) {
@@ -361,17 +366,18 @@
       '</form>';
   }
 
-  // A list's name over a highlighter stroke in its colour; `n` keeps the
-  // stroke's shape through a redraw.
-  function markedName(name, n) {
-    return '<span class="shortlists-marked"><span class="shortlists-underline" data-underline="' + n +
-      '" aria-hidden="true"></span>' + esc(name) + '</span>';
+  // A list's name over the site's ruled underline, the list's colour first
+  // (the stylesheet's); everything's over the band of every list's colour.
+  function markedName(name) {
+    return '<span class="shortlists-marked">' + esc(name) + '</span>';
+  }
+
+  function everythingName(hues) {
+    return '<span class="shortlists-marked shortlists-marked--band">everything' +
+      (hues.length ? bandHtml(hues) : '') + '</span>';
   }
 
   function decorate() {
-    Array.prototype.forEach.call(root.querySelectorAll('[data-underline]:empty'), function (slot) {
-      if (HTF.highlightInto) HTF.highlightInto(slot, Number(slot.getAttribute('data-underline')));
-    });
     Array.prototype.forEach.call(root.querySelectorAll('.shortlists-tape:empty'), function (slot) {
       if (HTF.tapeInto) HTF.tapeInto(slot);
     });
@@ -382,7 +388,7 @@
   function listBody(list) {
     return '<div class="shortlists-head">' +
       '<h2 class="shortlists-heading' + hueClass(V.hueOf(list.id)) + '" id="shortlists-heading" tabindex="-1">' +
-      markedName(list.name, V.hueOf(list.id) * 3 + 1) + '</h2>' +
+      markedName(list.name) + '</h2>' +
       '<span class="shortlists-actions">' +
       '<button type="button" class="shortlists-text-button" data-rename aria-label="rename ' + esc(list.name) + '">rename</button>' +
       '<button type="button" class="shortlists-text-button" data-delete aria-label="delete ' + esc(list.name) + '">delete</button>' +
@@ -395,7 +401,8 @@
   }
 
   function everythingBody(all) {
-    var head = '<div class="shortlists-head"><h2 class="shortlists-heading" id="shortlists-heading" tabindex="-1">everything</h2></div>';
+    var head = '<div class="shortlists-head"><h2 class="shortlists-heading" id="shortlists-heading" tabindex="-1">' +
+      everythingName(all.map(function (list) { return V.hueOf(list.id); })) + '</h2></div>';
     if (!all.length) {
       return head + '<p class="shortlists-empty">No shortlists yet. Start one with “+ new list”.</p>';
     }
@@ -406,7 +413,7 @@
         var hue = V.hueOf(list.id);
         return '<section class="shortlists-section">' +
           '<h3 class="shortlists-section-name' + hueClass(hue) + '"><button type="button" class="shortlists-section-link" data-go="' +
-          esc(list.id) + '">' + markedName(list.name, hue * 3 + 2) + '</button>' +
+          esc(list.id) + '">' + markedName(list.name) + '</button>' +
           '<span class="shortlists-section-count">' + V.countText(list.items.length) + '</span></h3>' +
           recipesHtml(list) + '</section>';
       }).join('') +
