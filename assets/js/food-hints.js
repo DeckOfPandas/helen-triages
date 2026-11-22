@@ -1,8 +1,11 @@
 // The words behind an ingredient line's tap-to-open hint (MANUAL §8.2). No DOM.
 //
-// Two hints, both read from _data/food/ingredient_hints.yml, passed in:
-//   stockHint  a stock line with a volume: how much of each product makes it
-//   spiceHint  a ground spice in tsp or tbsp: its weight, to grind your own
+// Five hints, all read from _data/food/ingredient_hints.yml, passed in:
+//   stockHint       a stock line with a volume: how much of each product
+//   spiceHint       a ground spice by the spoon: its weight
+//   wholeSpiceHint  a whole spice: its weight and the ground spoonfuls
+//   vanillaHint     paste, pod or extract: the other two
+//   pasteHint       fresh root, cloves or stalks: the paste, and back
 // Each takes the amount AS SHOWN (scaled, or in metric) and the item's text,
 // and returns { title, rows, lines } or null: rows are { amount, what } pairs,
 // lines are sentences. Loaded as a plain <script> attaching
@@ -141,7 +144,6 @@
       ? grams(tspLo * spice.g_per_tsp).replace(' g', '') + '–' + grams(tspHi * spice.g_per_tsp)
       : grams(tspLo * spice.g_per_tsp);
     var lines = [];
-    if (spice.whole) lines.push('Grinding your own? Weigh ' + weight + ' of ' + spice.whole + '.');
     if (spice.per_whole_tsp) {
       var part = Math.max(0.25, Math.round(tspHi / spice.per_whole_tsp * 4) / 4);
       var nutmegs = part < 1 ? fractionText(part) + ' a nutmeg'
@@ -155,5 +157,164 @@
     return { title: 'About ' + weight + '.', rows: [], lines: lines };
   }
 
-  return { stockHint: stockHint, spiceHint: spiceHint, volume: volume };
+  function span(lo, hi) {
+    return hi > lo ? fractionText(lo) + '–' + fractionText(hi) : fractionText(lo);
+  }
+
+  function quarter(n) {
+    return Math.max(0.25, Math.round(n * 4) / 4);
+  }
+
+  // Teaspoons, or from 6 tsp tablespoons to the nearest half.
+  function spoons(lo, hi) {
+    return hi >= 6 ? span(half(lo / 3), half(hi / 3)) + ' tbsp' : span(lo, hi) + ' tsp';
+  }
+
+  /* A whole spice: its weight, and the ground spoonfuls it grinds to. Seeds
+     come by the spoon (`whole.g_per_tsp`), a nutmeg is counted
+     (`whole.g_each`, grating to `per_whole_tsp` each). */
+  function wholeSpiceHint(amount, item, data) {
+    var spices = data && data.spices;
+    if (!spices) return null;
+    var text = words(item);
+    if (has(text, 'each') || has(words(amount), 'each')) return null;
+    var hits = spices.filter(function (s) {
+      return s.whole && hasAny(text, s.whole.match) && !hasAny(text, s.whole.unless);
+    });
+    if (hits.length !== 1) return null;
+    var spice = hits[0];
+    var parsed = parseAmount(String(amount || ''));
+    if (!parsed) return null;
+    var hi = parsed.max === undefined ? parsed.quantity : parsed.max;
+    var g, ground;
+    if (spice.whole.g_per_tsp) {
+      var spoon = SPOONS[parsed.unit.replace(QUALIFIER, '')];
+      if (!spoon) return null;
+      g = [parsed.quantity * spoon * spice.whole.g_per_tsp, hi * spoon * spice.whole.g_per_tsp];
+      ground = [quarter(g[0] / spice.g_per_tsp), quarter(g[1] / spice.g_per_tsp)];
+    } else {
+      if (parsed.unit) return null;
+      g = [parsed.quantity * spice.whole.g_each, hi * spice.whole.g_each];
+      ground = [quarter(parsed.quantity * spice.per_whole_tsp), quarter(hi * spice.per_whole_tsp)];
+    }
+    var weight = g[1] > g[0] ? grams(g[0]).replace(' g', '') + '–' + grams(g[1]) : grams(g[0]);
+    return {
+      title: 'About ' + weight + ', or ' + spoons(ground[0], ground[1]) + ' ground ' + spice.name + '.',
+      rows: [],
+      lines: []
+    };
+  }
+
+  var COUNTED = ['', 'small', 'medium', 'large', 'fat', 'plump', 'clove', 'cloves',
+    'stalk', 'stalks', 'stick', 'sticks'];
+
+  /* Fresh and paste, each way round, from `pastes`. Fresh root is measured
+     in cm (an inch is 2.54); garlic and lemongrass are counted. */
+  function pasteHint(amount, item, data) {
+    var pastes = data && data.pastes;
+    if (!pastes) return null;
+    var text = words(item);
+    var parsed = parseAmount(String(amount || ''));
+    if (!parsed) return null;
+    var lo = parsed.quantity;
+    var hi = parsed.max === undefined ? parsed.quantity : parsed.max;
+    var unit = parsed.unit.replace(/ piece$/, '');
+    for (var i = 0; i < pastes.length; i += 1) {
+      var p = pastes[i];
+      if (hasAny(text, p.paste)) {
+        // "garlic and ginger paste" is two pastes in one spoon: no figure fits.
+        var named = pastes.filter(function (q) { return has(text, q.name); });
+        if (named.length > 1) return null;
+        var spoon = SPOONS[unit.replace(QUALIFIER, '')];
+        if (!spoon) return null;
+        var fLo = half(lo * spoon / p.tsp_per[1]);
+        var fHi = half(hi * spoon / p.tsp_per[0]);
+        if (p.fresh === 'cm') {
+          return { title: 'Or a ' + span(fLo, fHi) + ' cm piece of ' + p.fresh_name + '.', rows: [], lines: [] };
+        }
+        return { title: 'Or ' + span(fLo, fHi) + ' ' + p.unit[fHi > 1 ? 1 : 0] + '.', rows: [], lines: [] };
+      }
+      if (hasAny(text, p.fresh_match) && !hasAny(text, p.fresh_unless)) {
+        var n;
+        if (p.fresh === 'cm') {
+          var per = unit === 'cm' ? 1 : (unit === 'inch' || unit === 'inches') ? 2.54 : 0;
+          if (!per) return null;
+          n = [lo * per, hi * per];
+        } else {
+          if (COUNTED.indexOf(unit) === -1) return null;
+          n = [lo, hi];
+        }
+        return {
+          title: 'Or ' + spoons(half(n[0] * p.tsp_per[0]), half(n[1] * p.tsp_per[1])) + ' ' + p.name + ' paste.',
+          rows: [],
+          lines: []
+        };
+      }
+    }
+    return null;
+  }
+
+  /* The form a line is in is the first one it names: "1 vanilla pod, or 1 tsp
+     paste" is a pod. A phrase inside a longer one does not count, so "vanilla
+     bean paste" names paste and not "vanilla bean". */
+  function vanillaForms(text, forms) {
+    var found = [];
+    forms.forEach(function (form) {
+      form.match.forEach(function (phrase) {
+        var at = text.indexOf(' ' + phrase + ' ');
+        if (at !== -1) found.push({ form: form, at: at, end: at + phrase.length });
+      });
+    });
+    found.sort(function (a, b) { return (b.end - b.at) - (a.end - a.at); });
+    var kept = found.filter(function (m, i) {
+      return !found.slice(0, i).some(function (k) { return m.at < k.end && k.at < m.end; });
+    });
+    if (!kept.length) return null;
+    kept.sort(function (a, b) { return a.at - b.at; });
+    var named = [];
+    kept.forEach(function (m) { if (named.indexOf(m.form) === -1) named.push(m.form); });
+    return { form: kept[0].form, named: named };
+  }
+
+  function vanillaText(form, pods) {
+    if (form.unit === 'pod') {
+      var n = half(pods * form.per_pod);
+      return fractionText(n) + ' ' + form.name + (n > 1 ? 's' : '');
+    }
+    return fractionText(Math.round(pods * form.per_pod * 4) / 4 || 0.25) + ' tsp ' + form.name;
+  }
+
+  function vanillaHint(amount, item, data) {
+    var vanilla = data && data.vanilla;
+    if (!vanilla) return null;
+    var text = words(item);
+    // `or paste` alone would catch "tamarind concentrate or paste".
+    if (!has(text, 'vanilla') || hasAny(text, vanilla.unless)) return null;
+    var found = vanillaForms(text, vanilla.forms);
+    if (!found) return null;
+    var parsed = parseAmount(String(amount || ''));
+    if (!parsed) return null;
+    var hi = parsed.max === undefined ? parsed.quantity : parsed.max;
+    var pods;
+    if (found.form.unit === 'pod') {
+      if (parsed.unit) return null;
+      pods = hi / found.form.per_pod;
+    } else {
+      var spoon = SPOONS[parsed.unit.replace(QUALIFIER, '')];
+      if (!spoon) return null;
+      pods = hi * spoon / found.form.per_pod;
+    }
+    var others = vanilla.forms.filter(function (f) { return found.named.indexOf(f) === -1; });
+    if (!others.length) return null;
+    return {
+      title: 'Or ' + others.map(function (f) { return vanillaText(f, pods); }).join(', or ') + '.',
+      rows: [],
+      lines: []
+    };
+  }
+
+  return {
+    stockHint: stockHint, spiceHint: spiceHint, wholeSpiceHint: wholeSpiceHint,
+    pasteHint: pasteHint, vanillaHint: vanillaHint, volume: volume
+  };
 });

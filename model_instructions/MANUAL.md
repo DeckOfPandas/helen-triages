@@ -1314,7 +1314,7 @@ The rulings behind every rule here are in DECISIONS §8.2.
 | `assets/js/ingredient-ticks.js`, `_sass/food/_ingredient-ticks.scss` | the recipe page's TICK BOXES OFF / ON switch and a box per ingredient line, hung left of the line so none moves (#1504) |
 | `assets/js/ingredient-units.js` | the IMPERIAL / METRIC switch, on a recipe with an amount in `oz`, `lb`, `fl oz` or `pint` (`isImperial` in `food-scale.js`) |
 | `_sass/food/_ingredient-switches.scss` | both switches' look and the row they share |
-| `assets/js/food-hints.js`, `assets/js/recipe-hints.js`, `_data/food/ingredient_hints.yml`, `_sass/food/_ingredient-hints.scss` | the stock and spice hints, a ship-key box behind a ringed i on an ingredient line |
+| `assets/js/food-hints.js`, `assets/js/recipe-hints.js`, `_data/food/ingredient_hints.yml`, `_sass/food/_ingredient-hints.scss` | the ingredient hints (stock, spices, vanilla, pastes), a ship-key box behind a ringed i on an ingredient line |
 | `assets/js/filters.js` | the shopping list's DOM half: the rows, their words, the painting |
 
 A tick box is the first child of its `<li>`, and `recipe-scale.js` steps over
@@ -1750,7 +1750,7 @@ a range of one (`yieldBox`: 5 is `2–3`, `125 ml` is `62–63 ml`, `64+` is
 - `tests/test_food_yield.py` names the published recipes offered a half
   step, and fails a published `makes:` it cannot read.
 
-#### The stock and spice hints
+#### The ingredient hints
 
 The cocktails' ship key (§9.13), in food's colours (DECISIONS §8.2): a small
 ringed i, set as a superscript after an ingredient line, opens a modal
@@ -1772,13 +1772,30 @@ then, so it follows the scaler and the metric switch.
   M&S concentrate 4 tsp chicken, 5 tsp beef, per pint. Knorr is the only
   fish stock.
 - **Ground spices:** a spice in `match` and not `unless`, in tsp or tbsp, one
-  spice to the line, gets its weight (USDA FoodData Central's level teaspoon)
-  and what whole spice to weigh out and grind. By weight, not by seeds,
-  sticks or pods. Ginger adds the classic fresh figure, 1 tbsp grated per
-  ¼ tsp ground; nutmeg adds how much of a nutmeg (one grates to about
-  2½ tsp). Spices with no whole form (paprika, blends) get none.
+  spice to the line, gets its weight (USDA FoodData Central's level
+  teaspoon), and nothing else. USDA has no ground figure for cumin,
+  coriander, fennel or fenugreek, so theirs is the seed's weight per tsp:
+  near enough for weighing seeds to grind, and Helen kept it. Ginger adds the
+  classic fresh figure, 1 tbsp grated per ¼ tsp ground; nutmeg adds how much
+  of a nutmeg (one grates to about 2½ tsp). Paprika and blends get none.
+- **Whole spices** (#1528): seeds by the spoon get their weight and the
+  ground spoonfuls they grind to, "About 2.1 g, or 1 tsp ground cumin"; a
+  counted nutmeg gets its weight (4.5 g each, the Indian Institute of Spices
+  Research's mean of 23 accessions) and its grated teaspoons. Black
+  peppercorns are USDA's 2.9 g per tsp whole. Only sourced figures:
+  cinnamon sticks, cardamom pods, cloves, mace and allspice berries had none
+  better than a seller's, so they get no hint.
+- **Vanilla** (#1517): 1 tsp vanilla bean paste = 1 tsp extract = 1 pod. A
+  line gets the forms it does not already name; pods to the nearest half.
+  Essence, vanilla sugar and ice cream get none.
+- **Fresh and paste** (#1528), both ways round, from the jars: ginger and
+  galangal 1 tsp = a 1 cm piece (Bart); garlic 1 tsp = 1 clove (Very Lazy).
+  Lemongrass is Helen's, 1 stalk = 1–2 tsp, the cook to choose: no UK jar
+  states a stalk. Root in cm or inches, cloves and stalks counted; from 6 tsp
+  the paste reads in tbsp. A line naming two pastes gets none.
 
-`tests/test_ingredient_hints.py` holds the data's shape and the six brands;
+`tests/test_ingredient_hints.py` holds the data's shape, the six brands and
+the rulings' figures;
 `tests/test_browser_smoke.py` opens a stock hint, closes it, scales, and
 opens it again.
 

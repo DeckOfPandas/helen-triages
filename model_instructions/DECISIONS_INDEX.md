@@ -88,7 +88,7 @@ argument and the rules each field is read by.
 - 2026-11-19 · §4 · a source step that straddles two phases may have its QQ Claude lines split across the method groups.
 - 2026-11-19 · §4 · cook_time leaves out cooling: "X mins, plus overnight cooling".
 - 2026-11-19 · §4 · caster sugar a source leaves unqualified is golden, except in a meringue or a pale icing or cream, where it is white.
-- 2026-11-19 · §4 · vanilla bean paste is a house vanilla, and 1 tsp of it is 1 vanilla pod, either way.
+- 2026-11-21 · §4 · #1517 · vanilla bean paste is a house vanilla, and 1 tsp of it = 1 tsp vanilla extract = 1 pod, every way round, as a hint.
 - 2026-11-19 · §4 · a 2-lb loaf tin is written "2-lb (900 g) loaf tin, about 25 x 12.5 x 8 cm".
 - 2026-11-19 · §4 · a teaspoon is 5 ml and a tablespoon 15 ml, on both sites.
 - 2026-10-29 · §4 · an unheaded first ingredient group is named for the dish or its main component, unasked.
@@ -252,7 +252,7 @@ argument and the rules each field is read by.
 - 2026-11-12 · §8.2 · #1504 · a recipe page can show a tick box on every ingredient line, behind a TICK BOXES OFF / ON switch under INGREDIENTS.
 - 2026-11-12 · §8.2 · a recipe written in imperial measures has an IMPERIAL / METRIC switch under INGREDIENTS, imperial by default.
 - 2026-11-12 · §8.2 · #1472 · a stock line's hint says how much of each product makes its volume of water, for all six brands, behind a tap.
-- 2026-11-12 · §8.2 · #1498 · a ground spice's hint gives its weight to grind your own, not a count of seeds, sticks or pods.
+- 2026-11-21 · §8.2 · #1498 #1527 #1528 · spice hints go both ways, by weight, and only on sourced figures; pastes convert to fresh from the jars.
 - 2026-10-09 · §8.2 · #1297 · the shopping list reads the zest and the juice of one lemon as one lemon.
 - 2026-10-10 · §8.2 · #1125 #1297 · on a recipe page a handful, sprig or bunch scales to the nearest quarter; a pinch, dash, splash, knob, drop, twist, lot or pat to the nearest half.
 - 2026-10-10 · §8.2 · #1297 · on the shopping list a by-eye measure is bought as the next whole one, with the recipes' figure in brackets, stepped as the recipe page steps it.
