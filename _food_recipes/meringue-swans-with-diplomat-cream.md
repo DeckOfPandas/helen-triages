@@ -89,6 +89,7 @@ notes:
   - label: "Assembly window"
     text: "A few hours ahead is fine, but the shells soften on contact with cream, even with gelatine, so leave it as late as sensibly possible. Keep the shells in an airtight tin, and the tightly covered cream in the fridge, before assembly."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

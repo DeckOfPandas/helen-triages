@@ -33,6 +33,7 @@ notes:
   - label: "Frozen cherries"
     text: "If using frozen cherries, thaw and strain them ahead to get rid of the spare water."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

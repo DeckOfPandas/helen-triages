@@ -1,13 +1,14 @@
 ---
 title: "Sticky Soy and Miso Dipping Sauce"
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true
 tagline: "A sake, mirin and white miso sauce, thickened to a sticky glaze."
 source: "Henry"
 source_type: person
-makes: "1 marinade for 4 portions of fish"
+makes: "enough marinade for 4 portions of fish"
 prep_time: "none"
 cook_time: "10 mins"
 main_ingredients: ["mirin", "white miso paste", "sake", "dark soy sauce", "dark brown muscovado sugar"]

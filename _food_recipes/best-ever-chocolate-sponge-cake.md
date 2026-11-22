@@ -77,6 +77,7 @@ notes:
   - label: "Topping"
     text: "Top with icing sugar. Or try [chocolate ganache](../chocolate-ganache/), or simply melted chocolate with salted butter 2:1."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

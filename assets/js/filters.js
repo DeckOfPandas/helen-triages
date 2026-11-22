@@ -36,6 +36,12 @@ document.addEventListener('DOMContentLoaded', function () {
   var draftsBtn = document.getElementById('drafts-toggle');
   var hideDrafts = false;
 
+  /* Only the untried (DECISIONS §4): local builds only, like the drafts
+     button, and composing with every filter. A row is untried if it carries
+     `data-untried`. */
+  var untriedBtn = document.getElementById('untried-toggle');
+  var onlyUntried = false;
+
   // The one clear-all is the results pill's × (_includes/results-pill.html,
   // #1448): this script sets its visibility and wires its click, and
   // results-bar.js shows it whenever that visibility says there is something
@@ -639,6 +645,7 @@ function renderResultsPool() {
 
       /* The local-only drafts switch, #1358. */
       if (visible && hideDrafts && li.querySelector('.badge-draft')) visible = false;
+      if (visible && onlyUntried && !li.hasAttribute('data-untried')) visible = false;
 
       if (visible) matchingLis.push(li);
       else if (!suppressList) li.style.display = 'none';
@@ -959,6 +966,18 @@ function renderResultsPool() {
       draftsBtn.textContent = hideDrafts ? 'show drafts' : 'hide drafts';
       draftsBtn.classList.toggle('is-on', hideDrafts);
       draftsBtn.setAttribute('aria-pressed', hideDrafts ? 'true' : 'false');
+      update();
+    });
+  }
+
+  /* A filter's label, not an action's: `is-on` and aria-pressed carry the
+     state, as on a filter chip. */
+  if (untriedBtn) {
+    untriedBtn.hidden = false;
+    untriedBtn.addEventListener('click', function () {
+      onlyUntried = !onlyUntried;
+      untriedBtn.classList.toggle('is-on', onlyUntried);
+      untriedBtn.setAttribute('aria-pressed', onlyUntried ? 'true' : 'false');
       update();
     });
   }

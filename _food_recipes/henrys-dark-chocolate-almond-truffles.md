@@ -39,6 +39,7 @@ notes:
   - label: "dusting"
     text: "Every time I've dusted them with icing sugar then re-fridged, they suck the icing sugar in, making their surfaces look all weird. I now tend to leave them to their own devices, and dust as close to gifting as I can get away with."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

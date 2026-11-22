@@ -38,6 +38,7 @@ notes:
   - label: "Examples of how much this makes"
     text: "About six servings as a sauce, or enough for a 16-cm square tin as Millionaire's filling."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

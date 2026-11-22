@@ -277,14 +277,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   it properly"*. Seven staged files had gone unscanned, the ones closest to
   publication. The folders are now `1-rewrite/`, `2-make/`, `3-keep/` and
   `4-promote/` (`PIPELINE.md`).
-- **2026-08-21, #429 — `meta:` is exactly three flags in order, and promotion
-  is never a step where "has it been cooked?" is open.** `cooked_before` and
-  `date_last_edited` are retired; both were read by nothing. Helen's ruling: a
-  recipe is cooked-and-liked (promoted), cooked-and-disliked (deleted) or not
-  cooked, *"why would I put it on my battle tested site?"* And *"I never want
-  to publish anything I haven't tested."* No test enforces it on food: it is
-  hers to decide at promotion. The made-and-liked state short of a rewrite is
-  now the drafts folder `3-keep/`, not a flag.
+- **2026-11-21 (replacing #429's 2026-08-21 ruling) — food `meta:` is four
+  flags, `made_before` first, and an untried recipe does not publish.** Helen,
+  before a month of Christmas test cooking: *"I now want to differentiate
+  between recipes I've cooked before and haven't cooked before, local site
+  only"*, so she can browse for candidates *"without having to remember they
+  exist"*. She chose an explicit flag over the folders, and kept #429's *"I
+  never want to publish anything I haven't tested"* as a gate leg: `made_before:
+  true` or the page is held back (cocktails differ, #722). The local index has
+  an `untried` pill that composes with every filter; never a row badge (#562).
+  Seeded once from the pipeline (published, `3-keep/`, `4-promote/` true, the
+  rest false); after that it is hers, set as she rewrites and proofreads, and
+  no command flips it. `date_last_edited` stays retired.
 - **2026-10-30 — a food DRAFT's `meta:` block sits directly under `title:`.**
   Helen: *"I'd like metadata (e.g. rewritten: false) to sit near the top of
   recipe files, to help me when I'm rewriting so I don't keep opening the same
@@ -508,10 +512,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   *"Golden for everything unspecified, other than meringue or light icing
   etc."* The line says what the source printed (`note: "the source gave
   \"caster sugar\""`), as milk, eggs and butter do (below).
-- **2026-11-19 — `vanilla bean paste` is a house vanilla, and 1 tsp of it is
-  1 vanilla pod, either way.** Helen: *"Add vanilla bean paste (plus a
-  conversion to and from pods -- 1 tsp = 1 pod"*. `_QUALIFIED_VANILLA` in
-  `tests/test_style.py`; no hint on the page yet.
+- **2026-11-21, #1517 — `vanilla bean paste` is a house vanilla, and 1 tsp of
+  it = 1 tsp vanilla extract = 1 pod, every way round, as a hint.** Helen:
+  *"Add vanilla bean paste (plus a conversion to and from pods -- 1 tsp = 1
+  pod"*; asked, she added extract one for one and pods to the nearest half.
+  Essence is not ruled and gets no hint. `_QUALIFIED_VANILLA` in
+  `tests/test_style.py`; the hint is MANUAL §8.2's.
 - **2026-11-19 — a 2-lb loaf tin is written "2-lb (900 g) loaf tin, about
   25 x 12.5 x 8 cm".** Helen: *"if this version here is more full then use
   this one everywhere."* In `QQ Claude` lines and published methods; a `QQ
@@ -1655,11 +1661,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   where, *"Behind a tap"*, and then, of the first build, *"please use the same
   pattern as the YOLO / ship explainer on the cocktails site"*: a ringed i
   opening a modal box. The spice hints share it.
-- **2026-11-12, #1498 — a ground spice's hint gives its weight to grind your
-  own, not a count of seeds, sticks or pods.** Helen: *"Default to weight
-  instead of seeds, sticks and pods. Take classic figures for fresh ginger."*
-  So ginger also gives 1 tbsp grated fresh per ¼ tsp ground. Nutmeg also
-  says how much of a nutmeg, the "about half" of her issue comment.
+- **2026-11-21, #1498 #1527 #1528 — spice hints go both ways, by weight, and
+  only on sourced figures; pastes convert to fresh from the jars.** Helen
+  (#1498): *"Default to weight instead of seeds, sticks and pods. Take classic
+  figures for fresh ginger."* A ground line says its weight and no longer
+  "Grinding your own? Weigh…" (#1527, *"Delete"*, every spice). #1528: *"I
+  want to show the conversions both ways, so on all spices"*; a whole line
+  reads *"About 2 g, or 1 tsp ground cumin."* Asked, she ruled sourced figures
+  only, so sticks, pods, cloves, mace and allspice wait; kept USDA's seed
+  weight on ground cumin, coriander, fennel and fenugreek; took the jars'
+  pastes; and for lemongrass: *"1 lemongrass stalk is 1-2 tsp of paste --
+  trust the cook"*.
 - **2026-10-09, #1297 — the shopping list reads the zest and the juice of one
   lemon as one lemon.** Helen: *'I would like to cleverly combine e.g. "zest
   of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the shopping list.'*

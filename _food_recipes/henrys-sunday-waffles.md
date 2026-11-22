@@ -40,6 +40,7 @@ notes:
   - label: "Keeping"
     text: "These don't keep at all, like, not even for five minutes while you're eating the first ones. If making a second batch while eating the first, prop spares up in pairs like a house of cards to stop them going soggy, but they will definitely be less good for it."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

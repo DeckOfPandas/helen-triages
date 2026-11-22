@@ -567,8 +567,8 @@ FAIL_CLOSED_FIXTURE = (
     '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
     'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
     'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
-    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
-    '  proofread: true\n{flag}  cooked_before: false\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  made_before: true\n  rewritten: true\n'
+    '  proofread: true\n{flag}'
     '---\n')
 FAIL_CLOSED_CASES = {
     "zzz-gate-no-flag": "",                             # field absent entirely
@@ -610,8 +610,8 @@ FOOD_GATE_FIXTURE = (
     '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
     'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
     'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
-    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
-    '  awaiting_fix: false\n  proofread: {proofread}\n  cooked_before: false\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  made_before: true\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: {proofread}\n'
     '---\n'
 )
 
@@ -653,6 +653,40 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build(fixture_site)
         "The control recipe -- identical but for `meta.proofread: true` -- "
         "is missing too, so this build proves nothing about the gate. It "
         "is over-firing, or the build dropped everything."
+    )
+
+
+# --- the food-only leg: `made_before` (DECISIONS §4) -------------------------
+# The pair differs in that one key; the drink equivalent publishes unmade.
+
+_in_the_fixture_build({
+    f"_food_recipes/{slug}.md": FOOD_GATE_FIXTURE.format(t=slug, proofread="true")
+    .replace("made_before: true", f"made_before: {value}")
+    for slug, value in {"zzz-gate-untried": "false",
+                        "zzz-gate-tried": "true"}.items()})
+
+
+def test_an_untried_recipe_does_not_reach_the_production_build(fixture_site):
+    """A food recipe says `made_before: true` or it does not publish."""
+    out = fixture_site
+    assert not (out / "food" / "recipes" / "zzz-gate-untried" / "index.html").exists(), (
+        "A recipe with `meta.made_before: false` was PUBLISHED. Helen "
+        "publishes nothing she has not cooked: _plugins/publish_gate.rb must "
+        "hold a food recipe back unless `made_before == true`."
+    )
+    assert (out / "food" / "recipes" / "zzz-gate-tried" / "index.html").exists(), (
+        "The control recipe -- identical but for `made_before: true` -- is "
+        "missing too, so this build proves nothing about the gate."
+    )
+
+
+def test_the_live_index_carries_no_untried_filter(prod_site):
+    """`untried` is local only: the live index has no button and no row mark."""
+    html = (prod_site / "food" / "index.html").read_text(encoding="utf-8")
+    assert "untried-toggle" not in html and "data-untried" not in html, (
+        "The production food index carries the local-only untried filter. "
+        "food/index.html must gate both the button and `data-untried` on "
+        "`site.show_drafts`."
     )
 
 
@@ -874,8 +908,8 @@ GROUP_HEADING_FIXTURE = (
     '  - name: to decorate\n    items:\n    - item: salt\n'
     '  - name: to serve\n    items:\n    - item: salt\n'
     '  - name: "variation: plain"\n    items:\n    - item: salt\n'
-    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
-    '  awaiting_fix: false\n  proofread: true\n  cooked_before: false\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  made_before: true\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: true\n'
     '---\n'
 )
 
@@ -1247,8 +1281,7 @@ GATE_FOOD_UNREWRITTEN = (
     'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
     'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
     'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n'
-    '  rewritten: false\n  awaiting_fix: false\n  proofread: true\n'
-    '  cooked_before: false\n---\n'
+    '  made_before: true\n  rewritten: false\n  awaiting_fix: false\n  proofread: true\n---\n'
 )
 
 
@@ -2251,7 +2284,7 @@ STAR_ALSO_FIXTURE = (
     'source: "test"\nsource_type: unknown\nserves: "2"\n'
     'main_ingredients: [{ing}]\nstar_ingredient: "greens"\ntags: []\n'
     'ingredient_groups:\n  - items:\n    - item: "salt"\n'
-    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  made_before: true\n  rewritten: true\n'
     '  awaiting_fix: false\n  proofread: true\n---\n')
 STAR_ALSO_CASES = {
     "zzz-star-also-beans": ('"Green Beans", "hazelnuts"', "legumes"),
@@ -2267,7 +2300,7 @@ YIELD_ALSO_FIXTURE = (
     'source: "test"\nsource_type: unknown\nmakes: "1 batch, about 100 g"\n'
     'main_ingredients: ["salt"]\ntags: []\n'
     'ingredient_groups:\n  - items:\n    - amount: "100 g"\n      item: "salt"\n'
-    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  made_before: true\n  rewritten: true\n'
     '  awaiting_fix: false\n  proofread: true\n---\n')
 _in_the_fixture_build({"_food_recipes/zzz-yield-also.md": YIELD_ALSO_FIXTURE})
 

@@ -43,6 +43,7 @@ method:
 method_short:
   - "Dry-fry then grind, sheesh."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

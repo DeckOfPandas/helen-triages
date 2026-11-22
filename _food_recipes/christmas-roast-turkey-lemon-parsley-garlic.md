@@ -57,6 +57,7 @@ notes:
   - label: "Resting"
     text: "The 45-minute rest is a requirement."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

@@ -58,6 +58,7 @@ notes:
   - label: "Doneness"
     text: "90 mins should leave the joint tender but still sliceable."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

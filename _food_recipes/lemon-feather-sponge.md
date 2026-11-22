@@ -43,6 +43,7 @@ notes:
    - label: delight
      text: "No real note. Just restating that this cake is a genuine delight."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

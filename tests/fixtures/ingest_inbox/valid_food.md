@@ -4,6 +4,7 @@
 ---
 title: "Crispy Sage Butter Gnocchi"
 meta:
+  made_before: false
   rewritten: false
   awaiting_fix: false
   proofread: false

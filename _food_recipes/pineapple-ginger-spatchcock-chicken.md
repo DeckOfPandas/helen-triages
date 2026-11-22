@@ -55,6 +55,7 @@ notes:
   - label: "Make ahead"
     text: "The marinade can be prepared in advance, but don't marinate the chicken for more than 30 mins as the acid will make it tough."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

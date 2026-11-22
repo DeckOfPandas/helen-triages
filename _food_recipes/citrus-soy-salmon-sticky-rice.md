@@ -57,6 +57,7 @@ method:
 method_short:
   - "Simmer glaze, bake, cook rice, assemble."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

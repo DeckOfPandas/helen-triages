@@ -116,6 +116,7 @@ notes:
   - label: "Ghee"
     text: "It's tempting to YOLO and use more ghee — no one would know, right? — but last time I did this the mutton was almost floating by the end, and the tomatoes were all weird and bubbly."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

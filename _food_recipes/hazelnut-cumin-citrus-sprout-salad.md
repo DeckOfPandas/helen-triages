@@ -51,6 +51,7 @@ notes:
   - label: "one-pan dressing"
     text: "Making the dressing in the same pan the spices were toasted in picks up the tasty oil left behind."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

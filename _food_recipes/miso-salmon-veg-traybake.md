@@ -52,6 +52,7 @@ notes:
      text: "Making double the marinade leaves extra for drizzling at the end."
 
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true

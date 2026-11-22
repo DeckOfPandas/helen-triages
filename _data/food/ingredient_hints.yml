@@ -1,7 +1,6 @@
-# The tap-to-open hints on a recipe's ingredient lines: how much stock
-# product makes a line's stock, and what a ground spice weighs. Read by
-# assets/js/food-hints.js. Stock figures are the packets' own; each product's
-# source is in MANUAL §8.2.
+# The tap-to-open hints on a recipe's ingredient lines: stock products, spice
+# weights, vanilla forms, and fresh against paste. Read by
+# assets/js/food-hints.js. Every figure's source is in MANUAL §8.2.
 
 # --- Stock (#1472) -----------------------------------------------------------
 # A line whose item says "stock" and whose amount is a volume gets the hint:
@@ -40,30 +39,49 @@ stock:
       unit: tsp
       flavours: { chicken: 142, beef: 114 }
 
-# --- Ground spices (#1498) ---------------------------------------------------
-# A line of a ground spice in tsp or tbsp gets its weight, so whole spice can
-# be weighed out and ground: Helen chose weight over seeds, sticks and pods.
-# `match` are the item's words for the GROUND spice; `unless`
-# are words that make it some other form. `g_per_tsp` is USDA FoodData
-# Central's level teaspoon. `whole` names what to grind. `fresh_tbsp_per_tsp`
-# (ginger only) is the classic 1 tbsp grated fresh per ¼ tsp ground;
-# `per_whole_tsp` (nutmeg only) is the teaspoons one whole nutmeg grates to.
+# --- Vanilla (#1517) ----------------------------------------------------------
+# 1 tsp vanilla bean paste = 1 tsp vanilla extract = 1 vanilla pod, Helen's
+# ruling. A line gets the forms it does not already name; its own form is the
+# first one it names. `or paste` and `or extract` catch "paste or extract". `per_pod` is how much of a form one pod is; a `tsp` form
+# is measured by the spoon, a `pod` form counted to the nearest half.
+# `unless` are words that make the line something else.
+vanilla:
+  unless: [sugar, ice cream, essence, orange, almond]
+  forms:
+    - name: vanilla bean paste
+      match: [vanilla bean paste, vanilla paste, bean paste, or paste]
+      unit: tsp
+      per_pod: 1
+    - name: vanilla pod
+      match: [vanilla pod, vanilla pods, vanilla bean pod, vanilla bean, vanilla beans]
+      unit: pod
+      per_pod: 1
+    - name: vanilla extract
+      match: [vanilla extract, or extract]
+      unit: tsp
+      per_pod: 1
+
+# --- Spices (#1498, #1527, #1528) --------------------------------------------
+# `match`/`unless`: the GROUND spice's words. `g_per_tsp`: USDA's level tsp
+# (the seed's, where USDA has no ground figure). `whole`, only where a
+# reputable figure exists: its words, and `g_per_tsp` by the spoon or `g_each`
+# counted. `fresh_tbsp_per_tsp` (ginger): 1 tbsp grated per ¼ tsp ground.
+# `per_whole_tsp` (nutmeg): the tsp one nutmeg grates to. MANUAL §8.2.
 spices:
   - name: cinnamon
     match: [ground cinnamon, cinnamon powder, cinnamon]
     unless: [stick, sticks, bark, quill, whole]
     g_per_tsp: 2.6
-    whole: cinnamon stick
   - name: cumin
     match: [ground cumin, cumin powder]
     unless: [seed, seeds, whole]
     g_per_tsp: 2.1
-    whole: cumin seeds
+    whole: { match: [cumin seeds, cumin seed], unless: [ground], g_per_tsp: 2.1 }
   - name: coriander
     match: [ground coriander, coriander powder]
     unless: [seed, seeds, whole, leaf, leaves, fresh]
     g_per_tsp: 1.8
-    whole: coriander seeds
+    whole: { match: [coriander seeds, coriander seed], unless: [ground], g_per_tsp: 1.8 }
   - name: ginger
     match: [ground ginger, dried ginger, ginger powder, ginger]
     unless: [fresh, grated, root, stem, crystallised, preserved, piece, knob, thumb, nuts, paste, minced, chopped, sliced, julienned, pickled]
@@ -73,45 +91,79 @@ spices:
     match: [ground nutmeg, grated nutmeg, nutmeg]
     unless: [whole]
     g_per_tsp: 2.2
-    whole: whole nutmeg
     per_whole_tsp: 2.5
+    # A dried nutmeg's mean weight, from a study of 23 accessions (Indian
+    # Institute of Spices Research): the range is 2.5-10 g.
+    whole: { match: [whole nutmeg, nutmeg], unless: [ground], g_each: 4.5 }
   - name: cloves
     match: [ground cloves, ground clove, clove powder]
     unless: [whole, garlic]
     g_per_tsp: 2.1
-    whole: whole cloves
   - name: allspice
     match: [ground allspice, allspice]
     unless: [berries, berry, whole]
     g_per_tsp: 1.9
-    whole: allspice berries
   - name: cardamom
     match: [ground cardamom, cardamom powder]
     unless: [pod, pods, seed, seeds, whole]
     g_per_tsp: 2.0
-    whole: cardamom seeds, out of their pods
   - name: black pepper
     match: [ground black pepper]
     unless: [whole, peppercorns]
     g_per_tsp: 2.3
-    whole: black peppercorns
+    whole: { match: [black peppercorns, black peppercorn], unless: [ground], g_per_tsp: 2.9 }
   - name: white pepper
     match: [ground white pepper]
     unless: [whole, peppercorns]
     g_per_tsp: 2.4
-    whole: white peppercorns
   - name: fennel
     match: [ground fennel, fennel powder]
     unless: [seed, seeds, whole, bulb, fronds]
     g_per_tsp: 2.0
-    whole: fennel seeds
+    whole: { match: [fennel seeds, fennel seed], unless: [ground], g_per_tsp: 2.0 }
   - name: fenugreek
     match: [ground fenugreek, fenugreek powder]
     unless: [seed, seeds, whole, leaves, methi]
     g_per_tsp: 3.7
-    whole: fenugreek seeds
+    whole: { match: [fenugreek seeds, fenugreek seed], unless: [ground], g_per_tsp: 3.7 }
   - name: mace
     match: [ground mace]
     unless: [blade, blades, whole]
     g_per_tsp: 1.7
-    whole: mace blades
+
+# --- Fresh and paste (#1528) ---------------------------------------------------
+# A line of the paste by the spoon gets the fresh amount, and a line of the
+# fresh one gets the paste, from the jars' own figures: Bart's ginger and
+# galangal (1 tsp = a 1 cm piece), Very Lazy's garlic (1 tsp = 1 clove).
+# Lemongrass is Helen's: 1 stalk is 1-2 tsp of paste, and the cook decides.
+# `fresh` is how the fresh one is measured: `cm` of root or a count of `unit`.
+# `tsp_per` is the paste for one cm or one counted piece, low and high.
+pastes:
+  - name: ginger
+    paste: [ginger paste]
+    fresh_match: [ginger]
+    fresh_unless: [ground, dried, powder, stem, syrup, crystallised, preserved, paste, pickled, essence, nuts, biscuits, beer, ale, wine, cordial]
+    fresh: cm
+    fresh_name: fresh ginger
+    tsp_per: [1, 1]
+  - name: galangal
+    paste: [galangal paste]
+    fresh_match: [galangal]
+    fresh_unless: [ground, dried, powder, paste]
+    fresh: cm
+    fresh_name: fresh galangal
+    tsp_per: [1, 1]
+  - name: garlic
+    paste: [garlic paste]
+    fresh_match: [garlic clove, garlic cloves, garlic]
+    fresh_unless: [granules, powder, paste, bulb, bulbs, head, heads, wild, black, oil, butter, bread, salt, puree, crushed garlic]
+    fresh: count
+    unit: [garlic clove, garlic cloves]
+    tsp_per: [1, 1]
+  - name: lemongrass
+    paste: [lemongrass paste]
+    fresh_match: [lemongrass stalk, lemongrass stalks, lemongrass sticks, lemongrass stick, lemongrass]
+    fresh_unless: [paste, dried, powder]
+    fresh: count
+    unit: [lemongrass stalk, lemongrass stalks]
+    tsp_per: [1, 2]

@@ -202,30 +202,29 @@ def test_meta_block_complete(recipe):
     assert isinstance(meta, dict), (
         f"{where(recipe)} has no `meta:` block, or it is not a mapping."
     )
-    missing = [f for f in ("rewritten", "awaiting_fix", "proofread") if f not in meta]
+    missing = [f for f in META_ORDER if f not in meta]
     assert not missing, (
         f"{where(recipe)} `meta:` is missing {missing}. "
-        f"All three are booleans and all three must be present. The publish "
-        f"gate fails closed, so a missing `awaiting_fix` or `proofread` holds "
-        f"the recipe back as surely as the wrong value; a missing `rewritten` "
-        f"records no answer at all."
+        f"All four are booleans and all four must be present. The publish "
+        f"gate fails closed, so a missing `made_before`, `awaiting_fix` or "
+        f"`proofread` holds the recipe back as surely as the wrong value; a "
+        f"missing `rewritten` records no answer at all."
     )
 
 
-# The three flags are read together, in the order a recipe moves through them
-# (#429). Reordering a meta block changes no value, so
-# `_only_invisible_keys_changed` exempts it and a fix here costs no proofread.
-META_ORDER = ["rewritten", "awaiting_fix", "proofread"]
+# The four flags are read together, `made_before` first as on a drink, then in
+# the order a recipe moves through them. Reordering a meta block changes no
+# value, so `_only_invisible_keys_changed` exempts it. DECISIONS §4.
+META_ORDER = ["made_before", "rewritten", "awaiting_fix", "proofread"]
 
 
-def test_meta_block_is_exactly_the_three_flags_in_order(recipe):
+def test_meta_block_is_exactly_the_four_flags_in_order(recipe):
     meta = recipe.fm.get("meta")
     assert isinstance(meta, dict), f"{where(recipe)} has no `meta:` mapping."
     assert list(meta) == META_ORDER, (
         f"{where(recipe)} `meta:` is {list(meta)}, expected exactly "
-        f"{META_ORDER}.\nThe three flags are read together and in the order a "
-        f"recipe moves through them. cooked_before and date_last_edited were "
-        f"retired by #429 — if one is back, it is dead weight, not data."
+        f"{META_ORDER}.\nThe four flags are read together. date_last_edited "
+        f"was retired by #429, and cooked_before is now made_before."
     )
 
 
@@ -435,7 +434,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 #   2. move it in a commit of its own, quoting her grant in the message;
 #   3. move it before the next agent edit, or it covers that too.
 # Grants made on parallel branches need the merge commit with both behind it.
-BASELINE_COMMIT = "92367a43"   # nine recipes' snack tags (#1526), Helen's grant; bffc53ec and every earlier grant behind it
+BASELINE_COMMIT = "9c5864c4"   # the sticky soy and miso sauce's `makes:`, Helen's grant; 966772aa and every earlier grant behind it
 AGENT_TRAILER = "co-authored-by: claude"
 
 

@@ -72,6 +72,7 @@ notes:
   - label: "I also like..."
     text: "...goat's cheese and cherry tomato."
 meta:
+  made_before: true
   rewritten: true
   awaiting_fix: false
   proofread: true
