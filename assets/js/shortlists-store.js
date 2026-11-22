@@ -17,7 +17,7 @@
   // --- core ------------------------------------------------------------------
 
   function empty() {
-    return { lists: [], next: 1, view: EVERYTHING, ticked: [] };
+    return { lists: [], next: 1, ticked: [] };
   }
 
   function copy(state) {
@@ -29,7 +29,7 @@
           ticked: list.ticked.slice()
         };
       }),
-      next: state.next, view: state.view, ticked: state.ticked.slice()
+      next: state.next, ticked: state.ticked.slice()
     };
   }
 
@@ -78,7 +78,6 @@
   function remove(state, id) {
     var next = copy(state);
     next.lists = next.lists.filter(function (list) { return list.id !== id; });
-    if (next.view === id) next.view = EVERYTHING;
     return next;
   }
 
@@ -143,12 +142,6 @@
     var list = find(next, id);
     var from = list ? indexOfRecipe(list, recipe) : -1;
     if (from !== -1) moveInArray(list.items, from, to);
-    return next;
-  }
-
-  function setView(state, view) {
-    var next = copy(state);
-    next.view = find(next, view) ? view : EVERYTHING;
     return next;
   }
 
@@ -252,7 +245,6 @@
     });
     state.next = Math.max(biggest + 1, Number(raw.next) || 0);
     state.ticked = strings(raw.ticked);
-    state.view = find(state, raw.view) ? raw.view : EVERYTHING;
     return state;
   }
 
@@ -269,7 +261,7 @@
     empty: empty, fromRecord: fromRecord, cleanName: cleanName,
     create: create, rename: rename, remove: remove,
     setMember: setMember, setPortions: setPortions, portions: portions, listsWith: listsWith,
-    moveList: moveList, moveItem: moveItem, setView: setView,
+    moveList: moveList, moveItem: moveItem,
     setTicked: setTicked, ticked: ticked, untick: untick,
     freeName: freeName, bringIn: bringIn
   };
@@ -325,7 +317,6 @@
     refresh: function () { state = null; },
     all: function () { return copy(load()).lists; },
     get: function (id) { return find(copy(load()), id); },
-    view: function () { return load().view; },
     nameProblem: function (name, exceptId) { return nameProblem(load(), cleanName(name), exceptId); },
     create: function (name) { return result(create(load(), name)); },
     rename: function (id, name) { return result(rename(load(), id, name)); },
@@ -336,7 +327,6 @@
     listsWith: function (recipe) { return listsWith(load(), recipe); },
     moveList: function (id, to) { save(moveList(load(), id, to)); },
     moveItem: function (id, recipe, to) { save(moveItem(load(), id, recipe, to)); },
-    setView: function (view) { save(setView(load(), view)); },
     setTicked: function (scope, rowKey, on) { save(setTicked(load(), scope, rowKey, on)); },
     ticked: function (scope) { return ticked(load(), scope); },
     untick: function (scope, rowKeys) { save(untick(load(), scope, rowKeys)); },

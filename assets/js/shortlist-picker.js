@@ -282,9 +282,8 @@
     if (barTemplate && barTemplate.content && main) {
       var bar = barTemplate.content.firstElementChild.cloneNode(true);
       bar.querySelector('.shortlist-into-name').textContent = into.name;
-      bar.querySelector('.shortlist-into-done').addEventListener('click', function () {
-        lists.setView(into.id);
-      });
+      var done = bar.querySelector('.shortlist-into-done');
+      done.href = V.pageUrl(done.getAttribute('href'), into.id);
       main.insertBefore(bar, main.firstChild);
     }
     controls().forEach(function (btn) {

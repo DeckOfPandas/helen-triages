@@ -1,7 +1,7 @@
 // recipe-lists.js: a recipe page and the lists it is on (#1521). MANUAL §8.9.
 //
 // - Opened from a list (`?list=<id>`, the shortlists page's links): a
-//   "← Christmas starters" link back to that list's tab, and the scaler shows
+//   "← Christmas starters" link back to that list's page, and the scaler shows
 //   and saves that list's portions, so the two pages edit one number. A
 //   `makes:` recipe's list keeps batches and its scaler counts the things
 //   made: HTF.listsView converts.
@@ -36,7 +36,7 @@
     var furniture = document.querySelector('.page-furniture');
     if (!list || !link) return;
     link.textContent = '← ' + list.name;
-    link.addEventListener('click', function () { lists.setView(list.id); });
+    link.href = V.pageUrl(link.getAttribute('href'), list.id);
     if (furniture) furniture.appendChild(link);
     link.hidden = false;
   }

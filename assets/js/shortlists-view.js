@@ -42,30 +42,30 @@
     return n ? (Number(n[1]) - 1 + HUES) % HUES : -1;
   }
 
-  function tabs(lists, view) {
-    var current = find(lists, view) ? view : EVERYTHING;
-    return [{
-      id: EVERYTHING, name: EVERYTHING, lists: lists.length, hue: -1,
-      hues: lists.map(function (list) { return hueOf(list.id); }),
-      count: rows(lists, EVERYTHING).length, selected: current === EVERYTHING
-    }].concat(lists.map(function (list) {
-      return { id: list.id, name: list.name, count: list.items.length, hue: hueOf(list.id),
-        selected: current === list.id };
-    }));
-  }
-
-  // "Lemons · 4"; everything's says how many lists too: "80 recipes · 9 lists".
-  function tabCount(tab) {
-    if (tab.id !== EVERYTHING) return String(tab.count);
-    return countText(tab.count) + ' · ' + tab.lists + (tab.lists === 1 ? ' list' : ' lists');
-  }
-
-  function tabLabel(tab) {
-    return tab.name + ' · ' + tabCount(tab);
-  }
-
   function countText(n) {
     return n + (n === 1 ? ' recipe' : ' recipes');
+  }
+
+  // Under a heading: "80 recipes on 9 lists · from £777.29" on the overview,
+  // "10 recipes · from £86.53" on a list; `cost` is a money text or ''.
+  function overviewText(lists, cost) {
+    return countText(rows(lists, EVERYTHING).length) + ' on ' + lists.length +
+      (lists.length === 1 ? ' list' : ' lists') + (cost ? ' · ' + cost : '');
+  }
+
+  function listText(list, cost) {
+    return countText(list.items.length) + (cost ? ' · ' + cost : '');
+  }
+
+  // The lists either side of `id`, in the reader's order, or null at an end:
+  // the foot of a list's page never wraps round.
+  function neighbours(lists, id) {
+    var at = -1;
+    lists.forEach(function (list, i) { if (list.id === id) at = i; });
+    return {
+      previous: at > 0 ? lists[at - 1] : null,
+      next: at !== -1 && at < lists.length - 1 ? lists[at + 1] : null
+    };
   }
 
   /* The shopping entries for some rows, through a site's shopping-rows
@@ -154,9 +154,9 @@
     rows: rows,
     HUES: HUES,
     hueOf: hueOf,
-    tabs: tabs,
-    tabCount: tabCount,
-    tabLabel: tabLabel,
+    overviewText: overviewText,
+    listText: listText,
+    neighbours: neighbours,
     countText: countText,
     shoppingEntries: shoppingEntries,
     buttonWords: buttonWords,
@@ -170,6 +170,8 @@
     clashChoices: clashChoices,
     broughtText: broughtText,
     intoUrl: function (indexUrl, id) { return withQuery(indexUrl, 'into', id); },
+    // A list's own page: the shortlists page with `?list=<id>`.
+    pageUrl: function (pageUrl, id) { return withQuery(pageUrl, 'list', id); },
     listUrl: function (recipeUrl, id) { return withQuery(recipeUrl, 'list', id); }
   };
 });

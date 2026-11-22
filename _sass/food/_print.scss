@@ -40,7 +40,8 @@
 
   // The shortlists' controls (#1521): the picker, the chevron beside a button
   // while filling a list, the bar that says which, the note under the scaler,
-  // a row's grip, steps and ×, "+ new list", a shopping line's chevron (an
+  // a row's grip, steps and ×, the overview's "+ new list" and "arrange", a
+  // list page's ▾ and its links either side, a shopping line's chevron (an
   // open breakdown still prints) and the share and import boxes. The back
   // link is on the furniture line, which prints nothing.
   .shortlist-picker,
@@ -50,11 +51,13 @@
   .reorder-grip,
   .shortlists-step,
   .shortlists-remove,
-  .shortlists-tab--new,
+  .shortlists-overview-actions,
+  .shortlists-crumb-more,
+  .shortlists-menu,
+  .shortlists-pager,
   .shopping-list-from-toggle,
   .shortlists-share,
-  .shortlists-shared-actions,
-  .shortlists-arrange-open {
+  .shortlists-shared-actions {
     display: none;
   }
 

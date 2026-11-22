@@ -3,8 +3,9 @@ layout: default
 ---
 
 {% include back-to-index.html %}
-{% comment %} Opened from a list (`?list=`), the way back to that list's tab (#1521):
-   recipe-lists.js names it and moves it onto the furniture line. {% endcomment %}
+{% comment %} Opened from a list (`?list=`), the way back to that list's page (#1521):
+   recipe-lists.js names it, points it at the list and moves it onto the
+   furniture line. {% endcomment %}
 <a class="shortlists-back" href="{{ '/food/shortlists/' | relative_url }}" data-shortlists-back hidden>your shortlists</a>
 
 <article class="recipe">

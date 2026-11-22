@@ -136,21 +136,15 @@ test('lists and their recipes keep the order given, and move one step or to a pl
   assert.deepStrictEqual(plain(s.lists[0].items.map((i) => i.recipe)), [C, A, B]);
 });
 
-// --- delete and view ---------------------------------------------------------
+// --- delete ---------------------------------------------------------------------
 
-test('deleting the list on view lands the view on everything', () => {
+test('deleting a list takes it alone, and its number is never given out again', () => {
   const { core } = boot();
-  const made = core.create(core.empty(), 'Lemons');
-  let s = core.setView(made.state, made.id);
-  assert.strictEqual(s.view, made.id);
-  s = core.remove(s, made.id);
-  assert.strictEqual(s.view, core.EVERYTHING);
-  assert.strictEqual(s.lists.length, 0);
-});
-
-test('a view naming no list reads as everything', () => {
-  const { core } = boot();
-  assert.strictEqual(core.setView(core.empty(), 'l99').view, core.EVERYTHING);
+  const one = core.create(core.empty(), 'Lemons');
+  const two = core.create(one.state, 'Limes');
+  let s = core.remove(two.state, two.id);
+  assert.deepStrictEqual(plain(s.lists.map((l) => l.name)), ['Lemons']);
+  assert.strictEqual(core.create(s, 'Oranges').id, 'l3', 'a colour goes by this number (#1521)');
 });
 
 // --- shopping ticks -----------------------------------------------------------

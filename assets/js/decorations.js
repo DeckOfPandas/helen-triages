@@ -104,21 +104,6 @@
     });
   }
 
-  // The same, for a slot a script draws later: the shortlists page's
-  // everything tab (#1521). One tape per page load, like the wordmark's.
-  // Without the file's <title>: inside a tab it would join the tab's text.
-  var laterTape = 0;
-  HTF.tapeInto = function (slot) {
-    var header = document.querySelector('.tape-bg');
-    var count = header ? parseInt(header.getAttribute('data-tape-count'), 10) : 0;
-    if (!count) return;
-    if (!laterTape) laterTape = Math.floor(Math.random() * count) + 1;
-    HTF.fetchSvg(HTF.chromeAsset('/tape/tape-' + laterTape + '.svg'), function (svg) {
-      slot.innerHTML = svg.replace(TAPE_OPEN, TAPE_ATTRS)
-        .replace(/<title>[\s\S]*?<\/title>|<desc>[\s\S]*?<\/desc>/g, '');
-    });
-  };
-
   // --- Centre the capitals on the band ---------------------------------------
   // CSS centres the line BOX; where the capitals sit inside it is a fact about
   // the face, and Canvas TextMetrics is the only thing here that knows it.
@@ -232,9 +217,8 @@
       // Every element that can hold a .tag-shape slot must be in this list. A
       // host missing from it makes `host` null and the slot is silently
       // skipped: no shape fetched, no fill shown.
-      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit, .btn-chaos, .btn-mood, .btn-pool, .shortlists-tab');
-      // `data-tag-key` stands in for text that changes, such as a tab's count.
-      var text = (host ? host.getAttribute('data-tag-key') || host.textContent : '').trim().toLowerCase();
+      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit, .btn-chaos, .btn-mood, .btn-pool');
+      var text = (host ? host.textContent : '').trim().toLowerCase();
       if (!text) return;
 
       // This runs again whenever a script adds a slot, so a slot is restyled

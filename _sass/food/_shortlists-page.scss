@@ -8,11 +8,11 @@
 // =============================================================================
 // THE SHORTLISTS PAGE (#1521), food/shortlists.html
 // =============================================================================
-// One hierarchy: the tabs choose, the heading names, the rows are the work,
-// the shopping list is the result. One style per kind of control: tabs are
-// tape, links are magenta with an arrow, small actions are quiet Courier caps
-// (the shopping list's "untick all"), and the numbers are the shopping list's
-// own boxes.
+// The overview and a page per list. One hierarchy: the heading names, the
+// list of lists chooses, the rows are the work, the shopping list is the
+// result. One style per kind of control: links are magenta with an arrow,
+// small actions are quiet Courier caps (the shopping list's "untick all"),
+// and the numbers are the shopping list's own boxes.
 
 // The foot is room for the floating pill, so it never covers the last line.
 .shortlists-page {
@@ -52,177 +52,263 @@ $list-hues: (
   }
 }
 
-// --- the tabs ------------------------------------------------------------------
-// Washi tape, as the filter chips wear it (shared/_tag-shape.scss), on the
-// site's rule: grey is available, saturated is chosen. At rest a list's tape
-// is plain grey with a strip of its colour along the foot, echoing
-// everything's band, its word the quiet grey; chosen, the full colour,
-// struck heavier, so colour is not the only cue.
+// --- a list's page: where it is -------------------------------------------------
+// "shortlists / <name> ▾", in the small labels' Courier. The ▾ opens the lists
+// as a plain column of links under it, each with its colour's mark.
 
-.shortlists-tabbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: $space-xs $space-sm;
-  margin: 0 0 $space-lg;
-}
-
-.shortlists-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-xs $space-sm;
-  min-width: 0;
-}
-
-.shortlists-tab {
+.shortlists-crumbs {
   position: relative;
-  isolation: isolate;
-  max-width: 100%;
-  padding: $space-xs $space-md;
-  border: 0;
-  background: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: $space-xs;
+  margin: 0 0 $space-md;
   font-family: $font-headings;
   font-size: 0.85rem;
   font-weight: 700;
-  text-align: left;
   text-transform: lowercase;
+  color: $color-clear-text;
+
+  &[hidden] { display: none; }
+}
+
+.shortlists-crumb {
+  color: $color-recipe-link;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
+.shortlists-crumb-current {
+  min-width: 0;
   overflow-wrap: anywhere;
+}
+
+// A chevron, drawn: down when shut, up when open.
+.shortlists-crumb-more {
+  @include tap-area(44px, 44px);
+  position: relative;
+  align-self: center;
+  width: 1.5rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
   color: $color-clear-text;
   cursor: pointer;
 
-  .tag-shape { color: rgba($color-text, 0.08); }
-
-  &:hover {
-    color: $color-text;
-    .tag-shape { color: rgba($color-text, 0.16); }
+  &::before {
+    content: '';
+    display: block;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin: -0.2rem auto 0;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
   }
+
+  &[aria-expanded="true"]::before {
+    margin-top: 0.2rem;
+    transform: rotate(-135deg);
+  }
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
 
   &:focus-visible {
-    outline: 2px solid $color-text;
-    outline-offset: 2px;
-  }
-
-  &.is-selected {
-    -webkit-text-stroke: $faux-bold-stroke currentColor;
-    color: var(--list-ink, #{$color-white});
-    .tag-shape { color: var(--list-hue, #{$color-clear-text}); }
+    outline: 2px solid $color-recipe-link;
+    outline-offset: 0;
   }
 }
 
-.shortlists-tab-count {
-  font-weight: 400;
-  -webkit-text-stroke: 0;
-}
-
-.shortlists-tab-strip {
+.shortlists-menu {
   position: absolute;
-  left: $space-xs;
-  right: $space-xs;
-  bottom: 0;
-  height: 3px;
-  background: var(--list-hue);
+  z-index: 10;
+  top: 100%;
+  left: 0;
+  min-width: min(18rem, 100%);
+  max-width: 100%;
+  margin: $space-xxs 0 0;
+  padding: $space-xs 0;
+  list-style: none;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  box-shadow: 0 4px 14px rgba($color-text, 0.12);
 
-  .is-selected > & { display: none; }
+  &[hidden] { display: none; }
+
+  a {
+    display: flex;
+    align-items: baseline;
+    gap: $space-sm;
+    padding: $space-xs $space-md;
+    color: $color-text;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+
+    &::before {
+      content: '';
+      flex: 0 0 auto;
+      width: 0.9rem;
+      height: 0.3rem;
+      background: var(--list-hue);
+    }
+
+    &:hover,
+    &:focus-visible { color: $color-recipe-link-hover; }
+
+    &[aria-current="page"] { -webkit-text-stroke: $faux-bold-stroke currentColor; }
+  }
 }
 
-// A whole line to itself, so everything sits apart above the lists.
-.shortlists-tabs-break {
-  flex-basis: 100%;
-  height: $space-sm;
-}
+// --- under the heading ------------------------------------------------------------
 
-// --- everything's tab ------------------------------------------------------------
-// Not a list: the logo's black tape when chosen, the bare word at rest, and
-// under it a band of every list's colour. On a line of its own, above the
-// lists (`.shortlists-tabs-break`).
-
-.shortlists-tab--everything {
+.shortlists-summary {
+  margin: $space-sm 0 $space-lg;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
   color: $color-clear-text;
 
-  .tag-shape { display: none; }
-  &:hover { color: $color-text; }
-
-  &.is-selected {
-    color: $color-tape-letter;
-    .shortlists-tape { display: block; }
-  }
+  &[hidden] { display: none; }
 }
 
-// The tape files draw their polygon inside a margin (assets/img/chrome/tape/):
-// 1284 of 1400 across and 120 of 170 down, so the slot overhangs the tab by
-// that much and the polygon meets the tab's edges.
-.shortlists-tape {
-  display: none;
-  position: absolute;
-  z-index: -1;
-  top: -23.33%;
-  left: -4.52%;
-  width: 109.03%;
-  height: 141.67%;
-  pointer-events: none;
+// --- the overview's list of lists ----------------------------------------------------
+// One line per list, in the reader's order, its cells in columns down the
+// list: grip (arranging only), a short mark in the list's colour, the name
+// (its page), the count and the subtotal. One grid, each line a subgrid of
+// it, as the rows are.
 
-  svg { display: block; width: 100%; height: 100%; }
-}
-
-.shortlists-band {
-  position: absolute;
-  left: $space-xs;
-  right: $space-xs;
-  bottom: 0;
-  height: 4px;
-  display: flex;
-  pointer-events: none;
-
-  > span {
-    flex: 1 1 0;
-    background: var(--list-hue);
-  }
-}
-
-// "+ new list" is not a tab: the same tape, quieter still, and the link
-// colour. Pressed, it becomes a blank tape to type the name on.
-.shortlists-tab--new {
-  color: $color-recipe-link;
-  .tag-shape { color: rgba($color-text, 0.07); }
-
-  &:hover {
-    color: $color-recipe-link-hover;
-    .tag-shape { color: rgba($color-text, 0.16); }
-  }
+.shortlists-overview {
+  margin: 0 0 $space-xl;
 
   &[hidden] { display: none; }
 }
 
-.shortlists-tab--draft {
-  cursor: text;
-  .tag-shape { color: rgba($color-text, 0.1); }
+.shortlists-overview-actions { margin: 0 0 $space-sm; }
 
-  &[hidden] { display: none; }
-
-  &:focus-within {
-    outline: 2px solid $color-text;
-    outline-offset: 2px;
-  }
-}
-
-.shortlists-new-input {
-  max-width: 100%;
+.shortlists-contents {
+  list-style: none;
+  max-width: 48rem;
+  margin: 0;
   padding: 0;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  column-gap: $space-md;
+}
+
+.shortlists-line {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+  padding: $space-xs 0;
+  border-bottom: 1px solid $color-border;
+}
+
+.shortlists-contents.is-arranging .shortlists-line { align-items: center; }
+
+// A piece of the headings' rule, in the list's colour.
+.shortlists-mark {
+  align-self: center;
+  width: 1.4rem;
+  height: 0.38em;
+  background: var(--list-hue, transparent);
+}
+
+.shortlists-line-name {
+  min-width: 0;
+  font-family: $font-headings;
+  font-weight: 700;
+  text-transform: lowercase;
+  overflow-wrap: anywhere;
+  color: $color-text;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
+.shortlists-line-count {
+  font-size: 0.85rem;
+  color: $color-clear-text;
+  white-space: nowrap;
+}
+
+// The blank line "+ new list" adds: a field that reads as a line.
+.shortlists-new-input {
+  width: 100%;
+  padding: 0 0 $space-xxs;
   border: 0;
+  border-bottom: 1px solid $color-clear-text;
   background: none;
   font: inherit;
   text-transform: lowercase;
   color: inherit;
 
-  &:focus { outline: none; }
+  &:focus-visible {
+    outline: none;
+    border-bottom-color: $color-recipe-link;
+  }
+
   &::placeholder { color: $color-clear-text; }
 }
 
-.shortlists-new-problem {
-  margin: (-$space-md) 0 $space-lg;
+#shortlists-new-problem {
+  margin: $space-xs 0 0;
 
   &:empty { display: none; }
 }
+
+@media (max-width: 600px) {
+  .shortlists-contents {
+    grid-template-columns: 1fr;
+  }
+
+  // The count and the subtotal stack at the right; the name takes the rest.
+  .shortlists-line {
+    grid-column: auto;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "grip mark name count"
+      "grip mark name price";
+    column-gap: $space-sm;
+
+    > :nth-child(1) { grid-area: grip; }
+    > :nth-child(2) { grid-area: mark; }
+    > :nth-child(3) { grid-area: name; }
+    > :nth-child(4) { grid-area: count; text-align: right; }
+    > :nth-child(5) { grid-area: price; }
+  }
+}
+
+// --- a list's page: the lists either side ------------------------------------------------
+
+.shortlists-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-lg;
+  margin: $space-xl 0 0;
+  padding-top: $space-md;
+  border-top: 1px solid $color-border;
+
+  &[hidden] { display: none; }
+}
+
+.shortlists-pager-link {
+  font-family: $font-headings;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: $color-recipe-link;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+}
+
+.shortlists-pager-link--next { text-align: right; }
 
 // --- naming a list ---------------------------------------------------------------
 
@@ -309,20 +395,21 @@ $list-hues: (
   &:focus-visible { color: $color-recipe-link-hover; }
 }
 
-// --- the panel -------------------------------------------------------------------------
+// --- the heading -------------------------------------------------------------------------
+// The page's own h1: "everything" on the overview, a list's name on its page.
 
 .shortlists-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: $space-xs $space-lg;
-  margin: 0 0 $space-xxs;
+  margin: 0;
 }
 
 .shortlists-heading {
   margin: 0;
   font-family: $font-headings;
-  font-size: 1.45rem;
+  font-size: 1.9rem;
   font-weight: 700;
   text-transform: lowercase;
   overflow-wrap: anywhere;
@@ -338,21 +425,28 @@ $list-hues: (
   @include overlapping-rule-double(var(--list-hue), $color-section-underline-2);
 }
 
-// Everything's name over the band of every list's colour, where a list's
-// rule would be: its tab's band, at the rule's depth and thickness.
+// Everything's name over the band of every list's colour, in list order,
+// where a list's rule would be: at the rule's depth and thickness, behind
+// the letters as the rule's background is.
 .shortlists-marked--band {
   position: relative;
   isolation: isolate;
   background-image: none;
+}
 
-  // Behind the letters, as the rule's background is.
-  .shortlists-band {
-    z-index: -1;
-    left: $rule-indent;
-    right: 0;
-    top: $rule-drop;
-    bottom: auto;
-    height: $rule-thickness;
+.shortlists-band {
+  position: absolute;
+  z-index: -1;
+  left: $rule-indent;
+  right: 0;
+  top: $rule-drop;
+  height: $rule-thickness;
+  display: flex;
+  pointer-events: none;
+
+  > span {
+    flex: 1 1 0;
+    background: var(--list-hue);
   }
 }
 
@@ -361,8 +455,7 @@ $list-hues: (
   gap: $space-lg;
 }
 
-.shortlists-count,
-.shortlists-arrange-hint {
+.shortlists-count {
   margin: 0 0 $space-lg;
   font-size: 0.85rem;
   color: $color-clear-text;
@@ -583,16 +676,10 @@ $list-hues: (
   overflow-wrap: anywhere;
 }
 
-// The list's name opens its tab: a link in all but element.
+// The list's name opens its page.
 .shortlists-section-link {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  text-align: left;
-  text-transform: inherit;
   color: $color-text;
-  cursor: pointer;
+  text-decoration: none;
 
   // After the ruled name, so the rule stops short of it.
   &::after {
@@ -660,52 +747,9 @@ $list-hues: (
   }
 }
 
-// --- arranging the lists -----------------------------------------------------------------
-
-.shortlists-tabbar[hidden],
-.shortlists-panel[hidden],
-.shortlists-arrange[hidden] { display: none; }
-
-.shortlists-arrange-lists {
-  list-style: none;
-  max-width: 32rem;
-  margin: 0 0 $space-lg;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-// Each list's colour down its left edge, as its tab wears it.
-.shortlists-arrange-list {
-  display: flex;
-  align-items: center;
-  gap: $space-xs;
-  padding: $space-xs 0 $space-xs $space-xs;
-  border-bottom: 1px solid $color-border;
-  border-left: 4px solid var(--list-hue, transparent);
-}
-
-.shortlists-arrange-name {
-  min-width: 0;
-  font-family: $font-headings;
-  font-weight: 700;
-  text-transform: lowercase;
-  overflow-wrap: anywhere;
-}
-
-.shortlists-arrange-list .shortlists-section-count {
-  margin-left: auto;
-  padding-left: $space-md;
-  white-space: nowrap;
-}
-
-.shortlists-arrange-open { align-self: center; }
-
-.shortlists-arrange-done-row { margin: 0 0 $space-lg; }
-
 // --- sharing and bringing in -------------------------------------------------------------
-// Under everything else, set apart by a rule: it is about the lists, not the
-// tab on show. The boxes are the name input's, grown to hold a block.
+// At the overview's foot, set apart by a rule. The boxes are the name input's,
+// grown to hold a block.
 
 .shortlists-share {
   max-width: 48rem;
@@ -806,7 +850,11 @@ $list-hues: (
   color: $color-clear-text;
 }
 
-.shortlists-shared-actions { margin: 0 0 $space-md; }
+.shortlists-shared-actions {
+  display: flex;
+  gap: $space-lg;
+  margin: 0 0 $space-md;
+}
 
 .shortlists-shared-count {
   font-family: $font-label;

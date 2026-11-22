@@ -17,21 +17,19 @@ const LISTS = [
   { id: 'l3', name: 'Empty', items: [] }
 ];
 
-test('the tabs are everything first, then the lists in their order, each with its count', () => {
-  const tabs = view.tabs(LISTS, 'l2');
-  assert.deepStrictEqual(tabs.map((t) => [t.id, t.name, t.count, t.selected]), [
-    ['everything', 'everything', 3, false],
-    ['l1', 'Christmas starters', 2, false],
-    ['l2', 'Lemons', 1, true],
-    ['l3', 'Empty', 0, false]
-  ]);
+test('the overview counts every recipe on every list, and the cost when there is one', () => {
+  assert.strictEqual(view.overviewText(LISTS, 'from £777.29'), '3 recipes on 3 lists · from £777.29');
+  assert.strictEqual(view.overviewText([LISTS[1]], ''), '1 recipe on 1 list');
+  assert.strictEqual(view.listText(LISTS[0], '£86.53'), '2 recipes · £86.53');
+  assert.strictEqual(view.listText(LISTS[2], ''), '0 recipes');
 });
 
-test('exactly one tab is selected, and a view naming no list selects everything', () => {
-  for (const viewing of ['everything', 'l99', undefined]) {
-    const selected = view.tabs(LISTS, viewing).filter((t) => t.selected).map((t) => t.id);
-    assert.deepStrictEqual(selected, ['everything'], `viewing ${viewing} should select everything alone`);
-  }
+test('a list\'s neighbours are in the reader\'s order, and the ends do not wrap round', () => {
+  const names = (n) => [n.previous && n.previous.name, n.next && n.next.name];
+  assert.deepStrictEqual(names(view.neighbours(LISTS, 'l1')), [null, 'Lemons']);
+  assert.deepStrictEqual(names(view.neighbours(LISTS, 'l2')), ['Christmas starters', 'Empty']);
+  assert.deepStrictEqual(names(view.neighbours(LISTS, 'l3')), ['Lemons', null]);
+  assert.deepStrictEqual(names(view.neighbours(LISTS, 'l99')), [null, null]);
 });
 
 test('a list\'s rows are its recipes in order; everything is every list\'s, a recipe twice if on two', () => {
@@ -49,13 +47,6 @@ test('counts say recipes, in the singular for one', () => {
   assert.strictEqual(view.countText(4), '4 recipes');
 });
 
-test('a tab reads "name · count"; everything\'s counts recipes and lists', () => {
-  assert.strictEqual(view.tabLabel({ id: 'l2', name: 'Lemons', count: 4 }), 'Lemons · 4');
-  const every = view.tabs(LISTS, 'everything')[0];
-  assert.strictEqual(view.tabCount(every), '3 recipes · 3 lists');
-  assert.strictEqual(view.tabCount({ id: 'everything', count: 1, lists: 1 }), '1 recipe · 1 list');
-});
-
 test('a list\'s colour goes round seven hues in the order lists were made', () => {
   assert.deepStrictEqual(['l1', 'l2', 'l7', 'l8', 'l15'].map(view.hueOf), [0, 1, 6, 0, 0]);
   assert.strictEqual(view.hueOf('everything'), -1, 'everything has no hue of its own');
@@ -63,13 +54,9 @@ test('a list\'s colour goes round seven hues in the order lists were made', () =
 });
 
 test('a list\'s colour is its own: moving or deleting another list leaves it alone', () => {
-  const before = view.tabs(LISTS, 'everything').map((t) => [t.id, t.hue]);
+  const before = LISTS.map((l) => view.hueOf(l.id));
   const moved = [LISTS[2], LISTS[0]];
-  const after = view.tabs(moved, 'everything');
-  after.slice(1).forEach((t) => {
-    assert.strictEqual(t.hue, before.find((b) => b[0] === t.id)[1]);
-  });
-  assert.deepStrictEqual(after[0].hues, [2, 0], 'everything\'s band follows the lists\' order');
+  assert.deepStrictEqual(moved.map((l) => view.hueOf(l.id)), [before[2], before[0]]);
 });
 
 // --- the merged shopping list -------------------------------------------------
@@ -170,7 +157,7 @@ test('a move is announced by place', () => {
   assert.strictEqual(view.movedText('Trifle', 3, 4), 'Trifle moved to 4 of 4.');
 });
 
-test('a list\'s recipes come in the list\'s order on its tab and on everything', () => {
+test('a list\'s recipes come in the list\'s order on its page and on the overview', () => {
   const moved = [{ id: 'l1', name: 'Christmas starters', items: [{ recipe: B, portions: 6 }, { recipe: A, portions: 4 }] }];
   assert.deepStrictEqual(view.rows(moved, 'l1').map((r) => r.recipe), [B, A]);
   assert.deepStrictEqual(view.rows(moved, 'everything').map((r) => r.recipe), [B, A]);
@@ -202,6 +189,7 @@ test('what was brought in is announced, and kept when it came from a link', () =
 
 test('the browse link carries the list it fills, and a recipe link the list it is opened from', () => {
   assert.strictEqual(view.intoUrl('/helen-triages/food/', 'l3'), '/helen-triages/food/?into=l3');
+  assert.strictEqual(view.pageUrl('/helen-triages/food/shortlists/', 'l3'), '/helen-triages/food/shortlists/?list=l3');
   assert.strictEqual(view.listUrl('/helen-triages/food/recipes/a/', 'l1'),
     '/helen-triages/food/recipes/a/?list=l1');
 });

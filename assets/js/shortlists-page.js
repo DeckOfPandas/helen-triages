@@ -5,12 +5,10 @@
 // this file draws and listens, and decides nothing a test could not reach
 // through those four.
 //
-// The tabs are a WAI-ARIA tablist with automatic activation: arrows, Home and
-// End move the selection, and only the selected tab is in the tab order. A tab
-// is only ever tapped: lists move in "arrange", and a list's recipes on its own
-// tab, by each row's grip, dragged (drag-reorder.js) or moved by its keys.
-// Anything that re-renders closes the rename and new-list forms first, so a
-// form is never left open on a list it does not belong to.
+// The address decides the page: the overview (every list, and the plan made
+// from them all), a list's own page at `?list=<id>`, or a shared link's
+// `?shortlist=…` as a list page that keeps nothing until asked. Moving
+// between them is following a link, so each survives a reload.
 
 (function () {
   'use strict';
@@ -62,13 +60,18 @@
   });
 
   var indexUrl = root.getAttribute('data-index-url') || '';
-  var tabsEl = root.querySelector('[data-shortlists-tabs]');
+  var overviewUrl = location.pathname;
+  var crumbsEl = root.querySelector('[data-shortlists-crumbs]');
+  var headEl = root.querySelector('[data-shortlists-head]');
+  var summaryEl = root.querySelector('[data-shortlists-summary]');
+  var overviewEl = root.querySelector('[data-shortlists-overview]');
+  var contentsEl = root.querySelector('[data-shortlists-contents]');
   var newBtn = root.querySelector('[data-shortlists-new]');
-  var newTab = root.querySelector('[data-shortlists-new-tab]');
-  var newInput = newTab.querySelector('input');
+  var arrangeBtn = root.querySelector('[data-shortlists-arrange]');
   var newProblem = root.querySelector('[data-shortlists-new-problem]');
-  var panel = root.querySelector('[data-shortlists-panel]');
   var body = root.querySelector('[data-shortlists-body]');
+  var pagerEl = root.querySelector('[data-shortlists-pager]');
+  var shareEl = root.querySelector('[data-shortlists-share]');
   var aislesEl = shoppingEl.querySelector('.shopping-list-aisles');
   var noteEl = shoppingEl.querySelector('.shopping-list-note');
   var totalEl = shoppingEl.querySelector('.shopping-list-total');
@@ -78,9 +81,11 @@
   var pillDown = pill.querySelector('[data-shortlists-pill-down]');
   var pillUp = pill.querySelector('[data-shortlists-pill-up]');
   var live = root.querySelector('[data-shortlists-live]');
+  var pageTitle = document.title;
 
-  var renaming = null;
-  var deleting = null;
+  var renaming = false;
+  var adding = false;
+  var arranging = false;
 
   function announce(text) {
     live.textContent = '';
@@ -96,9 +101,20 @@
     return V.nameProblemText(problem, name, lists.all());
   }
 
-  // --- a shared link -----------------------------------------------------------
-  // `?shortlist=` opens the list it carries as a "shared" tab beside the
-  // others, held in this page only: nothing is stored until "keep these".
+  function listHref(id) {
+    return V.pageUrl(overviewUrl, id);
+  }
+
+  function recipeHref(url, id) {
+    return V.listUrl(hrefs[url] || url, id);
+  }
+
+  // A list's colour is a class, `list-hue-N`; the stylesheet holds the hues.
+  function hueClass(hue) {
+    return hue < 0 ? '' : ' list-hue-' + hue;
+  }
+
+  // --- which page --------------------------------------------------------------
 
   var share = HTF.listsShare;
   var SHARED = 'shared';
@@ -120,22 +136,16 @@
 
   var fromLink = share.read(location.search);
   var shared = fromLink ? resolve(fromLink) : null;
-  var viewing = shared ? SHARED : null;
   var sharedTicks = [];
-
-  function currentView() {
-    return viewing || lists.view();
-  }
+  var listId = shared ? '' : ((/[?&]list=([a-z0-9]+)/.exec(location.search) || [])[1] || '');
 
   function sharedName() {
     return shared.name || lists.UNNAMED;
   }
 
-  function forgetShared() {
-    shared = null;
-    viewing = null;
-    sharedTicks = [];
-    if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + location.hash);
+  // The scope of the rows, the shopping list and its ticks.
+  function scope() {
+    return shared ? SHARED : (listId || EVERYTHING);
   }
 
   function rowsFor(view) {
@@ -145,89 +155,7 @@
     });
   }
 
-  // --- tabs ------------------------------------------------------------------
-
-  function tabsFor(view) {
-    var tabs = V.tabs(lists.all(), view);
-    if (!shared) return tabs;
-    if (viewing) tabs.forEach(function (tab) { tab.selected = false; });
-    tabs.splice(1, 0, { id: SHARED, name: 'shared: ' + sharedName(), count: shared.items.length,
-      hue: -1, selected: viewing === SHARED });
-    return tabs;
-  }
-
-  // A list's colour is a class, `list-hue-N`; the stylesheet holds the hues.
-  function hueClass(hue) {
-    return hue < 0 ? '' : ' list-hue-' + hue;
-  }
-
-  // Everything is the plan made from every list, not a list: black tape (the
-  // logo's), and along its edge a band of each list's colour, in list order.
-  function bandHtml(hues) {
-    return '<span class="shortlists-band" aria-hidden="true">' +
-      hues.map(function (hue) { return '<span class="' + hueClass(hue).trim() + '"></span>'; }).join('') +
-      '</span>';
-  }
-
-  function tabHtml(tab) {
-    var every = tab.id === EVERYTHING;
-    return '<button type="button" role="tab" class="shortlists-tab' +
-      (every ? ' shortlists-tab--everything' : '') + hueClass(tab.hue) +
-      (tab.selected ? ' is-selected' : '') + '" id="shortlists-tab-' + esc(tab.id) +
-      '" data-tab="' + esc(tab.id) + '" data-tag-key="' + esc(tab.name) +
-      '" aria-selected="' + tab.selected + '" aria-controls="shortlists-panel" tabindex="' +
-      (tab.selected ? '0' : '-1') + '">' +
-      (every ? '<span class="shortlists-tape" aria-hidden="true"></span>' : '') +
-      '<span class="tag-shape" aria-hidden="true"></span>' +
-      '<span class="shortlists-tab-name">' + esc(tab.name) + '</span>' +
-      '<span class="shortlists-tab-count"> · ' + esc(V.tabCount(tab)) + '</span>' +
-      (every && tab.hues.length ? bandHtml(tab.hues) : '') +
-      (tab.hue >= 0 ? '<span class="shortlists-tab-strip" aria-hidden="true"></span>' : '') + '</button>';
-  }
-
-  // Everything on a line of its own, above the lists: the break is the
-  // stylesheet's, and hidden from the tablist's readers.
-  function renderTabs(view) {
-    tabsEl.innerHTML = tabsFor(view).map(function (tab) {
-      return tabHtml(tab) + (tab.id === EVERYTHING ? '<span class="shortlists-tabs-break" aria-hidden="true"></span>' : '');
-    }).join('');
-    panel.setAttribute('aria-labelledby', 'shortlists-tab-' + view);
-  }
-
-  function selectedTab() {
-    return tabsEl.querySelector('[aria-selected="true"]');
-  }
-
-  function select(id, focus) {
-    viewing = id === SHARED && shared ? SHARED : null;
-    if (!viewing) lists.setView(id);
-    closeNewForm();
-    renaming = null;
-    render();
-    if (focus) selectedTab().focus();
-  }
-
-  tabsEl.addEventListener('click', function (ev) {
-    var tab = ev.target.closest('[data-tab]');
-    if (tab) select(tab.getAttribute('data-tab'), true);
-  });
-
-  tabsEl.addEventListener('keydown', function (ev) {
-    var tabs = Array.prototype.slice.call(tabsEl.querySelectorAll('[data-tab]'));
-    var at = tabs.indexOf(document.activeElement);
-    if (at === -1) return;
-    var to = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1 }[ev.key];
-    if (to === undefined) return;
-    ev.preventDefault();
-    to = (to + tabs.length) % tabs.length;
-    select(tabs[to].getAttribute('data-tab'), true);
-  });
-
-  // --- the panel -------------------------------------------------------------
-
-  function recipeHref(url, id) {
-    return V.listUrl(hrefs[url] || url, id);
-  }
+  // --- the rows -------------------------------------------------------------------
 
   // A row moves by its grip: dragged (drag-reorder.js), or focused and moved
   // with the up and down arrows.
@@ -261,9 +189,19 @@
       shop.rowCost(row.recipe, shop.count(row.recipe, row.portions)) : null;
   }
 
+  // What some rows cost: a list's subtotal, or every list's added.
+  function costOf(someRows) {
+    return shop.sumCosts(someRows.map(rowCost));
+  }
+
+  function costText(someRows) {
+    var cost = costOf(someRows);
+    return cost ? cost.text.split(' (')[0] : '';
+  }
+
   /* One recipe in columns: grip, − n +, unit, name, price, ×. `movable` only
-     on a list's own tab, with two rows or more; `list` null for a shared
-     link's rows, which show their count and nothing to change. */
+     on a list's own page, with two rows or more; a shared link's rows show
+     their count and nothing to change. */
   function rowHtml(row, listName, movable) {
     var url = row.recipe;
     var title = titles[url] || url.replace(/\/$/, '').split('/').pop();
@@ -291,11 +229,6 @@
       '<span class="shortlists-unit">' + esc(shop.unitText(url, n)) + '</span>' +
       '<span class="shortlists-name">' + shop.nameHtml(url, n, href) + '</span>' +
       '<span class="shortlists-price">' + priceHtml(shop.rowCost(url, n)) + '</span>' + remove + '</li>';
-  }
-
-  // A list's cost: its subtotal; on everything, every list's added.
-  function costOf(someRows) {
-    return shop.sumCosts(someRows.map(rowCost));
   }
 
   function totalHtml(label, cost, attr) {
@@ -353,6 +286,24 @@
     if (HTF.shortlistPicker) HTF.shortlistPicker.paint(slot);
   }
 
+  // --- the heading -----------------------------------------------------------------
+  // A list's name over the site's ruled underline, the list's colour first
+  // (the stylesheet's); everything's over the band of every list's colour.
+
+  function markedName(name) {
+    return '<span class="shortlists-marked">' + esc(name) + '</span>';
+  }
+
+  function bandHtml(hues) {
+    return '<span class="shortlists-band" aria-hidden="true">' +
+      hues.map(function (hue) { return '<span class="' + hueClass(hue).trim() + '"></span>'; }).join('') +
+      '</span>';
+  }
+
+  function headingHtml(classes, inner) {
+    return '<h1 class="shortlists-heading' + classes + '" id="shortlists-heading" tabindex="-1">' + inner + '</h1>';
+  }
+
   function renameFormHtml(list) {
     return '<form class="shortlists-name-form" data-rename-form>' +
       '<label class="shortlists-name-label" for="shortlists-rename-name">Rename ' + esc(list.name) + '</label>' +
@@ -366,89 +317,183 @@
       '</form>';
   }
 
-  // A list's name over the site's ruled underline, the list's colour first
-  // (the stylesheet's); everything's over the band of every list's colour.
-  function markedName(name) {
-    return '<span class="shortlists-marked">' + esc(name) + '</span>';
+  // "shortlists / <name> ▾": the ▾ shows every list as a link, this one marked.
+  function crumbsHtml(current, currentId) {
+    return '<a class="shortlists-crumb" href="' + esc(overviewUrl) + '">shortlists</a>' +
+      '<span class="shortlists-crumb-sep" aria-hidden="true">/</span>' +
+      '<span class="shortlists-crumb-current">' + esc(current) + '</span>' +
+      '<button type="button" class="shortlists-crumb-more" aria-expanded="false" aria-controls="shortlists-menu" ' +
+      'aria-label="your lists" data-crumb-more></button>' +
+      '<ul class="shortlists-menu" id="shortlists-menu" hidden>' +
+      lists.all().map(function (list) {
+        return '<li class="' + hueClass(V.hueOf(list.id)).trim() + '"><a href="' + esc(listHref(list.id)) + '"' +
+          (list.id === currentId ? ' aria-current="page"' : '') + '>' + esc(list.name) + '</a></li>';
+      }).join('') + '</ul>';
   }
 
-  function everythingName(hues) {
-    return '<span class="shortlists-marked shortlists-marked--band">everything' +
-      (hues.length ? bandHtml(hues) : '') + '</span>';
+  function closeMenu(refocus) {
+    var more = crumbsEl.querySelector('[data-crumb-more]');
+    if (!more || more.getAttribute('aria-expanded') !== 'true') return;
+    more.setAttribute('aria-expanded', 'false');
+    crumbsEl.querySelector('.shortlists-menu').hidden = true;
+    if (refocus) more.focus();
   }
 
-  function decorate() {
-    Array.prototype.forEach.call(root.querySelectorAll('.shortlists-tape:empty'), function (slot) {
-      if (HTF.tapeInto) HTF.tapeInto(slot);
-    });
-  }
-  // decorations.js loads after this file, at the foot of the layout.
-  document.addEventListener('DOMContentLoaded', decorate);
-
-  function listBody(list) {
-    return '<div class="shortlists-head">' +
-      '<h2 class="shortlists-heading' + hueClass(V.hueOf(list.id)) + '" id="shortlists-heading" tabindex="-1">' +
-      markedName(list.name) + '</h2>' +
-      '<span class="shortlists-actions">' +
-      '<button type="button" class="shortlists-text-button" data-rename aria-label="rename ' + esc(list.name) + '">rename</button>' +
-      '<button type="button" class="shortlists-text-button" data-delete aria-label="delete ' + esc(list.name) + '">delete</button>' +
-      '</span></div>' +
-      (renaming === list.id ? renameFormHtml(list) : '') +
-      '<p class="shortlists-count">' + V.countText(list.items.length) + '</p>' +
-      (list.items.length ? '<ul class="recipe-list recipe-related shortlists-cards" data-cards></ul>' +
-        '<h3 class="shortlists-subheading">how much</h3>' : '') +
-      recipesHtml(list, true);
-  }
-
-  function everythingBody(all) {
-    var head = '<div class="shortlists-head"><h2 class="shortlists-heading" id="shortlists-heading" tabindex="-1">' +
-      everythingName(all.map(function (list) { return V.hueOf(list.id); })) + '</h2></div>';
-    if (!all.length) {
-      return head + '<p class="shortlists-empty">No shortlists yet. Start one with “+ new list”.</p>';
+  crumbsEl.addEventListener('click', function (ev) {
+    var more = ev.target.closest('[data-crumb-more]');
+    if (!more) return;
+    var open = more.getAttribute('aria-expanded') !== 'true';
+    more.setAttribute('aria-expanded', String(open));
+    crumbsEl.querySelector('.shortlists-menu').hidden = !open;
+    if (open) {
+      var first = crumbsEl.querySelector('.shortlists-menu a');
+      if (first) first.focus();
     }
-    var n = V.rows(all, EVERYTHING).length;
-    return head +
-      '<p class="shortlists-count">' + V.countText(n) + ' on ' + all.length + (all.length === 1 ? ' list' : ' lists') + '</p>' +
-      all.map(function (list) {
-        var hue = V.hueOf(list.id);
+  });
+
+  crumbsEl.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') closeMenu(true);
+  });
+
+  document.addEventListener('click', function (ev) {
+    if (!crumbsEl.contains(ev.target)) closeMenu(false);
+  });
+
+  // --- the overview's list of lists --------------------------------------------------
+
+  function lineHtml(list) {
+    var rows = V.rows([list], list.id);
+    return '<li class="shortlists-line' + hueClass(V.hueOf(list.id)) + '" data-id="' + esc(list.id) + '"' +
+      (arranging ? ' data-reorder-item' : '') + '>' +
+      (arranging ? gripHtml(list.name) : '<span></span>') +
+      '<span class="shortlists-mark" aria-hidden="true"></span>' +
+      '<a class="shortlists-line-name" href="' + esc(listHref(list.id)) + '">' + esc(list.name) + '</a>' +
+      '<span class="shortlists-line-count">' + V.countText(list.items.length) + '</span>' +
+      '<span class="shortlists-price">' + priceHtml(costOf(rows)) + '</span></li>';
+  }
+
+  // The blank line "+ new list" adds, typed on directly.
+  function newLineHtml() {
+    return '<li class="shortlists-line shortlists-line--new"><span></span>' +
+      '<span class="shortlists-mark" aria-hidden="true"></span>' +
+      '<span class="shortlists-line-name">' +
+      '<label class="visually-hidden" for="shortlists-new-name">Name your new list, then press Enter</label>' +
+      '<input type="text" id="shortlists-new-name" class="shortlists-new-input" maxlength="' + lists.NAME_MAX +
+      '" placeholder="name your new list" autocomplete="off" spellcheck="false" enterkeyhint="done" ' +
+      'aria-describedby="shortlists-new-problem"></span><span></span><span></span></li>';
+  }
+
+  function renderContents() {
+    var all = lists.all();
+    contentsEl.innerHTML = all.map(lineHtml).join('') + (adding ? newLineHtml() : '');
+    contentsEl.classList.toggle('is-arranging', arranging);
+    arrangeBtn.hidden = all.length < 2;
+    arrangeBtn.textContent = arranging ? 'done' : 'arrange';
+    arrangeBtn.setAttribute('aria-pressed', String(arranging));
+    newBtn.hidden = arranging;
+  }
+
+  // --- the three pages ---------------------------------------------------------------
+
+  function renderOverview() {
+    var all = lists.all();
+    document.title = pageTitle;
+    crumbsEl.hidden = true;
+    headEl.innerHTML = headingHtml(' shortlists-heading--everything',
+      '<span class="shortlists-marked shortlists-marked--band">everything' +
+      (all.length ? bandHtml(all.map(function (list) { return V.hueOf(list.id); })) : '') + '</span>');
+    summaryEl.textContent = all.length ? V.overviewText(all, costText(V.rows(all, EVERYTHING))) : '';
+    summaryEl.hidden = !all.length;
+    overviewEl.hidden = false;
+    renderContents();
+    var full = all.filter(function (list) { return list.items.length; });
+    body.innerHTML = !all.length ? '<p class="shortlists-empty">No shortlists yet. Start one with “+ new list”.</p>' :
+      full.map(function (list) {
         return '<section class="shortlists-section">' +
-          '<h3 class="shortlists-section-name' + hueClass(hue) + '"><button type="button" class="shortlists-section-link" data-go="' +
-          esc(list.id) + '">' + markedName(list.name) + '</button>' +
-          '<span class="shortlists-section-count">' + V.countText(list.items.length) + '</span></h3>' +
+          '<h2 class="shortlists-section-name' + hueClass(V.hueOf(list.id)) + '">' +
+          '<a class="shortlists-section-link" href="' + esc(listHref(list.id)) + '">' + markedName(list.name) + '</a>' +
+          '<span class="shortlists-section-count">' + V.countText(list.items.length) + '</span></h2>' +
           recipesHtml(list) + '</section>';
       }).join('') +
       totalHtml('all lists', costOf(V.rows(all, EVERYTHING)), 'data-total');
+    pagerEl.hidden = true;
+    shareEl.hidden = false;
+    renderShare();
   }
 
-  function sharedBody() {
-    return '<div class="shortlists-head"><h2 class="shortlists-heading" id="shortlists-heading" tabindex="-1">' +
-      esc(sharedName()) + '</h2></div>' +
-      '<p class="shortlists-shared-note">Sent to you as a link. Nothing here is kept until you keep it.</p>' +
-      '<p class="shortlists-actions shortlists-shared-actions">' +
+  function renderList(list) {
+    document.title = list.name + ' · ' + pageTitle;
+    crumbsEl.innerHTML = crumbsHtml(list.name, list.id);
+    crumbsEl.hidden = false;
+    headEl.innerHTML = headingHtml(hueClass(V.hueOf(list.id)), markedName(list.name)) +
+      '<span class="shortlists-actions">' +
+      '<button type="button" class="shortlists-text-button" data-rename aria-label="rename ' + esc(list.name) + '">rename</button>' +
+      '<button type="button" class="shortlists-text-button" data-delete aria-label="delete ' + esc(list.name) + '">delete</button>' +
+      '<button type="button" class="shortlists-text-button" data-share-list aria-label="copy a link to ' + esc(list.name) + '">share</button>' +
+      '</span>' + (renaming ? renameFormHtml(list) : '');
+    summaryEl.textContent = V.listText(list, costText(V.rows([list], list.id)));
+    summaryEl.hidden = false;
+    overviewEl.hidden = true;
+    body.innerHTML = (list.items.length ? '<ul class="recipe-list recipe-related shortlists-cards" data-cards></ul>' +
+      '<h2 class="shortlists-subheading">how much</h2>' : '') + recipesHtml(list, true);
+    placeCards(list);
+    var near = V.neighbours(lists.all(), list.id);
+    pagerEl.innerHTML = (near.previous ? '<a class="shortlists-pager-link" rel="prev" href="' + esc(listHref(near.previous.id)) +
+      '">← ' + esc(near.previous.name) + '</a>' : '<span></span>') +
+      (near.next ? '<a class="shortlists-pager-link shortlists-pager-link--next" rel="next" href="' +
+        esc(listHref(near.next.id)) + '">' + esc(near.next.name) + ' →</a>' : '');
+    pagerEl.hidden = !near.previous && !near.next;
+    shareEl.hidden = true;
+  }
+
+  function renderShared() {
+    var rows = rowsFor(SHARED);
+    document.title = sharedName() + ' · ' + pageTitle;
+    crumbsEl.innerHTML = crumbsHtml('shared: ' + sharedName(), '');
+    crumbsEl.hidden = false;
+    headEl.innerHTML = headingHtml('', markedName(sharedName()));
+    summaryEl.textContent = V.listText(shared, costText(rows));
+    summaryEl.hidden = false;
+    overviewEl.hidden = true;
+    body.innerHTML = '<p class="shortlists-shared-note">Sent to you as a link. Nothing here is kept until you keep it.</p>' +
+      '<p class="shortlists-shared-actions">' +
       '<button type="button" class="shortlists-text-button" data-keep-shared>keep these</button>' +
       '<button type="button" class="shortlists-text-button" data-drop-shared>not now</button></p>' +
       (shared.missing ? '<p class="shortlists-count">' + esc(V.missingText(shared.missing)) + '</p>' : '') +
-      '<p class="shortlists-count">' + V.countText(shared.items.length) + '</p>' +
-      (shared.items.length ? rowsHtml(rowsFor(SHARED), sharedName(), false) +
-        totalHtml('subtotal', costOf(rowsFor(SHARED)), '') : '');
+      (rows.length ? rowsHtml(rows, sharedName(), false) + totalHtml('subtotal', costOf(rows), '') : '');
+    pagerEl.hidden = true;
+    shareEl.hidden = true;
   }
 
-  function renderBody(view) {
-    if (view === SHARED) { body.innerHTML = sharedBody(); return; }
-    var list = lists.get(view);
-    body.innerHTML = list ? listBody(list) : everythingBody(lists.all());
-    if (list) placeCards(list);
+  function render() {
+    var list = listId ? lists.get(listId) : null;
+    if (listId && !list) {
+      // Gone, from this page or another: the overview, at its own address.
+      listId = '';
+      if (window.history && history.replaceState) history.replaceState(null, '', overviewUrl);
+    }
+    if (shared) renderShared();
+    else if (list) renderList(list);
+    else renderOverview();
+    renderShopping(scope());
+    placePill();
+    if (HTF.tagShapes) HTF.tagShapes();
   }
 
-  // After a typed number: the subtotals and the total, redrawn in place.
+  // After a typed number: the subtotals, the total and the summary, in place.
   function refreshTotals() {
     Array.prototype.forEach.call(body.querySelectorAll('[data-subtotal]'), function (el) {
       var list = lists.get(el.getAttribute('data-subtotal'));
-      var cost = list && costOf(V.rows([list], list.id));
-      el.querySelector('.shortlists-price').innerHTML = priceHtml(cost);
+      el.querySelector('.shortlists-price').innerHTML = priceHtml(list && costOf(V.rows([list], list.id)));
     });
     var total = body.querySelector('[data-total]');
     if (total) total.querySelector('.shortlists-price').innerHTML = priceHtml(costOf(V.rows(lists.all(), EVERYTHING)));
+    var list = listId ? lists.get(listId) : null;
+    if (list) summaryEl.textContent = V.listText(list, costText(V.rows([list], list.id)));
+    else if (!shared) {
+      summaryEl.textContent = V.overviewText(lists.all(), costText(V.rows(lists.all(), EVERYTHING)));
+      renderContents();
+    }
   }
 
   // --- the shopping list -----------------------------------------------------
@@ -503,7 +548,7 @@
     refreshUntick();
   }
 
-  // A recipe's new count is a new shop for its rows, here and on everything.
+  // A recipe's new count is a new shop for its rows, on its list and overall.
   function recount(id, url) {
     var keys = [];
     shop.build(shop.entries(url, 1)).forEach(function (aisle) {
@@ -529,40 +574,24 @@
   aislesEl.addEventListener('change', function (ev) {
     var box = ev.target;
     if (!box.classList.contains('shopping-list-tick')) return;
-    setTickedFor(currentView(), box.getAttribute('data-key'), box.checked);
+    setTickedFor(scope(), box.getAttribute('data-key'), box.checked);
     box.closest('li').classList.toggle('is-ticked', box.checked);
     refreshUntick();
   });
 
   untickBtn.addEventListener('click', function () {
-    untickFor(currentView());
-    renderShopping(currentView());
+    untickFor(scope());
+    renderShopping(scope());
     var first = aislesEl.querySelector('.shopping-list-tick');
     if (first) first.focus();
   });
 
-  // --- everything at once ----------------------------------------------------
-
-  function render() {
-    var view = currentView();
-    renderTabs(view);
-    renderBody(view);
-    renderShopping(view);
-    renderShare();
-    arrangeBtn.hidden = lists.all().length < 2;
-    placePill();
-    if (HTF.tagShapes) HTF.tagShapes();
-    decorate();
-  }
-
   // A card's own button (shortlist-picker.js) can put its recipe on or off
   // any list, this one included.
-  document.addEventListener('htf:lists-change', function () {
-    if (!arranging) render();
-  });
+  document.addEventListener('htf:lists-change', render);
 
   // --- the scalers ------------------------------------------------------------
-  // Only the row's words are rewritten as a number is typed: re-rendering the
+  // Only the row's cells are rewritten as a number is typed: re-rendering the
   // box under the caret loses it.
 
   body.addEventListener('input', function (ev) {
@@ -584,7 +613,6 @@
     setCount(row, id, url, n, before);
   });
 
-  // A row's count changed: its own cells in place, then what adds it up.
   function setCount(row, id, url, n, before) {
     lists.setPortions(id, url, n);
     row.querySelector('.shortlists-unit').textContent = shop.unitText(url, n);
@@ -594,7 +622,7 @@
     row.querySelector('[data-step="1"]').disabled = shop.stepCount(url, n, 1) === n;
     refreshTotals();
     if (n !== before) recount(id, url);
-    renderShopping(lists.view());
+    renderShopping(scope());
     placePill();
   }
 
@@ -617,12 +645,12 @@
   body.addEventListener('change', function (ev) {
     var input = ev.target;
     if (!input.classList.contains('shopping-list-portions')) return;
-    var id = input.closest('[data-list]').getAttribute('data-list');
+    var id = input.closest('li[data-list]').getAttribute('data-list');
     var url = input.getAttribute('data-url');
     input.value = String(shop.count(url, lists.portions(id, url)));
   });
 
-  // --- the small actions --------------------------------------------------------
+  // --- a list's own actions ---------------------------------------------------------
 
   function focusHeading() {
     var heading = document.getElementById('shortlists-heading');
@@ -630,70 +658,82 @@
   }
 
   body.addEventListener('click', function (ev) {
-    var go = ev.target.closest('[data-go]');
-    if (go) { select(go.getAttribute('data-go'), true); return; }
-
     var removeBtn = ev.target.closest('[data-remove]');
-    if (removeBtn) {
-      var row = removeBtn.closest('[data-list]');
-      var id = row.getAttribute('data-list');
-      var url = row.getAttribute('data-url');
-      lists.setMember(id, url, false);
-      render();
-      focusHeading();
-      announce('Removed ' + (titles[url] || url) + ' from ' + nameOf(id) + '.');
-      return;
-    }
+    if (!removeBtn) return;
+    var row = removeBtn.closest('li[data-list]');
+    var id = row.getAttribute('data-list');
+    var url = row.getAttribute('data-url');
+    lists.setMember(id, url, false);
+    render();
+    focusHeading();
+    announce('Removed ' + (titles[url] || url) + ' from ' + nameOf(id) + '.');
+  });
 
+  headEl.addEventListener('click', function (ev) {
     if (ev.target.closest('[data-rename]')) {
-      renaming = lists.view();
+      renaming = true;
       render();
       var input = document.getElementById('shortlists-rename-name');
       input.focus();
       input.select();
       return;
     }
-
     if (ev.target.closest('[data-rename-cancel]')) {
-      renaming = null;
+      renaming = false;
       render();
-      body.querySelector('[data-rename]').focus();
+      headEl.querySelector('[data-rename]').focus();
       return;
     }
-
-    if (ev.target.closest('[data-delete]')) openDelete(lists.view());
+    if (ev.target.closest('[data-delete]')) { openDelete(listId); return; }
+    var shareBtn = ev.target.closest('[data-share-list]');
+    if (shareBtn) copyLink(shareBtn, share.link(location.origin + overviewUrl, lists.get(listId)));
   });
 
-  body.addEventListener('submit', function (ev) {
+  headEl.addEventListener('submit', function (ev) {
     var form = ev.target.closest('[data-rename-form]');
     if (!form) return;
     ev.preventDefault();
     var input = form.querySelector('input');
-    var outcome = lists.rename(renaming, input.value);
+    var outcome = lists.rename(listId, input.value);
     if (outcome.error) {
       form.querySelector('.shortlists-name-problem').textContent =
         problemText(outcome.error, lists.core.cleanName(input.value));
       input.focus();
       return;
     }
-    renaming = null;
+    renaming = false;
     render();
     focusHeading();
-    announce('Renamed to ' + nameOf(lists.view()) + '.');
+    announce('Renamed to ' + nameOf(listId) + '.');
   });
 
-  body.addEventListener('keydown', function (ev) {
+  headEl.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape' && ev.target.closest('[data-rename-form]')) {
-      renaming = null;
+      renaming = false;
       render();
-      body.querySelector('[data-rename]').focus();
+      headEl.querySelector('[data-rename]').focus();
     }
   });
 
-  // --- moving rows ------------------------------------------------------------------
+  // "share" copies the list's link, and says so; with no clipboard, the link
+  // is offered to copy by hand.
+  function copyLink(button, link) {
+    var said = button.textContent;
+    function done() {
+      button.textContent = 'copied ✓';
+      announce('Link copied.');
+      setTimeout(function () { button.textContent = said; }, 1500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(done, function () { window.prompt('Copy this link:', link); });
+    } else {
+      window.prompt('Copy this link:', link);
+    }
+  }
+
+  // --- moving rows and lists -----------------------------------------------------------
   // A grip with focus moves its row with the up and down arrows, Home and End.
-  // After a move the rows are redrawn, so focus goes back to the moved row's
-  // grip.
+  // After a move the rows are redrawn, so focus goes back to the moved grip.
 
   function rowsOf(container) {
     return Array.prototype.slice.call(container.querySelectorAll('[data-reorder-item]'));
@@ -735,63 +775,94 @@
     announce(V.movedText(titles[url] || url, Math.max(0, Math.min(total - 1, to)), total));
   }
 
-  var arrangeBtn = root.querySelector('[data-shortlists-arrange]');
-  var arrangePanel = root.querySelector('[data-shortlists-arrange-panel]');
-  var arrangeList = root.querySelector('[data-shortlists-arrange-lists]');
-  var tabbar = root.querySelector('.shortlists-tabbar');
-  var arranging = false;
-
-  function renderArrange() {
-    var all = lists.all();
-    arrangeList.innerHTML = all.map(function (list) {
-      return '<li class="shortlists-arrange-list' + hueClass(V.hueOf(list.id)) + '" data-reorder-item data-id="' +
-        esc(list.id) + '">' + gripHtml(list.name) +
-        '<span class="shortlists-arrange-name">' + esc(list.name) + '</span>' +
-        '<span class="shortlists-section-count">' + V.countText(list.items.length) + '</span></li>';
-    }).join('');
-  }
-
-  function arrange(on) {
-    arranging = on;
-    closeNewForm();
-    renaming = null;
-    tabbar.hidden = on;
-    panel.hidden = on;
-    arrangePanel.hidden = !on;
-    if (on) {
-      renderArrange();
-      pill.hidden = true;
-      document.getElementById('shortlists-arrange-title').focus();
-    } else {
-      render();
-      arrangeBtn.focus();
-    }
-  }
-
   function moveList(row, to, refocus) {
     var id = row.getAttribute('data-id');
     var total = lists.all().length;
     lists.moveList(id, to);
-    renderArrange();
-    if (refocus) focusGrip(arrangeList, 'data-id', id);
+    render();
+    if (refocus) focusGrip(contentsEl, 'data-id', id);
     announce(V.movedText(nameOf(id), Math.max(0, Math.min(total - 1, to)), total));
   }
 
-  arrangeBtn.addEventListener('click', function () { arrange(true); });
-  root.querySelector('[data-shortlists-arrange-done]').addEventListener('click', function () { arrange(false); });
-
   onGripKey(body, moveRecipe);
-  onGripKey(arrangeList, moveList);
+  onGripKey(contentsEl, moveList);
 
   if (HTF.dragReorder) {
     var dragOptions = { item: '[data-reorder-item]', grip: '[data-reorder-grip]' };
     HTF.dragReorder.attach(body, Object.assign({
       onDrop: function (row, from, to) { moveRecipe(row, to); }
     }, dragOptions));
-    HTF.dragReorder.attach(arrangeList, Object.assign({
+    HTF.dragReorder.attach(contentsEl, Object.assign({
       onDrop: function (row, from, to) { moveList(row, to); }
     }, dragOptions));
   }
+
+  // "arrange" puts a grip on every line of the overview's list; "done" takes
+  // them off.
+  arrangeBtn.addEventListener('click', function () {
+    arranging = !arranging;
+    adding = false;
+    newProblem.textContent = '';
+    renderContents();
+    var grip = contentsEl.querySelector('[data-reorder-grip]');
+    if (arranging && grip) grip.focus();
+    announce(arranging ? 'Arranging: move a list by its handle.' : 'Done arranging.');
+  });
+
+  // --- a new list --------------------------------------------------------------------
+  // A blank line at the end of the overview's list, typed on directly: Enter
+  // makes the list and opens another blank line, so several can be made in a
+  // row; Escape, or leaving it empty, takes it away. A refused name says why
+  // under the list and keeps the typing.
+
+  function newInput() {
+    return contentsEl.querySelector('#shortlists-new-name');
+  }
+
+  function stopAdding(refocus) {
+    adding = false;
+    newProblem.textContent = '';
+    renderContents();
+    if (refocus) newBtn.focus();
+  }
+
+  newBtn.addEventListener('click', function () {
+    adding = true;
+    renderContents();
+    newInput().focus();
+  });
+
+  contentsEl.addEventListener('input', function (ev) {
+    if (ev.target.id !== 'shortlists-new-name') return;
+    ev.target.removeAttribute('aria-invalid');
+    newProblem.textContent = '';
+  });
+
+  contentsEl.addEventListener('keydown', function (ev) {
+    var input = ev.target;
+    if (input.id !== 'shortlists-new-name') return;
+    if (ev.key === 'Escape') { stopAdding(true); return; }
+    if (ev.key !== 'Enter') return;
+    ev.preventDefault();
+    var made = lists.create(input.value);
+    if (made.error) {
+      input.setAttribute('aria-invalid', 'true');
+      newProblem.textContent = problemText(made.error, lists.core.cleanName(input.value));
+      return;
+    }
+    render();
+    newInput().focus();
+    announce('Made ' + nameOf(made.id) + '.');
+  });
+
+  contentsEl.addEventListener('focusout', function (ev) {
+    var input = ev.target;
+    if (input.id === 'shortlists-new-name' && !input.value.trim()) {
+      // After the click that moved focus, so a press on "+ new list" or a
+      // link still lands.
+      setTimeout(function () { if (adding && !newInput().value.trim() && document.activeElement !== newInput()) stopAdding(false); }, 0);
+    }
+  });
 
   // --- sharing and bringing in --------------------------------------------------------
   // Both ways in, the import box and "keep these", go through one preview,
@@ -804,7 +875,7 @@
   var importEl = root.querySelector('[data-shortlists-import]');
   var importProblem = root.querySelector('[data-shortlists-import-problem]');
   var previewEl = root.querySelector('[data-shortlists-preview-panel]');
-  var pageBase = location.origin + location.pathname;
+  var pageBase = location.origin + overviewUrl;
   var incoming = null;
   var keeping = false;
 
@@ -836,8 +907,8 @@
   }
 
   function previewHtml() {
-    return '<h3 class="shortlists-preview-title">' + (keeping ? 'Keeping ' : 'Bringing in ') +
-      (incoming.length === 1 ? 'one list' : incoming.length + ' lists') + '</h3>' +
+    return '<h2 class="shortlists-preview-title">' + (keeping ? 'Keeping ' : 'Bringing in ') +
+      (incoming.length === 1 ? 'one list' : incoming.length + ' lists') + '</h2>' +
       incoming.map(function (list, i) {
         var name = list.name || lists.UNNAMED;
         var clash = clashOf(name);
@@ -897,94 +968,28 @@
     var ids = lists.bringIn(plans);
     var kept = keeping;
     closePreview();
-    if (kept) forgetShared();
-    else importEl.value = '';
-    if (ids.length) select(ids[0], true);
-    else render();
+    // A kept link goes to the list it made, or back to the overview.
+    if (kept) { location.replace(ids.length ? listHref(ids[0]) : overviewUrl); return; }
+    importEl.value = '';
+    render();
+    focusHeading();
     announce(V.broughtText(ids.length, kept));
   });
 
   body.addEventListener('click', function (ev) {
     if (!shared) return;
-    if (ev.target.closest('[data-keep-shared]')) {
-      openPreview([shared], true);
-      return;
-    }
-    if (ev.target.closest('[data-drop-shared]')) {
-      closePreview();
-      forgetShared();
-      render();
-      selectedTab().focus();
-      announce('Not kept.');
-    }
-  });
-
-  // --- a new list -----------------------------------------------------------------
-
-  // A blank tape at the end of the tabs, typed on directly: Enter makes the
-  // list and opens its tab, Escape (or leaving it empty) puts "+ new list"
-  // back. A refused name says why under the row and keeps the typing.
-
-  function closeNewForm() {
-    newTab.hidden = true;
-    newBtn.hidden = false;
-    newInput.value = '';
-    newInput.removeAttribute('aria-invalid');
-    newProblem.textContent = '';
-  }
-
-  function fitNewInput() {
-    newInput.size = Math.max(10, newInput.value.length + 2);
-  }
-
-  newBtn.addEventListener('click', function () {
-    renaming = null;
-    renderBody(currentView());
-    newBtn.hidden = true;
-    newTab.hidden = false;
-    fitNewInput();
-    if (HTF.tagShapes) HTF.tagShapes();
-    newInput.focus();
-  });
-
-  newInput.addEventListener('input', function () {
-    fitNewInput();
-    newInput.removeAttribute('aria-invalid');
-    newProblem.textContent = '';
-  });
-
-  newInput.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Escape') {
-      closeNewForm();
-      newBtn.focus();
-      return;
-    }
-    if (ev.key !== 'Enter') return;
-    ev.preventDefault();
-    var made = lists.create(newInput.value);
-    if (made.error) {
-      newInput.setAttribute('aria-invalid', 'true');
-      newProblem.textContent = problemText(made.error, lists.core.cleanName(newInput.value));
-      return;
-    }
-    select(made.id, true);
-    announce('Made ' + nameOf(made.id) + '.');
-  });
-
-  // Tapping away from an empty tape is a cancel; from a named one, the name
-  // waits for Enter.
-  newInput.addEventListener('blur', function () {
-    if (!newTab.hidden && !newInput.value.trim()) closeNewForm();
+    if (ev.target.closest('[data-keep-shared]')) { openPreview([shared], true); return; }
+    if (ev.target.closest('[data-drop-shared]')) location.replace(overviewUrl);
   });
 
   // --- delete -----------------------------------------------------------------------
+  // Confirmed, then the overview.
+
+  var deleting = null;
 
   function remove(id) {
-    var name = nameOf(id);
     lists.remove(id);
-    render();
-    selectedTab().focus();
-    announce('Deleted ' + name + '.');
+    location.assign(overviewUrl);
   }
 
   function openDelete(id) {
@@ -1021,7 +1026,7 @@
   }
 
   function placePill() {
-    if (shoppingEl.hidden || arranging) { pill.hidden = true; return; }
+    if (shoppingEl.hidden) { pill.hidden = true; return; }
     var list = shoppingEl.getBoundingClientRect();
     var recipes = body.getBoundingClientRect();
     var below = list.top > window.innerHeight;
@@ -1048,7 +1053,6 @@
     if (!ev.persisted) return;
     lists.refresh();
     render();
-    if (arranging) renderArrange();
   });
 
   render();

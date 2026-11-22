@@ -70,25 +70,27 @@ def test_the_shortlists_page_exists_and_says_what_it_needs_without_javascript():
         "sees the no-JavaScript line and nothing half-built")
 
 
-def test_the_tabs_are_real_tabs():
+def test_a_list_has_a_page_of_its_own_reached_by_links():
     text = PAGE.read_text(encoding="utf-8")
     js = PAGE_JS.read_text(encoding="utf-8")
-    assert re.search(r'role="tablist"[^>]*aria-label=', text), "the tab row needs role=tablist and a name"
-    assert 'role="tabpanel"' in text, "the tabs need a tabpanel to control"
-    for attribute in ('role="tab"', "aria-selected=", 'aria-controls="shortlists-panel"', "tabindex="):
-        assert attribute in js, f"shortlists-page.js must draw each tab with {attribute}"
-    for key in ("ArrowRight", "ArrowLeft", "Home", "End"):
-        assert key in js, f"the tabs must move with {key}"
-    assert "aria-labelledby" in js, "the panel must be named by its selected tab"
+    assert 'role="tab' not in text + js, (
+        "the lists are an overview and a page each, reached by links, not tabs (#1521)")
+    assert "V.pageUrl(" in js, "a list's page is the shortlists page at ?list=<id>, built in one place"
+    menu = re.search(r"function crumbsHtml\(current, currentId\) \{(.*?)\n  \}", js, re.S)
+    assert menu, "shortlists-page.js has no crumbsHtml(): the scan is reading the wrong place"
+    assert "<a href=" in menu.group(1) and 'aria-current="page"' in menu.group(1), (
+        "the ▾ beside a list's name opens its lists as links, the current one "
+        "marked aria-current: navigation, not a form control")
+    assert 'role="menu' not in menu.group(1), "a list of links is not an ARIA menu"
 
 
-def test_a_tab_is_only_tapped_and_a_grip_never_scrolls_the_page():
+def test_a_list_moves_only_while_arranging_and_a_grip_never_scrolls_the_page():
     js = PAGE_JS.read_text(encoding="utf-8")
-    tabs = re.search(r"function renderTabs\(view\) \{(.*?)\n  \}", js, re.S)
-    assert tabs, "shortlists-page.js has no renderTabs(view): the scan is reading the wrong place"
-    assert "reorder" not in tabs.group(1) and "draggable" not in tabs.group(1), (
-        "a tab is only ever tapped: lists are moved in arrange mode, where a stray "
-        "drag cannot reorder them by accident (#1521)")
+    line = re.search(r"function lineHtml\(list\) \{(.*?)\n  \}", js, re.S)
+    assert line, "shortlists-page.js has no lineHtml(list): the scan is reading the wrong place"
+    assert "arranging ? ' data-reorder-item'" in line.group(1), (
+        "a line of the overview is only movable while arranging, where a stray "
+        "drag cannot reorder the lists by accident (#1521)")
     scss = (ROOT / "_sass/food/_shortlists-page.scss").read_text(encoding="utf-8")
     grip = re.search(r"\n\.reorder-grip \{(.*?)\n\}", scss, re.S)
     assert grip and "touch-action: none" in grip.group(1), (
