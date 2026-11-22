@@ -434,7 +434,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 #   2. move it in a commit of its own, quoting her grant in the message;
 #   3. move it before the next agent edit, or it covers that too.
 # Grants made on parallel branches need the merge commit with both behind it.
-BASELINE_COMMIT = "9c5864c4"   # the sticky soy and miso sauce's `makes:`, Helen's grant; 966772aa and every earlier grant behind it
+BASELINE_COMMIT = "9fb7a070"   # the ham's new title and the cheesecake's yield, Helen's grant; 9c5864c4 and every earlier grant behind it
 AGENT_TRAILER = "co-authored-by: claude"
 
 
@@ -836,11 +836,22 @@ ADJUDICATED_REWRITES = {
             "flags, rescued from the wrong branch and committed for her; "
             "covered by her standing grant under 026f3224."
         ),
-        "fbe70182": (
-            "Five of Henry's Bramley drafts (chutney, rye cake, celeriac soup, "
-            "Dorset apple cake, parsnip soup), 2026-11-22. Helen's rewrites "
-            "and flags, made in the agent's worktree and committed for her "
+        "a048e173": (
+            "Six Bramley drafts (chutney, rye cake, celeriac soup, Dorset "
+            "apple cake, parsnip soup, mincemeat), 2026-11-22: the rebuild of "
+            "food PR #84 on main, carrying Helen's own rewrites and flags "
             "unchanged; covered by her standing grant under 026f3224."
+        ),
+        "764b8571": (
+            "Roast turkey, black treacle ham and Raymond's roast goose, "
+            "2026-11-22: Helen's reorganisation of the Christmas drafts and "
+            "her rewrites and flags, committed for her unchanged; covered by "
+            "her standing grant under 026f3224."
+        ),
+        "2bae36b3": (
+            "Alain Ducasse's gougères, 2026-11-22: Helen's rewrite and flags "
+            "(made and rewritten), committed for her unchanged; covered by her "
+            "standing grant under 026f3224."
         ),
     },
     "_food_recipes": {

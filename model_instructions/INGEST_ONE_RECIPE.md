@@ -306,6 +306,17 @@ line item saying "The source gave "butter"."* Where the source does say —
 "unsalted butter", "medium eggs", "whole milk" — that is reading, and you
 write it, with no note.
 
+**A note records a choice, never a rename.** Write "the source gave …" only
+where the house picked between things the source left open: which butter,
+milk or egg size, golden caster sugar, light soy sauce, whole or ground
+cloves. Where the house name means exactly what the source said — "light
+brown sugar" to `light brown soft sugar`, "cider vinegar" to `apple cider
+vinegar`, "salad onions" to `spring onions`, "yellow mustard seed" to `white
+mustard seeds` — write the house name and **no note**. Helen (#1531): *"where
+a fix is just updating e.g. "light brown sugar" to "light brown soft sugar",
+don't add a note to the ingredient line. Same for other similar small
+mechanical fixes."*
+
 **A 2-lb loaf tin is written one way**: "2-lb (900 g) loaf tin, about 25 x
 12.5 x 8 cm", in the `QQ Claude` line (the `QQ original` keeps the source's
 words).
@@ -502,6 +513,14 @@ field, and do not split a recipe the source ran as one sequence — that is
 restructuring somebody else's recipe, which §3's rules forbid everywhere else.
 One unnamed ingredient group and a flat `method:` is the matching pair, and it
 is correct for plenty of recipes.
+
+**Few groups, never a heading per step.** Helen: *"not to split the method
+into too many groups (it's really annoying!)"*. A group is a phase that makes
+its own thing (a crumble, a sauce, a pastry) or happens at another time (the
+day before). A run of steps on one pan is one group however many verbs it has:
+a soup's soften, simmer and blend are `soup`, not three groups. Two or three
+groups is usual; more than four is almost always too many, and a group of one
+short step should join its neighbour.
 
 ### What the rewrite must NOT change
 

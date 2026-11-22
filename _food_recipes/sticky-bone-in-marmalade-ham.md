@@ -1,5 +1,5 @@
 ---
-title: "Sticky Marmalade Ham"
+title: "Sticky Bone-in Marmalade Ham"
 tagline: "Not just for Christmas in our house."
 source: "Adapted from Good Food, recipe John Torode"
 source_type: website

@@ -283,6 +283,11 @@ else has already done (MANUAL §9.1).
   milk, egg -> large egg, butter -> salted butter UNLESS it's baking and salt
   is named, then for each please add a note to the ingredient line item
   saying "The source gave "butter"."*
+- **A note records a choice, never a rename** (#1531). "The source gave …"
+  goes only where the house picked between things the source left open.
+  Where the house name means what the source said -- "light brown sugar" to
+  `light brown soft sugar`, "cider vinegar" to `apple cider vinegar` -- write
+  the house name and no note.
 - **A weight goes in the amount's bracket, never the item**: amount
   `"1 bunch (about 25 g)"`, item `"fresh dill"`, so the scaler moves it.
   "approx" is "about". DECISIONS §5.
@@ -380,6 +385,10 @@ else has already done (MANUAL §9.1).
   - The converse still holds and is not a licence: one phase means one unnamed
     ingredient group and a flat `method:`. Do not split a sequence the source
     ran as one.
+  - **Few groups, never a heading per step.** Helen: *"not to split the
+    method into too many groups (it's really annoying!)"*. A group makes its
+    own thing or happens at another time; a soup's soften, simmer and blend
+    are one group. More than four is almost always too many.
   - **An ingredient group's name is read after "For the", so say it that way
     before writing it.** `dressing` prints "For the dressing:". **The one shape
     that prints as itself is a name opening with `to `**: `to serve`, `to

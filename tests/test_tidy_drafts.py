@@ -466,14 +466,52 @@ def test_unit_spacing_fixes_an_amount_an_item_and_prose(food):
     run_food(food, "--apply")
     got = path.read_text(encoding="utf-8")
 
+    # "3cm chunks" is spaced by `units`, then hyphenated by `cm`.
     for want in ('amount: "40 g"',
-                 'item: "pork shoulder, in 3 cm chunks"',
+                 'item: "pork shoulder, in 3-cm chunks"',
                  'dissolved in 100 ml water',
                  '"Use 15 ml of it and keep the rest."'):
         assert want in got, (
             f"{want!r} is missing, so the unit space did not land there:\n"
             + got
         )
+
+
+CM_BEFORE = '''---
+title: "Test Recipe"
+meta:
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+tagline: "A test"
+source: "Adapted from Somebody"
+source_type: person
+serves: "4"
+ingredient_groups:
+  - name: ""
+    items:
+    - amount: "1"
+      item: "celery stick, cut into 1 cm slices"
+    - amount: "2 cm piece"
+      item: "fresh ginger"
+method:
+  - "QQ original Grease a 20 cm sandwich tin."
+  - "QQ Claude Grease a 20 cm sandwich tin. Roll it 1 cm thick, 2 cm apart."
+---
+'''
+
+
+def test_cm_hyphenates_a_measurement_before_a_noun_and_spares_a_qq(food):
+    """"1 cm slices" -> "1-cm slices"; "1 cm thick" and an amount stay open,
+    and a `QQ original` line keeps the source's words."""
+    path = food / "test-recipe.md"
+    path.write_text(CM_BEFORE, encoding="utf-8")
+    run_food(food, "--only", "cm", "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert 'item: "celery stick, cut into 1-cm slices"' in got, got
+    assert 'amount: "2 cm piece"' in got, got
+    assert '"QQ original Grease a 20 cm sandwich tin."' in got, got
+    assert '"QQ Claude Grease a 20-cm sandwich tin. Roll it 1 cm thick, 2 cm apart."' in got, got
 
 
 def test_unit_spacing_matches_the_longest_unit_first(food):
