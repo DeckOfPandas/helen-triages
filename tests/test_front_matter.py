@@ -842,6 +842,12 @@ ADJUDICATED_REWRITES = {
             "food PR #84 on main, carrying Helen's own rewrites and flags "
             "unchanged; covered by her standing grant under 026f3224."
         ),
+        "764b8571": (
+            "Roast turkey, black treacle ham and Raymond's roast goose, "
+            "2026-11-22: Helen's reorganisation of the Christmas drafts and "
+            "her rewrites and flags, committed for her unchanged; covered by "
+            "her standing grant under 026f3224."
+        ),
     },
     "_food_recipes": {
         "2d97c96a": (
