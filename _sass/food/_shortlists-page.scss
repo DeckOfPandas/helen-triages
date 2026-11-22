@@ -33,8 +33,7 @@
 // this order. Never violet: it is every list heading's second rule.
 // `--list-ink` is the lettering on the bright tape: white where ink on the
 // hue is under 4.5:1. Turquoise is the palette's mint (once medium spring
-// green). `--list-grey` is the index tag pills' resting tint
-// (food/_badges.scss), the hue mixed into the border colour.
+// green).
 $list-hues: (
   ($color-dazzling-dragonfruit, $color-text),
   ($color-wild-wasabi, $color-text),
@@ -49,18 +48,16 @@ $list-hues: (
   $hue: list.nth(list.nth($list-hues, $i), 1);
   .list-hue-#{$i - 1} {
     --list-hue: #{$hue};
-    --list-grey: #{color.mix($hue, $color-border, 14%)};
-    --list-hover: #{color.mix($hue, $color-border, 40%)};
     --list-ink: #{list.nth(list.nth($list-hues, $i), 2)};
   }
 }
 
 // --- the tabs ------------------------------------------------------------------
 // Washi tape, as the filter chips wear it (shared/_tag-shape.scss), on the
-// site's rule: greyed is available, saturated is chosen. At rest a list's
-// tape is its colour greyed as the index's tag pills are, its word the quiet
-// grey; chosen, the full colour, struck heavier, so colour is not the only
-// cue.
+// site's rule: grey is available, saturated is chosen. At rest a list's tape
+// is plain grey with a strip of its colour along the foot, echoing
+// everything's band, its word the quiet grey; chosen, the full colour,
+// struck heavier, so colour is not the only cue.
 
 .shortlists-tabbar {
   display: flex;
@@ -93,12 +90,11 @@ $list-hues: (
   color: $color-clear-text;
   cursor: pointer;
 
-  // A tab with no list behind it (a shared link's) is paper.
-  .tag-shape { color: var(--list-grey, #{rgba($color-text, 0.08)}); }
+  .tag-shape { color: rgba($color-text, 0.08); }
 
   &:hover {
     color: $color-text;
-    .tag-shape { color: var(--list-hover, #{rgba($color-text, 0.16)}); }
+    .tag-shape { color: rgba($color-text, 0.16); }
   }
 
   &:focus-visible {
@@ -118,32 +114,29 @@ $list-hues: (
   -webkit-text-stroke: 0;
 }
 
-// CANDIDATE (data-tabs="strip" on the page root, not for merge): plain grey
-// tape at rest, with a strip of the list's colour along its foot.
-.shortlists-tab-strip { display: none; }
+.shortlists-tab-strip {
+  position: absolute;
+  left: $space-xs;
+  right: $space-xs;
+  bottom: 0;
+  height: 3px;
+  background: var(--list-hue);
 
-[data-tabs="strip"] .shortlists-tab:not(.is-selected) {
-  .tag-shape { color: rgba($color-text, 0.08); }
-  &:hover .tag-shape { color: rgba($color-text, 0.16); }
+  .is-selected > & { display: none; }
+}
 
-  .shortlists-tab-strip {
-    display: block;
-    position: absolute;
-    left: $space-xs;
-    right: $space-xs;
-    bottom: 0;
-    height: 3px;
-    background: var(--list-hue);
-  }
+// A whole line to itself, so everything sits apart above the lists.
+.shortlists-tabs-break {
+  flex-basis: 100%;
+  height: $space-sm;
 }
 
 // --- everything's tab ------------------------------------------------------------
 // Not a list: the logo's black tape when chosen, the bare word at rest, and
-// under it a band of every list's colour. Set apart from the lists by more
-// than their gap.
+// under it a band of every list's colour. On a line of its own, above the
+// lists (`.shortlists-tabs-break`).
 
 .shortlists-tab--everything {
-  margin-right: $space-lg;
   color: $color-clear-text;
 
   .tag-shape { display: none; }
@@ -191,7 +184,11 @@ $list-hues: (
 .shortlists-tab--new {
   color: $color-recipe-link;
   .tag-shape { color: rgba($color-text, 0.07); }
-  &:hover .tag-shape { color: rgba($color-text, 0.16); }
+
+  &:hover {
+    color: $color-recipe-link-hover;
+    .tag-shape { color: rgba($color-text, 0.16); }
+  }
 
   &[hidden] { display: none; }
 }

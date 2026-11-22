@@ -79,10 +79,6 @@
   var pillUp = pill.querySelector('[data-shortlists-pill-up]');
   var live = root.querySelector('[data-shortlists-live]');
 
-  // CANDIDATES ONLY, not for merge: ?tabs=strip shows the fallback for
-  // unselected tabs, grey tape with a strip of the list's colour.
-  if (/[?&]tabs=strip/.test(window.location.search)) root.setAttribute('data-tabs', 'strip');
-
   var renaming = null;
   var deleting = null;
 
@@ -189,8 +185,12 @@
       (tab.hue >= 0 ? '<span class="shortlists-tab-strip" aria-hidden="true"></span>' : '') + '</button>';
   }
 
+  // Everything on a line of its own, above the lists: the break is the
+  // stylesheet's, and hidden from the tablist's readers.
   function renderTabs(view) {
-    tabsEl.innerHTML = tabsFor(view).map(tabHtml).join('');
+    tabsEl.innerHTML = tabsFor(view).map(function (tab) {
+      return tabHtml(tab) + (tab.id === EVERYTHING ? '<span class="shortlists-tabs-break" aria-hidden="true"></span>' : '');
+    }).join('');
     panel.setAttribute('aria-labelledby', 'shortlists-tab-' + view);
   }
 
