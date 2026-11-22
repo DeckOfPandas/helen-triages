@@ -199,6 +199,51 @@
         esc(words.pre) + recipeLink(url, words.title, href) + esc(words.post);
     }
 
+    /* The same words split for the shortlists page's columns (#1521): the
+       unit after the box ("batches of 40", "× 20-cm"), then the name. */
+    function unitText(url, n) {
+      var words = rowWords(url, title(url), n);
+      return (words.word + ' ' + words.pre).replace(/\s+/g, ' ').trim();
+    }
+
+    function nameHtml(url, n, href) {
+      var words = rowWords(url, title(url), n);
+      return recipeLink(url, words.title, href) + esc(words.post);
+    }
+
+    /* What − or + makes of a count: one portion or one batch either way,
+       with the half batch below one where the build offers it. The same
+       number back means the end is reached. */
+    function stepCount(url, n, way) {
+      if (way > 0) return n < 1 ? 1 : Math.min(99, n + 1);
+      if (n > 1) return n - 1;
+      return isBatch(url) && halfOffered(url) ? 0.5 : n;
+    }
+
+    /* What a row costs as cooked, n portions or batches of it (#1458):
+       { min, max, partial, text }, or null where nothing is costed. */
+    function rowCost(url, n) {
+      if (!options.costUnits || !has(url)) return null;
+      return foodShoppingList.recipeCost(entries(url, scale(url, n)), 1, options);
+    }
+
+    /* Several rows' costs added, for a list's subtotal and everything's
+       total: partial if any part is. null where none is costed. */
+    function sumCosts(costs) {
+      var known = costs.filter(Boolean);
+      if (!known.length) return null;
+      var sum = { min: 0, max: 0, partial: false };
+      known.forEach(function (c) {
+        sum.min += c.min;
+        sum.max += c.max;
+        sum.partial = sum.partial || !!c.partial || known.length < costs.length;
+      });
+      sum.text = foodShoppingList.moneyText(sum);
+      return sum;
+    }
+
+    function has(url) { return Object.prototype.hasOwnProperty.call(RECIPES, url); }
+
     // What a screen reader is told the box counts: it cannot move with the number.
     function boxLabel(url) {
       var made = RECIPES[url] && RECIPES[url].m;
@@ -360,8 +405,10 @@
     }
 
     return {
-      has: function (url) { return Object.prototype.hasOwnProperty.call(RECIPES, url); },
+      has: has,
       title: title,
+      unitText: unitText, nameHtml: nameHtml, stepCount: stepCount,
+      rowCost: rowCost, sumCosts: sumCosts,
       hasPortions: hasPortions, isBatch: isBatch, halfOffered: halfOffered,
       defaultCount: defaultCount, count: count, scale: scale,
       batchCount: batchCount, portionCount: portionCount,

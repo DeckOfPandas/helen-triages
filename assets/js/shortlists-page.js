@@ -8,7 +8,7 @@
 // The tabs are a WAI-ARIA tablist with automatic activation: arrows, Home and
 // End move the selection, and only the selected tab is in the tab order. A tab
 // is only ever tapped: lists move in "arrange", and a list's recipes on its own
-// tab, by drag-reorder.js's grip or by each row's ↑/↓.
+// tab, by each row's grip, dragged (drag-reorder.js) or moved by its keys.
 // Anything that re-renders closes the rename and new-list forms first, so a
 // form is never left open on a list it does not belong to.
 
@@ -64,9 +64,9 @@
   var indexUrl = root.getAttribute('data-index-url') || '';
   var tabsEl = root.querySelector('[data-shortlists-tabs]');
   var newBtn = root.querySelector('[data-shortlists-new]');
-  var newForm = root.querySelector('[data-shortlists-new-form]');
-  var newInput = newForm.querySelector('input');
-  var newProblem = newForm.querySelector('.shortlists-name-problem');
+  var newTab = root.querySelector('[data-shortlists-new-tab]');
+  var newInput = newTab.querySelector('input');
+  var newProblem = root.querySelector('[data-shortlists-new-problem]');
   var panel = root.querySelector('[data-shortlists-panel]');
   var body = root.querySelector('[data-shortlists-body]');
   var aislesEl = shoppingEl.querySelector('.shopping-list-aisles');
@@ -78,10 +78,6 @@
   var pillDown = pill.querySelector('[data-shortlists-pill-down]');
   var pillUp = pill.querySelector('[data-shortlists-pill-up]');
   var live = root.querySelector('[data-shortlists-live]');
-
-  // CANDIDATES ONLY, not for merge: ?look=a|b|c picks an everything tab.
-  var look = (/[?&]look=([abc])/.exec(window.location.search) || [])[1] || 'a';
-  root.setAttribute('data-look', look);
 
   var renaming = null;
   var deleting = null;
@@ -228,42 +224,85 @@
     return V.listUrl(hrefs[url] || url, id);
   }
 
-  // A grip to drag by (drag-reorder.js) and ↑/↓ for everyone else.
-  function stepHtml(name, way, off) {
-    return '<button type="button" class="reorder-step" data-move="' + way + '" aria-label="' +
-      esc(V.moveLabel(name, way)) + '"' + (off ? ' disabled' : '') + '>' +
-      (way === 'up' ? '↑' : '↓') + '</button>';
+  // A row moves by its grip: dragged (drag-reorder.js), or focused and moved
+  // with the up and down arrows.
+  function gripHtml(name) {
+    return '<button type="button" class="reorder-grip" data-reorder-grip aria-label="' +
+      esc('move ' + name) + '" aria-describedby="shortlists-move-help"></button>';
   }
 
-  function handleHtml(name, at, total) {
-    return '<span class="reorder-handle"><span class="reorder-grip" data-reorder-grip aria-hidden="true"></span>' +
-      '<span class="reorder-steps">' + stepHtml(name, 'up', at === 0) +
-      stepHtml(name, 'down', at === total - 1) + '</span></span>';
+  // The recipe page's − box +, the same shape (shared/_rule.scss's scale-step).
+  function stepperHtml(url, n, list) {
+    var name = titles[url] || url;
+    return '<span class="shortlists-stepper">' +
+      '<button type="button" class="shortlists-step" data-step="-1" aria-label="' + esc('one fewer: ' + name) + '"' +
+      (shop.stepCount(url, n, -1) === n ? ' disabled' : '') + '>&minus;</button>' +
+      shop.boxHtml(url, n, 'data-list="' + esc(list) + '"') +
+      '<button type="button" class="shortlists-step" data-step="1" aria-label="' + esc('one more: ' + name) + '"' +
+      (shop.stepCount(url, n, 1) === n ? ' disabled' : '') + '>+</button></span>';
   }
 
-  // `at` and `total` are given only where the row can be moved: a list's own tab.
-  function rowHtml(row, listName, at, total) {
+  // "£10.24", and under it the range, small and grey; '' where nothing is costed.
+  function priceHtml(cost) {
+    if (!cost) return '';
+    var cut = cost.text.indexOf(' (');
+    if (cut < 0) return '<span class="shortlists-price-mean">' + esc(cost.text) + '</span>';
+    return '<span class="shortlists-price-mean">' + esc(cost.text.slice(0, cut)) + '</span>' +
+      '<span class="shortlists-price-range">' + esc(cost.text.slice(cut + 1)) + '</span>';
+  }
+
+  function rowCost(row) {
+    return shop.has(row.recipe) && shop.boxHtml(row.recipe, 1) ?
+      shop.rowCost(row.recipe, shop.count(row.recipe, row.portions)) : null;
+  }
+
+  /* One recipe in columns: grip, − n +, unit, name, price, ×. `movable` only
+     on a list's own tab, with two rows or more; `list` null for a shared
+     link's rows, which show their count and nothing to change. */
+  function rowHtml(row, listName, movable) {
     var url = row.recipe;
     var title = titles[url] || url.replace(/\/$/, '').split('/').pop();
-    var remove = '<button type="button" class="shortlists-text-button shortlists-remove" data-remove ' +
-      'aria-label="remove ' + esc(title + ' from ' + listName) + '">remove</button>';
-    var movable = total > 1;
+    var editable = row.list !== SHARED;
+    var remove = editable ? '<button type="button" class="shortlists-remove" data-remove ' +
+      'aria-label="remove ' + esc(title + ' from ' + listName) + '"></button>' : '<span></span>';
     var attrs = 'class="shortlists-recipe" data-list="' + esc(row.list) + '" data-url="' + esc(url) + '"' +
       (movable ? ' data-reorder-item' : '');
-    var handle = movable ? handleHtml(title, at, total) : '';
+    var grip = movable ? gripHtml(title) : '<span></span>';
     if (!shop.has(url)) {
-      return '<li ' + attrs + '>' + handle + '<span class="shortlists-gone">' + esc(title) +
-        ' <span class="shopping-list-yield-missing">is no longer on the site</span></span>' + remove + '</li>';
+      return '<li ' + attrs + '>' + grip + '<span></span><span></span><span class="shortlists-name shortlists-gone">' +
+        esc(title) + ' <span class="shopping-list-yield-missing">is no longer on the site</span></span><span></span>' +
+        remove + '</li>';
     }
     var n = shop.count(url, row.portions);
-    var box = shop.boxHtml(url, n, 'data-list="' + esc(row.list) + '"');
-    if (!box) {
-      return '<li ' + attrs.replace('class="', 'class="shopping-list-recipe--unscalable ') + '>' + handle +
-        shop.unscalableHtml(url, recipeHref(url, row.list)) + remove + '</li>';
+    var href = editable ? recipeHref(url, row.list) : hrefs[url];
+    if (!shop.boxHtml(url, n)) {
+      return '<li ' + attrs.replace('class="', 'class="shopping-list-recipe--unscalable ') + '>' + grip +
+        '<span></span><span></span><span class="shortlists-name">' + shop.unscalableHtml(url, href) + '</span>' +
+        '<span></span>' + remove + '</li>';
     }
-    return '<li ' + attrs + '>' + handle + box +
-      shop.withCost(url, '<span class="shortlists-words">' + shop.rowInner(url, n, recipeHref(url, row.list)) + '</span>') +
-      remove + '</li>';
+    var count = editable ? stepperHtml(url, n, row.list) :
+      '<span class="shortlists-stepper"><span class="shortlists-shared-count">' + n + '</span></span>';
+    return '<li ' + attrs + '>' + grip + count +
+      '<span class="shortlists-unit">' + esc(shop.unitText(url, n)) + '</span>' +
+      '<span class="shortlists-name">' + shop.nameHtml(url, n, href) + '</span>' +
+      '<span class="shortlists-price">' + priceHtml(shop.rowCost(url, n)) + '</span>' + remove + '</li>';
+  }
+
+  // A list's cost: its subtotal; on everything, every list's added.
+  function costOf(someRows) {
+    return shop.sumCosts(someRows.map(rowCost));
+  }
+
+  function totalHtml(label, cost, attr) {
+    if (!cost) return '';
+    return '<p class="shortlists-subtotal" ' + attr + '><span class="shortlists-subtotal-label">' + esc(label) +
+      '</span><span class="shortlists-price">' + priceHtml(cost) + '</span></p>';
+  }
+
+  function rowsHtml(rows, listName, movable) {
+    return '<ul class="shortlists-rows">' + rows.map(function (row) {
+      return rowHtml(row, listName, movable && rows.length > 1);
+    }).join('') + '</ul>';
   }
 
   function recipesHtml(list, movable) {
@@ -273,10 +312,40 @@
         '<p class="shortlists-browse"><a class="shortlists-link" href="' +
         esc(V.intoUrl(indexUrl, list.id)) + '">Browse recipes to fill it</a></p>';
     }
-    return '<ul class="shopping-list-recipes shortlists-recipes">' +
-      rows.map(function (row, i) {
-        return movable ? rowHtml(row, list.name, i, rows.length) : rowHtml(row, list.name);
-      }).join('') + '</ul>';
+    return rowsHtml(rows, list.name, movable) +
+      totalHtml('subtotal', costOf(rows), 'data-subtotal="' + esc(list.id) + '"');
+  }
+
+  // --- the cards -----------------------------------------------------------------
+  // The index's rows, cloned once each from the page's <template> and kept, so
+  // a redraw moves a card rather than making a new one under an open picker.
+
+  var cardTemplate = document.querySelector('template[data-shortlists-cards]');
+  var cards = {};
+  if (cardTemplate) {
+    Array.prototype.forEach.call(cardTemplate.content.querySelectorAll('li[data-url]'), function (li) {
+      cards[li.getAttribute('data-url')] = li;
+    });
+  }
+
+  function cardFor(url) {
+    var card = cards[url];
+    if (card && card.ownerDocument !== document) {
+      card = cards[url] = document.importNode(card, true);
+      card.removeAttribute('data-url');
+      card.setAttribute('data-card', url);
+    }
+    return card || null;
+  }
+
+  function placeCards(list) {
+    var slot = body.querySelector('[data-cards]');
+    if (!slot) return;
+    list.items.forEach(function (item) {
+      var card = cardFor(item.recipe);
+      if (card) slot.appendChild(card);
+    });
+    if (HTF.shortlistPicker) HTF.shortlistPicker.paint(slot);
   }
 
   function renameFormHtml(list) {
@@ -320,6 +389,8 @@
       '</span></div>' +
       (renaming === list.id ? renameFormHtml(list) : '') +
       '<p class="shortlists-count">' + V.countText(list.items.length) + '</p>' +
+      (list.items.length ? '<ul class="recipe-list recipe-related shortlists-cards" data-cards></ul>' +
+        '<h3 class="shortlists-subheading">how much</h3>' : '') +
       recipesHtml(list, true);
   }
 
@@ -338,19 +409,8 @@
           esc(list.id) + '">' + markedName(list.name, hue * 3 + 2) + '</button>' +
           '<span class="shortlists-section-count">' + V.countText(list.items.length) + '</span></h3>' +
           recipesHtml(list) + '</section>';
-      }).join('');
-  }
-
-  // A shared list's rows say their count in words: there is nothing to edit
-  // until it is kept.
-  function sharedRowHtml(item) {
-    var url = item.recipe;
-    var n = shop.count(url, item.portions);
-    if (!shop.boxHtml(url, n)) {
-      return '<li class="shortlists-recipe shopping-list-recipe--unscalable">' + shop.unscalableHtml(url, hrefs[url]) + '</li>';
-    }
-    return '<li class="shortlists-recipe">' + shop.withCost(url, '<span class="shortlists-words">' +
-      '<span class="shortlists-shared-count">' + n + '</span> ' + shop.rowInner(url, n, hrefs[url]) + '</span>') + '</li>';
+      }).join('') +
+      totalHtml('all lists', costOf(V.rows(all, EVERYTHING)), 'data-total');
   }
 
   function sharedBody() {
@@ -362,14 +422,26 @@
       '<button type="button" class="shortlists-text-button" data-drop-shared>not now</button></p>' +
       (shared.missing ? '<p class="shortlists-count">' + esc(V.missingText(shared.missing)) + '</p>' : '') +
       '<p class="shortlists-count">' + V.countText(shared.items.length) + '</p>' +
-      (shared.items.length ? '<ul class="shopping-list-recipes shortlists-recipes">' +
-        shared.items.map(sharedRowHtml).join('') + '</ul>' : '');
+      (shared.items.length ? rowsHtml(rowsFor(SHARED), sharedName(), false) +
+        totalHtml('subtotal', costOf(rowsFor(SHARED)), '') : '');
   }
 
   function renderBody(view) {
     if (view === SHARED) { body.innerHTML = sharedBody(); return; }
     var list = lists.get(view);
     body.innerHTML = list ? listBody(list) : everythingBody(lists.all());
+    if (list) placeCards(list);
+  }
+
+  // After a typed number: the subtotals and the total, redrawn in place.
+  function refreshTotals() {
+    Array.prototype.forEach.call(body.querySelectorAll('[data-subtotal]'), function (el) {
+      var list = lists.get(el.getAttribute('data-subtotal'));
+      var cost = list && costOf(V.rows([list], list.id));
+      el.querySelector('.shortlists-price').innerHTML = priceHtml(cost);
+    });
+    var total = body.querySelector('[data-total]');
+    if (total) total.querySelector('.shortlists-price').innerHTML = priceHtml(costOf(V.rows(lists.all(), EVERYTHING)));
   }
 
   // --- the shopping list -----------------------------------------------------
@@ -476,6 +548,12 @@
     decorate();
   }
 
+  // A card's own button (shortlist-picker.js) can put its recipe on or off
+  // any list, this one included.
+  document.addEventListener('htf:lists-change', function () {
+    if (!arranging) render();
+  });
+
   // --- the scalers ------------------------------------------------------------
   // Only the row's words are rewritten as a number is typed: re-rendering the
   // box under the caret loses it.
@@ -483,7 +561,7 @@
   body.addEventListener('input', function (ev) {
     var input = ev.target;
     if (!input.classList.contains('shopping-list-portions')) return;
-    var row = input.closest('[data-list]');
+    var row = input.closest('li[data-list]');
     var id = row.getAttribute('data-list');
     var url = input.getAttribute('data-url');
     var before = shop.count(url, lists.portions(id, url));
@@ -496,12 +574,37 @@
       n = shop.portionCount(input.value);
     }
     if (!n) return;
+    setCount(row, id, url, n, before);
+  });
+
+  // A row's count changed: its own cells in place, then what adds it up.
+  function setCount(row, id, url, n, before) {
     lists.setPortions(id, url, n);
-    var wordsEl = row.querySelector('.shortlists-words');
-    if (wordsEl) wordsEl.innerHTML = shop.rowInner(url, n, recipeHref(url, id));
+    row.querySelector('.shortlists-unit').textContent = shop.unitText(url, n);
+    row.querySelector('.shortlists-name').innerHTML = shop.nameHtml(url, n, recipeHref(url, id));
+    row.querySelector('.shortlists-price').innerHTML = priceHtml(shop.rowCost(url, n));
+    row.querySelector('[data-step="-1"]').disabled = shop.stepCount(url, n, -1) === n;
+    row.querySelector('[data-step="1"]').disabled = shop.stepCount(url, n, 1) === n;
+    refreshTotals();
     if (n !== before) recount(id, url);
     renderShopping(lists.view());
     placePill();
+  }
+
+  // − and +: the box shows the new count, and focus stays on the button
+  // unless it has reached its end.
+  body.addEventListener('click', function (ev) {
+    var step = ev.target.closest('[data-step]');
+    if (!step) return;
+    var row = step.closest('li[data-list]');
+    var id = row.getAttribute('data-list');
+    var url = row.getAttribute('data-url');
+    var before = shop.count(url, lists.portions(id, url));
+    var n = shop.stepCount(url, before, Number(step.getAttribute('data-step')));
+    if (n === before) return;
+    row.querySelector('.shopping-list-portions').value = String(n);
+    setCount(row, id, url, n, before);
+    if (step.disabled) row.querySelector('.shopping-list-portions').focus();
   });
 
   body.addEventListener('change', function (ev) {
@@ -522,15 +625,6 @@
   body.addEventListener('click', function (ev) {
     var go = ev.target.closest('[data-go]');
     if (go) { select(go.getAttribute('data-go'), true); return; }
-
-    var step = ev.target.closest('[data-move]');
-    if (step) {
-      var moving = step.closest('[data-list]');
-      var way = step.getAttribute('data-move');
-      var at = rowsOf(body).indexOf(moving);
-      moveRecipe(moving, at + (way === 'up' ? -1 : 1), way);
-      return;
-    }
 
     var removeBtn = ev.target.closest('[data-remove]');
     if (removeBtn) {
@@ -590,28 +684,47 @@
   });
 
   // --- moving rows ------------------------------------------------------------------
+  // A grip with focus moves its row with the up and down arrows, Home and End.
   // After a move the rows are redrawn, so focus goes back to the moved row's
-  // arrow, or its other arrow once it reaches an end.
+  // grip.
 
   function rowsOf(container) {
     return Array.prototype.slice.call(container.querySelectorAll('[data-reorder-item]'));
   }
 
-  function focusStep(container, attribute, value, way) {
+  function focusGrip(container, attribute, value) {
     var row = rowsOf(container).filter(function (el) { return el.getAttribute(attribute) === value; })[0];
-    if (!row || !way) return;
-    var btn = row.querySelector('[data-move="' + way + '"]');
-    if (btn.disabled) btn = row.querySelector('[data-move="' + (way === 'up' ? 'down' : 'up') + '"]');
-    btn.focus();
+    if (row) row.querySelector('[data-reorder-grip]').focus();
   }
 
-  function moveRecipe(row, to, way) {
+  // Where a key sends the row at `at` of `total`, or null for a key that
+  // does not move it.
+  function keyTarget(key, at, total) {
+    var to = { ArrowUp: at - 1, ArrowDown: at + 1, Home: 0, End: total - 1 }[key];
+    if (to === undefined) return null;
+    return Math.max(0, Math.min(total - 1, to));
+  }
+
+  function onGripKey(container, move) {
+    container.addEventListener('keydown', function (ev) {
+      var grip = ev.target.closest('[data-reorder-grip]');
+      if (!grip) return;
+      var row = grip.closest('[data-reorder-item]');
+      var all = rowsOf(container);
+      var to = keyTarget(ev.key, all.indexOf(row), all.length);
+      if (to === null) return;
+      ev.preventDefault();
+      if (to !== all.indexOf(row)) move(row, to, true);
+    });
+  }
+
+  function moveRecipe(row, to, refocus) {
     var id = row.getAttribute('data-list');
     var url = row.getAttribute('data-url');
     var total = rowsOf(body).length;
     lists.moveItem(id, url, to);
     render();
-    focusStep(body, 'data-url', url, way);
+    if (refocus) focusGrip(body, 'data-url', url);
     announce(V.movedText(titles[url] || url, Math.max(0, Math.min(total - 1, to)), total));
   }
 
@@ -623,9 +736,9 @@
 
   function renderArrange() {
     var all = lists.all();
-    arrangeList.innerHTML = all.map(function (list, i) {
-      return '<li class="shortlists-arrange-list" data-reorder-item data-id="' + esc(list.id) + '">' +
-        handleHtml(list.name, i, all.length) +
+    arrangeList.innerHTML = all.map(function (list) {
+      return '<li class="shortlists-arrange-list' + hueClass(V.hueOf(list.id)) + '" data-reorder-item data-id="' +
+        esc(list.id) + '">' + gripHtml(list.name) +
         '<span class="shortlists-arrange-name">' + esc(list.name) + '</span>' +
         '<span class="shortlists-section-count">' + V.countText(list.items.length) + '</span></li>';
     }).join('');
@@ -648,25 +761,20 @@
     }
   }
 
-  function moveList(row, to, way) {
+  function moveList(row, to, refocus) {
     var id = row.getAttribute('data-id');
     var total = lists.all().length;
     lists.moveList(id, to);
     renderArrange();
-    focusStep(arrangeList, 'data-id', id, way);
+    if (refocus) focusGrip(arrangeList, 'data-id', id);
     announce(V.movedText(nameOf(id), Math.max(0, Math.min(total - 1, to)), total));
   }
 
   arrangeBtn.addEventListener('click', function () { arrange(true); });
   root.querySelector('[data-shortlists-arrange-done]').addEventListener('click', function () { arrange(false); });
 
-  arrangeList.addEventListener('click', function (ev) {
-    var step = ev.target.closest('[data-move]');
-    if (!step) return;
-    var row = step.closest('[data-id]');
-    var way = step.getAttribute('data-move');
-    moveList(row, rowsOf(arrangeList).indexOf(row) + (way === 'up' ? -1 : 1), way);
-  });
+  onGripKey(body, moveRecipe);
+  onGripKey(arrangeList, moveList);
 
   if (HTF.dragReorder) {
     var dragOptions = { item: '[data-reorder-item]', grip: '[data-reorder-grip]' };
@@ -806,42 +914,60 @@
 
   // --- a new list -----------------------------------------------------------------
 
+  // A blank tape at the end of the tabs, typed on directly: Enter makes the
+  // list and opens its tab, Escape (or leaving it empty) puts "+ new list"
+  // back. A refused name says why under the row and keeps the typing.
+
   function closeNewForm() {
-    newForm.hidden = true;
-    newBtn.setAttribute('aria-expanded', 'false');
+    newTab.hidden = true;
+    newBtn.hidden = false;
+    newInput.value = '';
+    newInput.removeAttribute('aria-invalid');
     newProblem.textContent = '';
   }
 
+  function fitNewInput() {
+    newInput.size = Math.max(10, newInput.value.length + 2);
+  }
+
   newBtn.addEventListener('click', function () {
-    if (!newForm.hidden) { closeNewForm(); return; }
     renaming = null;
     renderBody(currentView());
-    newForm.hidden = false;
-    newBtn.setAttribute('aria-expanded', 'true');
-    newInput.value = '';
+    newBtn.hidden = true;
+    newTab.hidden = false;
+    fitNewInput();
+    if (HTF.tagShapes) HTF.tagShapes();
     newInput.focus();
   });
 
-  newForm.addEventListener('submit', function (ev) {
+  newInput.addEventListener('input', function () {
+    fitNewInput();
+    newInput.removeAttribute('aria-invalid');
+    newProblem.textContent = '';
+  });
+
+  newInput.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') {
+      closeNewForm();
+      newBtn.focus();
+      return;
+    }
+    if (ev.key !== 'Enter') return;
     ev.preventDefault();
     var made = lists.create(newInput.value);
     if (made.error) {
+      newInput.setAttribute('aria-invalid', 'true');
       newProblem.textContent = problemText(made.error, lists.core.cleanName(newInput.value));
-      newInput.focus();
       return;
     }
-    newInput.value = '';
     select(made.id, true);
     announce('Made ' + nameOf(made.id) + '.');
   });
 
-  newForm.querySelector('[data-shortlists-cancel]').addEventListener('click', function () {
-    closeNewForm();
-    newBtn.focus();
-  });
-
-  newForm.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Escape') { closeNewForm(); newBtn.focus(); }
+  // Tapping away from an empty tape is a cancel; from a named one, the name
+  // waits for Enter.
+  newInput.addEventListener('blur', function () {
+    if (!newTab.hidden && !newInput.value.trim()) closeNewForm();
   });
 
   // --- delete -----------------------------------------------------------------------

@@ -145,11 +145,6 @@
     return name + ' moved to ' + (to + 1) + ' of ' + total + '.';
   }
 
-  // A row's ↑ and ↓, named for what they move: "move Christmas starters up".
-  function moveLabel(name, way) {
-    return 'move ' + name + ' ' + way;
-  }
-
   function withQuery(url, key, value) {
     return url + (url.indexOf('?') === -1 ? '?' : '&') + key + '=' + encodeURIComponent(value);
   }
@@ -174,7 +169,6 @@
     missingText: missingText,
     clashChoices: clashChoices,
     broughtText: broughtText,
-    moveLabel: moveLabel,
     intoUrl: function (indexUrl, id) { return withQuery(indexUrl, 'into', id); },
     listUrl: function (recipeUrl, id) { return withQuery(recipeUrl, 'list', id); }
   };

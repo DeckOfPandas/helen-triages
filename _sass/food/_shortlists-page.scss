@@ -1,6 +1,8 @@
 @use "sass:color";
 @use "sass:list";
 @use "food/palette" as *;
+@use "food/shopping-list" as *;
+@use "shared/rule" as *;
 @use "shared/tokens" as *;
 
 // =============================================================================
@@ -12,7 +14,9 @@
 // (the shopping list's "untick all"), and the numbers are the shopping list's
 // own boxes.
 
+// The foot is room for the floating pill, so it never covers the last line.
 .shortlists-page {
+  padding-bottom: 5rem;
   font-family: $font-body;
   color: $color-text;
 }
@@ -27,7 +31,8 @@
 // --- a colour per list ------------------------------------------------------------
 // Given out by the number in a list's id (HTF.listsView.hueOf), in this
 // order. `--list-ink` is the lettering on the bright tape: white where ink on
-// the hue is under 4.5:1. Turquoise is the palette's mint.
+// the hue is under 4.5:1. Turquoise is the palette's mint (once medium
+// spring green).
 $list-hues: (
   ($color-dazzling-dragonfruit, $color-text),
   ($color-wild-wasabi, $color-text),
@@ -36,7 +41,7 @@ $list-hues: (
   ($color-torrid-tangerine, $color-text),
   ($color-marauding-mint, $color-text),
   ($color-blazing-banana, $color-text),
-  ($color-cobalt, $color-white)
+  ($color-electric-cobalt, $color-white)
 );
 
 @for $i from 1 through list.length($list-hues) {
@@ -108,21 +113,19 @@ $list-hues: (
 }
 
 // --- everything's tab ------------------------------------------------------------
-// Not a list: the logo's black tape when chosen, and a band of every list's
-// colour along one edge. Set apart from the lists by more than their gap.
-// CANDIDATES (data-look on the page root, not for merge): a, paper tape at
-// rest; b, the bare word at rest; c, as a with the band along the top.
+// Not a list: the logo's black tape when chosen, the bare word at rest, and
+// under it a band of every list's colour. Set apart from the lists by more
+// than their gap.
 
 .shortlists-tab--everything {
   margin-right: $space-lg;
-  color: $color-text;
+  color: $color-clear-text;
 
-  .tag-shape { color: rgba($color-text, 0.08); }
-  &:hover .tag-shape { color: rgba($color-text, 0.16); }
+  .tag-shape { display: none; }
+  &:hover { color: $color-text; }
 
   &.is-selected {
     color: $color-tape-letter;
-    .tag-shape { display: none; }
     .shortlists-tape { display: block; }
   }
 }
@@ -158,22 +161,45 @@ $list-hues: (
   }
 }
 
-[data-look="b"] .shortlists-tab--everything:not(.is-selected) {
-  color: $color-clear-text;
-  .tag-shape { display: none; }
-}
-
-[data-look="c"] .shortlists-band {
-  top: 0;
-  bottom: auto;
-}
-
-// "+ new list" opens a form, so it is not a tab: the same tape, quieter still,
-// and the link colour.
+// "+ new list" is not a tab: the same tape, quieter still, and the link
+// colour. Pressed, it becomes a blank tape to type the name on.
 .shortlists-tab--new {
   color: $color-recipe-link;
   .tag-shape { color: rgba($color-text, 0.07); }
   &:hover .tag-shape { color: rgba($color-text, 0.16); }
+
+  &[hidden] { display: none; }
+}
+
+.shortlists-tab--draft {
+  cursor: text;
+  .tag-shape { color: rgba($color-text, 0.1); }
+
+  &[hidden] { display: none; }
+
+  &:focus-within {
+    outline: 2px solid $color-text;
+    outline-offset: 2px;
+  }
+}
+
+.shortlists-new-input {
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-transform: lowercase;
+  color: inherit;
+
+  &:focus { outline: none; }
+  &::placeholder { color: $color-clear-text; }
+}
+
+.shortlists-new-problem {
+  margin: (-$space-md) 0 $space-lg;
+
+  &:empty { display: none; }
 }
 
 // --- naming a list ---------------------------------------------------------------
@@ -325,20 +351,192 @@ $list-hues: (
 
 .shortlists-browse { margin: 0 0 $space-lg; }
 
-// A row is the shopping list's recipe row (_shopping-list.scss), with "remove"
-// pushed to its right-hand end.
-.shortlists-recipes li > span { min-width: 0; }
+// --- the cards -------------------------------------------------------------------
+// The index's rows (_includes/food/recipe-row.html), for reading and choosing.
 
-// "remove" takes room the index's rows keep, so a long price may wrap here.
-.shortlists-recipes .shopping-list-cost { white-space: normal; }
+.shortlists-cards { margin: 0 0 $space-xl; }
 
+.shortlists-subheading {
+  margin: 0 0 $space-sm;
+  padding-bottom: $space-xxs;
+  border-bottom: 1px solid $color-border;
+  font-family: $font-headings;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: lowercase;
+}
+
+// --- the rows: grip, − n +, unit, name, price, × ---------------------------------
+// One grid for the list, each row a subgrid of it, so every column lines up
+// down the list. On a phone a row is a grid of its own: the words take the
+// width, and − n + and the price go under them.
+
+.shortlists-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: auto auto auto minmax(0, 1fr) auto auto;
+  column-gap: $space-sm;
+
+  > li {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    align-items: center;
+    padding: $space-xs 0;
+    border-bottom: 1px solid $color-border;
+  }
+}
+
+@media (max-width: 600px) {
+  .shortlists-rows {
+    grid-template-columns: 1fr;
+  }
+
+  .shortlists-rows > li {
+    grid-column: auto;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "grip unit unit remove"
+      "grip name name remove"
+      "grip step price price";
+    column-gap: $space-xs;
+
+    > :nth-child(1) { grid-area: grip; }
+    > :nth-child(2) { grid-area: step; }
+    > :nth-child(3) { grid-area: unit; }
+    > :nth-child(4) { grid-area: name; }
+    > :nth-child(5) { grid-area: price; }
+    > :nth-child(6) { grid-area: remove; align-self: start; }
+  }
+}
+
+.shortlists-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xxs;
+
+  input {
+    @extend %food-number-input;
+    // The recipe page's box: two characters and the caret, centred, and no
+    // spinner, since − and + are the steps.
+    width: calc(3ch + 1.6ch);
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  }
+}
+
+.shortlists-step {
+  @include scale-step($color-recipe-link, $color-recipe-link-hover);
+  font-family: $font-label;
+  font-weight: 600;
+
+  &:disabled {
+    color: $color-border;
+    cursor: default;
+  }
+}
+
+.shortlists-unit {
+  font-size: 0.9rem;
+  color: $color-clear-text;
+  white-space: nowrap;
+}
+
+.shortlists-name {
+  min-width: 0;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+// Figures of one width, right-aligned so they read down as a column; the
+// range under the mean, smaller and grey.
+.shortlists-price {
+  font-family: $font-label;
+  font-size: 0.9rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.shortlists-price-mean { display: block; }
+
+.shortlists-price-range {
+  display: block;
+  font-size: 0.75rem;
+  color: $color-clear-text;
+}
+
+// A muted ×, magenta under the pointer or focus. Drawn, so no font decides it.
 .shortlists-remove {
-  flex-shrink: 0;
-  margin-left: auto;
-  padding-left: $space-md;
+  @include tap-area(44px, 44px);
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $color-clear-text;
+  cursor: pointer;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0.8rem;
+    height: 1.5px;
+    background: currentColor;
+  }
+
+  &::before { transform: translate(-50%, -50%) rotate(45deg); }
+  &::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
+  &:hover,
+  &:focus-visible { color: $color-recipe-link-hover; }
+
+  &:focus-visible {
+    outline: 2px solid $color-recipe-link;
+    outline-offset: 2px;
+  }
 }
 
 .shortlists-gone { color: $color-clear-text; }
+
+// A list's subtotal, and everything's total, in the price column.
+.shortlists-subtotal {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: $space-md;
+  margin: $space-xs 0 $space-lg;
+  // The × column's width, so the figure sits in the price column.
+  padding-right: calc(1.5rem + #{$space-sm});
+}
+
+.shortlists-subtotal-label {
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $color-clear-text;
+}
+
+[data-total] {
+  margin-top: $space-xl;
+  padding-top: $space-sm;
+  border-top: 2px solid $color-text;
+
+  .shortlists-price-mean { font-weight: 600; }
+}
 
 // --- everything: one section per list --------------------------------------------------
 
@@ -394,30 +592,18 @@ $list-hues: (
 }
 
 // --- moving rows -------------------------------------------------------------------------
-// The grip is drawn dots, so no font decides its look, inside a padded box a
-// finger can find. `touch-action: none`, or a finger on it scrolls the page in
-// iPad Safari. The dragged row lifts on the page's own surface; the others
-// slide aside, without the slide when motion is reduced.
-
-// The grip beside ↑ over ↓: narrow, so a phone row keeps its width for words.
-.reorder-handle {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  flex-shrink: 0;
-  margin-right: $space-xs;
-}
-
-.reorder-steps {
-  display: flex;
-  flex-direction: column;
-}
+// The grip is a button of drawn dots, so no font decides its look, padded for
+// a finger; with focus, the arrow keys move its row. `touch-action: none`, or
+// a finger on it scrolls the page in iPad Safari. The dragged row lifts on
+// the page's own surface; the others slide aside, without the slide when
+// motion is reduced.
 
 .reorder-grip {
   box-sizing: content-box;
   width: 12px;
   height: 18px;
   padding: 7px 6px;
+  border: 0;
   background: radial-gradient(circle, $color-clear-text 1.5px, transparent 2px) 0 0 / 6px 6px;
   background-origin: content-box;
   background-clip: content-box;
@@ -425,31 +611,10 @@ $list-hues: (
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-}
-
-.reorder-step {
-  min-width: 1.75rem;
-  min-height: 1.4rem;
-  padding: 0;
-  border: 0;
-  background: none;
-  font-family: $font-body;
-  font-size: 0.95rem;
-  line-height: 1;
-  color: $color-clear-text;
-  cursor: pointer;
-
-  &:hover,
-  &:focus-visible { color: $color-recipe-link-hover; }
 
   &:focus-visible {
     outline: 2px solid $color-recipe-link;
-    outline-offset: -2px;
-  }
-
-  &:disabled {
-    opacity: 0.3;
-    cursor: default;
+    outline-offset: 0;
   }
 }
 
@@ -489,12 +654,14 @@ $list-hues: (
   flex-direction: column;
 }
 
+// Each list's colour down its left edge, as its tab wears it.
 .shortlists-arrange-list {
   display: flex;
   align-items: center;
   gap: $space-xs;
-  padding: $space-xs 0;
+  padding: $space-xs 0 $space-xs $space-xs;
   border-bottom: 1px solid $color-border;
+  border-left: 4px solid var(--list-hue, transparent);
 }
 
 .shortlists-arrange-name {

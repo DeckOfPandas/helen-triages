@@ -165,9 +165,7 @@ test('a note under the scaler says which lists the recipe is on', () => {
 
 // --- moving -------------------------------------------------------------------
 
-test('a row\'s arrows are named for what they move, and a move is announced by place', () => {
-  assert.strictEqual(view.moveLabel('Christmas starters', 'up'), 'move Christmas starters up');
-  assert.strictEqual(view.moveLabel('Trifle', 'down'), 'move Trifle down');
+test('a move is announced by place', () => {
   assert.strictEqual(view.movedText('Christmas starters', 0, 4), 'Christmas starters moved to 1 of 4.');
   assert.strictEqual(view.movedText('Trifle', 3, 4), 'Trifle moved to 4 of 4.');
 });

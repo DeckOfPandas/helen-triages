@@ -1,10 +1,10 @@
 // drag-reorder.js: drag a row up or down a list by its grip (#1521), as
 // HTF.dragReorder. MANUAL §8.9. Pointer events, so a finger, a mouse and an
 // Apple Pencil all drag; the grip has `touch-action: none` in the stylesheet,
-// or iPad Safari scrolls the page instead. The grip is for pointers only: the
-// keyboard and a screen reader move a row with its ↑/↓ buttons, which the
-// page draws. Nothing moves in the DOM until the drop; the rows are slid with
-// transforms, and Escape or a cancelled pointer puts them back.
+// or iPad Safari scrolls the page instead. This file is the pointer's half:
+// the keyboard moves a row with the arrow keys on the same grip, which the
+// page handles. Nothing moves in the DOM until the drop; the rows are slid
+// with transforms, and Escape or a cancelled pointer puts them back.
 
 (function (root, factory) {
   if (typeof module !== 'undefined' && module.exports) {

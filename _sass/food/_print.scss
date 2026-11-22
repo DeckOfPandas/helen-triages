@@ -40,14 +40,17 @@
 
   // The shortlists' controls (#1521): the picker, the chevron beside a button
   // while filling a list, the bar that says which, the note under the scaler,
-  // a row's grip and arrows, a shopping line's chevron (an open breakdown
-  // still prints) and the share and import boxes. The back link is on the
-  // furniture line, which prints nothing.
+  // a row's grip, steps and ×, "+ new list", a shopping line's chevron (an
+  // open breakdown still prints) and the share and import boxes. The back
+  // link is on the furniture line, which prints nothing.
   .shortlist-picker,
   .btn-shortlist-more,
   .shortlist-into-bar,
   .recipe-lists-note,
-  .reorder-handle,
+  .reorder-grip,
+  .shortlists-step,
+  .shortlists-remove,
+  .shortlists-tab--new,
   .shopping-list-from-toggle,
   .shortlists-share,
   .shortlists-shared-actions,

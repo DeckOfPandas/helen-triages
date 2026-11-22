@@ -305,10 +305,18 @@
   }
 
   // For another control that opens and closes a button's picker (recipe-lists.js).
+  // `paint` is for buttons a script draws after load (the shortlists page's
+  // cards): clicks reach them already, through the document.
   HTF.shortlistPicker = {
     toggle: function (btn, anchor) {
       if (opener === anchor) closePicker(false);
       else openPicker(btn, anchor);
+    },
+    paint: function (root) {
+      all('.btn-shortlist[data-shortlist-key]', root).forEach(function (btn) {
+        paint(btn);
+        btn.hidden = false;
+      });
     }
   };
 

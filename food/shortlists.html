@@ -22,35 +22,33 @@ permalink: /food/shortlists/
 
   <div class="shortlists" data-shortlists data-index-url="{{ '/food/' | relative_url }}" hidden>
     {% comment %} Tabs: everything, then each list (role="tab", drawn by the script). "+ new
-       list" is a button beside them and not a tab: it opens a form, it shows
-       no panel. {% endcomment %}
+       list" is a button and not a tab: it shows no panel. It opens a blank
+       tape at the end of the row to type the name on, outside the tablist,
+       which may hold only tabs. {% endcomment %}
     <div class="shortlists-tabbar">
       <div class="shortlists-tabs" role="tablist" aria-label="Your shortlists" data-shortlists-tabs></div>
-      <button type="button" class="shortlists-tab shortlists-tab--new" data-shortlists-new
-              aria-expanded="false" aria-controls="shortlists-new-form"><span class="tag-shape" aria-hidden="true"></span>+ new list</button>
+      <span class="shortlists-tab shortlists-tab--draft" data-tag-key="new list" data-shortlists-new-tab hidden>
+        <span class="tag-shape" aria-hidden="true"></span>
+        <label class="visually-hidden" for="shortlists-new-name">Name your new list, then press Enter</label>
+        <input type="text" id="shortlists-new-name" class="shortlists-new-input" maxlength="40" size="10"
+               placeholder="name it" autocomplete="off" spellcheck="false" enterkeyhint="done"
+               aria-describedby="shortlists-new-problem">
+      </span>
+      <button type="button" class="shortlists-tab shortlists-tab--new" data-shortlists-new><span class="tag-shape" aria-hidden="true"></span>+ new list</button>
       <button type="button" class="shortlists-text-button shortlists-arrange-open" data-shortlists-arrange hidden>arrange</button>
     </div>
+    <p class="shortlists-name-problem shortlists-new-problem" id="shortlists-new-problem" aria-live="polite" data-shortlists-new-problem></p>
 
-    {% comment %} Arranging the lists: the tabs as a stack to drag, or to move with each
-       row's arrows. The tabs themselves are only ever tapped. {% endcomment %}
+    {% comment %} Arranging the lists: the tabs as a stack to move by each row's grip. The
+       tabs themselves are only ever tapped. {% endcomment %}
     <section class="shortlists-arrange" aria-labelledby="shortlists-arrange-title" data-shortlists-arrange-panel hidden>
       <h2 class="shortlists-heading" id="shortlists-arrange-title" tabindex="-1">Arrange your lists</h2>
-      <p class="shortlists-arrange-hint">Drag a list by its handle, or use its arrows. The tabs follow this order.</p>
+      <p class="shortlists-arrange-hint">Drag a list by its handle, or focus the handle and use the up and down arrow keys. The tabs follow this order.</p>
       <ol class="shortlists-arrange-lists" data-shortlists-arrange-lists></ol>
       <p class="shortlists-arrange-done-row"><button type="button" class="shortlists-text-button" data-shortlists-arrange-done>done</button></p>
     </section>
 
-    <form class="shortlists-name-form" id="shortlists-new-form" data-shortlists-new-form hidden>
-      <label class="shortlists-name-label" for="shortlists-new-name">Name your new list</label>
-      <span class="shortlists-name-row">
-        <input type="text" id="shortlists-new-name" class="shortlists-name-input" maxlength="40"
-               placeholder="name your list" autocomplete="off" spellcheck="false"
-               aria-describedby="shortlists-new-problem">
-        <button type="submit" class="shortlists-text-button">save</button>
-        <button type="button" class="shortlists-text-button" data-shortlists-cancel>cancel</button>
-      </span>
-      <span class="shortlists-name-problem" id="shortlists-new-problem" aria-live="polite"></span>
-    </form>
+    <p class="visually-hidden" id="shortlists-move-help">Up and down arrow keys move it; Home and End move it to either end.</p>
 
     <div class="shortlists-panel" role="tabpanel" id="shortlists-panel" tabindex="0" data-shortlists-panel>
       <div class="shortlists-body" id="shortlists-recipes" data-shortlists-body></div>
@@ -112,6 +110,23 @@ permalink: /food/shortlists/
 </article>
 
 {% include food/recipe-data.html %}
+
+{% comment %} Every recipe as the index shows it, for a list's tab to clone its own
+   from: the cards are for reading and choosing, the rows for planning. The
+   draft mark is the index's test, magic bag included. {% endcomment %}
+<template data-shortlists-cards>
+  {% for recipe in _rendered_recipes %}
+    {% assign _mb = false %}
+    {% if recipe.collection == "food_magic_bag" %}{% assign _mb = true %}{% endif %}
+    {% assign _draft = false %}
+    {% if recipe.collection == "food_drafts" %}{% assign _draft = true %}{% endif %}
+    {% if _mb %}
+      {% assign _draft = true %}
+      {% if recipe.meta.awaiting_fix == false and recipe.meta.proofread == true %}{% assign _draft = false %}{% endif %}
+    {% endif %}
+    {% include food/recipe-row.html recipe=recipe draft=_draft magic_bag=_mb %}
+  {% endfor %}
+</template>
 
 {% comment %} In this order: each shopping script reads the one before it as it parses
    (tests/test_site_config.py::test_the_food_shopping_scripts_load_in_dependency_order).

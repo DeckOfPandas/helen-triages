@@ -1,7 +1,8 @@
-{% comment %} One recipe as a row at the foot of a recipe page: the related picks and the
-   recipes this one goes with (_layouts/recipe.html). Takes
-   `recipe`, a published recipe. Indented as it sits in the layout, so the
-   rendered page is the same whichever list includes it. {% endcomment %}{% assign _rel = include.recipe %}<li data-url="{{ _rel.url }}">
+{% comment %} One recipe as a row: at the foot of a recipe page (the related picks and
+   the recipes this one goes with, _layouts/recipe.html) and as a card on the
+   shortlists page (food/shortlists.html). Takes `recipe`; `draft` and
+   `magic_bag`, if true, add the index row's marks. Indented as it sits in
+   the layout, so the rendered page is the same whichever list includes it. {% endcomment %}{% assign _rel = include.recipe %}<li data-url="{{ _rel.url }}">
             <div class="recipe-row-content">
               <a class="recipe-title-link" href="{{ _rel.url | relative_url }}">{{ _rel.title }}</a>
               {% if _rel.main_ingredients and _rel.main_ingredients.size > 0 %}
@@ -27,7 +28,7 @@
               <div class="badge-group">
                 <div class="badge-group-content">
                   {% include recipe_badges.html recipe=_rel %}
-                </div>
+                </div>{% if include.draft or include.magic_bag %}<div class="badge-group-meta">{% if include.draft %}<span class="badge badge-draft">draft</span>{% endif %}{% if include.magic_bag %}<span class="badge badge-magic-bag">magic bag</span>{% endif %}</div>{% endif %}
               </div>
             </div>
             {% comment %} The index row's button, exactly: same class, key and attributes.

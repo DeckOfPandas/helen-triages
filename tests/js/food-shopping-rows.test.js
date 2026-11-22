@@ -367,6 +367,38 @@ test('a costed total hands back its figure and the sum that names what it left o
     'shoppingList.drawTotal names the unpriced lines from this (#1523)');
 });
 
+// --- the shortlists page's columns (#1521) ------------------------------------
+
+test('the unit column is the words before the name, and the name column the rest', () => {
+  const r = rows();
+  assert.strictEqual(r.unitText('/food/recipes/cookies/', 2), 'batches of 18');
+  assert.strictEqual(r.unitText('/food/recipes/cookies/', 1), 'batch of 18');
+  assert.strictEqual(r.unitText('/food/recipes/a/', 4), 'portions of');
+  assert.strictEqual(r.unitText('/food/recipes/cake/', 2), '× 8-inch');
+  assert.strictEqual(text(r.nameHtml('/food/recipes/squares/', 2)), 'Sweet Potato Chocolate Brownie squares',
+    'what the title does not name follows it, in the name column');
+  assert.strictEqual(r.unitText('/food/recipes/squares/', 2) + ' ' + text(r.nameHtml('/food/recipes/squares/', 2)),
+    said('/food/recipes/squares/', 2), 'together the two columns say the row\'s sentence');
+});
+
+test('− and + step a portion or a batch, down to a half batch only where one is offered', () => {
+  const r = rows();
+  assert.strictEqual(r.stepCount('/food/recipes/a/', 4, 1), 5);
+  assert.strictEqual(r.stepCount('/food/recipes/a/', 1, -1), 1, 'one portion is the floor: the same number back');
+  assert.strictEqual(r.stepCount('/food/recipes/gelato/', 1, -1), 0.5);
+  assert.strictEqual(r.stepCount('/food/recipes/gelato/', 0.5, 1), 1);
+  assert.strictEqual(r.stepCount('/food/recipes/cookies/', 1, -1), 1, 'no half batch where none is offered');
+  assert.strictEqual(r.stepCount('/food/recipes/a/', 99, 1), 99, '99 is the ceiling');
+});
+
+test('costs add up, "from" if any part is unknown', () => {
+  const r = rows({ buildOptions: { aisles: AISLES, costUnits: {} } });
+  assert.strictEqual(r.sumCosts([{ min: 1, max: 2 }, { min: 3, max: 4 }]).text, '£5.00 (£4.00–£6.00)');
+  assert.strictEqual(r.sumCosts([{ min: 1, max: 1 }, null]).text, 'from £1.00');
+  assert.strictEqual(r.sumCosts([{ min: 1, max: 1, partial: true }]).text, 'from £1.00');
+  assert.strictEqual(r.sumCosts([null, null]), null);
+});
+
 test('with no cost units nothing is costed or totalled', () => {
   assert.strictEqual(rows().total([{ label: 'x', cost: { min: 1, max: 1 } }]), null);
   assert.strictEqual(rows().withCost('/food/recipes/a/', '<span>s</span>'), '<span>s</span>');
