@@ -328,7 +328,8 @@ def test_a_measurement_before_a_noun_is_hyphenated(draft):
     """
     from conftest import _QQ_LINE
     bad = [line.strip()[:70] for line in draft.path.read_text(encoding="utf-8").split("\n")
-           if not _QQ_LINE.match(line) and _st.CM_ADJECTIVE.search(line)]
+           if not _QQ_LINE.match(line) and not _st.CM_AMOUNT_LINE.match(line)
+           and _st.CM_ADJECTIVE.search(line)]
     assert not bad, (
         f"{where_draft(draft)} writes a measurement before a noun without its "
         f"hyphen: {bad}. Run `python3 scripts/tidy_drafts.py --site food --only cm --apply`."

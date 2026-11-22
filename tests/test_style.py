@@ -938,11 +938,15 @@ def _whole_egg_items(recipe):
 def test_egg_size_is_stated(recipe):
     """#144, #145. Every whole-egg ingredient states a UK size
     (small/medium/large/extra large) in its `amount:` field, not in `item:`
-    ("large eggs, lightly beaten" with amount: "3" fails).
+    ("large eggs, lightly beaten" with amount: "3" fails). Duck and quails'
+    eggs are not sold by UK size, so they carry none: Helen, "Duck eggs
+    don't need a size".
     """
     bad = []
     for item in _whole_egg_items(recipe):
         amount = str(item.get("amount", ""))
+        if re.search(r"\b(duck|quails?'?)\s+eggs?\b", str(item.get("item", "")), re.I):
+            continue
         if not _EGG_SIZE_RE.search(amount):
             bad.append(item.get("item"))
     assert not bad, (
@@ -995,6 +999,9 @@ _CM_NOUNS = (
     r"dish|ramekins?|skillet|mould|cheesecake|wedges?|batons?")
 CM_ADJECTIVE = re.compile(
     rf"(?<![\w.,-])(\d+(?:[.,]\d+)?|\d*[½¼¾⅓⅔]) cm (?=(?:{_CM_NOUNS})\b)")
+# An `amount:` is a quantity the scaler and the paste hint parse ("2 cm
+# piece"), not prose, so the rule never reaches one.
+CM_AMOUNT_LINE = re.compile(r"^\s*-?\s*amount:")
 
 
 def test_size_word_is_with_the_count_not_the_item(recipe):

@@ -10,7 +10,8 @@ test_taxonomy.py taking a single `recipe` is called on conftest.Recipe(path).
 Findings are grouped: AT 3-KEEP (fine before then, fixed when the draft reaches
 3-keep/: the empty note pair, a link to another draft, a draft's
 `claude_rewritten` flag), HELEN'S (conftest.HELENS_RULES: a QQ and the rules
-only she settles) and FIX (everything else). In 3-keep/ and 4-promote/ the
+only she settles) and FIX (everything else); an untried draft's QQ tagline and
+estimated times are held and counted (AFTER_COOKING). In 3-keep/ and 4-promote/ the
 suite enforces the same rules (conftest.STAGED_DRAFTS); this is the report
 that sorts them. PIPELINE.md §3 says when this runs.
 """
@@ -26,6 +27,23 @@ MODULES = ["test_style", "test_front_matter", "test_taxonomy"]
 
 AT_3_KEEP = {"test_note_dicts_have_label_and_text", "test_internal_recipe_links_resolve",
              "test_meta_block_is_exactly_the_four_flags_in_order"}
+
+# Held while a draft is untried (`made_before` not true): real times and a
+# tagline come after the test cook. Helen: "hold QQ tagline warnings until
+# made_before is true". The QQ rule is held only when the tagline is the one
+# QQ left; any other QQ still reports.
+AFTER_COOKING = {"test_no_estimated_timings", "test_no_qq_placeholder"}
+
+
+def held_until_cooked(name, recipe):
+    """True if this finding waits for `made_before: true`."""
+    if name not in AFTER_COOKING or (recipe.fm.get("meta") or {}).get("made_before") is True:
+        return False
+    if name == "test_no_estimated_timings":
+        return True
+    body = recipe.path.read_text(encoding="utf-8")
+    tagline = str(recipe.fm.get("tagline") or "")
+    return tagline.startswith("QQ") and body.count("QQ") == tagline.count("QQ")
 
 
 def targets(args):
@@ -48,6 +66,7 @@ def main(argv):
              if n.startswith("test_") and f.__module__ == m
              and list(inspect.signature(f).parameters) == ["recipe"]]
     totals = {"FIX": 0, "HELEN'S": 0, "AT 3-KEEP": 0}
+    held = 0
     for path in targets(argv):
         recipe = conftest.Recipe(path)
         staged = path.parent.name in conftest.STAGED_FOLDERS
@@ -56,6 +75,9 @@ def main(argv):
             try:
                 rule(recipe)
             except AssertionError as e:
+                if held_until_cooked(name, recipe):
+                    held += 1
+                    continue
                 group = ("HELEN'S" if name in conftest.HELENS_RULES
                          else "AT 3-KEEP" if name in AT_3_KEEP and not staged else "FIX")
                 first = (str(e).strip().splitlines() or ["(no message)"])[0]
@@ -69,6 +91,8 @@ def main(argv):
                 print(f"   {group}: {line}")
                 totals[group] += 1
     print(", ".join(f"{k}: {v}" for k, v in totals.items()))
+    if held:
+        print(f"Held until made_before: true (a QQ tagline, an estimated time): {held}")
     return 1 if totals["FIX"] else 0
 
 

@@ -592,6 +592,8 @@ SPELLINGS = {
     # One name for one product: Helen's rulings (DECISIONS §5).
     r"\bsea salt flakes\b": "flaked sea salt",
     r"\bflaky (?:sea )?salt\b": "flaked sea salt",
+    # Same grain and the same weight by the spoon (DECISIONS §5).
+    r"\btable salt\b": "fine sea salt",
     r"\bmaldon (?:sea )?salt(?: flakes)?\b": "flaked sea salt",
     r"\b(?:red|dried) chill?i flakes\b": "chilli flakes",
     r"\bred pepper flakes\b": "chilli flakes",

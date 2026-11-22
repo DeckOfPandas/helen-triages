@@ -380,6 +380,10 @@ else has already done (MANUAL §9.1).
   - The converse still holds and is not a licence: one phase means one unnamed
     ingredient group and a flat `method:`. Do not split a sequence the source
     ran as one.
+  - **Few groups, never a heading per step.** Helen: *"not to split the
+    method into too many groups (it's really annoying!)"*. A group makes its
+    own thing or happens at another time; a soup's soften, simmer and blend
+    are one group. More than four is almost always too many.
   - **An ingredient group's name is read after "For the", so say it that way
     before writing it.** `dressing` prints "For the dressing:". **The one shape
     that prints as itself is a name opening with `to `**: `to serve`, `to

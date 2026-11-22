@@ -144,7 +144,7 @@ from test_cocktails import (  # noqa: E402
 )
 # The size-word pattern is the recipe rule's own (#149, #577), and so is the
 # freshly squeezed citrus juice wording.
-from test_style import CM_ADJECTIVE, _LEADING_SIZE_WORD, citrus_juice_house  # noqa: E402
+from test_style import CM_ADJECTIVE, CM_AMOUNT_LINE, _LEADING_SIZE_WORD, citrus_juice_house  # noqa: E402
 # The tin-and-pan incidentals predicate (#1356) and its word list in data.
 from test_taxonomy import incidental_verdict  # noqa: E402
 
@@ -489,10 +489,10 @@ def fix_unit_spacing(text, path, skip_qq=True):
 
 
 def fix_cm_hyphen(text, path, skip_qq=True):
-    """`3 cm chunks` -> `3-cm chunks`; never inside a `QQ original` line."""
+    """`3 cm chunks` -> `3-cm chunks`; never a `QQ original` or an `amount:`."""
     out, changed = [], []
     for line in text.split("\n"):
-        if skip_qq and is_qq(line):
+        if (skip_qq and is_qq(line)) or CM_AMOUNT_LINE.match(line):
             out.append(line)
             continue
         if CM_ADJECTIVE.search(line):

@@ -504,6 +504,22 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   steps, which could then be split over the sections."* The `QQ original`
   stays whole in the earlier group; the lines for the later phase open the
   next group.
+- **2026-11-22 — few method groups, never a heading per step.** Helen:
+  *"not to split the method into too many groups (it's really annoying!)"*,
+  after collapsing a soup's Soften / Simmer / Blend into one. A group makes
+  its own thing or happens at another time; more than four is almost always
+  too many. In `INGEST_ONE_RECIPE.md` (web Claude) and the ingest command.
+- **2026-11-22 — copyediting: a measurement before a noun takes a hyphen.**
+  Helen: *"3-cm chunks rather than 3 cm chunks."* One that describes stays
+  open (1 cm thick, 2 cm apart). `tidy_drafts.py --only cm` fixes drafts;
+  `QQ original` lines keep the source's words.
+- **2026-11-22 — duck and quails' eggs carry no size.** Helen: *"Duck eggs
+  don't need a size."* `test_egg_size_is_stated` skips them.
+- **2026-11-22 — an untried draft is not reminded of its times or its QQ
+  tagline.** Helen: *"Real times for all will follow when I've tested, so
+  don't remind me about these for drafts until I try to promote"*, and *"hold
+  QQ tagline warnings until made_before is true"*. `promotion_qa.py` holds
+  both while `made_before` is not true; promotion still refuses them.
 - **2026-11-19 — `cook_time` leaves out cooling: "X mins, plus overnight
   cooling".** Helen, of a meringue left overnight in a switched-off oven:
   *"Don't add the cooling time to the cook time -- say "X mins, plus

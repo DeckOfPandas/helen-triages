@@ -492,6 +492,8 @@ ingredient_groups:
     items:
     - amount: "1"
       item: "celery stick, cut into 1 cm slices"
+    - amount: "2 cm piece"
+      item: "fresh ginger"
 method:
   - "QQ original Grease a 20 cm sandwich tin."
   - "QQ Claude Grease a 20 cm sandwich tin. Roll it 1 cm thick, 2 cm apart."
@@ -500,13 +502,14 @@ method:
 
 
 def test_cm_hyphenates_a_measurement_before_a_noun_and_spares_a_qq(food):
-    """"1 cm slices" -> "1-cm slices"; "1 cm thick" stays open, and a `QQ
-    original` line keeps the source's words."""
+    """"1 cm slices" -> "1-cm slices"; "1 cm thick" and an amount stay open,
+    and a `QQ original` line keeps the source's words."""
     path = food / "test-recipe.md"
     path.write_text(CM_BEFORE, encoding="utf-8")
     run_food(food, "--only", "cm", "--apply")
     got = path.read_text(encoding="utf-8")
     assert 'item: "celery stick, cut into 1-cm slices"' in got, got
+    assert 'amount: "2 cm piece"' in got, got
     assert '"QQ original Grease a 20 cm sandwich tin."' in got, got
     assert '"QQ Claude Grease a 20-cm sandwich tin. Roll it 1 cm thick, 2 cm apart."' in got, got
 

@@ -503,6 +503,14 @@ restructuring somebody else's recipe, which §3's rules forbid everywhere else.
 One unnamed ingredient group and a flat `method:` is the matching pair, and it
 is correct for plenty of recipes.
 
+**Few groups, never a heading per step.** Helen: *"not to split the method
+into too many groups (it's really annoying!)"*. A group is a phase that makes
+its own thing (a crumble, a sauce, a pastry) or happens at another time (the
+day before). A run of steps on one pan is one group however many verbs it has:
+a soup's soften, simmer and blend are `soup`, not three groups. Two or three
+groups is usual; more than four is almost always too many, and a group of one
+short step should join its neighbour.
+
 ### What the rewrite must NOT change
 
 - **Never invent a temperature, a time or a quantity the source does not give.**

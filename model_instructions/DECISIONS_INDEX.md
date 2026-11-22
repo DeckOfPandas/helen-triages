@@ -86,6 +86,10 @@ argument and the rules each field is read by.
 - 2026-10-08 · §4 · a QQ Claude line gives the fan figure alone.
 - 2026-11-19 · §4 · a rewrite never says "preheat the oven"; the temperature goes where the oven is first used.
 - 2026-11-19 · §4 · a source step that straddles two phases may have its QQ Claude lines split across the method groups.
+- 2026-11-22 · §4 · few method groups, never a heading per step.
+- 2026-11-22 · §4 · copyediting: a measurement before a noun takes a hyphen.
+- 2026-11-22 · §4 · duck and quails' eggs carry no size — Helen: "Duck eggs don't need a size." test_egg_size_is_stated skips them.
+- 2026-11-22 · §4 · an untried draft is not reminded of its times or its QQ tagline.
 - 2026-11-19 · §4 · cook_time leaves out cooling: "X mins, plus overnight cooling".
 - 2026-11-19 · §4 · caster sugar a source leaves unqualified is golden, except in a meringue or a pale icing or cream, where it is white.
 - 2026-11-21 · §4 · #1517 · vanilla bean paste is a house vanilla, and 1 tsp of it = 1 tsp vanilla extract = 1 pod, every way round, as a hint.
