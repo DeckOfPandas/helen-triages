@@ -322,6 +322,19 @@ def test_number_ranges_use_en_dashes(draft):
     _st.test_number_ranges_use_en_dashes(draft)
 
 
+def test_a_measurement_before_a_noun_is_hyphenated(draft):
+    """"3-cm chunks", not "3 cm chunks": Helen's copyediting. A `QQ original`
+    line keeps the source's words; `tidy_drafts.py --only cm` fixes the rest.
+    """
+    from conftest import _QQ_LINE
+    bad = [line.strip()[:70] for line in draft.path.read_text(encoding="utf-8").split("\n")
+           if not _QQ_LINE.match(line) and _st.CM_ADJECTIVE.search(line)]
+    assert not bad, (
+        f"{where_draft(draft)} writes a measurement before a noun without its "
+        f"hyphen: {bad}. Run `python3 scripts/tidy_drafts.py --site food --only cm --apply`."
+    )
+
+
 def test_weight_is_in_the_amount_not_the_item(draft):
     _st.test_weight_is_in_the_amount_not_the_item(draft)
 

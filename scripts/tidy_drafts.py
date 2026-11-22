@@ -144,7 +144,7 @@ from test_cocktails import (  # noqa: E402
 )
 # The size-word pattern is the recipe rule's own (#149, #577), and so is the
 # freshly squeezed citrus juice wording.
-from test_style import _LEADING_SIZE_WORD, citrus_juice_house  # noqa: E402
+from test_style import CM_ADJECTIVE, _LEADING_SIZE_WORD, citrus_juice_house  # noqa: E402
 # The tin-and-pan incidentals predicate (#1356) and its word list in data.
 from test_taxonomy import incidental_verdict  # noqa: E402
 
@@ -484,6 +484,20 @@ def fix_unit_spacing(text, path, skip_qq=True):
             new = UNIT_SPACE.sub(r" \1", line)
             changed.append(f"unit space in: {line.strip()[:60]}")
             line = new
+        out.append(line)
+    return "\n".join(out), changed
+
+
+def fix_cm_hyphen(text, path, skip_qq=True):
+    """`3 cm chunks` -> `3-cm chunks`; never inside a `QQ original` line."""
+    out, changed = [], []
+    for line in text.split("\n"):
+        if skip_qq and is_qq(line):
+            out.append(line)
+            continue
+        if CM_ADJECTIVE.search(line):
+            changed.append(f"cm hyphen in: {line.strip()[:60]}")
+            line = CM_ADJECTIVE.sub(r"\1-cm ", line)
         out.append(line)
     return "\n".join(out), changed
 
@@ -1106,6 +1120,8 @@ FOOD_FIXERS = [
     ("dashes", partial(fix_en_dashes, skip_qq=False)),
     ("typography", partial(fix_typography, skip_qq=False)),
     ("units", partial(fix_unit_spacing, skip_qq=False)),
+    # After `units`, which turns "3cm" into "3 cm" for this to hyphenate.
+    ("cm", fix_cm_hyphen),
     ("accents", partial(fix_accents, skip_qq=False)),
     ("meta", fix_meta_block),
     ("size", fix_size_words),

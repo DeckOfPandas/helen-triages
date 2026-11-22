@@ -983,6 +983,19 @@ def test_main_ingredients_egg_count_agrees(recipe):
 # is itself the amount. scripts/tidy_drafts.py imports the pattern from here.
 _LEADING_SIZE_WORD = re.compile(r"^(small|medium|large|extra large|baby)\s+", re.I)
 
+# A measurement that modifies a noun takes a hyphen, "3-cm chunks", as "a
+# 20-cm cake" already does; one that describes stays open, "1 cm thick".
+# Helen's copyediting; the nouns are read off the drafts' own phrases.
+# scripts/tidy_drafts.py imports it (`--only cm`); tests/test_drafts.py holds it.
+_CM_NOUNS = (
+    r"pieces?|chunks?|cubes?|dice|slices?|rounds?|circles?|squares?|strips?|"
+    r"lengths?|sticks?|discs?|rings?|border|rim|tins?|cakes?|sandwich|"
+    r"springform|loose-bottomed|fluted|ovenproof|baking|pies?|tarts?|"
+    r"traybake|sponge|nozzle|cutters?|rectangles?|hole|opening|frying|pan|"
+    r"dish|ramekins?|skillet|mould|cheesecake|wedges?|batons?")
+CM_ADJECTIVE = re.compile(
+    rf"(?<![\w.,-])(\d+(?:[.,]\d+)?|\d*[½¼¾⅓⅔]) cm (?=(?:{_CM_NOUNS})\b)")
+
 
 def test_size_word_is_with_the_count_not_the_item(recipe):
     """"2 large cooking apples" as amount: "2", item: "large cooking apples"
