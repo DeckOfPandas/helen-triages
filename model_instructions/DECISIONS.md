@@ -513,6 +513,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   Helen: *"3-cm chunks rather than 3 cm chunks."* One that describes stays
   open (1 cm thick, 2 cm apart). `tidy_drafts.py --only cm` fixes drafts;
   `QQ original` lines keep the source's words.
+- **2026-11-22, #1531 — "the source gave" records a choice, never a
+  rename.** Helen: *"where a fix is just updating e.g. "light brown sugar" to
+  "light brown soft sugar", don't add a note to the ingredient line. Same for
+  other similar small mechanical fixes."* The note stays where the house
+  chose between things the source left open (butter, milk, egg size, golden
+  caster, light soy, whole or ground cloves); a rename to the house's name for
+  the same thing gets none.
 - **2026-11-22 — duck and quails' eggs carry no size.** Helen: *"Duck eggs
   don't need a size."* `test_egg_size_is_stated` skips them.
 - **2026-11-22 — an untried draft is not reminded of its times or its QQ

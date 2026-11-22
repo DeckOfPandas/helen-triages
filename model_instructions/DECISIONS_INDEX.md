@@ -88,6 +88,7 @@ argument and the rules each field is read by.
 - 2026-11-19 · §4 · a source step that straddles two phases may have its QQ Claude lines split across the method groups.
 - 2026-11-22 · §4 · few method groups, never a heading per step.
 - 2026-11-22 · §4 · copyediting: a measurement before a noun takes a hyphen.
+- 2026-11-22 · §4 · #1531 · "the source gave" records a choice, never a rename.
 - 2026-11-22 · §4 · duck and quails' eggs carry no size — Helen: "Duck eggs don't need a size." test_egg_size_is_stated skips them.
 - 2026-11-22 · §4 · an untried draft is not reminded of its times or its QQ tagline.
 - 2026-11-19 · §4 · cook_time leaves out cooling: "X mins, plus overnight cooling".

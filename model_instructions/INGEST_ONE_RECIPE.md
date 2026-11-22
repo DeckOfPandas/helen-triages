@@ -306,6 +306,17 @@ line item saying "The source gave "butter"."* Where the source does say —
 "unsalted butter", "medium eggs", "whole milk" — that is reading, and you
 write it, with no note.
 
+**A note records a choice, never a rename.** Write "the source gave …" only
+where the house picked between things the source left open: which butter,
+milk or egg size, golden caster sugar, light soy sauce, whole or ground
+cloves. Where the house name means exactly what the source said — "light
+brown sugar" to `light brown soft sugar`, "cider vinegar" to `apple cider
+vinegar`, "salad onions" to `spring onions`, "yellow mustard seed" to `white
+mustard seeds` — write the house name and **no note**. Helen (#1531): *"where
+a fix is just updating e.g. "light brown sugar" to "light brown soft sugar",
+don't add a note to the ingredient line. Same for other similar small
+mechanical fixes."*
+
 **A 2-lb loaf tin is written one way**: "2-lb (900 g) loaf tin, about 25 x
 12.5 x 8 cm", in the `QQ Claude` line (the `QQ original` keeps the source's
 words).

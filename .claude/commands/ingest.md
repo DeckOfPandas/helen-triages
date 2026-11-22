@@ -283,6 +283,11 @@ else has already done (MANUAL §9.1).
   milk, egg -> large egg, butter -> salted butter UNLESS it's baking and salt
   is named, then for each please add a note to the ingredient line item
   saying "The source gave "butter"."*
+- **A note records a choice, never a rename** (#1531). "The source gave …"
+  goes only where the house picked between things the source left open.
+  Where the house name means what the source said -- "light brown sugar" to
+  `light brown soft sugar`, "cider vinegar" to `apple cider vinegar` -- write
+  the house name and no note.
 - **A weight goes in the amount's bracket, never the item**: amount
   `"1 bunch (about 25 g)"`, item `"fresh dill"`, so the scaler moves it.
   "approx" is "about". DECISIONS §5.
