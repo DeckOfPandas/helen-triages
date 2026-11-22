@@ -160,6 +160,7 @@ name you give is a courtesy rather than a contract.
 | a tip printed under the source's own label | **Transcribe the tip; drop the label.** Good Food runs its asides under a standing `gf tip` rubric, which on her page is an abbreviation nobody can expand, or one that reads as *gluten-free*: a false allergen claim. `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence (*"the magazine likes Kallo"* stays). **Never carry an unexplained abbreviation across**: expand it while the source is in front of you, or drop it. |
 | a nutrition box, or badges | **Ignore them entirely**: kcal, fat, carbs, "per serving", and badges such as "gluten free", "iron", "2 of 5-a-day", "V". Not a note, not a line in your list. Helen: *"Drop them and add clear instructions for ingestion to ignore these."* |
 | a dietary claim — vegan, vegetarian, gluten-free, dairy-free | **Helen does not mark dietary restrictions.** Helen: *"I don't mark dietary restrictions."* Never add a tag, a note or a field for one, and never ask her to: there is no such filter and none is planned. A claim inside an intro you are quoting verbatim stays in that `QQ original`; it is not a question for your list. |
+| an allergy concern — an "Allergy check" section, a warning about chilli, nuts or a stock's label | **Never note one, anywhere**: not a note, not a body section, not an ingredient note, not a line in your list. Helen: *"never to note allergy concerns anywhere -- I will always sort that myself, and I only ever delete its lines."* Drop the source's allergy text entirely. |
 | a "you will need" list | **Ignore it.** Cake rings, thermometers, palette knives and foil are never an ingredient group or a note. Helen: *"the rule is "trust the cook"."* |
 | page furniture | **Drop anything that sells something**: a show appearance, a ticket line or phone number, a book plug, a TV listing, a "next month" teaser, a web pointer, a "what to drink" box with bottles and prices. **Keep writing about the dish**: an essay, a bio of the cook, a boxed aside, which go in the body below the front matter. Helen: *"Drop ads, keep essays."* |
 | a sidebar box with no list | A box such as "Kale crisps" or "Mastering perfect mash" becomes a file in the usual shape (quantities lifted from its text, per §2) and **has no body**: its words are already in the `QQ original` lines, and a body repeating them would publish the book's text unmarked. |
@@ -382,8 +383,8 @@ method:
 
 **A recipe developed in this chat, not transcribed from a page, has `QQ
 Claude` lines only** — there is no source text to keep beside them. Its
-notes are QQ-labelled notes, and an allergy check goes in the body under a
-`QQ Allergy check` heading, word for word. Helen: *"QQ Claude lines only"*.
+notes are QQ-labelled notes, and any allergy check it carries is dropped
+(above). Helen: *"QQ Claude lines only"*.
 
 `QQ` is Helen's marker for "not yet in my voice". It stays on the file
 indefinitely; she takes it off one step at a time as she reads. Never remove

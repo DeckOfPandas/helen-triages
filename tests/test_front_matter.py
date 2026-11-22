@@ -836,6 +836,12 @@ ADJUDICATED_REWRITES = {
             "flags, rescued from the wrong branch and committed for her; "
             "covered by her standing grant under 026f3224."
         ),
+        "fbe70182": (
+            "Five of Henry's Bramley drafts (chutney, rye cake, celeriac soup, "
+            "Dorset apple cake, parsnip soup), 2026-11-22. Helen's rewrites "
+            "and flags, made in the agent's worktree and committed for her "
+            "unchanged; covered by her standing grant under 026f3224."
+        ),
     },
     "_food_recipes": {
         "2d97c96a": (

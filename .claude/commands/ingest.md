@@ -439,9 +439,10 @@ else has already done (MANUAL §9.1).
   **A write-up developed in a chat, not transcribed from a page, is the one
   exception: `QQ Claude` lines only**, because there is no source text to
   keep. Its notes become QQ-labelled notes, a "REMOVED:" line stays as a `QQ
-  REMOVED:` ingredient line, an "Allergy check" goes in the body word for
-  word under a `QQ Allergy check` heading, and the source is `"Henry"`
-  (DECISIONS §4).
+  REMOVED:` ingredient line, an "Allergy check" is dropped, and the source
+  is `"Henry"` (DECISIONS §4). **No allergy concern is ever noted,
+  anywhere** -- not a note, a body section or a line in her list: she
+  sorts that herself and only ever deletes such lines.
 
   **One source step is one `QQ original`, however many actions it holds, and
   a dense one gets several `QQ Claude` lines under it** (DECISIONS §4). Helen:

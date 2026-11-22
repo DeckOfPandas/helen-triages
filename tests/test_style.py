@@ -514,7 +514,7 @@ _QUALIFIED_SUGAR = {
 _COMPOUND_EXCLUDE = {
     "butter": re.compile(
         r"\b(butter beans?|peanut butter|almond butter|cashew butter"
-        r"|pistachio butter|all-butter)\b", re.I,
+        r"|pistachio butter|hazelnut butter|nut butters?|all-butter)\b", re.I,
     ),
     "sugar": re.compile(r"\bsugar snaps?\b|\bsugar-free\b|\bsugar flowers?\b", re.I),
     "ginger": re.compile(

@@ -470,10 +470,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-11-03 — a recipe written up in a chat, not transcribed from a page,
   has `QQ Claude` method lines and no `QQ original`.** Helen, of the fish
   write-ups: *"QQ Claude lines only"*; their "REMOVED:" ingredient lines and
-  "Allergy check" sections: *"leave as-is so I can decide how to amend"*. A
-  REMOVED line stays as a `QQ REMOVED:` ingredient line, the allergy check
-  stays word for word in the body under a `QQ Allergy check` heading, and the
-  write-up's notes become QQ-labelled notes. The words are already a
+  "Allergy check" sections, then: *"leave as-is so I can decide how to
+  amend"*. A REMOVED line stays as a `QQ REMOVED:` ingredient line, and the
+  write-up's notes become QQ-labelled notes. **Replaced 2026-11-22 for
+  allergy text:** *"never to note allergy concerns anywhere -- I will always
+  sort that myself, and I only ever delete its lines."* An allergy check is
+  dropped at ingest, and no ingest writes one. The words are already a
   paraphrase, so there is no source text to keep beside them. Applied again to
   the cockerel batch, 2026-11-06, whose source is Helen's (§4, "Henry").
 - **2026-11-03 — an unqualified milk, egg or butter takes the house default,
