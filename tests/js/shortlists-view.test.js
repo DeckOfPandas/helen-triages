@@ -49,8 +49,27 @@ test('counts say recipes, in the singular for one', () => {
   assert.strictEqual(view.countText(4), '4 recipes');
 });
 
-test('a tab reads "name · count"', () => {
-  assert.strictEqual(view.tabLabel({ name: 'Lemons', count: 4 }), 'Lemons · 4');
+test('a tab reads "name · count"; everything\'s counts recipes and lists', () => {
+  assert.strictEqual(view.tabLabel({ id: 'l2', name: 'Lemons', count: 4 }), 'Lemons · 4');
+  const every = view.tabs(LISTS, 'everything')[0];
+  assert.strictEqual(view.tabCount(every), '3 recipes · 3 lists');
+  assert.strictEqual(view.tabCount({ id: 'everything', count: 1, lists: 1 }), '1 recipe · 1 list');
+});
+
+test('a list\'s colour goes round eight hues in the order lists were made', () => {
+  assert.deepStrictEqual(['l1', 'l2', 'l8', 'l9', 'l17'].map(view.hueOf), [0, 1, 7, 0, 0]);
+  assert.strictEqual(view.hueOf('everything'), -1, 'everything has no hue of its own');
+  assert.strictEqual(view.hueOf('shared'), -1);
+});
+
+test('a list\'s colour is its own: moving or deleting another list leaves it alone', () => {
+  const before = view.tabs(LISTS, 'everything').map((t) => [t.id, t.hue]);
+  const moved = [LISTS[2], LISTS[0]];
+  const after = view.tabs(moved, 'everything');
+  after.slice(1).forEach((t) => {
+    assert.strictEqual(t.hue, before.find((b) => b[0] === t.id)[1]);
+  });
+  assert.deepStrictEqual(after[0].hues, [2, 0], 'everything\'s band follows the lists\' order');
 });
 
 // --- the merged shopping list -------------------------------------------------

@@ -33,18 +33,35 @@
     return out;
   }
 
+  // A list's colour, 0 to HUES - 1, from the number in its id. The store
+  // never reuses a number, so the hues go round in the order lists were
+  // made, and moving or deleting a list leaves every other list's hue alone.
+  var HUES = 8;
+  function hueOf(id) {
+    var n = /^l(\d+)$/.exec(String(id));
+    return n ? (Number(n[1]) - 1 + HUES) % HUES : -1;
+  }
+
   function tabs(lists, view) {
     var current = find(lists, view) ? view : EVERYTHING;
     return [{
-      id: EVERYTHING, name: EVERYTHING,
+      id: EVERYTHING, name: EVERYTHING, lists: lists.length, hue: -1,
+      hues: lists.map(function (list) { return hueOf(list.id); }),
       count: rows(lists, EVERYTHING).length, selected: current === EVERYTHING
     }].concat(lists.map(function (list) {
-      return { id: list.id, name: list.name, count: list.items.length, selected: current === list.id };
+      return { id: list.id, name: list.name, count: list.items.length, hue: hueOf(list.id),
+        selected: current === list.id };
     }));
   }
 
+  // "Lemons · 4"; everything's says how many lists too: "80 recipes · 9 lists".
+  function tabCount(tab) {
+    if (tab.id !== EVERYTHING) return String(tab.count);
+    return countText(tab.count) + ' · ' + tab.lists + (tab.lists === 1 ? ' list' : ' lists');
+  }
+
   function tabLabel(tab) {
-    return tab.name + ' · ' + tab.count;
+    return tab.name + ' · ' + tabCount(tab);
   }
 
   function countText(n) {
@@ -140,7 +157,10 @@
   return {
     EVERYTHING: EVERYTHING,
     rows: rows,
+    HUES: HUES,
+    hueOf: hueOf,
     tabs: tabs,
+    tabCount: tabCount,
     tabLabel: tabLabel,
     countText: countText,
     shoppingEntries: shoppingEntries,

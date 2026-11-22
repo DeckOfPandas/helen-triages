@@ -1,4 +1,5 @@
 @use "sass:color";
+@use "sass:list";
 @use "food/palette" as *;
 @use "shared/tokens" as *;
 
@@ -23,11 +24,35 @@
   background: $color-surface;
 }
 
+// --- a colour per list ------------------------------------------------------------
+// Given out by the number in a list's id (HTF.listsView.hueOf), in this
+// order. `--list-ink` is the lettering on the bright tape: white where ink on
+// the hue is under 4.5:1. Turquoise is the palette's mint.
+$list-hues: (
+  ($color-dazzling-dragonfruit, $color-text),
+  ($color-wild-wasabi, $color-text),
+  ($color-blinging-blackberry, $color-white),
+  ($color-sparkling-spirulina, $color-text),
+  ($color-torrid-tangerine, $color-text),
+  ($color-marauding-mint, $color-text),
+  ($color-blazing-banana, $color-text),
+  ($color-cobalt, $color-white)
+);
+
+@for $i from 1 through list.length($list-hues) {
+  $hue: list.nth(list.nth($list-hues, $i), 1);
+  .list-hue-#{$i - 1} {
+    --list-hue: #{$hue};
+    --list-pale: #{color.mix($hue, $color-white, 26%)};
+    --list-hover: #{color.mix($hue, $color-white, 48%)};
+    --list-ink: #{list.nth(list.nth($list-hues, $i), 2)};
+  }
+}
+
 // --- the tabs ------------------------------------------------------------------
-// Washi tape, as the filter chips wear it (shared/_tag-shape.scss): pale at
-// rest, bright magenta when chosen. The chosen one is also struck heavier,
-// so the colour is not the only cue. Ink on the bright tape, not white: white
-// on raw magenta is under 4.5:1.
+// Washi tape, as the filter chips wear it (shared/_tag-shape.scss): the
+// list's colour, pale at rest and bright when chosen. The chosen one is also
+// struck heavier, so the colour is not the only cue.
 
 .shortlists-tabbar {
   display: flex;
@@ -60,9 +85,10 @@
   color: $color-text;
   cursor: pointer;
 
-  .tag-shape { color: color.mix($color-dazzling-dragonfruit, $color-white, 16%); }
+  // A tab with no list behind it (a shared link's) is paper.
+  .tag-shape { color: var(--list-pale, #{rgba($color-text, 0.08)}); }
 
-  &:hover .tag-shape { color: color.mix($color-dazzling-dragonfruit, $color-white, 34%); }
+  &:hover .tag-shape { color: var(--list-hover, #{rgba($color-text, 0.16)}); }
 
   &:focus-visible {
     outline: 2px solid $color-text;
@@ -71,13 +97,75 @@
 
   &.is-selected {
     -webkit-text-stroke: $faux-bold-stroke currentColor;
-    .tag-shape { color: $color-dazzling-dragonfruit; }
+    color: var(--list-ink, #{$color-white});
+    .tag-shape { color: var(--list-hue, #{$color-clear-text}); }
   }
 }
 
 .shortlists-tab-count {
   font-weight: 400;
   -webkit-text-stroke: 0;
+}
+
+// --- everything's tab ------------------------------------------------------------
+// Not a list: the logo's black tape when chosen, and a band of every list's
+// colour along one edge. Set apart from the lists by more than their gap.
+// CANDIDATES (data-look on the page root, not for merge): a, paper tape at
+// rest; b, the bare word at rest; c, as a with the band along the top.
+
+.shortlists-tab--everything {
+  margin-right: $space-lg;
+  color: $color-text;
+
+  .tag-shape { color: rgba($color-text, 0.08); }
+  &:hover .tag-shape { color: rgba($color-text, 0.16); }
+
+  &.is-selected {
+    color: $color-tape-letter;
+    .tag-shape { display: none; }
+    .shortlists-tape { display: block; }
+  }
+}
+
+// The tape files draw their polygon inside a margin (assets/img/chrome/tape/):
+// 1284 of 1400 across and 120 of 170 down, so the slot overhangs the tab by
+// that much and the polygon meets the tab's edges.
+.shortlists-tape {
+  display: none;
+  position: absolute;
+  z-index: -1;
+  top: -23.33%;
+  left: -4.52%;
+  width: 109.03%;
+  height: 141.67%;
+  pointer-events: none;
+
+  svg { display: block; width: 100%; height: 100%; }
+}
+
+.shortlists-band {
+  position: absolute;
+  left: $space-xs;
+  right: $space-xs;
+  bottom: 0;
+  height: 4px;
+  display: flex;
+  pointer-events: none;
+
+  > span {
+    flex: 1 1 0;
+    background: var(--list-hue);
+  }
+}
+
+[data-look="b"] .shortlists-tab--everything:not(.is-selected) {
+  color: $color-clear-text;
+  .tag-shape { display: none; }
+}
+
+[data-look="c"] .shortlists-band {
+  top: 0;
+  bottom: auto;
 }
 
 // "+ new list" opens a form, so it is not a tab: the same tape, quieter still,
@@ -188,10 +276,34 @@
   font-family: $font-headings;
   font-size: 1.45rem;
   font-weight: 700;
+  text-transform: lowercase;
   overflow-wrap: anywhere;
   color: $color-text;
 
   &:focus { outline: none; }
+}
+
+// A list's name, as on its tab, over a highlighter stroke in its colour that
+// covers the lower part of the letters only, so violet and cobalt never sit
+// behind the whole word.
+// Inline-block, so a name that wraps is one box and the stroke runs under
+// its last line, full width, rather than under one fragment.
+.shortlists-marked {
+  display: inline-block;
+  position: relative;
+  isolation: isolate;
+}
+
+.shortlists-underline {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  bottom: -0.08em;
+  height: 0.5em;
+  pointer-events: none;
+
+  svg path { fill: var(--list-hue); }
 }
 
 .shortlists-actions {
@@ -232,14 +344,20 @@
 
 .shortlists-section { margin-top: $space-xl; }
 
+// The name and its arrow are the link, on the left; the count stands apart
+// at the right, so the arrow points at nothing but the name.
 .shortlists-section-name {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-md;
   margin: 0 0 $space-sm;
   padding-bottom: $space-xxs;
   border-bottom: 1px solid $color-border;
   font-family: $font-headings;
   font-size: 1.05rem;
   font-weight: 700;
-  text-transform: none;
+  text-transform: lowercase;
   overflow-wrap: anywhere;
 }
 
@@ -250,10 +368,15 @@
   background: none;
   font: inherit;
   text-align: left;
+  text-transform: inherit;
   color: $color-text;
   cursor: pointer;
 
-  &::after {
+  // Inside the name's box, so a wrapped name keeps its arrow on its last
+  // line; the stroke stops short of it.
+  .shortlists-underline { right: 1.3em; }
+
+  .shortlists-marked::after {
     content: '\00a0\2192';
     color: $color-recipe-link;
   }
@@ -263,7 +386,7 @@
 }
 
 .shortlists-section-count {
-  margin-left: $space-md;
+  flex-shrink: 0;
   font-family: $font-body;
   font-size: 0.85rem;
   font-weight: 400;

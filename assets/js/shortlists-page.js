@@ -79,6 +79,10 @@
   var pillUp = pill.querySelector('[data-shortlists-pill-up]');
   var live = root.querySelector('[data-shortlists-live]');
 
+  // CANDIDATES ONLY, not for merge: ?look=a|b|c picks an everything tab.
+  var look = (/[?&]look=([abc])/.exec(window.location.search) || [])[1] || 'a';
+  root.setAttribute('data-look', look);
+
   var renaming = null;
   var deleting = null;
 
@@ -152,20 +156,40 @@
     if (!shared) return tabs;
     if (viewing) tabs.forEach(function (tab) { tab.selected = false; });
     tabs.splice(1, 0, { id: SHARED, name: 'shared: ' + sharedName(), count: shared.items.length,
-      selected: viewing === SHARED });
+      hue: -1, selected: viewing === SHARED });
     return tabs;
   }
 
+  // A list's colour is a class, `list-hue-N`; the stylesheet holds the hues.
+  function hueClass(hue) {
+    return hue < 0 ? '' : ' list-hue-' + hue;
+  }
+
+  // Everything is the plan made from every list, not a list: black tape (the
+  // logo's), and along its edge a band of each list's colour, in list order.
+  function bandHtml(hues) {
+    return '<span class="shortlists-band" aria-hidden="true">' +
+      hues.map(function (hue) { return '<span class="' + hueClass(hue).trim() + '"></span>'; }).join('') +
+      '</span>';
+  }
+
+  function tabHtml(tab) {
+    var every = tab.id === EVERYTHING;
+    return '<button type="button" role="tab" class="shortlists-tab' +
+      (every ? ' shortlists-tab--everything' : '') + hueClass(tab.hue) +
+      (tab.selected ? ' is-selected' : '') + '" id="shortlists-tab-' + esc(tab.id) +
+      '" data-tab="' + esc(tab.id) + '" data-tag-key="' + esc(tab.name) +
+      '" aria-selected="' + tab.selected + '" aria-controls="shortlists-panel" tabindex="' +
+      (tab.selected ? '0' : '-1') + '">' +
+      (every ? '<span class="shortlists-tape" aria-hidden="true"></span>' : '') +
+      '<span class="tag-shape" aria-hidden="true"></span>' +
+      '<span class="shortlists-tab-name">' + esc(tab.name) + '</span>' +
+      '<span class="shortlists-tab-count"> · ' + esc(V.tabCount(tab)) + '</span>' +
+      (every && tab.hues.length ? bandHtml(tab.hues) : '') + '</button>';
+  }
+
   function renderTabs(view) {
-    tabsEl.innerHTML = tabsFor(view).map(function (tab) {
-      return '<button type="button" role="tab" class="shortlists-tab' +
-        (tab.selected ? ' is-selected' : '') + '" id="shortlists-tab-' + esc(tab.id) +
-        '" data-tab="' + esc(tab.id) + '" data-tag-key="' + esc(tab.name) +
-        '" aria-selected="' + tab.selected + '" aria-controls="shortlists-panel" tabindex="' +
-        (tab.selected ? '0' : '-1') + '"><span class="tag-shape" aria-hidden="true"></span>' +
-        '<span class="shortlists-tab-name">' + esc(tab.name) + '</span>' +
-        '<span class="shortlists-tab-count"> · ' + tab.count + '</span></button>';
-    }).join('');
+    tabsEl.innerHTML = tabsFor(view).map(tabHtml).join('');
     panel.setAttribute('aria-labelledby', 'shortlists-tab-' + view);
   }
 
@@ -268,9 +292,28 @@
       '</form>';
   }
 
+  // A list's name over a highlighter stroke in its colour; `n` keeps the
+  // stroke's shape through a redraw.
+  function markedName(name, n) {
+    return '<span class="shortlists-marked"><span class="shortlists-underline" data-underline="' + n +
+      '" aria-hidden="true"></span>' + esc(name) + '</span>';
+  }
+
+  function decorate() {
+    Array.prototype.forEach.call(root.querySelectorAll('[data-underline]:empty'), function (slot) {
+      if (HTF.highlightInto) HTF.highlightInto(slot, Number(slot.getAttribute('data-underline')));
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('.shortlists-tape:empty'), function (slot) {
+      if (HTF.tapeInto) HTF.tapeInto(slot);
+    });
+  }
+  // decorations.js loads after this file, at the foot of the layout.
+  document.addEventListener('DOMContentLoaded', decorate);
+
   function listBody(list) {
     return '<div class="shortlists-head">' +
-      '<h2 class="shortlists-heading" id="shortlists-heading" tabindex="-1">' + esc(list.name) + '</h2>' +
+      '<h2 class="shortlists-heading' + hueClass(V.hueOf(list.id)) + '" id="shortlists-heading" tabindex="-1">' +
+      markedName(list.name, V.hueOf(list.id) * 3 + 1) + '</h2>' +
       '<span class="shortlists-actions">' +
       '<button type="button" class="shortlists-text-button" data-rename aria-label="rename ' + esc(list.name) + '">rename</button>' +
       '<button type="button" class="shortlists-text-button" data-delete aria-label="delete ' + esc(list.name) + '">delete</button>' +
@@ -281,7 +324,7 @@
   }
 
   function everythingBody(all) {
-    var head = '<div class="shortlists-head"><h2 class="shortlists-heading" id="shortlists-heading" tabindex="-1">Everything</h2></div>';
+    var head = '<div class="shortlists-head"><h2 class="shortlists-heading" id="shortlists-heading" tabindex="-1">everything</h2></div>';
     if (!all.length) {
       return head + '<p class="shortlists-empty">No shortlists yet. Start one with “+ new list”.</p>';
     }
@@ -289,9 +332,10 @@
     return head +
       '<p class="shortlists-count">' + V.countText(n) + ' on ' + all.length + (all.length === 1 ? ' list' : ' lists') + '</p>' +
       all.map(function (list) {
+        var hue = V.hueOf(list.id);
         return '<section class="shortlists-section">' +
-          '<h3 class="shortlists-section-name"><button type="button" class="shortlists-section-link" data-go="' +
-          esc(list.id) + '">' + esc(list.name) + '</button>' +
+          '<h3 class="shortlists-section-name' + hueClass(hue) + '"><button type="button" class="shortlists-section-link" data-go="' +
+          esc(list.id) + '">' + markedName(list.name, hue * 3 + 2) + '</button>' +
           '<span class="shortlists-section-count">' + V.countText(list.items.length) + '</span></h3>' +
           recipesHtml(list) + '</section>';
       }).join('');
@@ -429,6 +473,7 @@
     arrangeBtn.hidden = lists.all().length < 2;
     placePill();
     if (HTF.tagShapes) HTF.tagShapes();
+    decorate();
   }
 
   // --- the scalers ------------------------------------------------------------
