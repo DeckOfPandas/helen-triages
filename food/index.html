@@ -204,17 +204,17 @@ permalink: /food/
   {% comment %} Ships `hidden`, like every shortlist control; shortlist.js reveals it and
      fills `[data-shortlist-count]`. {% endcomment %}
 </div>
-{% comment %} Hide / show drafts, on a local build only (#1358): gated on
-   `site.show_drafts`, which only _config_local.yml declares. Ships `hidden`;
-   filters.js reveals and wires it. The drafts button's identical block is on
-   cocktails/index.html. `untried` narrows to rows saying `meta.made_before`
-   is not true, which only a local build marks (`data-untried`); food only,
-   and never a row badge (#562). DECISIONS §4. {% endcomment %}
+{% comment %} Two switches, on a local build only (#1358): gated on `site.show_drafts`,
+   which only _config_local.yml declares. They are the recipe page's
+   word-track-word switch (_ingredient-switches.scss), one per line, and say
+   which way they are set. Ship `hidden`; filters.js reveals and wires them.
+   Untried narrows to rows whose `meta.made_before` is not true, marked
+   `data-untried` on a local build only; never a row badge (#562). DECISIONS §4. {% endcomment %}
 {% if site.show_drafts %}
-<p class="drafts-toggle-row">
-  <button type="button" class="btn-drafts-toggle" id="drafts-toggle" aria-pressed="false" hidden>hide drafts</button>
-  <button type="button" class="btn-drafts-toggle" id="untried-toggle" aria-pressed="false" hidden>untried</button>
-</p>
+<div class="index-switches">
+  <button type="button" class="ingredient-switch" id="drafts-toggle" role="switch" aria-checked="true" aria-label="show drafts" hidden><span class="ingredient-switch-off">hide drafts</span><span class="ingredient-switch-track" aria-hidden="true"></span><span class="ingredient-switch-on">show drafts</span></button>
+  <button type="button" class="ingredient-switch" id="untried-toggle" role="switch" aria-checked="false" aria-label="untried only" hidden><span class="ingredient-switch-off">all</span><span class="ingredient-switch-track" aria-hidden="true"></span><span class="ingredient-switch-on">untried only</span></button>
+</div>
 {% endif %}
 
 {% comment %} A shortlist someone sent (#1093): shown only while the index is showing a

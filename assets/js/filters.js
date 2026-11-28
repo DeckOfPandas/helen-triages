@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
      the matrix. It ships `hidden` and is revealed below. */
   var shortlistOnlyBtn = document.getElementById('shortlist-only');
 
-  /* Hide the drafts (#1358). The button exists only on a local build, so
+  /* Hide the drafts (#1358). The switch exists only on a local build, so
      this is null on the deployed index. A row is a draft if it wears the
      `.badge-draft` pill. Not a field of `state`; cocktail-index.js has the
      twin. */
@@ -1608,27 +1608,23 @@ function renderResultsPool() {
     });
   }
 
-  /* #1358. The label names what a press will do, and `is-on` says the list is
-     currently narrowed, as it does on the button above. */
+  /* Both are switches (food/index.html): `aria-checked` is the state, and the
+     stylesheet bolds the word it names. Checked means drafts shown, and
+     untried only. */
   if (draftsBtn) {
     draftsBtn.hidden = false;
     draftsBtn.addEventListener('click', function () {
       hideDrafts = !hideDrafts;
-      draftsBtn.textContent = hideDrafts ? 'show drafts' : 'hide drafts';
-      draftsBtn.classList.toggle('is-on', hideDrafts);
-      draftsBtn.setAttribute('aria-pressed', hideDrafts ? 'true' : 'false');
+      draftsBtn.setAttribute('aria-checked', hideDrafts ? 'false' : 'true');
       update();
     });
   }
 
-  /* A filter's label, not an action's: `is-on` and aria-pressed carry the
-     state, as on a filter chip. */
   if (untriedBtn) {
     untriedBtn.hidden = false;
     untriedBtn.addEventListener('click', function () {
       onlyUntried = !onlyUntried;
-      untriedBtn.classList.toggle('is-on', onlyUntried);
-      untriedBtn.setAttribute('aria-pressed', onlyUntried ? 'true' : 'false');
+      untriedBtn.setAttribute('aria-checked', onlyUntried ? 'true' : 'false');
       update();
     });
   }
